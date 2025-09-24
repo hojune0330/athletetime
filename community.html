@@ -2,149 +2,352 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>익명게시판 | 애슬리트 타임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .safe-top { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.5s infinite;
+    }
+    @keyframes skeleton {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
   <!-- Header -->
-  <div class="bg-gradient-to-r from-red-500 to-blue-600 text-white p-4">
-    <div class="flex items-center justify-between">
+  <div class="sticky top-0 z-40 bg-gradient-to-r from-red-500 to-blue-600 text-white safe-top">
+    <div class="flex items-center justify-between p-4">
       <div class="flex items-center gap-3">
         <a href="index.html" class="text-white">
-          <i class="fas fa-arrow-left"></i>
+          <i class="fas fa-arrow-left text-lg"></i>
         </a>
         <h1 class="text-xl font-bold">익명게시판</h1>
       </div>
-      <span class="text-sm bg-yellow-400 text-black px-2 py-1 rounded">BETA</span>
+      <span class="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full">BETA</span>
     </div>
   </div>
 
-  <!-- Write Button -->
-  <div class="max-w-md mx-auto p-4">
-    <button onclick="showWriteModal()" class="w-full bg-blue-500 text-white rounded-lg py-3 mb-4 hover:bg-blue-600">
-      <i class="fas fa-pen"></i> 글쓰기
-    </button>
-
-    <!-- Posts List -->
-    <div id="postsList" class="space-y-3">
-      <!-- Posts will be loaded here -->
+  <!-- Categories -->
+  <div class="sticky top-16 z-30 bg-white border-b">
+    <div class="flex gap-2 p-3 overflow-x-auto" id="categories">
+      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-blue-500 text-white" data-category="전체">전체</button>
+      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100" data-category="자유">자유</button>
+      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100" data-category="질문">질문</button>
+      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100" data-category="정보">정보</button>
+      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium bg-gray-100" data-category="거래">거래</button>
     </div>
   </div>
+
+  <!-- Posts List -->
+  <div id="postsList" class="pb-20"></div>
+
+  <!-- Write Button (FAB) -->
+  <button id="writeBtn" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full shadow-lg z-50">
+    <i class="fas fa-pen"></i>
+  </button>
 
   <!-- Write Modal -->
-  <div id="writeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg w-full max-w-md p-6">
-      <h3 class="text-xl font-bold mb-4">글쓰기</h3>
-      <input id="postTitle" type="text" placeholder="제목" class="w-full p-2 border rounded mb-3">
-      <textarea id="postContent" placeholder="내용" class="w-full p-2 border rounded h-32 mb-3"></textarea>
-      <input id="postPassword" type="password" placeholder="비밀번호 (수정/삭제용)" class="w-full p-2 border rounded mb-4">
-      <div class="flex gap-2">
-        <button onclick="submitPost()" class="flex-1 bg-blue-500 text-white py-2 rounded">작성</button>
-        <button onclick="closeWriteModal()" class="flex-1 bg-gray-300 py-2 rounded">취소</button>
+  <div id="writeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl slide-up" style="max-height: 90vh;">
+      <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+        <button onclick="closeWriteModal()" class="text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+        <h2 class="font-bold text-lg">게시물 작성</h2>
+        <button onclick="submitPost()" class="text-blue-500 font-medium">완료</button>
+      </div>
+      
+      <div class="p-4 space-y-4 overflow-y-auto" style="max-height: 70vh;">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-gray-600">카테고리</label>
+            <select id="postCategory" class="w-full px-3 py-2 border rounded-lg text-sm">
+              <option value="자유">자유</option>
+              <option value="질문">질문</option>
+              <option value="정보">정보</option>
+              <option value="거래">거래</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-gray-600">작성자</label>
+            <input id="postAuthor" type="text" placeholder="익명" class="w-full px-3 py-2 border rounded-lg text-sm">
+          </div>
+        </div>
+        
+        <div>
+          <label class="text-xs text-gray-600">제목 <span class="text-red-500">*</span></label>
+          <input id="postTitle" type="text" placeholder="제목을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
+        </div>
+        
+        <div>
+          <label class="text-xs text-gray-600">내용 <span class="text-red-500">*</span></label>
+          <textarea id="postContent" placeholder="내용을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm h-32"></textarea>
+        </div>
+        
+        <div>
+          <label class="text-xs text-gray-600">비밀번호 (수정/삭제용)</label>
+          <input id="postPassword" type="password" placeholder="비밀번호" class="w-full px-3 py-2 border rounded-lg text-sm">
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Local Storage Key
-    const POSTS_KEY = 'athletetime_posts';
+  <!-- Post Detail Modal -->
+  <div id="postModal" class="hidden fixed inset-0 bg-white z-50">
+    <div class="sticky top-0 bg-white border-b p-4 flex items-center gap-3">
+      <button onclick="closePostModal()" class="text-gray-600">
+        <i class="fas fa-arrow-left text-xl"></i>
+      </button>
+      <h2 class="font-bold text-lg">게시물</h2>
+    </div>
     
-    // Load posts from localStorage
+    <div id="postDetail" class="p-4 pb-20 overflow-y-auto"></div>
+    
+    <!-- Comment Input -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 safe-bottom">
+      <div class="flex gap-2">
+        <input id="commentInput" type="text" placeholder="댓글을 입력하세요" class="flex-1 px-3 py-2 border rounded-lg text-sm">
+        <button onclick="submitComment()" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm">등록</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    let currentCategory = '전체';
+    let currentPost = null;
+    const userId = API.initUser().id;
+
+    // Load posts
     function loadPosts() {
-      const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
-      const postsList = document.getElementById('postsList');
+      const posts = API.getPosts();
+      const filtered = currentCategory === '전체' 
+        ? posts 
+        : posts.filter(p => p.category === currentCategory);
       
-      if (posts.length === 0) {
-        postsList.innerHTML = `
-          <div class="bg-white rounded-lg p-6 text-center text-gray-500">
-            <i class="fas fa-inbox text-4xl mb-3"></i>
-            <p>아직 게시물이 없습니다.</p>
-            <p class="text-sm mt-2">첫 번째 글을 작성해보세요!</p>
+      const postsHTML = filtered.length === 0 
+        ? `<div class="text-center py-20 text-gray-500">
+             <i class="fas fa-inbox text-4xl mb-3"></i>
+             <p>게시물이 없습니다</p>
+           </div>`
+        : filtered.map(post => `
+            <div class="bg-white border-b p-4 cursor-pointer" onclick="openPost(${post.id})">
+              ${post.isNotice ? '<div class="inline-block px-2 py-0.5 bg-red-500 text-white text-xs rounded mb-2">공지</div>' : ''}
+              <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                  <span class="text-xs text-blue-600 font-medium">${post.category}</span>
+                  <h3 class="font-medium mt-1">${post.title}</h3>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm mb-3 line-clamp-2">${post.content}</p>
+              <div class="flex items-center justify-between text-xs text-gray-500">
+                <span>${post.author} • ${new Date(post.date).toLocaleDateString()}</span>
+                <div class="flex gap-3">
+                  <span><i class="far fa-eye"></i> ${post.views || 0}</span>
+                  <span><i class="far fa-comment"></i> ${post.comments.length}</span>
+                  <span><i class="far fa-thumbs-up"></i> ${post.likes.length}</span>
+                </div>
+              </div>
+            </div>
+          `).join('');
+      
+      document.getElementById('postsList').innerHTML = postsHTML;
+    }
+
+    // Open post detail
+    function openPost(postId) {
+      const posts = API.getPosts();
+      currentPost = posts.find(p => p.id === postId);
+      if (!currentPost) return;
+      
+      // Increment views
+      currentPost.views = (currentPost.views || 0) + 1;
+      localStorage.setItem(API.POSTS_KEY, JSON.stringify(posts));
+      
+      const userVote = currentPost.likes.includes(userId) ? 'like' 
+                     : currentPost.dislikes.includes(userId) ? 'dislike' 
+                     : null;
+      
+      const detailHTML = `
+        <div class="space-y-4">
+          <div>
+            ${currentPost.isNotice ? '<span class="inline-block px-2 py-1 bg-red-500 text-white text-xs rounded">공지</span>' : ''}
+            <span class="text-sm text-blue-600">${currentPost.category}</span>
+            <h1 class="text-xl font-bold mt-2">${currentPost.title}</h1>
+            <div class="flex items-center gap-2 mt-2 text-sm text-gray-500">
+              <span>${currentPost.author}</span>
+              <span>•</span>
+              <span>${new Date(currentPost.date).toLocaleString()}</span>
+              <span>•</span>
+              <span>조회 ${currentPost.views || 0}</span>
+            </div>
           </div>
-        `;
-        return;
-      }
-      
-      postsList.innerHTML = posts.map((post, index) => `
-        <div class="bg-white rounded-lg p-4 shadow">
-          <h3 class="font-semibold mb-2">${post.title}</h3>
-          <p class="text-gray-600 text-sm mb-2">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</p>
-          <div class="flex justify-between items-center text-xs text-gray-500">
-            <span>익명 • ${new Date(post.date).toLocaleDateString()}</span>
-            <div class="flex gap-3">
-              <span><i class="far fa-eye"></i> ${post.views || 0}</span>
-              <span><i class="far fa-comment"></i> ${post.comments || 0}</span>
+          
+          <div class="py-4 text-gray-800 whitespace-pre-wrap">${currentPost.content}</div>
+          
+          <div class="flex gap-2 pb-4 border-b">
+            <button onclick="votePost('like')" class="flex-1 py-2 rounded-lg border ${userVote === 'like' ? 'bg-blue-50 border-blue-500 text-blue-600' : ''}">
+              <i class="far fa-thumbs-up"></i> ${currentPost.likes.length}
+            </button>
+            <button onclick="votePost('dislike')" class="flex-1 py-2 rounded-lg border ${userVote === 'dislike' ? 'bg-red-50 border-red-500 text-red-600' : ''}">
+              <i class="far fa-thumbs-down"></i> ${currentPost.dislikes.length}
+            </button>
+            <button onclick="reportPost()" class="px-4 py-2 rounded-lg border text-red-600">
+              <i class="fas fa-exclamation-triangle"></i> 신고
+            </button>
+          </div>
+          
+          <div>
+            <h3 class="font-bold mb-3">댓글 ${currentPost.comments.length}</h3>
+            <div class="space-y-3">
+              ${currentPost.comments.map(comment => 
+                comment.isBlinded 
+                  ? '<div class="p-3 bg-gray-100 text-gray-500 rounded">블라인드 처리된 댓글입니다</div>'
+                  : `<div class="p-3 bg-gray-50 rounded">
+                       <div class="flex justify-between items-start mb-2">
+                         <span class="font-medium text-sm">${comment.author}</span>
+                         <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400">
+                           <i class="fas fa-ellipsis-v"></i>
+                         </button>
+                       </div>
+                       <p class="text-sm">${comment.content}</p>
+                       <span class="text-xs text-gray-500">${new Date(comment.date).toLocaleString()}</span>
+                     </div>`
+              ).join('')}
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      
+      document.getElementById('postDetail').innerHTML = detailHTML;
+      document.getElementById('postModal').classList.remove('hidden');
     }
-    
-    // Show write modal
-    function showWriteModal() {
+
+    // Close post modal
+    function closePostModal() {
+      document.getElementById('postModal').classList.add('hidden');
+      currentPost = null;
+      loadPosts(); // Refresh to show updated views
+    }
+
+    // Vote on post
+    function votePost(type) {
+      if (!currentPost) return;
+      API.votePost(currentPost.id, userId, type);
+      openPost(currentPost.id); // Refresh view
+    }
+
+    // Report post
+    function reportPost() {
+      if (!currentPost) return;
+      if (confirm('이 게시물을 신고하시겠습니까?')) {
+        API.reportItem(currentPost.id, null, userId);
+        alert('신고가 접수되었습니다.');
+        if (currentPost.reports.length >= 10) {
+          closePostModal();
+          loadPosts();
+        }
+      }
+    }
+
+    // Report comment
+    function reportComment(commentId) {
+      if (!currentPost) return;
+      if (confirm('이 댓글을 신고하시겠습니까?')) {
+        API.reportItem(currentPost.id, commentId, userId);
+        alert('신고가 접수되었습니다.');
+        openPost(currentPost.id); // Refresh view
+      }
+    }
+
+    // Submit comment
+    function submitComment() {
+      if (!currentPost) return;
+      const input = document.getElementById('commentInput');
+      const content = input.value.trim();
+      
+      if (!content) {
+        alert('댓글을 입력하세요.');
+        return;
+      }
+      
+      API.addComment(currentPost.id, { content });
+      input.value = '';
+      openPost(currentPost.id); // Refresh view
+    }
+
+    // Write modal functions
+    document.getElementById('writeBtn').onclick = () => {
       document.getElementById('writeModal').classList.remove('hidden');
-    }
-    
-    // Close write modal
+    };
+
     function closeWriteModal() {
       document.getElementById('writeModal').classList.add('hidden');
+      // Clear form
+      document.getElementById('postCategory').value = '자유';
+      document.getElementById('postAuthor').value = '';
       document.getElementById('postTitle').value = '';
       document.getElementById('postContent').value = '';
       document.getElementById('postPassword').value = '';
     }
-    
-    // Submit post
+
     function submitPost() {
       const title = document.getElementById('postTitle').value.trim();
       const content = document.getElementById('postContent').value.trim();
-      const password = document.getElementById('postPassword').value.trim();
       
       if (!title || !content) {
-        alert('제목과 내용을 입력해주세요.');
+        alert('제목과 내용을 입력하세요.');
         return;
       }
       
-      const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
-      const newPost = {
-        id: Date.now(),
-        title,
-        content,
-        password,
-        date: new Date().toISOString(),
-        views: 0,
-        comments: 0
+      const data = {
+        category: document.getElementById('postCategory').value,
+        author: document.getElementById('postAuthor').value || '익명',
+        title: title,
+        content: content,
+        password: document.getElementById('postPassword').value
       };
       
-      posts.unshift(newPost);
-      localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
-      
+      API.createPost(data);
       closeWriteModal();
       loadPosts();
       alert('게시물이 작성되었습니다!');
     }
-    
-    // Load posts on page load
-    loadPosts();
-    
-    // Add initial notice if no posts exist
-    if (JSON.parse(localStorage.getItem(POSTS_KEY) || '[]').length === 0) {
-      const initialPost = {
-        id: Date.now(),
-        title: '🎉 애슬리트 타임 베타 오픈!',
-        content: '안녕하세요! 애슬리트 타임 커뮤니티가 베타 오픈했습니다. 자유롭게 글을 작성해주세요!',
-        password: 'admin',
-        date: new Date().toISOString(),
-        views: 0,
-        comments: 0
+
+    // Category selection
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.onclick = function() {
+        document.querySelectorAll('.category-btn').forEach(b => {
+          b.classList.remove('bg-blue-500', 'text-white');
+          b.classList.add('bg-gray-100');
+        });
+        this.classList.remove('bg-gray-100');
+        this.classList.add('bg-blue-500', 'text-white');
+        
+        currentCategory = this.dataset.category;
+        loadPosts();
       };
-      localStorage.setItem(POSTS_KEY, JSON.stringify([initialPost]));
-      loadPosts();
-    }
+    });
+
+    // Initial load
+    loadPosts();
   </script>
 </body>
 </html>
