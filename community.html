@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>익명게시판 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-red-500 to-blue-600 text-white p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-white">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="text-xl font-bold">익명게시판</h1>
+      </div>
+      <span class="text-sm bg-yellow-400 text-black px-2 py-1 rounded">BETA</span>
+    </div>
+  </div>
+
+  <!-- Write Button -->
+  <div class="max-w-md mx-auto p-4">
+    <button onclick="showWriteModal()" class="w-full bg-blue-500 text-white rounded-lg py-3 mb-4 hover:bg-blue-600">
+      <i class="fas fa-pen"></i> 글쓰기
+    </button>
+
+    <!-- Posts List -->
+    <div id="postsList" class="space-y-3">
+      <!-- Posts will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Write Modal -->
+  <div id="writeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg w-full max-w-md p-6">
+      <h3 class="text-xl font-bold mb-4">글쓰기</h3>
+      <input id="postTitle" type="text" placeholder="제목" class="w-full p-2 border rounded mb-3">
+      <textarea id="postContent" placeholder="내용" class="w-full p-2 border rounded h-32 mb-3"></textarea>
+      <input id="postPassword" type="password" placeholder="비밀번호 (수정/삭제용)" class="w-full p-2 border rounded mb-4">
+      <div class="flex gap-2">
+        <button onclick="submitPost()" class="flex-1 bg-blue-500 text-white py-2 rounded">작성</button>
+        <button onclick="closeWriteModal()" class="flex-1 bg-gray-300 py-2 rounded">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Local Storage Key
+    const POSTS_KEY = 'athletetime_posts';
+    
+    // Load posts from localStorage
+    function loadPosts() {
+      const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
+      const postsList = document.getElementById('postsList');
+      
+      if (posts.length === 0) {
+        postsList.innerHTML = `
+          <div class="bg-white rounded-lg p-6 text-center text-gray-500">
+            <i class="fas fa-inbox text-4xl mb-3"></i>
+            <p>아직 게시물이 없습니다.</p>
+            <p class="text-sm mt-2">첫 번째 글을 작성해보세요!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      postsList.innerHTML = posts.map((post, index) => `
+        <div class="bg-white rounded-lg p-4 shadow">
+          <h3 class="font-semibold mb-2">${post.title}</h3>
+          <p class="text-gray-600 text-sm mb-2">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</p>
+          <div class="flex justify-between items-center text-xs text-gray-500">
+            <span>익명 • ${new Date(post.date).toLocaleDateString()}</span>
+            <div class="flex gap-3">
+              <span><i class="far fa-eye"></i> ${post.views || 0}</span>
+              <span><i class="far fa-comment"></i> ${post.comments || 0}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    // Show write modal
+    function showWriteModal() {
+      document.getElementById('writeModal').classList.remove('hidden');
+    }
+    
+    // Close write modal
+    function closeWriteModal() {
+      document.getElementById('writeModal').classList.add('hidden');
+      document.getElementById('postTitle').value = '';
+      document.getElementById('postContent').value = '';
+      document.getElementById('postPassword').value = '';
+    }
+    
+    // Submit post
+    function submitPost() {
+      const title = document.getElementById('postTitle').value.trim();
+      const content = document.getElementById('postContent').value.trim();
+      const password = document.getElementById('postPassword').value.trim();
+      
+      if (!title || !content) {
+        alert('제목과 내용을 입력해주세요.');
+        return;
+      }
+      
+      const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');
+      const newPost = {
+        id: Date.now(),
+        title,
+        content,
+        password,
+        date: new Date().toISOString(),
+        views: 0,
+        comments: 0
+      };
+      
+      posts.unshift(newPost);
+      localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
+      
+      closeWriteModal();
+      loadPosts();
+      alert('게시물이 작성되었습니다!');
+    }
+    
+    // Load posts on page load
+    loadPosts();
+    
+    // Add initial notice if no posts exist
+    if (JSON.parse(localStorage.getItem(POSTS_KEY) || '[]').length === 0) {
+      const initialPost = {
+        id: Date.now(),
+        title: '🎉 애슬리트 타임 베타 오픈!',
+        content: '안녕하세요! 애슬리트 타임 커뮤니티가 베타 오픈했습니다. 자유롭게 글을 작성해주세요!',
+        password: 'admin',
+        date: new Date().toISOString(),
+        views: 0,
+        comments: 0
+      };
+      localStorage.setItem(POSTS_KEY, JSON.stringify([initialPost]));
+      loadPosts();
+    }
+  </script>
+</body>
+</html>
