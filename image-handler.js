@@ -238,26 +238,88 @@ const ImageHandler = {
   },
   
   // 오래된 이미지 정리 (선택적)
-  cleanOldImages(posts, daysToKeep = 7) {
+  cleanOldImages(posts, daysToKeep = 7, keepThumbnails = true) {
     const now = Date.now();
     const cutoffTime = now - (daysToKeep * 24 * 60 * 60 * 1000);
-    let cleaned = 0;
+    let cleanedPosts = 0;
+    let freedSpace = 0;
     
     posts.forEach(post => {
       if (post.date && new Date(post.date).getTime() < cutoffTime) {
         if (post.images && post.images.length > 0) {
-          // 썸네일만 유지, 원본 제거
-          post.images = post.images.map(img => ({
-            ...img,
-            original: null,
-            thumbnail: img.thumbnail
-          }));
-          cleaned++;
+          if (keepThumbnails) {
+            // 썸네일만 유지, 원본 제거 (기본 동작)
+            post.images = post.images.map(img => {
+              if (img.original) {
+                // 원본 크기 추정 (base64 길이의 약 75%)
+                freedSpace += img.original.length * 0.75;
+                return {
+                  ...img,
+                  original: null,  // 원본 이미지 삭제
+                  thumbnail: img.thumbnail,  // 썸네일 유지
+                  cleanedAt: new Date().toISOString()
+                };
+              }
+              return img;
+            });
+          } else {
+            // 완전 삭제 옵션
+            freedSpace += post.images.reduce((sum, img) => {
+              return sum + (img.original ? img.original.length * 0.75 : 0) + 
+                          (img.thumbnail ? img.thumbnail.length * 0.75 : 0);
+            }, 0);
+            post.images = [];  // 모든 이미지 삭제
+          }
+          cleanedPosts++;
         }
       }
     });
     
-    return cleaned;
+    return {
+      postsAffected: cleanedPosts,
+      spaceFreedMB: (freedSpace / 1024 / 1024).toFixed(2)
+    };
+  },
+  
+  // 자동 정리 실행 (localStorage 용량 관리)
+  autoCleanup(posts, settings = {}) {
+    const {
+      storageThreshold = 80,  // 저장소 사용률 임계값 (%)
+      daysForOriginal = 3,    // 원본 이미지 보관 기간
+      daysForThumbnail = 30,  // 썸네일 보관 기간
+      daysForFullDelete = 90  // 완전 삭제 기간
+    } = settings;
+    
+    const storage = this.checkStorageSpace();
+    const results = {
+      originalsCleaned: 0,
+      thumbnailsCleaned: 0,
+      fullDeleted: 0,
+      spaceFreedMB: 0
+    };
+    
+    // 저장소 사용률이 임계값 이상일 때만 정리
+    if (storage.percent > storageThreshold) {
+      // 1단계: 3일 이상된 원본 이미지 삭제
+      const step1 = this.cleanOldImages(posts, daysForOriginal, true);
+      results.originalsCleaned = step1.postsAffected;
+      results.spaceFreedMB += parseFloat(step1.spaceFreedMB);
+      
+      // 2단계: 여전히 부족하면 30일 이상된 썸네일도 삭제
+      const newStorage = this.checkStorageSpace();
+      if (newStorage.percent > storageThreshold) {
+        const step2 = this.cleanOldImages(posts, daysForThumbnail, false);
+        results.thumbnailsCleaned = step2.postsAffected;
+        results.spaceFreedMB += parseFloat(step2.spaceFreedMB);
+      }
+      
+      // 3단계: 90일 이상된 게시물의 모든 이미지 삭제
+      const step3 = this.cleanOldImages(posts, daysForFullDelete, false);
+      results.fullDeleted = step3.postsAffected;
+      results.spaceFreedMB += parseFloat(step3.spaceFreedMB);
+    }
+    
+    return results;
   },
   
   // 이미지 다운로드
