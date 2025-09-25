@@ -144,9 +144,9 @@
   </header>
   
   <!-- Main Container -->
-  <div class="flex h-screen pt-16">
-    <!-- Thread List (Desktop: Left, Mobile: Hidden by default) -->
-    <div id="threadList" class="w-full md:w-80 lg:w-96 bg-white border-r overflow-y-auto hidden md:block">
+  <div class="flex" style="height: calc(100vh - 64px); margin-top: 64px;">
+    <!-- Thread List (Desktop: Left, Mobile: Overlay) -->
+    <div id="threadList" class="fixed md:relative w-full md:w-80 lg:w-96 bg-white border-r overflow-y-auto hidden md:block h-full z-30">
       <!-- Create Thread Button -->
       <div class="p-4 border-b bg-gray-50">
         <button onclick="openCreateThreadModal()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:shadow-lg transition flex items-center justify-center gap-2">
@@ -157,7 +157,7 @@
       
       <!-- Main Thread (Always on top) -->
       <div class="border-b">
-        <div onclick="selectThread('main')" class="thread-card p-4 hover:bg-gray-50 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50">
+        <div onclick="selectThread('main')" class="thread-card main-thread p-4 hover:bg-gray-50 cursor-pointer bg-gradient-to-r from-blue-50 to-purple-50">
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
               <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">

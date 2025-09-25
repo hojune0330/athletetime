@@ -234,12 +234,35 @@ const ChatSystem = {
     // 메시지 렌더링
     this.renderMessages();
     
-    // 스레드 목록 업데이트
+    // 스레드 목록 선택 상태 업데이트
     this.updateThreadListSelection();
     
     // 활동 시간 업데이트
     thread.lastActivity = Date.now();
     this.saveData();
+  },
+  
+  // 스레드 목록 선택 상태 업데이트
+  updateThreadListSelection() {
+    // 모든 스레드 카드에서 선택 상태 제거
+    document.querySelectorAll('.thread-card').forEach(card => {
+      card.classList.remove('ring-2', 'ring-purple-500', 'bg-opacity-50');
+    });
+    
+    // 현재 선택된 스레드 하이라이트
+    if (this.currentThread === 'main') {
+      const mainCard = document.querySelector('.main-thread');
+      if (mainCard) {
+        mainCard.classList.add('ring-2', 'ring-purple-500');
+      }
+    } else {
+      const cards = document.querySelectorAll('.thread-card');
+      cards.forEach(card => {
+        if (card.onclick && card.onclick.toString().includes(this.currentThread)) {
+          card.classList.add('ring-2', 'ring-purple-500', 'bg-opacity-50');
+        }
+      });
+    }
   },
   
   // 메시지 전송
@@ -516,6 +539,17 @@ function goBack() {
 function toggleThreadList() {
   const list = document.getElementById('threadList');
   list.classList.toggle('hidden');
+  
+  // 모바일에서 스레드 선택 시 자동으로 닫기
+  if (window.innerWidth < 768) {
+    document.querySelectorAll('.thread-card').forEach(card => {
+      const originalOnclick = card.onclick;
+      card.onclick = function(e) {
+        if (originalOnclick) originalOnclick.call(this, e);
+        list.classList.add('hidden');
+      };
+    });
+  }
 }
 
 function openCreateThreadModal() {
