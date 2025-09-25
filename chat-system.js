@@ -31,15 +31,31 @@ const ChatSystem = {
     this.selectThread('main');
     this.startUpdateLoop();
     this.initEmojis();
+    this.requestNotificationPermission();
     
     // 페이지 언로드 시 정리
     window.addEventListener('beforeunload', () => {
       this.cleanup();
     });
     
+    // 페이지 포커스/블러 이벤트
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        // 페이지가 다시 보이면 메시지 업데이트
+        this.checkForNewMessages();
+      }
+    });
+    
     // 활성 사용자 시스템 초기화
     if (typeof ActiveUsers !== 'undefined') {
       ActiveUsers.initSession();
+    }
+  },
+  
+  // 알림 권한 요청
+  requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
   },
   
@@ -101,10 +117,25 @@ const ChatSystem = {
   
   // 데이터 로드
   loadData() {
-    const saved = localStorage.getItem(this.STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      this.threads = data.threads || {};
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        this.threads = data.threads || {};
+        
+        // 데이터 유효성 검증 및 복구
+        Object.keys(this.threads).forEach(threadId => {
+          const thread = this.threads[threadId];
+          if (!thread.messages) thread.messages = [];
+          if (!thread.users) thread.users = [];
+          if (!thread.id) thread.id = threadId;
+          if (!thread.createdAt) thread.createdAt = Date.now();
+          if (!thread.lastActivity) thread.lastActivity = thread.createdAt;
+        });
+      }
+    } catch (e) {
+      console.error('데이터 로드 실패:', e);
+      this.threads = {};
     }
   },
   
@@ -116,7 +147,16 @@ const ChatSystem = {
     };
     
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+      // Set을 배열로 변환 (저장 전에)
+      const cleanData = JSON.parse(JSON.stringify(data, (key, value) => {
+        if (value instanceof Set) {
+          return Array.from(value);
+        }
+        return value;
+      }));
+      
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cleanData));
+      this.lastUpdate = Date.now();
     } catch (e) {
       console.error('Failed to save chat data:', e);
       this.handleStorageError();
@@ -232,13 +272,30 @@ const ChatSystem = {
   
   // 스레드 선택
   selectThread(threadId) {
-    if (!this.threads[threadId]) return;
+    if (!this.threads[threadId]) {
+      console.error('Thread not found:', threadId);
+      return;
+    }
+    
+    // 이전 스레드에서 사용자 제거
+    if (this.currentThread && this.threads[this.currentThread]) {
+      const oldThread = this.threads[this.currentThread];
+      const userIndex = oldThread.users.indexOf(this.currentUser.id);
+      if (userIndex > -1) {
+        oldThread.users.splice(userIndex, 1);
+      }
+    }
     
     this.currentThread = threadId;
     const thread = this.threads[threadId];
     
+    // 현재 스레드에 사용자 추가
+    if (!thread.users.includes(this.currentUser.id)) {
+      thread.users.push(this.currentUser.id);
+    }
+    
     // 헤더 업데이트
-    document.getElementById('currentThreadName').textContent = thread.name;
+    document.getElementById('currentThreadName').textContent = thread.name || '채팅방';
     document.getElementById('currentThreadUsers').textContent = thread.users.length || 1;
     
     // 메시지 렌더링
@@ -246,6 +303,11 @@ const ChatSystem = {
     
     // 스레드 목록 선택 상태 업데이트
     this.updateThreadListSelection();
+    
+    // 모바일에서 스레드 리스트 숨기기
+    if (window.innerWidth < 768) {
+      document.getElementById('threadList').classList.add('hidden');
+    }
     
     // 활동 시간 업데이트
     thread.lastActivity = Date.now();
@@ -420,20 +482,20 @@ const ChatSystem = {
       const minutes = Math.floor(timeLeft / 60000);
       
       html += `
-        <div onclick="selectThread('${thread.id}')" class="thread-card p-3 hover:bg-gray-50 cursor-pointer border-b">
+        <div onclick="ChatSystem.selectThread('${thread.id}')" class="thread-card p-3 hover:bg-gray-50 cursor-pointer border-b" data-thread-id="${thread.id}">
           <div class="flex items-center justify-between mb-1">
             <div class="flex items-center gap-2">
-              <div class="text-2xl">${thread.icon}</div>
-              <div>
-                <h4 class="font-medium text-sm">${this.escapeHtml(thread.name)}</h4>
-                ${thread.description ? `<p class="text-xs text-gray-500">${this.escapeHtml(thread.description)}</p>` : ''}
+              <div class="text-2xl">${thread.icon || '🏃'}</div>
+              <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-sm truncate">${this.escapeHtml(thread.name)}</h4>
+                ${thread.description ? `<p class="text-xs text-gray-500 truncate">${this.escapeHtml(thread.description)}</p>` : ''}
               </div>
             </div>
-            ${minutes <= 5 ? `<span class="text-xs text-red-500 font-medium">${minutes}분 남음</span>` : ''}
+            ${minutes <= 5 ? `<span class="text-xs text-red-500 font-medium whitespace-nowrap">${minutes}분 남음</span>` : ''}
           </div>
           <div class="flex items-center gap-3 text-xs text-gray-500 ml-10">
-            <span><i class="fas fa-users"></i> ${thread.users.length || 0}</span>
-            <span><i class="fas fa-comment"></i> ${thread.messages.length}</span>
+            <span><i class="fas fa-users"></i> ${thread.users?.length || 0}</span>
+            <span><i class="fas fa-comment"></i> ${thread.messages?.length || 0}</span>
             <span><i class="fas fa-clock"></i> ${this.formatTimeAgo(thread.lastActivity)}</span>
           </div>
         </div>
@@ -575,11 +637,13 @@ const ChatSystem = {
     
     let totalMessages = 0;
     Object.values(this.threads).forEach(thread => {
-      thread.messages.forEach(msg => {
-        if (msg.timestamp >= todayTime && msg.type === 'user') {
-          totalMessages++;
-        }
-      });
+      if (thread.messages && Array.isArray(thread.messages)) {
+        thread.messages.forEach(msg => {
+          if (msg && msg.timestamp >= todayTime && msg.type === 'user') {
+            totalMessages++;
+          }
+        });
+      }
     });
     
     return totalMessages;
@@ -606,8 +670,7 @@ const ChatSystem = {
   
   // 새 메시지 확인
   checkForNewMessages() {
-    const thread = this.threads[this.currentThread];
-    if (!thread) return;
+    const oldMessageCount = this.threads[this.currentThread]?.messages?.length || 0;
     
     // 데이터 다시 로드
     this.loadData();
@@ -615,9 +678,38 @@ const ChatSystem = {
     const currentThread = this.threads[this.currentThread];
     if (!currentThread) return;
     
+    const newMessageCount = currentThread.messages?.length || 0;
+    
     // 메시지 수가 다르면 렌더링
-    if (currentThread.messages.length !== thread.messages.length) {
+    if (newMessageCount !== oldMessageCount) {
       this.renderMessages();
+      
+      // 새 메시지가 있으면 알림
+      if (newMessageCount > oldMessageCount && document.hidden) {
+        const lastMessage = currentThread.messages[currentThread.messages.length - 1];
+        if (lastMessage && lastMessage.userId !== this.currentUser.id) {
+          // 브라우저 알림 (document.hidden일 때만)
+          this.showNotification(lastMessage);
+        }
+      }
+    }
+  },
+  
+  // 브라우저 알림 표시
+  showNotification(message) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const notification = new Notification('애슬리트 타임 - 새 메시지', {
+        body: `${message.nickname}: ${message.content.substring(0, 50)}...`,
+        icon: '/favicon.ico',
+        tag: 'athletetime-chat'
+      });
+      
+      notification.onclick = () => {
+        window.focus();
+        notification.close();
+      };
+      
+      setTimeout(() => notification.close(), 5000);
     }
   },
   
@@ -629,7 +721,33 @@ const ChatSystem = {
   
   // 유틸리티 함수들
   getCurrentNickname() {
-    return this.currentUser.customNickname || this.currentUser.nickname;
+    if (!this.currentUser) {
+      this.initUser();
+    }
+    return this.currentUser.customNickname || this.currentUser.nickname || '익명';
+  },
+  
+  // HTML 이스케이프
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },
+  
+  // URL을 링크로 변환
+  linkifyText(text) {
+    if (!text) return '';
+    
+    // HTML 이스케이프 먼저
+    text = this.escapeHtml(text);
+    
+    // URL 패턴
+    const urlPattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/g;
+    
+    return text.replace(urlPattern, (url) => {
+      return `<a href="${url}" target="_blank" class="text-blue-500 hover:underline">${url}</a>`;
+    });
   },
   
   updateUserDisplay() {
@@ -657,6 +775,7 @@ const ChatSystem = {
   },
   
   formatTime(timestamp) {
+    if (!timestamp) return '';
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
@@ -664,10 +783,13 @@ const ChatSystem = {
   },
   
   formatTimeAgo(timestamp) {
+    if (!timestamp) return '';
     const diff = Date.now() - timestamp;
     const minutes = Math.floor(diff / 60000);
     const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
     
+    if (days > 0) return `${days}일 전`;
     if (hours > 0) return `${hours}시간 전`;
     if (minutes > 0) return `${minutes}분 전`;
     return '방금 전';
@@ -729,22 +851,49 @@ function goBack() {
 
 function toggleThreadList() {
   const list = document.getElementById('threadList');
-  list.classList.toggle('hidden');
+  const isHidden = list.classList.contains('hidden');
   
-  // 모바일에서 스레드 선택 시 자동으로 닫기
-  if (window.innerWidth < 768) {
-    document.querySelectorAll('.thread-card').forEach(card => {
-      const originalOnclick = card.onclick;
-      card.onclick = function(e) {
-        if (originalOnclick) originalOnclick.call(this, e);
-        list.classList.add('hidden');
-      };
-    });
+  if (isHidden) {
+    list.classList.remove('hidden');
+    // 모바일에서 배경 클릭 시 닫기를 위한 backdrop
+    if (window.innerWidth < 768) {
+      const backdrop = document.createElement('div');
+      backdrop.id = 'threadListBackdrop';
+      backdrop.className = 'fixed inset-0 bg-black bg-opacity-50 z-25';
+      backdrop.onclick = toggleThreadList;
+      document.body.appendChild(backdrop);
+    }
+  } else {
+    list.classList.add('hidden');
+    // backdrop 제거
+    const backdrop = document.getElementById('threadListBackdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
   }
 }
 
 function openCreateThreadModal() {
-  document.getElementById('createThreadModal').classList.remove('hidden');
+  const modal = document.getElementById('createThreadModal');
+  modal.classList.remove('hidden');
+  
+  // 폼 초기화
+  document.getElementById('threadName').value = '';
+  document.getElementById('threadDescription').value = '';
+  document.getElementById('selectedIcon').value = '🏃';
+  
+  // 기본 아이콘 선택 표시
+  document.querySelectorAll('.icon-selector').forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-purple-500');
+    if (btn.dataset.icon === '🏃') {
+      btn.classList.add('ring-2', 'ring-purple-500');
+    }
+  });
+  
+  // 포커스
+  setTimeout(() => {
+    document.getElementById('threadName').focus();
+  }, 100);
 }
 
 function closeCreateThreadModal() {
@@ -755,19 +904,29 @@ function closeCreateThreadModal() {
 
 function selectThread(threadId) {
   ChatSystem.selectThread(threadId);
+  
+  // 모바일에서 스레드 리스트 자동 닫기
+  if (window.innerWidth < 768) {
+    const list = document.getElementById('threadList');
+    if (!list.classList.contains('hidden')) {
+      toggleThreadList();
+    }
+  }
 }
 
 function selectThreadIcon(icon) {
   document.getElementById('selectedIcon').value = icon;
   
-  // 선택된 아이콘 표시
-  document.querySelectorAll('.grid button').forEach(btn => {
-    if (btn.textContent === icon) {
-      btn.classList.add('bg-purple-100', 'border-purple-500');
-    } else {
-      btn.classList.remove('bg-purple-100', 'border-purple-500');
-    }
+  // 모든 아이콘에서 선택 표시 제거
+  document.querySelectorAll('.icon-selector').forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-purple-500', 'bg-purple-100');
   });
+  
+  // 현재 선택된 아이콘 표시
+  const selectedBtn = document.querySelector(`.icon-selector[data-icon="${icon}"]`);
+  if (selectedBtn) {
+    selectedBtn.classList.add('ring-2', 'ring-purple-500', 'bg-purple-100');
+  }
 }
 
 function createThread() {
