@@ -86,6 +86,41 @@
       background-size: 200% 100%;
       animation: skeleton 1.5s infinite;
     }
+    
+    /* 투표 관련 스타일 */
+    .poll-container {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .poll-option-button {
+      transition: all 0.2s ease;
+    }
+    
+    .poll-option-button:hover {
+      transform: translateX(4px);
+    }
+    
+    .poll-compact {
+      transition: all 0.2s ease;
+    }
+    
+    .poll-compact:hover {
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+    
+    @keyframes pollBarGrow {
+      from {
+        width: 0%;
+      }
+      to {
+        width: var(--poll-width);
+      }
+    }
+    
+    .poll-bar-animate {
+      animation: pollBarGrow 0.5s ease-out forwards;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -246,6 +281,17 @@
           <div id="storageInfo" class="text-xs text-gray-500 mt-2"></div>
         </div>
         
+        <!-- 투표 추가 -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs text-gray-600">추가 옵션</label>
+            <button type="button" onclick="togglePollCreator()" class="text-xs text-blue-600 hover:text-blue-700 font-medium">
+              <i class="fas fa-poll mr-1"></i>투표 추가
+            </button>
+          </div>
+          <div id="pollCreator" class="hidden"></div>
+        </div>
+        
         <div>
           <label class="text-xs text-gray-600 mb-1 block">비밀번호 (수정/삭제용)</label>
           <input id="postPassword" type="password" placeholder="비밀번호를 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
@@ -341,6 +387,7 @@
 
   <script src="active-users.js"></script>
   <script src="image-handler.js"></script>
+  <script src="poll-handler.js"></script>
   <script>
     // ===== 상태 관리 =====
     let posts = [];
@@ -349,6 +396,7 @@
     let currentPost = null;
     let searchQuery = '';
     let selectedImages = []; // 선택된 이미지들
+    let currentPoll = null; // 현재 생성중인 투표
     
     // 로컬 스토리지 키
     const STORAGE_KEY = 'athletetime_posts';
@@ -455,11 +503,13 @@
                   <span><i class="far fa-comment"></i> ${post.comments.filter(c => !c.isBlinded).length}</span>
                   <span><i class="far fa-thumbs-up"></i> ${post.likes.length}</span>
                   ${post.images && post.images.length > 0 ? `<span><i class="far fa-image"></i> ${post.images.length}</span>` : ''}
+                  ${post.poll ? `<span><i class="fas fa-poll"></i> ${post.poll.totalVotes}표</span>` : ''}
                 </div>
               </div>
               ${post.images && post.images.length > 0 ? 
                 `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3">` : ''}
             </div>
+            ${post.poll ? PollHandler.renderPollUI(post.poll, userId, true) : ''}
           </div>
         `;
       }).join('');
@@ -560,6 +610,9 @@
               `).join('')}
             </div>
           ` : ''}
+          
+          <!-- 투표 -->
+          ${currentPost.poll ? PollHandler.renderPollUI(currentPost.poll, userId, false) : ''}
           
           <!-- 투표 버튼 -->
           <div class="flex gap-2 py-4 border-y">
@@ -758,6 +811,20 @@
         return;
       }
       
+      // 투표 데이터 수집
+      let poll = null;
+      if (currentPoll) {
+        const pollOptions = collectPollOptions();
+        if (pollOptions.length >= 2) {
+          try {
+            poll = PollHandler.createPoll(pollOptions);
+          } catch (error) {
+            showToast(error.message);
+            return;
+          }
+        }
+      }
+      
       // 저장소 용량 체크
       const storage = ImageHandler.checkStorageSpace();
       if (storage.percent > 80) {
@@ -778,6 +845,7 @@
         content: content,
         password: password,
         images: selectedImages, // 이미지 추가
+        poll: poll, // 투표 추가
         date: new Date().toISOString(),
         views: 0,
         likes: [],
@@ -960,6 +1028,14 @@
       document.getElementById('imagePreview').innerHTML = '';
       document.getElementById('imageCount').textContent = '';
       document.getElementById('storageInfo').textContent = '';
+      
+      // 투표 초기화
+      currentPoll = null;
+      const pollCreator = document.getElementById('pollCreator');
+      if (pollCreator) {
+        pollCreator.classList.add('hidden');
+        pollCreator.innerHTML = '';
+      }
     }
     
     function closePostModal() {
@@ -1167,6 +1243,171 @@
       } else {
         info.textContent = '';
       }
+    }
+    
+    // ===== 투표 관련 함수 =====
+    function togglePollCreator() {
+      const creator = document.getElementById('pollCreator');
+      
+      if (!currentPoll) {
+        currentPoll = true;
+        creator.innerHTML = `
+          <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-sm font-medium text-gray-700">
+                <i class="fas fa-poll mr-2 text-blue-600"></i>투표 만들기
+              </label>
+              <button type="button" onclick="removePoll()" class="text-red-500 hover:text-red-600">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <div id="pollOptions" class="space-y-2">
+              <div class="poll-option-input flex gap-2">
+                <input type="text" placeholder="선택지 1" class="flex-1 px-3 py-2 border rounded-lg text-sm poll-input" maxlength="100">
+              </div>
+              <div class="poll-option-input flex gap-2">
+                <input type="text" placeholder="선택지 2" class="flex-1 px-3 py-2 border rounded-lg text-sm poll-input" maxlength="100">
+              </div>
+            </div>
+            
+            <button type="button" onclick="addPollOption()" class="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <i class="fas fa-plus-circle mr-1"></i>선택지 추가
+            </button>
+            
+            <div class="mt-3 text-xs text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              최소 2개, 최대 10개의 선택지를 만들 수 있습니다
+            </div>
+          </div>
+        `;
+        creator.classList.remove('hidden');
+      } else {
+        removePoll();
+      }
+    }
+    
+    function removePoll() {
+      currentPoll = null;
+      const creator = document.getElementById('pollCreator');
+      creator.classList.add('hidden');
+      creator.innerHTML = '';
+    }
+    
+    function addPollOption() {
+      const container = document.getElementById('pollOptions');
+      const options = container.querySelectorAll('.poll-option-input');
+      
+      if (options.length >= 10) {
+        showToast('최대 10개의 선택지만 만들 수 있습니다');
+        return;
+      }
+      
+      const newOption = document.createElement('div');
+      newOption.className = 'poll-option-input flex gap-2';
+      newOption.innerHTML = `
+        <input type="text" placeholder="선택지 ${options.length + 1}" class="flex-1 px-3 py-2 border rounded-lg text-sm poll-input" maxlength="100">
+        <button type="button" onclick="removePollOption(this)" class="px-2 text-gray-400 hover:text-red-500">
+          <i class="fas fa-minus-circle"></i>
+        </button>
+      `;
+      
+      container.appendChild(newOption);
+      updatePollOptionNumbers();
+    }
+    
+    function removePollOption(button) {
+      const container = document.getElementById('pollOptions');
+      const options = container.querySelectorAll('.poll-option-input');
+      
+      if (options.length <= 2) {
+        showToast('최소 2개의 선택지가 필요합니다');
+        return;
+      }
+      
+      button.parentElement.remove();
+      updatePollOptionNumbers();
+    }
+    
+    function updatePollOptionNumbers() {
+      const container = document.getElementById('pollOptions');
+      const inputs = container.querySelectorAll('.poll-input');
+      
+      inputs.forEach((input, index) => {
+        if (!input.value) {
+          input.placeholder = `선택지 ${index + 1}`;
+        }
+      });
+      
+      // 3개 이상일 때만 삭제 버튼 표시
+      const removeButtons = container.querySelectorAll('button');
+      removeButtons.forEach(btn => {
+        btn.style.display = inputs.length > 2 ? 'block' : 'none';
+      });
+    }
+    
+    function collectPollOptions() {
+      const container = document.getElementById('pollOptions');
+      if (!container) return [];
+      
+      const inputs = container.querySelectorAll('.poll-input');
+      const options = [];
+      
+      inputs.forEach(input => {
+        const value = input.value.trim();
+        if (value) {
+          options.push(value);
+        }
+      });
+      
+      return options;
+    }
+    
+    // 투표하기
+    function votePoll(optionId) {
+      if (!currentPost || !currentPost.poll) return;
+      
+      const success = PollHandler.vote(currentPost.poll, optionId, userId);
+      
+      if (success) {
+        // posts 배열 업데이트
+        const postIndex = posts.findIndex(p => p.id === currentPost.id);
+        if (postIndex !== -1) {
+          posts[postIndex] = currentPost;
+        }
+        
+        savePosts();
+        viewPost(currentPost.id); // 화면 새로고침
+        
+        // 애니메이션 효과
+        setTimeout(() => {
+          const pollContainer = document.querySelector('.poll-container');
+          if (pollContainer) {
+            PollHandler.animatePollResults(pollContainer);
+          }
+        }, 100);
+      }
+    }
+    
+    // 투표 다시하기
+    function changePollVote() {
+      if (!currentPost || !currentPost.poll) return;
+      
+      // 기존 투표 제거
+      currentPost.poll.options.forEach(option => {
+        option.votes = option.votes.filter(id => id !== userId);
+      });
+      
+      PollHandler.updatePollStats(currentPost.poll);
+      
+      // posts 배열 업데이트
+      const postIndex = posts.findIndex(p => p.id === currentPost.id);
+      if (postIndex !== -1) {
+        posts[postIndex] = currentPost;
+      }
+      
+      savePosts();
+      viewPost(currentPost.id); // 화면 새로고침
     }
     
     // ===== 페이지 초기화 =====

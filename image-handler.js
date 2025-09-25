@@ -20,13 +20,14 @@ const ImageHandler = {
     return new Promise((resolve, reject) => {
       // 파일 크기 체크
       if (file.size > this.MAX_FILE_SIZE) {
-        reject(new Error('파일 크기는 5MB를 초과할 수 없습니다.'));
+        reject(new Error(`파일 크기는 5MB를 초과할 수 없습니다. (현재: ${(file.size / 1024 / 1024).toFixed(2)}MB)`));
         return;
       }
       
       // 이미지 타입 체크
-      if (!file.type.startsWith('image/')) {
-        reject(new Error('이미지 파일만 업로드 가능합니다.'));
+      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!file.type || !acceptedTypes.includes(file.type.toLowerCase())) {
+        reject(new Error(`지원하지 않는 파일 형식입니다. (지원 형식: JPG, PNG, GIF, WebP)`));
         return;
       }
       
@@ -171,12 +172,46 @@ const ImageHandler = {
     modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-[100] flex items-center justify-center p-4';
     modal.onclick = () => modal.remove();
     
+    const container = document.createElement('div');
+    container.className = 'relative';
+    
     const img = document.createElement('img');
     img.src = imageSrc;
     img.className = 'max-w-full max-h-full object-contain';
     
-    modal.appendChild(img);
+    // 닫기 버튼
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'absolute top-4 right-4 text-white text-3xl font-bold bg-black bg-opacity-50 rounded-full w-10 h-10';
+    closeBtn.innerHTML = '×';
+    closeBtn.onclick = (e) => {
+      e.stopPropagation();
+      modal.remove();
+    };
+    
+    // 로딩 인디케이터
+    const loader = document.createElement('div');
+    loader.className = 'absolute inset-0 flex items-center justify-center';
+    loader.innerHTML = '<div class="text-white">로딩중...</div>';
+    
+    img.onload = () => loader.remove();
+    img.onerror = () => {
+      loader.innerHTML = '<div class="text-red-500">이미지를 불러올 수 없습니다</div>';
+    };
+    
+    container.appendChild(loader);
+    container.appendChild(img);
+    modal.appendChild(container);
+    modal.appendChild(closeBtn);
     document.body.appendChild(modal);
+    
+    // ESC 키로 닫기
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        document.removeEventListener('keydown', handleEsc);
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
   },
   
   // localStorage 용량 체크
