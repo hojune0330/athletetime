@@ -465,6 +465,11 @@
       currentPost = posts.find(p => p.id === postId);
       if (!currentPost) return;
       
+      // comments 배열 초기화
+      if (!currentPost.comments) {
+        currentPost.comments = [];
+      }
+      
       // 조회수 증가
       currentPost.views++;
       savePosts();
@@ -526,6 +531,11 @@
     function renderComments() {
       if (!currentPost) return;
       
+      // comments 배열 초기화 체크
+      if (!currentPost.comments) {
+        currentPost.comments = [];
+      }
+      
       const visibleComments = currentPost.comments.filter(c => !c.isBlinded);
       document.getElementById('commentCount').textContent = visibleComments.length;
       
@@ -537,18 +547,18 @@
       }
       
       container.innerHTML = visibleComments.map(comment => `
-        <div class="bg-gray-50 rounded-lg p-3">
+        <div class="bg-gray-50 rounded-lg p-3 mb-2">
           <div class="flex justify-between items-start mb-2">
             <div>
-              <span class="font-medium text-sm">${comment.author}</span>
+              <span class="font-medium text-sm">${escapeHtml(comment.author)}</span>
               <span class="text-xs text-gray-500 ml-2">${formatTime(comment.date)}</span>
             </div>
-            <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1">
+            <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1 hover:text-gray-600">
               <i class="fas fa-ellipsis-v"></i>
             </button>
           </div>
-          <p class="text-sm text-gray-700">${escapeHtml(comment.content)}</p>
-          ${comment.reports.length > 0 ? `<p class="text-xs text-red-500 mt-1">신고 ${comment.reports.length}건</p>` : ''}
+          <p class="text-sm text-gray-700 whitespace-pre-wrap">${escapeHtml(comment.content)}</p>
+          ${comment.reports && comment.reports.length > 0 ? `<p class="text-xs text-red-500 mt-1">신고 ${comment.reports.length}건</p>` : ''}
         </div>
       `).join('');
     }
@@ -556,6 +566,10 @@
     // ===== 투표 기능 =====
     function vote(type) {
       if (!currentPost) return;
+      
+      // 배열 초기화
+      if (!currentPost.likes) currentPost.likes = [];
+      if (!currentPost.dislikes) currentPost.dislikes = [];
       
       // 기존 투표 제거
       currentPost.likes = currentPost.likes.filter(id => id !== userId);
@@ -571,11 +585,24 @@
         if (currentPost.dislikes.length >= 10) {
           currentPost.isBlinded = true;
           showToast('게시물이 블라인드 처리되었습니다');
+          
+          // posts 배열 업데이트
+          const postIndex = posts.findIndex(p => p.id === currentPost.id);
+          if (postIndex !== -1) {
+            posts[postIndex] = currentPost;
+          }
+          
+          savePosts();
           closePostModal();
           renderPosts();
-          savePosts();
           return;
         }
+      }
+      
+      // posts 배열 업데이트
+      const postIndex = posts.findIndex(p => p.id === currentPost.id);
+      if (postIndex !== -1) {
+        posts[postIndex] = currentPost;
       }
       
       savePosts();
@@ -606,7 +633,19 @@
         isBlinded: false
       };
       
+      // currentPost에 댓글 추가
+      if (!currentPost.comments) {
+        currentPost.comments = [];
+      }
       currentPost.comments.push(comment);
+      
+      // posts 배열에서 해당 게시물 찾아서 업데이트
+      const postIndex = posts.findIndex(p => p.id === currentPost.id);
+      if (postIndex !== -1) {
+        posts[postIndex] = currentPost;
+      }
+      
+      // 저장
       savePosts();
       
       // 입력 필드 초기화
@@ -745,10 +784,15 @@
     }
     
     function reportComment(commentId) {
-      if (!currentPost) return;
+      if (!currentPost || !currentPost.comments) return;
       
       const comment = currentPost.comments.find(c => c.id === commentId);
       if (!comment) return;
+      
+      // reports 배열 초기화
+      if (!comment.reports) {
+        comment.reports = [];
+      }
       
       if (comment.reports.includes(userId)) {
         showToast('이미 신고한 댓글입니다');
@@ -763,6 +807,12 @@
           showToast('댓글이 블라인드 처리되었습니다');
         } else {
           showToast('신고가 접수되었습니다');
+        }
+        
+        // posts 배열 업데이트
+        const postIndex = posts.findIndex(p => p.id === currentPost.id);
+        if (postIndex !== -1) {
+          posts[postIndex] = currentPost;
         }
         
         savePosts();
