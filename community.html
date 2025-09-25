@@ -28,13 +28,26 @@
     .slide-up { animation: slideUp 0.3s ease-out; }
     .fade-in { animation: fadeIn 0.2s ease-out; }
     
-    /* 스크롤바 숨기기 */
+    /* 스크롤바 스타일 */
     .hide-scrollbar {
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
     .hide-scrollbar::-webkit-scrollbar {
       display: none;
+    }
+    
+    /* 모달 스크롤바 개선 */
+    #postModal .overflow-y-auto {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0,0,0,0.2) transparent;
+    }
+    #postModal .overflow-y-auto::-webkit-scrollbar {
+      width: 4px;
+    }
+    #postModal .overflow-y-auto::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.2);
+      border-radius: 2px;
     }
     
     /* 터치 피드백 */
@@ -227,9 +240,9 @@
   </div>
 
   <!-- Post Detail Modal -->
-  <div id="postModal" class="hidden fixed inset-0 bg-white z-50 overflow-hidden">
-    <!-- Post Header -->
-    <div class="sticky top-0 bg-white border-b p-4 flex items-center gap-3 safe-top z-10">
+  <div id="postModal" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+    <!-- Post Header (고정) -->
+    <div class="bg-white border-b p-4 flex items-center gap-3 safe-top flex-shrink-0">
       <button onclick="closePostModal()" class="p-1">
         <i class="fas fa-arrow-left text-xl"></i>
       </button>
@@ -239,23 +252,26 @@
       </button>
     </div>
     
-    <!-- Post Content Container -->
-    <div class="overflow-y-auto" style="height: calc(100vh - 120px);">
+    <!-- Post Content Container (스크롤 영역) -->
+    <div class="flex-1 overflow-y-auto pb-20">
       <div id="postDetail" class="p-4">
         <!-- Post content will be loaded here -->
       </div>
       
       <!-- Comments Section -->
-      <div id="commentsSection" class="border-t pt-4 px-4 pb-4">
+      <div id="commentsSection" class="border-t pt-4 px-4">
         <h3 class="font-bold mb-3">댓글 <span id="commentCount">0</span></h3>
-        <div id="commentsList" class="space-y-3">
+        <div id="commentsList" class="space-y-3 pb-4">
           <!-- Comments will be loaded here -->
         </div>
+        
+        <!-- 하단 여백 추가 (댓글 입력창 높이만큼) -->
+        <div class="h-20"></div>
       </div>
     </div>
     
-    <!-- Comment Input -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-3 safe-bottom">
+    <!-- Comment Input (고정) -->
+    <div class="absolute bottom-0 left-0 right-0 bg-white border-t p-3 safe-bottom">
       <div class="flex gap-2">
         <input 
           id="commentAuthor" 
@@ -532,6 +548,12 @@
       
       // 모달 표시
       document.getElementById('postModal').classList.remove('hidden');
+      
+      // 스크롤 초기화 (맨 위로)
+      const scrollContainer = document.querySelector('#postModal .overflow-y-auto');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = 0;
+      }
     }
     
     // ===== 댓글 렌더링 =====
@@ -553,19 +575,24 @@
         return;
       }
       
-      container.innerHTML = visibleComments.map(comment => `
-        <div class="bg-gray-50 rounded-lg p-3 mb-2">
+      container.innerHTML = visibleComments.map((comment, index) => `
+        <div class="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-100">
           <div class="flex justify-between items-start mb-2">
-            <div>
-              <span class="font-medium text-sm">${escapeHtml(comment.author)}</span>
-              <span class="text-xs text-gray-500 ml-2">${formatTime(comment.date)}</span>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                ${escapeHtml(comment.author.charAt(0).toUpperCase())}
+              </div>
+              <div>
+                <span class="font-medium text-sm">${escapeHtml(comment.author)}</span>
+                <span class="text-xs text-gray-500 ml-2">${formatTime(comment.date)}</span>
+              </div>
             </div>
             <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1 hover:text-gray-600">
               <i class="fas fa-ellipsis-v"></i>
             </button>
           </div>
-          <p class="text-sm text-gray-700 whitespace-pre-wrap">${escapeHtml(comment.content)}</p>
-          ${comment.reports && comment.reports.length > 0 ? `<p class="text-xs text-red-500 mt-1">신고 ${comment.reports.length}건</p>` : ''}
+          <p class="text-sm text-gray-700 whitespace-pre-wrap ml-10">${escapeHtml(comment.content)}</p>
+          ${comment.reports && comment.reports.length > 0 ? `<p class="text-xs text-red-500 mt-1 ml-10">신고 ${comment.reports.length}건</p>` : ''}
         </div>
       `).join('');
     }
@@ -662,6 +689,17 @@
       // 댓글 목록 새로고침
       renderComments();
       showToast('댓글이 등록되었습니다');
+      
+      // 새 댓글로 스크롤
+      setTimeout(() => {
+        const commentsList = document.getElementById('commentsList');
+        if (commentsList) {
+          const lastComment = commentsList.lastElementChild;
+          if (lastComment) {
+            lastComment.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        }
+      }, 100);
     }
     
     // ===== 게시물 작성 =====
