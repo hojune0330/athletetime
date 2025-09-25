@@ -76,6 +76,26 @@
       background-color: rgba(0,0,0,0.02);
     }
     
+    /* 애니메이션 */
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    .fade-in { animation: fadeIn 0.2s ease-out; }
+    .scale-in { animation: scaleIn 0.2s ease-out; }
+    
     /* 스켈레톤 로딩 */
     @keyframes skeleton {
       0% { background-position: -200% 0; }
@@ -408,7 +428,13 @@
       
       <!-- Comments Section -->
       <div id="commentsSection" class="border-t pt-4 px-4">
-        <h3 class="font-bold mb-3">댓글 <span id="commentCount">0</span></h3>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold">댓글 <span id="commentCount">0</span></h3>
+          <div class="text-xs text-gray-500 flex items-center gap-1">
+            <i class="fas fa-lock"></i>
+            <span>수정/삭제 불가</span>
+          </div>
+        </div>
         <div id="commentsList" class="space-y-3 pb-4">
           <!-- Comments will be loaded here -->
         </div>
@@ -465,6 +491,41 @@
         </button>
         <button onclick="reportPost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
           <i class="fas fa-exclamation-triangle mr-3"></i> 신고
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comment Warning Modal -->
+  <div id="commentWarningModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeCommentWarning()"></div>
+    <div class="relative bg-white rounded-2xl p-6 max-w-sm w-full scale-in shadow-xl">
+      <div class="text-center">
+        <div class="text-4xl mb-3">⚠️</div>
+        <h3 class="text-lg font-bold mb-3">댓글 작성 안내</h3>
+        <p class="text-gray-600 mb-4 text-sm leading-relaxed">
+          댓글은 작성 후 <span class="font-bold text-red-600">수정이나 삭제가 불가능</span>합니다.<br>
+          신중하게 작성해주세요.
+        </p>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+          <p class="text-xs text-yellow-800">
+            <i class="fas fa-info-circle mr-1"></i>
+            부적절한 댓글은 신고를 통해 블라인드 처리될 수 있습니다.
+          </p>
+        </div>
+        
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="dontShowAgain" class="w-4 h-4 text-blue-500 rounded">
+          <span class="text-sm text-gray-600">다시 보지 않기</span>
+        </label>
+      </div>
+      
+      <div class="flex gap-2 mt-4">
+        <button onclick="closeCommentWarning()" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+          취소
+        </button>
+        <button onclick="confirmSubmitComment()" class="flex-1 px-4 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
+          작성하기
         </button>
       </div>
     </div>
@@ -849,6 +910,8 @@
     }
     
     // ===== 댓글 작성 =====
+    let pendingComment = null; // 작성 대기중인 댓글 데이터
+    
     function submitComment() {
       if (!currentPost) return;
       
@@ -871,7 +934,8 @@
         return;
       }
       
-      const comment = {
+      // 댓글 데이터를 임시 저장
+      pendingComment = {
         id: Date.now(),
         author: author,
         instagram: instagram || null,
@@ -881,11 +945,27 @@
         isBlinded: false
       };
       
+      // 경고 모달 표시
+      const warningShown = localStorage.getItem('commentWarningShown');
+      if (!warningShown) {
+        // 처음 댓글을 작성하는 경우 경고 표시
+        document.getElementById('dontShowAgain').checked = false; // 체크박스 초기화
+        document.getElementById('commentWarningModal').classList.remove('hidden');
+      } else {
+        // 이미 경고를 본 적이 있으면 바로 작성
+        confirmSubmitComment();
+      }
+    }
+    
+    // 댓글 작성 확인
+    function confirmSubmitComment() {
+      if (!pendingComment || !currentPost) return;
+      
       // currentPost에 댓글 추가
       if (!currentPost.comments) {
         currentPost.comments = [];
       }
-      currentPost.comments.push(comment);
+      currentPost.comments.push(pendingComment);
       
       // posts 배열에서 해당 게시물 찾아서 업데이트
       const postIndex = posts.findIndex(p => p.id === currentPost.id);
@@ -896,14 +976,23 @@
       // 저장
       savePosts();
       
+      // "다시 보지 않기" 체크 확인
+      const dontShowAgain = document.getElementById('dontShowAgain').checked;
+      if (dontShowAgain) {
+        localStorage.setItem('commentWarningShown', 'true');
+      }
+      
       // 입력 필드 초기화
-      authorInput.value = '';
-      contentInput.value = '';
-      instagramInput.value = '';
+      document.getElementById('commentAuthor').value = '';
+      document.getElementById('commentInput').value = '';
+      document.getElementById('commentInstagram').value = '';
       
       // 댓글 목록 새로고침
       renderComments();
       showToast('댓글이 등록되었습니다');
+      
+      // 모달 닫기
+      closeCommentWarning();
       
       // 새 댓글로 스크롤
       setTimeout(() => {
@@ -915,6 +1004,15 @@
           }
         }
       }, 100);
+      
+      // pendingComment 초기화
+      pendingComment = null;
+    }
+    
+    // 댓글 경고 모달 닫기
+    function closeCommentWarning() {
+      document.getElementById('commentWarningModal').classList.add('hidden');
+      pendingComment = null;
     }
     
     // ===== 게시물 작성 =====
