@@ -94,6 +94,12 @@
       </div>
     </div>
     
+    <!-- 활성 사용자 표시 -->
+    <div class="px-4 pb-2 text-xs text-white/80">
+      <i class="fas fa-circle text-green-400 text-[8px] animate-pulse"></i>
+      <span id="activeUserCount">1</span>명 접속중
+    </div>
+    
     <!-- Search Bar (Hidden by default) -->
     <div id="searchBar" class="hidden px-4 pb-3">
       <div class="relative">
@@ -297,6 +303,7 @@
     <span id="toastMessage"></span>
   </div>
 
+  <script src="active-users.js"></script>
   <script>
     // ===== 상태 관리 =====
     let posts = [];
@@ -972,7 +979,31 @@
     }
     
     // ===== 페이지 초기화 =====
-    window.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('DOMContentLoaded', () => {
+      // 활성 사용자 시스템 초기화
+      ActiveUsers.initSession();
+      
+      // 커뮤니티 초기화
+      init();
+      
+      // 활성 사용자 수 업데이트
+      function updateActiveUsers() {
+        const activeCount = ActiveUsers.getActiveCount() || 1;
+        const activeElement = document.getElementById('activeUserCount');
+        if (activeElement) {
+          activeElement.textContent = activeCount;
+        }
+      }
+      
+      // 초기 업데이트
+      updateActiveUsers();
+      
+      // 주기적으로 업데이트
+      setInterval(updateActiveUsers, 30000);
+      
+      // 활성 사용자 업데이트 이벤트
+      window.addEventListener('activeUsersUpdate', updateActiveUsers);
+    });
   </script>
 </body>
 </html>

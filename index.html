@@ -217,14 +217,14 @@
     </div>
   </footer>
 
+  <script src="active-users.js"></script>
   <script>
     // 통계 업데이트
     function updateStats() {
       const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const users = JSON.parse(localStorage.getItem('athletetime_users') || '[]');
       
-      // 랜덤 활성 사용자 (시뮬레이션)
-      const activeUsers = Math.floor(Math.random() * 20) + 5;
+      // 실제 활성 사용자 수
+      const activeUserCount = ActiveUsers.getActiveCount();
       
       // 오늘 댓글 수
       const today = new Date().toDateString();
@@ -235,16 +235,23 @@
         return total + todayPostComments;
       }, 0);
       
-      // UI 업데이트
-      document.getElementById('userCount').textContent = activeUsers;
-      document.getElementById('postCount').textContent = posts.length;
-      document.getElementById('commentCount').textContent = todayComments;
-      document.getElementById('activeUsers').textContent = activeUsers;
+      // 실제 게시물 수 (블라인드 제외)
+      const visiblePosts = posts.filter(p => !p.isBlinded).length;
       
-      // 애니메이션 효과
-      animateNumber('userCount', 0, activeUsers, 1000);
-      animateNumber('postCount', 0, posts.length, 1000);
-      animateNumber('commentCount', 0, todayComments, 1000);
+      // UI 업데이트
+      document.getElementById('userCount').textContent = activeUserCount;
+      document.getElementById('postCount').textContent = visiblePosts;
+      document.getElementById('commentCount').textContent = todayComments;
+      
+      // 익명게시판 활성 사용자
+      const communityUsers = ActiveUsers.getActiveByPage('/community.html');
+      document.getElementById('activeUsers').textContent = communityUsers || activeUserCount;
+      
+      // 최소 1명은 표시 (본인)
+      if (activeUserCount === 0) {
+        document.getElementById('userCount').textContent = '1';
+        document.getElementById('activeUsers').textContent = '1';
+      }
     }
     
     // 숫자 애니메이션
@@ -266,10 +273,21 @@
     
     // 페이지 로드시 실행
     window.addEventListener('DOMContentLoaded', () => {
+      // 활성 사용자 시스템 초기화
+      ActiveUsers.initSession();
+      
+      // 초기 통계 업데이트
       updateStats();
       
-      // 주기적으로 업데이트
+      // 주기적으로 업데이트 (30초마다)
       setInterval(updateStats, 30000);
+      
+      // 활성 사용자 업데이트 이벤트 리스너
+      window.addEventListener('activeUsersUpdate', (e) => {
+        const count = e.detail.count || 1;
+        document.getElementById('userCount').textContent = count;
+        document.getElementById('activeUsers').textContent = count;
+      });
     });
   </script>
 </body>
