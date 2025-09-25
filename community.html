@@ -226,6 +226,26 @@
           <textarea id="postContent" placeholder="내용을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm h-40 resize-none"></textarea>
         </div>
         
+        <!-- 이미지 업로드 -->
+        <div>
+          <label class="text-xs text-gray-600 mb-1 block">
+            사진 첨부 <span class="text-gray-400">(최대 3장, 각 5MB)</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <label for="imageInput" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 text-sm">
+              <i class="fas fa-camera mr-2"></i>사진 선택
+            </label>
+            <input id="imageInput" type="file" accept="image/*" multiple class="hidden" onchange="handleImageSelect(event)">
+            <span id="imageCount" class="text-xs text-gray-500"></span>
+          </div>
+          
+          <!-- 이미지 미리보기 -->
+          <div id="imagePreview" class="mt-2 flex flex-wrap gap-2"></div>
+          
+          <!-- 용량 표시 -->
+          <div id="storageInfo" class="text-xs text-gray-500 mt-2"></div>
+        </div>
+        
         <div>
           <label class="text-xs text-gray-600 mb-1 block">비밀번호 (수정/삭제용)</label>
           <input id="postPassword" type="password" placeholder="비밀번호를 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
@@ -320,6 +340,7 @@
   </div>
 
   <script src="active-users.js"></script>
+  <script src="image-handler.js"></script>
   <script>
     // ===== 상태 관리 =====
     let posts = [];
@@ -327,6 +348,7 @@
     let currentSort = 'latest';
     let currentPost = null;
     let searchQuery = '';
+    let selectedImages = []; // 선택된 이미지들
     
     // 로컬 스토리지 키
     const STORAGE_KEY = 'athletetime_posts';
@@ -432,9 +454,11 @@
                   <span><i class="far fa-eye"></i> ${post.views}</span>
                   <span><i class="far fa-comment"></i> ${post.comments.filter(c => !c.isBlinded).length}</span>
                   <span><i class="far fa-thumbs-up"></i> ${post.likes.length}</span>
+                  ${post.images && post.images.length > 0 ? `<span><i class="far fa-image"></i> ${post.images.length}</span>` : ''}
                 </div>
               </div>
-              ${post.thumbnail ? `<img src="${post.thumbnail}" class="w-16 h-16 rounded object-cover">` : ''}
+              ${post.images && post.images.length > 0 ? 
+                `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3">` : ''}
             </div>
           </div>
         `;
@@ -522,6 +546,20 @@
           
           <!-- 내용 -->
           <div class="py-4 text-gray-800 whitespace-pre-wrap min-h-[200px]">${escapeHtml(currentPost.content)}</div>
+          
+          <!-- 이미지 -->
+          ${currentPost.images && currentPost.images.length > 0 ? `
+            <div class="py-4 space-y-2">
+              ${currentPost.images.map(img => `
+                <img 
+                  src="${img.original || img.thumbnail}" 
+                  class="w-full rounded-lg cursor-pointer"
+                  onclick="ImageHandler.showFullImage('${img.original || img.thumbnail}')"
+                  alt="게시물 이미지"
+                >
+              `).join('')}
+            </div>
+          ` : ''}
           
           <!-- 투표 버튼 -->
           <div class="flex gap-2 py-4 border-y">
@@ -720,6 +758,18 @@
         return;
       }
       
+      // 저장소 용량 체크
+      const storage = ImageHandler.checkStorageSpace();
+      if (storage.percent > 80) {
+        showToast(`저장 공간 부족 (${storage.percent}% 사용중)`);
+        // 오래된 이미지 정리
+        const cleaned = ImageHandler.cleanOldImages(posts, 3); // 3일 이상된 이미지 정리
+        if (cleaned > 0) {
+          savePosts();
+          showToast(`${cleaned}개 게시물의 이미지를 정리했습니다`);
+        }
+      }
+      
       const newPost = {
         id: Date.now(),
         category: category,
@@ -727,6 +777,7 @@
         author: author,
         content: content,
         password: password,
+        images: selectedImages, // 이미지 추가
         date: new Date().toISOString(),
         views: 0,
         likes: [],
@@ -903,6 +954,12 @@
       document.getElementById('postTitle').value = '';
       document.getElementById('postContent').value = '';
       document.getElementById('postPassword').value = '';
+      
+      // 이미지 초기화
+      selectedImages = [];
+      document.getElementById('imagePreview').innerHTML = '';
+      document.getElementById('imageCount').textContent = '';
+      document.getElementById('storageInfo').textContent = '';
     }
     
     function closePostModal() {
@@ -1014,6 +1071,102 @@
       if (hours > 0) return `${hours}시간 전`;
       if (minutes > 0) return `${minutes}분 전`;
       return '방금 전';
+    }
+    
+    // ===== 이미지 처리 함수 =====
+    async function handleImageSelect(event) {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
+      
+      // 기존 선택된 이미지와 합쳐서 3장 제한
+      if (selectedImages.length + files.length > 3) {
+        showToast('최대 3장까지만 업로드 가능합니다');
+        return;
+      }
+      
+      showToast('이미지 처리중...');
+      
+      try {
+        const { results, errors } = await ImageHandler.processMultipleImages(files);
+        
+        if (errors.length > 0) {
+          errors.forEach(err => {
+            showToast(`${err.file}: ${err.error}`);
+          });
+        }
+        
+        // 이미지 추가
+        selectedImages = [...selectedImages, ...results];
+        
+        // 미리보기 업데이트
+        updateImagePreview();
+        
+        // 용량 정보 업데이트
+        updateStorageInfo();
+        
+        if (results.length > 0) {
+          showToast(`${results.length}장의 이미지가 추가되었습니다`);
+        }
+      } catch (error) {
+        showToast('이미지 처리 실패: ' + error.message);
+      }
+      
+      // input 초기화 (같은 파일 다시 선택 가능하도록)
+      event.target.value = '';
+    }
+    
+    function updateImagePreview() {
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = '';
+      
+      selectedImages.forEach((img, index) => {
+        const div = document.createElement('div');
+        div.className = 'relative inline-block';
+        
+        const imgEl = document.createElement('img');
+        imgEl.src = img.thumbnail;
+        imgEl.className = 'w-20 h-20 object-cover rounded border cursor-pointer';
+        imgEl.onclick = () => ImageHandler.showFullImage(img.original);
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          removeImage(index);
+        };
+        
+        const sizeText = document.createElement('div');
+        sizeText.className = 'text-xs text-center text-gray-500 mt-1';
+        sizeText.textContent = `${(img.size / 1024).toFixed(0)}KB`;
+        
+        div.appendChild(imgEl);
+        div.appendChild(removeBtn);
+        div.appendChild(sizeText);
+        preview.appendChild(div);
+      });
+      
+      // 이미지 개수 업데이트
+      document.getElementById('imageCount').textContent = 
+        selectedImages.length > 0 ? `${selectedImages.length}/3장 선택됨` : '';
+    }
+    
+    function removeImage(index) {
+      selectedImages.splice(index, 1);
+      updateImagePreview();
+      updateStorageInfo();
+    }
+    
+    function updateStorageInfo() {
+      const storage = ImageHandler.checkStorageSpace();
+      const info = document.getElementById('storageInfo');
+      
+      if (selectedImages.length > 0) {
+        const totalSize = selectedImages.reduce((sum, img) => sum + img.size, 0);
+        info.textContent = `총 ${(totalSize / 1024).toFixed(0)}KB | 저장소 ${storage.percent}% 사용중`;
+      } else {
+        info.textContent = '';
+      }
     }
     
     // ===== 페이지 초기화 =====
