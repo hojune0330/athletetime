@@ -19,17 +19,20 @@ const ImageHandler = {
       forceCompress = false  // 강제 압축 옵션
     } = options;
     
+    // this 컨텍스트 저장
+    const self = this;
+    
     return new Promise((resolve, reject) => {
       // 입력 파일 크기 체크 (50MB까지 허용)
-      if (file.size > this.MAX_INPUT_SIZE) {
+      if (file.size > self.MAX_INPUT_SIZE) {
         reject(new Error(`파일이 너무 큽니다. 최대 50MB까지 가능합니다. (현재: ${(file.size / 1024 / 1024).toFixed(2)}MB)`));
         return;
       }
       
       // 이미지 타입 체크
-      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!file.type || !acceptedTypes.includes(file.type.toLowerCase())) {
-        reject(new Error(`지원하지 않는 파일 형식입니다. (지원 형식: JPG, PNG, GIF, WebP, HEIC)`));
+        reject(new Error(`지원하지 않는 파일 형식입니다. (지원 형식: JPG, PNG, GIF, WebP)`));
         return;
       }
       
@@ -43,19 +46,34 @@ const ImageHandler = {
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           
-          // 비율 계산
+          // 원본 크기가 매우 크면 먼저 줄임
           let width = img.width;
           let height = img.height;
           
+          // 원본이 4000px를 넘으면 먼저 줄임
+          if (width > 4000 || height > 4000) {
+            const preScale = Math.min(4000 / width, 4000 / height);
+            width = Math.floor(width * preScale);
+            height = Math.floor(height * preScale);
+            console.log(`Pre-scaling large image: ${img.width}x${img.height} → ${width}x${height}`);
+          }
+          
+          // 설정된 최대 크기로 다시 조정
           if (width > maxWidth || height > maxHeight) {
             const ratio = Math.min(maxWidth / width, maxHeight / height);
-            width *= ratio;
-            height *= ratio;
+            width = Math.floor(width * ratio);
+            height = Math.floor(height * ratio);
           }
           
           // Canvas 크기 설정
           canvas.width = width;
           canvas.height = height;
+          
+          // PNG의 경우 흰색 배경 추가 (투명 배경 처리)
+          if (file.type === 'image/png') {
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, width, height);
+          }
           
           // 이미지 그리기
           ctx.drawImage(img, 0, 0, width, height);
@@ -64,25 +82,50 @@ const ImageHandler = {
           if (outputType === 'base64') {
             let finalQuality = quality;
             let base64 = canvas.toDataURL('image/jpeg', finalQuality);
-            let estimatedSize = Math.round(base64.length * 0.75);
+            // Base64 실제 크기 계산 (더 정확한 방법)
+            let estimatedSize = (base64.length - 'data:image/jpeg;base64,'.length) * 3 / 4;
+            
+            console.log(`Initial compression: ${(file.size/1024/1024).toFixed(2)}MB → ${(estimatedSize/1024/1024).toFixed(2)}MB (quality: ${finalQuality})`);
             
             // 압축 후에도 5MB를 초과하면 품질을 더 낮춰서 재압축
             let attempts = 0;
-            while (estimatedSize > this.MAX_FILE_SIZE && attempts < 5) {
-              finalQuality *= 0.8; // 품질을 20%씩 감소
+            while (estimatedSize > self.MAX_FILE_SIZE && attempts < 5) {
+              finalQuality = Math.max(0.3, finalQuality * 0.8); // 품질을 20%씩 감소 (최소 0.3)
               base64 = canvas.toDataURL('image/jpeg', finalQuality);
-              estimatedSize = Math.round(base64.length * 0.75);
+              estimatedSize = (base64.length - 'data:image/jpeg;base64,'.length) * 3 / 4;
               attempts++;
+              console.log(`Recompression attempt ${attempts}: ${(estimatedSize/1024/1024).toFixed(2)}MB (quality: ${finalQuality.toFixed(2)})`);
             }
             
             // 그래도 크면 크기를 더 줄임
-            if (estimatedSize > this.MAX_FILE_SIZE) {
-              const scaleFactor = Math.sqrt(this.MAX_FILE_SIZE / estimatedSize) * 0.9;
-              canvas.width = Math.floor(width * scaleFactor);
-              canvas.height = Math.floor(height * scaleFactor);
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              base64 = canvas.toDataURL('image/jpeg', 0.7);
-              estimatedSize = Math.round(base64.length * 0.75);
+            if (estimatedSize > self.MAX_FILE_SIZE) {
+              const scaleFactor = Math.sqrt(self.MAX_FILE_SIZE / estimatedSize) * 0.8;
+              const newWidth = Math.max(400, Math.floor(width * scaleFactor));
+              const newHeight = Math.max(400, Math.floor(height * scaleFactor));
+              
+              console.log(`Resizing image: ${width}x${height} → ${newWidth}x${newHeight}`);
+              
+              // 새 캔버스 생성
+              const newCanvas = document.createElement('canvas');
+              const newCtx = newCanvas.getContext('2d');
+              newCanvas.width = newWidth;
+              newCanvas.height = newHeight;
+              
+              // PNG의 경우 흰색 배경
+              if (file.type === 'image/png') {
+                newCtx.fillStyle = '#FFFFFF';
+                newCtx.fillRect(0, 0, newWidth, newHeight);
+              }
+              
+              newCtx.drawImage(img, 0, 0, newWidth, newHeight);
+              base64 = newCanvas.toDataURL('image/jpeg', 0.4);
+              estimatedSize = (base64.length - 'data:image/jpeg;base64,'.length) * 3 / 4;
+              
+              // 최종 캔버스 업데이트
+              canvas.width = newWidth;
+              canvas.height = newHeight;
+              
+              console.log(`Final size after resize: ${(estimatedSize/1024/1024).toFixed(2)}MB`);
             }
             
             resolve({
@@ -134,22 +177,30 @@ const ImageHandler = {
       forceCompress: true
     };
     
-    if (fileSizeMB > 20) {
-      // 20MB 이상: 공격적 압축
+    // 더 공격적인 압축 전략
+    if (fileSizeMB > 30) {
+      // 30MB 이상: 매우 공격적 압축
+      compressionOptions.maxWidth = 800;
+      compressionOptions.maxHeight = 800;
+      compressionOptions.quality = 0.5;
+    } else if (fileSizeMB > 20) {
+      // 20-30MB: 공격적 압축
       compressionOptions.maxWidth = 1000;
       compressionOptions.maxHeight = 1000;
-      compressionOptions.quality = 0.6;
+      compressionOptions.quality = 0.55;
     } else if (fileSizeMB > 10) {
       // 10-20MB: 중간 압축
+      compressionOptions.maxWidth = 1100;
+      compressionOptions.maxHeight = 1100;
+      compressionOptions.quality = 0.65;
+    } else if (fileSizeMB > 5) {
+      // 5-10MB: 약간 압축
       compressionOptions.maxWidth = 1200;
       compressionOptions.maxHeight = 1200;
       compressionOptions.quality = 0.7;
-    } else if (fileSizeMB > 5) {
-      // 5-10MB: 약간 압축
-      compressionOptions.quality = 0.75;
     }
     
-    console.log(`Smart compress: ${fileSizeMB.toFixed(2)}MB file with quality ${compressionOptions.quality}`);
+    console.log(`Smart compress: ${fileSizeMB.toFixed(2)}MB file with strategy:`, compressionOptions);
     
     try {
       const result = await this.compressImage(file, compressionOptions);
@@ -157,8 +208,25 @@ const ImageHandler = {
       
       console.log(`Compressed: ${fileSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB (${result.compressionRatio}% reduction)`);
       
+      // 여전히 크면 추가 압축 시도
       if (result.size > this.MAX_FILE_SIZE) {
-        throw new Error(`압축 후에도 파일이 너무 큽니다 (${compressedSizeMB.toFixed(2)}MB). 더 작은 이미지를 사용해주세요.`);
+        console.log(`Still too large, trying aggressive compression...`);
+        
+        // 매우 공격적인 재압축
+        compressionOptions.maxWidth = 600;
+        compressionOptions.maxHeight = 600;
+        compressionOptions.quality = 0.4;
+        
+        const secondTry = await this.compressImage(file, compressionOptions);
+        const secondSizeMB = secondTry.size / 1024 / 1024;
+        
+        console.log(`Aggressive recompression: ${compressedSizeMB.toFixed(2)}MB → ${secondSizeMB.toFixed(2)}MB`);
+        
+        if (secondTry.size > this.MAX_FILE_SIZE) {
+          throw new Error(`파일이 너무 커서 압축할 수 없습니다. (${secondSizeMB.toFixed(2)}MB) 더 작은 이미지를 사용하거나 스크린샷으로 찍어주세요.`);
+        }
+        
+        return secondTry;
       }
       
       return result;
