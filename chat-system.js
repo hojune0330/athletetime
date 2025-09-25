@@ -212,6 +212,16 @@ const ChatSystem = {
       timestamp: Date.now()
     });
     
+    // 메인 채팅방에 알림 메시지 추가
+    if (this.threads.main) {
+      this.threads.main.messages.push({
+        id: Date.now() + 1,
+        type: 'system',
+        content: `🎉 새로운 채팅방 "${name}"이(가) 생성되었습니다!`,
+        timestamp: Date.now()
+      });
+    }
+    
     this.saveData();
     this.renderThreadList();
     this.selectThread(threadId);
@@ -310,11 +320,25 @@ const ChatSystem = {
     
     if (!thread) return;
     
+    // Room Discovery Panel 표시 여부
+    const roomDiscoveryPanel = document.getElementById('roomDiscoveryPanel');
+    if (this.currentThread === 'main') {
+      roomDiscoveryPanel.classList.remove('hidden');
+      this.updateRoomDiscovery();
+    } else {
+      roomDiscoveryPanel.classList.add('hidden');
+    }
+    
     let html = '';
+    
+    // Room Discovery Panel을 위한 placeholder (메인 채팅방에서만)
+    if (this.currentThread === 'main') {
+      html = '<div id="roomDiscoveryPlaceholder"></div>';
+    }
     
     // 환영 메시지
     if (thread.messages.length === 0) {
-      html = `
+      html += `
         <div class="text-center py-8">
           <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-6 inline-block">
             <div class="text-4xl mb-2">${thread.icon}</div>
@@ -355,6 +379,13 @@ const ChatSystem = {
     });
     
     container.innerHTML = html;
+    
+    // Room Discovery Panel을 placeholder 위치에 이동
+    if (this.currentThread === 'main' && document.getElementById('roomDiscoveryPlaceholder')) {
+      const placeholder = document.getElementById('roomDiscoveryPlaceholder');
+      placeholder.parentNode.replaceChild(roomDiscoveryPanel, placeholder);
+    }
+    
     this.scrollToBottom();
   },
   
@@ -410,6 +441,148 @@ const ChatSystem = {
     });
     
     container.innerHTML = html;
+    
+    // Room discovery panel도 업데이트
+    if (this.currentThread === 'main') {
+      this.updateRoomDiscovery();
+    }
+  },
+  
+  // Room Discovery 패널 업데이트
+  updateRoomDiscovery() {
+    const threads = Object.values(this.threads).filter(t => !t.isPermanent);
+    
+    if (threads.length === 0) {
+      document.getElementById('popularRooms').innerHTML = `
+        <div class="col-span-2 text-center text-xs text-gray-400 py-2">
+          아직 생성된 채팅방이 없습니다
+        </div>
+      `;
+      document.getElementById('newRooms').innerHTML = `
+        <div class="col-span-2 text-center text-xs text-gray-400 py-2">
+          첫 번째 채팅방을 만들어보세요!
+        </div>
+      `;
+      
+      // 통계 업데이트
+      document.getElementById('totalRoomsCount').textContent = '0';
+      document.getElementById('activeUsersCount').textContent = ActiveUsers ? ActiveUsers.getActiveCount() : 1;
+      document.getElementById('totalMessagesCount').textContent = this.getTotalMessagesToday();
+      return;
+    }
+    
+    // 인기 채팅방 (메시지가 많은 순)
+    const popularThreads = [...threads]
+      .sort((a, b) => {
+        // 먼저 메시지 수로 정렬
+        const msgDiff = b.messages.length - a.messages.length;
+        if (msgDiff !== 0) return msgDiff;
+        // 메시지 수가 같으면 사용자 수로 정렬
+        return (b.users?.length || 0) - (a.users?.length || 0);
+      })
+      .slice(0, 4);
+    
+    // 새로운 채팅방 (최근 생성순)
+    const newThreads = [...threads]
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .slice(0, 4);
+    
+    // 인기 채팅방 렌더링
+    let popularHtml = '';
+    if (popularThreads.length > 0) {
+      popularThreads.forEach((thread, index) => {
+        const timeLeft = Math.max(0, this.THREAD_LIFETIME - (Date.now() - thread.lastActivity));
+        const minutes = Math.floor(timeLeft / 60000);
+        const isHot = thread.messages.length >= 10 || (thread.users?.length || 0) >= 3;
+        
+        popularHtml += `
+          <div onclick="ChatSystem.selectThread('${thread.id}')" class="room-card bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-2 hover:shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2 flex-1">
+                <div class="text-lg">${thread.icon}</div>
+                <div class="flex-1 min-w-0">
+                  <h5 class="text-xs font-bold truncate">${this.escapeHtml(thread.name)}</h5>
+                  <div class="flex items-center gap-2 text-[10px] text-gray-600 mt-1">
+                    <span><i class="fas fa-users"></i> ${thread.users?.length || 0}</span>
+                    <span><i class="fas fa-comment"></i> ${thread.messages.length}</span>
+                    ${minutes <= 10 ? `<span class="text-red-500 font-medium">${minutes}분</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              ${isHot ? '<span class="room-badge text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full">🔥</span>' : ''}
+              ${index === 0 && thread.messages.length > 0 ? '<span class="text-[10px] bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded-full font-bold">#1</span>' : ''}
+            </div>
+          </div>
+        `;
+      });
+    } else {
+      popularHtml = `
+        <div class="col-span-2 text-center text-xs text-gray-400 py-2">
+          채팅이 활발해지면 여기에 표시됩니다
+        </div>
+      `;
+    }
+    
+    // 새로운 채팅방 렌더링
+    let newHtml = '';
+    if (newThreads.length > 0) {
+      newThreads.forEach(thread => {
+        const timeLeft = Math.max(0, this.THREAD_LIFETIME - (Date.now() - thread.lastActivity));
+        const minutes = Math.floor(timeLeft / 60000);
+        const isNew = (Date.now() - thread.createdAt) < 5 * 60000; // 5분 이내 생성
+        
+        newHtml += `
+          <div onclick="ChatSystem.selectThread('${thread.id}')" class="room-card bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-2 hover:shadow-md ${isNew ? 'bounce-in' : ''}">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center gap-2 flex-1">
+                <div class="text-lg">${thread.icon}</div>
+                <div class="flex-1 min-w-0">
+                  <h5 class="text-xs font-bold truncate">${this.escapeHtml(thread.name)}</h5>
+                  <div class="text-[10px] text-gray-500 truncate">${thread.description || '새로운 채팅방'}</div>
+                  <div class="flex items-center gap-2 text-[10px] text-gray-600 mt-1">
+                    <span><i class="fas fa-clock"></i> ${this.formatTimeAgo(thread.createdAt)}</span>
+                    ${minutes <= 10 ? `<span class="text-red-500 font-medium">${minutes}분 남음</span>` : ''}
+                  </div>
+                </div>
+              </div>
+              ${isNew ? '<span class="text-[10px] bg-purple-500 text-white px-1.5 py-0.5 rounded-full animate-pulse">NEW</span>' : ''}
+            </div>
+          </div>
+        `;
+      });
+    } else {
+      newHtml = `
+        <div class="col-span-2 text-center text-xs text-gray-400 py-2">
+          새로운 채팅방을 만들어보세요!
+        </div>
+      `;
+    }
+    
+    document.getElementById('popularRooms').innerHTML = popularHtml;
+    document.getElementById('newRooms').innerHTML = newHtml;
+    
+    // 통계 업데이트
+    document.getElementById('totalRoomsCount').textContent = threads.length;
+    document.getElementById('activeUsersCount').textContent = ActiveUsers ? ActiveUsers.getActiveCount() : 1;
+    document.getElementById('totalMessagesCount').textContent = this.getTotalMessagesToday();
+  },
+  
+  // 오늘 총 메시지 수 계산
+  getTotalMessagesToday() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayTime = today.getTime();
+    
+    let totalMessages = 0;
+    Object.values(this.threads).forEach(thread => {
+      thread.messages.forEach(msg => {
+        if (msg.timestamp >= todayTime && msg.type === 'user') {
+          totalMessages++;
+        }
+      });
+    });
+    
+    return totalMessages;
   },
   
   // 업데이트 루프
@@ -423,6 +596,11 @@ const ChatSystem = {
       
       // 스레드 목록 업데이트 (시간 표시)
       this.renderThreadList();
+      
+      // Room Discovery 패널 업데이트 (메인 채팅방인 경우)
+      if (this.currentThread === 'main' && !document.getElementById('roomDiscoveryPanel').classList.contains('hidden')) {
+        this.updateRoomDiscovery();
+      }
     }, this.UPDATE_INTERVAL);
   },
   
@@ -532,6 +710,19 @@ const ChatSystem = {
 };
 
 // 전역 함수들
+function toggleDiscoveryExpand(type) {
+  const roomsDiv = document.getElementById(type === 'popular' ? 'popularRooms' : 'newRooms');
+  const icon = document.getElementById(type === 'popular' ? 'popularExpandIcon' : 'newExpandIcon');
+  
+  if (roomsDiv.classList.contains('hidden')) {
+    roomsDiv.classList.remove('hidden');
+    icon.className = 'fas fa-chevron-down';
+  } else {
+    roomsDiv.classList.add('hidden');
+    icon.className = 'fas fa-chevron-right';
+  }
+}
+
 function goBack() {
   window.location.href = 'index.html';
 }

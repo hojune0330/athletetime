@@ -118,6 +118,32 @@
     .emoji-btn:hover {
       background: #F3F4F6;
     }
+    
+    /* Room Discovery Cards */
+    .room-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .room-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .room-badge {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .bounce-in {
+      animation: bounceIn 0.5s ease-out;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -212,6 +238,61 @@
       
       <!-- Messages Container -->
       <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <!-- Room Discovery Panel (Only in Main Room) -->
+        <div id="roomDiscoveryPanel" class="hidden">
+          <!-- Popular Rooms -->
+          <div class="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-bold text-gray-700">
+                <i class="fas fa-fire text-orange-500 mr-1"></i>
+                인기 채팅방
+              </h4>
+              <button onclick="toggleDiscoveryExpand('popular')" class="text-xs text-gray-500">
+                <i id="popularExpandIcon" class="fas fa-chevron-down"></i>
+              </button>
+            </div>
+            <div id="popularRooms" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <!-- Popular rooms will be inserted here -->
+            </div>
+          </div>
+          
+          <!-- New Rooms -->
+          <div class="bg-white rounded-lg shadow-sm p-3 mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-bold text-gray-700">
+                <i class="fas fa-sparkles text-purple-500 mr-1"></i>
+                새로운 채팅방
+              </h4>
+              <button onclick="toggleDiscoveryExpand('new')" class="text-xs text-gray-500">
+                <i id="newExpandIcon" class="fas fa-chevron-down"></i>
+              </button>
+            </div>
+            <div id="newRooms" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <!-- New rooms will be inserted here -->
+            </div>
+          </div>
+          
+          <!-- Quick Stats -->
+          <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 mb-3">
+            <div class="flex items-center justify-around text-center">
+              <div>
+                <div class="text-lg font-bold text-purple-600" id="totalRoomsCount">0</div>
+                <div class="text-xs text-gray-600">전체 채팅방</div>
+              </div>
+              <div class="border-l border-purple-200 h-8"></div>
+              <div>
+                <div class="text-lg font-bold text-pink-600" id="activeUsersCount">0</div>
+                <div class="text-xs text-gray-600">활동중인 사용자</div>
+              </div>
+              <div class="border-l border-purple-200 h-8"></div>
+              <div>
+                <div class="text-lg font-bold text-blue-600" id="totalMessagesCount">0</div>
+                <div class="text-xs text-gray-600">오늘의 메시지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- Welcome Message -->
         <div class="text-center py-8">
           <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-6 inline-block">
