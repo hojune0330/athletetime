@@ -264,7 +264,7 @@
         <!-- 이미지 업로드 -->
         <div>
           <label class="text-xs text-gray-600 mb-1 block">
-            사진 첨부 <span class="text-gray-400">(최대 3장, 각 5MB)</span>
+            사진 첨부 <span class="text-gray-400">(최대 3장, 50MB까지 자동 압축)</span>
           </label>
           <div class="flex items-center gap-2">
             <label for="imageInput" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-200 text-sm">
@@ -272,6 +272,12 @@
             </label>
             <input id="imageInput" type="file" accept="image/*" multiple class="hidden" onchange="handleImageSelect(event)">
             <span id="imageCount" class="text-xs text-gray-500"></span>
+          </div>
+          
+          <!-- 압축 진행 표시 -->
+          <div id="compressionProgress" class="hidden mt-2 text-xs text-blue-600">
+            <i class="fas fa-compress animate-pulse mr-1"></i>
+            <span id="compressionStatus">이미지 압축중...</span>
           </div>
           
           <!-- 이미지 미리보기 -->
@@ -1069,16 +1075,21 @@
       document.getElementById('postMenu').classList.add('hidden');
     }
     
-    function showToast(message) {
+    function showToast(message, duration = 3000) {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toastMessage');
       
       toastMessage.textContent = message;
       toast.classList.remove('hidden');
       
-      setTimeout(() => {
+      // 기존 타이머 제거
+      if (window.toastTimer) {
+        clearTimeout(window.toastTimer);
+      }
+      
+      window.toastTimer = setTimeout(() => {
         toast.classList.add('hidden');
-      }, 3000);
+      }, duration);
     }
     
     // ===== 검색 기능 =====
@@ -1177,14 +1188,28 @@
         return;
       }
       
-      showToast('이미지 처리중...');
+      // 압축 진행 표시
+      const progressEl = document.getElementById('compressionProgress');
+      const statusEl = document.getElementById('compressionStatus');
+      progressEl.classList.remove('hidden');
+      
+      // 파일 크기 계산
+      const totalSizeMB = Array.from(files).reduce((sum, file) => sum + file.size, 0) / 1024 / 1024;
+      let processedCount = 0;
       
       try {
+        // 대용량 파일 경고
+        if (totalSizeMB > 10) {
+          statusEl.textContent = `대용량 이미지 압축중... (${totalSizeMB.toFixed(1)}MB)`;
+        } else {
+          statusEl.textContent = '이미지 처리중...';
+        }
+        
         const { results, errors } = await ImageHandler.processMultipleImages(files);
         
         if (errors.length > 0) {
           errors.forEach(err => {
-            showToast(`${err.file}: ${err.error}`);
+            showToast(`❌ ${err.file} (${err.size}): ${err.error}`, 5000);
           });
         }
         
@@ -1198,10 +1223,22 @@
         updateStorageInfo();
         
         if (results.length > 0) {
-          showToast(`${results.length}장의 이미지가 추가되었습니다`);
+          // 압축 결과 표시
+          const totalCompressed = results.reduce((sum, img) => sum + img.size, 0) / 1024 / 1024;
+          const totalOriginal = results.reduce((sum, img) => sum + img.originalSize, 0) / 1024 / 1024;
+          const avgCompression = results.reduce((sum, img) => sum + img.compressionRatio, 0) / results.length;
+          
+          let message = `✅ ${results.length}장 추가됨`;
+          if (totalOriginal > 5) {
+            message += ` (${totalOriginal.toFixed(1)}MB → ${totalCompressed.toFixed(1)}MB, ${avgCompression.toFixed(0)}% 압축)`;
+          }
+          showToast(message, 4000);
         }
       } catch (error) {
-        showToast('이미지 처리 실패: ' + error.message);
+        showToast('❌ 이미지 처리 실패: ' + error.message, 5000);
+      } finally {
+        // 압축 진행 표시 숨기기
+        progressEl.classList.add('hidden');
       }
       
       // input 초기화 (같은 파일 다시 선택 가능하도록)
@@ -1231,7 +1268,15 @@
         
         const sizeText = document.createElement('div');
         sizeText.className = 'text-xs text-center text-gray-500 mt-1';
-        sizeText.textContent = `${(img.size / 1024).toFixed(0)}KB`;
+        const sizeMB = img.size / 1024 / 1024;
+        const originalSizeMB = img.originalSize / 1024 / 1024;
+        
+        if (originalSizeMB > 5) {
+          // 대용량 파일 압축된 경우 압축률 표시
+          sizeText.innerHTML = `<span class="text-green-600">${sizeMB.toFixed(1)}MB</span><br><span class="text-xs">(${originalSizeMB.toFixed(1)}MB→${img.compressionRatio}%↓)</span>`;
+        } else {
+          sizeText.textContent = sizeMB < 1 ? `${(img.size / 1024).toFixed(0)}KB` : `${sizeMB.toFixed(1)}MB`;
+        }
         
         div.appendChild(imgEl);
         div.appendChild(removeBtn);

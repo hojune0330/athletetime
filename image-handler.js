@@ -5,7 +5,8 @@ const ImageHandler = {
   MAX_HEIGHT: 1200,       // 최대 높이
   THUMB_WIDTH: 400,       // 썸네일 너비
   QUALITY: 0.8,           // JPEG 품질 (0.0 ~ 1.0)
-  MAX_FILE_SIZE: 5 * 1024 * 1024,  // 5MB
+  MAX_FILE_SIZE: 5 * 1024 * 1024,  // 압축 후 최대 크기 5MB
+  MAX_INPUT_SIZE: 50 * 1024 * 1024,  // 입력 파일 최대 크기 50MB
   MAX_IMAGES_PER_POST: 3, // 게시물당 최대 이미지 수
   
   // 이미지 압축 및 리사이징
@@ -14,20 +15,21 @@ const ImageHandler = {
       maxWidth = this.MAX_WIDTH,
       maxHeight = this.MAX_HEIGHT,
       quality = this.QUALITY,
-      outputType = 'base64'
+      outputType = 'base64',
+      forceCompress = false  // 강제 압축 옵션
     } = options;
     
     return new Promise((resolve, reject) => {
-      // 파일 크기 체크
-      if (file.size > this.MAX_FILE_SIZE) {
-        reject(new Error(`파일 크기는 5MB를 초과할 수 없습니다. (현재: ${(file.size / 1024 / 1024).toFixed(2)}MB)`));
+      // 입력 파일 크기 체크 (50MB까지 허용)
+      if (file.size > this.MAX_INPUT_SIZE) {
+        reject(new Error(`파일이 너무 큽니다. 최대 50MB까지 가능합니다. (현재: ${(file.size / 1024 / 1024).toFixed(2)}MB)`));
         return;
       }
       
       // 이미지 타입 체크
-      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
       if (!file.type || !acceptedTypes.includes(file.type.toLowerCase())) {
-        reject(new Error(`지원하지 않는 파일 형식입니다. (지원 형식: JPG, PNG, GIF, WebP)`));
+        reject(new Error(`지원하지 않는 파일 형식입니다. (지원 형식: JPG, PNG, GIF, WebP, HEIC)`));
         return;
       }
       
@@ -60,13 +62,37 @@ const ImageHandler = {
           
           // 압축된 이미지 반환
           if (outputType === 'base64') {
-            const base64 = canvas.toDataURL('image/jpeg', quality);
+            let finalQuality = quality;
+            let base64 = canvas.toDataURL('image/jpeg', finalQuality);
+            let estimatedSize = Math.round(base64.length * 0.75);
+            
+            // 압축 후에도 5MB를 초과하면 품질을 더 낮춰서 재압축
+            let attempts = 0;
+            while (estimatedSize > this.MAX_FILE_SIZE && attempts < 5) {
+              finalQuality *= 0.8; // 품질을 20%씩 감소
+              base64 = canvas.toDataURL('image/jpeg', finalQuality);
+              estimatedSize = Math.round(base64.length * 0.75);
+              attempts++;
+            }
+            
+            // 그래도 크면 크기를 더 줄임
+            if (estimatedSize > this.MAX_FILE_SIZE) {
+              const scaleFactor = Math.sqrt(this.MAX_FILE_SIZE / estimatedSize) * 0.9;
+              canvas.width = Math.floor(width * scaleFactor);
+              canvas.height = Math.floor(height * scaleFactor);
+              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+              base64 = canvas.toDataURL('image/jpeg', 0.7);
+              estimatedSize = Math.round(base64.length * 0.75);
+            }
+            
             resolve({
               data: base64,
-              width: width,
-              height: height,
-              size: Math.round(base64.length * 0.75), // Base64 크기 추정
-              originalSize: file.size
+              width: canvas.width,
+              height: canvas.height,
+              size: estimatedSize,
+              originalSize: file.size,
+              compressionRatio: Math.round((1 - estimatedSize / file.size) * 100),
+              quality: finalQuality
             });
           } else if (outputType === 'blob') {
             canvas.toBlob((blob) => {
@@ -96,12 +122,58 @@ const ImageHandler = {
     });
   },
   
+  // 대용량 이미지 스마트 압축
+  async smartCompress(file) {
+    const fileSizeMB = file.size / 1024 / 1024;
+    
+    // 파일 크기에 따라 압축 전략 결정
+    let compressionOptions = {
+      maxWidth: this.MAX_WIDTH,
+      maxHeight: this.MAX_HEIGHT,
+      quality: this.QUALITY,
+      forceCompress: true
+    };
+    
+    if (fileSizeMB > 20) {
+      // 20MB 이상: 공격적 압축
+      compressionOptions.maxWidth = 1000;
+      compressionOptions.maxHeight = 1000;
+      compressionOptions.quality = 0.6;
+    } else if (fileSizeMB > 10) {
+      // 10-20MB: 중간 압축
+      compressionOptions.maxWidth = 1200;
+      compressionOptions.maxHeight = 1200;
+      compressionOptions.quality = 0.7;
+    } else if (fileSizeMB > 5) {
+      // 5-10MB: 약간 압축
+      compressionOptions.quality = 0.75;
+    }
+    
+    console.log(`Smart compress: ${fileSizeMB.toFixed(2)}MB file with quality ${compressionOptions.quality}`);
+    
+    try {
+      const result = await this.compressImage(file, compressionOptions);
+      const compressedSizeMB = result.size / 1024 / 1024;
+      
+      console.log(`Compressed: ${fileSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB (${result.compressionRatio}% reduction)`);
+      
+      if (result.size > this.MAX_FILE_SIZE) {
+        throw new Error(`압축 후에도 파일이 너무 큽니다 (${compressedSizeMB.toFixed(2)}MB). 더 작은 이미지를 사용해주세요.`);
+      }
+      
+      return result;
+    } catch (error) {
+      throw new Error(`이미지 압축 실패: ${error.message}`);
+    }
+  },
+  
   // 썸네일 생성
   async createThumbnail(file) {
     return this.compressImage(file, {
       maxWidth: this.THUMB_WIDTH,
       maxHeight: this.THUMB_WIDTH,
-      quality: 0.6
+      quality: 0.6,
+      forceCompress: true
     });
   },
   
@@ -115,8 +187,17 @@ const ImageHandler = {
     
     for (const file of filesToProcess) {
       try {
-        // 원본 압축
-        const compressed = await this.compressImage(file);
+        let compressed;
+        const fileSizeMB = file.size / 1024 / 1024;
+        
+        // 5MB 이상이면 스마트 압축 사용
+        if (file.size > this.MAX_FILE_SIZE) {
+          console.log(`Large file detected: ${file.name} (${fileSizeMB.toFixed(2)}MB) - using smart compression`);
+          compressed = await this.smartCompress(file);
+        } else {
+          // 5MB 이하는 일반 압축
+          compressed = await this.compressImage(file);
+        }
         
         // 썸네일 생성
         const thumbnail = await this.createThumbnail(file);
@@ -129,11 +210,17 @@ const ImageHandler = {
           width: compressed.width,
           height: compressed.height,
           size: compressed.size,
-          compressionRatio: Math.round((1 - compressed.size / file.size) * 100)
+          originalSize: file.size,
+          compressionRatio: compressed.compressionRatio || Math.round((1 - compressed.size / file.size) * 100),
+          quality: compressed.quality
         });
+        
+        console.log(`Successfully processed: ${file.name} - ${(file.size/1024/1024).toFixed(2)}MB → ${(compressed.size/1024/1024).toFixed(2)}MB`);
       } catch (error) {
+        console.error(`Failed to process ${file.name}:`, error);
         errors.push({
           file: file.name,
+          size: `${(file.size/1024/1024).toFixed(2)}MB`,
           error: error.message
         });
       }
