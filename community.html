@@ -121,6 +121,32 @@
     .poll-bar-animate {
       animation: pollBarGrow 0.5s ease-out forwards;
     }
+    
+    /* 인스타그램 링크 스타일 */
+    .instagram-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #ec4899;
+      transition: all 0.2s;
+    }
+    
+    .instagram-link:hover {
+      color: #db2777;
+      transform: scale(1.05);
+    }
+    
+    .instagram-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -252,6 +278,21 @@
         </div>
         
         <div>
+          <label class="text-xs text-gray-600 mb-1 block">
+            <i class="fab fa-instagram text-pink-500 mr-1"></i>
+            인스타그램 ID <span class="text-gray-400">(선택)</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400 text-sm">@</span>
+            <input id="postInstagram" type="text" placeholder="instagram_id" 
+                   class="flex-1 px-3 py-2 border rounded-lg text-sm"
+                   pattern="[A-Za-z0-9._]+"
+                   title="영문, 숫자, 마침표(.), 언더스코어(_)만 사용 가능">
+          </div>
+          <p class="text-xs text-gray-500 mt-1">@ 없이 아이디만 입력 (예: athlete_time)</p>
+        </div>
+        
+        <div>
           <label class="text-xs text-gray-600 mb-1 block">제목 <span class="text-red-500">*</span></label>
           <input id="postTitle" type="text" placeholder="제목을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
         </div>
@@ -343,24 +384,32 @@
     </div>
     
     <!-- Comment Input (고정) -->
-    <div class="absolute bottom-0 left-0 right-0 bg-white border-t p-3 safe-bottom">
-      <div class="flex gap-2">
-        <input 
-          id="commentAuthor" 
-          type="text" 
-          placeholder="닉네임" 
-          class="w-24 px-3 py-2 border rounded-lg text-sm"
-        >
-        <input 
-          id="commentInput" 
-          type="text" 
-          placeholder="댓글을 입력하세요" 
-          class="flex-1 px-3 py-2 border rounded-lg text-sm"
-          onkeypress="if(event.key==='Enter') submitComment()"
-        >
-        <button onclick="submitComment()" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
-          등록
-        </button>
+    <div class="absolute bottom-0 left-0 right-0 bg-white border-t safe-bottom">
+      <div class="p-3">
+        <div class="flex flex-wrap gap-2">
+          <input 
+            id="commentAuthor" 
+            type="text" 
+            placeholder="닉네임" 
+            class="w-20 sm:w-24 px-2 sm:px-3 py-2 border rounded-lg text-sm"
+          >
+          <input 
+            id="commentInstagram" 
+            type="text" 
+            placeholder="@인스타" 
+            class="w-24 sm:w-32 px-2 sm:px-3 py-2 border rounded-lg text-sm"
+          >
+          <input 
+            id="commentInput" 
+            type="text" 
+            placeholder="댓글 입력" 
+            class="flex-1 min-w-0 px-2 sm:px-3 py-2 border rounded-lg text-sm"
+            onkeypress="if(event.key==='Enter') submitComment()"
+          >
+          <button onclick="submitComment()" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
+            등록
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -501,7 +550,10 @@
                 <h3 class="font-medium text-gray-900 mb-1 line-clamp-1">${escapeHtml(post.title)}</h3>
                 <p class="text-gray-600 text-sm mb-2 line-clamp-2">${escapeHtml(post.content)}</p>
                 <div class="flex items-center gap-3 text-xs text-gray-500">
-                  <span>${post.author}</span>
+                  <span class="flex items-center gap-1">
+                    ${post.author}
+                    ${post.instagram ? `<i class="fab fa-instagram text-pink-500"></i>` : ''}
+                  </span>
                   <span>•</span>
                   <span>${formatTime(post.date)}</span>
                   <span>•</span>
@@ -591,8 +643,18 @@
               <span class="text-sm text-blue-600 font-medium">${currentPost.category}</span>
             </div>
             <h1 class="text-xl font-bold text-gray-900">${escapeHtml(currentPost.title)}</h1>
-            <div class="flex items-center gap-2 mt-2 text-sm text-gray-500">
+            <div class="flex items-center flex-wrap gap-2 mt-2 text-sm text-gray-500">
               <span class="font-medium">${currentPost.author}</span>
+              ${currentPost.instagram ? `
+                <a href="https://instagram.com/${currentPost.instagram}" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="instagram-badge"
+                   title="인스타그램 프로필 보기">
+                  <i class="fab fa-instagram"></i>
+                  @${currentPost.instagram}
+                </a>
+              ` : ''}
               <span>•</span>
               <span>${formatTime(currentPost.date)}</span>
               <span>•</span>
@@ -680,8 +742,19 @@
                 ${escapeHtml(comment.author.charAt(0).toUpperCase())}
               </div>
               <div>
-                <span class="font-medium text-sm">${escapeHtml(comment.author)}</span>
-                <span class="text-xs text-gray-500 ml-2">${formatTime(comment.date)}</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-sm">${escapeHtml(comment.author)}</span>
+                  ${comment.instagram ? `
+                    <a href="https://instagram.com/${comment.instagram}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="instagram-link text-xs">
+                      <i class="fab fa-instagram"></i>
+                      @${comment.instagram}
+                    </a>
+                  ` : ''}
+                </div>
+                <span class="text-xs text-gray-500">${formatTime(comment.date)}</span>
               </div>
             </div>
             <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1 hover:text-gray-600">
@@ -746,18 +819,27 @@
       
       const authorInput = document.getElementById('commentAuthor');
       const contentInput = document.getElementById('commentInput');
+      const instagramInput = document.getElementById('commentInstagram');
       
       const author = authorInput.value.trim() || '익명';
       const content = contentInput.value.trim();
+      const instagram = instagramInput.value.trim().replace('@', '');
       
       if (!content) {
         showToast('댓글을 입력해주세요');
         return;
       }
       
+      // 인스타그램 아이디 유효성 검사
+      if (instagram && !/^[A-Za-z0-9._]+$/.test(instagram)) {
+        showToast('인스타그램 아이디는 영문, 숫자, 마침표(.), 언더스코어(_)만 사용 가능합니다');
+        return;
+      }
+      
       const comment = {
         id: Date.now(),
         author: author,
+        instagram: instagram || null,
         content: content,
         date: new Date().toISOString(),
         reports: [],
@@ -782,6 +864,7 @@
       // 입력 필드 초기화
       authorInput.value = '';
       contentInput.value = '';
+      instagramInput.value = '';
       
       // 댓글 목록 새로고침
       renderComments();
@@ -806,6 +889,7 @@
       const title = document.getElementById('postTitle').value.trim();
       const content = document.getElementById('postContent').value.trim();
       const password = document.getElementById('postPassword').value.trim();
+      const instagram = document.getElementById('postInstagram').value.trim().replace('@', '');
       
       if (!title) {
         showToast('제목을 입력해주세요');
@@ -860,11 +944,18 @@
         }
       }
       
+      // 인스타그램 아이디 유효성 검사
+      if (instagram && !/^[A-Za-z0-9._]+$/.test(instagram)) {
+        showToast('인스타그램 아이디는 영문, 숫자, 마침표(.), 언더스코어(_)만 사용 가능합니다');
+        return;
+      }
+      
       const newPost = {
         id: Date.now(),
         category: category,
         title: title,
         author: author,
+        instagram: instagram || null, // 인스타그램 아이디 추가
         content: content,
         password: password,
         images: selectedImages, // 이미지 추가
@@ -905,6 +996,7 @@
       document.getElementById('postAuthor').value = currentPost.author;
       document.getElementById('postTitle').value = currentPost.title;
       document.getElementById('postContent').value = currentPost.content;
+      document.getElementById('postInstagram').value = currentPost.instagram || '';
       
       // 삭제 후 수정 모드로 전환
       const index = posts.findIndex(p => p.id === currentPost.id);
@@ -1045,6 +1137,7 @@
       document.getElementById('postTitle').value = '';
       document.getElementById('postContent').value = '';
       document.getElementById('postPassword').value = '';
+      document.getElementById('postInstagram').value = '';
       
       // 이미지 초기화
       selectedImages = [];
