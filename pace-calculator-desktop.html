@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>페이스 계산기 & 차트 | 애슬리트 타임 (데스크톱)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/device-detector.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+    
+    /* 사이드바 스타일 */
+    .sidebar {
+      width: 260px;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-collapsed {
+      transform: translateX(-200px);
+    }
+    
+    .sidebar-toggle {
+      position: absolute;
+      right: -40px;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: #667eea;
+      border-radius: 0 8px 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+    }
+    
+    .main-content {
+      margin-left: 260px;
+      transition: margin-left 0.3s ease;
+      min-height: 100vh;
+      background: #f9fafb;
+    }
+    
+    .main-content-expanded {
+      margin-left: 60px;
+    }
+    
+    /* 탭 스타일 */
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* 차트 카드 호버 효과 */
+    .chart-card {
+      transition: all 0.3s ease;
+      cursor: move;
+    }
+    
+    .chart-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    /* 플로팅 도구 패널 */
+    .tools-panel {
+      position: fixed;
+      right: 20px;
+      top: 80px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 12px;
+      z-index: 90;
+    }
+    
+    .tool-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    
+    .tool-btn:hover {
+      background: #f3f4f6;
+      transform: scale(1.1);
+    }
+    
+    /* 키보드 단축키 힌트 */
+    .shortcut-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: none;
+      z-index: 1000;
+    }
+    
+    /* 그리드 레이아웃 */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 20px;
+    }
+    
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-260px);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .sidebar-toggle {
+        right: -50px;
+        width: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 사이드바 -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- 로고 섹션 -->
+    <div class="p-6 border-b border-white/20">
+      <div class="flex items-center gap-3">
+        <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+             alt="AT" 
+             class="h-12 filter brightness-0 invert">
+        <div>
+          <h1 class="text-xl font-bold">ATHLETE TIME</h1>
+          <p class="text-xs opacity-90">Professional Edition</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 네비게이션 메뉴 -->
+    <nav class="p-4">
+      <div class="space-y-2">
+        <a href="#" onclick="showTab('dashboard')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg bg-white/20 hover:bg-white/30 transition-all">
+          <i class="fas fa-dashboard text-lg"></i>
+          <span>대시보드</span>
+        </a>
+        
+        <a href="#" onclick="showTab('pace-chart')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-chart-line text-lg"></i>
+          <span>페이스 차트</span>
+        </a>
+        
+        <a href="#" onclick="showTab('target')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-bullseye text-lg"></i>
+          <span>목표 기록</span>
+        </a>
+        
+        <a href="#" onclick="showTab('lane')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-road text-lg"></i>
+          <span>레인 계산기</span>
+        </a>
+        
+        <a href="#" onclick="showTab('steeplechase')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-water text-lg"></i>
+          <span>3000m 장애물</span>
+        </a>
+        
+        <div class="border-t border-white/20 my-4"></div>
+        
+        <a href="#" onclick="showTab('calculator')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-calculator text-lg"></i>
+          <span>계산기</span>
+        </a>
+        
+        <a href="#" onclick="showTab('history')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-history text-lg"></i>
+          <span>기록 관리</span>
+        </a>
+        
+        <a href="#" onclick="showTab('settings')" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/20 transition-all">
+          <i class="fas fa-cog text-lg"></i>
+          <span>설정</span>
+        </a>
+      </div>
+    </nav>
+    
+    <!-- 하단 정보 -->
+    <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/20">
+      <p class="text-xs opacity-80 text-center">
+        제작: 장호준 코치<br>
+        © 2024 ATHLETE TIME
+      </p>
+    </div>
+  </aside>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="main-content" id="mainContent">
+    <!-- 상단 헤더 -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div class="flex items-center justify-between px-6 py-4">
+        <div class="flex items-center gap-4">
+          <h2 class="text-2xl font-bold text-gray-800">페이스 계산기 & 차트</h2>
+          <span class="text-sm text-gray-500">데스크톱 버전</span>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- 검색 -->
+          <div class="relative">
+            <input type="text" 
+                   placeholder="검색..." 
+                   class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+          </div>
+          
+          <!-- 알림 -->
+          <button class="relative p-2 hover:bg-gray-100 rounded-lg">
+            <i class="fas fa-bell text-gray-600"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
+          
+          <!-- 프로필 -->
+          <div class="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg">
+            <i class="fas fa-user-circle text-2xl text-gray-600"></i>
+            <span class="text-sm font-medium">사용자</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 탭 컨텐츠 영역 -->
+    <div class="p-6">
+      <!-- 대시보드 탭 -->
+      <div id="dashboard" class="tab-content active">
+        <h3 class="text-xl font-bold mb-4">대시보드</h3>
+        
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600">최근 기록</p>
+                <p class="text-2xl font-bold">21:35</p>
+                <p class="text-xs text-gray-500">5km</p>
+              </div>
+              <i class="fas fa-running text-3xl text-blue-500 opacity-30"></i>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600">평균 페이스</p>
+                <p class="text-2xl font-bold">4:19</p>
+                <p class="text-xs text-gray-500">/km</p>
+              </div>
+              <i class="fas fa-tachometer-alt text-3xl text-green-500 opacity-30"></i>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600">이번 달 거리</p>
+                <p class="text-2xl font-bold">185</p>
+                <p class="text-xs text-gray-500">km</p>
+              </div>
+              <i class="fas fa-road text-3xl text-purple-500 opacity-30"></i>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-600">훈련 일수</p>
+                <p class="text-2xl font-bold">22</p>
+                <p class="text-xs text-gray-500">일</p>
+              </div>
+              <i class="fas fa-calendar-check text-3xl text-orange-500 opacity-30"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 차트 그리드 -->
+        <div class="chart-grid">
+          <!-- 페이스 차트 카드 -->
+          <div class="chart-card bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-lg font-bold">
+                <i class="fas fa-chart-line text-blue-500 mr-2"></i>
+                킬로미터 페이스 차트
+              </h4>
+              <div class="flex gap-2">
+                <button class="text-gray-500 hover:text-blue-500">
+                  <i class="fas fa-expand"></i>
+                </button>
+                <button class="text-gray-500 hover:text-blue-500">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-3 py-2">km 페이스</th>
+                    <th class="px-3 py-2">5km</th>
+                    <th class="px-3 py-2">10km</th>
+                    <th class="px-3 py-2">하프</th>
+                    <th class="px-3 py-2">풀마라톤</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-3 py-2 font-bold">3:00</td>
+                    <td class="px-3 py-2">15:00</td>
+                    <td class="px-3 py-2">30:00</td>
+                    <td class="px-3 py-2">1:03:18</td>
+                    <td class="px-3 py-2">2:06:36</td>
+                  </tr>
+                  <tr class="bg-yellow-50">
+                    <td class="px-3 py-2 font-bold">3:30</td>
+                    <td class="px-3 py-2">17:30</td>
+                    <td class="px-3 py-2">35:00</td>
+                    <td class="px-3 py-2">1:13:53</td>
+                    <td class="px-3 py-2">2:27:46</td>
+                  </tr>
+                  <tr>
+                    <td class="px-3 py-2 font-bold">4:00</td>
+                    <td class="px-3 py-2">20:00</td>
+                    <td class="px-3 py-2">40:00</td>
+                    <td class="px-3 py-2">1:24:23</td>
+                    <td class="px-3 py-2">2:48:47</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- 목표 기록 카드 -->
+          <div class="chart-card bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="text-lg font-bold">
+                <i class="fas fa-trophy text-orange-500 mr-2"></i>
+                목표 기록별 페이스
+              </h4>
+              <div class="flex gap-2">
+                <button class="text-gray-500 hover:text-blue-500">
+                  <i class="fas fa-expand"></i>
+                </button>
+                <button class="text-gray-500 hover:text-blue-500">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="space-y-3">
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <span class="font-bold">5km 20분</span>
+                  <span class="text-sm text-gray-500 ml-2">목표</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-blue-600">4:00/km</span>
+                  <span class="text-sm text-gray-500 ml-2">페이스</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <span class="font-bold">10km 45분</span>
+                  <span class="text-sm text-gray-500 ml-2">목표</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-blue-600">4:30/km</span>
+                  <span class="text-sm text-gray-500 ml-2">페이스</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <span class="font-bold">하프 1:40:00</span>
+                  <span class="text-sm text-gray-500 ml-2">목표</span>
+                </div>
+                <div class="text-right">
+                  <span class="font-bold text-blue-600">4:44/km</span>
+                  <span class="text-sm text-gray-500 ml-2">페이스</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 다른 탭들 (간단한 플레이스홀더) -->
+      <div id="pace-chart" class="tab-content">
+        <h3 class="text-xl font-bold mb-4">페이스 차트</h3>
+        <p>페이스 차트 컨텐츠...</p>
+      </div>
+      
+      <div id="target" class="tab-content">
+        <h3 class="text-xl font-bold mb-4">목표 기록</h3>
+        <p>목표 기록 컨텐츠...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 플로팅 도구 패널 -->
+  <div class="tools-panel">
+    <div class="tool-btn" onclick="downloadAll()" title="전체 다운로드 (Ctrl+D)">
+      <i class="fas fa-download text-blue-500"></i>
+    </div>
+    <div class="tool-btn" onclick="printAll()" title="인쇄 (Ctrl+P)">
+      <i class="fas fa-print text-gray-500"></i>
+    </div>
+    <div class="tool-btn" onclick="toggleFullscreen()" title="전체화면 (F11)">
+      <i class="fas fa-expand text-purple-500"></i>
+    </div>
+    <div class="tool-btn" onclick="showSettings()" title="설정 (Ctrl+,)">
+      <i class="fas fa-cog text-gray-500"></i>
+    </div>
+  </div>
+
+  <!-- 키보드 단축키 힌트 -->
+  <div class="shortcut-hint" id="shortcutHint">
+    Press <kbd>?</kbd> for keyboard shortcuts
+  </div>
+
+  <script>
+    // 사이드바 토글
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
+      sidebar.classList.toggle('sidebar-collapsed');
+      mainContent.classList.toggle('main-content-expanded');
+    }
+
+    // 탭 전환
+    function showTab(tabId) {
+      // 모든 탭 숨기기
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // 선택된 탭 표시
+      const selectedTab = document.getElementById(tabId);
+      if (selectedTab) {
+        selectedTab.classList.add('active');
+      }
+      
+      // 사이드바 아이템 활성화
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('bg-white/20');
+      });
+      event.currentTarget.classList.add('bg-white/20');
+    }
+
+    // 전체화면 토글
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // 키보드 단축키
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+D: 다운로드
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        downloadAll();
+      }
+      
+      // Ctrl+P: 인쇄
+      if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        printAll();
+      }
+      
+      // F11: 전체화면
+      if (e.key === 'F11') {
+        e.preventDefault();
+        toggleFullscreen();
+      }
+      
+      // ?: 도움말
+      if (e.key === '?') {
+        showShortcuts();
+      }
+    });
+
+    // 다운로드 전체
+    function downloadAll() {
+      alert('전체 차트 다운로드 기능 (구현 예정)');
+    }
+
+    // 인쇄
+    function printAll() {
+      window.print();
+    }
+
+    // 설정
+    function showSettings() {
+      alert('설정 패널 (구현 예정)');
+    }
+
+    // 단축키 도움말
+    function showShortcuts() {
+      alert(`키보드 단축키:
+      
+Ctrl+D : 전체 다운로드
+Ctrl+P : 인쇄
+F11 : 전체화면
+Ctrl+, : 설정
+? : 이 도움말`);
+    }
+
+    // 드래그 앤 드롭 지원 (추후 구현)
+    // ...
+
+    // 차트 확대
+    function expandChart(chartId) {
+      // 구현 예정
+    }
+  </script>
+</body>
+</html>

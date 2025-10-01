@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>페이스 계산기 | 애슬리트 타임 (모바일)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="js/device-detector.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* 하단 탭 바 스타일 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 1000;
+    }
+    
+    .bottom-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .bottom-nav-item.active {
+      color: #667eea;
+    }
+    
+    .bottom-nav-item.active i {
+      transform: scale(1.1);
+    }
+    
+    /* 스와이프 가능한 카드 컨테이너 */
+    .swiper-container {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    
+    .swiper-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .swiper-card {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      width: 100%;
+    }
+    
+    /* 모바일 테이블 스타일 */
+    .mobile-table {
+      font-size: 12px;
+    }
+    
+    .mobile-table th, .mobile-table td {
+      padding: 8px 4px;
+      white-space: nowrap;
+    }
+    
+    /* 터치 버튼 스타일 */
+    .touch-button {
+      min-height: 44px;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 플로팅 액션 버튼 */
+    .fab {
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 999;
+    }
+    
+    /* 페이지 인디케이터 */
+    .page-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 0;
+    }
+    
+    .page-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+      transition: all 0.3s ease;
+    }
+    
+    .page-dot.active {
+      width: 24px;
+      border-radius: 4px;
+      background: #667eea;
+    }
+    
+    /* 접이식 섹션 */
+    .collapsible {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .collapsed {
+      max-height: 0;
+    }
+    
+    .expanded {
+      max-height: 2000px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 상단 헤더 -->
+  <header class="fixed top-0 left-0 right-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white z-50">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button onclick="toggleMenu()" class="touch-button">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+      
+      <div class="flex items-center gap-2">
+        <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+             alt="AT" 
+             class="h-8 filter brightness-0 invert">
+        <div>
+          <h1 class="text-sm font-bold">ATHLETE TIME</h1>
+          <p class="text-xs opacity-90">페이스 계산기</p>
+        </div>
+      </div>
+      
+      <button onclick="shareApp()" class="touch-button">
+        <i class="fas fa-share-alt text-xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 사이드 메뉴 (햄버거) -->
+  <div id="sideMenu" class="fixed inset-0 bg-black/50 z-[60] hidden" onclick="toggleMenu()">
+    <div class="w-72 h-full bg-white" onclick="event.stopPropagation()">
+      <div class="p-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
+        <h2 class="text-lg font-bold">메뉴</h2>
+      </div>
+      <div class="p-4 space-y-4">
+        <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-info-circle text-purple-600"></i>
+          <span>앱 정보</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-cog text-purple-600"></i>
+          <span>설정</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-question-circle text-purple-600"></i>
+          <span>도움말</span>
+        </a>
+        <hr>
+        <p class="text-xs text-gray-500 text-center">
+          제작: 장호준 코치<br>
+          © 2024 ATHLETE TIME
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="pt-14 pb-20 px-4">
+    <!-- 탭 선택 (스크롤 가능) -->
+    <div class="sticky top-14 bg-white rounded-lg shadow-sm mb-4 overflow-x-auto z-40">
+      <div class="flex whitespace-nowrap p-2">
+        <button onclick="selectTab(0)" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm flex-shrink-0 bg-purple-600 text-white">
+          페이스 차트
+        </button>
+        <button onclick="selectTab(1)" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm flex-shrink-0">
+          목표 기록
+        </button>
+        <button onclick="selectTab(2)" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm flex-shrink-0">
+          레인 계산
+        </button>
+        <button onclick="selectTab(3)" class="tab-btn px-4 py-2 rounded-lg font-medium text-sm flex-shrink-0">
+          3000m SC
+        </button>
+      </div>
+    </div>
+
+    <!-- 컨텐츠 영역 -->
+    <div id="content-area">
+      <!-- 차트 1: 페이스 차트 -->
+      <div class="chart-section bg-white rounded-lg shadow-md p-4 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-bold">
+            <i class="fas fa-tachometer-alt text-blue-500 mr-2"></i>
+            페이스 차트
+          </h3>
+          <button onclick="toggleExpand('chart1')" class="touch-button text-gray-500">
+            <i class="fas fa-chevron-down" id="chart1-icon"></i>
+          </button>
+        </div>
+        
+        <div id="chart1-content" class="collapsible expanded">
+          <!-- 간소화된 모바일 테이블 -->
+          <div class="overflow-x-auto">
+            <table class="mobile-table w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="sticky left-0 bg-gray-50">km/분</th>
+                  <th>5km</th>
+                  <th>10km</th>
+                  <th>하프</th>
+                  <th>풀</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="sticky left-0 bg-white font-bold">3:00</td>
+                  <td>15:00</td>
+                  <td>30:00</td>
+                  <td>1:03:18</td>
+                  <td>2:06:36</td>
+                </tr>
+                <tr class="bg-yellow-50">
+                  <td class="sticky left-0 bg-yellow-50 font-bold">3:30</td>
+                  <td>17:30</td>
+                  <td>35:00</td>
+                  <td>1:13:53</td>
+                  <td>2:27:46</td>
+                </tr>
+                <tr>
+                  <td class="sticky left-0 bg-white font-bold">4:00</td>
+                  <td>20:00</td>
+                  <td>40:00</td>
+                  <td>1:24:23</td>
+                  <td>2:48:47</td>
+                </tr>
+                <tr class="bg-blue-50">
+                  <td class="sticky left-0 bg-blue-50 font-bold">4:30</td>
+                  <td>22:30</td>
+                  <td>45:00</td>
+                  <td>1:34:54</td>
+                  <td>3:09:48</td>
+                </tr>
+                <tr>
+                  <td class="sticky left-0 bg-white font-bold">5:00</td>
+                  <td>25:00</td>
+                  <td>50:00</td>
+                  <td>1:45:24</td>
+                  <td>3:30:49</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- 액션 버튼 -->
+          <div class="flex gap-2 mt-4">
+            <button onclick="downloadChart('chart1')" class="flex-1 bg-blue-500 text-white py-2 rounded-lg text-sm">
+              <i class="fas fa-download mr-1"></i>저장
+            </button>
+            <button onclick="shareChart('chart1')" class="flex-1 bg-gray-500 text-white py-2 rounded-lg text-sm">
+              <i class="fas fa-share mr-1"></i>공유
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 빠른 계산기 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+        <h3 class="text-lg font-bold mb-3">
+          <i class="fas fa-calculator text-purple-500 mr-2"></i>
+          빠른 계산
+        </h3>
+        
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium mb-1">거리 (km)</label>
+            <input type="number" 
+                   inputmode="decimal" 
+                   placeholder="예: 5" 
+                   class="w-full px-3 py-2 border rounded-lg text-lg">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">목표 시간</label>
+            <div class="grid grid-cols-3 gap-2">
+              <input type="number" inputmode="numeric" placeholder="시" class="px-3 py-2 border rounded-lg text-center">
+              <input type="number" inputmode="numeric" placeholder="분" class="px-3 py-2 border rounded-lg text-center">
+              <input type="number" inputmode="numeric" placeholder="초" class="px-3 py-2 border rounded-lg text-center">
+            </div>
+          </div>
+          
+          <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-bold">
+            계산하기
+          </button>
+          
+          <div id="result" class="hidden bg-purple-50 rounded-lg p-3 text-center">
+            <p class="text-sm text-purple-600 font-medium">평균 페이스</p>
+            <p class="text-2xl font-bold text-purple-700">4:30 /km</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이지 인디케이터 -->
+    <div class="page-indicator">
+      <span class="page-dot active"></span>
+      <span class="page-dot"></span>
+      <span class="page-dot"></span>
+      <span class="page-dot"></span>
+    </div>
+  </main>
+
+  <!-- 하단 네비게이션 -->
+  <nav class="bottom-nav">
+    <div class="flex">
+      <div class="bottom-nav-item active" onclick="selectBottomNav(0)">
+        <i class="fas fa-home text-xl mb-1"></i>
+        <span class="text-xs">홈</span>
+      </div>
+      <div class="bottom-nav-item" onclick="selectBottomNav(1)">
+        <i class="fas fa-chart-line text-xl mb-1"></i>
+        <span class="text-xs">차트</span>
+      </div>
+      <div class="bottom-nav-item" onclick="selectBottomNav(2)">
+        <i class="fas fa-calculator text-xl mb-1"></i>
+        <span class="text-xs">계산</span>
+      </div>
+      <div class="bottom-nav-item" onclick="selectBottomNav(3)">
+        <i class="fas fa-bookmark text-xl mb-1"></i>
+        <span class="text-xs">저장</span>
+      </div>
+      <div class="bottom-nav-item" onclick="selectBottomNav(4)">
+        <i class="fas fa-ellipsis-h text-xl mb-1"></i>
+        <span class="text-xs">더보기</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 플로팅 액션 버튼 -->
+  <button class="fab" onclick="showQuickActions()">
+    <i class="fas fa-plus text-xl"></i>
+  </button>
+
+  <script>
+    // 메뉴 토글
+    function toggleMenu() {
+      const menu = document.getElementById('sideMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    // 탭 선택
+    function selectTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach((tab, i) => {
+        if (i === index) {
+          tab.classList.add('bg-purple-600', 'text-white');
+          tab.classList.remove('text-gray-600');
+        } else {
+          tab.classList.remove('bg-purple-600', 'text-white');
+          tab.classList.add('text-gray-600');
+        }
+      });
+      
+      // 페이지 인디케이터 업데이트
+      updatePageIndicator(index);
+    }
+
+    // 하단 네비게이션 선택
+    function selectBottomNav(index) {
+      const items = document.querySelectorAll('.bottom-nav-item');
+      items.forEach((item, i) => {
+        if (i === index) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // 페이지 인디케이터 업데이트
+    function updatePageIndicator(index) {
+      const dots = document.querySelectorAll('.page-dot');
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // 섹션 확장/축소
+    function toggleExpand(id) {
+      const content = document.getElementById(id + '-content');
+      const icon = document.getElementById(id + '-icon');
+      
+      if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        content.classList.add('collapsed');
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-right');
+      } else {
+        content.classList.remove('collapsed');
+        content.classList.add('expanded');
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-down');
+      }
+    }
+
+    // 공유 기능
+    async function shareApp() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: '애슬리트 타임 - 페이스 계산기',
+            text: '러닝 페이스 계산기 & 트레이닝 차트',
+            url: window.location.href
+          });
+        } catch (err) {
+          console.log('공유 취소됨');
+        }
+      } else {
+        alert('공유 기능을 지원하지 않는 브라우저입니다.');
+      }
+    }
+
+    // 차트 다운로드
+    async function downloadChart(chartId) {
+      // 실제 구현 필요
+      alert('차트 저장 기능 (개발 중)');
+    }
+
+    // 차트 공유
+    async function shareChart(chartId) {
+      // 실제 구현 필요
+      alert('차트 공유 기능 (개발 중)');
+    }
+
+    // 빠른 액션
+    function showQuickActions() {
+      // 실제 구현 필요
+      alert('빠른 액션 메뉴 (개발 중)');
+    }
+
+    // 터치 제스처 지원 (스와이프)
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let currentTab = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0 && currentTab < 3) {
+          // 왼쪽으로 스와이프 (다음 탭)
+          currentTab++;
+          selectTab(currentTab);
+        } else if (diff < 0 && currentTab > 0) {
+          // 오른쪽으로 스와이프 (이전 탭)
+          currentTab--;
+          selectTab(currentTab);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

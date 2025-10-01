@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>애슬리트 타임 | 러닝 페이스 계산기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="js/device-detector.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .device-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .device-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .device-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .device-card:hover::before {
+      opacity: 1;
+    }
+    
+    .recommended {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .logo-text {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .auto-detect-badge {
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { 
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <div class="max-w-5xl w-full">
+    <!-- 헤더 -->
+    <div class="text-center mb-8 text-white">
+      <div class="mb-4">
+        <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+             alt="Athlete Time" 
+             class="h-20 md:h-24 mx-auto mb-4 filter brightness-0 invert">
+      </div>
+      <h1 class="text-3xl md:text-5xl font-bold mb-2">ATHLETE TIME</h1>
+      <p class="text-lg md:text-xl opacity-90">러닝 페이스 계산기 & 트레이닝 차트</p>
+    </div>
+
+    <!-- 자동 감지 알림 -->
+    <div id="autoDetectBadge" class="auto-detect-badge bg-white/20 backdrop-blur rounded-full px-6 py-3 mb-8 text-white text-center mx-auto w-fit">
+      <i class="fas fa-magic mr-2"></i>
+      <span id="detectedDevice">디바이스 감지 중...</span>
+    </div>
+
+    <!-- 디바이스 선택 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- 모바일 버전 카드 -->
+      <div id="mobileCard" class="device-card bg-white rounded-2xl p-8 shadow-xl">
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-mobile-alt text-6xl md:text-7xl text-purple-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2">모바일 버전</h2>
+          <p class="text-gray-600 mb-4">스마트폰 & 태블릿 최적화</p>
+          
+          <div class="space-y-2 text-sm text-left bg-purple-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>터치 친화적 인터페이스</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>세로 모드 최적화</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>스와이프 제스처 지원</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>간소화된 테이블 뷰</span>
+            </div>
+          </div>
+          
+          <button onclick="selectVersion('mobile')" 
+                  class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition-all">
+            모바일 버전으로 입장
+            <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- PC 버전 카드 -->
+      <div id="desktopCard" class="device-card bg-white rounded-2xl p-8 shadow-xl">
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-desktop text-6xl md:text-7xl text-blue-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2">PC 버전</h2>
+          <p class="text-gray-600 mb-4">데스크톱 & 노트북 최적화</p>
+          
+          <div class="space-y-2 text-sm text-left bg-blue-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>넓은 화면 활용</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>다중 차트 동시 표시</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>키보드 단축키 지원</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>상세한 데이터 표시</span>
+            </div>
+          </div>
+          
+          <button onclick="selectVersion('desktop')" 
+                  class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all">
+            PC 버전으로 입장
+            <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 추가 옵션 -->
+    <div class="text-center text-white">
+      <p class="text-sm opacity-80 mb-2">
+        <i class="fas fa-info-circle mr-2"></i>
+        입장 후에도 상단 버튼으로 언제든지 버전을 전환할 수 있습니다
+      </p>
+      <div class="flex items-center justify-center gap-4 text-xs opacity-60">
+        <span>제작: 장호준 코치</span>
+        <span>•</span>
+        <span>© 2024 ATHLETE TIME</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 디바이스 감지 및 표시
+    document.addEventListener('DOMContentLoaded', () => {
+      const detector = new DeviceDetector();
+      const detectedDevice = document.getElementById('detectedDevice');
+      const mobileCard = document.getElementById('mobileCard');
+      const desktopCard = document.getElementById('desktopCard');
+      
+      // 감지된 디바이스 표시
+      if (detector.isMobile) {
+        detectedDevice.innerHTML = '<i class="fas fa-mobile-alt mr-2"></i>모바일 디바이스 감지됨';
+        mobileCard.classList.add('recommended', 'ring-4', 'ring-purple-300');
+        
+        // 추천 배지 추가
+        const badge = document.createElement('div');
+        badge.className = 'absolute top-4 right-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white px-3 py-1 rounded-full text-xs font-bold';
+        badge.innerHTML = '<i class="fas fa-star mr-1"></i>추천';
+        mobileCard.appendChild(badge);
+      } else {
+        detectedDevice.innerHTML = '<i class="fas fa-desktop mr-2"></i>데스크톱 디바이스 감지됨';
+        desktopCard.classList.add('recommended', 'ring-4', 'ring-blue-300');
+        
+        // 추천 배지 추가
+        const badge = document.createElement('div');
+        badge.className = 'absolute top-4 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-1 rounded-full text-xs font-bold';
+        badge.innerHTML = '<i class="fas fa-star mr-1"></i>추천';
+        desktopCard.appendChild(badge);
+      }
+      
+      // 저장된 선호도가 있으면 자동 리다이렉트 (3초 후)
+      const preference = detector.getUserPreference();
+      if (preference) {
+        const autoRedirectBadge = document.createElement('div');
+        autoRedirectBadge.className = 'fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4';
+        autoRedirectBadge.innerHTML = `
+          <div class="flex items-center gap-3">
+            <i class="fas fa-spinner fa-spin text-blue-600"></i>
+            <div>
+              <p class="font-bold">이전 선택 기억됨</p>
+              <p class="text-sm text-gray-600">${preference === 'mobile' ? '모바일' : 'PC'} 버전으로 이동 중...</p>
+            </div>
+            <button onclick="cancelAutoRedirect()" class="text-red-500 hover:text-red-700">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `;
+        document.body.appendChild(autoRedirectBadge);
+        
+        window.autoRedirectTimer = setTimeout(() => {
+          selectVersion(preference);
+        }, 3000);
+      }
+    });
+    
+    // 버전 선택
+    function selectVersion(version) {
+      const detector = new DeviceDetector();
+      detector.setUserPreference(version);
+      
+      // 로딩 표시
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.className = 'fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50';
+      loadingOverlay.innerHTML = `
+        <div class="bg-white rounded-lg p-8 text-center">
+          <i class="fas fa-spinner fa-spin text-4xl mb-4 text-blue-600"></i>
+          <p class="font-bold">${version === 'mobile' ? '모바일' : 'PC'} 버전 로딩 중...</p>
+        </div>
+      `;
+      document.body.appendChild(loadingOverlay);
+      
+      // 페이지 이동
+      setTimeout(() => {
+        window.location.href = `pace-calculator-${version}.html`;
+      }, 500);
+    }
+    
+    // 자동 리다이렉트 취소
+    function cancelAutoRedirect() {
+      if (window.autoRedirectTimer) {
+        clearTimeout(window.autoRedirectTimer);
+        document.querySelector('.fixed.bottom-4').remove();
+      }
+    }
+  </script>
+</body>
+</html>
