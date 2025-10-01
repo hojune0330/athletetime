@@ -32,16 +32,13 @@
     
     .pace-table {
       font-size: 12px;
-      width: 100%;
-      table-layout: fixed;
     }
     
     .pace-table td, .pace-table th {
-      padding: 6px 4px;
+      padding: 6px;
       text-align: center;
       border: 1px solid #e5e7eb;
       white-space: nowrap;
-      box-sizing: border-box;
     }
     
     .pace-table th {
@@ -126,35 +123,17 @@
       position: absolute;
       font-size: 11px;
       font-weight: 600;
-      color: rgba(0,0,0,0.15) !important;
+      color: rgba(0,0,0,0.25) !important;
       pointer-events: none;
       z-index: 2;
       white-space: nowrap;
       opacity: 1 !important;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    
-    /* 다운로드시 워터마크 강조 */
-    .watermark-text.download-mode {
-      color: rgba(0,0,0,0.45) !important;
-      font-weight: 700;
     }
     
     @media print {
       .watermark-text {
-        color: rgba(0,0,0,0.25) !important;
+        color: rgba(0,0,0,0.15) !important;
       }
-    }
-    
-    /* 다운로드시 테이블 간격 유지 */
-    .pace-table {
-      border-spacing: 0;
-      border-collapse: separate;
-    }
-    
-    .pace-table td, .pace-table th {
-      line-height: 1.2;
-      vertical-align: middle;
     }
     
     /* A4 인쇄 최적화 */
@@ -360,22 +339,22 @@
         
         <div class="table-container" style="position: relative;">
           <!-- 중앙 대형 워터마크 텍스트 -->
-          <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-12deg); font-size: 42px; letter-spacing: 6px; font-weight: 800;">
+          <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-12deg); font-size: 48px; opacity: 0.04; letter-spacing: 8px;">
             ATHLETE TIME
           </div>
           
           <!-- 상단 워터마크 -->
-          <div class="watermark-text" style="top: 20px; left: 120px; font-size: 13px; font-weight: 700;">
+          <div class="watermark-text" style="top: 15px; left: 100px; font-size: 11px;">
             ATHLETE TIME
           </div>
           
           <!-- 중간 워터마크 -->
-          <div class="watermark-text" style="top: 50%; right: 40px; transform: translateY(-50%); font-size: 12px; font-weight: 600;">
+          <div class="watermark-text" style="top: 50%; right: 30px; transform: translateY(-50%); font-size: 10px;">
             제작: 장호준 코치
           </div>
           
           <!-- 하단 워터마크 -->
-          <div class="watermark-text" style="bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 12px; letter-spacing: 1.5px; font-weight: 600;">
+          <div class="watermark-text" style="bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 2px;">
             © ATHLETE TIME · 장호준 코치
           </div>
           
@@ -450,8 +429,8 @@
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 5km 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
           <!-- 워터마크 -->
-          <div class="watermark-text" style="top: 15px; left: 120px; font-size: 13px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="top: 50%; right: 20px; transform: translateY(-50%); font-size: 11px; writing-mode: vertical-rl; font-weight: 600;">제작: 장호준 코치</div>
+          <div class="watermark-text" style="top: 8px; left: 100px; font-size: 10px;">ATHLETE TIME</div>
+          <div class="watermark-text" style="top: 50%; right: 10px; transform: translateY(-50%); font-size: 9px; writing-mode: vertical-rl;">제작: 장호준</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -473,8 +452,8 @@
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 10km 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
           <!-- 워터마크 -->
-          <div class="watermark-text" style="bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="top: 45%; right: 40px; transform: translateY(-50%); font-size: 11px; writing-mode: vertical-lr; font-weight: 600;">장호준 코치</div>
+          <div class="watermark-text" style="bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 10px;">ATHLETE TIME</div>
+          <div class="watermark-text" style="top: 45%; right: 35px; transform: translateY(-50%); font-size: 9px; writing-mode: vertical-lr;">장호준 코치</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -496,8 +475,8 @@
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 하프마라톤 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
           <!-- 워터마크 -->
-          <div class="watermark-text" style="top: 12px; left: 150px; font-size: 12px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="bottom: 22px; left: 60%; font-size: 11px; font-weight: 600;">© 장호준 코치</div>
+          <div class="watermark-text" style="top: 8px; left: 140px; font-size: 9px;">AT</div>
+          <div class="watermark-text" style="bottom: 20px; left: 60%; font-size: 9px;">© 장호준</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -764,9 +743,8 @@
             </div>
             <div class="table-container" style="position: relative;">
               <!-- 워터마크 -->
-              <div class="watermark-text" style="top: 35px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 700; letter-spacing: 2px;">ATHLETE TIME</div>
-              <div class="watermark-text" style="bottom: 35px; right: 20px; font-size: 12px; font-weight: 600;">제작: 장호준 코치</div>
-              <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 36px; font-weight: 800; letter-spacing: 4px; opacity: 0.03;">AT</div>
+              <div class="watermark-text" style="top: 32px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #3b82f6; letter-spacing: 2px;">ATHLETE TIME</div>
+              <div class="watermark-text" style="bottom: 35px; right: 15px; font-size: 9px; color: #3b82f6;">제작: 장호준</div>
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
                 <thead>
                   <tr class="bg-blue-100">
@@ -794,9 +772,8 @@
             </div>
             <div class="table-container" style="position: relative;">
               <!-- 워터마크 -->
-              <div class="watermark-text" style="top: 35px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 700; letter-spacing: 2px;">ATHLETE TIME</div>
-              <div class="watermark-text" style="bottom: 35px; left: 20px; font-size: 12px; font-weight: 600;">장호준 코치</div>
-              <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 36px; font-weight: 800; letter-spacing: 4px; opacity: 0.03;">AT</div>
+              <div class="watermark-text" style="top: 32px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #a855f7; letter-spacing: 2px;">ATHLETE TIME</div>
+              <div class="watermark-text" style="bottom: 35px; left: 15px; font-size: 9px; color: #a855f7;">장호준 코치</div>
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
                 <thead>
                   <tr class="bg-purple-100">
@@ -1647,228 +1624,96 @@
       window.location.href = 'index.html';
     }
 
-    // 차트 다운로드 기능 (완전 개선)
+    // 차트 다운로드 기능 (개선된 버전)
     async function downloadChart(elementId, filename, format = 'png') {
       try {
+        // 다운로드 버튼 임시 숨기기
         const downloadBtn = document.querySelector(`#${elementId} .download-btn`);
         if (downloadBtn) downloadBtn.style.display = 'none';
         
         const element = document.getElementById(elementId);
+        
+        // 임시로 워터마크 강화
+        const watermarks = element.querySelectorAll('.watermark-text');
+        const originalOpacities = [];
+        watermarks.forEach((wm, index) => {
+          originalOpacities[index] = wm.style.opacity || window.getComputedStyle(wm).opacity;
+          wm.style.opacity = '0.25'; // 다운로드 시 워터마크 더 진하게
+        });
+        
+        // 차트를 이미지로 변환 (개선된 옵션)
+        const canvas = await html2canvas(element, {
+          scale: 3, // 더 높은 해상도
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          windowWidth: 1920, // 고정 너비로 렌더링
+          windowHeight: 1080,
+          onclone: function(clonedDoc) {
+            // 클론된 문서의 스타일 수정
+            const clonedElement = clonedDoc.getElementById(elementId);
+            if (clonedElement) {
+              // 모든 요소의 폰트 렌더링 개선
+              clonedElement.style.fontSmooth = 'always';
+              clonedElement.style.webkitFontSmoothing = 'antialiased';
+              clonedElement.style.MozOsxFontSmoothing = 'grayscale';
+              
+              // 테이블 스타일 보정
+              const tables = clonedElement.getElementsByTagName('table');
+              for (let table of tables) {
+                table.style.borderCollapse = 'collapse';
+                table.style.tableLayout = 'fixed';
+                
+                // 모든 셀 패딩 명시적 설정
+                const cells = table.querySelectorAll('td, th');
+                cells.forEach(cell => {
+                  if (!cell.style.padding) {
+                    cell.style.padding = '6px';
+                  }
+                  cell.style.verticalAlign = 'middle';
+                  cell.style.textAlign = cell.tagName === 'TH' || cell.classList.contains('pace-header') ? 'center' : 'center';
+                });
+              }
+              
+              // SVG 텍스트를 일반 텍스트로 변환
+              const svgs = clonedElement.getElementsByTagName('svg');
+              for (let svg of svgs) {
+                const replacement = clonedDoc.createElement('div');
+                replacement.style.fontSize = '22px';
+                replacement.style.fontWeight = '900';
+                replacement.style.letterSpacing = '-1px';
+                replacement.style.color = '#1f2937';
+                replacement.innerHTML = '<span style=\"font-style: italic;\">ATHLETE</span> <span>TIME</span>';
+                svg.parentNode.replaceChild(replacement, svg);
+              }
+            }
+          }
+        });
+        
+        // 워터마크 원래 투명도로 복원
+        watermarks.forEach((wm, index) => {
+          wm.style.opacity = originalOpacities[index];
+        });
+        
+        // 이미지 다운로드
+        const link = document.createElement('a');
         const timestamp = new Date().toISOString().slice(0,10);
-        const credit = 'AthleteTime_장호준코치제작';
-        const fullFilename = `${credit}_${filename}_${timestamp}`;
+        link.download = `AthleteTime_${filename}_${timestamp}.png`;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
         
-        if (format === 'pdf') {
-          await downloadPDF(element, fullFilename);
-        } else {
-          await downloadPNG(element, fullFilename);
-        }
-        
-        if (downloadBtn) downloadBtn.style.display = 'flex';
+        // 다운로드 버튼 다시 표시
+        if (downloadBtn) downloadBtn.style.display = 'block';
         
       } catch (error) {
         console.error('차트 다운로드 실패:', error);
         alert('차트 다운로드에 실패했습니다. 다시 시도해주세요.');
+        // 다운로드 버튼 다시 표시
         const downloadBtn = document.querySelector(`#${elementId} .download-btn`);
-        if (downloadBtn) downloadBtn.style.display = 'flex';
+        if (downloadBtn) downloadBtn.style.display = 'block';
       }
     }
-    
-    // PNG 다운로드 함수 (개선된 버전)
-    async function downloadPNG(element, filename) {
-      // 워터마크를 다운로드 모드로 전환
-      const watermarks = element.querySelectorAll('.watermark-text');
-      watermarks.forEach(wm => {
-        wm.classList.add('download-mode');
-      });
-      
-      // 원본 요소 복제하여 렌더링 문제 방지
-      const clonedElement = element.cloneNode(true);
-      clonedElement.style.position = 'absolute';
-      clonedElement.style.left = '-9999px';
-      clonedElement.style.width = element.offsetWidth + 'px';
-      document.body.appendChild(clonedElement);
-      
-      // 복제된 요소의 다운로드 버튼 제거
-      const downloadBtns = clonedElement.querySelectorAll('.download-btn');
-      downloadBtns.forEach(btn => btn.remove());
-      
-      // 복제된 요소의 워터마크 강조
-      const clonedWatermarks = clonedElement.querySelectorAll('.watermark-text');
-      clonedWatermarks.forEach(wm => {
-        wm.style.setProperty('color', 'rgba(0,0,0,0.5)', 'important');
-        wm.style.setProperty('font-weight', '700', 'important');
-      });
-      
-      try {
-        // dom-to-image로 고품질 렌더링
-        const dataUrl = await domtoimage.toPng(clonedElement, {
-          quality: 1.0,
-          bgcolor: '#ffffff',
-          width: clonedElement.offsetWidth * 2,
-          height: clonedElement.offsetHeight * 2,
-          style: {
-            transform: 'scale(2)',
-            transformOrigin: 'top left',
-            width: clonedElement.offsetWidth + 'px',
-            height: clonedElement.offsetHeight + 'px'
-          }
-        });
-        
-        // 다운로드 링크 생성
-        const link = document.createElement('a');
-        link.download = filename + '.png';
-        link.href = dataUrl;
-        link.click();
-        
-      } finally {
-        // 복제된 요소 제거
-        document.body.removeChild(clonedElement);
-        
-        // 원본 워터마크 상태 복원
-        watermarks.forEach(wm => {
-          wm.classList.remove('download-mode');
-        });
-      }
-    }
-    
-    // PDF 다운로드 함수 (개선된 버전)
-    async function downloadPDF(element, filename) {
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('l', 'mm', 'a4');
-      
-      // 원본 요소 복제
-      const clonedElement = element.cloneNode(true);
-      clonedElement.style.position = 'absolute';
-      clonedElement.style.left = '-9999px';
-      clonedElement.style.width = element.offsetWidth + 'px';
-      document.body.appendChild(clonedElement);
-      
-      // 다운로드 버튼 제거
-      const downloadBtns = clonedElement.querySelectorAll('.download-btn');
-      downloadBtns.forEach(btn => btn.remove());
-      
-      // 워터마크 강조
-      const watermarks = clonedElement.querySelectorAll('.watermark-text');
-      watermarks.forEach(wm => {
-        wm.style.setProperty('color', 'rgba(0,0,0,0.5)', 'important');
-        wm.style.setProperty('font-weight', '700', 'important');
-      });
-      
-      try {
-        const dataUrl = await domtoimage.toPng(clonedElement, {
-          quality: 1.0,
-          bgcolor: '#ffffff',
-          width: clonedElement.offsetWidth * 2,
-          height: clonedElement.offsetHeight * 2,
-          style: {
-            transform: 'scale(2)',
-            transformOrigin: 'top left',
-            width: clonedElement.offsetWidth + 'px',
-            height: clonedElement.offsetHeight + 'px'
-          }
-        });
-        
-        const imgWidth = 277;
-        const imgHeight = (clonedElement.offsetHeight * imgWidth) / clonedElement.offsetWidth;
-      
-      let finalWidth = imgWidth;
-      let finalHeight = imgHeight;
-      
-        if (imgHeight > 190) {
-          finalHeight = 190;
-          finalWidth = (clonedElement.offsetWidth * finalHeight) / clonedElement.offsetHeight;
-        }
-      
-      const x = (297 - finalWidth) / 2;
-      const y = 10;
-      
-      pdf.addImage(dataUrl, 'PNG', x, y, finalWidth, finalHeight);
-      
-      pdf.setProperties({
-        title: filename,
-        subject: 'Running Pace Chart',
-        author: '장호준 코치',
-        keywords: 'running, pace, athlete time',
-        creator: 'ATHLETE TIME'
-      });
-      
-      pdf.setFontSize(9);
-      pdf.setTextColor(100);
-      pdf.text('© ATHLETE TIME · 제작: 장호준 코치', 148.5, 200, { align: 'center' });
-        
-        pdf.save(filename + '.pdf');
-        
-      } finally {
-        // 복제된 요소 제거
-        document.body.removeChild(clonedElement);
-      }
-    }
-    
-    // 차트 인쇄 함수
-    function printChart(elementId) {
-      const element = document.getElementById(elementId);
-      const printWindow = window.open('', 'PRINT', 'width=1200,height=800');
-      
-      const printHTML = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>애슬리트 타임 - 페이스 차트</title>
-            <style>
-              @page {
-                size: A4 landscape;
-                margin: 15mm;
-              }
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
-                margin: 0;
-                padding: 20px;
-              }
-              .download-btn { display: none !important; }
-              .watermark-text { color: rgba(0,0,0,0.12) !important; }
-              table {
-                border-collapse: collapse;
-                width: 100%;
-              }
-              th, td {
-                border: 1px solid #ddd;
-                padding: 6px;
-                text-align: center;
-              }
-              th {
-                background-color: #f3f4f6;
-                font-weight: bold;
-              }
-              .highlight-row { background-color: #fef3c7; }
-              .sub-highlight { background-color: #dbeafe; }
-              @media print {
-                body { 
-                  print-color-adjust: exact; 
-                  -webkit-print-color-adjust: exact;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            ${element.innerHTML}
-            <div style="text-align: center; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd;">
-              © ATHLETE TIME · 제작: 장호준 코치 · ${new Date().toLocaleDateString('ko-KR')}
-            </div>
-          </body>
-        </html>
-      `;
-      
-      printWindow.document.write(printHTML);
-      printWindow.document.close();
-      printWindow.focus();
-      
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 500);
-    }
-
 
     // 페이지 로드 시 차트 탭 활성화 및 차트 생성
     window.addEventListener('DOMContentLoaded', () => {
