@@ -606,9 +606,9 @@
       const tbody = document.getElementById('paceChartBody1');
       tbody.innerHTML = '';
       
-      // km 페이스 목록 (3:00부터 6:00까지 10초 간격)
+      // km 페이스 목록 (2:30부터 8:00까지 10초 간격)
       const paces = [];
-      for (let seconds = 180; seconds <= 360; seconds += 10) {
+      for (let seconds = 150; seconds <= 480; seconds += 10) {
         paces.push(seconds);
       }
       
@@ -616,9 +616,9 @@
         const row = tbody.insertRow();
         
         // 주요 페이스 하이라이트
-        if (pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360) {
+        if (pacePerKm === 180 || pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360 || pacePerKm === 420) {
           row.className = 'highlight-row';
-        } else if (pacePerKm === 210 || pacePerKm === 270 || pacePerKm === 330) {
+        } else if (pacePerKm === 210 || pacePerKm === 270 || pacePerKm === 330 || pacePerKm === 390 || pacePerKm === 450) {
           row.className = 'sub-highlight';
         }
         
@@ -647,14 +647,20 @@
     function generateTargetTables() {
       // 5km 목표 기록
       const targets5km = [
+        { time: 13 * 60, label: '세계 엘리트', highlight: true },
+        { time: 14 * 60, label: '국가대표' },
         { time: 15 * 60, label: '엘리트', highlight: true },
+        { time: 16 * 60, label: '준엘리트' },
+        { time: 17 * 60, label: '최상급' },
         { time: 18 * 60, label: '상급' },
-        { time: 20 * 60, label: '중상급', highlight: true },
+        { time: 19 * 60, label: '중상급' },
+        { time: 20 * 60, label: '서브 20', highlight: true },
         { time: 22 * 60, label: '중급' },
         { time: 25 * 60, label: '초중급', highlight: true },
         { time: 28 * 60, label: '초급' },
         { time: 30 * 60, label: '입문', highlight: true },
-        { time: 35 * 60, label: '완주 목표' }
+        { time: 35 * 60, label: '완주 목표' },
+        { time: 40 * 60, label: '건강 조깅', highlight: true }
       ];
       
       const tbody5km = document.getElementById('target5kmTable');
@@ -681,14 +687,19 @@
       
       // 10km 목표 기록
       const targets10km = [
+        { time: 27 * 60, label: '세계 엘리트', highlight: true },
+        { time: 29 * 60, label: '국가대표' },
         { time: 31 * 60, label: '엘리트', highlight: true },
+        { time: 33 * 60, label: '준엘리트' },
         { time: 35 * 60, label: '상급' },
-        { time: 40 * 60, label: '중상급', highlight: true },
+        { time: 38 * 60, label: '중상급' },
+        { time: 40 * 60, label: '서브 40', highlight: true },
         { time: 45 * 60, label: '중급' },
-        { time: 50 * 60, label: '초중급', highlight: true },
+        { time: 50 * 60, label: '서브 50', highlight: true },
         { time: 55 * 60, label: '초급' },
-        { time: 60 * 60, label: '입문', highlight: true },
-        { time: 70 * 60, label: '완주 목표' }
+        { time: 60 * 60, label: '서브 1시간', highlight: true },
+        { time: 70 * 60, label: '완주 목표' },
+        { time: 80 * 60, label: '건강 조깅', highlight: true }
       ];
       
       const tbody10km = document.getElementById('target10kmTable');
@@ -715,15 +726,21 @@
       
       // 하프마라톤 목표 기록
       const targetsHalf = [
+        { time: 60 * 60, label: '세계 엘리트', highlight: true },
+        { time: 65 * 60, label: '국가대표' },
         { time: 70 * 60, label: '엘리트', highlight: true },
+        { time: 75 * 60, label: '준엘리트' },
         { time: 80 * 60, label: '상급' },
+        { time: 85 * 60, label: '중상급' },
         { time: 90 * 60, label: '서브 1:30', highlight: true },
-        { time: 100 * 60, label: '중상급' },
-        { time: 110 * 60, label: '중급', highlight: true },
+        { time: 100 * 60, label: '중급' },
+        { time: 110 * 60, label: '초중급', highlight: true },
         { time: 120 * 60, label: '서브 2:00', highlight: true },
-        { time: 130 * 60, label: '초중급' },
-        { time: 140 * 60, label: '초급' },
-        { time: 150 * 60, label: '입문', highlight: true }
+        { time: 130 * 60, label: '초급' },
+        { time: 140 * 60, label: '입문' },
+        { time: 150 * 60, label: '서브 2:30', highlight: true },
+        { time: 160 * 60, label: '완주 목표' },
+        { time: 180 * 60, label: '건강 조깅', highlight: true }
       ];
       
       const tbodyHalf = document.getElementById('targetHalfTable');
@@ -752,16 +769,23 @@
       
       // 풀마라톤 목표 기록
       const targetsFull = [
+        { time: 125 * 60, label: '세계 엘리트', highlight: true },
+        { time: 135 * 60, label: '국가대표' },
         { time: 150 * 60, label: '엘리트', highlight: true },
-        { time: 170 * 60, label: '상급' },
+        { time: 165 * 60, label: '준엘리트' },
         { time: 180 * 60, label: '서브 3', highlight: true },
         { time: 195 * 60, label: '중상급' },
         { time: 210 * 60, label: '서브 3:30', highlight: true },
         { time: 225 * 60, label: '중급' },
         { time: 240 * 60, label: '서브 4', highlight: true },
+        { time: 255 * 60, label: '초중급' },
         { time: 270 * 60, label: '서브 4:30', highlight: true },
+        { time: 285 * 60, label: '초급' },
         { time: 300 * 60, label: '서브 5', highlight: true },
-        { time: 330 * 60, label: '완주 목표' }
+        { time: 330 * 60, label: '서브 5:30' },
+        { time: 360 * 60, label: '서브 6', highlight: true },
+        { time: 390 * 60, label: '완주 목표' },
+        { time: 420 * 60, label: '건강 완주', highlight: true }
       ];
       
       const tbodyFull = document.getElementById('targetFullTable');
@@ -796,9 +820,9 @@
       const tbody = document.getElementById('laneChartTable');
       tbody.innerHTML = '';
       
-      // km 페이스 목록 (3:00부터 5:00까지 15초 간격)
+      // km 페이스 목록 (2:30부터 6:00까지 10초 간격)
       const paces = [];
-      for (let seconds = 180; seconds <= 300; seconds += 15) {
+      for (let seconds = 150; seconds <= 360; seconds += 10) {
         paces.push(seconds);
       }
       
@@ -806,7 +830,7 @@
         const row = tbody.insertRow();
         
         // 주요 페이스 하이라이트
-        if (pacePerKm === 240) {
+        if (pacePerKm === 180 || pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360) {
           row.className = 'highlight-row';
         }
         
