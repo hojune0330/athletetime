@@ -27,8 +27,9 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       position: relative;
-      margin: 0 -16px;
-      padding: 0 16px;
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
     }
     
     .mobile-pace-table {
@@ -185,6 +186,17 @@
       font-weight: 600;
     }
     
+    /* 레인 트랙 스타일 */
+    .lane-track {
+      background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    .lane-track td {
+      color: white;
+      font-weight: bold;
+    }
+    
     @media print {
       .no-print { display: none !important; }
       .mobile-pace-table { page-break-inside: avoid; }
@@ -192,7 +204,7 @@
   </style>
 </head>
 <body class="bg-gray-50">
-  <div class="container mx-auto px-4 py-4 pb-24 max-w-lg">
+  <div class="container mx-auto px-4 py-4 pb-32" style="max-width: 100%; overflow-x: hidden;">
     <!-- 헤더 -->
     <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
       <div class="flex items-center justify-between">
@@ -227,7 +239,7 @@
       </div>
     </div>
     
-    <!-- 차트 탭 -->
+    <!-- 차트 탭 (기본 표시) -->
     <div id="chart-content" class="tab-content">
       <!-- 3000m 장애물 차트 -->
       <div id="steeplechase-chart" class="bg-white rounded-lg shadow-sm p-4 mb-4">
@@ -950,15 +962,30 @@
     
     // 초기화
     window.addEventListener('DOMContentLoaded', () => {
+      console.log('페이지 초기화 시작');
+      
+      // 차트 탭 활성화
+      switchTab('chart');
+      
       // 차트 생성
+      console.log('차트 생성 시작');
       updateSteeplechaseTable();
       generate400LapTable();
       generate1000PaceTable();
       generateLaneTable();
+      console.log('차트 생성 완료');
       
       // 모든 테이블 컨테이너에 스크롤 리스너 추가
       document.querySelectorAll('.mobile-table-container').forEach(container => {
         updateScrollIndicators(container);
+      });
+      
+      // 테이블 내용 확인
+      const tables = document.querySelectorAll('.mobile-pace-table');
+      console.log('생성된 테이블 수:', tables.length);
+      tables.forEach((table, index) => {
+        const rows = table.querySelectorAll('tbody tr');
+        console.log(`테이블 ${index + 1}: ${rows.length}개 행`);
       });
     });
   </script>
