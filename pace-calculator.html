@@ -122,28 +122,9 @@
       display: none; /* 일단 숨김 처리 */
     }
     
+    /* 워터마크 제거 */
     .watermark-text {
-      position: absolute;
-      font-size: 11px;
-      font-weight: 600;
-      color: rgba(0,0,0,0.15) !important;
-      pointer-events: none;
-      z-index: 2;
-      white-space: nowrap;
-      opacity: 1 !important;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    
-    /* 다운로드시 워터마크 강조 */
-    .watermark-text.download-mode {
-      color: rgba(0,0,0,0.45) !important;
-      font-weight: 700;
-    }
-    
-    @media print {
-      .watermark-text {
-        color: rgba(0,0,0,0.25) !important;
-      }
+      display: none !important;
     }
     
     /* 다운로드시 테이블 간격 유지 */
@@ -359,25 +340,6 @@
         </div>
         
         <div class="table-container" style="position: relative;">
-          <!-- 중앙 대형 워터마크 텍스트 -->
-          <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-12deg); font-size: 42px; letter-spacing: 6px; font-weight: 800;">
-            ATHLETE TIME
-          </div>
-          
-          <!-- 상단 워터마크 -->
-          <div class="watermark-text" style="top: 20px; left: 120px; font-size: 13px; font-weight: 700;">
-            ATHLETE TIME
-          </div>
-          
-          <!-- 중간 워터마크 -->
-          <div class="watermark-text" style="top: 50%; right: 40px; transform: translateY(-50%); font-size: 12px; font-weight: 600;">
-            제작: 장호준 코치
-          </div>
-          
-          <!-- 하단 워터마크 -->
-          <div class="watermark-text" style="bottom: 15px; left: 50%; transform: translateX(-50%); font-size: 12px; letter-spacing: 1.5px; font-weight: 600;">
-            © ATHLETE TIME · 장호준 코치
-          </div>
           
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
@@ -401,6 +363,14 @@
               <!-- JavaScript로 채워짐 -->
             </tbody>
           </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">러닝 전문 트레이닝 프로그램</span>
+          </p>
         </div>
       </div>
 
@@ -449,9 +419,6 @@
         <!-- 5km 목표 기록 -->
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 5km 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
-          <!-- 워터마크 -->
-          <div class="watermark-text" style="top: 15px; left: 120px; font-size: 13px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="top: 50%; right: 20px; transform: translateY(-50%); font-size: 11px; writing-mode: vertical-rl; font-weight: 600;">제작: 장호준 코치</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -472,9 +439,6 @@
         <!-- 10km 목표 기록 -->
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 10km 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
-          <!-- 워터마크 -->
-          <div class="watermark-text" style="bottom: 18px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="top: 45%; right: 40px; transform: translateY(-50%); font-size: 11px; writing-mode: vertical-lr; font-weight: 600;">장호준 코치</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -495,9 +459,6 @@
         <!-- 하프마라톤 목표 기록 -->
         <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 하프마라톤 목표 기록</h4>
         <div class="table-container mb-4" style="position: relative;">
-          <!-- 워터마크 -->
-          <div class="watermark-text" style="top: 12px; left: 150px; font-size: 12px; font-weight: 700;">ATHLETE TIME</div>
-          <div class="watermark-text" style="bottom: 22px; left: 60%; font-size: 11px; font-weight: 600;">© 장호준 코치</div>
           <table class="pace-table w-full" style="position: relative; z-index: 3;">
             <thead>
               <tr>
@@ -539,6 +500,14 @@
               <!-- JavaScript로 채워짐 -->
             </tbody>
           </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">목표 달성을 위한 정확한 페이스 가이드</span>
+          </p>
         </div>
       </div>
 
@@ -614,6 +583,14 @@
               <!-- JavaScript로 채워짐 -->
             </tbody>
           </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">트랙 레인별 정확한 거리 계산</span>
+          </p>
         </div>
       </div>
 
@@ -763,10 +740,6 @@
               <p class="text-sm opacity-90">랩당 396.084m • 시작 227.4m</p>
             </div>
             <div class="table-container" style="position: relative;">
-              <!-- 워터마크 -->
-              <div class="watermark-text" style="top: 35px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 700; letter-spacing: 2px;">ATHLETE TIME</div>
-              <div class="watermark-text" style="bottom: 35px; right: 20px; font-size: 12px; font-weight: 600;">제작: 장호준 코치</div>
-              <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 36px; font-weight: 800; letter-spacing: 4px; opacity: 0.03;">AT</div>
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
                 <thead>
                   <tr class="bg-blue-100">
@@ -793,10 +766,6 @@
               <p class="text-sm opacity-90">랩당 419.407m • 시작 64.2m</p>
             </div>
             <div class="table-container" style="position: relative;">
-              <!-- 워터마크 -->
-              <div class="watermark-text" style="top: 35px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: 700; letter-spacing: 2px;">ATHLETE TIME</div>
-              <div class="watermark-text" style="bottom: 35px; left: 20px; font-size: 12px; font-weight: 600;">장호준 코치</div>
-              <div class="watermark-text" style="top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 36px; font-weight: 800; letter-spacing: 4px; opacity: 0.03;">AT</div>
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
                 <thead>
                   <tr class="bg-purple-100">
@@ -822,6 +791,14 @@
             <strong>참고:</strong> 실제 경기에서는 장애물 통과 시 속도 저하가 발생합니다. 
             일반적으로 평지 3000m 기록보다 30-60초 정도 늦은 기록이 나옵니다.
             이 표는 균등 페이스 기준이며, 실제 경기에서는 장애물 구간에서 페이스 변화가 있을 수 있습니다.
+          </p>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">3000m 장애물 경주 전문 페이스 분석</span>
           </p>
         </div>
       </div>
@@ -1676,12 +1653,6 @@
     
     // PNG 다운로드 함수 (개선된 버전)
     async function downloadPNG(element, filename) {
-      // 워터마크를 다운로드 모드로 전환
-      const watermarks = element.querySelectorAll('.watermark-text');
-      watermarks.forEach(wm => {
-        wm.classList.add('download-mode');
-      });
-      
       // 원본 요소 복제하여 렌더링 문제 방지
       const clonedElement = element.cloneNode(true);
       clonedElement.style.position = 'absolute';
@@ -1692,13 +1663,6 @@
       // 복제된 요소의 다운로드 버튼 제거
       const downloadBtns = clonedElement.querySelectorAll('.download-btn');
       downloadBtns.forEach(btn => btn.remove());
-      
-      // 복제된 요소의 워터마크 강조
-      const clonedWatermarks = clonedElement.querySelectorAll('.watermark-text');
-      clonedWatermarks.forEach(wm => {
-        wm.style.setProperty('color', 'rgba(0,0,0,0.5)', 'important');
-        wm.style.setProperty('font-weight', '700', 'important');
-      });
       
       try {
         // dom-to-image로 고품질 렌더링
@@ -1724,11 +1688,6 @@
       } finally {
         // 복제된 요소 제거
         document.body.removeChild(clonedElement);
-        
-        // 원본 워터마크 상태 복원
-        watermarks.forEach(wm => {
-          wm.classList.remove('download-mode');
-        });
       }
     }
     
@@ -1747,13 +1706,6 @@
       // 다운로드 버튼 제거
       const downloadBtns = clonedElement.querySelectorAll('.download-btn');
       downloadBtns.forEach(btn => btn.remove());
-      
-      // 워터마크 강조
-      const watermarks = clonedElement.querySelectorAll('.watermark-text');
-      watermarks.forEach(wm => {
-        wm.style.setProperty('color', 'rgba(0,0,0,0.5)', 'important');
-        wm.style.setProperty('font-weight', '700', 'important');
-      });
       
       try {
         const dataUrl = await domtoimage.toPng(clonedElement, {
