@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>애슬리트 타임 | 모바일</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="device-router.js"></script>
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: contain;
+    }
+    
+    /* iOS 안전영역 */
+    .safe-top { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    
+    /* 하단 탭바 고정 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 50;
+    }
+    
+    /* 메뉴 카드 */
+    .menu-card {
+      transition: all 0.2s ease;
+    }
+    .menu-card:active {
+      transform: scale(0.95);
+      background-color: #f3f4f6;
+    }
+    
+    /* 스크롤 스냅 */
+    .snap-x {
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .snap-center {
+      scroll-snap-align: center;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 상단 헤더 -->
+  <header class="bg-gradient-to-r from-purple-600 to-blue-600 text-white safe-top sticky top-0 z-40">
+    <div class="flex items-center justify-between p-4">
+      <div class="flex items-center gap-3">
+        <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+             alt="Logo" 
+             class="h-8 w-auto"
+             style="filter: brightness(0) invert(1);">
+        <div>
+          <h1 class="text-lg font-bold">ATHLETE TIME</h1>
+          <p class="text-xs opacity-90">한국 육상인 플랫폼</p>
+        </div>
+      </div>
+      
+      <!-- 버전 전환 버튼 -->
+      <button onclick="switchToDesktop()" 
+              class="bg-white/20 backdrop-blur rounded-lg px-3 py-2 text-sm">
+        <i class="fas fa-desktop mr-1"></i> PC
+      </button>
+    </div>
+  </header>
+  
+  <!-- 메인 컨텐츠 -->
+  <main class="pb-20">
+    <!-- 빠른 실행 섹션 -->
+    <section class="p-4">
+      <h2 class="text-lg font-bold mb-3 text-gray-800">빠른 실행</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <a href="pace-calculator-mobile.html" 
+           class="menu-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div class="text-center">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-calculator text-xl"></i>
+            </div>
+            <h3 class="font-bold text-sm text-gray-800">페이스 계산기</h3>
+            <p class="text-xs text-gray-500 mt-1">러닝 페이스 계산</p>
+          </div>
+        </a>
+        
+        <a href="community-mobile.html" 
+           class="menu-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div class="text-center">
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-users text-xl"></i>
+            </div>
+            <h3 class="font-bold text-sm text-gray-800">커뮤니티</h3>
+            <p class="text-xs text-gray-500 mt-1">익명 게시판</p>
+          </div>
+        </a>
+        
+        <a href="chat-mobile.html" 
+           class="menu-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+          <div class="text-center">
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-comments text-xl"></i>
+            </div>
+            <h3 class="font-bold text-sm text-gray-800">실시간 채팅</h3>
+            <p class="text-xs text-gray-500 mt-1">자유로운 대화</p>
+          </div>
+        </a>
+        
+        <a href="#" 
+           class="menu-card bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-60">
+          <div class="text-center">
+            <div class="bg-gradient-to-br from-gray-400 to-gray-500 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-trophy text-xl"></i>
+            </div>
+            <h3 class="font-bold text-sm text-gray-800">대회 정보</h3>
+            <p class="text-xs text-gray-500 mt-1">준비 중</p>
+          </div>
+        </a>
+      </div>
+    </section>
+    
+    <!-- 인기 콘텐츠 슬라이더 -->
+    <section class="px-4 py-6">
+      <h2 class="text-lg font-bold mb-3 text-gray-800">인기 콘텐츠</h2>
+      <div class="flex gap-3 overflow-x-auto snap-x pb-2 -mx-4 px-4">
+        <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+          <h3 class="font-bold mb-2">🏃 페이스 차트</h3>
+          <p class="text-sm opacity-90">km당 페이스로 목표 시간 계산</p>
+          <a href="pace-calculator-mobile.html" class="inline-block mt-3 bg-white/20 backdrop-blur rounded-lg px-4 py-2 text-sm font-medium">
+            바로가기 →
+          </a>
+        </div>
+        
+        <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+          <h3 class="font-bold mb-2">💬 오늘의 화제</h3>
+          <p class="text-sm opacity-90">커뮤니티 인기 글 확인</p>
+          <a href="community-mobile.html" class="inline-block mt-3 bg-white/20 backdrop-blur rounded-lg px-4 py-2 text-sm font-medium">
+            바로가기 →
+          </a>
+        </div>
+        
+        <div class="snap-center flex-shrink-0 w-64 bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
+          <h3 class="font-bold mb-2">🎯 트랙 계산기</h3>
+          <p class="text-sm opacity-90">레인별 거리 계산</p>
+          <a href="pace-calculator-mobile.html#lane" class="inline-block mt-3 bg-white/20 backdrop-blur rounded-lg px-4 py-2 text-sm font-medium">
+            바로가기 →
+          </a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 공지사항 -->
+    <section class="px-4 pb-6">
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-bullhorn text-yellow-600 mt-1"></i>
+          <div class="flex-1">
+            <h3 class="font-bold text-sm text-gray-800 mb-1">공지사항</h3>
+            <p class="text-xs text-gray-600">
+              모바일 버전이 새롭게 출시되었습니다. 
+              더 나은 사용성을 위해 지속적으로 개선하겠습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 제작자 정보 -->
+    <section class="px-4 pb-6">
+      <div class="text-center text-xs text-gray-500">
+        <p>© 2024 ATHLETE TIME</p>
+        <p>제작: 장호준 코치</p>
+      </div>
+    </section>
+  </main>
+  
+  <!-- 하단 네비게이션 -->
+  <nav class="bottom-nav">
+    <div class="grid grid-cols-4 gap-1">
+      <a href="index-mobile.html" class="flex flex-col items-center py-2 text-purple-600">
+        <i class="fas fa-home text-xl mb-1"></i>
+        <span class="text-xs">홈</span>
+      </a>
+      <a href="pace-calculator-mobile.html" class="flex flex-col items-center py-2 text-gray-600">
+        <i class="fas fa-calculator text-xl mb-1"></i>
+        <span class="text-xs">계산기</span>
+      </a>
+      <a href="community-mobile.html" class="flex flex-col items-center py-2 text-gray-600">
+        <i class="fas fa-users text-xl mb-1"></i>
+        <span class="text-xs">커뮤니티</span>
+      </a>
+      <a href="chat-mobile.html" class="flex flex-col items-center py-2 text-gray-600">
+        <i class="fas fa-comments text-xl mb-1"></i>
+        <span class="text-xs">채팅</span>
+      </a>
+    </div>
+  </nav>
+  
+  <script>
+    // PC 버전으로 전환
+    function switchToDesktop() {
+      if (confirm('PC 버전으로 전환하시겠습니까?')) {
+        DeviceRouter.switchVersion('desktop');
+      }
+    }
+    
+    // 현재 페이지 활성화 표시
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.bottom-nav a');
+      navLinks.forEach(link => {
+        if (link.href.includes(currentPath.split('/').pop())) {
+          link.classList.add('text-purple-600');
+          link.classList.remove('text-gray-600');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
