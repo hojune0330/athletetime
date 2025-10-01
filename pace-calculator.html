@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+  <!-- dom-to-image 제거, html2canvas만 사용 -->
   <style>
     body { 
       font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
@@ -1624,7 +1624,7 @@
       window.location.href = 'index.html';
     }
 
-    // 차트 다운로드 기능 (완전 개선)
+    // 차트 다운로드 기능 (안정화 버전)
     async function downloadChart(elementId, filename, format = 'png') {
       const element = document.getElementById(elementId);
       if (!element) {
@@ -1633,26 +1633,21 @@
         return;
       }
       
-      // 로딩 메시지 표시
-      const loadingMsg = document.createElement('div');
-      loadingMsg.innerHTML = `
-        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                    background: rgba(0,0,0,0.8); color: white; padding: 20px; 
-                    border-radius: 10px; z-index: 9999; text-align: center;">
-          <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
-          <br>
-          ${format === 'pdf' ? 'PDF' : 'PNG'} 파일 생성 중...
-        </div>
-      `;
-      document.body.appendChild(loadingMsg);
-      
       try {
-        const downloadBtn = document.querySelector(`#${elementId} .download-btn`);
-        if (downloadBtn) downloadBtn.style.display = 'none';
-        
-        const timestamp = new Date().toISOString().slice(0,10);
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
         const credit = 'AthleteTime_장호준코치제작';
         const fullFilename = `${credit}_${filename}_${timestamp}`;
+        
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        const originalDisplay = [];
+        downloadBtns.forEach((btn, idx) => {
+          originalDisplay[idx] = btn.style.display;
+          btn.style.display = 'none';
+        });
+        
+        // 잠시 대기 (렌더링 완료를 위해)
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         if (format === 'pdf') {
           await downloadPDF(element, fullFilename);
@@ -1660,73 +1655,64 @@
           await downloadPNG(element, fullFilename);
         }
         
-        // 성공 메시지
-        loadingMsg.innerHTML = `
-          <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                      background: rgba(34, 197, 94, 0.9); color: white; padding: 20px; 
-                      border-radius: 10px; z-index: 9999; text-align: center;">
-            <i class="fas fa-check-circle fa-2x mb-2"></i>
-            <br>
-            다운로드 완료!
-          </div>
-        `;
-        
-        setTimeout(() => {
-          document.body.removeChild(loadingMsg);
-          if (downloadBtn) downloadBtn.style.display = 'flex';
-        }, 1500);
+        // 버튼 복원
+        downloadBtns.forEach((btn, idx) => {
+          btn.style.display = originalDisplay[idx] || 'flex';
+        });
         
       } catch (error) {
         console.error('차트 다운로드 실패:', error);
-        document.body.removeChild(loadingMsg);
+        
+        // 버튼 복원
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => {
+          btn.style.display = 'flex';
+        });
         
         const errorMsg = format === 'pdf' 
-          ? 'PDF 다운로드 중 오류가 발생했습니다.\n\nPNG 형식으로 시도해보세요.' 
-          : '다운로드 중 오류가 발생했습니다.\n\n다시 시도해주세요.';
+          ? 'PDF 다운로드 중 오류가 발생했습니다.\n\nPNG 형식으로 시도해보세요.\n\n오류: ' + error.message
+          : '다운로드 중 오류가 발생했습니다.\n\n다시 시도해주세요.\n\n오류: ' + error.message;
         alert(errorMsg);
-        
-        const downloadBtn = document.querySelector(`#${elementId} .download-btn`);
-        if (downloadBtn) downloadBtn.style.display = 'flex';
       }
     }
     
     // PNG 다운로드 함수 (개선된 버전)
     async function downloadPNG(element, filename) {
-      // 원본 요소 복제하여 렌더링 문제 방지
-      const clonedElement = element.cloneNode(true);
-      clonedElement.style.position = 'absolute';
-      clonedElement.style.left = '-9999px';
-      clonedElement.style.width = element.offsetWidth + 'px';
-      document.body.appendChild(clonedElement);
-      
-      // 복제된 요소의 다운로드 버튼 제거
-      const downloadBtns = clonedElement.querySelectorAll('.download-btn');
-      downloadBtns.forEach(btn => btn.remove());
-      
       try {
-        // dom-to-image로 고품질 렌더링
-        const dataUrl = await domtoimage.toPng(clonedElement, {
-          quality: 1.0,
-          bgcolor: '#ffffff',
-          width: clonedElement.offsetWidth * 2,
-          height: clonedElement.offsetHeight * 2,
-          style: {
-            transform: 'scale(2)',
-            transformOrigin: 'top left',
-            width: clonedElement.offsetWidth + 'px',
-            height: clonedElement.offsetHeight + 'px'
-          }
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'none');
+        
+        // html2canvas 사용 (더 안정적)
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          width: element.scrollWidth,
+          height: element.scrollHeight,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
         });
         
         // 다운로드 링크 생성
         const link = document.createElement('a');
         link.download = filename + '.png';
-        link.href = dataUrl;
+        link.href = canvas.toDataURL('image/png', 1.0);
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         
-      } finally {
-        // 복제된 요소 제거
-        document.body.removeChild(clonedElement);
+        // 버튼 다시 표시
+        downloadBtns.forEach(btn => btn.style.display = 'flex');
+        
+      } catch (error) {
+        console.error('PNG 다운로드 오류:', error);
+        // 버튼 다시 표시
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'flex');
+        throw error;
       }
     }
     
@@ -1736,31 +1722,23 @@
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('l', 'mm', 'a4'); // A4 가로 방향
         
-        // 원본 요소 복제
-        const clonedElement = element.cloneNode(true);
-        clonedElement.style.position = 'absolute';
-        clonedElement.style.left = '-9999px';
-        clonedElement.style.width = element.offsetWidth + 'px';
-        document.body.appendChild(clonedElement);
-        
-        // 다운로드 버튼 제거
-        const downloadBtns = clonedElement.querySelectorAll('.download-btn');
-        downloadBtns.forEach(btn => btn.remove());
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'none');
         
         try {
-          // 고품질 이미지로 변환
-          const dataUrl = await domtoimage.toPng(clonedElement, {
-            quality: 1.0,
-            bgcolor: '#ffffff',
-            width: clonedElement.offsetWidth * 2,
-            height: clonedElement.offsetHeight * 2,
-            style: {
-              transform: 'scale(2)',
-              transformOrigin: 'top left',
-              width: clonedElement.offsetWidth + 'px',
-              height: clonedElement.offsetHeight + 'px'
-            }
+          // html2canvas로 이미지 생성
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            useCORS: true,
+            allowTaint: true,
+            width: element.scrollWidth,
+            height: element.scrollHeight
           });
+          
+          const dataUrl = canvas.toDataURL('image/png', 1.0);
           
           // A4 가로 크기: 297mm x 210mm
           // 여백 고려: 좌우 각 10mm
@@ -1768,7 +1746,7 @@
           const maxHeight = 190; // 210 - 20 (상하 여백)
           
           // 이미지 비율 계산
-          const imgRatio = clonedElement.offsetHeight / clonedElement.offsetWidth;
+          const imgRatio = element.offsetHeight / element.offsetWidth;
           
           let finalWidth = maxWidth;
           let finalHeight = maxWidth * imgRatio;
@@ -1813,9 +1791,13 @@
           // PDF 저장
           pdf.save(filename + '.pdf');
           
-        } finally {
-          // 복제된 요소 제거
-          document.body.removeChild(clonedElement);
+          // 버튼 다시 표시
+          downloadBtns.forEach(btn => btn.style.display = 'flex');
+          
+        } catch (innerError) {
+          // 버튼 다시 표시
+          downloadBtns.forEach(btn => btn.style.display = 'flex');
+          throw innerError;
         }
         
       } catch (error) {
