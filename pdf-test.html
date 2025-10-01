@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF 다운로드 테스트 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+  <style>
+    .test-table td, .test-table th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    .test-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h1 class="text-2xl font-bold mb-4 text-center">
+        <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+        PDF 다운로드 기능 테스트
+      </h1>
+      
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <h2 class="font-bold text-blue-900 mb-2">📊 PDF 다운로드 개선 사항</h2>
+        <ul class="space-y-1 text-sm text-blue-800">
+          <li>✅ A4 가로 방향 (297mm x 210mm) 최적화</li>
+          <li>✅ 이미지 중앙 정렬</li>
+          <li>✅ 고품질 2배 해상도 렌더링</li>
+          <li>✅ PDF 메타데이터 포함 (제목, 작성자, 키워드)</li>
+          <li>✅ 하단 저작권 정보 및 날짜 추가</li>
+          <li>✅ 에러 처리 개선</li>
+        </ul>
+      </div>
+      
+      <!-- 테스트용 샘플 차트 -->
+      <div id="test-chart" class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h3 class="text-xl font-bold mb-4 text-center">
+          <i class="fas fa-running text-blue-500 mr-2"></i>
+          샘플 페이스 차트
+        </h3>
+        
+        <div class="text-center mb-4 pb-3 border-b-2 border-gray-200">
+          <div class="inline-block">
+            <div style="font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
+          </div>
+        </div>
+        
+        <table class="test-table w-full mb-4">
+          <thead>
+            <tr>
+              <th>거리</th>
+              <th>3:30/km</th>
+              <th>4:00/km</th>
+              <th>4:30/km</th>
+              <th>5:00/km</th>
+              <th>5:30/km</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-yellow-50">
+              <td class="font-bold">5km</td>
+              <td>17:30</td>
+              <td>20:00</td>
+              <td>22:30</td>
+              <td>25:00</td>
+              <td>27:30</td>
+            </tr>
+            <tr>
+              <td class="font-bold">10km</td>
+              <td>35:00</td>
+              <td>40:00</td>
+              <td>45:00</td>
+              <td>50:00</td>
+              <td>55:00</td>
+            </tr>
+            <tr class="bg-blue-50">
+              <td class="font-bold">21.1km</td>
+              <td>1:13:53</td>
+              <td>1:24:23</td>
+              <td>1:34:54</td>
+              <td>1:45:24</td>
+              <td>1:55:55</td>
+            </tr>
+            <tr>
+              <td class="font-bold">42.2km</td>
+              <td>2:27:46</td>
+              <td>2:48:47</td>
+              <td>3:09:48</td>
+              <td>3:30:49</td>
+              <td>3:51:50</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">러닝 전문 트레이닝 프로그램</span>
+          </p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <button onclick="testPdfDownload()" 
+                class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-bold hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105">
+          <i class="fas fa-file-pdf mr-2"></i>
+          PDF로 다운로드 테스트
+        </button>
+        
+        <button onclick="testPngDownload()" 
+                class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105">
+          <i class="fas fa-image mr-2"></i>
+          PNG로 다운로드 테스트
+        </button>
+      </div>
+      
+      <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+        <h3 class="font-bold text-yellow-900 mb-2">🔍 테스트 체크리스트</h3>
+        <ul class="text-sm text-yellow-800 space-y-1">
+          <li>☐ PDF 파일이 정상적으로 다운로드되는가?</li>
+          <li>☐ 차트가 PDF 중앙에 배치되는가?</li>
+          <li>☐ 텍스트와 표가 선명하게 보이는가?</li>
+          <li>☐ 하단 저작권 정보가 표시되는가?</li>
+          <li>☐ 파일명에 타임스탬프가 포함되는가?</li>
+          <li>☐ 메타데이터가 올바르게 설정되는가?</li>
+        </ul>
+      </div>
+      
+      <div class="text-center">
+        <a href="/pace-calculator.html" target="_blank" 
+           class="inline-block bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+          <i class="fas fa-calculator mr-2"></i>
+          실제 페이스 계산기에서 테스트하기
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function testPdfDownload() {
+      const element = document.getElementById('test-chart');
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '');
+      const filename = `AthleteTime_장호준코치제작_테스트차트_${timestamp}`;
+      
+      try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        
+        const clonedElement = element.cloneNode(true);
+        clonedElement.style.position = 'absolute';
+        clonedElement.style.left = '-9999px';
+        clonedElement.style.width = element.offsetWidth + 'px';
+        document.body.appendChild(clonedElement);
+        
+        try {
+          const dataUrl = await domtoimage.toPng(clonedElement, {
+            quality: 1.0,
+            bgcolor: '#ffffff',
+            width: clonedElement.offsetWidth * 2,
+            height: clonedElement.offsetHeight * 2,
+            style: {
+              transform: 'scale(2)',
+              transformOrigin: 'top left',
+              width: clonedElement.offsetWidth + 'px',
+              height: clonedElement.offsetHeight + 'px'
+            }
+          });
+          
+          const maxWidth = 277;
+          const maxHeight = 190;
+          const imgRatio = clonedElement.offsetHeight / clonedElement.offsetWidth;
+          
+          let finalWidth = maxWidth;
+          let finalHeight = maxWidth * imgRatio;
+          
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = maxHeight / imgRatio;
+          }
+          
+          const x = (297 - finalWidth) / 2;
+          const y = (210 - finalHeight) / 2;
+          
+          pdf.addImage(dataUrl, 'PNG', x, y, finalWidth, finalHeight);
+          
+          pdf.setProperties({
+            title: '테스트 페이스 차트',
+            subject: 'ATHLETE TIME 러닝 페이스 차트',
+            author: '장호준 코치',
+            keywords: 'running, pace, athlete time',
+            creator: 'ATHLETE TIME'
+          });
+          
+          pdf.setFont('helvetica');
+          pdf.setFontSize(8);
+          pdf.setTextColor(128, 128, 128);
+          const footerText = '© ATHLETE TIME · 제작: 장호준 코치 · ' + new Date().toLocaleDateString('ko-KR');
+          pdf.text(footerText, 148.5, 205, { align: 'center' });
+          
+          pdf.save(filename + '.pdf');
+          
+          alert('PDF 다운로드 성공!\n파일명: ' + filename + '.pdf');
+          
+        } finally {
+          document.body.removeChild(clonedElement);
+        }
+        
+      } catch (error) {
+        console.error('PDF 다운로드 오류:', error);
+        alert('PDF 다운로드 실패: ' + error.message);
+      }
+    }
+    
+    async function testPngDownload() {
+      const element = document.getElementById('test-chart');
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '');
+      const filename = `AthleteTime_장호준코치제작_테스트차트_${timestamp}`;
+      
+      try {
+        const dataUrl = await domtoimage.toPng(element, {
+          quality: 1.0,
+          bgcolor: '#ffffff',
+          width: element.offsetWidth * 2,
+          height: element.offsetHeight * 2,
+          style: {
+            transform: 'scale(2)',
+            transformOrigin: 'top left'
+          }
+        });
+        
+        const link = document.createElement('a');
+        link.download = filename + '.png';
+        link.href = dataUrl;
+        link.click();
+        
+        alert('PNG 다운로드 성공!\n파일명: ' + filename + '.png');
+        
+      } catch (error) {
+        console.error('PNG 다운로드 오류:', error);
+        alert('PNG 다운로드 실패: ' + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
