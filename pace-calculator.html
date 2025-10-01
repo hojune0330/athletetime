@@ -369,9 +369,17 @@
           <p class="text-xs md:text-sm opacity-90 -mt-1">ATHLETE TIME</p>
         </div>
       </div>
-      <button onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg">
-        <i class="fas fa-print text-xl"></i>
-      </button>
+      <div class="flex items-center gap-2">
+        <a href="pace-calculator-mobile.html" class="p-2 hover:bg-white/20 rounded-lg" title="모바일 버전">
+          <i class="fas fa-mobile-alt text-xl"></i>
+        </a>
+        <a href="pace-calculator-selector.html?force=true" class="p-2 hover:bg-white/20 rounded-lg" title="버전 선택">
+          <i class="fas fa-exchange-alt text-xl"></i>
+        </a>
+        <button onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg" title="인쇄">
+          <i class="fas fa-print text-xl"></i>
+        </button>
+      </div>
     </div>
   </header>
 
