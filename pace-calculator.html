@@ -28,18 +28,27 @@
     }
     
     .pace-table {
-      font-size: 11px;
+      font-size: 12px;
     }
     
     .pace-table td, .pace-table th {
-      padding: 4px;
+      padding: 6px;
       text-align: center;
       border: 1px solid #e5e7eb;
       white-space: nowrap;
     }
     
+    .pace-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    
     .pace-table .highlight-row {
-      background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+      background: #fef3c7;
+    }
+    
+    .pace-table .sub-highlight {
+      background: #dbeafe;
     }
     
     .pace-table .highlight-cell {
@@ -71,6 +80,23 @@
     .table-container {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+    }
+
+    .pace-header {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 1;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .pace-table {
+        font-size: 10px;
+      }
+      .pace-table td, .pace-table th {
+        padding: 4px;
+      }
     }
   </style>
 </head>
@@ -115,7 +141,7 @@
       <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-4 mb-6">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="font-bold text-purple-900">러닝 페이스 차트</h3>
+            <h3 class="font-bold text-purple-900">🏃‍♂️ 러닝 페이스 차트</h3>
             <p class="text-sm text-purple-700 mt-1">과학적 훈련을 위한 정밀 페이스 분석 도구</p>
           </div>
           <div class="text-right">
@@ -125,91 +151,187 @@
         </div>
       </div>
 
-      <!-- 차트 1: 거리별 목표 시간 차트 -->
+      <!-- 차트 1: KM 페이스별 거리 환산표 -->
       <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-        <h3 class="text-lg font-bold mb-3">
-          <i class="fas fa-chart-bar text-blue-500 mr-2"></i>
-          거리별 목표 시간 차트
+        <h3 class="text-lg font-bold mb-3 flex items-center justify-between">
+          <span>
+            <i class="fas fa-tachometer-alt text-blue-500 mr-2"></i>
+            킬로미터 페이스 → 거리별 완주 시간
+          </span>
+          <span class="text-xs font-normal text-gray-500">단위: 분:초</span>
         </h3>
         
         <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mb-4">
-          <h4 class="font-bold text-blue-900 mb-1">차트 사용법</h4>
-          <p class="text-sm text-blue-800">
-            이 차트는 <strong>100m 기준 속도</strong>를 바탕으로 각 거리별 예상 기록을 보여줍니다.
-            단거리부터 마라톤까지 다양한 거리에서의 목표 시간을 한눈에 확인할 수 있습니다.
-            <br><br>
-            <strong>특징:</strong> 거리가 길어질수록 페이스 저하를 고려한 실제적인 예측 시간을 제공합니다.
-          </p>
-        </div>
-        
-        <div class="table-container">
-          <table class="pace-table w-full min-w-[1000px]">
-            <thead class="bg-gray-100">
-              <tr>
-                <th class="p-2 sticky left-0 bg-gray-100">100m</th>
-                <th class="p-2">200m</th>
-                <th class="p-2">400m</th>
-                <th class="p-2">800m</th>
-                <th class="p-2">1500m</th>
-                <th class="p-2">3000m</th>
-                <th class="p-2">5000m</th>
-                <th class="p-2">10km</th>
-                <th class="p-2">15km</th>
-                <th class="p-2">20km</th>
-                <th class="p-2 bg-yellow-100">하프</th>
-                <th class="p-2">25km</th>
-                <th class="p-2">30km</th>
-                <th class="p-2">35km</th>
-                <th class="p-2">40km</th>
-                <th class="p-2 bg-green-100">풀코스</th>
-              </tr>
-            </thead>
-            <tbody id="paceChartBody1">
-              <!-- 실제 계산된 데이터로 채워짐 -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 차트 2: 마라톤 페이스별 트랙 랩타임 -->
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h3 class="text-lg font-bold mb-3">
-          <i class="fas fa-running text-orange-500 mr-2"></i>
-          마라톤 페이스별 400m 트랙 랩타임
-        </h3>
-        
-        <div class="bg-orange-50 border-l-4 border-orange-500 p-3 mb-4">
-          <h4 class="font-bold text-orange-900 mb-1">차트 사용법</h4>
-          <p class="text-sm text-orange-800">
-            이 차트는 <strong>마라톤 목표 기록</strong>에 따른 400m 트랙 각 레인별 랩타임을 보여줍니다.
-            트랙 훈련 시 목표 마라톤 페이스를 유지하기 위한 정확한 랩타임을 제공합니다.
-            <br><br>
-            <strong>특징:</strong> 1번 레인(400m)부터 8번 레인(453m)까지 각 레인의 실제 거리를 고려한 정밀한 랩타임을 제공합니다.
-            인터벌 훈련이나 페이스 러닝 시 자신의 레인에 맞는 정확한 목표 시간을 확인할 수 있습니다.
+          <h4 class="font-bold text-blue-900 text-sm mb-1">📖 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-blue-800 leading-relaxed">
+            <strong>"내가 km당 4분 페이스로 뛰면..."</strong> 이라고 생각할 때 사용합니다.<br>
+            • 예: km당 4분 페이스 → 5km는 20분, 10km는 40분, 하프는 1:24:23<br>
+            • 훈련 시 목표 페이스를 정하고 각 거리별 통과 시간을 확인할 때 활용하세요.
           </p>
         </div>
         
         <div class="table-container">
           <table class="pace-table w-full">
-            <thead class="bg-gray-100">
+            <thead>
               <tr>
-                <th rowspan="2" class="p-2">마라톤<br>목표</th>
-                <th rowspan="2" class="p-2">km당<br>페이스</th>
-                <th colspan="8" class="p-2">400m 트랙 레인별 랩타임</th>
-              </tr>
-              <tr>
-                <th class="p-2 bg-red-100">1레인<br>400m</th>
-                <th class="p-2">2레인<br>407m</th>
-                <th class="p-2">3레인<br>415m</th>
-                <th class="p-2">4레인<br>422m</th>
-                <th class="p-2">5레인<br>430m</th>
-                <th class="p-2">6레인<br>438m</th>
-                <th class="p-2">7레인<br>445m</th>
-                <th class="p-2">8레인<br>453m</th>
+                <th class="pace-header">km 페이스</th>
+                <th>100m</th>
+                <th>200m</th>
+                <th>400m</th>
+                <th>800m</th>
+                <th>1km</th>
+                <th>3km</th>
+                <th class="bg-yellow-50">5km</th>
+                <th class="bg-green-50">10km</th>
+                <th>15km</th>
+                <th class="bg-blue-50">하프</th>
+                <th>30km</th>
+                <th class="bg-purple-50">풀코스</th>
               </tr>
             </thead>
-            <tbody id="paceChartBody2">
-              <!-- 실제 계산된 데이터로 채워짐 -->
+            <tbody id="paceChartBody1">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 차트 2: 목표 기록별 페이스 분석표 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <h3 class="text-lg font-bold mb-3">
+          <i class="fas fa-trophy text-orange-500 mr-2"></i>
+          목표 기록별 필요 페이스 분석
+        </h3>
+        
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-3 mb-4">
+          <h4 class="font-bold text-orange-900 text-sm mb-1">🎯 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-orange-800 leading-relaxed">
+            <strong>"5km를 20분에 완주하려면..."</strong> 이라고 생각할 때 사용합니다.<br>
+            • 대회 목표 기록을 설정하고 필요한 페이스를 확인할 때<br>
+            • 인기 목표 시간별로 km 페이스, 400m 랩타임, 속도를 한눈에 확인 가능
+          </p>
+        </div>
+
+        <!-- 5km 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 5km 목표 기록</h4>
+        <div class="table-container mb-4">
+          <table class="pace-table w-full">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>100m</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="target5kmTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 10km 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 10km 목표 기록</h4>
+        <div class="table-container mb-4">
+          <table class="pace-table w-full">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>5km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="target10kmTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 하프마라톤 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 하프마라톤 목표 기록</h4>
+        <div class="table-container mb-4">
+          <table class="pace-table w-full">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>5km 통과</th>
+                <th>10km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="targetHalfTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 풀마라톤 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 풀마라톤 목표 기록</h4>
+        <div class="table-container">
+          <table class="pace-table w-full">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>10km 통과</th>
+                <th>하프 통과</th>
+                <th>30km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="targetFullTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 차트 3: 400m 트랙 레인별 보정 시간 -->
+      <div class="bg-white rounded-lg shadow-md p-4">
+        <h3 class="text-lg font-bold mb-3">
+          <i class="fas fa-route text-green-500 mr-2"></i>
+          400m 트랙 레인별 거리 & 시간 보정표
+        </h3>
+        
+        <div class="bg-green-50 border-l-4 border-green-500 p-3 mb-4">
+          <h4 class="font-bold text-green-900 text-sm mb-1">🏟️ 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-green-800 leading-relaxed">
+            <strong>트랙에서 훈련할 때</strong> 각 레인의 실제 거리를 확인합니다.<br>
+            • 1레인은 정확히 400m, 8레인은 453m (13% 더 김)<br>
+            • 인터벌 훈련 시 레인별로 목표 시간을 조정해야 할 때 사용하세요.
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="pace-table w-full">
+            <thead>
+              <tr>
+                <th rowspan="2">km 페이스</th>
+                <th rowspan="2">400m<br>(1레인)</th>
+                <th colspan="7">외측 레인 보정 시간</th>
+              </tr>
+              <tr>
+                <th class="text-xs">2레인<br>407m</th>
+                <th class="text-xs">3레인<br>415m</th>
+                <th class="text-xs">4레인<br>422m</th>
+                <th class="text-xs">5레인<br>430m</th>
+                <th class="text-xs">6레인<br>438m</th>
+                <th class="text-xs">7레인<br>445m</th>
+                <th class="text-xs">8레인<br>453m</th>
+              </tr>
+            </thead>
+            <tbody id="laneChartTable">
+              <!-- JavaScript로 채워짐 -->
             </tbody>
           </table>
         </div>
@@ -427,24 +549,27 @@
     };
 
     // 시간 포맷팅 함수
-    function formatTime(seconds) {
-      if (seconds < 60) {
-        return seconds.toFixed(2);
-      } else if (seconds < 3600) {
-        const mins = Math.floor(seconds / 60);
-        const secs = (seconds % 60).toFixed(2);
-        return `${mins}:${String(secs).padStart(5, '0')}`;
+    function formatTime(seconds, forceHours = false) {
+      if (isNaN(seconds) || seconds === null) return '-';
+      
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0 || forceHours) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else if (mins > 0) {
+        return `${mins}:${String(Math.floor(secs)).padStart(2, '0')}`;
       } else {
-        const hours = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = (seconds % 60).toFixed(2);
-        return `${hours}:${String(mins).padStart(2, '0')}:${String(secs).padStart(5, '0')}`;
+        return secs.toFixed(1);
       }
     }
 
-    // 시간을 초로 변환
-    function timeToSeconds(hours, minutes, seconds) {
-      return (hours || 0) * 3600 + (minutes || 0) * 60 + (seconds || 0);
+    // 페이스를 분:초 형식으로 포맷
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${String(secs).padStart(2, '0')}`;
     }
 
     // 탭 전환
@@ -468,123 +593,239 @@
       // 차트가 선택되면 차트 생성
       if (tabName === 'chart') {
         generatePaceChart1();
-        generatePaceChart2();
+        generateTargetTables();
+        generateLaneChart();
       } else if (tabName === 'lane') {
         calculateLane();
         generateAllLanesTable();
       }
     }
 
-    // 페이스 차트 1 생성 (거리별 목표 시간)
+    // 차트 1: KM 페이스별 거리 환산표
     function generatePaceChart1() {
       const tbody = document.getElementById('paceChartBody1');
       tbody.innerHTML = '';
       
-      // 100m 기준 시간 (10초부터 20초까지)
-      const base100Times = [];
-      for (let time = 10.0; time <= 20.0; time += 0.2) {
-        base100Times.push(time);
+      // km 페이스 목록 (3:00부터 6:00까지 10초 간격)
+      const paces = [];
+      for (let seconds = 180; seconds <= 360; seconds += 10) {
+        paces.push(seconds);
       }
       
-      base100Times.forEach((base100, index) => {
+      paces.forEach((pacePerKm, index) => {
         const row = tbody.insertRow();
         
-        // 특정 행 하이라이트
-        if (Math.abs(base100 - 11.0) < 0.01 || Math.abs(base100 - 12.0) < 0.01 || 
-            Math.abs(base100 - 13.0) < 0.01 || Math.abs(base100 - 14.0) < 0.01 ||
-            Math.abs(base100 - 15.0) < 0.01) {
+        // 주요 페이스 하이라이트
+        if (pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360) {
           row.className = 'highlight-row';
+        } else if (pacePerKm === 210 || pacePerKm === 270 || pacePerKm === 330) {
+          row.className = 'sub-highlight';
         }
         
-        // 거리별 예상 시간 계산
-        const distances = [100, 200, 400, 800, 1500, 3000, 5000, 10000, 15000, 20000, 21097.5, 25000, 30000, 35000, 40000, 42195];
+        // km 페이스 (첫 번째 열)
+        let cell = row.insertCell();
+        cell.textContent = formatPace(pacePerKm);
+        cell.className = 'pace-header font-bold';
         
-        distances.forEach((dist, i) => {
-          let time;
-          
-          if (dist <= 400) {
-            // 단거리: 속도 유지
-            time = base100 * (dist / 100);
-          } else if (dist <= 1500) {
-            // 중거리: 약간의 속도 저하
-            time = base100 * (dist / 100) * (1 + (dist - 400) / 20000);
-          } else if (dist <= 10000) {
-            // 장거리: 점진적 속도 저하
-            time = base100 * (dist / 100) * (1 + (dist - 400) / 10000);
-          } else {
-            // 마라톤: 더 큰 속도 저하
-            time = base100 * (dist / 100) * (1 + (dist - 400) / 8000);
-          }
-          
-          const cell = row.insertCell();
+        // 각 거리별 시간 계산
+        const distances = [100, 200, 400, 800, 1000, 3000, 5000, 10000, 15000, 21097.5, 30000, 42195];
+        distances.forEach((distance, i) => {
+          const time = (pacePerKm / 1000) * distance;
+          cell = row.insertCell();
           cell.textContent = formatTime(time);
           
-          // 첫 번째 열 (100m) 강조
-          if (i === 0) {
-            cell.className = 'font-bold bg-gray-50 sticky left-0';
-          }
-          // 하프마라톤과 풀마라톤 열 배경색
-          if (i === 10) cell.className = 'bg-yellow-50';
-          if (i === 15) cell.className = 'bg-green-50';
+          // 주요 거리 컬럼 색상
+          if (i === 6) cell.className = 'bg-yellow-50'; // 5km
+          if (i === 7) cell.className = 'bg-green-50';  // 10km
+          if (i === 9) cell.className = 'bg-blue-50';   // 하프
+          if (i === 11) cell.className = 'bg-purple-50'; // 풀
         });
       });
     }
 
-    // 페이스 차트 2 생성 (마라톤 페이스별 트랙 랩타임)
-    function generatePaceChart2() {
-      const tbody = document.getElementById('paceChartBody2');
+    // 차트 2: 목표 기록별 테이블들
+    function generateTargetTables() {
+      // 5km 목표 기록
+      const targets5km = [
+        { time: 15 * 60, label: '엘리트', highlight: true },
+        { time: 18 * 60, label: '상급' },
+        { time: 20 * 60, label: '중상급', highlight: true },
+        { time: 22 * 60, label: '중급' },
+        { time: 25 * 60, label: '초중급', highlight: true },
+        { time: 28 * 60, label: '초급' },
+        { time: 30 * 60, label: '입문', highlight: true },
+        { time: 35 * 60, label: '완주 목표' }
+      ];
+      
+      const tbody5km = document.getElementById('target5kmTable');
+      tbody5km.innerHTML = '';
+      
+      targets5km.forEach(target => {
+        const row = tbody5km.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 5;
+        const pace400m = pacePerKm * 0.4;
+        const pace100m = pacePerKm * 0.1;
+        const speed = 5000 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(pace100m)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 10km 목표 기록
+      const targets10km = [
+        { time: 31 * 60, label: '엘리트', highlight: true },
+        { time: 35 * 60, label: '상급' },
+        { time: 40 * 60, label: '중상급', highlight: true },
+        { time: 45 * 60, label: '중급' },
+        { time: 50 * 60, label: '초중급', highlight: true },
+        { time: 55 * 60, label: '초급' },
+        { time: 60 * 60, label: '입문', highlight: true },
+        { time: 70 * 60, label: '완주 목표' }
+      ];
+      
+      const tbody10km = document.getElementById('target10kmTable');
+      tbody10km.innerHTML = '';
+      
+      targets10km.forEach(target => {
+        const row = tbody10km.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 10;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = target.time / 2;
+        const speed = 10000 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time5km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 하프마라톤 목표 기록
+      const targetsHalf = [
+        { time: 70 * 60, label: '엘리트', highlight: true },
+        { time: 80 * 60, label: '상급' },
+        { time: 90 * 60, label: '서브 1:30', highlight: true },
+        { time: 100 * 60, label: '중상급' },
+        { time: 110 * 60, label: '중급', highlight: true },
+        { time: 120 * 60, label: '서브 2:00', highlight: true },
+        { time: 130 * 60, label: '초중급' },
+        { time: 140 * 60, label: '초급' },
+        { time: 150 * 60, label: '입문', highlight: true }
+      ];
+      
+      const tbodyHalf = document.getElementById('targetHalfTable');
+      tbodyHalf.innerHTML = '';
+      
+      targetsHalf.forEach(target => {
+        const row = tbodyHalf.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 21.0975;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = pacePerKm * 5;
+        const time10km = pacePerKm * 10;
+        const speed = 21097.5 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time5km)}</td>
+          <td>${formatTime(time10km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 풀마라톤 목표 기록
+      const targetsFull = [
+        { time: 150 * 60, label: '엘리트', highlight: true },
+        { time: 170 * 60, label: '상급' },
+        { time: 180 * 60, label: '서브 3', highlight: true },
+        { time: 195 * 60, label: '중상급' },
+        { time: 210 * 60, label: '서브 3:30', highlight: true },
+        { time: 225 * 60, label: '중급' },
+        { time: 240 * 60, label: '서브 4', highlight: true },
+        { time: 270 * 60, label: '서브 4:30', highlight: true },
+        { time: 300 * 60, label: '서브 5', highlight: true },
+        { time: 330 * 60, label: '완주 목표' }
+      ];
+      
+      const tbodyFull = document.getElementById('targetFullTable');
+      tbodyFull.innerHTML = '';
+      
+      targetsFull.forEach(target => {
+        const row = tbodyFull.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 42.195;
+        const pace400m = pacePerKm * 0.4;
+        const time10km = pacePerKm * 10;
+        const timeHalf = pacePerKm * 21.0975;
+        const time30km = pacePerKm * 30;
+        const speed = 42195 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time, true)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time10km)}</td>
+          <td>${formatTime(timeHalf)}</td>
+          <td>${formatTime(time30km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+    }
+
+    // 차트 3: 레인별 보정 시간
+    function generateLaneChart() {
+      const tbody = document.getElementById('laneChartTable');
       tbody.innerHTML = '';
       
-      // 마라톤 목표 시간 (2시간부터 5시간까지 5분 단위)
-      const marathonTimes = [];
-      for (let hours = 2; hours <= 5; hours++) {
-        for (let minutes = 0; minutes < 60; minutes += 5) {
-          const totalMinutes = hours * 60 + minutes;
-          if (totalMinutes >= 120 && totalMinutes <= 300) {
-            marathonTimes.push(totalMinutes);
-          }
-        }
+      // km 페이스 목록 (3:00부터 5:00까지 15초 간격)
+      const paces = [];
+      for (let seconds = 180; seconds <= 300; seconds += 15) {
+        paces.push(seconds);
       }
       
-      marathonTimes.forEach((totalMinutes, index) => {
+      paces.forEach((pacePerKm) => {
         const row = tbody.insertRow();
         
-        // 특정 시간 하이라이트 (서브3, 3시간 30분, 4시간)
-        if (totalMinutes === 180 || totalMinutes === 210 || totalMinutes === 240) {
+        // 주요 페이스 하이라이트
+        if (pacePerKm === 240) {
           row.className = 'highlight-row';
         }
         
-        // 마라톤 시간 표시
-        const hours = Math.floor(totalMinutes / 60);
-        const mins = totalMinutes % 60;
-        const marathonTime = `${hours}:${String(mins).padStart(2, '0')}:00`;
-        
-        // km당 페이스 계산
-        const secondsPerKm = (totalMinutes * 60) / 42.195;
-        const paceMinutes = Math.floor(secondsPerKm / 60);
-        const paceSeconds = Math.round(secondsPerKm % 60);
-        const kmPace = `${paceMinutes}:${String(paceSeconds).padStart(2, '0')}`;
-        
-        // 첫 두 열 (마라톤 목표, km 페이스)
+        // km 페이스
         let cell = row.insertCell();
-        cell.textContent = marathonTime;
+        cell.textContent = formatPace(pacePerKm);
         cell.className = 'font-bold';
         
+        // 1레인 400m 시간
+        const time400 = pacePerKm * 0.4;
         cell = row.insertCell();
-        cell.textContent = kmPace;
+        cell.textContent = formatTime(time400);
+        cell.className = 'font-bold bg-yellow-50';
         
-        // 각 레인별 400m 랩타임 계산
-        for (let lane = 1; lane <= 8; lane++) {
-          const laneDistance = laneDistances[lane];
-          const lapTime = (secondsPerKm / 1000) * laneDistance;
-          
+        // 2-8레인 보정 시간
+        for (let lane = 2; lane <= 8; lane++) {
+          const laneTime = (pacePerKm / 1000) * laneDistances[lane];
           cell = row.insertCell();
-          cell.textContent = formatTime(lapTime);
-          
-          // 1번 레인 강조
-          if (lane === 1) {
-            cell.className = 'bg-red-50 font-bold';
-          }
+          cell.textContent = formatTime(laneTime);
         }
       });
     }
