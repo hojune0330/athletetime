@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="device-router.js"></script>
   <!-- dom-to-image 제거, html2canvas만 사용 -->
   <style>
     body { 
@@ -97,160 +96,12 @@
       box-shadow: 2px 0 4px rgba(0,0,0,0.1);
     }
 
-    /* 모바일 반응형 개선 */
     @media (max-width: 768px) {
-      /* 테이블 기본 스타일 */
       .pace-table {
-        font-size: 11px;
-        display: block;
-        table-layout: auto;
-      }
-      
-      .pace-table td, .pace-table th {
-        padding: 8px 4px;
-        min-width: 45px;
-      }
-      
-      /* 첫번째 열 고정 (sticky) */
-      .table-container {
-        position: relative;
-        max-width: 100vw;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      .pace-table thead th:first-child,
-      .pace-table tbody td:first-child {
-        position: sticky;
-        left: 0;
-        background: white;
-        z-index: 10;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-        font-weight: bold;
-      }
-      
-      /* 차트 컨테이너 간격 */
-      .chart-container {
-        margin-bottom: 20px;
-      }
-      
-      /* 다운로드 버튼 모바일 최적화 */
-      .download-btn {
-        position: relative !important;
-        top: auto !important;
-        right: auto !important;
-        margin-bottom: 10px;
-        width: 100%;
-        justify-content: center;
-      }
-      
-      .download-btn button {
-        flex: 1;
-        padding: 10px;
-        font-size: 12px;
-      }
-      
-      /* 탭 메뉴 개선 */
-      .tab-btn {
-        padding: 8px 12px;
-        font-size: 13px;
-      }
-      
-      /* 제목 크기 조정 */
-      h3 {
-        font-size: 16px;
-      }
-      
-      /* 설명 박스 패딩 줄이기 */
-      .bg-blue-50, .bg-orange-50, .bg-green-50, .bg-cyan-50 {
-        padding: 12px;
-      }
-      
-      /* 3000m 장애물 테이블 */
-      .grid.grid-cols-1.lg\:grid-cols-2 {
-        display: block;
-      }
-      
-      .grid.grid-cols-1.lg\:grid-cols-2 > div {
-        margin-bottom: 20px;
-      }
-      
-      /* 테이블 스크롤 표시기 */
-      .table-container::after {
-        content: '→ 스크롤';
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        background: rgba(0,0,0,0.7);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 4px;
         font-size: 10px;
-        pointer-events: none;
       }
-      
-      /* 헤더 로고 크기 */
-      header img {
-        height: 32px;
-      }
-      
-      /* 제작 정보 텍스트 크기 */
-      .text-xs {
-        font-size: 11px;
-      }
-    }
-    
-    /* 태블릿 반응형 */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .pace-table {
-        font-size: 11px;
-      }
-      
       .pace-table td, .pace-table th {
-        padding: 5px 3px;
-      }
-    }
-    
-    /* 모바일 전용 아코디언 */
-    .accordion-header {
-      display: none;
-    }
-    
-    @media (max-width: 768px) {
-      .accordion-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px;
-        background: #f3f4f6;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        user-select: none;
-      }
-      
-      .accordion-header:active {
-        background: #e5e7eb;
-      }
-      
-      .accordion-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out;
-      }
-      
-      .accordion-content.active {
-        max-height: 2000px;
-        transition: max-height 0.5s ease-in;
-      }
-      
-      .accordion-icon {
-        transition: transform 0.3s;
-      }
-      
-      .accordion-header.active .accordion-icon {
-        transform: rotate(180deg);
+        padding: 4px;
       }
     }
 
@@ -377,8 +228,6 @@
 </head>
 <body class="bg-gray-50">
   
-  <!-- 버전 전환 플로팅 버튼 (제거 - 반응형으로 해결) -->
-  
   <!-- Header -->
   <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-10 no-print">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -445,17 +294,7 @@
       </div>
 
       <!-- 차트 1: KM 페이스별 거리 환산표 -->
-      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container accordion-wrapper" id="chart1">
-        <!-- 모바일 아코디언 헤더 -->
-        <div class="accordion-header" onclick="toggleAccordion('chart1')">
-          <span class="font-bold text-sm">
-            <i class="fas fa-tachometer-alt text-blue-500 mr-2"></i>
-            페이스 → 완주시간
-          </span>
-          <i class="fas fa-chevron-down accordion-icon"></i>
-        </div>
-        
-        <div class="accordion-content" id="chart1-content">
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart1">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
           <button onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
@@ -533,21 +372,10 @@
             <span class="text-gray-500">러닝 전문 트레이닝 프로그램</span>
           </p>
         </div>
-        </div> <!-- accordion-content 닫기 -->
       </div>
 
       <!-- 차트 2: 목표 기록별 페이스 분석표 -->
-      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container accordion-wrapper" id="chart2">
-        <!-- 모바일 아코디언 헤더 -->
-        <div class="accordion-header" onclick="toggleAccordion('chart2')">
-          <span class="font-bold text-sm">
-            <i class="fas fa-trophy text-orange-500 mr-2"></i>
-            목표 기록별 페이스
-          </span>
-          <i class="fas fa-chevron-down accordion-icon"></i>
-        </div>
-        
-        <div class="accordion-content" id="chart2-content">
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart2">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
           <button onclick="downloadChart('chart2', '목표_기록별_페이스', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
@@ -1793,14 +1621,7 @@
 
     // 뒤로가기
     function goBack() {
-      window.location.href = 'index-desktop.html';
-    }
-    
-    // 모바일 버전으로 전환
-    function switchToMobile() {
-      if (confirm('모바일 버전으로 전환하시겠습니까?')) {
-        DeviceRouter.switchVersion('mobile');
-      }
+      window.location.href = 'index.html';
     }
 
     // 차트 다운로드 기능 (안정화 버전)
@@ -2053,7 +1874,6 @@
     // 페이지 로드 시 차트 탭 활성화 및 차트 생성
     window.addEventListener('DOMContentLoaded', () => {
       switchTab('chart');
-      initResponsive(); // 반응형 초기화
     });
   </script>
 </body>

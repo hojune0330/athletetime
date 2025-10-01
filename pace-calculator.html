@@ -96,12 +96,135 @@
       box-shadow: 2px 0 4px rgba(0,0,0,0.1);
     }
 
+    /* 모바일 반응형 개선 */
     @media (max-width: 768px) {
+      /* 테이블 기본 스타일 */
       .pace-table {
-        font-size: 10px;
+        font-size: 11px;
       }
+      
       .pace-table td, .pace-table th {
-        padding: 4px;
+        padding: 6px 3px;
+        min-width: 40px;
+      }
+      
+      /* 첫번째 열 고정 */
+      .pace-table thead th:first-child,
+      .pace-table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 10;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        font-weight: bold;
+        background-color: #f9fafb;
+      }
+      
+      /* 다운로드 버튼 모바일 최적화 */
+      .download-btn {
+        position: static !important;
+        margin-bottom: 10px;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      
+      .download-btn button {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 4px;
+        font-size: 11px;
+      }
+      
+      /* 탭 메뉴 스크롤 */
+      .tab-menu-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .tab-menu-container::-webkit-scrollbar {
+        display: none;
+      }
+      
+      /* 차트 컨테이너 간격 */
+      .chart-container {
+        margin-bottom: 20px;
+        padding: 12px !important;
+      }
+      
+      /* 제목 크기 */
+      h3 {
+        font-size: 16px !important;
+      }
+      
+      /* 설명 박스 */
+      .bg-blue-50, .bg-orange-50, .bg-green-50, .bg-cyan-50 {
+        padding: 10px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      /* 3000m 장애물 모바일 레이아웃 */
+      .steeplechase-tables {
+        display: block !important;
+      }
+      
+      .steeplechase-tables > div {
+        margin-bottom: 20px;
+      }
+      
+      /* 헤더 크기 조정 */
+      header h1 {
+        font-size: 18px !important;
+      }
+      
+      header img {
+        height: 32px !important;
+      }
+      
+      /* 제작 정보 */
+      .chart-header-logo {
+        font-size: 18px !important;
+      }
+      
+      /* 스크롤 표시기 */
+      .table-container {
+        position: relative;
+      }
+      
+      .table-container.scrollable::after {
+        content: '← 좌우 스크롤 →';
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        pointer-events: none;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+      }
+    }
+    
+    /* 태블릿 반응형 */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .pace-table {
+        font-size: 11px;
+      }
+      
+      .pace-table td, .pace-table th {
+        padding: 5px 3px;
+      }
+      
+      .chart-container {
+        padding: 16px;
       }
     }
 
@@ -254,8 +377,16 @@
 
   <div class="max-w-6xl mx-auto p-4 pb-20">
     
+    <!-- 모바일 안내 메시지 -->
+    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center">
+      <p class="text-sm font-medium">
+        <i class="fas fa-hand-point-left mr-2"></i>
+        테이블을 좌우로 스크롤하세요
+      </p>
+    </div>
+    
     <!-- 탭 메뉴 -->
-    <div class="flex gap-2 mb-6 overflow-x-auto no-print">
+    <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container">
       <button onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
         <i class="fas fa-table mr-2"></i>페이스 차트
       </button>
@@ -732,7 +863,7 @@
           }
         </style>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 steeplechase-tables">
           <!-- 내측 구성 테이블 -->
           <div class="border-4 border-blue-500 rounded-lg overflow-hidden shadow-xl">
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 text-center">
@@ -1871,9 +2002,72 @@
     }
 
 
-    // 페이지 로드 시 차트 탭 활성화 및 차트 생성
+    // 모바일 감지 및 스크롤 표시기 추가
+    function checkMobileAndScroll() {
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        // 스크롤 가능한 테이블 표시
+        document.querySelectorAll('.table-container').forEach(container => {
+          const table = container.querySelector('.pace-table');
+          if (table && table.scrollWidth > container.clientWidth) {
+            container.classList.add('scrollable');
+          }
+        });
+        
+        // 다운로드 버튼 재배치
+        document.querySelectorAll('.download-btn').forEach(btn => {
+          const chartContainer = btn.closest('.chart-container');
+          if (chartContainer) {
+            const title = chartContainer.querySelector('h3');
+            if (title && btn.parentElement === chartContainer) {
+              title.insertAdjacentElement('afterend', btn);
+            }
+          }
+        });
+      }
+    }
+    
+    // 화면 크기 변경 시 처리
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        checkMobileAndScroll();
+      }, 250);
+    });
+    
+    // 페이지 로드 시 초기화
     window.addEventListener('DOMContentLoaded', () => {
       switchTab('chart');
+      checkMobileAndScroll();
+      
+      // 모바일에서 테이블 터치 스크롤 개선
+      if ('ontouchstart' in window) {
+        document.querySelectorAll('.table-container').forEach(container => {
+          let isScrolling = false;
+          let startX;
+          let scrollLeft;
+          
+          container.addEventListener('touchstart', (e) => {
+            isScrolling = true;
+            startX = e.touches[0].pageX - container.offsetLeft;
+            scrollLeft = container.scrollLeft;
+          });
+          
+          container.addEventListener('touchmove', (e) => {
+            if (!isScrolling) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - container.offsetLeft;
+            const walk = (x - startX) * 2;
+            container.scrollLeft = scrollLeft - walk;
+          });
+          
+          container.addEventListener('touchend', () => {
+            isScrolling = false;
+          });
+        });
+      }
     });
   </script>
 </body>
