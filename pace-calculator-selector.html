@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>페이스 계산기 버전 선택 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .version-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .version-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .version-card:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <div class="max-w-4xl w-full">
+    <!-- 헤더 -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-3">페이스 계산기</h1>
+      <p class="text-white/90 text-lg">디바이스에 맞는 버전을 선택하세요</p>
+    </div>
+    
+    <!-- 버전 선택 카드 -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- 모바일 버전 카드 -->
+      <div onclick="selectMobileVersion()" 
+           class="version-card bg-white rounded-xl p-6 md:p-8 shadow-xl">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full mb-4">
+            <i class="fas fa-mobile-alt text-3xl text-white"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2 text-gray-800">모바일 버전</h2>
+          <div class="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full mb-3">
+            추천: 스마트폰
+          </div>
+        </div>
+        
+        <ul class="text-left text-gray-600 space-y-3 mb-6">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>스크롤 시 첫 열(km 페이스) 고정</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>터치에 최적화된 큰 버튼</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>세로 화면에 맞춘 레이아웃</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>간소화된 테이블 표시</span>
+          </li>
+        </ul>
+        
+        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition-all">
+          모바일 버전 시작
+        </button>
+      </div>
+      
+      <!-- PC 버전 카드 -->
+      <div onclick="selectDesktopVersion()" 
+           class="version-card bg-white rounded-xl p-6 md:p-8 shadow-xl">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full mb-4">
+            <i class="fas fa-desktop text-3xl text-white"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2 text-gray-800">PC 버전</h2>
+          <div class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">
+            추천: 데스크톱/태블릿
+          </div>
+        </div>
+        
+        <ul class="text-left text-gray-600 space-y-3 mb-6">
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>전체 테이블을 한눈에 확인</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>상세한 차트와 데이터 표시</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>PDF/PNG 다운로드 기능</span>
+          </li>
+          <li class="flex items-start">
+            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+            <span>인쇄 최적화 레이아웃</span>
+          </li>
+        </ul>
+        
+        <button class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all">
+          PC 버전 시작
+        </button>
+      </div>
+    </div>
+    
+    <!-- 추가 정보 -->
+    <div class="mt-8 text-center">
+      <div class="bg-white/20 backdrop-blur rounded-lg px-4 py-3 inline-block">
+        <p class="text-white text-sm">
+          <i class="fas fa-info-circle mr-2"></i>
+          선택은 7일간 저장되며, 언제든 변경 가능합니다
+        </p>
+      </div>
+    </div>
+    
+    <!-- 메인으로 돌아가기 -->
+    <div class="mt-6 text-center">
+      <a href="index.html" class="text-white/90 hover:text-white text-sm">
+        <i class="fas fa-arrow-left mr-2"></i>
+        메인으로 돌아가기
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // 사용자 선택 저장
+    function saveVersionPreference(version) {
+      localStorage.setItem('paceCalculatorVersion', version);
+      localStorage.setItem('versionTimestamp', Date.now());
+    }
+    
+    // 저장된 선택 가져오기
+    function getSavedPreference() {
+      const version = localStorage.getItem('paceCalculatorVersion');
+      const timestamp = localStorage.getItem('versionTimestamp');
+      
+      if (version && timestamp) {
+        const daysSince = (Date.now() - parseInt(timestamp)) / (1000 * 60 * 60 * 24);
+        if (daysSince < 7) {
+          return version;
+        }
+      }
+      return null;
+    }
+    
+    // 모바일 버전 선택
+    function selectMobileVersion() {
+      saveVersionPreference('mobile');
+      window.location.href = 'pace-calculator-mobile.html';
+    }
+    
+    // PC 버전 선택
+    function selectDesktopVersion() {
+      saveVersionPreference('desktop');
+      window.location.href = 'pace-calculator.html';
+    }
+    
+    // 페이지 로드 시 저장된 선택 확인
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedVersion = getSavedPreference();
+      
+      // 저장된 선택이 있으면 자동 리디렉션
+      if (savedVersion) {
+        if (savedVersion === 'mobile') {
+          window.location.href = 'pace-calculator-mobile.html';
+        } else {
+          window.location.href = 'pace-calculator.html';
+        }
+      }
+    });
+  </script>
+</body>
+</html>

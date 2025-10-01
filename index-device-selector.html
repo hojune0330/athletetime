@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>애슬리트 타임 | 한국 육상인 플랫폼</title>
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="애슬리트타임 - 육상 선수들의 커뮤니티">
+  <meta property="og:description" content="육상 선수들을 위한 익명 커뮤니티">
+  <meta property="og:url" content="https://hojune0330.github.io/athletetime/">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="device-router.js"></script>
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .device-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .device-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .device-card:active {
+      transform: scale(0.98);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <div class="max-w-6xl w-full">
+    <!-- 로고 섹션 -->
+    <div class="text-center mb-8">
+      <div class="inline-block float-animation">
+        <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+             alt="Athlete Time Logo" 
+             class="h-20 md:h-24 mx-auto mb-4"
+             style="filter: brightness(0) invert(1);">
+      </div>
+      <h1 class="text-3xl md:text-5xl font-bold text-white mb-2">ATHLETE TIME</h1>
+      <p class="text-white/80 text-lg">한국 육상인을 위한 플랫폼</p>
+    </div>
+    
+    <!-- 디바이스 선택 카드 -->
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+      <!-- 모바일 버전 -->
+      <div onclick="selectDevice('mobile')" 
+           class="device-card bg-white rounded-2xl p-8 text-center shadow-xl">
+        <div class="mb-6">
+          <i class="fas fa-mobile-alt text-6xl text-purple-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-3 text-gray-800">모바일 버전</h2>
+        <p class="text-gray-600 mb-4">
+          스마트폰에 최적화된 인터페이스<br>
+          터치 친화적 디자인
+        </p>
+        <ul class="text-sm text-left text-gray-500 space-y-2 mb-6">
+          <li><i class="fas fa-check text-green-500 mr-2"></i>간편한 터치 조작</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>세로 화면 최적화</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>빠른 로딩 속도</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>단순화된 UI</li>
+        </ul>
+        <button class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition-all">
+          모바일로 시작하기
+        </button>
+      </div>
+      
+      <!-- PC 버전 -->
+      <div onclick="selectDevice('desktop')" 
+           class="device-card bg-white rounded-2xl p-8 text-center shadow-xl">
+        <div class="mb-6">
+          <i class="fas fa-desktop text-6xl text-blue-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-3 text-gray-800">PC 버전</h2>
+        <p class="text-gray-600 mb-4">
+          데스크톱에 최적화된 인터페이스<br>
+          풍부한 기능과 상세 정보
+        </p>
+        <ul class="text-sm text-left text-gray-500 space-y-2 mb-6">
+          <li><i class="fas fa-check text-green-500 mr-2"></i>넓은 화면 활용</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>상세한 차트 표시</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>다중 작업 지원</li>
+          <li><i class="fas fa-check text-green-500 mr-2"></i>전체 기능 제공</li>
+        </ul>
+        <button class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all">
+          PC로 시작하기
+        </button>
+      </div>
+    </div>
+    
+    <!-- 자동 선택 안내 -->
+    <div class="text-center text-white/80">
+      <p class="text-sm mb-2">
+        <i class="fas fa-info-circle mr-2"></i>
+        현재 기기가 자동으로 감지되었습니다
+      </p>
+      <p class="text-xs">
+        선택은 7일간 저장되며, 언제든 변경할 수 있습니다
+      </p>
+    </div>
+    
+    <!-- 자동 리디렉션 (3초 후) -->
+    <div id="autoRedirect" class="hidden text-center mt-8">
+      <div class="inline-block bg-white/20 backdrop-blur rounded-lg px-6 py-3">
+        <p class="text-white">
+          <i class="fas fa-spinner fa-spin mr-2"></i>
+          <span id="deviceName"></span> 버전으로 자동 이동 중... 
+          <span id="countdown">3</span>초
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 디바이스 자동 감지
+    const detectedDevice = DeviceRouter.detectDevice();
+    const savedPreference = DeviceRouter.getUserPreference();
+    
+    // 저장된 선택이 있으면 바로 리디렉션
+    if (savedPreference) {
+      window.location.href = savedPreference === 'mobile' ? 'index-mobile.html' : 'index-desktop.html';
+    }
+    
+    // 자동 감지된 디바이스 표시
+    if (detectedDevice && !savedPreference) {
+      setTimeout(() => {
+        const autoDiv = document.getElementById('autoRedirect');
+        const deviceNameSpan = document.getElementById('deviceName');
+        const countdownSpan = document.getElementById('countdown');
+        
+        autoDiv.classList.remove('hidden');
+        deviceNameSpan.textContent = detectedDevice === 'mobile' ? '모바일' : 'PC';
+        
+        let count = 3;
+        const timer = setInterval(() => {
+          count--;
+          countdownSpan.textContent = count;
+          
+          if (count === 0) {
+            clearInterval(timer);
+            selectDevice(detectedDevice === 'mobile' ? 'mobile' : 'desktop');
+          }
+        }, 1000);
+      }, 1000);
+    }
+    
+    // 디바이스 선택 함수
+    function selectDevice(device) {
+      DeviceRouter.saveUserPreference(device);
+      
+      // 로딩 애니메이션 표시
+      document.body.innerHTML = `
+        <div class="flex items-center justify-center min-h-screen">
+          <div class="text-center">
+            <i class="fas fa-spinner fa-spin text-white text-5xl mb-4"></i>
+            <p class="text-white text-xl">${device === 'mobile' ? '모바일' : 'PC'} 버전으로 이동 중...</p>
+          </div>
+        </div>
+      `;
+      
+      // 페이지 이동
+      setTimeout(() => {
+        window.location.href = device === 'mobile' ? 'index-mobile.html' : 'index-desktop.html';
+      }, 500);
+    }
+  </script>
+</body>
+</html>
