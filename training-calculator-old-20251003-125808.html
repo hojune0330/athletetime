@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>고급 훈련 페이스 계산기 - 개인 맞춤형 | Athlete Time</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .training-zone-easy { background: linear-gradient(135deg, #10b981, #059669); }
+    .training-zone-marathon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .training-zone-threshold { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .training-zone-interval { background: linear-gradient(135deg, #ef4444, #dc2626); }
+    .training-zone-repetition { background: linear-gradient(135deg, #a855f7, #9333ea); }
+    
+    .zone-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .zone-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .checkbox-custom {
+      width: 20px;
+      height: 20px;
+      accent-color: #9333ea;
+    }
+    
+    .radio-custom {
+      width: 20px;
+      height: 20px;
+      accent-color: #9333ea;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.5s ease;
+    }
+    
+    .training-day {
+      transition: all 0.3s ease;
+    }
+    
+    .training-day:hover {
+      transform: translateX(5px);
+    }
+    
+    .high-intensity {
+      border-left: 4px solid #ef4444;
+      background: linear-gradient(to right, rgba(239, 68, 68, 0.1), transparent);
+    }
+    
+    .medium-intensity {
+      border-left: 4px solid #3b82f6;
+      background: linear-gradient(to right, rgba(59, 130, 246, 0.1), transparent);
+    }
+    
+    .low-intensity {
+      border-left: 4px solid #10b981;
+      background: linear-gradient(to right, rgba(16, 185, 129, 0.1), transparent);
+    }
+    
+    .rest-day {
+      border-left: 4px solid #6b7280;
+      background: linear-gradient(to right, rgba(107, 114, 128, 0.1), transparent);
+    }
+    
+    .profile-section {
+      transition: all 0.3s ease;
+    }
+    
+    .profile-section:hover {
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen">
+    <!-- 헤더 -->
+    <div class="gradient-bg text-white py-8 px-4 shadow-lg">
+      <div class="container mx-auto max-w-6xl">
+        <div class="flex items-center justify-between mb-4">
+          <h1 class="text-3xl font-bold flex items-center gap-3">
+            <i class="fas fa-running"></i>
+            고급 훈련 페이스 계산기
+          </h1>
+          <div class="flex gap-2">
+            <a href="training-calculator-selector.html" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+              <i class="fas fa-exchange-alt mr-2"></i>버전 선택
+            </a>
+            <a href="index.html" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+              <i class="fas fa-home mr-2"></i>메인으로
+            </a>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <p class="text-lg opacity-90">개인 맞춤형 과학적 훈련 시스템</p>
+          <span class="bg-white/20 px-3 py-1 rounded-full text-sm">
+            <i class="fas fa-user-check mr-1"></i>개발: 장호준 코치
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto max-w-6xl px-4 py-8">
+      <!-- Step 1: 개인 프로필 설정 -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8 profile-section">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+          개인 프로필 설정
+        </h2>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- 성별 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              <i class="fas fa-venus-mars text-pink-500 mr-1"></i>
+              성별
+            </label>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-purple-50 cursor-pointer">
+                <input type="radio" name="gender" value="male" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">남성</span>
+                  <p class="text-xs text-gray-500">남성 기준 VDOT 적용</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-pink-50 cursor-pointer">
+                <input type="radio" name="gender" value="female" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">여성</span>
+                  <p class="text-xs text-gray-500">여성 기준 VDOT 적용 (보정계수 0.88)</p>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 훈련 빈도 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              <i class="fas fa-calendar-check text-blue-500 mr-1"></i>
+              일일 훈련 빈도
+            </label>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer">
+                <input type="radio" name="frequency" value="single" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">1일 1회</span>
+                  <p class="text-xs text-gray-500">표준 훈련 (권장)</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-orange-50 cursor-pointer">
+                <input type="radio" name="frequency" value="double" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">1일 2회</span>
+                  <p class="text-xs text-gray-500">엘리트 훈련 (오전/오후)</p>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 훈련 강도 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-3">
+              <i class="fas fa-tachometer-alt text-red-500 mr-1"></i>
+              훈련 강도
+            </label>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-green-50 cursor-pointer">
+                <input type="radio" name="intensity" value="beginner" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">초급자</span>
+                  <p class="text-xs text-gray-500">부상 회복 / 입문자</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-yellow-50 cursor-pointer">
+                <input type="radio" name="intensity" value="intermediate" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">중급자</span>
+                  <p class="text-xs text-gray-500">1년 이상 경험</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-red-50 cursor-pointer">
+                <input type="radio" name="intensity" value="advanced" class="radio-custom" onchange="updateProfile()">
+                <div>
+                  <span class="font-semibold">고급자</span>
+                  <p class="text-xs text-gray-500">3년 이상 / 엘리트</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: 추가 정보 체크리스트 -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+          추가 정보 체크리스트
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- 현재 상태 -->
+          <div>
+            <h3 class="font-semibold mb-3 text-gray-700">
+              <i class="fas fa-heartbeat text-red-500 mr-1"></i>
+              현재 상태
+            </h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="injury_recovery" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">부상 회복 중 (강도 30% 감소)</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="fatigue" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">피로 누적 상태 (회복 위주)</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="offseason" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">비시즌 기간 (기초 체력)</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="tapering" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">경기 준비 기간 (테이퍼링)</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- 목표 & 선호도 -->
+          <div>
+            <h3 class="font-semibold mb-3 text-gray-700">
+              <i class="fas fa-target text-purple-500 mr-1"></i>
+              목표 & 선호도
+            </h3>
+            <div class="space-y-2">
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="speed_focus" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">스피드 향상 중점</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="endurance_focus" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">지구력 향상 중점</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="weight_loss" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">체중 감량 목표</span>
+              </label>
+              <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                <input type="checkbox" id="morning_runner" class="checkbox-custom" onchange="updateProfile()">
+                <span class="text-sm">아침 훈련 선호</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 특수 상황 -->
+        <div class="mt-6">
+          <h3 class="font-semibold mb-3 text-gray-700">
+            <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
+            특수 상황
+          </h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+              <input type="checkbox" id="age_master" class="checkbox-custom" onchange="updateProfile()">
+              <span class="text-sm">마스터즈 (40세 이상)</span>
+            </label>
+            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+              <input type="checkbox" id="altitude_training" class="checkbox-custom" onchange="updateProfile()">
+              <span class="text-sm">고지대 훈련 가능</span>
+            </label>
+            <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+              <input type="checkbox" id="heat_adaptation" class="checkbox-custom" onchange="updateProfile()">
+              <span class="text-sm">더위 적응 필요</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: 기준 기록 입력 -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+          기준 기록 입력
+        </h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- 거리 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-route text-blue-500 mr-1"></i>
+              거리 선택
+            </label>
+            <select id="distanceSelect" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-lg">
+              <option value="">거리를 선택하세요</option>
+              <optgroup label="트랙 경기">
+                <option value="800">800m</option>
+                <option value="1500">1500m</option>
+                <option value="3000">3000m</option>
+                <option value="5000">5000m</option>
+                <option value="10000">10000m</option>
+              </optgroup>
+              <optgroup label="로드 경기">
+                <option value="21097.5">하프마라톤</option>
+                <option value="42195">풀마라톤</option>
+              </optgroup>
+            </select>
+          </div>
+          
+          <!-- 시간 입력 -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-clock text-green-500 mr-1"></i>
+              기록 입력
+            </label>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <input type="number" id="hours" min="0" max="23" placeholder="시" 
+                       class="w-full px-3 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-center text-lg">
+                <span class="text-xs text-gray-500 block mt-1 text-center">시간</span>
+              </div>
+              <div class="flex-1">
+                <input type="number" id="minutes" min="0" max="59" placeholder="분" 
+                       class="w-full px-3 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-center text-lg">
+                <span class="text-xs text-gray-500 block mt-1 text-center">분</span>
+              </div>
+              <div class="flex-1">
+                <input type="number" id="seconds" min="0" max="59" step="0.1" placeholder="초" 
+                       class="w-full px-3 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none text-center text-lg">
+                <span class="text-xs text-gray-500 block mt-1 text-center">초</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button onclick="calculateAdvancedTraining()" class="w-full mt-6 bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-purple-800 transition flex items-center justify-center gap-2">
+          <i class="fas fa-magic"></i>
+          맞춤형 훈련 계획 생성
+        </button>
+      </div>
+
+      <!-- 프로필 요약 (계산 전 숨김) -->
+      <div id="profileSummary" class="hidden bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-xl font-bold mb-4">
+          <i class="fas fa-user-circle text-purple-600 mr-2"></i>
+          개인 프로필 요약
+        </h3>
+        <div id="profileDetails" class="grid md:grid-cols-3 gap-4 text-sm">
+          <!-- JavaScript로 동적 생성 -->
+        </div>
+      </div>
+
+      <!-- 결과 섹션 (초기 숨김) -->
+      <div id="resultsSection" class="hidden">
+        <!-- VDOT & 예상 기록 -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8 slide-in">
+          <!-- VDOT 점수 -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <i class="fas fa-award text-yellow-500"></i>
+              VDOT 점수
+            </h3>
+            <div class="text-center">
+              <div class="text-5xl font-bold gradient-text mb-2" id="vdotScore">-</div>
+              <div class="text-gray-600" id="vdotLevel">-</div>
+              <div class="text-sm text-gray-500 mt-2" id="genderAdjustment">-</div>
+            </div>
+          </div>
+          
+          <!-- 예상 기록 -->
+          <div class="bg-white rounded-xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+              <i class="fas fa-trophy text-purple-500"></i>
+              주요 거리 예상 기록
+            </h3>
+            <div class="max-h-64 overflow-y-auto">
+              <table class="w-full text-sm result-table">
+                <thead>
+                  <tr class="bg-gray-100">
+                    <th class="px-4 py-2 text-left">거리</th>
+                    <th class="px-4 py-2 text-center">예상 기록</th>
+                    <th class="px-4 py-2 text-center">km 페이스</th>
+                  </tr>
+                </thead>
+                <tbody id="predictedTimesTable" class="divide-y">
+                  <!-- JavaScript로 채워짐 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 훈련 페이스 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <i class="fas fa-tachometer-alt text-red-500"></i>
+            맞춤형 훈련 페이스
+          </h2>
+          
+          <div id="adjustmentNotice" class="mb-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+            <!-- 조정 사항 안내 -->
+          </div>
+          
+          <div class="grid md:grid-cols-5 gap-4 mb-6" id="trainingZones">
+            <!-- E (Easy) -->
+            <div class="zone-card bg-gradient-to-b from-green-500 to-green-600 rounded-lg p-4 text-white">
+              <div class="text-xs opacity-90 mb-1">E (Easy)</div>
+              <div class="text-2xl font-bold mb-2" id="easyPace">-</div>
+              <div class="text-xs opacity-80">회복/지구력</div>
+              <div class="text-xs opacity-80 mt-1">65-79% HRmax</div>
+            </div>
+            
+            <!-- M (Marathon) -->
+            <div class="zone-card bg-gradient-to-b from-blue-500 to-blue-600 rounded-lg p-4 text-white">
+              <div class="text-xs opacity-90 mb-1">M (Marathon)</div>
+              <div class="text-2xl font-bold mb-2" id="marathonPace">-</div>
+              <div class="text-xs opacity-80">마라톤 페이스</div>
+              <div class="text-xs opacity-80 mt-1">80-90% HRmax</div>
+            </div>
+            
+            <!-- T (Threshold) -->
+            <div class="zone-card bg-gradient-to-b from-yellow-500 to-orange-600 rounded-lg p-4 text-white">
+              <div class="text-xs opacity-90 mb-1">T (Threshold)</div>
+              <div class="text-2xl font-bold mb-2" id="thresholdPace">-</div>
+              <div class="text-xs opacity-80">젖산역치</div>
+              <div class="text-xs opacity-80 mt-1">88-92% HRmax</div>
+            </div>
+            
+            <!-- I (Interval) -->
+            <div class="zone-card bg-gradient-to-b from-red-500 to-red-600 rounded-lg p-4 text-white">
+              <div class="text-xs opacity-90 mb-1">I (Interval)</div>
+              <div class="text-2xl font-bold mb-2" id="intervalPace">-</div>
+              <div class="text-xs opacity-80">VO₂max</div>
+              <div class="text-xs opacity-80 mt-1">95-100% HRmax</div>
+            </div>
+            
+            <!-- R (Repetition) -->
+            <div class="zone-card bg-gradient-to-b from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+              <div class="text-xs opacity-90 mb-1">R (Repetition)</div>
+              <div class="text-2xl font-bold mb-2" id="repetitionPace">-</div>
+              <div class="text-xs opacity-80">스피드/폼</div>
+              <div class="text-xs opacity-80 mt-1">효율성 중심</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 맞춤형 훈련 계획 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <i class="fas fa-calendar-alt text-blue-500"></i>
+            개인 맞춤 훈련 계획
+          </h2>
+          
+          <div id="trainingPlanNotice" class="mb-4">
+            <!-- 훈련 계획 안내 -->
+          </div>
+          
+          <div class="space-y-3" id="trainingPlan">
+            <!-- JavaScript로 동적 생성 -->
+          </div>
+        </div>
+
+        <!-- 특별 권장사항 -->
+        <div id="specialRecommendations" class="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+            <i class="fas fa-star text-yellow-500"></i>
+            개인별 특별 권장사항
+          </h2>
+          <div id="recommendationsList" class="grid md:grid-cols-2 gap-6">
+            <!-- JavaScript로 동적 생성 -->
+          </div>
+        </div>
+
+        <!-- 개발자 정보 -->
+        <div class="text-center py-6 border-t">
+          <p class="text-gray-600">
+            <i class="fas fa-code mr-2"></i>
+            개발: <span class="font-bold">장호준 코치</span> | 
+            개인 맞춤형 과학적 훈련 프로그램
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // VDOT 테이블
+    const vdotTable = {
+      30: { 800: 234, 1500: 462, 3000: 978, 5000: 1680, 10000: 3480, 21097.5: 7680, 42195: 16020 },
+      35: { 800: 210, 1500: 414, 3000: 876, 5000: 1500, 10000: 3105, 21097.5: 6825, 42195: 14220 },
+      40: { 800: 192, 1500: 378, 3000: 798, 5000: 1365, 10000: 2820, 21097.5: 6180, 42195: 12840 },
+      45: { 800: 177, 1500: 348, 3000: 732, 5000: 1251, 10000: 2580, 21097.5: 5640, 42195: 11700 },
+      50: { 800: 164, 1500: 322, 3000: 677, 5000: 1155, 10000: 2376, 21097.5: 5184, 42195: 10740 },
+      55: { 800: 153, 1500: 300, 3000: 630, 5000: 1073, 10000: 2205, 21097.5: 4800, 42195: 9930 },
+      60: { 800: 143, 1500: 280, 3000: 588, 5000: 1001, 10000: 2055, 21097.5: 4470, 42195: 9240 },
+      65: { 800: 134, 1500: 262, 3000: 551, 5000: 937, 10000: 1922, 21097.5: 4176, 42195: 8628 },
+      70: { 800: 126, 1500: 247, 3000: 518, 5000: 880, 10000: 1803, 21097.5: 3912, 42195: 8076 },
+      75: { 800: 119, 1500: 233, 3000: 488, 5000: 829, 10000: 1695, 21097.5: 3675, 42195: 7575 },
+      80: { 800: 112, 1500: 220, 3000: 461, 5000: 782, 10000: 1598, 21097.5: 3462, 42195: 7128 },
+      85: { 800: 106, 1500: 208, 3000: 436, 5000: 740, 10000: 1510, 21097.5: 3267, 42195: 6720 }
+    };
+
+    // 프로필 상태
+    let userProfile = {
+      gender: null,
+      frequency: null,
+      intensity: null,
+      conditions: {},
+      adjustments: {
+        vdot: 1.0,
+        volume: 1.0,
+        intensity: 1.0
+      }
+    };
+
+    function updateProfile() {
+      // 성별
+      const genderInput = document.querySelector('input[name="gender"]:checked');
+      userProfile.gender = genderInput ? genderInput.value : null;
+      
+      // 훈련 빈도
+      const frequencyInput = document.querySelector('input[name="frequency"]:checked');
+      userProfile.frequency = frequencyInput ? frequencyInput.value : null;
+      
+      // 훈련 강도
+      const intensityInput = document.querySelector('input[name="intensity"]:checked');
+      userProfile.intensity = intensityInput ? intensityInput.value : null;
+      
+      // 체크박스 상태
+      userProfile.conditions = {
+        injury_recovery: document.getElementById('injury_recovery').checked,
+        fatigue: document.getElementById('fatigue').checked,
+        offseason: document.getElementById('offseason').checked,
+        tapering: document.getElementById('tapering').checked,
+        speed_focus: document.getElementById('speed_focus').checked,
+        endurance_focus: document.getElementById('endurance_focus').checked,
+        weight_loss: document.getElementById('weight_loss').checked,
+        morning_runner: document.getElementById('morning_runner').checked,
+        age_master: document.getElementById('age_master').checked,
+        altitude_training: document.getElementById('altitude_training').checked,
+        heat_adaptation: document.getElementById('heat_adaptation').checked
+      };
+      
+      // 조정 계수 계산
+      calculateAdjustments();
+    }
+
+    function calculateAdjustments() {
+      // 초기화
+      userProfile.adjustments = {
+        vdot: 1.0,
+        volume: 1.0,
+        intensity: 1.0
+      };
+      
+      // 성별 조정
+      if (userProfile.gender === 'female') {
+        userProfile.adjustments.vdot *= 0.88; // 여성 VDOT 보정
+      }
+      
+      // 훈련 강도 조정
+      if (userProfile.intensity === 'beginner') {
+        userProfile.adjustments.volume *= 0.7;
+        userProfile.adjustments.intensity *= 0.8;
+      } else if (userProfile.intensity === 'advanced') {
+        userProfile.adjustments.volume *= 1.2;
+        userProfile.adjustments.intensity *= 1.1;
+      }
+      
+      // 상태별 조정
+      if (userProfile.conditions.injury_recovery) {
+        userProfile.adjustments.volume *= 0.7;
+        userProfile.adjustments.intensity *= 0.7;
+      }
+      
+      if (userProfile.conditions.fatigue) {
+        userProfile.adjustments.volume *= 0.8;
+        userProfile.adjustments.intensity *= 0.9;
+      }
+      
+      if (userProfile.conditions.tapering) {
+        userProfile.adjustments.volume *= 0.5;
+        userProfile.adjustments.intensity *= 1.0; // 강도 유지, 볼륨 감소
+      }
+      
+      if (userProfile.conditions.age_master) {
+        userProfile.adjustments.volume *= 0.9;
+        userProfile.adjustments.intensity *= 0.95;
+      }
+    }
+
+    function calculateVDOT(distance, timeInSeconds) {
+      let closestVDOT = 30;
+      let minDiff = Infinity;
+      
+      for (const [vdot, times] of Object.entries(vdotTable)) {
+        if (times[distance]) {
+          const diff = Math.abs(times[distance] - timeInSeconds);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestVDOT = parseInt(vdot);
+          }
+        }
+      }
+      
+      return closestVDOT;
+    }
+
+    function getVDOTLevel(vdot) {
+      if (vdot >= 75) return "엘리트 선수";
+      if (vdot >= 65) return "준엘리트 선수";
+      if (vdot >= 55) return "상급자";
+      if (vdot >= 45) return "중급자";
+      if (vdot >= 35) return "초급자";
+      return "입문자";
+    }
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      
+      if (hours > 0) {
+        return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      return `${minutes}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function formatPace(secondsPerKm) {
+      const minutes = Math.floor(secondsPerKm / 60);
+      const seconds = Math.floor(secondsPerKm % 60);
+      return `${minutes}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function calculateTrainingPaces(vdot) {
+      const vdotFloat = parseFloat(vdot);
+      
+      let paces = {
+        easy: {
+          min: Math.round(360 - (vdotFloat - 30) * 3.5),
+          max: Math.round(330 - (vdotFloat - 30) * 3.2)
+        },
+        marathon: Math.round(280 - (vdotFloat - 30) * 2.8),
+        threshold: Math.round(265 - (vdotFloat - 30) * 2.6),
+        interval: Math.round(245 - (vdotFloat - 30) * 2.4),
+        repetition: Math.round(225 - (vdotFloat - 30) * 2.2)
+      };
+      
+      // 강도 조정 적용
+      const intensityAdj = userProfile.adjustments.intensity;
+      paces.easy.min = Math.round(paces.easy.min / intensityAdj);
+      paces.easy.max = Math.round(paces.easy.max / intensityAdj);
+      paces.marathon = Math.round(paces.marathon / intensityAdj);
+      paces.threshold = Math.round(paces.threshold / intensityAdj);
+      paces.interval = Math.round(paces.interval / intensityAdj);
+      paces.repetition = Math.round(paces.repetition / intensityAdj);
+      
+      return paces;
+    }
+
+    function generateCustomTrainingPlan() {
+      const plan = document.getElementById('trainingPlan');
+      plan.innerHTML = '';
+      
+      // 1일 2회 훈련 계획
+      if (userProfile.frequency === 'double') {
+        // 오전 훈련
+        const morningDiv = document.createElement('div');
+        morningDiv.className = 'mb-6';
+        morningDiv.innerHTML = `
+          <h3 class="text-lg font-bold mb-3 text-orange-600">
+            <i class="fas fa-sun mr-2"></i>오전 훈련
+          </h3>
+        `;
+        
+        // 오후 훈련
+        const afternoonDiv = document.createElement('div');
+        afternoonDiv.innerHTML = `
+          <h3 class="text-lg font-bold mb-3 text-blue-600">
+            <i class="fas fa-moon mr-2"></i>오후 훈련
+          </h3>
+        `;
+        
+        plan.appendChild(morningDiv);
+        plan.appendChild(afternoonDiv);
+        
+        // 2회 훈련 내용 생성
+        generateDoubleSessionPlan(morningDiv, afternoonDiv);
+      } else {
+        // 1일 1회 훈련 계획
+        generateSingleSessionPlan(plan);
+      }
+    }
+
+    function generateSingleSessionPlan(container) {
+      const days = getSingleSessionDays();
+      
+      days.forEach(day => {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = `training-day ${day.intensity} p-4 rounded-lg mb-3`;
+        dayDiv.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h4 class="font-bold text-lg mb-1">${day.title}</h4>
+              <p class="text-sm text-gray-700 mb-2">${day.description}</p>
+              <div class="space-y-1 text-sm">
+                ${day.details.map(d => `<p>${d}</p>`).join('')}
+              </div>
+            </div>
+            <div class="text-2xl ${day.iconColor}">
+              <i class="${day.icon}"></i>
+            </div>
+          </div>
+        `;
+        container.appendChild(dayDiv);
+      });
+    }
+
+    function generateDoubleSessionPlan(morningContainer, afternoonContainer) {
+      const plans = getDoubleSessionDays();
+      
+      plans.morning.forEach(session => {
+        const sessionDiv = document.createElement('div');
+        sessionDiv.className = `training-day ${session.intensity} p-3 rounded-lg mb-2`;
+        sessionDiv.innerHTML = `
+          <h4 class="font-semibold">${session.title}</h4>
+          <p class="text-sm text-gray-600">${session.description}</p>
+        `;
+        morningContainer.appendChild(sessionDiv);
+      });
+      
+      plans.afternoon.forEach(session => {
+        const sessionDiv = document.createElement('div');
+        sessionDiv.className = `training-day ${session.intensity} p-3 rounded-lg mb-2`;
+        sessionDiv.innerHTML = `
+          <h4 class="font-semibold">${session.title}</h4>
+          <p class="text-sm text-gray-600">${session.description}</p>
+        `;
+        afternoonContainer.appendChild(sessionDiv);
+      });
+    }
+
+    function getSingleSessionDays() {
+      // 강도별 훈련 일정
+      if (userProfile.intensity === 'beginner') {
+        return [
+          {
+            title: 'Day 1: 가벼운 조깅',
+            description: '회복과 기초 체력',
+            details: ['🔥 워밍업: 10분 걷기', '💪 메인: 20-30분 Easy', '❄️ 쿨다운: 5분 걷기'],
+            intensity: 'low-intensity',
+            icon: 'fas fa-walking',
+            iconColor: 'text-green-500'
+          },
+          {
+            title: 'Day 2: 휴식',
+            description: '완전 휴식',
+            details: ['😴 충분한 수면', '💆 스트레칭 15분'],
+            intensity: 'rest-day',
+            icon: 'fas fa-bed',
+            iconColor: 'text-gray-500'
+          },
+          {
+            title: 'Day 3: 템포 조깅',
+            description: '약간의 속도 변화',
+            details: ['🔥 워밍업: 10분 Easy', '💪 메인: 15분 Tempo', '❄️ 쿨다운: 10분 Easy'],
+            intensity: 'medium-intensity',
+            icon: 'fas fa-running',
+            iconColor: 'text-blue-500'
+          }
+        ];
+      } else if (userProfile.intensity === 'advanced') {
+        return [
+          {
+            title: 'Day 1: 인터벌 훈련',
+            description: 'VO₂max 향상',
+            details: ['🔥 워밍업: 20분 Easy', '💪 메인: 1200m × 6 (I 페이스)', '❄️ 쿨다운: 15분 Easy'],
+            intensity: 'high-intensity',
+            icon: 'fas fa-fire',
+            iconColor: 'text-red-500'
+          },
+          {
+            title: 'Day 2: 회복 조깅',
+            description: '적극적 회복',
+            details: ['💚 45-60분 Easy 페이스', '💆 코어 운동 20분'],
+            intensity: 'low-intensity',
+            icon: 'fas fa-leaf',
+            iconColor: 'text-green-500'
+          }
+        ];
+      }
+      
+      // 중급자 기본값
+      return [
+        {
+          title: 'Day 1: 인터벌 훈련',
+          description: 'VO₂max 향상',
+          details: ['🔥 워밍업: 15분 Easy', '💪 메인: 800m × 5 (I 페이스)', '❄️ 쿨다운: 10분 Easy'],
+          intensity: 'high-intensity',
+          icon: 'fas fa-fire',
+          iconColor: 'text-red-500'
+        }
+      ];
+    }
+
+    function getDoubleSessionDays() {
+      return {
+        morning: [
+          {
+            title: 'Easy 조깅 40분',
+            description: '기초 유산소 + 회복',
+            intensity: 'low-intensity'
+          },
+          {
+            title: '템포런 25분',
+            description: '젖산역치 향상',
+            intensity: 'medium-intensity'
+          }
+        ],
+        afternoon: [
+          {
+            title: '스피드 드릴',
+            description: '100m × 6 스트라이드',
+            intensity: 'medium-intensity'
+          },
+          {
+            title: '코어 & 보강',
+            description: '30분 근력 운동',
+            intensity: 'low-intensity'
+          }
+        ]
+      };
+    }
+
+    function generateSpecialRecommendations() {
+      const container = document.getElementById('recommendationsList');
+      container.innerHTML = '';
+      
+      const recommendations = [];
+      
+      // 성별 특화 권장사항
+      if (userProfile.gender === 'female') {
+        recommendations.push({
+          icon: 'fas fa-venus',
+          title: '여성 러너 특별 권장',
+          items: [
+            '철분 섭취 강화 (빈혈 예방)',
+            '칼슘 & 비타민D 보충',
+            '월경 주기 고려한 훈련 조절'
+          ],
+          color: 'pink'
+        });
+      }
+      
+      // 부상 회복
+      if (userProfile.conditions.injury_recovery) {
+        recommendations.push({
+          icon: 'fas fa-band-aid',
+          title: '부상 회복 프로토콜',
+          items: [
+            '점진적 거리 증가 (주 10% 이내)',
+            '크로스 트레이닝 병행 (수영, 자전거)',
+            '통증 발생 시 즉시 중단',
+            '충분한 휴식과 재활 운동'
+          ],
+          color: 'red'
+        });
+      }
+      
+      // 마스터즈
+      if (userProfile.conditions.age_master) {
+        recommendations.push({
+          icon: 'fas fa-user-clock',
+          title: '마스터즈 러너 가이드',
+          items: [
+            '충분한 회복 시간 확보',
+            '근력 운동 비중 증가',
+            '유연성 운동 필수',
+            '정기적인 건강 검진'
+          ],
+          color: 'purple'
+        });
+      }
+      
+      // 체중 감량
+      if (userProfile.conditions.weight_loss) {
+        recommendations.push({
+          icon: 'fas fa-weight',
+          title: '체중 감량 전략',
+          items: [
+            '아침 공복 Easy 런 추천',
+            '주 5-6회 꾸준한 운동',
+            '고단백 저지방 식단',
+            '충분한 수분 섭취'
+          ],
+          color: 'green'
+        });
+      }
+      
+      recommendations.forEach(rec => {
+        const div = document.createElement('div');
+        div.className = `p-4 bg-${rec.color}-50 rounded-lg border border-${rec.color}-200`;
+        div.innerHTML = `
+          <h4 class="font-bold mb-3 text-${rec.color}-800">
+            <i class="${rec.icon} mr-2"></i>${rec.title}
+          </h4>
+          <ul class="text-sm space-y-1 text-gray-700">
+            ${rec.items.map(item => `<li>• ${item}</li>`).join('')}
+          </ul>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function showProfileSummary() {
+      const summary = document.getElementById('profileSummary');
+      const details = document.getElementById('profileDetails');
+      
+      const genderText = userProfile.gender === 'male' ? '남성' : userProfile.gender === 'female' ? '여성' : '미선택';
+      const frequencyText = userProfile.frequency === 'double' ? '1일 2회' : userProfile.frequency === 'single' ? '1일 1회' : '미선택';
+      const intensityText = userProfile.intensity === 'beginner' ? '초급자' : 
+                           userProfile.intensity === 'intermediate' ? '중급자' : 
+                           userProfile.intensity === 'advanced' ? '고급자' : '미선택';
+      
+      const activeConditions = Object.entries(userProfile.conditions)
+        .filter(([key, value]) => value)
+        .map(([key]) => {
+          const labels = {
+            injury_recovery: '부상 회복',
+            fatigue: '피로 누적',
+            offseason: '비시즌',
+            tapering: '테이퍼링',
+            speed_focus: '스피드 중점',
+            endurance_focus: '지구력 중점',
+            weight_loss: '체중 감량',
+            morning_runner: '아침 훈련',
+            age_master: '마스터즈',
+            altitude_training: '고지대 훈련',
+            heat_adaptation: '더위 적응'
+          };
+          return labels[key];
+        });
+      
+      details.innerHTML = `
+        <div>
+          <p class="font-semibold">기본 정보</p>
+          <p class="text-gray-600">성별: ${genderText}</p>
+          <p class="text-gray-600">훈련 빈도: ${frequencyText}</p>
+          <p class="text-gray-600">수준: ${intensityText}</p>
+        </div>
+        <div>
+          <p class="font-semibold">적용 조정</p>
+          <p class="text-gray-600">VDOT 보정: ${(userProfile.adjustments.vdot * 100).toFixed(0)}%</p>
+          <p class="text-gray-600">훈련량: ${(userProfile.adjustments.volume * 100).toFixed(0)}%</p>
+          <p class="text-gray-600">강도: ${(userProfile.adjustments.intensity * 100).toFixed(0)}%</p>
+        </div>
+        <div>
+          <p class="font-semibold">활성 조건</p>
+          <p class="text-gray-600">${activeConditions.length > 0 ? activeConditions.join(', ') : '없음'}</p>
+        </div>
+      `;
+      
+      summary.classList.remove('hidden');
+    }
+
+    function calculateAdvancedTraining() {
+      const distance = parseFloat(document.getElementById('distanceSelect').value);
+      const hours = parseInt(document.getElementById('hours').value) || 0;
+      const minutes = parseInt(document.getElementById('minutes').value) || 0;
+      const seconds = parseFloat(document.getElementById('seconds').value) || 0;
+      
+      if (!distance || (hours === 0 && minutes === 0 && seconds === 0)) {
+        alert('거리와 시간을 모두 입력해주세요.');
+        return;
+      }
+      
+      if (!userProfile.gender || !userProfile.frequency || !userProfile.intensity) {
+        alert('프로필 설정을 완료해주세요.');
+        return;
+      }
+      
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      let vdot = calculateVDOT(distance, totalSeconds);
+      
+      // 성별 보정 적용
+      const adjustedVdot = vdot * userProfile.adjustments.vdot;
+      
+      // VDOT 점수 표시
+      document.getElementById('vdotScore').textContent = adjustedVdot.toFixed(1);
+      document.getElementById('vdotLevel').textContent = getVDOTLevel(adjustedVdot);
+      
+      if (userProfile.gender === 'female') {
+        document.getElementById('genderAdjustment').textContent = 
+          `여성 보정 적용 (원본 VDOT: ${vdot.toFixed(1)})`;
+      } else {
+        document.getElementById('genderAdjustment').textContent = '';
+      }
+      
+      // 훈련 페이스 계산
+      const paces = calculateTrainingPaces(adjustedVdot);
+      
+      document.getElementById('easyPace').textContent = 
+        `${formatPace(paces.easy.max)}-${formatPace(paces.easy.min)}`;
+      document.getElementById('marathonPace').textContent = formatPace(paces.marathon);
+      document.getElementById('thresholdPace').textContent = formatPace(paces.threshold);
+      document.getElementById('intervalPace').textContent = formatPace(paces.interval);
+      document.getElementById('repetitionPace').textContent = formatPace(paces.repetition);
+      
+      // 조정 사항 안내
+      const adjustmentNotice = document.getElementById('adjustmentNotice');
+      let notices = [];
+      
+      if (userProfile.conditions.injury_recovery) {
+        notices.push('⚠️ 부상 회복: 훈련량 30% 감소 적용');
+      }
+      if (userProfile.conditions.fatigue) {
+        notices.push('😴 피로 누적: 회복 위주 훈련');
+      }
+      if (userProfile.conditions.tapering) {
+        notices.push('🏁 테이퍼링: 훈련량 50% 감소, 강도 유지');
+      }
+      
+      adjustmentNotice.innerHTML = notices.length > 0 ? 
+        `<p class="text-sm text-yellow-800"><i class="fas fa-info-circle mr-2"></i>${notices.join(' | ')}</p>` : '';
+      
+      // 프로필 요약 표시
+      showProfileSummary();
+      
+      // 맞춤 훈련 계획 생성
+      generateCustomTrainingPlan();
+      
+      // 특별 권장사항 생성
+      generateSpecialRecommendations();
+      
+      // 결과 섹션 표시
+      document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 엔터키 지원
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        calculateAdvancedTraining();
+      }
+    });
+  </script>
+</body>
+</html>
