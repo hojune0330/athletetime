@@ -962,12 +962,19 @@
       const laneNum = parseInt(document.getElementById('laneNumber').value);
       const laps = parseFloat(document.getElementById('laps').value);
       
-      const baseRadius = 36.5;
-      const laneWidth = 1.22;
-      const radius = baseRadius + (laneNum - 1) * laneWidth;
+      // IAAF 표준 레인별 거리 (정확한 값)
+      const laneDistances = {
+        1: 400.00,
+        2: 407.04,
+        3: 414.70,
+        4: 422.37,
+        5: 430.03,
+        6: 437.70,
+        7: 445.36,
+        8: 453.03
+      };
       
-      const circumference = 2 * Math.PI * radius;
-      const laneDistance = circumference + 2 * 84.39;
+      const laneDistance = laneDistances[laneNum];
       const totalDistance = laneDistance * laps;
       
       const resultsDiv = document.getElementById('laneResults');
@@ -1004,19 +1011,27 @@
       const table = document.getElementById('allLanesTable');
       let html = '<thead><tr><th>레인</th><th>1바퀴</th><th>추가거리</th><th>비율</th></tr></thead><tbody>';
       
+      // IAAF 표준 레인별 거리
+      const laneDistances = {
+        1: 400.00,
+        2: 407.04,
+        3: 414.70,
+        4: 422.37,
+        5: 430.03,
+        6: 437.70,
+        7: 445.36,
+        8: 453.03
+      };
+      
       for (let i = 1; i <= 8; i++) {
-        const baseRadius = 36.5;
-        const laneWidth = 1.22;
-        const radius = baseRadius + (i - 1) * laneWidth;
-        const circumference = 2 * Math.PI * radius;
-        const distance = circumference + 2 * 84.39;
+        const distance = laneDistances[i];
         const extra = distance - 400;
         const ratio = (distance / 400) * 100;
         
         html += `<tr class="${i === 1 ? 'bg-yellow-50' : ''}">`;
         html += `<td>${i}번</td>`;
-        html += `<td>${distance.toFixed(1)}m</td>`;
-        html += `<td>+${extra.toFixed(1)}m</td>`;
+        html += `<td>${distance.toFixed(2)}m</td>`;
+        html += `<td>${extra > 0 ? '+' : ''}${extra.toFixed(2)}m</td>`;
         html += `<td>${ratio.toFixed(1)}%</td>`;
         html += '</tr>';
       }
