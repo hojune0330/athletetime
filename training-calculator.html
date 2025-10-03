@@ -59,15 +59,6 @@
       border-left: 4px solid #6b7280; 
       background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
     }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    
-    .pulse-on-hover:hover {
-      animation: pulse 1s infinite;
-    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -77,7 +68,7 @@
       <div class="flex justify-between items-start">
         <div>
           <h1 class="text-3xl font-bold mb-2">전문 훈련 페이스 계산기</h1>
-          <p class="opacity-90">과학적 데이터 기반 개인 맞춤형 훈련 계획</p>
+          <p class="opacity-90">Jack Daniels VDOT 시스템 기반 과학적 훈련</p>
         </div>
         <button onclick="window.location.href='index.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition">
           <i class="fas fa-home text-xl"></i>
@@ -214,7 +205,7 @@
       </div>
       
       <button onclick="calculateTraining()" 
-        class="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition pulse-on-hover">
+        class="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition">
         <i class="fas fa-calculator mr-2"></i>훈련 계획 생성
       </button>
     </div>
@@ -231,7 +222,7 @@
           <input type="checkbox" id="injury_recovery" class="mr-3 w-5 h-5">
           <div>
             <div class="font-medium">부상 회복중</div>
-            <div class="text-xs text-gray-600">훈련 강도 40% 감소</div>
+            <div class="text-xs text-gray-600">훈련량 60%, 강도 70%</div>
           </div>
         </label>
         
@@ -247,7 +238,7 @@
           <input type="checkbox" id="altitude" class="mr-3 w-5 h-5">
           <div>
             <div class="font-medium">고지대 훈련</div>
-            <div class="text-xs text-gray-600">강도 조절 필요</div>
+            <div class="text-xs text-gray-600">페이스 3% 조정</div>
           </div>
         </label>
         
@@ -255,7 +246,7 @@
           <input type="checkbox" id="hot_weather" class="mr-3 w-5 h-5">
           <div>
             <div class="font-medium">고온다습 환경</div>
-            <div class="text-xs text-gray-600">페이스 5-10초 조절</div>
+            <div class="text-xs text-gray-600">페이스 5% 조정</div>
           </div>
         </label>
         
@@ -319,7 +310,7 @@
             <div class="flex justify-between items-center">
               <div>
                 <div class="font-bold text-lg">Marathon (M) - 마라톤 페이스</div>
-                <div class="text-sm opacity-90">최대심박수의 80-85% | 지속 가능한 페이스</div>
+                <div class="text-sm opacity-90">최대심박수의 80-85% | 2-3시간 유지 가능</div>
               </div>
               <div class="text-2xl font-bold" id="marathonPace">--</div>
             </div>
@@ -360,7 +351,7 @@
         </div>
       </div>
 
-      <!-- Microcycle Plan -->
+      <!-- Weekly Plan -->
       <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
         <h3 class="text-xl font-bold mb-4">주간 마이크로사이클 (7일)</h3>
         <div id="weeklyPlan" class="grid md:grid-cols-7 gap-2">
@@ -418,9 +409,8 @@
       }
     };
 
-    // VDOT tables based on Jack Daniels' Running Formula
+    // VDOT tables based on Jack Daniels' Running Formula (거리(m): 시간(초))
     const vdotTables = {
-      // Distance in meters: time in seconds for each VDOT value
       30: { 800: 316, 1500: 681, 3000: 1520, 5000: 2680, 10000: 5560, 21097.5: 12240, 42195: 25380 },
       35: { 800: 279, 1500: 598, 3000: 1330, 5000: 2340, 10000: 4860, 21097.5: 10680, 42195: 22140 },
       40: { 800: 249, 1500: 532, 3000: 1178, 5000: 2070, 10000: 4290, 21097.5: 9420, 42195: 19500 },
@@ -523,7 +513,7 @@
       // 선형 보간으로 정확한 페이스 계산
       let paces;
       if (lowerVdot === upperVdot) {
-        paces = vdotPaceTable[lowerVdot];
+        paces = JSON.parse(JSON.stringify(vdotPaceTable[lowerVdot]));
       } else {
         const ratio = (vdot - lowerVdot) / (upperVdot - lowerVdot);
         const lowerPaces = vdotPaceTable[lowerVdot];
@@ -580,11 +570,6 @@
         intensity: 1.0
       };
       
-      // Gender adjustment (female VDOT is typically 88% of male)
-      if (userProfile.gender === 'female') {
-        userProfile.adjustments.pace *= 1.05; // Paces are 5% slower
-      }
-      
       // Age group adjustments
       switch(userProfile.ageGroup) {
         case 'junior':
@@ -606,15 +591,15 @@
           break;
       }
       
-      // Experience level adjustments
+      // Experience level adjustments (중급자는 조정 없음)
       switch(userProfile.experience) {
         case 'beginner':
           userProfile.adjustments.volume *= 0.7;
-          userProfile.adjustments.intensity *= 0.8;
+          userProfile.adjustments.intensity *= 0.85;
           break;
-        case 'intermediate':
-          userProfile.adjustments.volume *= 0.85;
-          userProfile.adjustments.intensity *= 0.9;
+        case 'advanced':
+          userProfile.adjustments.volume *= 1.1;
+          userProfile.adjustments.intensity *= 1.05;
           break;
         case 'elite':
           userProfile.adjustments.volume *= 1.2;
@@ -626,7 +611,7 @@
       switch(userProfile.trainingPhase) {
         case 'base':
           userProfile.adjustments.volume *= 1.1;
-          userProfile.adjustments.intensity *= 0.8;
+          userProfile.adjustments.intensity *= 0.85;
           break;
         case 'peak':
           userProfile.adjustments.volume *= 0.9;
@@ -634,7 +619,7 @@
           break;
         case 'taper':
           userProfile.adjustments.volume *= 0.5;
-          userProfile.adjustments.intensity *= 1.0;
+          userProfile.adjustments.intensity *= 1.0; // 강도 유지
           break;
         case 'recovery':
           userProfile.adjustments.volume *= 0.6;
@@ -674,43 +659,43 @@
       // Generate appropriate weekly plan based on frequency and phase
       if (frequency === '3-4') {
         days = [
-          { day: '월', type: 'Easy', intensity: 'low', duration: '40-50분', description: 'E 페이스 회복런' },
-          { day: '화', type: 'Rest', intensity: 'rest', duration: '휴식', description: '완전 휴식 또는 크로스트레이닝' },
-          { day: '수', type: 'Interval', intensity: 'high', duration: '45분', description: '400m x 8 @ I 페이스' },
-          { day: '목', type: 'Rest', intensity: 'rest', duration: '휴식', description: '완전 휴식' },
-          { day: '금', type: 'Tempo', intensity: 'medium', duration: '35분', description: '20분 T 페이스' },
-          { day: '토', type: 'Rest', intensity: 'rest', duration: '휴식', description: '완전 휴식' },
-          { day: '일', type: 'Long', intensity: 'low', duration: '60-90분', description: 'E 페이스 장거리' }
+          { day: '월', type: 'Easy', intensity: 'intensity-low', duration: '40-50분', description: 'E 페이스 회복런' },
+          { day: '화', type: 'Rest', intensity: 'intensity-rest', duration: '휴식', description: '완전 휴식 또는 크로스트레이닝' },
+          { day: '수', type: 'Interval', intensity: 'intensity-high', duration: '45분', description: '400m x 6-8 @ I 페이스' },
+          { day: '목', type: 'Rest', intensity: 'intensity-rest', duration: '휴식', description: '완전 휴식' },
+          { day: '금', type: 'Tempo', intensity: 'intensity-medium', duration: '35분', description: '20분 T 페이스' },
+          { day: '토', type: 'Rest', intensity: 'intensity-rest', duration: '휴식', description: '완전 휴식' },
+          { day: '일', type: 'Long', intensity: 'intensity-low', duration: '60-90분', description: 'E 페이스 장거리' }
         ];
       } else if (frequency === '5-6') {
         days = [
-          { day: '월', type: 'Easy', intensity: 'low', duration: '50-60분', description: 'E 페이스 회복런' },
-          { day: '화', type: 'Interval', intensity: 'high', duration: '50분', description: '1000m x 5 @ I 페이스' },
-          { day: '수', type: 'Easy', intensity: 'low', duration: '40분', description: 'E 페이스 + 스트라이드' },
-          { day: '목', type: 'Tempo', intensity: 'medium', duration: '45분', description: '2 x 15분 T 페이스' },
-          { day: '금', type: 'Easy', intensity: 'low', duration: '30분', description: '회복 조깅' },
-          { day: '토', type: 'Race Pace', intensity: 'medium', duration: '40분', description: '목표 레이스 페이스' },
-          { day: '일', type: 'Long', intensity: 'low', duration: '90-120분', description: 'E/M 페이스 장거리' }
+          { day: '월', type: 'Easy', intensity: 'intensity-low', duration: '50-60분', description: 'E 페이스 회복런' },
+          { day: '화', type: 'Interval', intensity: 'intensity-high', duration: '50분', description: '1000m x 4-5 @ I 페이스' },
+          { day: '수', type: 'Easy', intensity: 'intensity-low', duration: '40분', description: 'E 페이스 + 스트라이드' },
+          { day: '목', type: 'Tempo', intensity: 'intensity-medium', duration: '45분', description: '2 x 15분 T 페이스' },
+          { day: '금', type: 'Easy', intensity: 'intensity-low', duration: '30분', description: '회복 조깅' },
+          { day: '토', type: 'Race Pace', intensity: 'intensity-medium', duration: '40분', description: '목표 레이스 페이스' },
+          { day: '일', type: 'Long', intensity: 'intensity-low', duration: '90-120분', description: 'E/M 페이스 장거리' }
         ];
       } else if (frequency === '7') {
         days = [
-          { day: '월', type: 'Easy+', intensity: 'low', duration: '60분', description: 'E 페이스 + 언덕' },
-          { day: '화', type: 'Interval', intensity: 'high', duration: '60분', description: '1200m x 5 @ I 페이스' },
-          { day: '수', type: 'Recovery', intensity: 'low', duration: '40분', description: '회복 조깅' },
-          { day: '목', type: 'Threshold', intensity: 'medium', duration: '50분', description: '30분 T 페이스' },
-          { day: '금', type: 'Easy', intensity: 'low', duration: '45분', description: 'E 페이스' },
-          { day: '토', type: 'Repetition', intensity: 'high', duration: '45분', description: '200m x 10 @ R 페이스' },
-          { day: '일', type: 'Long', intensity: 'low', duration: '120-150분', description: 'Progressive 장거리' }
+          { day: '월', type: 'Easy+', intensity: 'intensity-low', duration: '60분', description: 'E 페이스 + 언덕' },
+          { day: '화', type: 'Interval', intensity: 'intensity-high', duration: '60분', description: '1200m x 4-5 @ I 페이스' },
+          { day: '수', type: 'Recovery', intensity: 'intensity-low', duration: '40분', description: '회복 조깅' },
+          { day: '목', type: 'Threshold', intensity: 'intensity-medium', duration: '50분', description: '30분 T 페이스' },
+          { day: '금', type: 'Easy', intensity: 'intensity-low', duration: '45분', description: 'E 페이스' },
+          { day: '토', type: 'Repetition', intensity: 'intensity-high', duration: '45분', description: '200m x 8-10 @ R 페이스' },
+          { day: '일', type: 'Long', intensity: 'intensity-low', duration: '120-150분', description: 'Progressive 장거리' }
         ];
       } else { // double sessions
         days = [
-          { day: '월', type: 'AM: Easy\nPM: Recovery', intensity: 'low', duration: 'AM: 50분\nPM: 30분', description: '이중 회복' },
-          { day: '화', type: 'AM: Interval\nPM: Easy', intensity: 'high', duration: 'AM: 60분\nPM: 30분', description: '핵심 세션 + 회복' },
-          { day: '수', type: 'AM: Easy', intensity: 'low', duration: 'AM: 60분', description: '싱글 세션' },
-          { day: '목', type: 'AM: Threshold\nPM: Easy', intensity: 'medium', duration: 'AM: 50분\nPM: 30분', description: 'T 페이스 + 회복' },
-          { day: '금', type: 'AM: Recovery', intensity: 'low', duration: 'AM: 40분', description: '회복 조깅' },
-          { day: '토', type: 'AM: Repetition', intensity: 'high', duration: 'AM: 50분', description: '스피드 세션' },
-          { day: '일', type: 'AM: Long\nPM: Recovery', intensity: 'low', duration: 'AM: 120분\nPM: 20분', description: '장거리 + 쿨다운' }
+          { day: '월', type: 'AM: Easy\nPM: Recovery', intensity: 'intensity-low', duration: 'AM: 50분\nPM: 30분', description: '이중 회복' },
+          { day: '화', type: 'AM: Interval\nPM: Easy', intensity: 'intensity-high', duration: 'AM: 60분\nPM: 30분', description: '핵심 세션 + 회복' },
+          { day: '수', type: 'AM: Easy', intensity: 'intensity-low', duration: 'AM: 60분', description: '싱글 세션' },
+          { day: '목', type: 'AM: Threshold\nPM: Easy', intensity: 'intensity-medium', duration: 'AM: 50분\nPM: 30분', description: 'T 페이스 + 회복' },
+          { day: '금', type: 'AM: Recovery', intensity: 'intensity-low', duration: 'AM: 40분', description: '회복 조깅' },
+          { day: '토', type: 'AM: Repetition', intensity: 'intensity-high', duration: 'AM: 50분', description: '스피드 세션' },
+          { day: '일', type: 'AM: Long\nPM: Recovery', intensity: 'intensity-low', duration: 'AM: 120분\nPM: 20분', description: '장거리 + 쿨다운' }
         ];
       }
       
@@ -719,7 +704,7 @@
         days = days.map(d => {
           if (d.type.includes('Interval') || d.type.includes('Repetition')) {
             d.type = d.type.replace(/Interval|Repetition/, 'Fartlek');
-            d.intensity = 'medium';
+            d.intensity = 'intensity-medium';
             d.description = '변속주 (구조화되지 않은)';
           }
           return d;
@@ -733,7 +718,7 @@
       
       // Render weekly plan
       weeklyPlan.innerHTML = days.map(d => `
-        <div class="intensity-${d.intensity} p-3 rounded-lg">
+        <div class="${d.intensity} p-3 rounded-lg">
           <div class="font-bold text-center mb-1">${d.day}</div>
           <div class="text-sm font-semibold">${d.type}</div>
           <div class="text-xs text-gray-600 mt-1">${d.duration}</div>
@@ -751,7 +736,7 @@
       switch(phase) {
         case 'base':
           weeks = [
-            { week: '1주차', focus: '적응', volume: '70%', keyWorkout: 'Easy 런 위주, 주 3-4회 Fartlek' },
+            { week: '1주차', focus: '적응', volume: '70%', keyWorkout: 'Easy 런 위주, 주 2회 Fartlek' },
             { week: '2주차', focus: '볼륨 증가', volume: '85%', keyWorkout: 'Long Run 10% 증가, Tempo 도입' },
             { week: '3주차', focus: '강도 도입', volume: '100%', keyWorkout: 'Threshold 20분 x 2회, Long Run 유지' },
             { week: '4주차', focus: '회복', volume: '60%', keyWorkout: 'Easy 런 위주, 테스트 타임트라이얼' }
@@ -759,16 +744,16 @@
           break;
         case 'build':
           weeks = [
-            { week: '1주차', focus: 'VO₂max', volume: '80%', keyWorkout: '1000m x 5 @ I pace, Tempo 25분' },
-            { week: '2주차', focus: '젖산역치', volume: '90%', keyWorkout: 'Threshold 30분 연속, 800m x 6' },
-            { week: '3주차', focus: '종합', volume: '100%', keyWorkout: '1600m x 4 @ I pace, Long Run w/ M pace' },
+            { week: '1주차', focus: 'VO₂max', volume: '80%', keyWorkout: '800-1000m x 4-5 @ I pace, Tempo 25분' },
+            { week: '2주차', focus: '젖산역치', volume: '90%', keyWorkout: 'Threshold 30분 연속, 400m x 8 @ R pace' },
+            { week: '3주차', focus: '종합', volume: '100%', keyWorkout: '1200-1600m x 3-4 @ I pace, Long Run w/ M pace' },
             { week: '4주차', focus: '회복/테스트', volume: '70%', keyWorkout: '3-5km 테스트, Easy 런' }
           ];
           break;
         case 'peak':
           weeks = [
-            { week: '1주차', focus: '레이스 시뮬레이션', volume: '90%', keyWorkout: '목표 거리 80% @ 목표 페이스' },
-            { week: '2주차', focus: '스피드', volume: '80%', keyWorkout: '400m x 10 @ R pace, 짧은 Tempo' },
+            { week: '1주차', focus: '레이스 시뮬레이션', volume: '90%', keyWorkout: '목표 거리 70-80% @ 목표 페이스' },
+            { week: '2주차', focus: '스피드', volume: '80%', keyWorkout: '200-400m x 8-10 @ R pace, 짧은 Tempo' },
             { week: '3주차', focus: '레이스 준비', volume: '70%', keyWorkout: '목표 페이스 확인, 전략 점검' },
             { week: '4주차', focus: '대회', volume: '50%', keyWorkout: '대회 3일전부터 테이퍼링' }
           ];
@@ -808,10 +793,10 @@
       const intervalWorkout = {
         title: 'VO₂max 인터벌',
         warmup: '20분 Easy + 4x100m 스트라이드',
-        main: experience === 'beginner' ? '800m x 4 @ I 페이스 (회복 2-3분)' :
-              experience === 'intermediate' ? '1000m x 5 @ I 페이스 (회복 2-3분)' :
-              experience === 'advanced' ? '1200m x 5 @ I 페이스 (회복 2분)' :
-              '1600m x 5 @ I 페이스 (회복 90초)',
+        main: experience === 'beginner' ? '400m x 6-8 @ I 페이스 (회복 2-3분)' :
+              experience === 'intermediate' ? '800m x 5-6 @ I 페이스 (회복 2-3분)' :
+              experience === 'advanced' ? '1000m x 5 @ I 페이스 (회복 2분)' :
+              '1200-1600m x 4-5 @ I 페이스 (회복 90초)',
         cooldown: '15분 Easy + 스트레칭',
         tips: '일정한 페이스 유지, 마지막 반복까지 여유 있게',
         pace: formatPace(paces.interval)
@@ -826,7 +811,7 @@
               experience === 'advanced' ? '30분 연속 @ T 페이스' :
               '2 x 20분 @ T 페이스 (휴식 1분)',
         cooldown: '10분 Easy',
-        tips: '편안하게 힘든 정도, 대화 어려운 수준',
+        tips: '편안하게 힘든 정도, 짧은 문장 대화 가능',
         pace: formatPace(paces.threshold)
       };
       
@@ -836,7 +821,7 @@
         warmup: '천천히 시작',
         main: experience === 'beginner' ? '60-75분 @ E 페이스' :
               experience === 'intermediate' ? '90-105분 @ E/M 페이스' :
-              experience === 'advanced' ? '105-120분, 마지막 30분 M 페이스' :
+              experience === 'advanced' ? '105-120분, 마지막 20-30분 M 페이스' :
               '120-150분 Progressive (E→M→T)',
         cooldown: '5-10분 매우 천천히',
         tips: '수분과 에너지 보충, 일정한 페이스',
@@ -847,10 +832,10 @@
       const repetitionWorkout = {
         title: '스피드/폼 훈련',
         warmup: '20분 Easy + 드릴',
-        main: experience === 'beginner' ? '200m x 6 @ R 페이스 (완전회복)' :
-              experience === 'intermediate' ? '400m x 6 @ R 페이스 (완전회복)' :
+        main: experience === 'beginner' ? '200m x 6-8 @ R 페이스 (완전회복)' :
+              experience === 'intermediate' ? '400m x 5-6 @ R 페이스 (완전회복)' :
               experience === 'advanced' ? '400m x 4 + 200m x 4 @ R 페이스' :
-              '600m x 6 @ R 페이스 (완전회복)',
+              '600m x 5-6 @ R 페이스 (완전회복)',
         cooldown: '15분 Easy',
         tips: '폼에 집중, 완전 회복 후 다음 반복',
         pace: formatPace(paces.repetition)
@@ -886,7 +871,7 @@
       const recommendations = document.getElementById('recommendations');
       const recs = [];
       
-      // Gender-specific
+      // Gender-specific (여성 VDOT 표시로 충분, 페이스 조정은 하지 않음)
       if (userProfile.gender === 'female') {
         recs.push({
           title: '여성 러너 권장사항',
@@ -1007,7 +992,7 @@
       const totalSeconds = hours * 3600 + minutes * 60 + seconds;
       let vdot = calculateVDOT(distance, totalSeconds);
       
-      // Apply gender correction to VDOT display (not to pace calculation)
+      // 여성의 경우 VDOT 표시만 조정 (페이스 계산은 실제 VDOT 사용)
       const displayVDOT = userProfile.gender === 'female' ? vdot * 0.88 : vdot;
       
       // Display VDOT
@@ -1016,12 +1001,12 @@
       document.getElementById('predictedVO2max').textContent = (displayVDOT * 1.05).toFixed(1);
       
       if (userProfile.gender === 'female') {
-        document.getElementById('vdotAdjustment').textContent = '여성 보정 적용됨';
+        document.getElementById('vdotAdjustment').textContent = '여성 보정 적용 (실제 VDOT: ' + vdot.toFixed(1) + ')';
       } else {
         document.getElementById('vdotAdjustment').textContent = '';
       }
       
-      // Calculate training paces
+      // Calculate training paces using actual VDOT
       const paces = calculateTrainingPaces(vdot);
       
       // Display paces
