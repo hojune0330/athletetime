@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="js/download-helper.js"></script>
   
   <style>
     body { 
@@ -246,9 +247,14 @@
     <div id="chart-content" class="tab-content">
       <!-- 3000m 장애물 차트 -->
       <div id="steeplechase-chart" class="bg-white rounded-lg shadow-sm p-4 mb-4">
-        <h2 class="text-lg font-bold mb-3">
-          <i class="fas fa-water text-blue-500"></i> 3000m 장애물
-        </h2>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-water text-blue-500"></i> 3000m 장애물
+          </h2>
+          <button onclick="downloadChart('steeplechase-chart')" class="text-gray-500 hover:text-gray-700 no-print">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
         
         <div class="mb-3">
           <label class="block text-sm font-medium text-gray-700 mb-2">물장 위치</label>
@@ -273,9 +279,14 @@
       
       <!-- 400m 랩 차트 -->
       <div id="lap400-chart" class="bg-white rounded-lg shadow-sm p-4 mb-4">
-        <h2 class="text-lg font-bold mb-3">
-          <i class="fas fa-stopwatch text-green-500"></i> 400m 랩 차트
-        </h2>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-stopwatch text-green-500"></i> 400m 랩 차트
+          </h2>
+          <button onclick="downloadChart('lap400-chart')" class="text-gray-500 hover:text-gray-700 no-print">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
         
         <div class="mobile-table-container">
           <div class="scroll-indicator-left">
@@ -292,9 +303,14 @@
       
       <!-- 1000m 페이스 차트 -->
       <div id="pace1000-chart" class="bg-white rounded-lg shadow-sm p-4 mb-4">
-        <h2 class="text-lg font-bold mb-3">
-          <i class="fas fa-tachometer-alt text-purple-500"></i> 1000m 페이스 차트
-        </h2>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-tachometer-alt text-purple-500"></i> 1000m 페이스 차트
+          </h2>
+          <button onclick="downloadChart('pace1000-chart')" class="text-gray-500 hover:text-gray-700 no-print">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
         
         <div class="mobile-table-container">
           <div class="scroll-indicator-left">
@@ -311,9 +327,14 @@
       
       <!-- 레인별 보정 차트 -->
       <div id="lane-chart" class="bg-white rounded-lg shadow-sm p-4 mb-4">
-        <h2 class="text-lg font-bold mb-3">
-          <i class="fas fa-road text-orange-500"></i> 레인별 보정
-        </h2>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-road text-orange-500"></i> 레인별 보정
+          </h2>
+          <button onclick="downloadChart('lane-chart')" class="text-gray-500 hover:text-gray-700 no-print">
+            <i class="fas fa-download"></i>
+          </button>
+        </div>
         
         <div class="mobile-table-container">
           <div class="scroll-indicator-left">
@@ -495,12 +516,35 @@
     
     <!-- 다운로드 버튼 그룹 (고정) -->
     <div class="download-group no-print">
-      <button onclick="downloadCurrentView('png')" class="bg-blue-500 text-white hover:bg-blue-600">
-        <i class="fas fa-image mr-1"></i> PNG
+      <button onclick="showDownloadOptions()" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+        <i class="fas fa-download mr-1"></i> 다운로드
       </button>
-      <button onclick="downloadCurrentView('pdf')" class="bg-red-500 text-white hover:bg-red-600">
-        <i class="fas fa-file-pdf mr-1"></i> PDF
-      </button>
+    </div>
+    
+    <!-- 다운로드 옵션 모달 -->
+    <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+        <h3 class="text-lg font-bold mb-4">다운로드 옵션</h3>
+        
+        <div class="space-y-3">
+          <button onclick="downloadImproved('current', 'png')" class="w-full p-3 bg-blue-500 text-white rounded-lg">
+            <i class="fas fa-image mr-2"></i>현재 화면 PNG
+          </button>
+          <button onclick="downloadImproved('current', 'pdf')" class="w-full p-3 bg-red-500 text-white rounded-lg">
+            <i class="fas fa-file-pdf mr-2"></i>현재 화면 PDF
+          </button>
+          <button onclick="downloadAllCharts()" class="w-full p-3 bg-green-500 text-white rounded-lg">
+            <i class="fas fa-images mr-2"></i>모든 차트 (ZIP)
+          </button>
+          <button onclick="downloadAsTable()" class="w-full p-3 bg-yellow-500 text-white rounded-lg">
+            <i class="fas fa-table mr-2"></i>데이터 (CSV)
+          </button>
+        </div>
+        
+        <button onclick="closeDownloadModal()" class="w-full mt-4 p-2 border border-gray-300 rounded-lg">
+          닫기
+        </button>
+      </div>
     </div>
   </div>
   
@@ -993,53 +1037,282 @@
       resultsDiv.classList.remove('hidden');
     }
     
-    // 다운로드 함수
-    async function downloadCurrentView(format) {
-      const activeTab = document.querySelector('.tab-content:not(.hidden)');
+    // 다운로드 모달 표시
+    function showDownloadOptions() {
+      document.getElementById('downloadModal').classList.remove('hidden');
+    }
+    
+    // 다운로드 모달 닫기
+    function closeDownloadModal() {
+      document.getElementById('downloadModal').classList.add('hidden');
+    }
+    
+    // 개선된 다운로드 함수
+    async function downloadImproved(type, format) {
+      closeDownloadModal();
       
-      if (!activeTab) {
-        alert('다운로드할 컨텐츠가 없습니다');
-        return;
+      // 다운로드할 요소 선택
+      let targetElement;
+      let fileName = 'pace-chart';
+      
+      if (type === 'current') {
+        const activeTab = document.querySelector('.tab-content:not(.hidden)');
+        if (!activeTab) {
+          alert('다운로드할 컨텐츠가 없습니다');
+          return;
+        }
+        targetElement = activeTab;
+        
+        // 현재 탭 이름 가져오기
+        const activeTabBtn = document.querySelector('.mobile-tab.active');
+        if (activeTabBtn) {
+          fileName = activeTabBtn.textContent.trim();
+        }
       }
       
-      // 다운로드 버튼 임시 숨기기
-      const downloadGroup = document.querySelector('.download-group');
-      downloadGroup.style.display = 'none';
+      // 다운로드용 컨테이너 생성
+      const downloadContainer = document.createElement('div');
+      downloadContainer.style.cssText = `
+        position: absolute;
+        left: -9999px;
+        background: white;
+        padding: 40px;
+        width: 1080px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+      `;
+      
+      // 헤더 추가
+      const header = document.createElement('div');
+      header.style.cssText = 'margin-bottom: 30px; text-align: center;';
+      header.innerHTML = `
+        <h1 style="font-size: 28px; font-weight: bold; color: #1a1a1a; margin-bottom: 10px;">
+          애슬리트 타임 페이스 계산기
+        </h1>
+        <p style="color: #666; font-size: 14px;">
+          ${fileName} | ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 2px solid #667eea;"></div>
+      `;
+      downloadContainer.appendChild(header);
+      
+      // 컨텐츠 복사 및 스타일 정리
+      const contentClone = targetElement.cloneNode(true);
+      
+      // 불필요한 요소 제거
+      contentClone.querySelectorAll('.no-print, .download-group, button').forEach(el => el.remove());
+      
+      // 테이블 스타일 개선
+      contentClone.querySelectorAll('.mobile-table-container').forEach(container => {
+        container.style.overflow = 'visible';
+        container.style.margin = '0';
+        container.style.padding = '0';
+      });
+      
+      // 스크롤 인디케이터 제거
+      contentClone.querySelectorAll('.scroll-indicator-left, .scroll-indicator-right').forEach(el => el.remove());
+      
+      // sticky 해제
+      contentClone.querySelectorAll('[style*="sticky"]').forEach(el => {
+        el.style.position = 'relative';
+        el.style.left = 'auto';
+      });
+      
+      // 테이블 너비 조정
+      contentClone.querySelectorAll('.mobile-pace-table').forEach(table => {
+        table.style.width = '100%';
+        table.style.minWidth = 'auto';
+        table.style.fontSize = '14px';
+      });
+      
+      downloadContainer.appendChild(contentClone);
+      
+      // 푸터 추가
+      const footer = document.createElement('div');
+      footer.style.cssText = 'margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;';
+      footer.innerHTML = `
+        <p style="color: #999; font-size: 12px;">
+          © 2024 Athlete Time | 한국 육상인을 위한 페이스 계산기<br>
+          <span style="font-size: 10px;">www.athletetime.com</span>
+        </p>
+      `;
+      downloadContainer.appendChild(footer);
+      
+      // DOM에 임시 추가
+      document.body.appendChild(downloadContainer);
       
       try {
+        // 캡처 옵션
+        const options = {
+          scale: 3,  // 고해상도
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          windowWidth: 1080,
+          windowHeight: 1920
+        };
+        
+        const canvas = await html2canvas(downloadContainer, options);
+        
         if (format === 'png') {
-          const canvas = await html2canvas(activeTab, {
-            scale: 2,
-            backgroundColor: '#ffffff',
-            logging: false
-          });
-          
-          const link = document.createElement('a');
-          link.download = `pace-calculator-${Date.now()}.png`;
-          link.href = canvas.toDataURL();
-          link.click();
+          // PNG 다운로드
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `athletetime-${fileName}-${new Date().getTime()}.png`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+          }, 'image/png', 1.0);
         } else if (format === 'pdf') {
+          // PDF 다운로드
           const { jsPDF } = window.jspdf;
           const pdf = new jsPDF('p', 'mm', 'a4');
           
-          const canvas = await html2canvas(activeTab, {
-            scale: 2,
-            backgroundColor: '#ffffff',
-            logging: false
-          });
-          
-          const imgData = canvas.toDataURL('image/png');
+          const imgData = canvas.toDataURL('image/png', 1.0);
           const imgWidth = 210;
           const imgHeight = (canvas.height * imgWidth) / canvas.width;
           
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-          pdf.save(`pace-calculator-${Date.now()}.pdf`);
+          // 페이지에 맞게 크기 조정
+          let finalWidth = imgWidth;
+          let finalHeight = imgHeight;
+          
+          if (imgHeight > 297) {
+            finalHeight = 297;
+            finalWidth = (canvas.width * finalHeight) / canvas.height;
+          }
+          
+          pdf.addImage(imgData, 'PNG', (210 - finalWidth) / 2, 0, finalWidth, finalHeight);
+          pdf.save(`athletetime-${fileName}-${new Date().getTime()}.pdf`);
         }
       } catch (error) {
         console.error('다운로드 실패:', error);
         alert('다운로드 중 오류가 발생했습니다');
       } finally {
-        downloadGroup.style.display = 'flex';
+        // 임시 요소 제거
+        document.body.removeChild(downloadContainer);
+      }
+    }
+    
+    // CSV 다운로드
+    function downloadAsTable() {
+      closeDownloadModal();
+      
+      const activeTab = document.querySelector('.tab-content:not(.hidden)');
+      if (!activeTab) {
+        alert('다운로드할 데이터가 없습니다');
+        return;
+      }
+      
+      let csvContent = 'data:text/csv;charset=utf-8,';
+      
+      // 테이블 데이터 추출
+      const tables = activeTab.querySelectorAll('table');
+      tables.forEach((table, index) => {
+        if (index > 0) csvContent += '\n\n';
+        
+        // 테이블 제목 추출
+        const title = table.closest('div').querySelector('h2')?.textContent || `Table ${index + 1}`;
+        csvContent += title + '\n';
+        
+        // 헤더 추출
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+        csvContent += headers.join(',') + '\n';
+        
+        // 데이터 추출
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          const cells = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
+          csvContent += cells.join(',') + '\n';
+        });
+      });
+      
+      // 다운로드
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `pace-data-${new Date().getTime()}.csv`);
+      link.click();
+    }
+    
+    // 모든 차트 다운로드 (개별 이미지로)
+    async function downloadAllCharts() {
+      closeDownloadModal();
+      alert('모든 차트를 개별 이미지로 다운로드합니다. 잠시만 기다려주세요...');
+      
+      const charts = document.querySelectorAll('#chart-content > div');
+      
+      for (let i = 0; i < charts.length; i++) {
+        const chart = charts[i];
+        const chartName = chart.querySelector('h2')?.textContent || `chart-${i + 1}`;
+        
+        // 각 차트를 개별적으로 다운로드
+        await downloadSingleChart(chart, chartName);
+        
+        // 다음 다운로드까지 잠시 대기
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    
+    // 개별 차트 다운로드
+    async function downloadChart(chartId) {
+      const chartElement = document.getElementById(chartId);
+      if (!chartElement) return;
+      
+      const chartName = chartElement.querySelector('h2')?.textContent.replace(/[^\w\s가-힣]/g, '').trim() || chartId;
+      
+      // 다운로드용 컨테이너 생성
+      const container = document.createElement('div');
+      container.style.cssText = `
+        position: absolute;
+        left: -9999px;
+        background: white;
+        padding: 30px;
+        width: 800px;
+      `;
+      
+      // 헤더
+      const header = document.createElement('div');
+      header.innerHTML = `
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #1a1a1a;">${chartName}</h1>
+          <p style="color: #666; font-size: 12px; margin-top: 5px;">
+            ${new Date().toLocaleDateString('ko-KR')} | 애슬리트 타임
+          </p>
+        </div>
+      `;
+      container.appendChild(header);
+      
+      // 차트 복사
+      const chartClone = chartElement.cloneNode(true);
+      chartClone.querySelectorAll('.no-print, button').forEach(el => el.remove());
+      chartClone.querySelectorAll('.mobile-table-container').forEach(el => {
+        el.style.overflow = 'visible';
+      });
+      chartClone.querySelectorAll('[style*="sticky"]').forEach(el => {
+        el.style.position = 'relative';
+      });
+      container.appendChild(chartClone);
+      
+      document.body.appendChild(container);
+      
+      try {
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          backgroundColor: '#ffffff'
+        });
+        
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `${chartName}-${Date.now()}.png`;
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        });
+      } catch (error) {
+        console.error('다운로드 실패:', error);
+      } finally {
+        document.body.removeChild(container);
       }
     }
     

@@ -2006,31 +2006,89 @@
     
     // PNG 다운로드 함수 (개선된 버전)
     async function downloadPNG(element, filename) {
+      // 다운로드용 컨테이너 생성
+      const downloadContainer = document.createElement('div');
+      downloadContainer.style.cssText = `
+        position: absolute;
+        left: -9999px;
+        background: white;
+        padding: 40px;
+        width: 1200px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+      `;
+      
+      // 헤더 추가
+      const header = document.createElement('div');
+      header.style.cssText = 'margin-bottom: 30px; text-align: center;';
+      const chartTitle = element.querySelector('h3')?.textContent || '페이스 차트';
+      header.innerHTML = `
+        <h1 style="font-size: 32px; font-weight: bold; color: #1a1a1a; margin-bottom: 10px;">
+          애슬리트 타임 페이스 계산기
+        </h1>
+        <p style="color: #666; font-size: 16px;">
+          ${chartTitle} | ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 3px solid #667eea;"></div>
+      `;
+      downloadContainer.appendChild(header);
+      
+      // 컨텐츠 복사 및 스타일 정리
+      const contentClone = element.cloneNode(true);
+      
+      // 불필요한 요소 제거
+      contentClone.querySelectorAll('.download-btn, .no-print, button').forEach(el => el.remove());
+      
+      // 테이블 스타일 개선
+      contentClone.querySelectorAll('.table-container').forEach(container => {
+        container.style.overflow = 'visible';
+      });
+      
+      // sticky 해제
+      contentClone.querySelectorAll('[style*="sticky"]').forEach(el => {
+        el.style.position = 'relative';
+      });
+      
+      downloadContainer.appendChild(contentClone);
+      
+      // 푸터 추가
+      const footer = document.createElement('div');
+      footer.style.cssText = 'margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center;';
+      footer.innerHTML = `
+        <p style="color: #999; font-size: 14px;">
+          © 2024 Athlete Time | 한국 육상인을 위한 페이스 계산기<br>
+          <span style="font-size: 12px;">www.athletetime.com</span>
+        </p>
+      `;
+      downloadContainer.appendChild(footer);
+      
+      // DOM에 임시 추가
+      document.body.appendChild(downloadContainer);
+      
       try {
         // 다운로드 버튼 숨기기
         const downloadBtns = element.querySelectorAll('.download-btn');
         downloadBtns.forEach(btn => btn.style.display = 'none');
         
-        // html2canvas 사용 (더 안정적)
-        const canvas = await html2canvas(element, {
-          scale: 2,
+        // html2canvas 사용 (개선된 옵션)
+        const canvas = await html2canvas(downloadContainer, {
+          scale: 3,  // 고해상도
           backgroundColor: '#ffffff',
           logging: false,
           useCORS: true,
           allowTaint: true,
-          width: element.scrollWidth,
-          height: element.scrollHeight,
-          windowWidth: element.scrollWidth,
-          windowHeight: element.scrollHeight
+          windowWidth: 1200,
+          windowHeight: 2000
         });
         
-        // 다운로드 링크 생성
-        const link = document.createElement('a');
-        link.download = filename + '.png';
-        link.href = canvas.toDataURL('image/png', 1.0);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Blob으로 변환하여 다운로드 (더 나은 품질)
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = filename + '.png';
+          link.href = url;
+          link.click();
+          URL.revokeObjectURL(url);
+        }, 'image/png', 1.0);
         
         // 버튼 다시 표시
         downloadBtns.forEach(btn => btn.style.display = 'flex');
@@ -2041,6 +2099,9 @@
         const downloadBtns = element.querySelectorAll('.download-btn');
         downloadBtns.forEach(btn => btn.style.display = 'flex');
         throw error;
+      } finally {
+        // 임시 요소 제거
+        document.body.removeChild(downloadContainer);
       }
     }
     
