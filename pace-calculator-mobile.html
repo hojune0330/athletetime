@@ -453,13 +453,21 @@
           <i class="fas fa-running text-orange-500"></i> 훈련 페이스 계산기
         </h2>
         
+        <div class="bg-blue-50 rounded-lg p-3 mb-4 text-sm">
+          <p class="text-blue-800">
+            <i class="fas fa-info-circle mr-1"></i>
+            기준 기록을 입력하면 Jack Daniels VDOT 방식으로 
+            최적의 훈련 페이스를 계산해드립니다.
+          </p>
+        </div>
+        
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">기준 기록</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">기준 거리</label>
             <select id="baseDistance" class="mobile-input w-full">
               <option value="1500">1500m</option>
               <option value="3000">3000m</option>
-              <option value="5000" selected>5000m</option>
+              <option value="5000" selected>5000m (추천)</option>
               <option value="10000">10000m</option>
             </select>
           </div>
@@ -846,7 +854,24 @@
         `;
       });
       
-      html += '</div></div>';
+      html += '</div>';
+      
+      // 훈련 팁 추가
+      html += `
+        <div class="mt-4 pt-4 border-t border-orange-200">
+          <h4 class="font-medium text-sm mb-2">💡 훈련 팁</h4>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• <strong>주간 훈련 비율:</strong> Easy 70-80%, Threshold 10-15%, Interval 8-10%</li>
+            <li>• <strong>Recovery:</strong> 훈련 다음날 회복을 위해 사용</li>
+            <li>• <strong>Easy:</strong> 대부분의 훈련량을 차지, 30-90분 지속</li>
+            <li>• <strong>Threshold:</strong> 20-40분 템포런으로 실시</li>
+            <li>• <strong>Interval:</strong> 3-5분씩 4-6회 반복 (회복 2-3분)</li>
+            <li>• <strong>Repetition:</strong> 200-400m씩 8-12회 (완전 회복)</li>
+          </ul>
+        </div>
+      `;
+      
+      html += '</div>';
       resultsDiv.innerHTML = html;
       resultsDiv.classList.remove('hidden');
     }
@@ -865,40 +890,104 @@
         return;
       }
       
-      const basePace = totalSeconds / baseDistance * 1000; // 1km 페이스 (초)
+      // 기준 속도 계산 (m/s)
+      const baseSpeed = baseDistance / totalSeconds;
       
-      // 훈련 페이스 계산 (기준 페이스의 백분율)
-      const trainingPaces = {
-        'Recovery': basePace * 1.20, // 120%
-        'Easy': basePace * 1.15, // 115%
-        'Threshold': basePace * 0.95, // 95%
-        'VO2 Max': basePace * 0.90, // 90%
-        'Speed': basePace * 0.85, // 85%
-        'Sprint': basePace * 0.80 // 80%
+      // VDOT 기반 훈련 속도 계산
+      // 5km 기준일 때 가장 정확, 다른 거리는 근사치
+      let vdotMultiplier = 1.0;
+      if (baseDistance === 1500) vdotMultiplier = 1.07;  // 1500m은 5km보다 약 7% 빠름
+      else if (baseDistance === 3000) vdotMultiplier = 1.03;  // 3000m은 5km보다 약 3% 빠름
+      else if (baseDistance === 10000) vdotMultiplier = 0.95;  // 10km은 5km보다 약 5% 느림
+      
+      const estimatedVO2maxSpeed = baseSpeed * vdotMultiplier;
+      
+      // 훈련 속도 계산 (속도 기준)
+      const trainingSpeeds = {
+        'Recovery (회복)': estimatedVO2maxSpeed * 0.60,     // 60% 속도
+        'Easy (편안한)': estimatedVO2maxSpeed * 0.70,      // 70% 속도
+        'Marathon (마라톤)': estimatedVO2maxSpeed * 0.80,   // 80% 속도
+        'Threshold (역치)': estimatedVO2maxSpeed * 0.88,    // 88% 속도
+        'Interval (인터벌)': estimatedVO2maxSpeed * 0.95,   // 95% 속도
+        'Repetition (반복)': estimatedVO2maxSpeed * 1.05    // 105% 속도
       };
+      
+      // 속도를 페이스로 변환 (초/km)
+      const trainingPaces = {};
+      Object.entries(trainingSpeeds).forEach(([type, speed]) => {
+        trainingPaces[type] = 1000 / speed;  // 초/km
+      });
       
       // 결과 표시
       const resultsDiv = document.getElementById('trainingResults');
       let html = '<div class="bg-orange-50 rounded-lg p-4 mt-4">';
-      html += '<h3 class="font-bold mb-3">훈련 페이스</h3>';
+      html += '<h3 class="font-bold mb-3">훈련 페이스 가이드</h3>';
+      
+      // 기준 페이스 표시
+      const basePaceKm = totalSeconds / baseDistance * 1000;
+      html += `<div class="mb-3 text-sm text-gray-600">
+        <strong>기준 기록:</strong> ${baseDistance}m - ${formatTime(totalSeconds)}<br>
+        <strong>기준 페이스:</strong> ${formatTime(basePaceKm)}/km
+      </div>`;
+      
       html += '<div class="space-y-2">';
+      
+      // 훈련 구역별 색상과 설명
+      const zoneInfo = {
+        'Recovery (회복)': { color: 'blue', desc: '회복 달리기, 편안한 대화 가능' },
+        'Easy (편안한)': { color: 'green', desc: '기초 체력 향상, 장거리 훈련' },
+        'Marathon (마라톤)': { color: 'yellow', desc: '마라톤 목표 페이스' },
+        'Threshold (역치)': { color: 'orange', desc: '젖산 역치 향상, 템포런' },
+        'Interval (인터벌)': { color: 'red', desc: 'VO2 Max 향상, 3-5분 반복' },
+        'Repetition (반복)': { color: 'purple', desc: '스피드 향상, 200-400m 반복' }
+      };
       
       Object.entries(trainingPaces).forEach(([type, pace]) => {
         const per400 = pace * 0.4;
+        const per200 = pace * 0.2;
         const perKm = pace;
+        const info = zoneInfo[type] || { color: 'gray', desc: '' };
         
         html += `
-          <div class="bg-white rounded px-3 py-2">
-            <div class="font-medium text-sm text-gray-700">${type}</div>
-            <div class="flex justify-between mt-1">
-              <span class="text-xs text-gray-500">1km: ${formatTime(perKm)}</span>
-              <span class="text-xs text-gray-500">400m: ${formatTime(per400)}</span>
+          <div class="bg-white rounded-lg px-3 py-3 border-l-4 border-${info.color}-500">
+            <div class="font-medium text-sm text-gray-800">${type}</div>
+            <div class="text-xs text-gray-500 mb-1">${info.desc}</div>
+            <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
+              <div class="bg-gray-50 rounded p-1 text-center">
+                <span class="text-gray-500">200m</span><br>
+                <span class="font-mono font-bold">${formatTime(per200)}</span>
+              </div>
+              <div class="bg-gray-50 rounded p-1 text-center">
+                <span class="text-gray-500">400m</span><br>
+                <span class="font-mono font-bold">${formatTime(per400)}</span>
+              </div>
+              <div class="bg-gray-50 rounded p-1 text-center">
+                <span class="text-gray-500">1km</span><br>
+                <span class="font-mono font-bold">${formatTime(perKm)}</span>
+              </div>
             </div>
           </div>
         `;
       });
       
-      html += '</div></div>';
+      html += '</div>';
+      
+      // 훈련 팁 추가
+      html += `
+        <div class="mt-4 pt-4 border-t border-orange-200">
+          <h4 class="font-medium text-sm mb-2">💡 훈련 팁</h4>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• <strong>주간 훈련 비율:</strong> Easy 70-80%, Threshold 10-15%, Interval 8-10%</li>
+            <li>• <strong>Recovery:</strong> 훈련 다음날 회복을 위해 사용</li>
+            <li>• <strong>Easy:</strong> 대부분의 훈련량을 차지, 30-90분 지속</li>
+            <li>• <strong>Threshold:</strong> 20-40분 템포런으로 실시</li>
+            <li>• <strong>Interval:</strong> 3-5분씩 4-6회 반복 (회복 2-3분)</li>
+            <li>• <strong>Repetition:</strong> 200-400m씩 8-12회 (완전 회복)</li>
+          </ul>
+        </div>
+      `;
+      
+      html += '</div>';
       resultsDiv.innerHTML = html;
       resultsDiv.classList.remove('hidden');
     }
