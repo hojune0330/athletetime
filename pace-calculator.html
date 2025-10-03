@@ -1827,35 +1827,37 @@
         return;
       }
       
-      // 기준 속도 계산 (m/s)
-      const baseSpeed = baseDistance / totalSeconds;
+      // 기준 페이스 계산 (초/km)
+      const basePacePerKm = totalSeconds / baseDistance * 1000;
       
-      // VDOT 기반 훈련 속도 계산
-      let vdotMultiplier = 1.0;
-      if (baseDistance === 1500) vdotMultiplier = 1.07;
-      else if (baseDistance === 3000) vdotMultiplier = 1.03;
-      else if (baseDistance === 5000) vdotMultiplier = 1.00;
-      else if (baseDistance === 10000) vdotMultiplier = 0.95;
-      else if (baseDistance === 21097.5) vdotMultiplier = 0.90;
-      else if (baseDistance === 42195) vdotMultiplier = 0.85;
+      // 거리별 5K 환산 페이스 계산 (Jack Daniels VDOT 기준)
+      let fiveKPace;
+      if (baseDistance === 1500) {
+        fiveKPace = basePacePerKm * 1.11;  // 1500m은 5K보다 11% 빠름
+      } else if (baseDistance === 3000) {
+        fiveKPace = basePacePerKm * 1.05;  // 3000m은 5K보다 5% 빠름
+      } else if (baseDistance === 5000) {
+        fiveKPace = basePacePerKm;  // 그대로 사용
+      } else if (baseDistance === 10000) {
+        fiveKPace = basePacePerKm * 0.96;  // 10K는 5K보다 4% 느림
+      } else if (baseDistance === 21097.5) {
+        fiveKPace = basePacePerKm * 0.92;  // 하프는 5K보다 8% 느림
+      } else if (baseDistance === 42195) {
+        fiveKPace = basePacePerKm * 0.87;  // 풀은 5K보다 13% 느림
+      } else {
+        fiveKPace = basePacePerKm;
+      }
       
-      const estimatedVO2maxSpeed = baseSpeed * vdotMultiplier;
-      
-      // 훈련 속도 계산
-      const trainingSpeeds = {
-        'Recovery (회복)': estimatedVO2maxSpeed * 0.60,
-        'Easy (편안한)': estimatedVO2maxSpeed * 0.70,
-        'Marathon (마라톤)': estimatedVO2maxSpeed * 0.80,
-        'Threshold (역치)': estimatedVO2maxSpeed * 0.88,
-        'Interval (인터벌)': estimatedVO2maxSpeed * 0.95,
-        'Repetition (반복)': estimatedVO2maxSpeed * 1.05
+      // Jack Daniels VDOT 정확한 훈련 페이스 (5K 페이스 기준)
+      // Running Formula 3rd Edition 기준
+      const trainingPaces = {
+        'Easy (E)': fiveKPace * 1.30,           // 5K의 125-140% 중간값
+        'Marathon (M)': fiveKPace * 1.16,       // 5K의 116%
+        'Threshold (T)': fiveKPace * 1.09,      // 5K의 109%
+        'Interval (I)': fiveKPace * 0.98,       // 5K의 98% (약간 빠름)
+        'Repetition (R)': fiveKPace * 0.94,     // 5K의 94%
+        'Recovery': fiveKPace * 1.45            // Easy보다 느림
       };
-      
-      // 속도를 페이스로 변환
-      const trainingPaces = {};
-      Object.entries(trainingSpeeds).forEach(([type, speed]) => {
-        trainingPaces[type] = 1000 / speed;
-      });
       
       // 결과 표시
       const resultsDiv = document.getElementById('trainingResults');
@@ -1887,12 +1889,12 @@
       html += '</tr></thead><tbody>';
       
       const zoneInfo = {
-        'Recovery (회복)': { color: '#3B82F6', desc: '회복 달리기' },
-        'Easy (편안한)': { color: '#10B981', desc: '기초 체력' },
-        'Marathon (마라톤)': { color: '#F59E0B', desc: '마라톤 페이스' },
-        'Threshold (역치)': { color: '#F97316', desc: '젖산 역치' },
-        'Interval (인터벌)': { color: '#EF4444', desc: 'VO2 Max' },
-        'Repetition (반복)': { color: '#8B5CF6', desc: '스피드 향상' }
+        'Easy (E)': { color: '#10B981', desc: '유산소 기초 (65-79% HRmax)' },
+        'Marathon (M)': { color: '#3B82F6', desc: '마라톤 지구력 (80-90% HRmax)' },
+        'Threshold (T)': { color: '#F59E0B', desc: '젖산 역치 (88-92% HRmax)' },
+        'Interval (I)': { color: '#F97316', desc: 'VO2max (98-100% HRmax)' },
+        'Repetition (R)': { color: '#EF4444', desc: '속도/경제성' },
+        'Recovery': { color: '#8B5CF6', desc: '회복 조깅' }
       };
       
       Object.entries(trainingPaces).forEach(([type, pace]) => {
@@ -1917,21 +1919,23 @@
           <h4 class="font-bold mb-3">💡 훈련 가이드</h4>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <h5 class="font-medium mb-2">주간 훈련 비율</h5>
+              <h5 class="font-medium mb-2">Jack Daniels 주간 훈련 비율</h5>
               <ul class="space-y-1 text-gray-600">
-                <li>• Easy: 70-80%</li>
-                <li>• Threshold: 10-15%</li>
-                <li>• Interval: 8-10%</li>
-                <li>• Repetition: 2-5%</li>
+                <li>• Easy (E): 65-75%</li>
+                <li>• Marathon (M): 15-20% (마라톤 준비시)</li>
+                <li>• Threshold (T): 10%</li>
+                <li>• Interval (I): 8%</li>
+                <li>• Repetition (R): 5%</li>
               </ul>
             </div>
             <div>
-              <h5 class="font-medium mb-2">훈련 세션 예시</h5>
+              <h5 class="font-medium mb-2">Jack Daniels 훈련 세션</h5>
               <ul class="space-y-1 text-gray-600">
-                <li>• <strong>Easy:</strong> 30-90분 지속 달리기</li>
-                <li>• <strong>Threshold:</strong> 20-40분 템포런</li>
-                <li>• <strong>Interval:</strong> 3-5분 × 4-6회</li>
-                <li>• <strong>Repetition:</strong> 200-400m × 8-12회</li>
+                <li>• <strong>E:</strong> 30-150분 지속 (주 2회 장거리)</li>
+                <li>• <strong>M:</strong> 60-150분 (마라톤 16주전부터)</li>
+                <li>• <strong>T:</strong> 20분 템포 또는 5분×4 크루즈</li>
+                <li>• <strong>I:</strong> 1000m×5 또는 1200m×4 (동일휴식)</li>
+                <li>• <strong>R:</strong> 200m×8 또는 400m×6 (완전휴식)</li>
               </ul>
             </div>
           </div>

@@ -861,12 +861,12 @@
         <div class="mt-4 pt-4 border-t border-orange-200">
           <h4 class="font-medium text-sm mb-2">💡 훈련 팁</h4>
           <ul class="text-xs text-gray-600 space-y-1">
-            <li>• <strong>주간 훈련 비율:</strong> Easy 70-80%, Threshold 10-15%, Interval 8-10%</li>
-            <li>• <strong>Recovery:</strong> 훈련 다음날 회복을 위해 사용</li>
-            <li>• <strong>Easy:</strong> 대부분의 훈련량을 차지, 30-90분 지속</li>
-            <li>• <strong>Threshold:</strong> 20-40분 템포런으로 실시</li>
-            <li>• <strong>Interval:</strong> 3-5분씩 4-6회 반복 (회복 2-3분)</li>
-            <li>• <strong>Repetition:</strong> 200-400m씩 8-12회 (완전 회복)</li>
+            <li>• <strong>주간 훈련 비율:</strong> Easy 65-75%, Marathon/Threshold 20%, Quality(I+R) 8-10%</li>
+            <li>• <strong>Easy (E):</strong> 대화 가능한 페이스, 30-150분 지속</li>
+            <li>• <strong>Marathon (M):</strong> 마라톤 준비시, 60-150분 지속</li>
+            <li>• <strong>Threshold (T):</strong> "편안하게 힘든" 20분 템포런 또는 크루즈 인터벌</li>
+            <li>• <strong>Interval (I):</strong> 3-5분 × 4-6회, 회복은 운동시간과 동일</li>
+            <li>• <strong>Repetition (R):</strong> 200-600m × 4-8회, 완전회복(운동시간의 2-3배)</li>
           </ul>
         </div>
       `;
@@ -890,33 +890,34 @@
         return;
       }
       
-      // 기준 속도 계산 (m/s)
-      const baseSpeed = baseDistance / totalSeconds;
+      // 기준 페이스 계산 (초/km)
+      const basePacePerKm = totalSeconds / baseDistance * 1000;
       
-      // VDOT 기반 훈련 속도 계산
-      // 5km 기준일 때 가장 정확, 다른 거리는 근사치
-      let vdotMultiplier = 1.0;
-      if (baseDistance === 1500) vdotMultiplier = 1.07;  // 1500m은 5km보다 약 7% 빠름
-      else if (baseDistance === 3000) vdotMultiplier = 1.03;  // 3000m은 5km보다 약 3% 빠름
-      else if (baseDistance === 10000) vdotMultiplier = 0.95;  // 10km은 5km보다 약 5% 느림
+      // 거리별 5K 환산 페이스 계산 (Jack Daniels VDOT 기준)
+      let fiveKPace;
+      if (baseDistance === 1500) {
+        fiveKPace = basePacePerKm * 1.11;  // 1500m은 5K보다 11% 빠름
+      } else if (baseDistance === 3000) {
+        fiveKPace = basePacePerKm * 1.05;  // 3000m은 5K보다 5% 빠름
+      } else if (baseDistance === 5000) {
+        fiveKPace = basePacePerKm;  // 그대로 사용
+      } else if (baseDistance === 10000) {
+        fiveKPace = basePacePerKm * 0.96;  // 10K는 5K보다 4% 느림
+      } else {
+        // 기본값 (근사치)
+        fiveKPace = basePacePerKm;
+      }
       
-      const estimatedVO2maxSpeed = baseSpeed * vdotMultiplier;
-      
-      // 훈련 속도 계산 (속도 기준)
-      const trainingSpeeds = {
-        'Recovery (회복)': estimatedVO2maxSpeed * 0.60,     // 60% 속도
-        'Easy (편안한)': estimatedVO2maxSpeed * 0.70,      // 70% 속도
-        'Marathon (마라톤)': estimatedVO2maxSpeed * 0.80,   // 80% 속도
-        'Threshold (역치)': estimatedVO2maxSpeed * 0.88,    // 88% 속도
-        'Interval (인터벌)': estimatedVO2maxSpeed * 0.95,   // 95% 속도
-        'Repetition (반복)': estimatedVO2maxSpeed * 1.05    // 105% 속도
+      // Jack Daniels VDOT 정확한 훈련 페이스 (5K 페이스 기준)
+      // Running Formula 3rd Edition 기준
+      const trainingPaces = {
+        'Easy (E)': fiveKPace * 1.30,           // 5K의 125-140% 중간값
+        'Marathon (M)': fiveKPace * 1.16,       // 5K의 116%
+        'Threshold (T)': fiveKPace * 1.09,      // 5K의 109%
+        'Interval (I)': fiveKPace * 0.98,       // 5K의 98% (약간 빠름)
+        'Repetition (R)': fiveKPace * 0.94,     // 5K의 94%
+        'Recovery': fiveKPace * 1.45            // Easy보다 느림
       };
-      
-      // 속도를 페이스로 변환 (초/km)
-      const trainingPaces = {};
-      Object.entries(trainingSpeeds).forEach(([type, speed]) => {
-        trainingPaces[type] = 1000 / speed;  // 초/km
-      });
       
       // 결과 표시
       const resultsDiv = document.getElementById('trainingResults');
@@ -932,14 +933,14 @@
       
       html += '<div class="space-y-2">';
       
-      // 훈련 구역별 색상과 설명
+      // Jack Daniels 훈련 구역별 색상과 설명 (느린 순서대로)
       const zoneInfo = {
-        'Recovery (회복)': { color: 'blue', desc: '회복 달리기, 편안한 대화 가능' },
-        'Easy (편안한)': { color: 'green', desc: '기초 체력 향상, 장거리 훈련' },
-        'Marathon (마라톤)': { color: 'yellow', desc: '마라톤 목표 페이스' },
-        'Threshold (역치)': { color: 'orange', desc: '젖산 역치 향상, 템포런' },
-        'Interval (인터벌)': { color: 'red', desc: 'VO2 Max 향상, 3-5분 반복' },
-        'Repetition (반복)': { color: 'purple', desc: '스피드 향상, 200-400m 반복' }
+        'Recovery': { color: 'purple', desc: '회복 조깅, 매우 편안한 페이스' },
+        'Easy (E)': { color: 'green', desc: '유산소 기초, 최대심박수 65-79%' },
+        'Marathon (M)': { color: 'blue', desc: '마라톤 특이적 지구력, 최대심박수 80-90%' },
+        'Threshold (T)': { color: 'yellow', desc: '젖산 역치, 최대심박수 88-92%' },
+        'Interval (I)': { color: 'orange', desc: 'VO2max 향상, 최대심박수 98-100%' },
+        'Repetition (R)': { color: 'red', desc: '속도와 경제성, 200-600m 반복' }
       };
       
       Object.entries(trainingPaces).forEach(([type, pace]) => {
@@ -977,12 +978,12 @@
         <div class="mt-4 pt-4 border-t border-orange-200">
           <h4 class="font-medium text-sm mb-2">💡 훈련 팁</h4>
           <ul class="text-xs text-gray-600 space-y-1">
-            <li>• <strong>주간 훈련 비율:</strong> Easy 70-80%, Threshold 10-15%, Interval 8-10%</li>
-            <li>• <strong>Recovery:</strong> 훈련 다음날 회복을 위해 사용</li>
-            <li>• <strong>Easy:</strong> 대부분의 훈련량을 차지, 30-90분 지속</li>
-            <li>• <strong>Threshold:</strong> 20-40분 템포런으로 실시</li>
-            <li>• <strong>Interval:</strong> 3-5분씩 4-6회 반복 (회복 2-3분)</li>
-            <li>• <strong>Repetition:</strong> 200-400m씩 8-12회 (완전 회복)</li>
+            <li>• <strong>주간 훈련 비율:</strong> Easy 65-75%, Marathon/Threshold 20%, Quality(I+R) 8-10%</li>
+            <li>• <strong>Easy (E):</strong> 대화 가능한 페이스, 30-150분 지속</li>
+            <li>• <strong>Marathon (M):</strong> 마라톤 준비시, 60-150분 지속</li>
+            <li>• <strong>Threshold (T):</strong> "편안하게 힘든" 20분 템포런 또는 크루즈 인터벌</li>
+            <li>• <strong>Interval (I):</strong> 3-5분 × 4-6회, 회복은 운동시간과 동일</li>
+            <li>• <strong>Repetition (R):</strong> 200-600m × 4-8회, 완전회복(운동시간의 2-3배)</li>
           </ul>
         </div>
       `;
