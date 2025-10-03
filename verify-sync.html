@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC/Mobile 동기화 검증</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <h1 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+      PC/Mobile 버전 동기화 검증
+    </h1>
+    
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- PC Version -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4 text-purple-600">
+          <i class="fas fa-desktop mr-2"></i>PC 버전
+        </h2>
+        <iframe src="pace-calculator.html" class="w-full h-96 border rounded"></iframe>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>차트 1: 킬로미터 페이스 → 거리별 완주 시간</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>차트 2: 목표 기록별 필요 페이스 분석</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>차트 3: 400m 트랙 레인별 거리 & 시간 보정표</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>차트 4: 3000m 장애물 경주 페이스 계산표</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>장호준 코치 제작 크레딧</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>PDF/PNG 다운로드 기능</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Mobile Version -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold mb-4 text-pink-600">
+          <i class="fas fa-mobile-alt mr-2"></i>모바일 버전
+        </h2>
+        <iframe src="pace-calculator-mobile.html" class="w-full h-96 border rounded"></iframe>
+        <div class="mt-4 space-y-2 text-sm">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>4개 탭 구성 (훈련 탭 제거됨)</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>차트 탭: 킬로미터 페이스 차트</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>레인 탭: 레인별 보정 계산</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>목표 탭: 목표 기록별 페이스</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>스플릿 탭: 3000m 장애물 차트</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+            <span>PC 스타일 다운로드 (장호준 코치 크레딧 포함)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Version Selector -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-gray-700">
+        <i class="fas fa-exchange-alt mr-2"></i>버전 선택기
+      </h2>
+      <iframe src="pace-calculator-selector.html" class="w-full h-64 border rounded"></iframe>
+      <div class="mt-4 space-y-2 text-sm">
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-green-500 mr-2"></i>
+          <span>5초 카운트다운 후 자동 리다이렉션</span>
+        </div>
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-green-500 mr-2"></i>
+          <span>7일간 선택 기록 저장 (localStorage)</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Summary -->
+    <div class="mt-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-6">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">
+        <i class="fas fa-tasks mr-2"></i>완료된 작업 요약
+      </h2>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>훈련 탭 제거:</strong> 사용자 요청에 따라 모바일 버전에서 훈련 탭을 제거하고 4개 탭으로 구성</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>다운로드 기능 수정:</strong> HTML2Canvas와 jsPDF를 이용한 완전한 다운로드 구현</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>3000m 장애물 차트:</strong> 내측/외측 물장애 구성 완전 구현</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>장호준 코치 크레딧:</strong> 모든 다운로드 파일에 제작자 정보 포함</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>PC/Mobile 동기화:</strong> 동일한 차트 구조 및 기능 유지</span>
+        </li>
+        <li class="flex items-start">
+          <i class="fas fa-check text-green-600 mr-2 mt-1"></i>
+          <span><strong>버전 선택기:</strong> 5초 카운트다운 및 7일 기억 기능</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Links -->
+    <div class="mt-8 flex justify-center space-x-4">
+      <a href="pace-calculator-selector.html" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition">
+        <i class="fas fa-calculator mr-2"></i>페이스 계산기 시작
+      </a>
+      <a href="training-calculator-selector.html" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-semibold hover:shadow-lg transition">
+        <i class="fas fa-running mr-2"></i>훈련 계산기
+      </a>
+    </div>
+  </div>
+</body>
+</html>
