@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>페이스 계산기 (모바일) | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* 모바일 테이블 스타일 */
+    .mobile-table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+    }
+    
+    .mobile-pace-table {
+      font-size: 12px;
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+    
+    .mobile-pace-table td, 
+    .mobile-pace-table th {
+      padding: 6px 4px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+    
+    .mobile-pace-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    
+    /* 첫 번째 열 고정 */
+    .mobile-pace-table thead th:first-child,
+    .mobile-pace-table tbody td:first-child {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 10;
+      font-weight: bold;
+      background-color: #f9fafb;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+    }
+    
+    .mobile-pace-table thead th:first-child {
+      background-color: #e5e7eb;
+      z-index: 11;
+    }
+    
+    /* 로딩 오버레이 */
+    .download-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    
+    .download-loading.active {
+      display: flex;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 다운로드 로딩 오버레이 -->
+  <div class="download-loading" id="downloadLoading">
+    <div class="bg-white p-6 rounded-lg text-center max-w-xs">
+      <div class="loading-spinner mx-auto mb-4"></div>
+      <p class="text-lg font-bold text-gray-800 mb-1">고품질 차트 생성 중</p>
+      <p class="text-sm text-gray-600">잠시만 기다려주세요...</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-4 pb-20" style="max-width: 100%; overflow-x: hidden;">
+    <!-- 헤더 -->
+    <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-bold gradient-text">페이스 계산기</h1>
+        <div class="flex items-center gap-2">
+          <a href="pace-calculator.html" class="text-gray-500 hover:text-gray-700" title="PC 버전">
+            <i class="fas fa-desktop"></i>
+          </a>
+          <a href="index.html" class="text-gray-500 hover:text-gray-700" title="메인">
+            <i class="fas fa-home"></i>
+          </a>
+        </div>
+      </div>
+      <p class="text-xs text-gray-600 mt-1">모바일 버전</p>
+    </div>
+    
+    <!-- 안내 메시지 -->
+    <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mb-4">
+      <p class="text-sm text-blue-800">
+        <i class="fas fa-info-circle mr-1"></i>
+        PC 버전과 동일한 고품질 차트를 다운로드할 수 있습니다.
+      </p>
+    </div>
+
+    <!-- 차트 섹션들 -->
+    <div class="space-y-4">
+      <!-- 킬로미터 페이스 차트 -->
+      <div id="chart1" class="bg-white rounded-lg shadow-sm p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-tachometer-alt text-blue-500"></i> KM 페이스
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="downloadProfessionalChart('chart1', '킬로미터_페이스_차트', 'png')" 
+                    class="text-blue-500 hover:text-blue-700" title="PNG">
+              <i class="fas fa-image"></i>
+            </button>
+            <button onclick="downloadProfessionalChart('chart1', '킬로미터_페이스_차트', 'pdf')" 
+                    class="text-red-500 hover:text-red-700" title="PDF">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mobile-table-container">
+          <table class="mobile-pace-table">
+            <thead>
+              <tr>
+                <th>km 페이스</th>
+                <th>5km</th>
+                <th>10km</th>
+                <th>하프</th>
+                <th>풀코스</th>
+              </tr>
+            </thead>
+            <tbody id="paceTableBody">
+              <!-- 데이터는 JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 목표 기록별 페이스 -->
+      <div id="chart2" class="bg-white rounded-lg shadow-sm p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-trophy text-orange-500"></i> 목표 기록
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="downloadProfessionalChart('chart2', '목표_기록별_페이스', 'png')" 
+                    class="text-blue-500 hover:text-blue-700" title="PNG">
+              <i class="fas fa-image"></i>
+            </button>
+            <button onclick="downloadProfessionalChart('chart2', '목표_기록별_페이스', 'pdf')" 
+                    class="text-red-500 hover:text-red-700" title="PDF">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mobile-table-container">
+          <table class="mobile-pace-table">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>속도(km/h)</th>
+              </tr>
+            </thead>
+            <tbody id="targetTableBody">
+              <!-- 데이터는 JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3000m 장애물 -->
+      <div id="chart3" class="bg-white rounded-lg shadow-sm p-4">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-lg font-bold">
+            <i class="fas fa-water text-cyan-500"></i> 3000m 장애물
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="downloadProfessionalChart('chart3', '3000m_장애물_페이스', 'png')" 
+                    class="text-blue-500 hover:text-blue-700" title="PNG">
+              <i class="fas fa-image"></i>
+            </button>
+            <button onclick="downloadProfessionalChart('chart3', '3000m_장애물_페이스', 'pdf')" 
+                    class="text-red-500 hover:text-red-700" title="PDF">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mobile-table-container">
+          <table class="mobile-pace-table">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>1000m</th>
+                <th>2000m</th>
+              </tr>
+            </thead>
+            <tbody id="steeplechaseTableBody">
+              <!-- 데이터는 JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 페이스 계산 함수들
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = Math.floor(seconds % 60);
+      
+      if (h > 0) {
+        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      }
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    
+    // 테이블 데이터 생성
+    function generateTables() {
+      // 킬로미터 페이스 테이블
+      const paceTableBody = document.getElementById('paceTableBody');
+      const paces = [
+        { pace: '3:00', five: '15:00', ten: '30:00', half: '1:03:17', full: '2:06:34' },
+        { pace: '3:30', five: '17:30', ten: '35:00', half: '1:13:52', full: '2:27:39' },
+        { pace: '4:00', five: '20:00', ten: '40:00', half: '1:24:23', full: '2:48:45' },
+        { pace: '4:30', five: '22:30', ten: '45:00', half: '1:34:58', full: '3:09:51' },
+        { pace: '5:00', five: '25:00', ten: '50:00', half: '1:45:33', full: '3:30:57' },
+        { pace: '5:30', five: '27:30', ten: '55:00', half: '1:56:03', full: '3:52:06' },
+        { pace: '6:00', five: '30:00', ten: '1:00:00', half: '2:06:34', full: '4:13:08' },
+      ];
+      
+      paceTableBody.innerHTML = paces.map(p => `
+        <tr>
+          <td>${p.pace}</td>
+          <td>${p.five}</td>
+          <td>${p.ten}</td>
+          <td>${p.half}</td>
+          <td>${p.full}</td>
+        </tr>
+      `).join('');
+      
+      // 목표 기록 테이블
+      const targetTableBody = document.getElementById('targetTableBody');
+      const targets = [
+        { record: '하프 1:20:00', pace: '3:47', lap: '1:31', speed: '15.84' },
+        { record: '하프 1:30:00', pace: '4:16', lap: '1:42', speed: '14.06' },
+        { record: '풀 2:50:00', pace: '4:02', lap: '1:37', speed: '14.85' },
+        { record: '풀 3:00:00', pace: '4:16', lap: '1:42', speed: '14.06' },
+        { record: '풀 3:30:00', pace: '4:58', lap: '1:59', speed: '12.05' },
+        { record: '풀 4:00:00', pace: '5:41', lap: '2:16', speed: '10.55' },
+      ];
+      
+      targetTableBody.innerHTML = targets.map(t => `
+        <tr>
+          <td>${t.record}</td>
+          <td>${t.pace}</td>
+          <td>${t.lap}</td>
+          <td>${t.speed}</td>
+        </tr>
+      `).join('');
+      
+      // 3000m 장애물 테이블
+      const steeplechaseTableBody = document.getElementById('steeplechaseTableBody');
+      const steeplechase = [
+        { record: '8:00', pace: '2:40', lap: '1:04', km1: '2:40', km2: '5:20' },
+        { record: '8:30', pace: '2:50', lap: '1:08', km1: '2:50', km2: '5:40' },
+        { record: '9:00', pace: '3:00', lap: '1:12', km1: '3:00', km2: '6:00' },
+        { record: '9:30', pace: '3:10', lap: '1:16', km1: '3:10', km2: '6:20' },
+        { record: '10:00', pace: '3:20', lap: '1:20', km1: '3:20', km2: '6:40' },
+        { record: '11:00', pace: '3:40', lap: '1:28', km1: '3:40', km2: '7:20' },
+      ];
+      
+      steeplechaseTableBody.innerHTML = steeplechase.map(s => `
+        <tr>
+          <td>${s.record}</td>
+          <td>${s.pace}</td>
+          <td>${s.lap}</td>
+          <td>${s.km1}</td>
+          <td>${s.km2}</td>
+        </tr>
+      `).join('');
+    }
+    
+    // PC 스타일 전문 차트 다운로드 함수
+    async function downloadProfessionalChart(chartId, filename, format) {
+      const loadingOverlay = document.getElementById('downloadLoading');
+      
+      try {
+        // 로딩 표시
+        loadingOverlay.classList.add('active');
+        
+        // 현재 차트 요소 가져오기
+        const chartElement = document.getElementById(chartId);
+        if (!chartElement) {
+          throw new Error('차트를 찾을 수 없습니다');
+        }
+        
+        // 타임스탬프와 크레딧
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        const credit = 'AthleteTime_장호준코치제작';
+        const fullFilename = `${credit}_${filename}_${timestamp}`;
+        
+        // PC 스타일 컨테이너 생성
+        const downloadContainer = document.createElement('div');
+        downloadContainer.style.cssText = `
+          position: absolute;
+          left: -9999px;
+          background: white;
+          padding: 40px;
+          width: 1200px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+        `;
+        
+        // 전문적인 헤더 (장호준 코치 정보 포함)
+        const header = document.createElement('div');
+        header.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 3px solid #667eea; margin-bottom: 30px;">
+            <div>
+              <h3 style="font-size: 24px; font-weight: bold; color: #667eea;">러닝 페이스 차트</h3>
+              <p style="color: #764ba2; font-size: 14px;">과학적 훈련을 위한 정밀 분석 도구</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 12px; color: #667eea; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Developer</div>
+              <p style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 5px 0;">장호준 코치</p>
+              <p style="font-size: 14px; color: #764ba2; font-weight: 600;">ATHLETE TIME</p>
+            </div>
+          </div>
+        `;
+        downloadContainer.appendChild(header);
+        
+        // 차트 제목
+        const chartTitle = chartElement.querySelector('h2')?.textContent || filename;
+        const titleDiv = document.createElement('div');
+        titleDiv.innerHTML = `
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; font-weight: bold; color: #1a1a1a;">${chartTitle}</h1>
+            <p style="color: #666; font-size: 14px; margin-top: 8px;">
+              ${new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </div>
+        `;
+        downloadContainer.appendChild(titleDiv);
+        
+        // 차트 내용 복사 (테이블 스타일 개선)
+        const contentClone = chartElement.cloneNode(true);
+        
+        // 버튼 제거
+        contentClone.querySelectorAll('button, .flex').forEach(el => {
+          if (el.querySelector('button')) el.remove();
+        });
+        
+        // 테이블 스타일 개선
+        const table = contentClone.querySelector('table');
+        if (table) {
+          table.style.width = '100%';
+          table.style.fontSize = '14px';
+          table.style.borderCollapse = 'collapse';
+          
+          // 모든 셀에 스타일 적용
+          table.querySelectorAll('th, td').forEach(cell => {
+            cell.style.border = '1px solid #e5e7eb';
+            cell.style.padding = '10px';
+            cell.style.textAlign = 'center';
+          });
+          
+          // 헤더 스타일
+          table.querySelectorAll('th').forEach(th => {
+            th.style.backgroundColor = '#f3f4f6';
+            th.style.fontWeight = 'bold';
+          });
+        }
+        
+        downloadContainer.appendChild(contentClone);
+        
+        // 푸터 (장호준 코치 정보 강조)
+        const footer = document.createElement('div');
+        footer.innerHTML = `
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center;">
+            <div style="font-size: 24px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin-top: 5px;">제작: 장호준 코치</div>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">
+              © 2024 Athlete Time | 한국 육상인을 위한 페이스 계산기<br>
+              <span style="font-size: 11px;">러닝 전문 트레이닝 프로그램</span>
+            </p>
+          </div>
+        `;
+        downloadContainer.appendChild(footer);
+        
+        // DOM에 임시 추가
+        document.body.appendChild(downloadContainer);
+        
+        // 잠시 대기 (렌더링 완료)
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // html2canvas로 캡처
+        const canvas = await html2canvas(downloadContainer, {
+          scale: 3,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          windowWidth: 1200,
+          windowHeight: 2000
+        });
+        
+        if (format === 'pdf') {
+          // PDF 다운로드
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('l', 'mm', 'a4');
+          
+          const dataUrl = canvas.toDataURL('image/png', 1.0);
+          
+          const maxWidth = 277;
+          const maxHeight = 190;
+          const imgRatio = canvas.height / canvas.width;
+          
+          let finalWidth = maxWidth;
+          let finalHeight = maxWidth * imgRatio;
+          
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = maxHeight / imgRatio;
+          }
+          
+          const x = (297 - finalWidth) / 2;
+          const y = (210 - finalHeight) / 2;
+          
+          pdf.addImage(dataUrl, 'PNG', x, y, finalWidth, finalHeight, undefined, 'FAST');
+          
+          pdf.setProperties({
+            title: filename.replace(/_/g, ' '),
+            subject: 'ATHLETE TIME 러닝 페이스 차트',
+            author: '장호준 코치',
+            creator: 'ATHLETE TIME - 애슬리트 타임'
+          });
+          
+          pdf.save(fullFilename + '.pdf');
+        } else {
+          // PNG 다운로드
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = fullFilename + '.png';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+          }, 'image/png', 1.0);
+        }
+        
+        // 임시 요소 제거
+        document.body.removeChild(downloadContainer);
+        
+      } catch (error) {
+        console.error('차트 다운로드 실패:', error);
+        alert('다운로드 중 오류가 발생했습니다.\n\n' + error.message);
+      } finally {
+        // 로딩 숨기기
+        loadingOverlay.classList.remove('active');
+      }
+    }
+    
+    // 페이지 로드 시 테이블 생성
+    window.addEventListener('DOMContentLoaded', () => {
+      generateTables();
+    });
+  </script>
+</body>
+</html>

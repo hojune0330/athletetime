@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>페이스 계산기 (모바일) | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* 모바일 테이블 스타일 */
+    .mobile-table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      max-width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .mobile-table {
+      font-size: 11px;
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+    
+    .mobile-table td, 
+    .mobile-table th {
+      padding: 4px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+    
+    .mobile-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    
+    /* 첫 번째 열 고정 */
+    .mobile-table thead th:first-child,
+    .mobile-table tbody td:first-child {
+      position: sticky;
+      left: 0;
+      background: #f9fafb;
+      font-weight: bold;
+      z-index: 10;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+    }
+    
+    .mobile-table thead th:first-child {
+      background: #e5e7eb;
+      z-index: 11;
+    }
+    
+    /* 하이라이트 */
+    .highlight-row {
+      background: #fef3c7 !important;
+    }
+    
+    .sub-highlight {
+      background: #dbeafe !important;
+    }
+    
+    /* 로딩 스타일 */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    
+    .loading-overlay.active {
+      display: flex;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 색상 구분 */
+    .bg-yellow-50 { background: #fef3c7 !important; }
+    .bg-green-50 { background: #dcfce7 !important; }
+    .bg-blue-50 { background: #dbeafe !important; }
+    .bg-purple-50 { background: #f3e8ff !important; }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="bg-white p-6 rounded-lg text-center max-w-xs">
+      <div class="loading-spinner mx-auto mb-4"></div>
+      <p class="text-lg font-bold text-gray-800 mb-1">고품질 차트 생성 중</p>
+      <p class="text-sm text-gray-600">잠시만 기다려주세요...</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-3 py-3" style="max-width: 100%;">
+    <!-- 헤더 -->
+    <div class="bg-white rounded-lg shadow-sm p-3 mb-3">
+      <div class="flex items-center justify-between">
+        <h1 class="text-lg font-bold gradient-text">페이스 계산기</h1>
+        <div class="flex items-center gap-2">
+          <a href="pace-calculator.html" class="text-gray-500 hover:text-gray-700 text-sm" title="PC 버전">
+            <i class="fas fa-desktop"></i>
+          </a>
+          <a href="pace-calculator-selector.html?force=true" class="text-gray-500 hover:text-gray-700 text-sm" title="버전 선택">
+            <i class="fas fa-exchange-alt"></i>
+          </a>
+          <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm" title="메인">
+            <i class="fas fa-home"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 1: 킬로미터 페이스 → 거리별 완주 시간 -->
+    <div id="chart1" class="bg-white rounded-lg shadow-sm p-3 mb-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold">
+          <i class="fas fa-tachometer-alt text-blue-500 text-xs"></i> 
+          <span class="text-xs">킬로미터 페이스 → 거리별 완주 시간</span>
+        </h2>
+        <div class="flex gap-1">
+          <button onclick="downloadChart('chart1', 'KM페이스_거리별완주시간', 'png')" 
+                  class="text-blue-500 text-xs p-1">
+            <i class="fas fa-image"></i>
+          </button>
+          <button onclick="downloadChart('chart1', 'KM페이스_거리별완주시간', 'pdf')" 
+                  class="text-red-500 text-xs p-1">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="mobile-table-container">
+        <table id="paceTable1" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+    </div>
+
+    <!-- 차트 2: 목표 기록별 필요 페이스 분석 -->
+    <div id="chart2" class="bg-white rounded-lg shadow-sm p-3 mb-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold">
+          <i class="fas fa-trophy text-orange-500 text-xs"></i> 
+          <span class="text-xs">목표 기록별 필요 페이스 분석</span>
+        </h2>
+        <div class="flex gap-1">
+          <button onclick="downloadChart('chart2', '목표기록별_페이스분석', 'png')" 
+                  class="text-blue-500 text-xs p-1">
+            <i class="fas fa-image"></i>
+          </button>
+          <button onclick="downloadChart('chart2', '목표기록별_페이스분석', 'pdf')" 
+                  class="text-red-500 text-xs p-1">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 5km 목표 -->
+      <h3 class="text-xs font-bold mb-1 text-gray-700">🏃 5km 목표 기록</h3>
+      <div class="mobile-table-container mb-2">
+        <table id="target5kmTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+      
+      <!-- 10km 목표 -->
+      <h3 class="text-xs font-bold mb-1 text-gray-700">🏃 10km 목표 기록</h3>
+      <div class="mobile-table-container mb-2">
+        <table id="target10kmTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+      
+      <!-- 하프마라톤 목표 -->
+      <h3 class="text-xs font-bold mb-1 text-gray-700">🏃 하프마라톤 목표 기록</h3>
+      <div class="mobile-table-container mb-2">
+        <table id="targetHalfTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+      
+      <!-- 풀마라톤 목표 -->
+      <h3 class="text-xs font-bold mb-1 text-gray-700">🏃 풀마라톤 목표 기록</h3>
+      <div class="mobile-table-container">
+        <table id="targetFullTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+    </div>
+
+    <!-- 차트 3: 400m 트랙 레인별 거리 & 시간 보정표 -->
+    <div id="chart3" class="bg-white rounded-lg shadow-sm p-3 mb-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold">
+          <i class="fas fa-route text-green-500 text-xs"></i> 
+          <span class="text-xs">400m 트랙 레인별 거리 & 시간 보정표</span>
+        </h2>
+        <div class="flex gap-1">
+          <button onclick="downloadChart('chart3', '트랙레인별_보정표', 'png')" 
+                  class="text-blue-500 text-xs p-1">
+            <i class="fas fa-image"></i>
+          </button>
+          <button onclick="downloadChart('chart3', '트랙레인별_보정표', 'pdf')" 
+                  class="text-red-500 text-xs p-1">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="mobile-table-container">
+        <table id="laneTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+    </div>
+
+    <!-- 차트 4: 3000m 장애물 경주 페이스 계산표 -->
+    <div id="chart4" class="bg-white rounded-lg shadow-sm p-3 mb-3">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold">
+          <i class="fas fa-water text-cyan-500 text-xs"></i> 
+          <span class="text-xs">3000m 장애물 경주 페이스 계산표</span>
+        </h2>
+        <div class="flex gap-1">
+          <button onclick="downloadChart('chart4', '3000m장애물_페이스', 'png')" 
+                  class="text-blue-500 text-xs p-1">
+            <i class="fas fa-image"></i>
+          </button>
+          <button onclick="downloadChart('chart4', '3000m장애물_페이스', 'pdf')" 
+                  class="text-red-500 text-xs p-1">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 물장 내측 -->
+      <h3 class="text-xs font-bold mb-1 text-blue-700">💧 물 장애물 내측 (INSIDE)</h3>
+      <div class="mobile-table-container mb-2">
+        <table id="steeplechaseInsideTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+      
+      <!-- 물장 외측 -->
+      <h3 class="text-xs font-bold mb-1 text-purple-700">💧 물 장애물 외측 (OUTSIDE)</h3>
+      <div class="mobile-table-container">
+        <table id="steeplechaseOutsideTable" class="mobile-table">
+          <!-- JavaScript로 채워짐 -->
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 시간 포맷팅 함수 (PC 버전과 동일)
+    function formatTime(seconds, forceHours = false) {
+      if (isNaN(seconds) || seconds === null) return '-';
+      
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0 || forceHours) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else if (mins > 0) {
+        return `${mins}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else {
+        return secs.toFixed(1);
+      }
+    }
+    
+    // 페이스를 분:초 형식으로 포맷
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+    
+    // 차트 1: KM 페이스별 거리 환산표 (PC 버전과 동일)
+    function generateChart1() {
+      const table = document.getElementById('paceTable1');
+      
+      // 헤더
+      let html = '<thead><tr>';
+      html += '<th>km 페이스</th>';
+      const distances = ['100m', '200m', '400m', '800m', '1km', '3km', '5km', '10km', '15km', '하프', '30km', '풀코스'];
+      distances.forEach(d => {
+        html += `<th>${d}</th>`;
+      });
+      html += '</tr></thead><tbody>';
+      
+      // 2:30부터 8:00까지 10초 간격
+      for (let seconds = 150; seconds <= 480; seconds += 10) {
+        const pace = formatPace(seconds);
+        
+        // 하이라이트 처리
+        let rowClass = '';
+        if (seconds === 180 || seconds === 240 || seconds === 300 || seconds === 360 || seconds === 420) {
+          rowClass = 'highlight-row';
+        } else if (seconds === 210 || seconds === 270 || seconds === 330 || seconds === 390 || seconds === 450) {
+          rowClass = 'sub-highlight';
+        }
+        
+        html += `<tr class="${rowClass}">`;
+        html += `<td>${pace}</td>`;
+        
+        // 각 거리별 시간 계산
+        const distanceMeters = [100, 200, 400, 800, 1000, 3000, 5000, 10000, 15000, 21097.5, 30000, 42195];
+        distanceMeters.forEach((distance, i) => {
+          const time = (seconds / 1000) * distance;
+          let cellClass = '';
+          if (i === 6) cellClass = 'bg-yellow-50'; // 5km
+          if (i === 7) cellClass = 'bg-green-50';  // 10km
+          if (i === 9) cellClass = 'bg-blue-50';   // 하프
+          if (i === 11) cellClass = 'bg-purple-50'; // 풀
+          html += `<td class="${cellClass}">${formatTime(time)}</td>`;
+        });
+        
+        html += '</tr>';
+      }
+      
+      html += '</tbody>';
+      table.innerHTML = html;
+    }
+    
+    // 차트 2: 목표 기록별 테이블들 (PC 버전과 동일)
+    function generateChart2() {
+      // 5km 목표 기록
+      const targets5km = [
+        { time: 13 * 60, label: '세계 엘리트', highlight: true },
+        { time: 14 * 60, label: '국가대표' },
+        { time: 15 * 60, label: '엘리트', highlight: true },
+        { time: 16 * 60, label: '준엘리트' },
+        { time: 17 * 60, label: '최상급' },
+        { time: 18 * 60, label: '상급' },
+        { time: 19 * 60, label: '중상급' },
+        { time: 20 * 60, label: '서브 20', highlight: true },
+        { time: 22 * 60, label: '중급' },
+        { time: 25 * 60, label: '초중급', highlight: true },
+        { time: 28 * 60, label: '초급' },
+        { time: 30 * 60, label: '입문', highlight: true },
+        { time: 35 * 60, label: '완주 목표' },
+        { time: 40 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const table5km = document.getElementById('target5kmTable');
+      let html = '<thead><tr>';
+      html += '<th>목표 기록</th><th>km 페이스</th><th>400m</th><th>100m</th><th>속도</th><th>비고</th>';
+      html += '</tr></thead><tbody>';
+      
+      targets5km.forEach(target => {
+        const pacePerKm = target.time / 5;
+        const pace400m = pacePerKm * 0.4;
+        const pace100m = pacePerKm * 0.1;
+        const speed = 5000 / target.time * 3.6;
+        
+        html += `<tr class="${target.highlight ? 'highlight-row' : ''}">`;
+        html += `<td>${formatTime(target.time)}</td>`;
+        html += `<td>${formatPace(pacePerKm)}</td>`;
+        html += `<td>${formatTime(pace400m)}</td>`;
+        html += `<td>${formatTime(pace100m)}</td>`;
+        html += `<td>${speed.toFixed(1)}</td>`;
+        html += `<td class="text-xs">${target.label}</td>`;
+        html += '</tr>';
+      });
+      
+      html += '</tbody>';
+      table5km.innerHTML = html;
+      
+      // 10km 목표 기록
+      const targets10km = [
+        { time: 27 * 60, label: '세계 엘리트', highlight: true },
+        { time: 29 * 60, label: '국가대표' },
+        { time: 31 * 60, label: '엘리트', highlight: true },
+        { time: 33 * 60, label: '준엘리트' },
+        { time: 35 * 60, label: '상급' },
+        { time: 38 * 60, label: '중상급' },
+        { time: 40 * 60, label: '서브 40', highlight: true },
+        { time: 45 * 60, label: '중급' },
+        { time: 50 * 60, label: '서브 50', highlight: true },
+        { time: 55 * 60, label: '초급' },
+        { time: 60 * 60, label: '서브 1시간', highlight: true },
+        { time: 70 * 60, label: '완주 목표' },
+        { time: 80 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const table10km = document.getElementById('target10kmTable');
+      html = '<thead><tr>';
+      html += '<th>목표 기록</th><th>km 페이스</th><th>400m</th><th>5km</th><th>속도</th><th>비고</th>';
+      html += '</tr></thead><tbody>';
+      
+      targets10km.forEach(target => {
+        const pacePerKm = target.time / 10;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = target.time / 2;
+        const speed = 10000 / target.time * 3.6;
+        
+        html += `<tr class="${target.highlight ? 'highlight-row' : ''}">`;
+        html += `<td>${formatTime(target.time)}</td>`;
+        html += `<td>${formatPace(pacePerKm)}</td>`;
+        html += `<td>${formatTime(pace400m)}</td>`;
+        html += `<td>${formatTime(time5km)}</td>`;
+        html += `<td>${speed.toFixed(1)}</td>`;
+        html += `<td class="text-xs">${target.label}</td>`;
+        html += '</tr>';
+      });
+      
+      html += '</tbody>';
+      table10km.innerHTML = html;
+      
+      // 하프마라톤 목표 기록
+      const targetsHalf = [
+        { time: 60 * 60, label: '세계 엘리트', highlight: true },
+        { time: 65 * 60, label: '국가대표' },
+        { time: 70 * 60, label: '엘리트', highlight: true },
+        { time: 75 * 60, label: '준엘리트' },
+        { time: 80 * 60, label: '상급' },
+        { time: 85 * 60, label: '중상급' },
+        { time: 90 * 60, label: '서브 1:30', highlight: true },
+        { time: 100 * 60, label: '중급' },
+        { time: 110 * 60, label: '초중급', highlight: true },
+        { time: 120 * 60, label: '서브 2:00', highlight: true },
+        { time: 130 * 60, label: '초급' },
+        { time: 140 * 60, label: '입문' },
+        { time: 150 * 60, label: '서브 2:30', highlight: true },
+        { time: 160 * 60, label: '완주 목표' },
+        { time: 180 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const tableHalf = document.getElementById('targetHalfTable');
+      html = '<thead><tr>';
+      html += '<th>목표 기록</th><th>km 페이스</th><th>400m</th><th>5km</th><th>10km</th><th>속도</th><th>비고</th>';
+      html += '</tr></thead><tbody>';
+      
+      targetsHalf.forEach(target => {
+        const pacePerKm = target.time / 21.0975;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = (target.time / 21.0975) * 5;
+        const time10km = (target.time / 21.0975) * 10;
+        const speed = 21097.5 / target.time * 3.6;
+        
+        html += `<tr class="${target.highlight ? 'highlight-row' : ''}">`;
+        html += `<td>${formatTime(target.time)}</td>`;
+        html += `<td>${formatPace(pacePerKm)}</td>`;
+        html += `<td>${formatTime(pace400m)}</td>`;
+        html += `<td>${formatTime(time5km)}</td>`;
+        html += `<td>${formatTime(time10km)}</td>`;
+        html += `<td>${speed.toFixed(1)}</td>`;
+        html += `<td class="text-xs">${target.label}</td>`;
+        html += '</tr>';
+      });
+      
+      html += '</tbody>';
+      tableHalf.innerHTML = html;
+      
+      // 풀마라톤 목표 기록
+      const targetsFull = [
+        { time: 2 * 3600 + 0 * 60, label: '세계 신기록', highlight: true },
+        { time: 2 * 3600 + 10 * 60, label: '세계 엘리트' },
+        { time: 2 * 3600 + 20 * 60, label: '국가대표', highlight: true },
+        { time: 2 * 3600 + 30 * 60, label: '서브 2:30' },
+        { time: 2 * 3600 + 40 * 60, label: '엘리트' },
+        { time: 2 * 3600 + 50 * 60, label: '준엘리트' },
+        { time: 3 * 3600 + 0 * 60, label: '서브 3', highlight: true },
+        { time: 3 * 3600 + 10 * 60, label: '상급' },
+        { time: 3 * 3600 + 20 * 60, label: '중상급' },
+        { time: 3 * 3600 + 30 * 60, label: '서브 3:30', highlight: true },
+        { time: 3 * 3600 + 40 * 60, label: '중급' },
+        { time: 3 * 3600 + 50 * 60, label: '초중급' },
+        { time: 4 * 3600 + 0 * 60, label: '서브 4', highlight: true },
+        { time: 4 * 3600 + 30 * 60, label: '초급' },
+        { time: 5 * 3600 + 0 * 60, label: '완주', highlight: true },
+        { time: 5 * 3600 + 30 * 60, label: '건강 조깅' },
+        { time: 6 * 3600 + 0 * 60, label: '완보', highlight: true }
+      ];
+      
+      const tableFull = document.getElementById('targetFullTable');
+      html = '<thead><tr>';
+      html += '<th>목표 기록</th><th>km 페이스</th><th>400m</th><th>10km</th><th>하프</th><th>30km</th><th>속도</th><th>비고</th>';
+      html += '</tr></thead><tbody>';
+      
+      targetsFull.forEach(target => {
+        const pacePerKm = target.time / 42.195;
+        const pace400m = pacePerKm * 0.4;
+        const time10km = (target.time / 42.195) * 10;
+        const timeHalf = (target.time / 42.195) * 21.0975;
+        const time30km = (target.time / 42.195) * 30;
+        const speed = 42195 / target.time * 3.6;
+        
+        html += `<tr class="${target.highlight ? 'highlight-row' : ''}">`;
+        html += `<td>${formatTime(target.time, true)}</td>`;
+        html += `<td>${formatPace(pacePerKm)}</td>`;
+        html += `<td>${formatTime(pace400m)}</td>`;
+        html += `<td>${formatTime(time10km)}</td>`;
+        html += `<td>${formatTime(timeHalf)}</td>`;
+        html += `<td>${formatTime(time30km)}</td>`;
+        html += `<td>${speed.toFixed(1)}</td>`;
+        html += `<td class="text-xs">${target.label}</td>`;
+        html += '</tr>';
+      });
+      
+      html += '</tbody>';
+      tableFull.innerHTML = html;
+    }
+    
+    // 차트 3: 레인별 보정 시간 (PC 버전과 동일)
+    function generateChart3() {
+      const table = document.getElementById('laneTable');
+      
+      // 레인별 거리
+      const laneDistances = {
+        1: 400.00,
+        2: 407.04,
+        3: 414.70,
+        4: 422.37,
+        5: 430.03,
+        6: 437.70,
+        7: 445.36,
+        8: 453.03
+      };
+      
+      let html = '<thead><tr>';
+      html += '<th rowspan="2">km 페이스</th>';
+      html += '<th rowspan="2">400m<br>(1레인)</th>';
+      html += '<th colspan="7">외측 레인 보정 시간</th>';
+      html += '</tr><tr>';
+      
+      for (let lane = 2; lane <= 8; lane++) {
+        html += `<th>
+${lane}레인<br>${Math.round(laneDistances[lane])}m</th>`;
+      }
+      html += '</tr></thead><tbody>';
+      
+      // 2:30부터 6:00까지 10초 간격
+      for (let seconds = 150; seconds <= 360; seconds += 10) {
+        const pace = formatPace(seconds);
+        
+        // 하이라이트
+        let rowClass = '';
+        if (seconds === 180 || seconds === 240 || seconds === 300 || seconds === 360) {
+          rowClass = 'highlight-row';
+        } else if (seconds === 210 || seconds === 270 || seconds === 330) {
+          rowClass = 'sub-highlight';
+        }
+        
+        html += `<tr class="${rowClass}">`;
+        html += `<td>${pace}</td>`;
+        
+        // 1레인 400m 시간
+        const time400 = (seconds / 1000) * 400;
+        html += `<td>${formatTime(time400)}</td>`;
+        
+        // 각 레인별 보정 시간
+        for (let lane = 2; lane <= 8; lane++) {
+          const laneTime = (seconds / 1000) * laneDistances[lane];
+          html += `<td>${formatTime(laneTime)}</td>`;
+        }
+        
+        html += '</tr>';
+      }
+      
+      html += '</tbody>';
+      table.innerHTML = html;
+    }
+    
+    // 차트 4: 3000m 장애물 페이스 계산 (PC 버전과 동일)
+    function generateChart4() {
+      const tableInside = document.getElementById('steeplechaseInsideTable');
+      const tableOutside = document.getElementById('steeplechaseOutsideTable');
+      
+      // 헤더 (내측)
+      let htmlInside = '<thead><tr>';
+      htmlInside += '<th>목표 기록</th><th>km 페이스</th><th>시작 구간</th><th>랩당 시간</th><th>3랩</th><th>5랩</th><th>최종</th>';
+      htmlInside += '</tr></thead><tbody>';
+      
+      // 헤더 (외측)
+      let htmlOutside = '<thead><tr>';
+      htmlOutside += '<th>목표 기록</th><th>km 페이스</th><th>시작 구간</th><th>랩당 시간</th><th>3랩</th><th>5랩</th><th>최종</th>';
+      htmlOutside += '</tr></thead><tbody>';
+      
+      // 목표 기록들 (7분 30초부터 13분까지)
+      const targetTimes = [
+        { time: 7 * 60 + 30, label: '세계 엘리트', highlight: true },
+        { time: 8 * 60, label: '국가대표급' },
+        { time: 8 * 60 + 30, label: '엘리트', highlight: true },
+        { time: 9 * 60, label: '준엘리트' },
+        { time: 9 * 60 + 30, label: '상급', highlight: true },
+        { time: 10 * 60, label: '서브 10' },
+        { time: 10 * 60 + 30, label: '중상급', highlight: true },
+        { time: 11 * 60, label: '중급' },
+        { time: 11 * 60 + 30, label: '초중급', highlight: true },
+        { time: 12 * 60, label: '초급' },
+        { time: 12 * 60 + 30, label: '입문' },
+        { time: 13 * 60, label: '완주 목표', highlight: true }
+      ];
+      
+      // 구성별 거리
+      const insideConfig = {
+        lapDistance: 396.084,
+        startSection: 227.412,
+        totalLapDistance: 2772.588
+      };
+      
+      const outsideConfig = {
+        lapDistance: 419.407,
+        startSection: 64.151,
+        totalLapDistance: 2935.849
+      };
+      
+      targetTimes.forEach(target => {
+        const pacePerKm = target.time / 3;
+        
+        // 내측 계산
+        const insideStartTime = (target.time / 3000) * insideConfig.startSection;
+        const insideLapTime = (target.time / 3000) * insideConfig.lapDistance;
+        const inside3Laps = insideStartTime + (insideLapTime * 3);
+        const inside5Laps = insideStartTime + (insideLapTime * 5);
+        
+        htmlInside += `<tr class="${target.highlight ? 'bg-blue-50' : ''}">`;
+        htmlInside += `<td class="text-blue-700">${formatTime(target.time)}</td>`;
+        htmlInside += `<td>${formatPace(pacePerKm)}</td>`;
+        htmlInside += `<td>${formatTime(insideStartTime)}</td>`;
+        htmlInside += `<td>${formatTime(insideLapTime)}</td>`;
+        htmlInside += `<td>${formatTime(inside3Laps)}</td>`;
+        htmlInside += `<td>${formatTime(inside5Laps)}</td>`;
+        htmlInside += `<td class="font-bold">${formatTime(target.time)}</td>`;
+        htmlInside += '</tr>';
+        
+        // 외측 계산
+        const outsideStartTime = (target.time / 3000) * outsideConfig.startSection;
+        const outsideLapTime = (target.time / 3000) * outsideConfig.lapDistance;
+        const outside3Laps = outsideStartTime + (outsideLapTime * 3);
+        const outside5Laps = outsideStartTime + (outsideLapTime * 5);
+        
+        htmlOutside += `<tr class="${target.highlight ? 'bg-purple-50' : ''}">`;
+        htmlOutside += `<td class="text-purple-700">${formatTime(target.time)}</td>`;
+        htmlOutside += `<td>${formatPace(pacePerKm)}</td>`;
+        htmlOutside += `<td>${formatTime(outsideStartTime)}</td>`;
+        htmlOutside += `<td>${formatTime(outsideLapTime)}</td>`;
+        htmlOutside += `<td>${formatTime(outside3Laps)}</td>`;
+        htmlOutside += `<td>${formatTime(outside5Laps)}</td>`;
+        htmlOutside += `<td class="font-bold">${formatTime(target.time)}</td>`;
+        htmlOutside += '</tr>';
+      });
+      
+      htmlInside += '</tbody>';
+      htmlOutside += '</tbody>';
+      
+      tableInside.innerHTML = htmlInside;
+      tableOutside.innerHTML = htmlOutside;
+    }
+    
+    // 차트 다운로드 함수 (PC 스타일)
+    async function downloadChart(chartId, filename, format) {
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      try {
+        loadingOverlay.classList.add('active');
+        
+        const chartElement = document.getElementById(chartId);
+        if (!chartElement) {
+          throw new Error('차트를 찾을 수 없습니다');
+        }
+        
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        const credit = 'AthleteTime_장호준코치제작';
+        const fullFilename = `${credit}_${filename}_${timestamp}`;
+        
+        // PC 스타일 컨테이너 생성
+        const downloadContainer = document.createElement('div');
+        downloadContainer.style.cssText = `
+          position: absolute;
+          left: -9999px;
+          background: white;
+          padding: 40px;
+          width: 1200px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+        `;
+        
+        // 헤더
+        const header = document.createElement('div');
+        header.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 3px solid #667eea; margin-bottom: 30px;">
+            <div>
+              <h3 style="font-size: 24px; font-weight: bold; color: #667eea;">러닝 페이스 차트</h3>
+              <p style="color: #764ba2; font-size: 14px;">과학적 훈련을 위한 정밀 분석 도구</p>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 12px; color: #667eea; text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Developer</div>
+              <p style="font-size: 20px; font-weight: bold; color: #1a1a1a; margin: 5px 0;">장호준 코치</p>
+              <p style="font-size: 14px; color: #764ba2; font-weight: 600;">ATHLETE TIME</p>
+            </div>
+          </div>
+        `;
+        downloadContainer.appendChild(header);
+        
+        // 차트 내용
+        const contentClone = chartElement.cloneNode(true);
+        contentClone.querySelectorAll('button').forEach(el => el.remove());
+        contentClone.querySelectorAll('.mobile-table-container').forEach(el => {
+          el.style.overflow = 'visible';
+        });
+        contentClone.querySelectorAll('[style*="sticky"]').forEach(el => {
+          el.style.position = 'relative';
+          el.style.left = 'auto';
+        });
+        downloadContainer.appendChild(contentClone);
+        
+        // 푸터
+        const footer = document.createElement('div');
+        footer.innerHTML = `
+          <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center;">
+            <div style="font-size: 24px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div style="font-size: 14px; color: #666; margin-top: 5px;">제작: 장호준 코치</div>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">
+              © 2024 Athlete Time | 한국 육상인을 위한 페이스 계산기<br>
+              <span style="font-size: 11px;">러닝 전문 트레이닝 프로그램</span>
+            </p>
+          </div>
+        `;
+        downloadContainer.appendChild(footer);
+        
+        document.body.appendChild(downloadContainer);
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const canvas = await html2canvas(downloadContainer, {
+          scale: 3,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        
+        if (format === 'pdf') {
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('l', 'mm', 'a4');
+          const dataUrl = canvas.toDataURL('image/png');
+          
+          const maxWidth = 277;
+          const maxHeight = 190;
+          const imgRatio = canvas.height / canvas.width;
+          
+          let finalWidth = maxWidth;
+          let finalHeight = maxWidth * imgRatio;
+          
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = maxHeight / imgRatio;
+          }
+          
+          const x = (297 - finalWidth) / 2;
+          const y = (210 - finalHeight) / 2;
+          
+          pdf.addImage(dataUrl, 'PNG', x, y, finalWidth, finalHeight);
+          pdf.setProperties({
+            title: filename.replace(/_/g, ' '),
+            author: '장호준 코치',
+            creator: 'ATHLETE TIME'
+          });
+          pdf.save(fullFilename + '.pdf');
+        } else {
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = fullFilename + '.png';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+          });
+        }
+        
+        document.body.removeChild(downloadContainer);
+        
+      } catch (error) {
+        console.error('다운로드 실패:', error);
+        alert('다운로드 중 오류가 발생했습니다');
+      } finally {
+        loadingOverlay.classList.remove('active');
+      }
+    }
+    
+    // 페이지 로드 시 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      generateChart1();
+      generateChart2();
+      generateChart3();
+      generateChart4();
+    });
+  </script>
+</body>
+</html>
