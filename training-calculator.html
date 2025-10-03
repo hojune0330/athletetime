@@ -486,28 +486,73 @@
     }
 
     function calculateTrainingPaces(vdot) {
-      // Jack Daniels' formula for training paces
-      const paces = {
-        easy: {
-          min: Math.round((180 / vdot) * 195), // E pace minimum (slower)
-          max: Math.round((180 / vdot) * 175)  // E pace maximum (faster)
-        },
-        marathon: Math.round((180 / vdot) * 165),    // M pace
-        threshold: Math.round((180 / vdot) * 155),   // T pace  
-        interval: Math.round((180 / vdot) * 140),    // I pace
-        repetition: Math.round((180 / vdot) * 125)   // R pace
+      // Jack Daniels 공식 VDOT 페이스 테이블 (초/km)
+      const vdotPaceTable = {
+        30: { easy: { min: 417, max: 458 }, marathon: 374, threshold: 354, interval: 320, repetition: 296 },
+        35: { easy: { min: 372, max: 409 }, marathon: 333, threshold: 315, interval: 285, repetition: 264 },
+        40: { easy: { min: 337, max: 370 }, marathon: 301, threshold: 285, interval: 258, repetition: 239 },
+        45: { easy: { min: 308, max: 339 }, marathon: 275, threshold: 260, interval: 236, repetition: 218 },
+        50: { easy: { min: 284, max: 312 }, marathon: 253, threshold: 239, interval: 217, repetition: 201 },
+        55: { easy: { min: 263, max: 290 }, marathon: 235, threshold: 222, interval: 201, repetition: 186 },
+        60: { easy: { min: 246, max: 270 }, marathon: 219, threshold: 207, interval: 188, repetition: 174 },
+        65: { easy: { min: 230, max: 253 }, marathon: 205, threshold: 194, interval: 176, repetition: 163 },
+        70: { easy: { min: 217, max: 238 }, marathon: 193, threshold: 182, interval: 165, repetition: 153 },
+        75: { easy: { min: 205, max: 225 }, marathon: 182, threshold: 172, interval: 156, repetition: 144 },
+        80: { easy: { min: 194, max: 213 }, marathon: 172, threshold: 163, interval: 148, repetition: 137 },
+        85: { easy: { min: 185, max: 203 }, marathon: 164, threshold: 155, interval: 140, repetition: 130 }
       };
       
-      // Apply adjustments based on conditions
-      const adj = userProfile.adjustments.pace;
-      Object.keys(paces).forEach(key => {
-        if (key === 'easy') {
-          paces.easy.min = Math.round(paces.easy.min * adj);
-          paces.easy.max = Math.round(paces.easy.max * adj);
-        } else {
-          paces[key] = Math.round(paces[key] * adj);
+      // VDOT 값에 가장 가까운 테이블 값 찾기 및 보간
+      const vdotKeys = Object.keys(vdotPaceTable).map(k => parseInt(k)).sort((a, b) => a - b);
+      let lowerVdot = 30, upperVdot = 30;
+      
+      for (let i = 0; i < vdotKeys.length - 1; i++) {
+        if (vdot >= vdotKeys[i] && vdot <= vdotKeys[i + 1]) {
+          lowerVdot = vdotKeys[i];
+          upperVdot = vdotKeys[i + 1];
+          break;
         }
-      });
+      }
+      
+      if (vdot < 30) {
+        lowerVdot = upperVdot = 30;
+      } else if (vdot > 85) {
+        lowerVdot = upperVdot = 85;
+      }
+      
+      // 선형 보간으로 정확한 페이스 계산
+      let paces;
+      if (lowerVdot === upperVdot) {
+        paces = vdotPaceTable[lowerVdot];
+      } else {
+        const ratio = (vdot - lowerVdot) / (upperVdot - lowerVdot);
+        const lowerPaces = vdotPaceTable[lowerVdot];
+        const upperPaces = vdotPaceTable[upperVdot];
+        
+        paces = {
+          easy: {
+            min: Math.round(lowerPaces.easy.min - (lowerPaces.easy.min - upperPaces.easy.min) * ratio),
+            max: Math.round(lowerPaces.easy.max - (lowerPaces.easy.max - upperPaces.easy.max) * ratio)
+          },
+          marathon: Math.round(lowerPaces.marathon - (lowerPaces.marathon - upperPaces.marathon) * ratio),
+          threshold: Math.round(lowerPaces.threshold - (lowerPaces.threshold - upperPaces.threshold) * ratio),
+          interval: Math.round(lowerPaces.interval - (lowerPaces.interval - upperPaces.interval) * ratio),
+          repetition: Math.round(lowerPaces.repetition - (lowerPaces.repetition - upperPaces.repetition) * ratio)
+        };
+      }
+      
+      // 조건에 따른 조정 적용
+      const adj = userProfile.adjustments.pace;
+      if (adj !== 1.0) {
+        Object.keys(paces).forEach(key => {
+          if (key === 'easy') {
+            paces.easy.min = Math.round(paces.easy.min * adj);
+            paces.easy.max = Math.round(paces.easy.max * adj);
+          } else {
+            paces[key] = Math.round(paces[key] * adj);
+          }
+        });
+      }
       
       return paces;
     }
