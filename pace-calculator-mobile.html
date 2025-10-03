@@ -620,7 +620,7 @@
         
         const distanceMeters = [100, 200, 400, 800, 1000, 3000, 5000, 10000, 15000, 21097.5, 30000, 42195];
         distanceMeters.forEach((distance, i) => {
-          const time = (seconds / 1000) * distance;
+          const time = (seconds / 1000) * distance;  // seconds는 이미 km당 초 단위이므로 1000으로 나누어 미터당 시간 계산
           let cellClass = '';
           if (i === 6) cellClass = 'bg-yellow-50';
           if (i === 7) cellClass = 'bg-green-50';
