@@ -211,17 +211,26 @@
         
         // force 파라미터가 없고, 메인 페이지에서 온 경우에만 자동 리디렉션
         if (!forceSelection && document.referrer.includes('index.html')) {
-          // 1초 후 자동 리디렉션 (사용자가 다른 버전을 선택할 시간을 줌)
-          setTimeout(() => {
-            if (savedVersion === 'mobile') {
-              window.location.href = 'pace-calculator-mobile.html';
-            } else {
-              window.location.href = 'pace-calculator.html';
+          // 카운트다운 표시
+          let countdown = 5;
+          const countdownInterval = setInterval(() => {
+            savedVersionText.innerHTML = `현재 <strong>${savedVersion === 'mobile' ? '모바일' : 'PC'}</strong> 버전이 선택되어 있습니다.<br>
+              <span class="text-sm text-gray-600">${countdown}초 후 마지막으로 선택했던 환경으로 이동합니다...</span>`;
+            countdown--;
+            
+            if (countdown < 0) {
+              clearInterval(countdownInterval);
+              if (savedVersion === 'mobile') {
+                window.location.href = 'pace-calculator-mobile.html';
+              } else {
+                window.location.href = 'pace-calculator.html';
+              }
             }
           }, 1000);
           
-          // 자동 리디렉션 안내 표시
-          savedVersionText.textContent += ' (자동 이동 중...)';
+          // 초기 메시지 설정
+          savedVersionText.innerHTML = `현재 <strong>${savedVersion === 'mobile' ? '모바일' : 'PC'}</strong> 버전이 선택되어 있습니다.<br>
+            <span class="text-sm text-gray-600">5초 후 마지막으로 선택했던 환경으로 이동합니다...</span>`;
         }
       }
     });
