@@ -598,54 +598,189 @@
           userProfile.adjustments.intensity *= 0.85;
           break;
         case 'advanced':
-          userProfile.adjustments.volume *= 1.1;
-          userProfile.adjustments.intensity *= 1.05;
+          volumeFactors.push(1.05);    // 1.1 → 1.05
           break;
         case 'elite':
-          userProfile.adjustments.volume *= 1.2;
-          userProfile.adjustments.intensity *= 1.1;
+          volumeFactors.push(1.08);    // 1.2 → 1.08
           break;
       }
       
-      // Training phase adjustments
+      // 3. 훈련 빈도 조정 (보수적)
+      const frequency = document.getElementById('frequency').value;
+      switch(frequency) {
+        case '1-2':
+          volumeFactors.push(0.9);     // 0.6 → 0.9
+          intensityFactors.push(0.95); // 0.7 → 0.95
+          break;
+        case '5-6':
+          volumeFactors.push(1.02);    // 1.1 → 1.02
+          break;
+        case '7':
+          volumeFactors.push(1.05);    // 1.2 → 1.05
+          break;
+        case 'double':
+          volumeFactors.push(1.08);    // 1.4 → 1.08
+          intensityFactors.push(1.02); // 1.1 → 1.02
+          break;
+      }
+      
+      // 4. 훈련 단계 조정
       switch(userProfile.trainingPhase) {
         case 'base':
-          userProfile.adjustments.volume *= 1.1;
-          userProfile.adjustments.intensity *= 0.85;
+          volumeFactors.push(1.05);
+          intensityFactors.push(0.9);
           break;
         case 'peak':
-          userProfile.adjustments.volume *= 0.9;
-          userProfile.adjustments.intensity *= 1.1;
+          volumeFactors.push(0.95);
+          intensityFactors.push(1.05);
           break;
         case 'taper':
-          userProfile.adjustments.volume *= 0.5;
-          userProfile.adjustments.intensity *= 1.0; // 강도 유지
+          volumeFactors.push(0.6);
           break;
         case 'recovery':
-          userProfile.adjustments.volume *= 0.6;
-          userProfile.adjustments.intensity *= 0.7;
+          volumeFactors.push(0.7);
+          intensityFactors.push(0.8);
           break;
       }
       
-      // Special conditions
-      if (document.getElementById('injury_recovery').checked) {
-        userProfile.adjustments.volume *= 0.6;
-        userProfile.adjustments.intensity *= 0.7;
-        userProfile.adjustments.pace *= 1.1;
+      // 5. 사용자 컨디션 및 목적 반영
+      if (userAdjustments.condition !== 0) {
+        const conditionFactor = 1 + (userAdjustments.condition / 100);
+        paceFactors.push(1 / conditionFactor);  // 컨디션 나쁘면 페이스 느림
+        volumeFactors.push(conditionFactor);
+        intensityFactors.push(conditionFactor);
       }
       
-      if (document.getElementById('high_fatigue').checked) {
-        userProfile.adjustments.volume *= 0.8;
-        userProfile.adjustments.intensity *= 0.85;
+      // 훈련 목적별 조정
+      switch(userAdjustments.purpose) {
+        case 'recovery':
+          paceFactors.push(1.15);      // 15% 느림
+          volumeFactors.push(0.8);     // 20% 감소
+          intensityFactors.push(0.7);  // 30% 감소
+          break;
+        case 'speed':
+          paceFactors.push(0.95);      // 5% 빠름
+          volumeFactors.push(0.9);     // 10% 감소
+          intensityFactors.push(1.2);  // 20% 증가
+          break;
+        case 'race':
+          paceFactors.push(0.97);      // 3% 빠름
+          volumeFactors.push(0.85);    // 15% 감소
+          intensityFactors.push(1.1);  // 10% 증가
+          break;
       }
       
-      if (document.getElementById('altitude').checked) {
-        userProfile.adjustments.pace *= 1.03;
-        userProfile.adjustments.intensity *= 0.9;
+      // 6. 특별 상황 처리
+      userAdjustments.specials.forEach(special => {
+        switch(special) {
+          case 'sleep':
+            intensityFactors.push(0.9);
+            break;
+          case 'muscle':
+            volumeFactors.push(0.85);
+            break;
+          case 'weather':
+            paceFactors.push(1.05);
+            break;
+          case 'stress':
+            intensityFactors.push(0.9);
+            break;
+          case 'race-soon':
+            volumeFactors.push(0.7);
+            intensityFactors.push(0.8);
+            break;
+          case 'injury':
+            paceFactors.push(1.1);
+            volumeFactors.push(0.7);
+            intensityFactors.push(0.7);
+            break;
+          case 'dehydration':
+            intensityFactors.push(0.8);
+            break;
+          case 'mental':
+            intensityFactors.push(0.85);
+            break;
+          case 'altitude':
+            paceFactors.push(1.03);
+        }
+      });
+      
+      // 7. 가중 평균 계산
+      adjustments.pace = calculateWeightedAverage(paceFactors);
+      adjustments.volume = calculateWeightedAverage(volumeFactors);
+      adjustments.intensity = calculateWeightedAverage(intensityFactors);
+      
+      // 8. 최대 보정 제한 (안전 범위)
+      adjustments.pace = Math.min(Math.max(adjustments.pace, 0.90), 1.15);      // ±10-15%
+      adjustments.volume = Math.min(Math.max(adjustments.volume, 0.60), 1.20);   // -40% ~ +20%
+      adjustments.intensity = Math.min(Math.max(adjustments.intensity, 0.70), 1.15); // -30% ~ +15%
+      
+      userProfile.adjustments = adjustments;
+      return adjustments;
+    }
+    
+    // 가중 평균 계산 함수
+    function calculateWeightedAverage(factors) {
+      if (factors.length === 0) return 1.0;
+      if (factors.length === 1) return factors[0];
+      
+      // 첫 번째 요소 100%, 두 번째 50%, 세 번째 이후 25%
+      const weights = [1.0, 0.5, 0.25, 0.25, 0.25];
+      let sum = 0;
+      let weightSum = 0;
+      
+      factors.forEach((factor, i) => {
+        const weight = weights[Math.min(i, weights.length - 1)];
+        sum += factor * weight;
+        weightSum += weight;
+      });
+      
+      return sum / weightSum;
+    }
+
+    // 이모지 컨디션 설정
+    function setCondition(value) {
+      document.querySelectorAll('.condition-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'bg-purple-50', 'border-red-500', 'bg-red-50', 
+                              'border-orange-500', 'bg-orange-50', 'border-green-500', 'bg-green-50');
+      });
+      
+      const btn = document.querySelector(`.condition-btn[data-value="${value}"]`);
+      if (btn) {
+        btn.classList.add('border-purple-500', 'bg-purple-50');
       }
       
-      if (document.getElementById('hot_weather').checked) {
-        userProfile.adjustments.pace *= 1.05;
+      const conditionMap = {
+        'very-bad': -20,
+        'bad': -10,
+        'normal': 0,
+        'good': 5,
+        'excellent': 10
+      };
+      userAdjustments.condition = conditionMap[value] || 0;
+    }
+
+    // 훈련 목적 설정
+    function setPurpose(value) {
+      document.querySelectorAll('.purpose-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'bg-purple-50');
+      });
+      
+      const btn = document.querySelector(`.purpose-btn[data-value="${value}"]`);
+      if (btn) {
+        btn.classList.add('border-purple-500', 'bg-purple-50');
+      }
+      
+      userAdjustments.purpose = value;
+    }
+
+    // 특별 상황 토글
+    function toggleSpecial(type) {
+      const index = userAdjustments.specials.indexOf(type);
+      if (index > -1) {
+        userAdjustments.specials.splice(index, 1);
+      } else {
+        userAdjustments.specials.push(type);
       }
     }
 
@@ -1017,6 +1152,9 @@
       document.getElementById('intervalPace').textContent = formatPace(paces.interval);
       document.getElementById('repetitionPace').textContent = formatPace(paces.repetition);
       
+      // 보정값 표시
+      displayAdjustmentSummary();
+      
       // Generate training plans
       generateWeeklyPlan(vdot);
       generateMesocycle();
@@ -1027,6 +1165,87 @@
       document.getElementById('resultsSection').classList.remove('hidden');
       document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
     }
+    
+    // 보정값 요약 표시
+    function displayAdjustmentSummary() {
+      const adj = userProfile.adjustments;
+      const conditionEmoji = userAdjustments.condition >= 5 ? '😄' : 
+                            userAdjustments.condition >= 0 ? '😊' : 
+                            userAdjustments.condition >= -10 ? '😔' : '😫';
+      
+      let summaryHtml = `
+        <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-l-4 border-purple-400 p-4 rounded-lg mt-4">
+          <h4 class="font-bold mb-2 flex items-center">
+            <span class="text-xl mr-2">${conditionEmoji}</span>
+            적용된 맞춤 보정
+          </h4>
+          <div class="grid md:grid-cols-3 gap-3 text-sm">
+            <div class="flex items-center">
+              <span class="text-2xl mr-2">🏃</span>
+              <div>
+                <div class="font-medium">페이스 조정</div>
+                <div class="text-gray-600">${((adj.pace - 1) * 100).toFixed(0) > 0 ? '+' : ''}${((adj.pace - 1) * 100).toFixed(0)}%</div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <span class="text-2xl mr-2">📏</span>
+              <div>
+                <div class="font-medium">훈련량 조정</div>
+                <div class="text-gray-600">${((adj.volume - 1) * 100).toFixed(0) > 0 ? '+' : ''}${((adj.volume - 1) * 100).toFixed(0)}%</div>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <span class="text-2xl mr-2">💪</span>
+              <div>
+                <div class="font-medium">강도 조정</div>
+                <div class="text-gray-600">${((adj.intensity - 1) * 100).toFixed(0) > 0 ? '+' : ''}${((adj.intensity - 1) * 100).toFixed(0)}%</div>
+              </div>
+            </div>
+          </div>
+          ${(adj.pace > 1.1 || adj.volume < 0.7 || userAdjustments.specials.includes('injury')) ? 
+            `<div class="mt-3 text-sm text-orange-600 flex items-center">
+              <span class="text-lg mr-2">⚠️</span>
+              보정값이 크게 적용되었습니다. 몸 상태를 주의 깊게 관찰하며 훈련하세요!
+            </div>` : ''}
+          ${userAdjustments.specials.length > 0 ? 
+            `<div class="mt-2 text-xs text-gray-600">
+              특별 상황: ${userAdjustments.specials.map(s => {
+                const specialEmoji = {
+                  'sleep': '😴',
+                  'muscle': '💪',
+                  'weather': '🌧️',
+                  'stress': '😰',
+                  'race-soon': '🏁',
+                  'injury': '🤕',
+                  'dehydration': '💧',
+                  'mental': '🧠',
+                  'altitude': '⛰️'
+                };
+                return specialEmoji[s] || '';
+              }).join(' ')}
+            </div>` : ''}
+        </div>
+      `;
+      
+      // VDOT 결과 섹션 바로 아래에 추가
+      const vdotSection = document.querySelector('#resultsSection .bg-white');
+      const existingSummary = vdotSection.querySelector('.adjustment-summary');
+      if (existingSummary) {
+        existingSummary.remove();
+      }
+      
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'adjustment-summary';
+      summaryDiv.innerHTML = summaryHtml;
+      
+      // VDOT 점수 카드 다음에 삽입
+      const vdotCards = vdotSection.querySelector('.grid');
+      if (vdotCards && vdotCards.nextSibling) {
+        vdotSection.insertBefore(summaryDiv, vdotCards.nextSibling);
+      } else {
+        vdotSection.appendChild(summaryDiv);
+      }
+    }
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -1036,6 +1255,10 @@
       document.getElementById('weeklyVolume').value = 'moderate';
       document.getElementById('frequency').value = '5-6';
       document.getElementById('trainingPhase').value = 'build';
+      
+      // 기본 컨디션과 목적 설정
+      setCondition('normal');
+      setPurpose('base');
     });
   </script>
 </body>

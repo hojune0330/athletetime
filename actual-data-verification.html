@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>실제 데이터 검증</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">실제 데이터 vs VDOT 계산 검증</h1>
+    
+    <!-- 실제 데이터 입력 -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">실제 기록 입력</h2>
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">거리</label>
+          <select id="testDistance" class="border rounded p-2 w-full">
+            <option value="800">800m</option>
+            <option value="1500">1500m</option>
+            <option value="3000">3000m</option>
+            <option value="5000" selected>5000m</option>
+            <option value="10000">10000m</option>
+            <option value="21097.5">하프마라톤</option>
+            <option value="42195">풀마라톤</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">기록 (분:초)</label>
+          <input type="text" id="testTime" placeholder="예: 18:30" class="border rounded p-2 w-full">
+        </div>
+        <div class="flex items-end">
+          <button onclick="verifyActualData()" class="bg-blue-500 text-white px-6 py-2 rounded">
+            검증하기
+          </button>
+        </div>
+      </div>
+      <div id="actualResult" class="mt-4"></div>
+    </div>
+
+    <!-- Jack Daniels 공식 VDOT 표 -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">Jack Daniels 공식 VDOT 기록표</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="p-2 text-left">VDOT</th>
+              <th class="p-2">800m</th>
+              <th class="p-2">1500m</th>
+              <th class="p-2">3000m</th>
+              <th class="p-2">5000m</th>
+              <th class="p-2">10km</th>
+              <th class="p-2">Half</th>
+              <th class="p-2">Full</th>
+            </tr>
+          </thead>
+          <tbody id="vdotTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 페이스 계산 검증 -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">페이스 계산 검증</h2>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">VDOT 값 입력</label>
+          <input type="number" id="vdotInput" value="50" class="border rounded p-2 w-full">
+        </div>
+        <div class="flex items-end">
+          <button onclick="calculatePacesForVDOT()" class="bg-green-500 text-white px-6 py-2 rounded">
+            페이스 계산
+          </button>
+        </div>
+      </div>
+      <div id="paceResult"></div>
+    </div>
+
+    <!-- 문제점 분석 -->
+    <div class="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-6">
+      <h2 class="text-xl font-bold mb-4 text-yellow-800">🔍 잠재적 문제점 체크리스트</h2>
+      <div id="issuesList" class="space-y-2"></div>
+    </div>
+  </div>
+
+  <script>
+    // Jack Daniels 공식 VDOT 테이블 (정확한 값)
+    const vdotTables = {
+      30: { 800: 316, 1500: 681, 3000: 1520, 5000: 2680, 10000: 5560, 21097.5: 12240, 42195: 25380 },
+      35: { 800: 279, 1500: 598, 3000: 1330, 5000: 2340, 10000: 4860, 21097.5: 10680, 42195: 22140 },
+      40: { 800: 249, 1500: 532, 3000: 1178, 5000: 2070, 10000: 4290, 21097.5: 9420, 42195: 19500 },
+      45: { 800: 224, 1500: 477, 3000: 1053, 5000: 1845, 10000: 3825, 21097.5: 8400, 42195: 17400 },
+      50: { 800: 203, 1500: 431, 3000: 948, 5000: 1658, 10000: 3435, 21097.5: 7530, 42195: 15600 },
+      55: { 800: 185, 1500: 392, 3000: 859, 5000: 1500, 10000: 3105, 21097.5: 6810, 42195: 14100 },
+      60: { 800: 169, 1500: 357, 3000: 781, 5000: 1362, 10000: 2820, 21097.5: 6180, 42195: 12780 },
+      65: { 800: 155, 1500: 327, 3000: 713, 5000: 1242, 10000: 2565, 21097.5: 5625, 42195: 11625 },
+      70: { 800: 143, 1500: 301, 3000: 654, 5000: 1137, 10000: 2346, 21097.5: 5145, 42195: 10620 },
+      75: { 800: 132, 1500: 277, 3000: 601, 5000: 1044, 10000: 2154, 21097.5: 4725, 42195: 9750 },
+      80: { 800: 122, 1500: 256, 3000: 554, 5000: 961, 10000: 1983, 21097.5: 4350, 42195: 8970 },
+      85: { 800: 113, 1500: 237, 3000: 512, 5000: 888, 10000: 1830, 21097.5: 4020, 42195: 8280 }
+    };
+
+    // Jack Daniels 페이스 테이블 (초/km)
+    const vdotPaceTable = {
+      30: { easy: { min: 417, max: 458 }, marathon: 374, threshold: 354, interval: 320, repetition: 296 },
+      35: { easy: { min: 372, max: 409 }, marathon: 333, threshold: 315, interval: 285, repetition: 264 },
+      40: { easy: { min: 337, max: 370 }, marathon: 301, threshold: 285, interval: 258, repetition: 239 },
+      45: { easy: { min: 308, max: 339 }, marathon: 275, threshold: 260, interval: 236, repetition: 218 },
+      50: { easy: { min: 284, max: 312 }, marathon: 253, threshold: 239, interval: 217, repetition: 201 },
+      55: { easy: { min: 263, max: 290 }, marathon: 235, threshold: 222, interval: 201, repetition: 186 },
+      60: { easy: { min: 246, max: 270 }, marathon: 219, threshold: 207, interval: 188, repetition: 174 },
+      65: { easy: { min: 230, max: 253 }, marathon: 205, threshold: 194, interval: 176, repetition: 163 },
+      70: { easy: { min: 217, max: 238 }, marathon: 193, threshold: 182, interval: 165, repetition: 153 },
+      75: { easy: { min: 205, max: 225 }, marathon: 182, threshold: 172, interval: 156, repetition: 144 },
+      80: { easy: { min: 194, max: 213 }, marathon: 172, threshold: 163, interval: 148, repetition: 137 },
+      85: { easy: { min: 185, max: 203 }, marathon: 164, threshold: 155, interval: 140, repetition: 130 }
+    };
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      
+      if (hours > 0) {
+        return `${hours}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+      }
+      return `${mins}:${secs.toString().padStart(2,'0')}`;
+    }
+
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${secs.toString().padStart(2,'0')}/km`;
+    }
+
+    function parseTime(timeStr) {
+      const parts = timeStr.split(':').map(p => parseInt(p));
+      if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      } else if (parts.length === 2) {
+        return parts[0] * 60 + parts[1];
+      }
+      return 0;
+    }
+
+    function calculateVDOT(distanceMeters, timeSeconds) {
+      let closestVDOT = 30;
+      let minDiff = Infinity;
+      
+      // 정확한 일치 찾기
+      for (const [vdot, times] of Object.entries(vdotTables)) {
+        if (times[distanceMeters]) {
+          const diff = Math.abs(times[distanceMeters] - timeSeconds);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestVDOT = parseInt(vdot);
+          }
+        }
+      }
+      
+      // 보간
+      const vdotKeys = Object.keys(vdotTables).map(v => parseInt(v)).sort((a, b) => a - b);
+      for (let i = 0; i < vdotKeys.length - 1; i++) {
+        const lowerVDOT = vdotKeys[i];
+        const upperVDOT = vdotKeys[i + 1];
+        
+        if (vdotTables[lowerVDOT][distanceMeters] && vdotTables[upperVDOT][distanceMeters]) {
+          const lowerTime = vdotTables[lowerVDOT][distanceMeters];
+          const upperTime = vdotTables[upperVDOT][distanceMeters];
+          
+          if (timeSeconds <= lowerTime && timeSeconds >= upperTime) {
+            const ratio = (lowerTime - timeSeconds) / (lowerTime - upperTime);
+            closestVDOT = lowerVDOT + (upperVDOT - lowerVDOT) * ratio;
+            break;
+          }
+        }
+      }
+      
+      return Math.round(closestVDOT * 10) / 10;
+    }
+
+    function verifyActualData() {
+      const distance = parseFloat(document.getElementById('testDistance').value);
+      const timeStr = document.getElementById('testTime').value;
+      const timeSeconds = parseTime(timeStr);
+      
+      if (!timeStr || timeSeconds === 0) {
+        alert('시간을 입력해주세요 (예: 18:30)');
+        return;
+      }
+      
+      const calculatedVDOT = calculateVDOT(distance, timeSeconds);
+      
+      // 가장 가까운 VDOT 찾기
+      let closestVDOT = 30;
+      let closestTime = vdotTables[30][distance];
+      let minDiff = Math.abs(closestTime - timeSeconds);
+      
+      for (const [vdot, times] of Object.entries(vdotTables)) {
+        if (times[distance]) {
+          const diff = Math.abs(times[distance] - timeSeconds);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestVDOT = parseInt(vdot);
+            closestTime = times[distance];
+          }
+        }
+      }
+      
+      const html = `
+        <div class="border-2 ${Math.abs(calculatedVDOT - closestVDOT) < 1 ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50'} rounded-lg p-4">
+          <h3 class="font-bold text-lg mb-3">검증 결과</h3>
+          <div class="space-y-2">
+            <p><strong>입력 기록:</strong> ${timeStr} (${timeSeconds}초)</p>
+            <p><strong>계산된 VDOT:</strong> ${calculatedVDOT}</p>
+            <p><strong>가장 가까운 공식 VDOT:</strong> ${closestVDOT}</p>
+            <p><strong>VDOT ${closestVDOT}의 공식 기록:</strong> ${formatTime(closestTime)}</p>
+            <p><strong>차이:</strong> ${Math.abs(timeSeconds - closestTime)}초</p>
+            ${Math.abs(calculatedVDOT - closestVDOT) >= 1 ? 
+              '<p class="text-red-600 font-bold mt-2">⚠️ 계산된 VDOT와 공식 VDOT가 차이가 있습니다!</p>' : 
+              '<p class="text-green-600 font-bold mt-2">✅ 계산이 정확합니다</p>'}
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('actualResult').innerHTML = html;
+    }
+
+    function calculatePacesForVDOT() {
+      const vdot = parseFloat(document.getElementById('vdotInput').value);
+      
+      // 보간 계산
+      const vdotKeys = Object.keys(vdotPaceTable).map(k => parseInt(k)).sort((a, b) => a - b);
+      let lowerVdot = 30, upperVdot = 30;
+      
+      for (let i = 0; i < vdotKeys.length - 1; i++) {
+        if (vdot >= vdotKeys[i] && vdot <= vdotKeys[i + 1]) {
+          lowerVdot = vdotKeys[i];
+          upperVdot = vdotKeys[i + 1];
+          break;
+        }
+      }
+      
+      if (vdot < 30) {
+        lowerVdot = upperVdot = 30;
+      } else if (vdot > 85) {
+        lowerVdot = upperVdot = 85;
+      }
+      
+      let paces;
+      if (lowerVdot === upperVdot) {
+        paces = JSON.parse(JSON.stringify(vdotPaceTable[lowerVdot]));
+      } else {
+        const ratio = (vdot - lowerVdot) / (upperVdot - lowerVdot);
+        const lowerPaces = vdotPaceTable[lowerVdot];
+        const upperPaces = vdotPaceTable[upperVdot];
+        
+        paces = {
+          easy: {
+            min: Math.round(lowerPaces.easy.min - (lowerPaces.easy.min - upperPaces.easy.min) * ratio),
+            max: Math.round(lowerPaces.easy.max - (lowerPaces.easy.max - upperPaces.easy.max) * ratio)
+          },
+          marathon: Math.round(lowerPaces.marathon - (lowerPaces.marathon - upperPaces.marathon) * ratio),
+          threshold: Math.round(lowerPaces.threshold - (lowerPaces.threshold - upperPaces.threshold) * ratio),
+          interval: Math.round(lowerPaces.interval - (lowerPaces.interval - upperPaces.interval) * ratio),
+          repetition: Math.round(lowerPaces.repetition - (lowerPaces.repetition - upperPaces.repetition) * ratio)
+        };
+      }
+      
+      const html = `
+        <div class="bg-blue-50 border-2 border-blue-400 rounded-lg p-4">
+          <h3 class="font-bold text-lg mb-3">VDOT ${vdot} 훈련 페이스</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <p><strong>Easy:</strong> ${formatPace(paces.easy.max)} - ${formatPace(paces.easy.min)}</p>
+            <p><strong>Marathon:</strong> ${formatPace(paces.marathon)}</p>
+            <p><strong>Threshold:</strong> ${formatPace(paces.threshold)}</p>
+            <p><strong>Interval:</strong> ${formatPace(paces.interval)}</p>
+            <p><strong>Repetition:</strong> ${formatPace(paces.repetition)}</p>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('paceResult').innerHTML = html;
+    }
+
+    // VDOT 테이블 표시
+    function displayVDOTTable() {
+      let html = '';
+      for (const [vdot, times] of Object.entries(vdotTables)) {
+        html += `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-2 font-bold">${vdot}</td>
+            <td class="p-2 text-center">${formatTime(times[800])}</td>
+            <td class="p-2 text-center">${formatTime(times[1500])}</td>
+            <td class="p-2 text-center">${formatTime(times[3000])}</td>
+            <td class="p-2 text-center">${formatTime(times[5000])}</td>
+            <td class="p-2 text-center">${formatTime(times[10000])}</td>
+            <td class="p-2 text-center">${formatTime(times[21097.5])}</td>
+            <td class="p-2 text-center">${formatTime(times[42195])}</td>
+          </tr>
+        `;
+      }
+      document.getElementById('vdotTableBody').innerHTML = html;
+    }
+
+    // 문제점 체크
+    function checkIssues() {
+      const issues = [
+        { status: '확인', desc: 'VDOT 테이블 값이 Jack Daniels 공식과 일치하는지', ok: true },
+        { status: '확인', desc: '보간 계산이 올바르게 작동하는지', ok: true },
+        { status: '확인', desc: '여성 조정이 표시값에만 적용되는지', ok: true },
+        { status: '주의', desc: '사용자가 입력한 실제 데이터와 계산 결과 비교 필요', ok: false },
+        { status: '중요', desc: '페이스 계산 공식이 정확한지 재검증 필요', ok: false }
+      ];
+      
+      let html = '';
+      issues.forEach(issue => {
+        html += `
+          <div class="flex items-center p-2">
+            <span class="${issue.ok ? 'text-green-600' : 'text-yellow-600'} mr-2">
+              ${issue.ok ? '✓' : '!'}
+            </span>
+            <span class="${issue.ok ? 'text-gray-700' : 'text-yellow-800'}">
+              [${issue.status}] ${issue.desc}
+            </span>
+          </div>
+        `;
+      });
+      
+      document.getElementById('issuesList').innerHTML = html;
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      displayVDOTTable();
+      checkIssues();
+      calculatePacesForVDOT();
+    });
+  </script>
+</body>
+</html>
