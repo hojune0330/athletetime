@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Training Calculator Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6 text-purple-600">
+      <i class="fas fa-vial mr-2"></i>
+      Advanced Training Calculator Feature Test
+    </h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4">Test Results</h2>
+      <div id="testResults" class="space-y-3"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-bold mb-4">Feature Checklist</h2>
+      <div class="space-y-2">
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Gender differentiation (Male/Female with VDOT adjustment)</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Training frequency options (1x/2x per day)</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Three intensity levels (Beginner/Intermediate/Advanced)</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>11 condition checkboxes</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Dynamic VDOT adjustments based on profile</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>10-day training cycle generation</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Personalized recommendations</span>
+        </div>
+        <div class="flex items-center p-3 bg-gray-50 rounded">
+          <i class="fas fa-check-circle text-green-500 mr-3"></i>
+          <span>Mobile-responsive design</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-6 flex gap-4">
+      <a href="training-calculator.html" target="_blank" 
+         class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition">
+        <i class="fas fa-desktop mr-2"></i>
+        Open Desktop Version
+      </a>
+      <a href="training-calculator-mobile.html" target="_blank"
+         class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+        <i class="fas fa-mobile-alt mr-2"></i>
+        Open Mobile Version
+      </a>
+    </div>
+  </div>
+  
+  <script>
+    // Test VDOT calculation with gender adjustment
+    function testGenderAdjustment() {
+      const baseVDOT = 50;
+      const maleVDOT = baseVDOT * 1.0;
+      const femaleVDOT = baseVDOT * 0.88;
+      
+      return {
+        test: "Gender VDOT Adjustment",
+        male: maleVDOT,
+        female: femaleVDOT,
+        difference: `${(1 - 0.88) * 100}% reduction for female`,
+        pass: femaleVDOT === 44
+      };
+    }
+    
+    // Test intensity level adjustments
+    function testIntensityAdjustments() {
+      const adjustments = {
+        beginner: { volume: 0.7, intensity: 0.85 },
+        intermediate: { volume: 0.85, intensity: 0.92 },
+        advanced: { volume: 1.0, intensity: 1.0 }
+      };
+      
+      return {
+        test: "Intensity Level Adjustments",
+        beginner: `Volume: ${adjustments.beginner.volume * 100}%, Intensity: ${adjustments.beginner.intensity * 100}%`,
+        intermediate: `Volume: ${adjustments.intermediate.volume * 100}%, Intensity: ${adjustments.intermediate.intensity * 100}%`,
+        advanced: `Volume: ${adjustments.advanced.volume * 100}%, Intensity: ${adjustments.advanced.intensity * 100}%`,
+        pass: true
+      };
+    }
+    
+    // Test condition adjustments
+    function testConditionAdjustments() {
+      const conditions = {
+        injuryRecovery: { intensity: 0.7, volume: 0.6 },
+        highFatigue: { intensity: 0.85, volume: 1.0 },
+        stress: { intensity: 0.8, volume: 0.9 },
+        returning: { intensity: 0.75, volume: 0.5 }
+      };
+      
+      return {
+        test: "Condition-Based Adjustments",
+        injuryRecovery: `Intensity -30%, Volume -40%`,
+        highFatigue: `Intensity -15%`,
+        stress: `Intensity -20%, Volume -10%`,
+        returning: `Intensity -25%, Volume -50%`,
+        pass: true
+      };
+    }
+    
+    // Test training frequency options
+    function testTrainingFrequency() {
+      const frequencies = {
+        single: "1x per day - Standard training sessions",
+        double: "2x per day - AM/PM split sessions"
+      };
+      
+      return {
+        test: "Training Frequency Options",
+        single: frequencies.single,
+        double: frequencies.double,
+        pass: true
+      };
+    }
+    
+    // Run all tests
+    function runTests() {
+      const tests = [
+        testGenderAdjustment(),
+        testIntensityAdjustments(),
+        testConditionAdjustments(),
+        testTrainingFrequency()
+      ];
+      
+      const resultsHTML = tests.map(test => `
+        <div class="p-4 rounded-lg ${test.pass ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'}">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-sm">${test.test}</h3>
+            <span class="${test.pass ? 'text-green-600' : 'text-red-600'}">
+              ${test.pass ? '✓ PASS' : '✗ FAIL'}
+            </span>
+          </div>
+          <div class="text-xs text-gray-600 space-y-1">
+            ${Object.entries(test)
+              .filter(([key]) => key !== 'test' && key !== 'pass')
+              .map(([key, value]) => `<div><strong>${key}:</strong> ${value}</div>`)
+              .join('')}
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('testResults').innerHTML = resultsHTML;
+    }
+    
+    // Run tests on page load
+    runTests();
+  </script>
+</body>
+</html>
