@@ -43,6 +43,40 @@
   </style>
 </head>
 <body class="bg-gray-50">
+  <!-- 빠른 메뉴 모달 -->
+  <div id="quickMenuModal" class="fixed inset-0 z-[1000] hidden">
+    <div class="absolute inset-0 bg-black/50" onclick="hideQuickMenu()"></div>
+    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-xl transform transition-transform translate-y-full" id="quickMenuPanel">
+      <div class="p-4">
+        <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+        <h3 class="font-bold text-lg mb-3">빠른 메뉴</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <a href="index.html" class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-home text-2xl text-blue-500"></i>
+            <span class="text-xs">홈</span>
+          </a>
+          <a href="community.html" class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-comments text-2xl text-purple-500"></i>
+            <span class="text-xs">익명게시판</span>
+          </a>
+          <a href="chat-mobile.html" class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-comment text-2xl text-pink-500"></i>
+            <span class="text-xs">실시간 채팅</span>
+          </a>
+          <a href="pace-calculator-selector.html" class="flex flex-col items-center gap-2 p-3 bg-gray-50 rounded-lg">
+            <i class="fas fa-calculator text-2xl text-green-500"></i>
+            <span class="text-xs">페이스 계산기</span>
+          </a>
+        </div>
+        <div class="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+          <div class="flex items-center justify-center gap-2">
+            <i class="fas fa-running text-orange-600"></i>
+            <span class="text-sm font-bold text-orange-700">훈련 계산기 (현재)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- 헤더 -->
   <div class="gradient-bg text-white py-4 px-3 shadow-lg">
     <div class="flex items-center justify-between">
@@ -53,9 +87,17 @@
         </h1>
         <p class="text-xs opacity-90 mt-1">VDOT 기반 과학적 훈련</p>
       </div>
-      <a href="index.html" class="bg-white/20 px-3 py-1.5 rounded-lg text-sm">
-        <i class="fas fa-home"></i>
-      </a>
+      <div class="flex items-center gap-2">
+        <a href="training-calculator.html" class="bg-white/20 px-2 py-1.5 rounded-lg text-sm" title="PC 버전">
+          <i class="fas fa-desktop"></i>
+        </a>
+        <button onclick="showQuickMenu()" class="bg-white/20 px-2 py-1.5 rounded-lg text-sm" title="빠른 메뉴">
+          <i class="fas fa-th"></i>
+        </button>
+        <a href="index.html" class="bg-white/20 px-2 py-1.5 rounded-lg text-sm">
+          <i class="fas fa-home"></i>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -637,6 +679,25 @@
       document.getElementById('resultsSection').classList.add('hidden');
       document.getElementById('heartRateZones').classList.add('hidden');
       document.getElementById('ageInput').value = '';
+    }
+    
+    // 빠른 메뉴 함수
+    function showQuickMenu() {
+      const modal = document.getElementById('quickMenuModal');
+      const panel = document.getElementById('quickMenuPanel');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        panel.classList.remove('translate-y-full');
+      }, 10);
+    }
+    
+    function hideQuickMenu() {
+      const modal = document.getElementById('quickMenuModal');
+      const panel = document.getElementById('quickMenuPanel');
+      panel.classList.add('translate-y-full');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
     }
   </script>
 </body>

@@ -219,6 +219,9 @@
         <button onclick="searchToggle()" class="p-2">
           <i class="fas fa-search"></i>
         </button>
+        <button onclick="showNavMenu()" class="p-2" title="메뉴">
+          <i class="fas fa-bars"></i>
+        </button>
         <span class="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full font-bold">BETA</span>
       </div>
     </div>
@@ -243,6 +246,45 @@
       </div>
     </div>
   </header>
+
+  <!-- Navigation Menu Modal -->
+  <div id="navMenuModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50" onclick="hideNavMenu()"></div>
+    <div class="absolute right-0 top-0 h-full w-64 bg-white shadow-xl transform transition-transform translate-x-full" id="navMenuPanel">
+      <div class="p-4 border-b">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-lg">메뉴</h3>
+          <button onclick="hideNavMenu()" class="text-gray-500">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-4 space-y-3">
+        <a href="index.html" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-home text-blue-500"></i>
+          <span>메인 홈</span>
+        </a>
+        <a href="chat-mobile.html" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-comments text-purple-500"></i>
+          <span>실시간 채팅</span>
+        </a>
+        <a href="pace-calculator-selector.html" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-calculator text-green-500"></i>
+          <span>페이스 계산기</span>
+        </a>
+        <a href="training-calculator-selector.html" class="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg">
+          <i class="fas fa-running text-orange-500"></i>
+          <span>훈련 계산기</span>
+        </a>
+        <div class="border-t pt-3 mt-3">
+          <div class="flex items-center gap-3 p-3 bg-gradient-to-r from-red-50 to-blue-50 rounded-lg">
+            <i class="fas fa-comments text-blue-600"></i>
+            <span class="font-bold text-gray-700">익명게시판 (현재)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Categories -->
   <div class="sticky top-16 z-30 bg-white border-b">
@@ -1379,6 +1421,24 @@
     // ===== 유틸리티 함수 =====
     function goBack() {
       window.location.href = 'index.html';
+    }
+    
+    function showNavMenu() {
+      const modal = document.getElementById('navMenuModal');
+      const panel = document.getElementById('navMenuPanel');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        panel.classList.remove('translate-x-full');
+      }, 10);
+    }
+    
+    function hideNavMenu() {
+      const modal = document.getElementById('navMenuModal');
+      const panel = document.getElementById('navMenuPanel');
+      panel.classList.add('translate-x-full');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
     }
     
     function escapeHtml(text) {

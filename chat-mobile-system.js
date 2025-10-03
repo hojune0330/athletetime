@@ -721,6 +721,25 @@ function goBack() {
   window.location.href = 'index.html';
 }
 
+// 네비게이션 메뉴
+function showNavMenu() {
+  const modal = document.getElementById('navMenuModal');
+  const panel = document.getElementById('navMenuPanel');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    panel.classList.remove('translate-x-full');
+  }, 10);
+}
+
+function hideNavMenu() {
+  const modal = document.getElementById('navMenuModal');
+  const panel = document.getElementById('navMenuPanel');
+  panel.classList.add('translate-x-full');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 300);
+}
+
 function toggleRoomList(show = null) {
   const panel = document.getElementById('roomListPanel');
   if (show === null) {
