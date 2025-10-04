@@ -360,7 +360,11 @@
       
       for (let i = 1; i <= 8; i++) {
         const data = calculateLaneData(i);
-        const speed = data.totalDistance / (targetTime * data.totalDistance / 400);
+        // 400m 기준 시간을 실제 거리에 맞게 보정
+        const adjustedTime = targetTime * (data.totalDistance / 400);
+        // 속도 계산 (m/s)
+        const speed = data.totalDistance / adjustedTime;
+        // 구간별 시간 계산
         const straightTime = data.straightLength / speed;
         const curveTime = data.curveLength / speed;
         

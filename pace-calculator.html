@@ -407,9 +407,7 @@
       <button onclick="switchTab('split')" id="tab-split" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
         <i class="fas fa-chart-line mr-2"></i>스플릿 계산
       </button>
-      <button onclick="switchTab('training')" id="tab-training" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
-        <i class="fas fa-running mr-2"></i>훈련 페이스
-      </button>
+
     </div>
 
     <!-- 페이스 차트 탭 -->
@@ -1145,57 +1143,7 @@
       </div>
     </div>
     
-    <!-- 훈련 페이스 탭 -->
-    <div id="training-content" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <h2 class="text-xl font-bold mb-4">
-          <i class="fas fa-running text-orange-500"></i> 훈련 페이스 계산기
-        </h2>
-        
-        <div class="bg-blue-50 rounded-lg p-4 mb-6">
-          <p class="text-blue-800">
-            <i class="fas fa-info-circle mr-2"></i>
-            기준 기록을 입력하면 <strong>Jack Daniels VDOT 방식</strong>으로 
-            과학적인 훈련 페이스를 계산해드립니다. 각 훈련 구역별로 최적화된 페이스를 제공합니다.
-          </p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">기준 거리</label>
-            <select id="baseDistance" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="1500">1500m</option>
-              <option value="3000">3000m</option>
-              <option value="5000" selected>5000m (추천)</option>
-              <option value="10000">10000m</option>
-              <option value="21097.5">하프마라톤</option>
-              <option value="42195">풀마라톤</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">기준 시간</label>
-            <div class="flex gap-2">
-              <input type="number" id="baseHours" placeholder="시" min="0" max="23" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
-              <input type="number" id="baseMinutes" placeholder="분" min="0" max="59" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
-              <input type="number" id="baseSeconds" placeholder="초" min="0" max="59" step="0.1" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
-            </div>
-          </div>
-        </div>
-        
-        <button onclick="calculateTrainingPaces()" 
-                class="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
-          훈련 페이스 계산하기
-        </button>
-        
-        <div id="trainingResults" class="mt-6 hidden">
-          <!-- 동적으로 생성됨 -->
-        </div>
-      </div>
-    </div>
+
     
   </div>
 
@@ -1817,7 +1765,8 @@
       document.getElementById('splitResults').classList.remove('hidden');
     }
 
-    // 훈련 페이스 계산
+    // 제거됨: 훈련 페이스는 별도 페이지로 이동
+    /*
     function calculateTrainingPaces() {
       const baseDistance = parseFloat(document.getElementById('baseDistance').value);
       const hours = parseInt(document.getElementById('baseHours').value) || 0;
@@ -1950,6 +1899,7 @@
       resultsDiv.innerHTML = html;
       resultsDiv.classList.remove('hidden');
     }
+    */
     
     // 뒤로가기
     function goBack() {
