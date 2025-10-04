@@ -6,6 +6,7 @@
   <title>400m 트랙 레인 계산기 | Athlete Time</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
     body {
@@ -184,6 +185,21 @@
       </div>
     </div>
 
+    <!-- Charts Section -->
+    <div class="grid md:grid-cols-2 gap-4 mt-4">
+      <!-- Distance Chart -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="font-bold mb-3 text-sm">구간별 거리 (m)</h3>
+        <canvas id="distanceChart" style="max-height: 250px;"></canvas>
+      </div>
+      
+      <!-- Time Chart -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="font-bold mb-3 text-sm">구간별 소요 시간 (초)</h3>
+        <canvas id="timeChart" style="max-height: 250px;"></canvas>
+      </div>
+    </div>
+
     <!-- Bottom Info Bar -->
     <div class="bg-white rounded-lg shadow p-4 mt-4">
       <div class="flex flex-wrap justify-between items-center text-sm">
@@ -302,6 +318,9 @@
       
       // Update table
       updateLaneTable(targetTime);
+      
+      // Update charts
+      updateCharts(targetTime);
     }
     
     function updateLaneTable(targetTime) {
@@ -326,6 +345,202 @@
           </tr>
         `;
       }
+    }
+    
+    // Chart instances
+    let distanceChartInstance = null;
+    let timeChartInstance = null;
+    
+    function updateCharts(targetTime) {
+      const laneLabels = [];
+      const straightDistances = [];
+      const curveDistances = [];
+      const straightTimes = [];
+      const curveTimes = [];
+      
+      for (let i = 1; i <= 8; i++) {
+        const data = calculateLaneData(i);
+        const speed = data.totalDistance / (targetTime * data.totalDistance / 400);
+        const straightTime = data.straightLength / speed;
+        const curveTime = data.curveLength / speed;
+        
+        laneLabels.push(`레인 ${i}`);
+        straightDistances.push(data.straightLength);
+        curveDistances.push(data.curveLength);
+        straightTimes.push(parseFloat(straightTime.toFixed(2)));
+        curveTimes.push(parseFloat(curveTime.toFixed(2)));
+      }
+      
+      // Distance Chart
+      const distanceCtx = document.getElementById('distanceChart').getContext('2d');
+      if (distanceChartInstance) {
+        distanceChartInstance.destroy();
+      }
+      
+      distanceChartInstance = new Chart(distanceCtx, {
+        type: 'bar',
+        data: {
+          labels: laneLabels,
+          datasets: [
+            {
+              label: '직선 구간',
+              data: straightDistances,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgb(59, 130, 246)',
+              borderWidth: 1
+            },
+            {
+              label: '곡선 구간',
+              data: curveDistances,
+              backgroundColor: 'rgba(239, 68, 68, 0.7)',
+              borderColor: 'rgb(239, 68, 68)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 10,
+                font: { size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}m`;
+                },
+                afterLabel: function(context) {
+                  const total = straightDistances[context.dataIndex] + curveDistances[context.dataIndex];
+                  if (context.datasetIndex === 1) {
+                    return `총 거리: ${total.toFixed(2)}m`;
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: { font: { size: 10 } }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: { font: { size: 10 } },
+              title: {
+                display: true,
+                text: '거리 (m)',
+                font: { size: 11 }
+              }
+            }
+          }
+        }
+      });
+      
+      // Time Chart
+      const timeCtx = document.getElementById('timeChart').getContext('2d');
+      if (timeChartInstance) {
+        timeChartInstance.destroy();
+      }
+      
+      timeChartInstance = new Chart(timeCtx, {
+        type: 'bar',
+        data: {
+          labels: laneLabels,
+          datasets: [
+            {
+              label: '직선 시간',
+              data: straightTimes,
+              backgroundColor: 'rgba(59, 130, 246, 0.7)',
+              borderColor: 'rgb(59, 130, 246)',
+              borderWidth: 1
+            },
+            {
+              label: '곡선 시간',
+              data: curveTimes,
+              backgroundColor: 'rgba(239, 68, 68, 0.7)',
+              borderColor: 'rgb(239, 68, 68)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 10,
+                font: { size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}초`;
+                },
+                afterLabel: function(context) {
+                  const total = straightTimes[context.dataIndex] + curveTimes[context.dataIndex];
+                  if (context.datasetIndex === 1) {
+                    return `총 시간: ${total.toFixed(2)}초`;
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              stacked: true,
+              ticks: { font: { size: 10 } }
+            },
+            y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: { font: { size: 10 } },
+              title: {
+                display: true,
+                text: '시간 (초)',
+                font: { size: 11 }
+              }
+            }
+          }
+        }
+      });
+      
+      // Highlight selected lane
+      const selectedIndex = selectedLane - 1;
+      distanceChartInstance.data.datasets.forEach(dataset => {
+        dataset.backgroundColor = dataset.data.map((_, index) => {
+          if (index === selectedIndex) {
+            return dataset.label.includes('직선') ? 
+              'rgba(59, 130, 246, 1)' : 'rgba(239, 68, 68, 1)';
+          }
+          return dataset.label.includes('직선') ? 
+            'rgba(59, 130, 246, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+        });
+      });
+      
+      timeChartInstance.data.datasets.forEach(dataset => {
+        dataset.backgroundColor = dataset.data.map((_, index) => {
+          if (index === selectedIndex) {
+            return dataset.label.includes('직선') ? 
+              'rgba(59, 130, 246, 1)' : 'rgba(239, 68, 68, 1)';
+          }
+          return dataset.label.includes('직선') ? 
+            'rgba(59, 130, 246, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+        });
+      });
+      
+      distanceChartInstance.update();
+      timeChartInstance.update();
     }
     
     // Initialize
