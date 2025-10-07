@@ -1163,82 +1163,79 @@
       <div class="bg-white rounded-lg shadow p-6 mb-4">
         <h3 class="font-bold text-xl mb-4">트랙 구간별 시간 시각화</h3>
         
-        <!-- SVG 트랙 -->
+        <!-- SVG 트랙 (실제 비율) -->
         <div class="w-full overflow-x-auto">
-          <svg viewBox="0 0 800 500" class="w-full" style="min-width: 700px; min-height: 450px;">
+          <svg viewBox="0 0 800 400" class="w-full" style="min-width: 700px; min-height: 350px;">
             <!-- 배경 -->
-            <rect width="800" height="500" fill="#f0f0f0"/>
+            <rect width="800" height="400" fill="#f0f0f0"/>
             
-            <!-- 트랙 배경 (잔디) -->
-            <rect x="50" y="50" width="700" height="400" rx="200" fill="#90EE90" opacity="0.3"/>
-            
-            <!-- 트랙 레인들 -->
+            <!-- 트랙 레인들 (먼저 그려서 잔디 아래에 위치) -->
             <g id="laneTrackLanes">
               <!-- 동적으로 생성됨 -->
             </g>
             
-            <!-- 중앙 잔디 -->
-            <rect x="200" y="200" width="400" height="100" rx="50" fill="#90EE90"/>
+            <!-- 중앙 잔디 (실제 비율) -->
+            <ellipse cx="400" cy="200" rx="211" ry="92" fill="#90EE90"/>
             
             <!-- Start/Finish 라인 -->
-            <line x1="400" y1="50" x2="400" y2="450" stroke="white" stroke-width="4"/>
-            <rect x="380" y="240" width="40" height="20" fill="black"/>
-            <text x="400" y="255" font-size="12" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
+            <line x1="505" y1="100" x2="505" y2="300" stroke="white" stroke-width="3"/>
+            <rect x="490" y="190" width="30" height="20" fill="black"/>
+            <text x="505" y="204" font-size="11" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
             
             <!-- 100m, 200m, 300m 마커 -->
             <g id="distanceMarkers">
-              <!-- 100m 지점 -->
-              <line x1="200" y1="240" x2="200" y2="260" stroke="yellow" stroke-width="3"/>
-              <text x="200" y="275" font-size="11" fill="black" text-anchor="middle" font-weight="bold">100m</text>
+              <!-- 100m 지점 (첫 번째 곡선 중간) -->
+              <circle cx="250" cy="200" r="3" fill="yellow"/>
+              <text x="250" y="190" font-size="10" fill="black" text-anchor="middle" font-weight="bold">100m</text>
               
-              <!-- 200m 지점 -->
-              <line x1="400" y1="90" x2="400" y2="110" stroke="yellow" stroke-width="3"/>
-              <text x="400" y="80" font-size="11" fill="black" text-anchor="middle" font-weight="bold">200m</text>
+              <!-- 200m 지점 (백스트레치 끝) -->
+              <circle cx="295" cy="108" r="3" fill="yellow"/>
+              <text x="295" y="98" font-size="10" fill="black" text-anchor="middle" font-weight="bold">200m</text>
               
-              <!-- 300m 지점 -->
-              <line x1="600" y1="240" x2="600" y2="260" stroke="yellow" stroke-width="3"/>
-              <text x="600" y="275" font-size="11" fill="black" text-anchor="middle" font-weight="bold">300m</text>
+              <!-- 300m 지점 (두 번째 곡선 중간) -->
+              <circle cx="550" cy="200" r="3" fill="yellow"/>
+              <text x="550" y="190" font-size="10" fill="black" text-anchor="middle" font-weight="bold">300m</text>
             </g>
             
             <!-- 구간 라벨 -->
             <g id="sectionLabels">
-              <!-- 홈스트레치 -->
-              <rect x="450" y="380" width="100" height="30" rx="5" fill="#3b82f6" opacity="0.8"/>
-              <text x="500" y="398" font-size="14" fill="white" text-anchor="middle" font-weight="bold">직선② 홈</text>
+              <!-- 홈스트레치 (하단) -->
+              <rect x="350" y="310" width="100" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
+              <text x="400" y="327" font-size="13" fill="white" text-anchor="middle" font-weight="bold">직선② 홈</text>
               
-              <!-- 백스트레치 -->
-              <rect x="250" y="90" width="100" height="30" rx="5" fill="#3b82f6" opacity="0.8"/>
-              <text x="300" y="108" font-size="14" fill="white" text-anchor="middle" font-weight="bold">직선① 백</text>
+              <!-- 백스트레치 (상단) -->
+              <rect x="350" y="65" width="100" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
+              <text x="400" y="82" font-size="13" fill="white" text-anchor="middle" font-weight="bold">직선① 백</text>
               
-              <!-- 첫 번째 곡선 -->
-              <rect x="620" y="225" width="80" height="30" rx="5" fill="#ef4444" opacity="0.8"/>
-              <text x="660" y="243" font-size="14" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
+              <!-- 첫 번째 곡선 (오른쪽) -->
+              <rect x="630" y="185" width="70" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
+              <text x="665" y="202" font-size="13" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
               
-              <!-- 두 번째 곡선 -->
-              <rect x="100" y="225" width="80" height="30" rx="5" fill="#ef4444" opacity="0.8"/>
-              <text x="140" y="243" font-size="14" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
+              <!-- 두 번째 곡선 (왼쪽) -->
+              <rect x="100" y="185" width="70" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
+              <text x="135" y="202" font-size="13" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
             </g>
             
             <!-- 진행 방향 화살표 -->
             <defs>
-              <marker id="arrowhead" markerWidth="15" markerHeight="10" refX="15" refY="5" orient="auto">
-                <polygon points="0 0, 15 5, 0 10" fill="#333" />
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
               </marker>
             </defs>
             
-            <!-- 화살표들 -->
-            <g opacity="0.7">
-              <!-- 홈스트레치 화살표 -->
-              <path d="M 420 410 L 550 410" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
-              
-              <!-- 첫 번째 곡선 화살표 -->
-              <path d="M 650 390 Q 680 250 650 110" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
-              
-              <!-- 백스트레치 화살표 -->
-              <path d="M 550 90 L 420 90" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+            <!-- 화살표들 (실제 트랙 방향) -->
+            <g opacity="0.6">
+              <!-- 홈스트레치 화살표 (시계 반대 방향) -->
+              <path d="M 480 280 L 320 280" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
               
               <!-- 두 번째 곡선 화살표 -->
-              <path d="M 150 110 Q 120 250 150 390" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+              <path d="M 295 280 Q 200 200 295 120" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+              
+              <!-- 백스트레치 화살표 -->
+              <path d="M 320 120 L 480 120" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+              
+              <!-- 첫 번째 곡선 화살표 -->
+              <path d="M 505 120 Q 600 200 505 280" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
             </g>
           </svg>
         </div>
@@ -1420,22 +1417,30 @@
       
       svg.innerHTML = '';
       
+      // 실제 트랙 비율에 맞게 조정
+      // 직선: 84.39m, 반경: 36.5m 비율 유지
+      const scaleFactor = 2.5; // 전체 크기 조정
+      const straightLength = 84.39 * scaleFactor; // 약 210px
+      const centerX = 400;
+      const centerY = 250;
+      
       // 레인 그리기
       lanes.forEach(lane => {
-        const scaleFactor = 3;
-        const centerX = 400;
-        const centerY = 250;
-        const straightLength = 84.39 * scaleFactor;
         const radius = lane.radius * scaleFactor;
         
-        // 트랙 경로 생성
+        // 실제 트랙 형태로 그리기
+        // 왼쪽 반원 중심점
+        const leftCenterX = centerX - straightLength / 2;
+        // 오른쪽 반원 중심점  
+        const rightCenterX = centerX + straightLength / 2;
+        
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const d = `
-          M ${centerX} ${centerY + radius}
-          L ${centerX - straightLength} ${centerY + radius}
-          A ${radius} ${radius} 0 0 1 ${centerX - straightLength} ${centerY - radius}
-          L ${centerX} ${centerY - radius}
-          A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius}
+          M ${leftCenterX} ${centerY - radius}
+          L ${rightCenterX} ${centerY - radius}
+          A ${radius} ${radius} 0 0 1 ${rightCenterX} ${centerY + radius}
+          L ${leftCenterX} ${centerY + radius}
+          A ${radius} ${radius} 0 0 1 ${leftCenterX} ${centerY - radius}
         `;
         
         path.setAttribute('d', d);
@@ -1445,9 +1450,15 @@
         
         // 선택된 레인에 시간 표시
         if (lane.isSelected) {
-          // 직선1 (백스트레치)
+          const scaleFactor = 2.5;
+          const straightLength = 84.39 * scaleFactor;
+          const radius = lane.radius * scaleFactor;
+          const leftCenterX = centerX - straightLength / 2;
+          const rightCenterX = centerX + straightLength / 2;
+          
+          // 직선1 (백스트레치 - 상단)
           const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text1.setAttribute('x', centerX - straightLength/2);
+          text1.setAttribute('x', centerX);
           text1.setAttribute('y', centerY - radius - 10);
           text1.setAttribute('text-anchor', 'middle');
           text1.setAttribute('class', 'track-time-text');
@@ -1455,9 +1466,9 @@
           text1.textContent = `${lane.sectionTimes.straight1.toFixed(2)}초`;
           svg.appendChild(text1);
           
-          // 곡선1
+          // 곡선1 (왼쪽)
           const text2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text2.setAttribute('x', centerX - straightLength - radius/2);
+          text2.setAttribute('x', leftCenterX - radius - 15);
           text2.setAttribute('y', centerY);
           text2.setAttribute('text-anchor', 'middle');
           text2.setAttribute('class', 'track-time-text');
@@ -1465,19 +1476,19 @@
           text2.textContent = `${lane.sectionTimes.curve1.toFixed(2)}초`;
           svg.appendChild(text2);
           
-          // 직선2 (홈스트레치)
+          // 직선2 (홈스트레치 - 하단)
           const text3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text3.setAttribute('x', centerX - straightLength/2);
+          text3.setAttribute('x', centerX);
           text3.setAttribute('y', centerY + radius + 25);
           text3.setAttribute('text-anchor', 'middle');
           text3.setAttribute('class', 'track-time-text');
           text3.setAttribute('fill', '#3b82f6');
-          text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}초`;
+          text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}춈`;
           svg.appendChild(text3);
           
-          // 곡선2
+          // 곡선2 (오른쪽)
           const text4 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text4.setAttribute('x', centerX + radius/2);
+          text4.setAttribute('x', rightCenterX + radius + 15);
           text4.setAttribute('y', centerY);
           text4.setAttribute('text-anchor', 'middle');
           text4.setAttribute('class', 'track-time-text');

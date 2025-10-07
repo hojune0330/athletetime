@@ -412,27 +412,37 @@
       svg.innerHTML = '';
       timesGroup.innerHTML = '';
       
+      // 실제 트랙 비율에 맞게 조정
+      const scaleFactor = 2.5;
+      const straightLength = 84.39 * scaleFactor; // 약 211px
+      const centerX = 400;
+      const centerY = 250;
+      
       // 레인 8부터 1까지 역순으로 그리기 (바깥쪽부터)
       for (let i = 8; i >= 1; i--) {
-        const laneOffset = (8 - i) * 15; // 레인 간격
-        const x = 100 + laneOffset;
-        const y = 100 + laneOffset;
-        const width = 600 - (laneOffset * 2);
-        const height = 300 - (laneOffset * 2);
-        const rx = 150 - laneOffset;
-        
         const isSelected = i === selectedLane;
         const strokeWidth = isSelected ? 3 : 1.5;
         const opacity = isSelected ? 1 : 0.4;
         const color = isSelected ? '#9333ea' : laneData[i-1].color;
         
-        // 레인 트랙 그리기
-        const lane = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        lane.setAttribute('x', x);
-        lane.setAttribute('y', y);
-        lane.setAttribute('width', width);
-        lane.setAttribute('height', height);
-        lane.setAttribute('rx', rx);
+        // 각 레인의 측정 반경 계산
+        const measurementRadius = getLaneMeasurementRadius(i);
+        const radius = measurementRadius * scaleFactor;
+        
+        // 실제 트랙 형태로 그리기
+        const leftCenterX = centerX - straightLength / 2;
+        const rightCenterX = centerX + straightLength / 2;
+        
+        const lane = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const d = `
+          M ${leftCenterX} ${centerY - radius}
+          L ${rightCenterX} ${centerY - radius}
+          A ${radius} ${radius} 0 0 1 ${rightCenterX} ${centerY + radius}
+          L ${leftCenterX} ${centerY + radius}
+          A ${radius} ${radius} 0 0 1 ${leftCenterX} ${centerY - radius}
+        `;
+        
+        lane.setAttribute('d', d);
         lane.setAttribute('fill', 'none');
         lane.setAttribute('stroke', color);
         lane.setAttribute('stroke-width', strokeWidth);

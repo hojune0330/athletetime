@@ -464,22 +464,19 @@
       <div class="bg-white rounded-lg shadow-sm p-4 mb-3">
         <h3 class="font-bold text-base mb-2">트랙 구간별 시간</h3>
         
-        <!-- SVG 트랙 -->
+        <!-- SVG 트랙 (실제 비율) -->
         <div class="w-full overflow-x-auto">
-          <svg viewBox="0 0 800 500" class="w-full" style="min-height: 300px;">
+          <svg viewBox="0 0 800 400" class="w-full" style="min-height: 250px;">
             <!-- 배경 -->
-            <rect width="800" height="500" fill="#f0f0f0"/>
+            <rect width="800" height="400" fill="#f0f0f0"/>
             
-            <!-- 트랙 배경 (잔디) -->
-            <rect x="50" y="50" width="700" height="400" rx="200" fill="#90EE90" opacity="0.3"/>
-            
-            <!-- 트랙 레인들 -->
+            <!-- 트랙 레인들 (먼저 그려서 잔디 아래에 위치) -->
             <g id="laneTrackLanes">
               <!-- 동적으로 생성됨 -->
             </g>
             
-            <!-- 중앙 잔디 -->
-            <rect x="200" y="200" width="400" height="100" rx="50" fill="#90EE90"/>
+            <!-- 중앙 잔디 (실제 비율) -->
+            <ellipse cx="400" cy="250" rx="169" ry="73" fill="#90EE90"/>
             
             <!-- Start/Finish 라인 -->
             <line x1="400" y1="50" x2="400" y2="450" stroke="white" stroke-width="4"/>
@@ -1143,9 +1140,15 @@
         
         // 선택된 레인에 시간 표시
         if (lane.isSelected) {
-          // 직선① (백스트레치)
+          const scaleFactor = 2.0;
+          const straightLength = 84.39 * scaleFactor;
+          const radius = lane.radius * scaleFactor;
+          const leftCenterX = centerX - straightLength / 2;
+          const rightCenterX = centerX + straightLength / 2;
+          
+          // 직선① (백스트레치 - 상단)
           const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text1.setAttribute('x', centerX - straightLength/2);
+          text1.setAttribute('x', centerX);
           text1.setAttribute('y', centerY - radius - 10);
           text1.setAttribute('text-anchor', 'middle');
           text1.setAttribute('class', 'track-time-text');
@@ -1153,9 +1156,9 @@
           text1.textContent = `${lane.sectionTimes.straight1.toFixed(2)}초`;
           svg.appendChild(text1);
           
-          // 곡선①
+          // 곡선① (왼쪽)
           const text2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text2.setAttribute('x', centerX - straightLength - radius/2);
+          text2.setAttribute('x', leftCenterX - radius - 10);
           text2.setAttribute('y', centerY);
           text2.setAttribute('text-anchor', 'middle');
           text2.setAttribute('class', 'track-time-text');
@@ -1163,19 +1166,19 @@
           text2.textContent = `${lane.sectionTimes.curve1.toFixed(2)}초`;
           svg.appendChild(text2);
           
-          // 직선② (홈스트레치)
+          // 직선② (홈스트레치 - 하단)
           const text3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text3.setAttribute('x', centerX - straightLength/2);
-          text3.setAttribute('y', centerY + radius + 25);
+          text3.setAttribute('x', centerX);
+          text3.setAttribute('y', centerY + radius + 20);
           text3.setAttribute('text-anchor', 'middle');
           text3.setAttribute('class', 'track-time-text');
           text3.setAttribute('fill', '#3b82f6');
           text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}초`;
           svg.appendChild(text3);
           
-          // 곡선②
+          // 곡선② (오른쪽)
           const text4 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text4.setAttribute('x', centerX + radius/2);
+          text4.setAttribute('x', rightCenterX + radius + 10);
           text4.setAttribute('y', centerY);
           text4.setAttribute('text-anchor', 'middle');
           text4.setAttribute('class', 'track-time-text');
