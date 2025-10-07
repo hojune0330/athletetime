@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>실시간 채팅 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* 스크롤바 스타일 */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+    
+    /* 메시지 애니메이션 */
+    @keyframes slideIn {
+      from {
+        transform: translateX(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .message-item {
+      animation: slideIn 0.3s ease-out;
+      padding: 8px 12px;
+      margin: 4px 0;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.2s;
+    }
+    
+    .message-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .own-message {
+      background: rgba(88, 101, 242, 0.2);
+      border-left: 3px solid #5865f2;
+    }
+    
+    .input-container {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .chat-input {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 24px;
+      width: 100%;
+      outline: none;
+      font-size: 14px;
+    }
+    
+    .chat-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .send-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .send-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .send-btn:active {
+      transform: scale(0.9);
+    }
+    
+    .user-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .emoji-btn {
+      padding: 4px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    
+    .emoji-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.2);
+    }
+    
+    .loading-spinner {
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="flex flex-col h-screen">
+    <!-- 헤더 -->
+    <header class="bg-gradient-to-r from-purple-600 to-pink-600 p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h1 class="text-xl font-bold">실시간 채팅</h1>
+        </div>
+        <div class="user-count">
+          <div class="live-dot"></div>
+          <span id="userCount">연결 중...</span>
+        </div>
+      </div>
+    </header>
+    
+    <!-- 채팅 영역 -->
+    <div id="chatContainer" class="flex-1 overflow-y-auto p-4">
+      <div id="messageList"></div>
+      
+      <!-- 로딩 표시 -->
+      <div id="loadingIndicator" class="flex justify-center items-center h-full">
+        <div class="text-center">
+          <div class="loading-spinner mx-auto mb-4"></div>
+          <p class="text-gray-400">채팅 연결 중...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 입력 영역 -->
+    <div class="input-container p-4">
+      <!-- 이모지 바 -->
+      <div class="flex gap-2 mb-3 overflow-x-auto pb-2">
+        <span class="emoji-btn" onclick="addEmoji('👍')">👍</span>
+        <span class="emoji-btn" onclick="addEmoji('❤️')">❤️</span>
+        <span class="emoji-btn" onclick="addEmoji('😂')">😂</span>
+        <span class="emoji-btn" onclick="addEmoji('🔥')">🔥</span>
+        <span class="emoji-btn" onclick="addEmoji('👏')">👏</span>
+        <span class="emoji-btn" onclick="addEmoji('💪')">💪</span>
+        <span class="emoji-btn" onclick="addEmoji('🏃')">🏃</span>
+        <span class="emoji-btn" onclick="addEmoji('⚡')">⚡</span>
+      </div>
+      
+      <!-- 입력 필드 -->
+      <div class="flex gap-2">
+        <input 
+          type="text" 
+          id="messageInput" 
+          class="chat-input"
+          placeholder="메시지를 입력하세요..."
+          maxlength="200"
+          disabled>
+        <button onclick="sendMessage()" class="send-btn" id="sendButton" disabled>
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 전역 변수
+    let ws = null;
+    let userId = null;
+    let username = null;
+    let messageQueue = [];
+    let reconnectTimer = null;
+    let userCount = 0;
+    
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      initializeChat();
+    });
+    
+    function initializeChat() {
+      // 사용자 ID 생성 또는 복원
+      userId = localStorage.getItem('chatUserId');
+      if (!userId) {
+        userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('chatUserId', userId);
+      }
+      
+      // 사용자명 생성 또는 복원
+      username = localStorage.getItem('chatUsername');
+      if (!username) {
+        username = generateUsername();
+        localStorage.setItem('chatUsername', username);
+      }
+      
+      // WebSocket 연결
+      connectWebSocket();
+      
+      // 이벤트 리스너
+      setupEventListeners();
+    }
+    
+    function generateUsername() {
+      const adjectives = ['빠른', '강한', '민첩한', '파워', '열정'];
+      const nouns = ['러너', '스프린터', '선수', '챔피언', '마라토너'];
+      const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+      const noun = nouns[Math.floor(Math.random() * nouns.length)];
+      const num = Math.floor(Math.random() * 999);
+      return `${adj}${noun}${num}`;
+    }
+    
+    function connectWebSocket() {
+      // 실제 WebSocket 서버가 필요하지만, 현재는 로컬 시뮬레이션
+      // 실제 구현시: ws = new WebSocket('wss://your-server.com/chat');
+      
+      simulateConnection();
+    }
+    
+    function simulateConnection() {
+      // WebSocket 연결 시뮬레이션
+      setTimeout(() => {
+        onConnected();
+        
+        // 가상의 다른 사용자 메시지 생성
+        simulateOtherUsers();
+      }, 1000);
+    }
+    
+    function onConnected() {
+      console.log('채팅 연결됨');
+      
+      // UI 업데이트
+      document.getElementById('loadingIndicator').style.display = 'none';
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendButton').disabled = false;
+      
+      // 입장 메시지
+      addSystemMessage(`${username}님이 입장했습니다.`);
+      
+      // 사용자 수 업데이트
+      updateUserCount(Math.floor(Math.random() * 50) + 10);
+    }
+    
+    function setupEventListeners() {
+      const input = document.getElementById('messageInput');
+      
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    }
+    
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      
+      if (!text) return;
+      
+      // 메시지 추가
+      addMessage({
+        id: Date.now().toString(),
+        userId: userId,
+        username: username,
+        text: text,
+        timestamp: new Date(),
+        isOwn: true
+      });
+      
+      // 입력 초기화
+      input.value = '';
+      
+      // 로컬 스토리지에 저장 (실제로는 서버로 전송)
+      saveMessage(text);
+    }
+    
+    function addMessage(data) {
+      const messageList = document.getElementById('messageList');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message-item ${data.isOwn ? 'own-message' : ''}`;
+      
+      const time = new Date(data.timestamp).toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      messageDiv.innerHTML = `
+        <div class="flex items-start gap-2">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-semibold text-sm ${data.isOwn ? 'text-purple-400' : 'text-gray-300'}">
+                ${data.username}
+              </span>
+              <span class="text-xs text-gray-500">${time}</span>
+            </div>
+            <div class="text-gray-100">${escapeHtml(data.text)}</div>
+          </div>
+        </div>
+      `;
+      
+      messageList.appendChild(messageDiv);
+      
+      // 스크롤 하단으로
+      scrollToBottom();
+      
+      // 오래된 메시지 제거 (100개 제한)
+      while (messageList.children.length > 100) {
+        messageList.removeChild(messageList.firstChild);
+      }
+    }
+    
+    function addSystemMessage(text) {
+      const messageList = document.getElementById('messageList');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'text-center my-2';
+      
+      messageDiv.innerHTML = `
+        <span class="inline-block px-3 py-1 bg-gray-800 rounded-full text-xs text-gray-400">
+          ${text}
+        </span>
+      `;
+      
+      messageList.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    function addEmoji(emoji) {
+      const input = document.getElementById('messageInput');
+      input.value += emoji;
+      input.focus();
+    }
+    
+    function updateUserCount(count) {
+      userCount = count;
+      document.getElementById('userCount').textContent = `${count}명 접속중`;
+    }
+    
+    function scrollToBottom() {
+      const container = document.getElementById('chatContainer');
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function saveMessage(text) {
+      // 로컬 스토리지에 메시지 저장
+      const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      messages.push({
+        userId: userId,
+        username: username,
+        text: text,
+        timestamp: new Date().toISOString()
+      });
+      
+      // 최근 100개만 유지
+      if (messages.length > 100) {
+        messages.splice(0, messages.length - 100);
+      }
+      
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+    }
+    
+    function loadMessages() {
+      // 저장된 메시지 로드
+      const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      messages.forEach(msg => {
+        addMessage({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+          isOwn: msg.userId === userId
+        });
+      });
+    }
+    
+    // 다른 사용자 시뮬레이션
+    function simulateOtherUsers() {
+      const messages = [
+        { username: '프로러너', text: '오늘도 화이팅! 💪' },
+        { username: '열정맨', text: '같이 뛰실 분?' },
+        { username: '스피드킹', text: '날씨 좋네요~' },
+        { username: '마라톤초보', text: '팁 좀 알려주세요!' },
+        { username: '러닝매니아', text: '10km 완주! 🏃' },
+        { username: '운동중독', text: '새벽런 가즈아!' },
+        { username: '건강러너', text: '페이스 조절이 중요해요' },
+        { username: '아침런너', text: '굿모닝~' }
+      ];
+      
+      // 5-10초마다 랜덤 메시지
+      setInterval(() => {
+        if (Math.random() > 0.7) {
+          const msg = messages[Math.floor(Math.random() * messages.length)];
+          addMessage({
+            id: Date.now().toString(),
+            userId: 'other_' + Math.random().toString(36).substr(2, 9),
+            username: msg.username,
+            text: msg.text,
+            timestamp: new Date(),
+            isOwn: false
+          });
+          
+          // 사용자 수 변동
+          updateUserCount(userCount + Math.floor(Math.random() * 5) - 2);
+        }
+      }, 7000);
+    }
+    
+    // 저장된 메시지 로드
+    setTimeout(() => {
+      loadMessages();
+    }, 1500);
+  </script>
+</body>
+</html>
