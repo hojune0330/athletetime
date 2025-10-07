@@ -944,62 +944,23 @@
       </div>
     </div>
 
-    <!-- 레인 계산기 탭 -->
+    <!-- 레인 계산기 탭 (클릭시 새 창으로 열림) -->
     <div id="lane-content" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6 card-hover">
-        <h2 class="text-xl font-bold mb-4">
-          <i class="fas fa-road text-orange-500"></i> 400m 트랙 레인별 거리 계산기
-        </h2>
-        
-        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
-          <p class="text-sm text-orange-800">
-            <strong>IAAF 공식 규격:</strong> 1레인 반경 36.5m 기준, 레인 폭 1.22m
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="text-center py-12">
+          <i class="fas fa-road text-orange-500 text-6xl mb-4"></i>
+          <h2 class="text-2xl font-bold mb-4">400m 트랙 레인별 구간 시간 계산기</h2>
+          <p class="text-gray-600 mb-6">
+            트랙 레인 계산기가 새 창에서 열립니다.
           </p>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">레인 선택</label>
-            <select id="laneNumber" onchange="calculateLane()" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-              <option value="1">1번 레인</option>
-              <option value="2">2번 레인</option>
-              <option value="3">3번 레인</option>
-              <option value="4">4번 레인</option>
-              <option value="5">5번 레인</option>
-              <option value="6">6번 레인</option>
-              <option value="7">7번 레인</option>
-              <option value="8">8번 레인</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">바퀴 수</label>
-            <input type="number" id="laps" value="1" min="0.5" step="0.5" onchange="calculateLane()" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-          </div>
-        </div>
-        
-        <div id="laneResults" class="space-y-3">
-          <!-- 결과가 여기 표시됨 -->
-        </div>
-        
-        <!-- 모든 레인 비교 테이블 -->
-        <div class="mt-6 pt-6 border-t">
-          <h3 class="font-bold mb-3">모든 레인 비교표</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-100">
-                <tr>
-                  <th class="p-2">레인</th>
-                  <th class="p-2">1바퀴(m)</th>
-                  <th class="p-2">추가거리(m)</th>
-                  <th class="p-2">비율(%)</th>
-                </tr>
-              </thead>
-              <tbody id="allLanesTable">
-                <!-- 동적으로 생성됨 -->
-              </tbody>
-            </table>
+          <button onclick="window.open('track-lane-simple.html', '_blank')" 
+                  class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg font-medium text-lg hover:opacity-90 transition">
+            <i class="fas fa-external-link-alt mr-2"></i>
+            트랙 레인 계산기 열기
+          </button>
+          <div class="mt-8 text-sm text-gray-500">
+            <p>트랙 레인별 4구간 (직선×2, 공선×2) 시간 분석</p>
+            <p>각 레인의 실제 거리와 구간별 시간 자동 계산</p>
           </div>
         </div>
       </div>
@@ -1205,8 +1166,11 @@
         generateLaneChart();
         generateSteeplechaseChart();
       } else if (tabName === 'lane') {
-        calculateLane();
-        generateAllLanesTable();
+        // 트랙 레인 계산기를 새 창에서 열기
+        window.open('track-lane-simple.html', '_blank');
+        // 차트 탭으로 돌아가기
+        switchTab('chart');
+        return;
       }
     }
 
@@ -1548,69 +1512,8 @@
       });
     }
 
-    // 레인 계산
-    function calculateLane() {
-      const laneNumber = parseInt(document.getElementById('laneNumber').value);
-      const laps = parseFloat(document.getElementById('laps').value);
-      
-      const distance = laneDistances[laneNumber];
-      const totalDistance = distance * laps;
-      const extraDistance = totalDistance - (400 * laps);
-      
-      const results = document.getElementById('laneResults');
-      results.innerHTML = `
-        <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg p-4 lane-track">
-          <div class="text-3xl font-bold mb-2">${totalDistance.toFixed(2)}m</div>
-          <div class="text-sm">
-            ${laneNumber}번 레인 × ${laps}바퀴
-          </div>
-        </div>
-        
-        <div class="bg-gray-50 rounded-lg p-4">
-          <div class="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span class="text-gray-600">1바퀴 거리:</span>
-              <span class="font-bold ml-2">${distance.toFixed(2)}m</span>
-            </div>
-            <div>
-              <span class="text-gray-600">추가 거리:</span>
-              <span class="font-bold ml-2 ${extraDistance > 0 ? 'text-red-600' : ''}">${extraDistance > 0 ? '+' : ''}${extraDistance.toFixed(2)}m</span>
-            </div>
-            <div>
-              <span class="text-gray-600">1레인 대비:</span>
-              <span class="font-bold ml-2">${((distance / 400 - 1) * 100).toFixed(1)}% 증가</span>
-            </div>
-            <div>
-              <span class="text-gray-600">레인 반경:</span>
-              <span class="font-bold ml-2">${(36.5 + (laneNumber - 1) * 1.22).toFixed(2)}m</span>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // 모든 레인 비교표 생성
-    function generateAllLanesTable() {
-      const tbody = document.getElementById('allLanesTable');
-      tbody.innerHTML = '';
-      
-      for (let lane = 1; lane <= 8; lane++) {
-        const row = tbody.insertRow();
-        const distance = laneDistances[lane];
-        const extra = distance - 400;
-        const percentage = ((distance / 400 - 1) * 100).toFixed(1);
-        
-        row.innerHTML = `
-          <td class="p-2 font-bold">${lane}번</td>
-          <td class="p-2">${distance.toFixed(2)}</td>
-          <td class="p-2 ${extra > 0 ? 'text-red-600' : ''}">${extra > 0 ? '+' : ''}${extra.toFixed(2)}</td>
-          <td class="p-2">${percentage}%</td>
-        `;
-        
-        if (lane === 1) row.className = 'bg-red-50';
-        if (lane === 8) row.className = 'bg-blue-50';
-      }
-    }
+    // 레인 계산 기능은 track-lane-simple.html로 이동
+    // calculateLane() 및 generateAllLanesTable() 함수 제거
 
     // 목표 거리 선택 변경
     document.getElementById('targetDistance').addEventListener('change', function() {
