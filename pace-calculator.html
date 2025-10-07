@@ -2165,6 +2165,15 @@
       });
       
       document.getElementById('targetResults').classList.remove('hidden');
+      
+      // 채팅에 활동 공유
+      const distanceText = distanceSelect.value === 'custom' ? 
+        `${distance}m` : distanceSelect.options[distanceSelect.selectedIndex].text;
+      shareToChat('pace_calculated', {
+        distance: distanceText,
+        pace: formatTime(pace1km) + '/km',
+        time: formatTime(totalSeconds)
+      });
     }
 
     // 스플릿 계산
@@ -2769,6 +2778,398 @@
         });
       }
     });
+    // 채팅 통합
+    function initializeChatIntegration() {
+      // 채팅 플로팅 버튼 추가
+      if (!document.getElementById('chatFab')) {
+        const chatFab = document.createElement('div');
+        chatFab.id = 'chatFab';
+        chatFab.className = 'chat-fab';
+        chatFab.innerHTML = `
+          <i class="fas fa-comments"></i>
+          <div class="chat-badge" id="chatBadge" style="display: none;">0</div>
+        `;
+        chatFab.onclick = toggleMiniChat;
+        document.body.appendChild(chatFab);
+      }
+      
+      // 미니 채팅창 추가
+      if (!document.getElementById('miniChat')) {
+        const miniChat = document.createElement('div');
+        miniChat.id = 'miniChat';
+        miniChat.className = 'mini-chat';
+        miniChat.innerHTML = `
+          <div class="mini-chat-header">
+            <span>💬 러닝톡</span>
+            <span class="chat-online">● 온라인</span>
+            <button onclick="toggleMiniChat()" style="color: white;">✕</button>
+          </div>
+          <div class="mini-chat-messages" id="miniChatMessages">
+            <div style="text-align: center; padding: 10px; color: #999;">
+              다른 러너들과 대화해보세요!
+            </div>
+          </div>
+          <div class="mini-chat-input">
+            <input type="text" id="miniChatInput" placeholder="메시지 입력..." 
+                   onkeypress="if(event.key==='Enter') sendMiniMessage()">
+            <button onclick="sendMiniMessage()">전송</button>
+          </div>
+        `;
+        document.body.appendChild(miniChat);
+      }
+      
+      // WebSocket 연결 시도
+      connectChatWebSocket();
+    }
+    
+    function toggleMiniChat() {
+      const chat = document.getElementById('miniChat');
+      const badge = document.getElementById('chatBadge');
+      
+      if (chat.classList.contains('active')) {
+        chat.classList.remove('active');
+      } else {
+        chat.classList.add('active');
+        badge.style.display = 'none';
+        document.getElementById('miniChatInput').focus();
+      }
+    }
+    
+    function sendMiniMessage() {
+      const input = document.getElementById('miniChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      const username = localStorage.getItem('username') || '나';
+      
+      // 메시지 표시
+      addMiniMessage(username, text, true);
+      
+      // WebSocket으로 전송 (연결되어 있으면)
+      if (window.chatWs && window.chatWs.readyState === WebSocket.OPEN) {
+        window.chatWs.send(JSON.stringify({
+          type: 'message',
+          data: { 
+            text, 
+            username,
+            source: 'pace-calculator',
+            timestamp: new Date().toISOString()
+          }
+        }));
+      } else if (window.chatFallback) {
+        // 폴백 모드: 로컬 스토리지에 저장
+        const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
+        messages.push({ username, text, timestamp: new Date().toISOString() });
+        if (messages.length > 100) messages.shift(); // 최대 100개 메시지 유지
+        localStorage.setItem('fallbackMessages', JSON.stringify(messages));
+      }
+      
+      input.value = '';
+    }
+    
+    // 계산기 활동을 채팅에 자동으로 공유하는 함수
+    function shareToChat(activity, details) {
+      if (!window.chatWs || window.chatWs.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      
+      const username = localStorage.getItem('username') || '익명 러너';
+      let message = '';
+      
+      switch(activity) {
+        case 'pace_calculated':
+          message = `🏃 ${details.distance}에서 ${details.pace} 페이스로 달리면 ${details.time} 걸려요!`;
+          break;
+        case 'split_generated':
+          message = `📊 ${details.distance} 스플릿 차트를 생성했어요`;
+          break;
+        case 'lane_calculated':
+          message = `🏟️ ${details.lane}번 레인 거리: ${details.distance}m`;
+          break;
+        case 'goal_set':
+          message = `🎯 목표 설정: ${details.goal}`;
+          break;
+      }
+      
+      if (message) {
+        // 자동 메시지는 조용히 전송 (UI에는 표시하지 않음)
+        window.chatWs.send(JSON.stringify({
+          type: 'activity',
+          data: {
+            text: message,
+            username,
+            activity,
+            details,
+            source: 'pace-calculator',
+            timestamp: new Date().toISOString()
+          }
+        }));
+      }
+    }
+    
+    function addMiniMessage(username, text, isOwn = false) {
+      const container = document.getElementById('miniChatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `mini-message ${isOwn ? 'own' : ''}`;
+      msgDiv.innerHTML = `
+        <strong>${username}:</strong> ${text}
+      `;
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      
+      // 채팅창이 닫혀있으면 배지 표시
+      if (!document.getElementById('miniChat').classList.contains('active') && !isOwn) {
+        const badge = document.getElementById('chatBadge');
+        const count = parseInt(badge.textContent || '0') + 1;
+        badge.textContent = count;
+        badge.style.display = 'block';
+      }
+    }
+    
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    let reconnectTimeout = null;
+    
+    function connectChatWebSocket() {
+      try {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        window.chatWs = new WebSocket(`${protocol}//${window.location.hostname}:3002`);
+        
+        window.chatWs.onopen = () => {
+          console.log('채팅 서버 연결됨');
+          reconnectAttempts = 0;
+          addMiniMessage('시스템', '채팅 서버 연결됨 ✅');
+          
+          // 사용자명 설정
+          const username = localStorage.getItem('username') || `러너${Math.floor(Math.random() * 1000)}`;
+          localStorage.setItem('username', username);
+          
+          window.chatWs.send(JSON.stringify({
+            type: 'join',
+            data: { username, page: 'pace-calculator' }
+          }));
+        };
+        
+        window.chatWs.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            switch(data.type) {
+              case 'message':
+                if (data.data) {
+                  addMiniMessage(data.data.username || '익명', data.data.text);
+                }
+                break;
+                
+              case 'user_joined':
+                addMiniMessage('시스템', `${data.data.username}님이 입장했습니다 👋`);
+                break;
+                
+              case 'user_left':
+                addMiniMessage('시스템', `${data.data.username}님이 퇴장했습니다`);
+                break;
+                
+              case 'users_online':
+                updateOnlineCount(data.data.count);
+                break;
+            }
+          } catch (e) {
+            console.error('메시지 파싱 오류:', e);
+          }
+        };
+        
+        window.chatWs.onclose = () => {
+          console.log('채팅 연결 종료');
+          addMiniMessage('시스템', '채팅 서버 연결 끊김 ⚠️');
+          
+          // 자동 재연결
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
+            
+            reconnectTimeout = setTimeout(() => {
+              console.log(`재연결 시도 ${reconnectAttempts}/${maxReconnectAttempts}`);
+              connectChatWebSocket();
+            }, delay);
+          }
+        };
+        
+        window.chatWs.onerror = (error) => {
+          console.log('채팅 연결 오류:', error);
+        };
+        
+      } catch (error) {
+        console.log('WebSocket 미지원 또는 연결 오류:', error);
+        addMiniMessage('시스템', '채팅 서버 오프라인 (로컬 모드)');
+        useFallbackChat();
+      }
+    }
+    
+    function updateOnlineCount(count) {
+      const onlineIndicator = document.querySelector('.chat-online');
+      if (onlineIndicator) {
+        onlineIndicator.textContent = `● 온라인 (${count}명)`;
+      }
+    }
+    
+    function useFallbackChat() {
+      // 로컬 스토리지 기반 폴백
+      window.chatFallback = true;
+      
+      // 기존 메시지 로드
+      const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
+      messages.forEach(msg => {
+        addMiniMessage(msg.username, msg.text);
+      });
+    }
+    
+    // 페이지 로드 시 채팅 초기화
+    setTimeout(initializeChatIntegration, 1000);
   </script>
+  
+  <style>
+    /* 채팅 통합 스타일 */
+    .chat-fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transition: all 0.3s;
+    }
+    
+    .chat-fab:hover {
+      transform: scale(1.1);
+    }
+    
+    .chat-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    
+    .mini-chat {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 320px;
+      height: 450px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+    }
+    
+    .mini-chat.active {
+      display: flex;
+    }
+    
+    .mini-chat-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 12px;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+    
+    .chat-online {
+      font-size: 12px;
+      color: #4ade80;
+    }
+    
+    .mini-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      background: #0f0f0f;
+    }
+    
+    .mini-message {
+      margin: 8px 0;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 14px;
+    }
+    
+    .mini-message.own {
+      background: rgba(102, 126, 234, 0.2);
+      margin-left: 20%;
+    }
+    
+    .mini-message strong {
+      color: #667eea;
+      font-size: 12px;
+    }
+    
+    .mini-chat-input {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: #1a1a1a;
+      border-top: 1px solid #333;
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .mini-chat-input input {
+      flex: 1;
+      padding: 8px 12px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 20px;
+      color: white;
+      font-size: 14px;
+      outline: none;
+    }
+    
+    .mini-chat-input button {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .mini-chat-input button:hover {
+      opacity: 0.9;
+    }
+    
+    @media (max-width: 640px) {
+      .mini-chat {
+        width: 90%;
+        right: 5%;
+        left: 5%;
+      }
+    }
+  </style>
 </body>
 </html>
