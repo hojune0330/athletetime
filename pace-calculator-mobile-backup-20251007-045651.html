@@ -28,31 +28,6 @@
       color: white;
     }
     
-    /* Track lane visualization styles */
-    .lane-1 { stroke: #ef4444; fill: none; }
-    .lane-2 { stroke: #f97316; fill: none; }
-    .lane-3 { stroke: #eab308; fill: none; }
-    .lane-4 { stroke: #84cc16; fill: none; }
-    .lane-5 { stroke: #22c55e; fill: none; }
-    .lane-6 { stroke: #06b6d4; fill: none; }
-    .lane-7 { stroke: #3b82f6; fill: none; }
-    .lane-8 { stroke: #8b5cf6; fill: none; }
-    
-    .lane-selected {
-      stroke-width: 3;
-      opacity: 1;
-    }
-    
-    .lane-unselected {
-      stroke-width: 1.5;
-      opacity: 0.4;
-    }
-    
-    .track-time-text {
-      font-size: 11px;
-      font-weight: bold;
-    }
-    
     /* 탭 메뉴 스크롤 */
     .tab-menu-container {
       -webkit-overflow-scrolling: touch;
@@ -424,117 +399,52 @@
 
     <!-- 레인 계산기 탭 -->
     <div id="lane-content" class="tab-content hidden">
-      <!-- 목표 시간 입력 섹션 -->
-      <div class="bg-white rounded-lg shadow-sm p-4 mb-3">
+      <div class="bg-white rounded-lg shadow-sm p-4">
         <h2 class="text-lg font-bold mb-3 flex items-center gap-2">
           <i class="fas fa-road text-orange-500"></i>
-          <span>트랙 구간별 시간 계산</span>
+          <span>400m 트랙 레인별 거리 계산</span>
         </h2>
         
-        <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-3 mb-4 rounded">
+          <p class="text-xs text-orange-800">
+            <strong>IAAF 공식 규격:</strong> 1레인 반경 36.5m, 레인 폭 1.22m
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mb-4">
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">400m 목표 시간 (초)</label>
-            <input type="number" id="laneTargetTime" value="72" min="30" max="120" step="0.1"
-                   class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
+            <label class="block text-xs font-semibold text-gray-700 mb-1">레인 선택</label>
+            <select id="laneNumber" onchange="calculateLane()" class="input-field text-sm">
+              <option value="1">1번 레인</option>
+              <option value="2">2번 레인</option>
+              <option value="3">3번 레인</option>
+              <option value="4">4번 레인</option>
+              <option value="5">5번 레인</option>
+              <option value="6">6번 레인</option>
+              <option value="7">7번 레인</option>
+              <option value="8">8번 레인</option>
+            </select>
           </div>
           
           <div>
-            <label class="block text-xs font-semibold text-gray-700 mb-1">선택 레인</label>
-            <select id="laneLaneSelector" onchange="calculateLaneAll()" 
-                    class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <option value="1">레인 1</option>
-              <option value="2">레인 2</option>
-              <option value="3">레인 3</option>
-              <option value="4">레인 4</option>
-              <option value="5">레인 5</option>
-              <option value="6">레인 6</option>
-              <option value="7">레인 7</option>
-              <option value="8">레인 8</option>
-            </select>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">바퀴 수</label>
+            <input type="number" id="laps" value="1" min="0.5" step="0.5" onchange="calculateLane()" 
+                   class="input-field text-sm">
           </div>
         </div>
         
-        <button onclick="calculateLaneAll()" 
-                class="w-full bg-purple-600 text-white py-2 rounded text-sm font-semibold">
-          계산하기
-        </button>
-      </div>
-
-      <!-- 트랙 시각화 -->
-      <div class="bg-white rounded-lg shadow-sm p-4 mb-3">
-        <h3 class="font-bold text-base mb-2">트랙 구간별 시간</h3>
-        
-        <!-- SVG 트랙 -->
-        <div class="w-full overflow-x-auto">
-          <svg viewBox="0 0 800 500" class="w-full" style="min-height: 300px;">
-            <!-- 배경 -->
-            <rect width="800" height="500" fill="#f0f0f0"/>
-            
-            <!-- 트랙 배경 (잔디) -->
-            <rect x="50" y="50" width="700" height="400" rx="200" fill="#90EE90" opacity="0.3"/>
-            
-            <!-- 트랙 레인들 -->
-            <g id="laneTrackLanes">
-              <!-- 동적으로 생성됨 -->
-            </g>
-            
-            <!-- 중앙 잔디 -->
-            <rect x="200" y="200" width="400" height="100" rx="50" fill="#90EE90"/>
-            
-            <!-- Start/Finish 라인 -->
-            <line x1="400" y1="50" x2="400" y2="450" stroke="white" stroke-width="4"/>
-            <rect x="380" y="240" width="40" height="20" fill="black"/>
-            <text x="400" y="255" font-size="12" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
-            
-            <!-- 구간 라벨 -->
-            <g id="sectionLabels">
-              <!-- 홈스트레치 -->
-              <rect x="450" y="380" width="80" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
-              <text x="490" y="397" font-size="12" fill="white" text-anchor="middle" font-weight="bold">직선② 홈</text>
-              
-              <!-- 백스트레치 -->
-              <rect x="270" y="95" width="80" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
-              <text x="310" y="112" font-size="12" fill="white" text-anchor="middle" font-weight="bold">직선① 백</text>
-              
-              <!-- 첫 번째 곡선 -->
-              <rect x="620" y="230" width="60" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
-              <text x="650" y="247" font-size="12" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
-              
-              <!-- 두 번째 곡선 -->
-              <rect x="120" y="230" width="60" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
-              <text x="150" y="247" font-size="12" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
-            </g>
-          </svg>
-        </div>
-      </div>
-
-      <!-- 레인별 시간 테이블 -->
-      <div class="bg-white rounded-lg shadow-sm p-4">
-        <h3 class="font-bold text-base mb-2">레인별 구간 시간 분석</h3>
-        <div class="overflow-x-auto">
-          <table class="mobile-table">
-            <thead>
-              <tr>
-                <th>레인</th>
-                <th>총거리</th>
-                <th>시간</th>
-                <th>직선①</th>
-                <th>곡선①</th>
-                <th>직선②</th>
-                <th>곡선②</th>
-              </tr>
-            </thead>
-            <tbody id="laneTimeTable">
-              <!-- 동적으로 생성됨 -->
-            </tbody>
-          </table>
+        <div id="laneResults" class="space-y-3">
+          <!-- 결과가 여기 표시됨 -->
         </div>
         
-        <div class="mt-3 p-3 bg-blue-50 rounded text-xs">
-          <p class="font-semibold mb-1">💡 사용법</p>
-          <p>• 목표 시간과 레인을 선택하면 구간별 통과 시간이 계산됩니다</p>
-          <p>• 직선 구간: 84.39m × 2</p>
-          <p>• 곡선 구간: 레인별로 다름</p>
+        <!-- 전체 레인 비교표 -->
+        <div class="mt-4">
+          <h3 class="text-sm font-bold mb-2">전체 레인 비교</h3>
+          <div class="overflow-x-auto">
+            <table id="allLanesTable" class="mobile-table">
+              <!-- JavaScript로 채워짐 -->
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -654,7 +564,8 @@
         generateChart3();
         generateChart4();
       } else if (tabName === 'lane') {
-        calculateLaneAll();
+        calculateLane();
+        generateAllLanesTable();
       }
     }
 
@@ -1047,155 +958,86 @@
     }
     
     // 레인 계산기 함수
-    // 트랙 레인별 계산 함수들
-    function calculateLaneAll() {
-      const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
-      const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
+    function calculateLane() {
+      const laneNum = parseInt(document.getElementById('laneNumber').value);
+      const laps = parseFloat(document.getElementById('laps').value);
       
-      // IAAF 표준 트랙 규격
-      const STRAIGHT_LENGTH = 84.39;
-      const LANE_WIDTH = 1.22;
-      const BASE_RADIUS = 36.8; // 레인 1의 정확한 반경 (400m를 만들기 위함)
+      // IAAF 표준 레인별 거리 (정확한 값)
+      const laneDistances = {
+        1: 400.00,
+        2: 407.04,
+        3: 414.70,
+        4: 422.37,
+        5: 430.03,
+        6: 437.70,
+        7: 445.36,
+        8: 453.03
+      };
       
-      // 레인별 계산
-      const lanes = [];
-      for (let lane = 1; lane <= 8; lane++) {
-        const radius = BASE_RADIUS + (LANE_WIDTH * (lane - 1));
-        const curveLength = Math.PI * radius * 2;
-        const totalDistance = (STRAIGHT_LENGTH * 2) + curveLength;
-        const stagger = lane === 1 ? 0 : totalDistance - 400;
+      const laneDistance = laneDistances[laneNum];
+      const totalDistance = laneDistance * laps;
+      
+      const resultsDiv = document.getElementById('laneResults');
+      resultsDiv.innerHTML = `
+        <div class="result-card">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-semibold">선택한 레인</span>
+            <span class="result-badge bg-purple-100 text-purple-700">${laneNum}번 레인</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-gray-50 p-2 rounded">
+              <span class="text-gray-600">1바퀴 거리</span>
+              <p class="font-bold text-lg">${laneDistance.toFixed(2)}m</p>
+            </div>
+            <div class="bg-gray-50 p-2 rounded">
+              <span class="text-gray-600">총 거리</span>
+              <p class="font-bold text-lg">${totalDistance.toFixed(2)}m</p>
+            </div>
+            <div class="bg-blue-50 p-2 rounded">
+              <span class="text-gray-600">추가 거리</span>
+              <p class="font-bold text-lg">+${(laneDistance - 400).toFixed(2)}m</p>
+            </div>
+            <div class="bg-orange-50 p-2 rounded">
+              <span class="text-gray-600">보정 비율</span>
+              <p class="font-bold text-lg">${((laneDistance / 400) * 100).toFixed(1)}%</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 전체 레인 비교표
+    function generateAllLanesTable() {
+      const table = document.getElementById('allLanesTable');
+      let html = '<thead><tr><th>레인</th><th>1바퀴</th><th>추가거리</th><th>비율</th></tr></thead><tbody>';
+      
+      // IAAF 표준 레인별 거리
+      const laneDistances = {
+        1: 400.00,
+        2: 407.04,
+        3: 414.70,
+        4: 422.37,
+        5: 430.03,
+        6: 437.70,
+        7: 445.36,
+        8: 453.03
+      };
+      
+      for (let i = 1; i <= 8; i++) {
+        const distance = laneDistances[i];
+        const extra = distance - 400;
+        const ratio = (distance / 400) * 100;
         
-        // 구간별 거리 계산
-        const sectionDistances = {
-          straight1: STRAIGHT_LENGTH,
-          curve1: curveLength / 2,
-          straight2: STRAIGHT_LENGTH,
-          curve2: curveLength / 2
-        };
-        
-        // 구간별 시간 계산 (비율 기반)
-        const timeRatio = targetTime / 400;
-        const sectionTimes = {
-          straight1: sectionDistances.straight1 * timeRatio,
-          curve1: sectionDistances.curve1 * timeRatio,
-          straight2: sectionDistances.straight2 * timeRatio,
-          curve2: sectionDistances.curve2 * timeRatio
-        };
-        
-        lanes.push({
-          lane,
-          radius,
-          distance: totalDistance,
-          stagger,
-          adjustedTime: totalDistance * timeRatio,
-          sectionDistances,
-          sectionTimes,
-          isSelected: lane === selectedLane
-        });
+        html += `<tr class="${i === 1 ? 'bg-yellow-50' : ''}">`;
+        html += `<td>${i}번</td>`;
+        html += `<td>${distance.toFixed(2)}m</td>`;
+        html += `<td>${extra > 0 ? '+' : ''}${extra.toFixed(2)}m</td>`;
+        html += `<td>${ratio.toFixed(1)}%</td>`;
+        html += '</tr>';
       }
       
-      // 트랙 시각화 업데이트
-      drawTrackLanes(lanes, selectedLane);
-      
-      // 테이블 업데이트
-      updateLaneTable(lanes, targetTime);
-    }
-    
-    function drawTrackLanes(lanes, selectedLane) {
-      const svg = document.getElementById('laneTrackLanes');
-      if (!svg) return;
-      
-      svg.innerHTML = '';
-      
-      // 레인 그리기
-      lanes.forEach(lane => {
-        const scaleFactor = 3;
-        const centerX = 400;
-        const centerY = 250;
-        const straightLength = 84.39 * scaleFactor;
-        const radius = lane.radius * scaleFactor;
-        
-        // 트랙 경로 생성
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const d = `
-          M ${centerX} ${centerY + radius}
-          L ${centerX - straightLength} ${centerY + radius}
-          A ${radius} ${radius} 0 0 1 ${centerX - straightLength} ${centerY - radius}
-          L ${centerX} ${centerY - radius}
-          A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius}
-        `;
-        
-        path.setAttribute('d', d);
-        path.setAttribute('class', `lane-${lane.lane} ${lane.isSelected ? 'lane-selected' : 'lane-unselected'}`);
-        path.setAttribute('stroke-width', lane.isSelected ? '3' : '1.5');
-        svg.appendChild(path);
-        
-        // 선택된 레인에 시간 표시
-        if (lane.isSelected) {
-          // 직선① (백스트레치)
-          const text1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text1.setAttribute('x', centerX - straightLength/2);
-          text1.setAttribute('y', centerY - radius - 10);
-          text1.setAttribute('text-anchor', 'middle');
-          text1.setAttribute('class', 'track-time-text');
-          text1.setAttribute('fill', '#3b82f6');
-          text1.textContent = `${lane.sectionTimes.straight1.toFixed(2)}초`;
-          svg.appendChild(text1);
-          
-          // 곡선①
-          const text2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text2.setAttribute('x', centerX - straightLength - radius/2);
-          text2.setAttribute('y', centerY);
-          text2.setAttribute('text-anchor', 'middle');
-          text2.setAttribute('class', 'track-time-text');
-          text2.setAttribute('fill', '#ef4444');
-          text2.textContent = `${lane.sectionTimes.curve1.toFixed(2)}초`;
-          svg.appendChild(text2);
-          
-          // 직선② (홈스트레치)
-          const text3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text3.setAttribute('x', centerX - straightLength/2);
-          text3.setAttribute('y', centerY + radius + 25);
-          text3.setAttribute('text-anchor', 'middle');
-          text3.setAttribute('class', 'track-time-text');
-          text3.setAttribute('fill', '#3b82f6');
-          text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}초`;
-          svg.appendChild(text3);
-          
-          // 곡선②
-          const text4 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text4.setAttribute('x', centerX + radius/2);
-          text4.setAttribute('y', centerY);
-          text4.setAttribute('text-anchor', 'middle');
-          text4.setAttribute('class', 'track-time-text');
-          text4.setAttribute('fill', '#ef4444');
-          text4.textContent = `${lane.sectionTimes.curve2.toFixed(2)}초`;
-          svg.appendChild(text4);
-        }
-      });
-    }
-    
-    function updateLaneTable(lanes, targetTime) {
-      const tbody = document.getElementById('laneTimeTable');
-      if (!tbody) return;
-      
-      tbody.innerHTML = '';
-      
-      lanes.forEach(lane => {
-        const row = tbody.insertRow();
-        if (lane.isSelected) row.className = 'bg-yellow-50';
-        
-        row.innerHTML = `
-          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.lane}</td>
-          <td>${lane.distance.toFixed(1)}m</td>
-          <td class="font-bold">${lane.adjustedTime.toFixed(2)}초</td>
-          <td>${lane.sectionTimes.straight1.toFixed(2)}</td>
-          <td>${lane.sectionTimes.curve1.toFixed(2)}</td>
-          <td>${lane.sectionTimes.straight2.toFixed(2)}</td>
-          <td>${lane.sectionTimes.curve2.toFixed(2)}</td>
-        `;
-      });
-    }
+      html += '</tbody>';
+      table.innerHTML = html;
     }
     
     // 목표 페이스 계산
