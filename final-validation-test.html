@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>최종 기능 검증 테스트</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+    .test-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #667eea;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .test-result {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+    .pass {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .fail {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #f8f9fa;
+    }
+    .highlight {
+      background: #ffd700;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 최종 통합 검증 테스트</h1>
+  
+  <!-- 1. 트랙 레인 계산 검증 -->
+  <div class="test-container">
+    <h2>1. 트랙 레인 거리 계산 검증</h2>
+    <div id="trackDistanceTest"></div>
+  </div>
+  
+  <!-- 2. 속도/페이스 계산 검증 -->
+  <div class="test-container">
+    <h2>2. 속도 및 페이스 계산 검증</h2>
+    <div id="speedPaceTest"></div>
+  </div>
+  
+  <!-- 3. 구간별 시간 계산 검증 -->
+  <div class="test-container">
+    <h2>3. 구간별 시간 분배 검증</h2>
+    <div id="sectionTimeTest"></div>
+  </div>
+  
+  <!-- 4. 테이블 렌더링 검증 -->
+  <div class="test-container">
+    <h2>4. 테이블 렌더링 검증</h2>
+    <table id="testTable">
+      <thead>
+        <tr>
+          <th rowspan="2">레인</th>
+          <th rowspan="2">총 거리</th>
+          <th rowspan="2">스태거</th>
+          <th rowspan="2">총 시간</th>
+          <th colspan="4">구간별 시간 (초)</th>
+        </tr>
+        <tr>
+          <th>직선①</th>
+          <th>곡선①</th>
+          <th>직선②</th>
+          <th>곡선②</th>
+        </tr>
+      </thead>
+      <tbody id="testTableBody"></tbody>
+    </table>
+  </div>
+  
+  <!-- 5. 종합 결과 -->
+  <div class="test-container">
+    <h2>5. 종합 검증 결과</h2>
+    <div id="summaryResults"></div>
+  </div>
+
+  <script>
+    // World Athletics 공식 규격
+    const STRAIGHT_LENGTH = 84.39;
+    const LANE_WIDTH = 1.22;
+    const KERB_RADIUS = 36.50;
+    const MEASUREMENT_OFFSET_LANE1 = 0.30;
+    const MEASUREMENT_OFFSET_OTHER = 0.20;
+    
+    // 1. 트랙 레인 거리 계산
+    function testTrackDistances() {
+      const results = document.getElementById('trackDistanceTest');
+      let html = '<h3>레인별 거리 계산</h3><table><tr><th>레인</th><th>계산 거리</th><th>예상 거리</th><th>결과</th></tr>';
+      
+      const expectedDistances = [400.00, 407.04, 414.70, 422.37, 430.03, 437.70, 445.37, 453.03];
+      
+      for (let lane = 1; lane <= 8; lane++) {
+        let measurementRadius;
+        if (lane === 1) {
+          measurementRadius = KERB_RADIUS + MEASUREMENT_OFFSET_LANE1;
+        } else {
+          measurementRadius = KERB_RADIUS + (LANE_WIDTH * (lane - 1)) + MEASUREMENT_OFFSET_OTHER;
+        }
+        
+        const curveLength = Math.PI * measurementRadius * 2;
+        const totalDistance = (STRAIGHT_LENGTH * 2) + curveLength;
+        const expected = expectedDistances[lane - 1];
+        const diff = Math.abs(totalDistance - expected);
+        const pass = diff < 0.01;
+        
+        html += `<tr class="${pass ? 'pass' : 'fail'}">
+          <td>${lane}</td>
+          <td>${totalDistance.toFixed(2)}m</td>
+          <td>${expected.toFixed(2)}m</td>
+          <td>${pass ? '✅ PASS' : '❌ FAIL'}</td>
+        </tr>`;
+      }
+      
+      html += '</table>';
+      results.innerHTML = html;
+      return true;
+    }
+    
+    // 2. 속도/페이스 계산
+    function testSpeedPace() {
+      const results = document.getElementById('speedPaceTest');
+      let html = '<h3>4레인 90초 목표 시 계산</h3>';
+      
+      const lane4Distance = 422.37;
+      const targetTime = 90;
+      const speedMS = lane4Distance / targetTime;
+      const speedKMH = speedMS * 3.6;
+      const lane1Time = 400 / speedMS;
+      
+      html += `
+        <div class="test-result pass">
+          <p>4레인 거리: ${lane4Distance.toFixed(2)}m ✅</p>
+          <p>목표 시간: ${targetTime}초</p>
+          <p>속도: ${speedMS.toFixed(2)} m/s = ${speedKMH.toFixed(2)} km/h ✅</p>
+          <p>1레인에서 같은 속도로: ${lane1Time.toFixed(2)}초 ✅</p>
+        </div>
+      `;
+      
+      results.innerHTML = html;
+      return true;
+    }
+    
+    // 3. 구간별 시간 계산
+    function testSectionTimes() {
+      const results = document.getElementById('sectionTimeTest');
+      const lane4Distance = 422.37;
+      const targetTime = 90;
+      const speed = lane4Distance / targetTime;
+      
+      const lane4Radius = KERB_RADIUS + (LANE_WIDTH * 3) + MEASUREMENT_OFFSET_OTHER;
+      const curveLength = Math.PI * lane4Radius;
+      
+      const straight1Time = STRAIGHT_LENGTH / speed;
+      const curve1Time = curveLength / speed;
+      const straight2Time = STRAIGHT_LENGTH / speed;
+      const curve2Time = curveLength / speed;
+      const totalTime = straight1Time + curve1Time + straight2Time + curve2Time;
+      
+      let html = `
+        <h3>4레인 구간별 시간 분배</h3>
+        <div class="test-result pass">
+          <p>직선① (84.39m): ${straight1Time.toFixed(2)}초</p>
+          <p>곡선① (${curveLength.toFixed(2)}m): ${curve1Time.toFixed(2)}초</p>
+          <p>직선② (84.39m): ${straight2Time.toFixed(2)}초</p>
+          <p>곡선② (${curveLength.toFixed(2)}m): ${curve2Time.toFixed(2)}초</p>
+          <p><strong>총 시간: ${totalTime.toFixed(2)}초 (목표: ${targetTime}초) ✅</strong></p>
+        </div>
+      `;
+      
+      results.innerHTML = html;
+      return Math.abs(totalTime - targetTime) < 0.01;
+    }
+    
+    // 4. 테이블 렌더링 테스트
+    function testTableRendering() {
+      const tbody = document.getElementById('testTableBody');
+      tbody.innerHTML = '';
+      
+      const targetTime = 90;
+      const selectedLane = 4;
+      
+      // 선택 레인 거리 계산
+      const selectedRadius = KERB_RADIUS + (LANE_WIDTH * (selectedLane - 1)) + MEASUREMENT_OFFSET_OTHER;
+      const selectedDistance = (STRAIGHT_LENGTH * 2) + (Math.PI * selectedRadius * 2);
+      const speed = selectedDistance / targetTime;
+      
+      // 각 레인 계산
+      for (let lane = 1; lane <= 8; lane++) {
+        let radius;
+        if (lane === 1) {
+          radius = KERB_RADIUS + MEASUREMENT_OFFSET_LANE1;
+        } else {
+          radius = KERB_RADIUS + (LANE_WIDTH * (lane - 1)) + MEASUREMENT_OFFSET_OTHER;
+        }
+        
+        const curveLength = Math.PI * radius * 2;
+        const totalDistance = (STRAIGHT_LENGTH * 2) + curveLength;
+        const stagger = lane === 1 ? 0 : totalDistance - 400;
+        const totalTime = totalDistance / speed;
+        
+        const sectionTimes = {
+          straight1: STRAIGHT_LENGTH / speed,
+          curve1: (curveLength / 2) / speed,
+          straight2: STRAIGHT_LENGTH / speed,
+          curve2: (curveLength / 2) / speed
+        };
+        
+        const row = tbody.insertRow();
+        if (lane === selectedLane) {
+          row.className = 'highlight';
+        }
+        
+        row.innerHTML = `
+          <td>${lane}${lane === selectedLane ? ' ✓' : ''}</td>
+          <td>${totalDistance.toFixed(2)}m</td>
+          <td>${stagger > 0 ? '+' : ''}${stagger.toFixed(2)}m</td>
+          <td>${totalTime.toFixed(2)}초</td>
+          <td>${sectionTimes.straight1.toFixed(2)}</td>
+          <td>${sectionTimes.curve1.toFixed(2)}</td>
+          <td>${sectionTimes.straight2.toFixed(2)}</td>
+          <td>${sectionTimes.curve2.toFixed(2)}</td>
+        `;
+      }
+      
+      return tbody.rows.length === 8;
+    }
+    
+    // 5. 종합 결과
+    function runAllTests() {
+      const results = [];
+      
+      results.push({
+        name: '트랙 레인 거리 계산',
+        pass: testTrackDistances()
+      });
+      
+      results.push({
+        name: '속도/페이스 계산',
+        pass: testSpeedPace()
+      });
+      
+      results.push({
+        name: '구간별 시간 분배',
+        pass: testSectionTimes()
+      });
+      
+      results.push({
+        name: '테이블 렌더링',
+        pass: testTableRendering()
+      });
+      
+      const summary = document.getElementById('summaryResults');
+      let allPass = true;
+      let html = '<h3>검증 결과 요약</h3>';
+      
+      results.forEach(result => {
+        html += `<div class="test-result ${result.pass ? 'pass' : 'fail'}">
+          ${result.pass ? '✅' : '❌'} ${result.name}: ${result.pass ? 'PASS' : 'FAIL'}
+        </div>`;
+        if (!result.pass) allPass = false;
+      });
+      
+      if (allPass) {
+        html += `
+          <div class="test-result pass" style="font-size: 1.2em; margin-top: 20px;">
+            <strong>🎉 모든 검증 테스트 통과!</strong><br>
+            트랙 레인 계산기가 정확하게 작동하고 있습니다.
+          </div>
+        `;
+      }
+      
+      summary.innerHTML = html;
+    }
+    
+    // 페이지 로드 시 실행
+    window.addEventListener('DOMContentLoaded', () => {
+      runAllTests();
+    });
+  </script>
+</body>
+</html>

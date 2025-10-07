@@ -5,61 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>실시간 채팅 | 애슬리트 타임</title>
+  <title>라이브톡 | 애슬리트 타임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <style>
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      overscroll-behavior: none;
-      touch-action: pan-y;
     }
     
-    /* Safe area handling */
-    .safe-top { 
-      padding-top: env(safe-area-inset-top);
-      padding-top: constant(safe-area-inset-top);
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overscroll-behavior: none;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      height: -webkit-fill-available;
     }
-    .safe-bottom { 
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-bottom: constant(safe-area-inset-bottom);
-    }
+    
+    /* iOS 안전 영역 */
+    .safe-top { padding-top: env(safe-area-inset-top); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    .safe-left { padding-left: env(safe-area-inset-left); }
+    .safe-right { padding-right: env(safe-area-inset-right); }
     
     /* 스크롤 숨기기 */
-    .no-scrollbar {
+    .hide-scroll {
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
-    .no-scrollbar::-webkit-scrollbar {
+    .hide-scroll::-webkit-scrollbar {
       display: none;
     }
     
-    /* 메시지 버블 */
-    .message-bubble {
-      max-width: 75%;
-      word-break: break-word;
-    }
-    
-    .message-bubble.own {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-    
-    .message-bubble.other {
-      background: #f3f4f6;
-      color: #1f2937;
-    }
-    
-    /* 애니메이션 */
-    @keyframes slideIn {
-      from { 
-        opacity: 0; 
-        transform: translateY(10px);
+    /* 메시지 애니메이션 */
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
       }
-      to { 
-        opacity: 1; 
+      to {
         transform: translateY(0);
+        opacity: 1;
       }
     }
     
@@ -68,387 +57,696 @@
       to { opacity: 1; }
     }
     
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
     
-    .slide-in { animation: slideIn 0.3s ease-out; }
-    .fade-in { animation: fadeIn 0.2s ease-out; }
-    
-    /* 타이핑 인디케이터 */
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      background: #9ca3af;
-      border-radius: 50%;
-      animation: pulse 1.4s infinite;
+    /* 메시지 스타일 - 치지직/유튜브 스타일 */
+    .chat-message {
+      animation: slideUp 0.3s ease-out;
+      padding: 6px 12px;
+      margin: 2px 0;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      max-width: 85%;
+      word-break: break-word;
     }
     
-    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .chat-message.highlight {
+      background: linear-gradient(90deg, rgba(147, 51, 234, 0.2), rgba(236, 72, 153, 0.2));
+      border-left: 3px solid #ec4899;
+    }
     
-    /* 방 카드 */
-    .room-card {
+    /* 배지 스타일 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      margin-right: 4px;
+      text-transform: uppercase;
+    }
+    
+    .badge-streamer {
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      color: #fff;
+    }
+    
+    .badge-mod {
+      background: #10b981;
+      color: #fff;
+    }
+    
+    .badge-vip {
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      color: #000;
+    }
+    
+    .badge-fan {
+      background: #8b5cf6;
+      color: #fff;
+    }
+    
+    /* 슈퍼챗/도네이션 */
+    .donation {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #000;
+      padding: 12px;
+      margin: 8px 12px;
+      border-radius: 12px;
+      animation: heartbeat 2s infinite;
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+    }
+    
+    /* 이모티콘 플로팅 */
+    .floating-emoji {
+      position: fixed;
+      font-size: 28px;
+      animation: float-up 3s ease-out forwards;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    
+    @keyframes float-up {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* 빠른 이모티콘 바 */
+    .quick-emoji-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      overflow-x: auto;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .quick-emoji {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      font-size: 20px;
+      cursor: pointer;
       transition: all 0.2s;
     }
     
-    .room-card:active {
-      transform: scale(0.98);
+    .quick-emoji:active {
+      transform: scale(1.2);
+      background: rgba(255, 255, 255, 0.2);
     }
     
-    .room-card.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+    /* 입력창 스타일 */
+    .input-area {
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    /* 입력창 포커스 */
-    .input-focus:focus {
+    .input-field {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 10px 40px 10px 16px;
+      border-radius: 24px;
       outline: none;
-      border-color: #667eea;
+      font-size: 15px;
     }
     
-    /* 모달 백드롭 */
-    .modal-backdrop {
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+    .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.5);
     }
     
-    /* 플로팅 버튼 */
-    .fab {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    /* 온라인 인디케이터 */
-    .online-dot {
-      width: 8px;
-      height: 8px;
-      background: #10b981;
+    /* 전송 버튼 */
+    .send-button {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
       border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .send-button:active {
+      transform: translateY(-50%) scale(0.9);
+    }
+    
+    /* 실시간 인디케이터 */
+    .live-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(239, 68, 68, 0.9);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
       animation: pulse 2s infinite;
     }
     
-    /* 스와이프 힌트 */
-    .swipe-hint {
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      animation: swipe 2s infinite;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
     
-    @keyframes swipe {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
     }
     
-    /* iOS 고정 입력창 처리 */
-    .message-input-container {
-      position: fixed;
+    /* 참여자 아바타 */
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: white;
+    }
+    
+    /* 멘션 스타일 */
+    .mention {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+    
+    /* 링크 스타일 */
+    .chat-link {
+      color: #60a5fa;
+      text-decoration: underline;
+    }
+    
+    /* 채팅 속도 제한 표시 */
+    .cooldown-bar {
+      height: 2px;
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+      animation: cooldown 3s linear;
+      position: absolute;
       bottom: 0;
       left: 0;
-      right: 0;
-      background: white;
-      border-top: 1px solid #e5e7eb;
-      z-index: 30;
     }
     
-    /* 메시지 컨테이너 패딩 */
-    .messages-container {
-      padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    @keyframes cooldown {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    
+    /* 새 메시지 알림 */
+    .new-msg-pill {
+      position: fixed;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(59, 130, 246, 0.95);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      animation: bounce 2s infinite;
+      z-index: 100;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+    
+    /* 채팅 모드 토글 */
+    .chat-mode-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2px;
+    }
+    
+    .mode-option {
+      padding: 6px 12px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .mode-option.active {
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+      color: white;
     }
   </style>
 </head>
-<body class="bg-gray-50">
-  
-  <!-- 메인 컨테이너 -->
-  <div class="h-screen flex flex-col">
-    
-    <!-- 헤더 (고정) -->
-    <header class="bg-gradient-to-r from-purple-600 to-pink-600 text-white safe-top flex-shrink-0">
-      <div class="flex items-center justify-between p-4">
+<body>
+  <div class="flex flex-col h-screen">
+    <!-- 상단 헤더 -->
+    <header class="safe-top bg-gradient-to-b from-black/80 to-transparent backdrop-blur-lg fixed w-full z-50">
+      <div class="flex items-center justify-between p-3">
         <div class="flex items-center gap-3">
-          <button onclick="goBack()" class="p-1">
-            <i class="fas fa-arrow-left text-lg"></i>
+          <button onclick="history.back()" class="text-white/80">
+            <i class="fas fa-chevron-left text-lg"></i>
           </button>
           <div>
-            <h1 class="font-bold text-lg">실시간 채팅</h1>
-            <p class="text-xs opacity-90 flex items-center gap-1">
-              <span class="online-dot"></span>
-              <span id="onlineCount">1</span>명 온라인
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="toggleRoomList()" class="p-2">
-            <i class="fas fa-comments text-lg"></i>
-          </button>
-          <button onclick="showSettings()" class="p-2">
-            <i class="fas fa-cog text-lg"></i>
-          </button>
-        </div>
-      </div>
-      
-      <!-- 현재 방 정보 -->
-      <div id="currentRoomInfo" class="px-4 pb-2 border-t border-white/20">
-        <div class="flex items-center justify-between pt-2">
-          <div class="flex items-center gap-2">
-            <span id="roomIcon" class="text-xl">🏠</span>
-            <div>
-              <h2 id="roomName" class="font-medium text-sm">메인 채팅방</h2>
-              <p id="roomDesc" class="text-xs opacity-75">모두가 함께하는 공간</p>
+            <h1 class="font-bold text-sm">라이브톡</h1>
+            <div class="flex items-center gap-2">
+              <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>LIVE</span>
+              </div>
+              <span class="text-xs text-gray-400">
+                <i class="fas fa-eye mr-1"></i>
+                <span id="viewerCount">2.3K</span>
+              </span>
             </div>
           </div>
-          <span id="roomTimer" class="text-xs bg-white/20 px-2 py-1 rounded-full hidden">
-            <i class="fas fa-clock mr-1"></i><span id="timeLeft">30:00</span>
-          </span>
+        </div>
+        
+        <!-- 채팅 모드 토글 -->
+        <div class="chat-mode-toggle">
+          <div class="mode-option active" onclick="setChatMode('all')">전체</div>
+          <div class="mode-option" onclick="setChatMode('top')">인기</div>
+          <div class="mode-option" onclick="setChatMode('fan')">팬</div>
         </div>
       </div>
     </header>
-    
-    <!-- 메시지 영역 -->
-    <div class="flex-1 overflow-hidden relative">
-      <!-- Room Discovery (메인 채팅방에서만 표시) -->
-      <div id="roomDiscovery" class="bg-white border-b p-3 hidden">
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="text-xs font-bold text-gray-600">
-            <i class="fas fa-fire text-orange-500 mr-1"></i>활발한 채팅방
-          </h3>
-          <button onclick="toggleRoomDiscovery()" class="text-xs text-gray-500">
-            <i class="fas fa-chevron-down"></i>
-          </button>
+
+    <!-- 채팅 영역 -->
+    <main class="flex-1 pt-20 pb-28 overflow-hidden">
+      <div id="chatContainer" class="h-full overflow-y-auto hide-scroll px-3 py-2">
+        <!-- 시스템 메시지 -->
+        <div class="text-center py-4">
+          <div class="inline-block px-3 py-1 bg-white/10 backdrop-blur rounded-full text-xs text-gray-400">
+            채팅방에 입장하셨습니다
+          </div>
         </div>
-        <div id="activeRooms" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          <!-- 활성 룸 카드들 -->
-        </div>
+        
+        <!-- 채팅 메시지 컨테이너 -->
+        <div id="messageList"></div>
       </div>
       
-      <!-- 메시지 목록 -->
-      <div id="messagesList" class="flex-1 overflow-y-auto messages-container p-4 space-y-3">
-        <!-- 환영 메시지 -->
-        <div class="text-center py-8 fade-in">
-          <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 inline-block max-w-xs">
-            <div class="text-4xl mb-3">👋</div>
-            <h3 class="font-bold text-gray-800 mb-2">채팅에 오신 것을 환영합니다!</h3>
-            <p class="text-sm text-gray-600 mb-3">육상인들과 실시간으로 소통하세요</p>
-            <div class="bg-white/80 rounded-lg p-2 text-xs text-gray-500">
-              <i class="fas fa-info-circle text-blue-500 mr-1"></i>
-              닉네임 설정: 우측 상단 ⚙️ 설정 버튼
-            </div>
-          </div>
-        </div>
+      <!-- 새 메시지 알림 -->
+      <div id="newMessagePill" class="new-msg-pill hidden">
+        <i class="fas fa-arrow-down mr-1"></i>
+        새 메시지
+      </div>
+    </main>
+
+    <!-- 하단 입력 영역 -->
+    <footer class="input-area fixed bottom-0 w-full safe-bottom">
+      <!-- 빠른 이모티콘 바 -->
+      <div class="quick-emoji-bar hide-scroll">
+        <div class="quick-emoji" onclick="sendQuickEmoji('👍')">👍</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('❤️')">❤️</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('😂')">😂</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('🔥')">🔥</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('👏')">👏</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('💪')">💪</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('🏃')">🏃</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('⚡')">⚡</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('💯')">💯</div>
+        <div class="quick-emoji" onclick="sendQuickEmoji('🎉')">🎉</div>
       </div>
       
-      <!-- 타이핑 인디케이터 -->
-      <div id="typingIndicator" class="hidden px-4 py-2 bg-white/90 border-t">
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500">누군가 입력중</span>
-          <div class="flex gap-1">
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-          </div>
+      <!-- 텍스트 입력 -->
+      <div class="p-3 safe-left safe-right relative">
+        <div class="relative">
+          <input 
+            type="text"
+            id="messageInput"
+            class="input-field w-full"
+            placeholder="메시지 보내기..."
+            maxlength="100"
+            onkeypress="handleKeyPress(event)">
+          <button onclick="sendMessage()" class="send-button">
+            <i class="fas fa-paper-plane text-sm"></i>
+          </button>
         </div>
+        <!-- 쿨다운 바 -->
+        <div id="cooldownBar" class="cooldown-bar hidden"></div>
       </div>
-    </div>
+    </footer>
     
-    <!-- 입력 영역 (고정) -->
-    <div class="message-input-container safe-bottom">
-      <div class="p-3">
-        <div class="flex gap-2">
-          <button onclick="showEmojiPicker()" class="p-2 text-gray-600">
-            <i class="far fa-smile text-xl"></i>
-          </button>
-          <div class="flex-1 relative">
-            <textarea 
-              id="messageInput"
-              placeholder="메시지 입력..."
-              class="w-full px-3 py-2 border rounded-2xl resize-none input-focus text-sm"
-              rows="1"
-              maxlength="500"
-            ></textarea>
-            <span id="charCount" class="absolute right-2 bottom-2 text-xs text-gray-400 hidden">0/500</span>
-          </div>
-          <button onclick="sendMessage()" id="sendBtn" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl font-medium disabled:opacity-50">
-            <i class="fas fa-paper-plane"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- 이모지 플로팅 컨테이너 -->
+    <div id="floatingContainer"></div>
   </div>
-  
-  <!-- 채팅방 목록 (슬라이드 패널) -->
-  <div id="roomListPanel" class="fixed inset-0 z-40 hidden">
-    <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="toggleRoomList()"></div>
-    <div class="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white slide-in">
-      <div class="flex flex-col h-full">
-        <!-- 패널 헤더 -->
-        <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 safe-top">
-          <div class="flex items-center justify-between">
-            <h3 class="font-bold">채팅방 목록</h3>
-            <button onclick="toggleRoomList()" class="p-1">
-              <i class="fas fa-times"></i>
-            </button>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase 초기화
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKJGqP2E0qBMXZI4_4lXxcqtLLyWMNe9o",
+      authDomain: "athlete-time-community.firebaseapp.com",
+      projectId: "athlete-time-community",
+      storageBucket: "athlete-time-community.appspot.com",
+      messagingSenderId: "936784789813",
+      appId: "1:936784789813:web:1234567890abcdef"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    // 전역 변수
+    let currentUser = null;
+    let chatMode = 'all';
+    let isAtBottom = true;
+    let lastMessageTime = 0;
+    let cooldownTime = 3000; // 3초 쿨다운
+    let messageCount = 0;
+    
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeChat();
+      setupEventListeners();
+      startMockData(); // 개발용 모의 데이터
+    });
+    
+    function initializeChat() {
+      // 익명 사용자 생성
+      auth.signInAnonymously().then((result) => {
+        currentUser = {
+          uid: result.user.uid,
+          name: generateUsername(),
+          level: Math.floor(Math.random() * 30) + 1,
+          badge: getRandomBadge()
+        };
+        
+        // 실시간 메시지 구독
+        subscribeToMessages();
+        
+        // 시청자 수 업데이트
+        updateViewerCount();
+        setInterval(updateViewerCount, 5000);
+      });
+    }
+    
+    function generateUsername() {
+      const adjectives = ['빠른', '강한', '날쌘', '민첩한', '파워풀한'];
+      const nouns = ['러너', '스프린터', '마라토너', '챔피언', '선수'];
+      const number = Math.floor(Math.random() * 999);
+      return adjectives[Math.floor(Math.random() * adjectives.length)] + 
+             nouns[Math.floor(Math.random() * nouns.length)] + 
+             number;
+    }
+    
+    function getRandomBadge() {
+      const badges = [null, null, null, 'fan', 'vip', 'mod'];
+      return badges[Math.floor(Math.random() * badges.length)];
+    }
+    
+    function subscribeToMessages() {
+      // Firestore 실시간 구독
+      db.collection('liveMessages')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === 'added') {
+              const data = change.doc.data();
+              displayMessage(data);
+            }
+          });
+          
+          if (isAtBottom) {
+            scrollToBottom();
+          } else {
+            showNewMessageAlert();
+          }
+        });
+    }
+    
+    function displayMessage(data) {
+      const messageList = document.getElementById('messageList');
+      const messageDiv = document.createElement('div');
+      
+      // 메시지 타입별 스타일
+      let messageClass = 'chat-message';
+      if (data.isDonation) {
+        messageClass = 'donation';
+      } else if (data.isStreamer) {
+        messageClass += ' highlight';
+      }
+      
+      messageDiv.className = messageClass;
+      
+      // 배지 생성
+      let badgeHTML = '';
+      if (data.badge) {
+        const badgeTypes = {
+          streamer: { text: 'LIVE', class: 'badge-streamer' },
+          mod: { text: 'MOD', class: 'badge-mod' },
+          vip: { text: 'VIP', class: 'badge-vip' },
+          fan: { text: 'FAN', class: 'badge-fan' }
+        };
+        
+        if (badgeTypes[data.badge]) {
+          const badge = badgeTypes[data.badge];
+          badgeHTML = `<span class="badge ${badge.class}">${badge.text}</span>`;
+        }
+      }
+      
+      // 메시지 내용 처리 (멘션, 링크 등)
+      let processedText = escapeHtml(data.text);
+      processedText = processedText.replace(/@(\w+)/g, '<span class="mention">@$1</span>');
+      
+      // 도네이션 메시지
+      if (data.isDonation) {
+        messageDiv.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            ${badgeHTML}
+            <span class="font-bold text-sm">${data.username}</span>
+            <span class="font-bold">💰 ${data.amount?.toLocaleString()}원</span>
           </div>
-        </div>
-        
-        <!-- 새 채팅방 만들기 버튼 -->
-        <div class="p-3 border-b">
-          <button onclick="showCreateRoom()" class="w-full py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium">
-            <i class="fas fa-plus mr-2"></i>새 채팅방 만들기
-          </button>
-        </div>
-        
-        <!-- 메인 채팅방 -->
-        <div class="p-3 border-b">
-          <div onclick="selectRoom('main')" class="room-card p-3 rounded-lg border cursor-pointer" data-room="main">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="text-2xl">🏠</span>
-                <div>
-                  <h4 class="font-medium text-sm">메인 채팅방</h4>
-                  <p class="text-xs text-gray-500">모두가 함께하는 공간</p>
-                </div>
-              </div>
-              <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">HOT</span>
+          <div class="text-sm">${processedText}</div>
+        `;
+      } else {
+        // 일반 메시지
+        messageDiv.innerHTML = `
+          <div class="flex items-start gap-2">
+            <span class="text-gray-500 text-xs">Lv.${data.level || 1}</span>
+            <div class="flex-1">
+              <span class="inline-flex items-center gap-1">
+                ${badgeHTML}
+                <span class="font-semibold text-sm">${data.username}</span>
+              </span>
+              <span class="text-gray-300 text-sm ml-1">${processedText}</span>
             </div>
-            <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
-              <span><i class="fas fa-users"></i> <span id="mainUsers">0</span></span>
-              <span><i class="fas fa-comment"></i> <span id="mainMsgs">0</span></span>
-            </div>
           </div>
-        </div>
+        `;
+      }
+      
+      messageList.appendChild(messageDiv);
+      
+      // 오래된 메시지 제거 (최대 100개)
+      while (messageList.children.length > 100) {
+        messageList.removeChild(messageList.firstChild);
+      }
+      
+      // 이모지 리액션 트리거
+      if (data.text.match(/[❤️🔥👍💪]/)) {
+        const emojis = data.text.match(/[❤️🔥👍💪]/g);
+        if (emojis) {
+          triggerFloatingEmoji(emojis[0]);
+        }
+      }
+      
+      messageCount++;
+    }
+    
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      
+      if (!text) return;
+      
+      // 쿨다운 체크
+      const now = Date.now();
+      if (now - lastMessageTime < cooldownTime) {
+        showCooldown();
+        return;
+      }
+      
+      // 메시지 전송
+      db.collection('liveMessages').add({
+        username: currentUser.name,
+        text: text,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        userId: currentUser.uid,
+        level: currentUser.level,
+        badge: currentUser.badge,
+        isStreamer: false,
+        isDonation: false
+      }).then(() => {
+        input.value = '';
+        lastMessageTime = now;
+        showCooldown();
+      });
+    }
+    
+    function sendQuickEmoji(emoji) {
+      // 쿨다운 체크
+      const now = Date.now();
+      if (now - lastMessageTime < 1000) return; // 이모지는 1초 쿨다운
+      
+      db.collection('liveMessages').add({
+        username: currentUser.name,
+        text: emoji,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        userId: currentUser.uid,
+        level: currentUser.level,
+        badge: currentUser.badge,
+        isStreamer: false,
+        isDonation: false
+      });
+      
+      lastMessageTime = now;
+      triggerFloatingEmoji(emoji);
+    }
+    
+    function triggerFloatingEmoji(emoji) {
+      const container = document.getElementById('floatingContainer');
+      const emojiEl = document.createElement('div');
+      emojiEl.className = 'floating-emoji';
+      emojiEl.textContent = emoji;
+      emojiEl.style.left = Math.random() * 80 + 10 + '%';
+      emojiEl.style.bottom = '100px';
+      
+      container.appendChild(emojiEl);
+      
+      setTimeout(() => {
+        container.removeChild(emojiEl);
+      }, 3000);
+    }
+    
+    function showCooldown() {
+      const bar = document.getElementById('cooldownBar');
+      bar.classList.remove('hidden');
+      setTimeout(() => {
+        bar.classList.add('hidden');
+      }, cooldownTime);
+    }
+    
+    function setChatMode(mode) {
+      chatMode = mode;
+      document.querySelectorAll('.mode-option').forEach(el => {
+        el.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // 모드별 필터링 로직 구현
+      // 실제로는 Firebase 쿼리를 변경
+    }
+    
+    function setupEventListeners() {
+      // 스크롤 이벤트
+      const container = document.getElementById('chatContainer');
+      container.addEventListener('scroll', () => {
+        const threshold = 100;
+        isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
         
-        <!-- 사용자 생성 채팅방 목록 -->
-        <div class="flex-1 overflow-y-auto p-3">
-          <div id="userRoomsList" class="space-y-2">
-            <!-- 동적으로 채팅방 추가 -->
-          </div>
-        </div>
-        
-        <!-- 하단 안내 -->
-        <div class="p-3 border-t bg-gray-50 text-center">
-          <p class="text-xs text-gray-500">
-            <i class="fas fa-info-circle"></i> 30분간 활동이 없으면 자동 삭제
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 설정 모달 -->
-  <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="closeSettings()"></div>
-    <div class="relative bg-white rounded-2xl w-full max-w-sm slide-in">
-      <div class="p-6">
-        <h3 class="text-lg font-bold mb-4">채팅 설정</h3>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium text-gray-700 mb-1 block">닉네임 설정</label>
-            <input 
-              id="nicknameInput"
-              type="text"
-              placeholder="원하는 닉네임 입력"
-              maxlength="20"
-              class="w-full px-3 py-2 border rounded-lg input-focus"
-            >
-            <p class="text-xs text-gray-500 mt-1">비워두면 랜덤 닉네임이 생성됩니다</p>
-          </div>
-          
-          <div class="bg-gray-50 rounded-lg p-3">
-            <p class="text-sm text-gray-600">현재 닉네임</p>
-            <p id="currentNickname" class="font-medium text-purple-600"></p>
-          </div>
-          
-          <div class="border-t pt-4">
-            <label class="flex items-center gap-2">
-              <input type="checkbox" id="soundEnabled" class="rounded">
-              <span class="text-sm">알림음 켜기</span>
-            </label>
-          </div>
-        </div>
-        
-        <div class="flex gap-2 mt-6">
-          <button onclick="closeSettings()" class="flex-1 py-2 border rounded-lg">
-            취소
-          </button>
-          <button onclick="saveSettings()" class="flex-1 py-2 bg-purple-600 text-white rounded-lg">
-            저장
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 채팅방 생성 모달 -->
-  <div id="createRoomModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/50 modal-backdrop" onclick="closeCreateRoom()"></div>
-    <div class="relative bg-white rounded-2xl w-full max-w-sm slide-in">
-      <div class="p-6">
-        <h3 class="text-lg font-bold mb-4">새 채팅방 만들기</h3>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="text-sm font-medium text-gray-700 mb-1 block">채팅방 이름</label>
-            <input 
-              id="newRoomName"
-              type="text"
-              placeholder="예: 100m 스프린터 모임"
-              maxlength="30"
-              class="w-full px-3 py-2 border rounded-lg input-focus"
-            >
-          </div>
-          
-          <div>
-            <label class="text-sm font-medium text-gray-700 mb-1 block">설명 (선택)</label>
-            <input 
-              id="newRoomDesc"
-              type="text"
-              placeholder="예: 단거리 선수들 환영!"
-              maxlength="50"
-              class="w-full px-3 py-2 border rounded-lg input-focus"
-            >
-          </div>
-          
-          <div>
-            <label class="text-sm font-medium text-gray-700 mb-1 block">아이콘 선택</label>
-            <div class="grid grid-cols-8 gap-1">
-              <button type="button" onclick="selectIcon('🏃')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🏃">🏃</button>
-              <button type="button" onclick="selectIcon('🏃‍♀️')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🏃‍♀️">🏃‍♀️</button>
-              <button type="button" onclick="selectIcon('🏅')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🏅">🏅</button>
-              <button type="button" onclick="selectIcon('🏆')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🏆">🏆</button>
-              <button type="button" onclick="selectIcon('⚡')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="⚡">⚡</button>
-              <button type="button" onclick="selectIcon('💪')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="💪">💪</button>
-              <button type="button" onclick="selectIcon('🔥')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🔥">🔥</button>
-              <button type="button" onclick="selectIcon('🎯')" class="icon-btn p-2 border rounded hover:bg-purple-100" data-icon="🎯">🎯</button>
-            </div>
-            <input type="hidden" id="selectedIcon" value="🏃">
-          </div>
-        </div>
-        
-        <div class="flex gap-2 mt-6">
-          <button onclick="closeCreateRoom()" class="flex-1 py-2 border rounded-lg">
-            취소
-          </button>
-          <button onclick="createRoom()" class="flex-1 py-2 bg-purple-600 text-white rounded-lg">
-            만들기
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 이모지 피커 -->
-  <div id="emojiPicker" class="fixed bottom-20 left-4 right-4 bg-white rounded-2xl shadow-xl p-4 hidden z-30 safe-bottom">
-    <div class="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
-      <!-- 이모지 동적 추가 -->
-    </div>
-  </div>
-  
-  <!-- 토스트 메시지 -->
-  <div id="toast" class="fixed top-20 left-4 right-4 bg-black/90 text-white px-4 py-3 rounded-lg hidden z-50 text-sm text-center">
-    <span id="toastMsg"></span>
-  </div>
-  
-  <script src="active-users.js"></script>
-  <script src="chat-mobile-system.js"></script>
+        if (isAtBottom) {
+          document.getElementById('newMessagePill').classList.add('hidden');
+        }
+      });
+      
+      // 새 메시지 알림 클릭
+      document.getElementById('newMessagePill').addEventListener('click', () => {
+        scrollToBottom();
+        document.getElementById('newMessagePill').classList.add('hidden');
+      });
+    }
+    
+    function scrollToBottom() {
+      const container = document.getElementById('chatContainer');
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function showNewMessageAlert() {
+      if (!isAtBottom) {
+        document.getElementById('newMessagePill').classList.remove('hidden');
+      }
+    }
+    
+    function updateViewerCount() {
+      const base = 2000;
+      const variation = Math.floor(Math.random() * 800);
+      const count = base + variation;
+      const formatted = count >= 1000 ? (count / 1000).toFixed(1) + 'K' : count;
+      document.getElementById('viewerCount').textContent = formatted;
+    }
+    
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    // 개발용 모의 데이터
+    function startMockData() {
+      if (window.location.hostname !== 'localhost') return;
+      
+      const mockMessages = [
+        { username: '파워러너', text: '와 진짜 빠르다 ㄷㄷ', level: 15, badge: null },
+        { username: '스트리머', text: '여러분 오늘도 화이팅! 💪', level: 99, badge: 'streamer', isStreamer: true },
+        { username: 'VIP유저', text: '응원합니다~~', level: 45, badge: 'vip', isDonation: true, amount: 5000 },
+        { username: '열정맨', text: '저도 내일 뛰어야겠네요 ㅋㅋ', level: 8, badge: 'fan' },
+        { username: '프로선수', text: '@파워러너 맞아요 진짜 대박', level: 32, badge: null },
+        { username: '관리자', text: '채팅 규칙 지켜주세요~', level: 50, badge: 'mod' },
+        { username: '초보러너', text: '❤️❤️❤️', level: 3, badge: null },
+        { username: '마라톤킹', text: '기록 깨고 싶다 🔥', level: 28, badge: 'fan' }
+      ];
+      
+      // 3초마다 랜덤 메시지
+      setInterval(() => {
+        const randomMsg = mockMessages[Math.floor(Math.random() * mockMessages.length)];
+        displayMessage({
+          ...randomMsg,
+          timestamp: new Date()
+        });
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
