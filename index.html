@@ -3,110 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>애슬리트 타임 - 러닝 커뮤니티 & 페이스 계산기</title>
+  <title>애슬리트 타임 | 러닝 페이스 계산기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
-      background: #0a0a0a;
-      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
     }
     
-    /* 그라디언트 배경 */
-    .hero-gradient {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      background-size: 200% 200%;
-      animation: gradient 15s ease infinite;
-    }
-    
-    @keyframes gradient {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    
-    /* 글라스모피즘 효과 */
-    .glass {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .glass-dark {
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    /* 네온 효과 */
-    .neon-text {
-      text-shadow: 0 0 10px rgba(102, 126, 234, 0.8),
-                   0 0 20px rgba(102, 126, 234, 0.6),
-                   0 0 30px rgba(102, 126, 234, 0.4);
-    }
-    
-    .neon-border {
-      box-shadow: 0 0 20px rgba(102, 126, 234, 0.5),
-                  inset 0 0 20px rgba(102, 126, 234, 0.1);
-    }
-    
-    /* 채팅 패널 */
-    .chat-panel {
-      position: fixed;
-      right: 0;
-      top: 0;
-      width: 380px;
-      height: 100vh;
-      background: rgba(10, 10, 10, 0.95);
-      backdrop-filter: blur(20px);
-      border-left: 1px solid rgba(102, 126, 234, 0.3);
-      transform: translateX(100%);
-      transition: transform 0.3s ease-out;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .chat-panel.active {
-      transform: translateX(0);
-    }
-    
-    .chat-header {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      background: #0a0a0a;
-    }
-    
-    .chat-message {
-      margin-bottom: 15px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 12px;
+    .device-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
       position: relative;
-      animation: fadeInUp 0.3s ease-out;
+      overflow: hidden;
     }
     
-    @keyframes fadeInUp {
-      from {
+    .device-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .device-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    
+    .device-card:hover::before {
+      opacity: 1;
+    }
+    
+    .recommended {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .logo-text {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .auto-detect-badge {
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { 
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(-20px);
       }
       to {
         opacity: 1;
@@ -114,81 +72,8 @@
       }
     }
     
-    .chat-message.own {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-      margin-left: 50px;
-    }
-    
-    .chat-message.activity {
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
-      border-left: 3px solid #22c55e;
-    }
-    
-    .chat-username {
-      font-weight: bold;
-      color: #667eea;
-      font-size: 14px;
-      margin-bottom: 4px;
-    }
-    
-    .chat-text {
-      color: #e0e0e0;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    
-    .chat-time {
-      font-size: 11px;
-      color: #666;
-      margin-top: 4px;
-    }
-    
-    .chat-input-container {
-      padding: 20px;
-      background: rgba(20, 20, 20, 0.95);
-      border-top: 1px solid rgba(102, 126, 234, 0.3);
-    }
-    
-    .chat-input {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .chat-input input {
-      flex: 1;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(102, 126, 234, 0.3);
-      border-radius: 25px;
-      color: white;
-      font-size: 14px;
-      outline: none;
-      transition: all 0.3s;
-    }
-    
-    .chat-input input:focus {
-      border-color: #667eea;
-      background: rgba(255, 255, 255, 0.08);
-    }
-    
-    .chat-input button {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    
-    .chat-input button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    /* 플로팅 채팅 버튼 */
-    .chat-toggle {
+    /* 채팅 플로팅 버튼 */
+    .chat-fab {
       position: fixed;
       bottom: 30px;
       right: 30px;
@@ -200,20 +85,18 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      z-index: 999;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
       transition: all 0.3s;
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      color: white;
     }
     
-    .chat-toggle:hover {
+    .chat-fab:hover {
       transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
     }
     
-    .chat-toggle.active {
-      right: 400px;
-    }
-    
-    .notification-badge {
+    .chat-badge {
       position: absolute;
       top: -5px;
       right: -5px;
@@ -227,279 +110,417 @@
       justify-content: center;
       font-size: 12px;
       font-weight: bold;
+      animation: pulse 2s infinite;
     }
     
-    /* 실시간 활동 피드 */
-    .activity-feed {
+    /* 미니 채팅창 */
+    .mini-chat {
       position: fixed;
-      left: 30px;
-      bottom: 30px;
-      width: 300px;
-      max-height: 200px;
-      background: rgba(20, 20, 20, 0.9);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(102, 126, 234, 0.3);
+      bottom: 100px;
+      right: 30px;
+      width: 380px;
+      height: 500px;
+      background: white;
       border-radius: 16px;
-      padding: 15px;
-      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+      animation: slideUp 0.3s ease-out;
     }
     
-    .activity-item {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      animation: slideInLeft 0.5s ease-out;
+    .mini-chat.active {
+      display: flex;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .mini-chat-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+    
+    .chat-online {
+      font-size: 12px;
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .mini-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background: #f9fafb;
+    }
+    
+    .mini-message {
+      margin: 8px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mini-message.own {
+      background: linear-gradient(135deg, #f3e8ff, #ede9fe);
+      margin-left: 20%;
+    }
+    
+    .mini-message strong {
+      color: #667eea;
       font-size: 13px;
-      color: #a0a0a0;
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    .mini-message .text {
+      color: #374151;
+      font-size: 14px;
+    }
+    
+    .mini-message .time {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    
+    .mini-chat-input {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      background: white;
+      border-top: 1px solid #e5e7eb;
+      border-radius: 0 0 16px 16px;
+    }
+    
+    .mini-chat-input input {
+      flex: 1;
+      padding: 10px 15px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 25px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    
+    .mini-chat-input input:focus {
+      border-color: #667eea;
+      background: white;
+    }
+    
+    .mini-chat-input button {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    .mini-chat-input button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* 실시간 활동 알림 */
+    .activity-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      animation: slideInLeft 0.5s ease-out;
+      max-width: 350px;
     }
     
     @keyframes slideInLeft {
       from {
-        opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(-100%);
       }
       to {
-        opacity: 1;
         transform: translateX(0);
       }
     }
     
-    /* 메인 컨텐츠 */
-    .main-container {
-      padding-right: 0;
-      transition: padding-right 0.3s ease-out;
+    .activity-toast.show {
+      display: flex;
     }
     
-    .main-container.chat-open {
-      padding-right: 380px;
-    }
-    
-    /* 퀵 액션 카드 */
-    .quick-action {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(102, 126, 234, 0.3);
-      border-radius: 16px;
-      padding: 24px;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-    
-    .quick-action:hover {
-      transform: translateY(-5px);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    }
-    
-    /* 실시간 통계 */
-    .stat-card {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-      border: 1px solid rgba(102, 126, 234, 0.3);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    
-    .stat-number {
-      font-size: 32px;
-      font-weight: bold;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    
-    .stat-label {
-      color: #999;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-    
-    /* 반응형 */
     @media (max-width: 768px) {
-      .chat-panel {
+      .mini-chat {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
         width: 100%;
+        height: 70vh;
+        border-radius: 20px 20px 0 0;
       }
       
-      .main-container.chat-open {
-        padding-right: 0;
-        transform: scale(0.9);
-        opacity: 0.3;
-      }
-      
-      .chat-toggle.active {
-        right: 30px;
-      }
-      
-      .activity-feed {
-        display: none;
+      .activity-toast {
+        left: 10px;
+        right: 10px;
+        max-width: none;
       }
     }
   </style>
 </head>
-<body>
-  <!-- 메인 컨테이너 -->
-  <div class="main-container" id="mainContainer">
-    <!-- 히어로 섹션 -->
-    <div class="hero-gradient min-h-screen">
-      <nav class="glass-dark">
-        <div class="container mx-auto px-6 py-4">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-              <i class="fas fa-running text-2xl"></i>
-              <span class="text-xl font-bold neon-text">애슬리트 타임</span>
-            </div>
-            <div class="flex space-x-6">
-              <a href="pace-calculator.html" class="hover:text-purple-400 transition">페이스 계산기</a>
-              <a href="chat-websocket.html" class="hover:text-purple-400 transition">채팅</a>
-              <a href="community.html" class="hover:text-purple-400 transition">커뮤니티</a>
-            </div>
+<body class="flex items-center justify-center p-4">
+  <div class="max-w-5xl w-full">
+    <!-- 헤더 -->
+    <div class="text-center mb-8 text-white">
+      <div class="mb-4">
+        <i class="fas fa-running text-6xl md:text-7xl"></i>
+      </div>
+      <h1 class="text-3xl md:text-5xl font-bold mb-2">ATHLETE TIME</h1>
+      <p class="text-lg md:text-xl opacity-90">러닝 페이스 계산기 & 트레이닝 차트</p>
+    </div>
+
+    <!-- 자동 감지 알림 -->
+    <div id="autoDetectBadge" class="auto-detect-badge bg-white/20 backdrop-blur rounded-full px-6 py-3 mb-8 text-white text-center mx-auto w-fit">
+      <i class="fas fa-magic mr-2"></i>
+      <span id="detectedDevice">디바이스 감지 중...</span>
+    </div>
+
+    <!-- 디바이스 선택 카드 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <!-- 모바일 버전 카드 -->
+      <div id="mobileCard" class="device-card bg-white rounded-2xl p-8 shadow-xl">
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-mobile-alt text-6xl md:text-7xl text-purple-600"></i>
           </div>
-        </div>
-      </nav>
-      
-      <div class="container mx-auto px-6 py-20">
-        <div class="text-center mb-16">
-          <h1 class="text-6xl font-bold mb-6 neon-text">러너들의 실시간 공간</h1>
-          <p class="text-xl text-gray-300">페이스 계산, 실시간 채팅, 커뮤니티가 하나로</p>
-        </div>
-        
-        <!-- 실시간 통계 -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div class="stat-card">
-            <div class="stat-number" id="onlineCount">0</div>
-            <div class="stat-label">온라인 러너</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="messageCount">0</div>
-            <div class="stat-label">오늘의 메시지</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="calculationCount">0</div>
-            <div class="stat-label">페이스 계산</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number" id="activeRooms">3</div>
-            <div class="stat-label">활성 채널</div>
-          </div>
-        </div>
-        
-        <!-- 퀵 액션 -->
-        <div class="grid md:grid-cols-3 gap-6">
-          <a href="pace-calculator.html" class="quick-action">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-calculator text-3xl text-purple-400 mr-4"></i>
-              <h3 class="text-xl font-bold">페이스 계산기</h3>
-            </div>
-            <p class="text-gray-400">목표 시간과 거리로 페이스를 계산하고 스플릿 차트를 생성하세요</p>
-            <div class="mt-4 flex items-center text-sm text-green-400">
-              <i class="fas fa-circle text-xs mr-2"></i>
-              <span id="calcActive">12명 사용 중</span>
-            </div>
-          </a>
+          <h2 class="text-2xl font-bold mb-2">모바일 버전</h2>
+          <p class="text-gray-600 mb-4">스마트폰 & 태블릿 최적화</p>
           
-          <div class="quick-action" onclick="toggleChat()">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-comments text-3xl text-purple-400 mr-4"></i>
-              <h3 class="text-xl font-bold">실시간 채팅</h3>
+          <div class="space-y-2 text-sm text-left bg-purple-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>터치 친화적 인터페이스</span>
             </div>
-            <p class="text-gray-400">다른 러너들과 실시간으로 대화하고 정보를 공유하세요</p>
-            <div class="mt-4 flex items-center text-sm text-green-400">
-              <i class="fas fa-circle text-xs mr-2"></i>
-              <span id="chatActive">채팅 활성화</span>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>세로 모드 최적화</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>실시간 채팅 통합</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-purple-600 mr-2"></i>
+              <span>간소화된 테이블 뷰</span>
             </div>
           </div>
           
-          <a href="community.html" class="quick-action">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-users text-3xl text-purple-400 mr-4"></i>
-              <h3 class="text-xl font-bold">커뮤니티</h3>
+          <button onclick="selectVersion('mobile')" 
+                  class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-bold hover:from-purple-700 hover:to-purple-800 transition-all">
+            모바일 버전으로 입장
+            <i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- PC 버전 카드 -->
+      <div id="desktopCard" class="device-card bg-white rounded-2xl p-8 shadow-xl">
+        <div class="text-center">
+          <div class="mb-4">
+            <i class="fas fa-desktop text-6xl md:text-7xl text-blue-600"></i>
+          </div>
+          <h2 class="text-2xl font-bold mb-2">PC 버전</h2>
+          <p class="text-gray-600 mb-4">데스크톱 & 노트북 최적화</p>
+          
+          <div class="space-y-2 text-sm text-left bg-blue-50 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>넓은 화면 활용</span>
             </div>
-            <p class="text-gray-400">러닝 일지를 공유하고 다른 러너들과 소통하세요</p>
-            <div class="mt-4 flex items-center text-sm text-blue-400">
-              <i class="fas fa-arrow-up text-xs mr-2"></i>
-              <span>새 글 3개</span>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>다중 차트 동시 표시</span>
             </div>
-          </a>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>실시간 채팅 패널</span>
+            </div>
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-blue-600 mr-2"></i>
+              <span>상세 통계 분석</span>
+            </div>
+          </div>
+          
+          <button onclick="selectVersion('desktop')" 
+                  class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all">
+            PC 버전으로 입장
+            <i class="fas fa-arrow-right ml-2"></i>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- 추가 기능 소개 -->
+    <div class="bg-white/10 backdrop-blur rounded-2xl p-6 mb-8">
+      <h3 class="text-white text-xl font-bold mb-4 text-center">
+        <i class="fas fa-star mr-2"></i>
+        주요 기능
+      </h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-white text-center">
+        <div class="bg-white/10 rounded-lg p-4">
+          <i class="fas fa-calculator text-2xl mb-2"></i>
+          <p class="text-sm">페이스 계산기</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-4">
+          <i class="fas fa-route text-2xl mb-2"></i>
+          <p class="text-sm">트랙 레인 계산</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-4">
+          <i class="fas fa-comments text-2xl mb-2"></i>
+          <p class="text-sm">실시간 채팅</p>
+        </div>
+        <div class="bg-white/10 rounded-lg p-4">
+          <i class="fas fa-chart-line text-2xl mb-2"></i>
+          <p class="text-sm">스플릿 차트</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 빠른 링크 -->
+    <div class="text-center text-white/80 text-sm">
+      <div class="flex justify-center gap-6 mb-4">
+        <a href="chat-websocket.html" class="hover:text-white transition">
+          <i class="fas fa-comments mr-1"></i> 채팅방
+        </a>
+        <a href="community.html" class="hover:text-white transition">
+          <i class="fas fa-users mr-1"></i> 커뮤니티
+        </a>
+        <a href="#" onclick="showAbout(); return false;" class="hover:text-white transition">
+          <i class="fas fa-info-circle mr-1"></i> 소개
+        </a>
+      </div>
+      <p class="opacity-60">© 2024 Athlete Time. All rights reserved.</p>
+    </div>
   </div>
-  
-  <!-- 채팅 패널 -->
-  <div class="chat-panel" id="chatPanel">
-    <div class="chat-header">
+
+  <!-- 채팅 플로팅 버튼 -->
+  <div class="chat-fab" id="chatFab" onclick="toggleChat()">
+    <i class="fas fa-comments text-2xl"></i>
+    <div class="chat-badge" id="chatBadge" style="display: none;">0</div>
+  </div>
+
+  <!-- 미니 채팅창 -->
+  <div class="mini-chat" id="miniChat">
+    <div class="mini-chat-header">
       <div>
-        <h3 class="text-lg font-bold">💬 러닝톡</h3>
-        <div class="text-sm text-green-300" id="onlineStatus">
-          <i class="fas fa-circle text-xs"></i> 온라인
+        <span>💬 러닝톡</span>
+        <div class="chat-online">
+          <i class="fas fa-circle text-xs"></i>
+          <span id="onlineCount">연결 중...</span>
         </div>
       </div>
-      <button onclick="toggleChat()" class="text-white hover:text-gray-300">
-        <i class="fas fa-times text-xl"></i>
-      </button>
+      <button onclick="toggleChat()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">✕</button>
     </div>
-    
-    <div class="chat-messages" id="chatMessages">
-      <div class="text-center py-10 text-gray-500">
-        <i class="fas fa-comments text-4xl mb-4"></i>
-        <p>채팅에 참여해보세요!</p>
+    <div class="mini-chat-messages" id="miniChatMessages">
+      <div class="text-center py-10 text-gray-400">
+        <i class="fas fa-comments text-3xl mb-3"></i>
+        <p>다른 러너들과 대화해보세요!</p>
       </div>
     </div>
-    
-    <div class="chat-input-container">
-      <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." 
-               onkeypress="if(event.key==='Enter') sendMessage()">
-        <button onclick="sendMessage()">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
+    <div class="mini-chat-input">
+      <input type="text" id="miniChatInput" placeholder="메시지를 입력하세요..." 
+             onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">전송</button>
     </div>
   </div>
-  
-  <!-- 플로팅 채팅 버튼 -->
-  <div class="chat-toggle" id="chatToggle" onclick="toggleChat()">
-    <i class="fas fa-comments text-2xl text-white"></i>
-    <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
-  </div>
-  
-  <!-- 실시간 활동 피드 -->
-  <div class="activity-feed" id="activityFeed">
-    <h4 class="text-sm font-bold mb-3 text-purple-400">실시간 활동</h4>
-    <div id="activityList">
-      <div class="activity-item">
-        <i class="fas fa-calculator text-xs text-green-400"></i>
-        시스템이 시작되었습니다...
-      </div>
+
+  <!-- 실시간 활동 알림 -->
+  <div class="activity-toast" id="activityToast">
+    <i class="fas fa-bell text-purple-600"></i>
+    <div>
+      <div class="font-bold text-sm" id="activityTitle">새로운 활동</div>
+      <div class="text-xs text-gray-600" id="activityText"></div>
     </div>
   </div>
-  
+
   <script>
+    // 디바이스 감지
+    function detectDevice() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
+      const isTablet = /tablet|ipad/i.test(userAgent);
+      
+      const badge = document.getElementById('detectedDevice');
+      const mobileCard = document.getElementById('mobileCard');
+      const desktopCard = document.getElementById('desktopCard');
+      
+      if (isMobile || isTablet) {
+        badge.textContent = '모바일 디바이스 감지됨';
+        mobileCard.classList.add('recommended');
+        mobileCard.style.border = '2px solid #8b5cf6';
+      } else {
+        badge.textContent = 'PC 환경 감지됨';
+        desktopCard.classList.add('recommended');
+        desktopCard.style.border = '2px solid #3b82f6';
+      }
+    }
+    
+    // 버전 선택
+    function selectVersion(version) {
+      if (version === 'mobile') {
+        window.location.href = 'pace-calculator-mobile.html';
+      } else {
+        window.location.href = 'pace-calculator.html';
+      }
+    }
+    
+    // 채팅 관련
     let ws = null;
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
     let unreadCount = 0;
-    let username = localStorage.getItem('username') || `러너${Math.floor(Math.random() * 1000)}`;
-    localStorage.setItem('username', username);
     
-    // 채팅 패널 토글
     function toggleChat() {
-      const panel = document.getElementById('chatPanel');
-      const toggle = document.getElementById('chatToggle');
-      const container = document.getElementById('mainContainer');
-      const badge = document.getElementById('notificationBadge');
+      const chat = document.getElementById('miniChat');
+      const badge = document.getElementById('chatBadge');
       
-      panel.classList.toggle('active');
-      toggle.classList.toggle('active');
-      container.classList.toggle('chat-open');
+      chat.classList.toggle('active');
       
-      if (panel.classList.contains('active')) {
+      if (chat.classList.contains('active')) {
         badge.style.display = 'none';
         unreadCount = 0;
-        document.getElementById('messageInput').focus();
+        document.getElementById('miniChatInput').focus();
+        
+        // 처음 열 때 WebSocket 연결
+        if (!ws) {
+          connectWebSocket();
+        }
       }
     }
     
-    // WebSocket 연결
     function connectWebSocket() {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       
@@ -507,14 +528,16 @@
         ws = new WebSocket(`${protocol}//${window.location.hostname}:3002`);
         
         ws.onopen = () => {
-          console.log('WebSocket 연결됨');
+          console.log('채팅 서버 연결됨');
           reconnectAttempts = 0;
-          updateStatus('online');
+          document.getElementById('onlineCount').textContent = '온라인';
           
-          // 입장 메시지
+          const username = localStorage.getItem('username') || `러너${Math.floor(Math.random() * 1000)}`;
+          localStorage.setItem('username', username);
+          
           ws.send(JSON.stringify({
             type: 'join',
-            data: { username, page: 'index' }
+            data: { username, page: 'landing' }
           }));
           
           addSystemMessage('채팅 서버에 연결되었습니다');
@@ -526,20 +549,17 @@
         };
         
         ws.onclose = () => {
-          console.log('WebSocket 연결 종료');
-          updateStatus('offline');
-          addSystemMessage('채팅 서버 연결이 끊어졌습니다');
+          console.log('채팅 연결 종료');
+          document.getElementById('onlineCount').textContent = '오프라인';
           
-          // 자동 재연결
           if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
-            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
-            setTimeout(connectWebSocket, delay);
+            setTimeout(connectWebSocket, Math.min(1000 * Math.pow(2, reconnectAttempts), 10000));
           }
         };
         
         ws.onerror = (error) => {
-          console.error('WebSocket 오류:', error);
+          console.error('채팅 연결 오류:', error);
         };
         
       } catch (error) {
@@ -548,17 +568,16 @@
       }
     }
     
-    // 메시지 처리
     function handleMessage(data) {
       switch(data.type) {
         case 'message':
           addChatMessage(data.data.username, data.data.text, false);
-          updateNotification();
+          showNotification();
           break;
           
         case 'activity':
-          addChatMessage(data.data.username, data.data.text, false, true);
-          addActivityItem(data.data);
+          addChatMessage(data.data.username, data.data.text, false);
+          showActivityToast(data.data);
           break;
           
         case 'user_joined':
@@ -570,21 +589,17 @@
           break;
           
         case 'users_online':
-          updateOnlineCount(data.data.count);
-          break;
-          
-        case 'stats':
-          updateStats(data.data);
+          document.getElementById('onlineCount').textContent = `온라인 (${data.data.count}명)`;
           break;
       }
     }
     
-    // 메시지 전송
     function sendMessage() {
-      const input = document.getElementById('messageInput');
+      const input = document.getElementById('miniChatInput');
       const text = input.value.trim();
-      
       if (!text) return;
+      
+      const username = localStorage.getItem('username') || '나';
       
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
@@ -592,164 +607,101 @@
           data: {
             text,
             username,
-            source: 'index',
+            source: 'landing',
             timestamp: new Date().toISOString()
           }
         }));
         
         addChatMessage(username, text, true);
-        input.value = '';
       } else {
         // 폴백 모드
-        saveFallbackMessage(username, text);
         addChatMessage(username, text, true);
-        input.value = '';
+        saveToLocalStorage(username, text);
       }
+      
+      input.value = '';
     }
     
-    // 채팅 메시지 추가
-    function addChatMessage(user, text, isOwn = false, isActivity = false) {
-      const container = document.getElementById('chatMessages');
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `chat-message ${isOwn ? 'own' : ''} ${isActivity ? 'activity' : ''}`;
+    function addChatMessage(username, text, isOwn = false) {
+      const container = document.getElementById('miniChatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `mini-message ${isOwn ? 'own' : ''}`;
       
       const time = new Date().toLocaleTimeString('ko-KR', { 
         hour: '2-digit', 
         minute: '2-digit' 
       });
       
-      messageDiv.innerHTML = `
-        <div class="chat-username">${user}</div>
-        <div class="chat-text">${text}</div>
-        <div class="chat-time">${time}</div>
+      msgDiv.innerHTML = `
+        <strong>${username}</strong>
+        <div class="text">${text}</div>
+        <div class="time">${time}</div>
       `;
       
-      container.appendChild(messageDiv);
+      container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
     }
     
-    // 시스템 메시지
     function addSystemMessage(text) {
-      const container = document.getElementById('chatMessages');
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'text-center text-gray-500 text-sm py-2';
-      messageDiv.textContent = text;
-      container.appendChild(messageDiv);
+      const container = document.getElementById('miniChatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'text-center text-gray-500 text-sm py-2';
+      msgDiv.textContent = text;
+      container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
     }
     
-    // 활동 피드 업데이트
-    function addActivityItem(data) {
-      const list = document.getElementById('activityList');
-      const item = document.createElement('div');
-      item.className = 'activity-item';
+    function showNotification() {
+      const chat = document.getElementById('miniChat');
+      const badge = document.getElementById('chatBadge');
       
-      let icon = 'fa-info-circle';
-      let color = 'text-blue-400';
-      
-      if (data.activity === 'pace_calculated') {
-        icon = 'fa-calculator';
-        color = 'text-green-400';
-      } else if (data.activity === 'message') {
-        icon = 'fa-comment';
-        color = 'text-purple-400';
-      }
-      
-      item.innerHTML = `
-        <i class="fas ${icon} text-xs ${color}"></i>
-        ${data.username}: ${data.text}
-      `;
-      
-      list.insertBefore(item, list.firstChild);
-      
-      // 최대 5개 항목만 유지
-      while (list.children.length > 5) {
-        list.removeChild(list.lastChild);
-      }
-    }
-    
-    // 알림 업데이트
-    function updateNotification() {
-      const panel = document.getElementById('chatPanel');
-      const badge = document.getElementById('notificationBadge');
-      
-      if (!panel.classList.contains('active')) {
+      if (!chat.classList.contains('active')) {
         unreadCount++;
         badge.textContent = unreadCount;
         badge.style.display = 'flex';
       }
     }
     
-    // 상태 업데이트
-    function updateStatus(status) {
-      const statusEl = document.getElementById('onlineStatus');
-      if (status === 'online') {
-        statusEl.innerHTML = '<i class="fas fa-circle text-xs"></i> 온라인';
-        statusEl.className = 'text-sm text-green-300';
-      } else {
-        statusEl.innerHTML = '<i class="fas fa-circle text-xs"></i> 오프라인';
-        statusEl.className = 'text-sm text-gray-400';
-      }
+    function showActivityToast(data) {
+      const toast = document.getElementById('activityToast');
+      const title = document.getElementById('activityTitle');
+      const text = document.getElementById('activityText');
+      
+      title.textContent = data.username;
+      text.textContent = data.text;
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
     }
     
-    // 통계 업데이트
-    function updateOnlineCount(count) {
-      document.getElementById('onlineCount').textContent = count;
-    }
-    
-    function updateStats(stats) {
-      if (stats.messages !== undefined) {
-        document.getElementById('messageCount').textContent = stats.messages;
-      }
-      if (stats.calculations !== undefined) {
-        document.getElementById('calculationCount').textContent = stats.calculations;
-      }
-    }
-    
-    // 폴백 모드
     function useFallbackMode() {
+      document.getElementById('onlineCount').textContent = '로컬 모드';
       addSystemMessage('로컬 모드로 실행 중입니다');
       
       // 로컬 스토리지에서 메시지 로드
       const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
-      messages.forEach(msg => {
+      messages.slice(-10).forEach(msg => {
         addChatMessage(msg.username, msg.text);
       });
     }
     
-    function saveFallbackMessage(user, text) {
+    function saveToLocalStorage(username, text) {
       const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
-      messages.push({ 
-        username: user, 
-        text, 
-        timestamp: new Date().toISOString() 
-      });
-      
-      if (messages.length > 100) {
-        messages.shift();
-      }
-      
+      messages.push({ username, text, timestamp: new Date().toISOString() });
+      if (messages.length > 100) messages.shift();
       localStorage.setItem('fallbackMessages', JSON.stringify(messages));
+    }
+    
+    function showAbout() {
+      alert('애슬리트 타임\n\n러너를 위한 종합 트레이닝 도구\n• 정확한 페이스 계산\n• 트랙 레인별 거리 계산\n• 실시간 채팅 커뮤니티\n• 스플릿 차트 생성\n\nVersion 2.0');
     }
     
     // 초기화
     document.addEventListener('DOMContentLoaded', () => {
-      connectWebSocket();
-      
-      // 가짜 실시간 통계 (데모용)
-      setInterval(() => {
-        const online = document.getElementById('onlineCount');
-        const current = parseInt(online.textContent);
-        online.textContent = Math.max(1, current + Math.floor(Math.random() * 3) - 1);
-        
-        const msgs = document.getElementById('messageCount');
-        msgs.textContent = parseInt(msgs.textContent) + Math.floor(Math.random() * 2);
-        
-        const calcs = document.getElementById('calculationCount');
-        if (Math.random() > 0.7) {
-          calcs.textContent = parseInt(calcs.textContent) + 1;
-        }
-      }, 5000);
+      detectDevice();
     });
   </script>
 </body>
