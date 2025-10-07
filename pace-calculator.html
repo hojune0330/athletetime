@@ -1175,10 +1175,10 @@
             </g>
             
             <!-- 중앙 잔디 (실제 비율) -->
-            <ellipse cx="400" cy="200" rx="211" ry="92" fill="#90EE90"/>
+            <ellipse cx="400" cy="200" rx="210" ry="90" fill="#90EE90"/>
             
             <!-- Start/Finish 라인 -->
-            <line x1="505" y1="100" x2="505" y2="300" stroke="white" stroke-width="3"/>
+            <line x1="505" y1="110" x2="505" y2="290" stroke="white" stroke-width="3"/>
             <rect x="490" y="190" width="30" height="20" fill="black"/>
             <text x="505" y="204" font-size="11" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
             
@@ -1376,7 +1376,10 @@
         generateSteeplechaseChart();
       } else if (tabName === 'lane') {
         // 트랙 레인 계산기 직접 표시
-        calculateLaneAll();
+        // 약간의 지연 후 초기 계산 실행
+        setTimeout(() => {
+          calculateLaneAll();
+        }, 100);
       }
     }
 
@@ -1496,7 +1499,7 @@
       const scaleFactor = 2.5; // 전체 크기 조정
       const straightLength = 84.39 * scaleFactor; // 약 210px
       const centerX = 400;
-      const centerY = 250;
+      const centerY = 200; // SVG viewBox에 맞게 조정
       
       // 레인 그리기
       lanes.forEach(lane => {
@@ -1524,9 +1527,7 @@
         
         // 선택된 레인에 시간 표시
         if (lane.isSelected) {
-          const scaleFactor = 2.5;
-          const straightLength = 84.39 * scaleFactor;
-          const radius = lane.radius * scaleFactor;
+          // 상위 스코프의 변수 재사용
           const leftCenterX = centerX - straightLength / 2;
           const rightCenterX = centerX + straightLength / 2;
           

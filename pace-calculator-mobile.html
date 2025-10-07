@@ -1144,22 +1144,29 @@
       
       svg.innerHTML = '';
       
+      // 실제 트랙 비율에 맞게 조정 (모바일용 작게)
+      const scaleFactor = 2.0; // 모바일에 맞게 작게 조정
+      const straightLength = 84.39 * scaleFactor; // 약 169px
+      const centerX = 400;
+      const centerY = 200; // SVG viewBox에 맞게 조정
+      
       // 레인 그리기
       lanes.forEach(lane => {
-        const scaleFactor = 3;
-        const centerX = 400;
-        const centerY = 250;
-        const straightLength = 84.39 * scaleFactor;
         const radius = lane.radius * scaleFactor;
         
-        // 트랙 경로 생성
+        // 실제 트랙 형태로 그리기
+        // 왼쪽 반원 중심점
+        const leftCenterX = centerX - straightLength / 2;
+        // 오른쪽 반원 중심점  
+        const rightCenterX = centerX + straightLength / 2;
+        
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         const d = `
-          M ${centerX} ${centerY + radius}
-          L ${centerX - straightLength} ${centerY + radius}
-          A ${radius} ${radius} 0 0 1 ${centerX - straightLength} ${centerY - radius}
-          L ${centerX} ${centerY - radius}
-          A ${radius} ${radius} 0 0 1 ${centerX} ${centerY + radius}
+          M ${leftCenterX} ${centerY - radius}
+          L ${rightCenterX} ${centerY - radius}
+          A ${radius} ${radius} 0 0 1 ${rightCenterX} ${centerY + radius}
+          L ${leftCenterX} ${centerY + radius}
+          A ${radius} ${radius} 0 0 1 ${leftCenterX} ${centerY - radius}
         `;
         
         path.setAttribute('d', d);
