@@ -1131,7 +1131,7 @@
       <div class="bg-white rounded-lg shadow p-6 mb-4">
         <div class="flex flex-wrap items-center gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">400m 목표 시간 (초)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">해당 레인 목표 시간 (초)</label>
             <div class="flex gap-2">
               <input type="number" id="laneTargetTime" value="72" min="30" max="120" step="0.1"
                      class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -1248,14 +1248,18 @@
           <table class="w-full pace-table">
             <thead>
               <tr>
-                <th>레인</th>
-                <th>총 거리</th>
-                <th>스태거</th>
-                <th>조정 시간</th>
-                <th>직선① (백)</th>
-                <th>곡선①</th>
-                <th>직선② (홈)</th>
-                <th>곡선②</th>
+                <th rowspan="2">레인</th>
+                <th rowspan="2">총 거리</th>
+                <th rowspan="2">스태거</th>
+                <th rowspan="2">총 시간</th>
+                <th rowspan="2">시차</th>
+                <th colspan="4" class="bg-gray-50">구간별 시간 (초)</th>
+              </tr>
+              <tr>
+                <th class="bg-blue-50">직선①</th>
+                <th class="bg-red-50">곡선①</th>
+                <th class="bg-blue-50">직선②</th>
+                <th class="bg-red-50">곡선②</th>
               </tr>
             </thead>
             <tbody id="laneTimeTable">
@@ -1264,15 +1268,45 @@
           </table>
         </div>
         
+        <!-- 추가 정보 영역 -->
+        <div id="laneAdditionalInfo">
+          <!-- 동적으로 생성됨 -->
+        </div>
+        
         <div class="mt-6 p-4 bg-blue-50 rounded-lg">
           <h4 class="font-bold text-lg mb-2">💡 사용 방법</h4>
           <ul class="space-y-1 text-sm">
-            <li>• <strong>400m 목표 시간</strong>을 입력하고 훈련할 <strong>레인을 선택</strong>하세요</li>
-            <li>• 트랙에서 <strong>4개 구간별 통과 시간</strong>을 직접 확인할 수 있습니다</li>
-            <li>• <strong>직선 구간 (파란색)</strong>: 84.39m × 2 = 168.78m</li>
-            <li>• <strong>곡선 구간 (빨간색)</strong>: 레인별로 다름 (바깥쪽일수록 김)</li>
-            <li>• <strong>스태거</strong>: 1레인 대비 추가 거리 (8레인은 53.66m 더 김)</li>
+            <li>• <strong>목표 시간</strong>은 <strong>선택한 레인에서의 실제 시간</strong>입니다</li>
+            <li>• 예: 4레인에서 90초 = 4레인(422.37m)을 90초에 완주</li>
+            <li>• 동일한 속도로 1레인을 달리면 약 85.17초가 됩니다</li>
+            <li>• <strong>직선 구간</strong>: 모든 레인 동일 (84.39m × 2)</li>
+            <li>• <strong>곡선 구간</strong>: 바깥 레인일수록 더 김</li>
           </ul>
+        </div>
+        
+        <!-- 훈련 페이스 추천 -->
+        <div class="mt-4 p-4 bg-green-50 rounded-lg">
+          <h4 class="font-bold text-lg mb-2">🏃 훈련 페이스 가이드</h4>
+          <div id="trainingPaceGuide">
+            <!-- 동적으로 생성됨 -->
+          </div>
+        </div>
+        
+        <!-- 예상 기록 계산기 -->
+        <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
+          <h4 class="font-bold text-lg mb-2">🎯 거리별 예상 기록</h4>
+          <div id="distancePredictions">
+            <!-- 동적으로 생성됨 -->
+          </div>
+        </div>
+        
+        <!-- 200m 스플릿 계산 -->
+        <div class="mt-4 p-4 bg-indigo-50 rounded-lg">
+          <h4 class="font-bold text-lg mb-2">⏱️ 200m 스플릿 타임</h4>
+          <p class="text-sm text-gray-600 mb-2">선택한 레인에서 일정 페이스로 달릴 때의 200m 통과 시간</p>
+          <div id="splitTimes">
+            <!-- 동적으로 생성됨 -->
+          </div>
         </div>
       </div>
     </div>
@@ -1351,6 +1385,12 @@
       const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
       const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
       
+      // 입력값 검증
+      if (isNaN(targetTime) || targetTime <= 0) {
+        alert('올바른 목표 시간을 입력해주세요.');
+        return;
+      }
+      
       // World Athletics (IAAF) 공식 표준 트랙 규격
       const STRAIGHT_LENGTH = 84.39; // 직선 구간 길이
       const LANE_WIDTH = 1.22; // 레인 폭
@@ -1383,24 +1423,33 @@
           curve2: curveLength / 2
         };
         
-        // 구간별 시간 계산 (비율 기반)
-        const timeRatio = targetTime / 400;
+        // 구간별 시간 계산 (선택한 레인에서의 목표 시간 기준)
+        // 선택한 레인에서 targetTime동안 뛰었을 때의 속도
+        const speedInSelectedLane = totalDistance / targetTime; // m/s
+        
+        // 각 구간을 해당 속도로 통과하는 시간
         const sectionTimes = {
-          straight1: sectionDistances.straight1 * timeRatio,
-          curve1: sectionDistances.curve1 * timeRatio,
-          straight2: sectionDistances.straight2 * timeRatio,
-          curve2: sectionDistances.curve2 * timeRatio
+          straight1: sectionDistances.straight1 / speedInSelectedLane,
+          curve1: sectionDistances.curve1 / speedInSelectedLane,
+          straight2: sectionDistances.straight2 / speedInSelectedLane,
+          curve2: sectionDistances.curve2 / speedInSelectedLane
         };
+        
+        // 다른 레인에서 동일한 속도로 뛰었을 때의 총 시간
+        const adjustedTime = totalDistance / speedInSelectedLane;
         
         lanes.push({
           lane,
           radius: measurementRadius,
           distance: totalDistance,
           stagger,
-          adjustedTime: totalDistance * timeRatio,
+          adjustedTime,
           sectionDistances,
           sectionTimes,
-          isSelected: lane === selectedLane
+          isSelected: lane === selectedLane,
+          speedMPS: speedInSelectedLane,
+          speedKMH: speedInSelectedLane * 3.6,
+          pacePerKm: 1000 / speedInSelectedLane
         });
       }
       
@@ -1483,7 +1532,7 @@
           text3.setAttribute('text-anchor', 'middle');
           text3.setAttribute('class', 'track-time-text');
           text3.setAttribute('fill', '#3b82f6');
-          text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}춈`;
+          text3.textContent = `${lane.sectionTimes.straight2.toFixed(2)}초`;
           svg.appendChild(text3);
           
           // 곡선2 (오른쪽)
@@ -1505,21 +1554,161 @@
       
       tbody.innerHTML = '';
       
+      // 선택된 레인 정보 가져오기
+      const selectedLaneData = lanes.find(l => l.isSelected);
+      const selectedSpeed = selectedLaneData ? selectedLaneData.speedKMH : 0;
+      
       lanes.forEach(lane => {
         const row = tbody.insertRow();
-        if (lane.isSelected) row.className = 'bg-yellow-50';
+        if (lane.isSelected) {
+          row.className = 'bg-purple-100 font-semibold';
+        } else if (Math.abs(lane.distance - 400) < 0.1) {
+          row.className = 'bg-green-50'; // 레인 1 하이라이트
+        }
+        
+        // 동일 속도로 달렸을 때 1레인과의 시간 차이
+        const timeDiff = lane.lane === 1 ? 0 : lane.adjustedTime - lanes[0].adjustedTime;
+        const timeDiffStr = timeDiff > 0 ? `+${timeDiff.toFixed(2)}` : timeDiff.toFixed(2);
         
         row.innerHTML = `
-          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.lane}</td>
+          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.lane}${lane.isSelected ? ' ✓' : ''}</td>
           <td>${lane.distance.toFixed(2)}m</td>
-          <td>${lane.stagger.toFixed(2)}m</td>
-          <td class="font-bold">${lane.adjustedTime.toFixed(2)}초</td>
-          <td>${lane.sectionTimes.straight1.toFixed(2)}초</td>
-          <td>${lane.sectionTimes.curve1.toFixed(2)}초</td>
-          <td>${lane.sectionTimes.straight2.toFixed(2)}초</td>
-          <td>${lane.sectionTimes.curve2.toFixed(2)}초</td>
+          <td>${lane.stagger > 0 ? '+' + lane.stagger.toFixed(2) : lane.stagger.toFixed(2)}m</td>
+          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.adjustedTime.toFixed(2)}초</td>
+          <td class="text-xs">${timeDiff === 0 ? '-' : timeDiffStr}</td>
+          <td class="text-blue-600">${lane.sectionTimes.straight1.toFixed(2)}</td>
+          <td class="text-red-600">${lane.sectionTimes.curve1.toFixed(2)}</td>
+          <td class="text-blue-600">${lane.sectionTimes.straight2.toFixed(2)}</td>
+          <td class="text-red-600">${lane.sectionTimes.curve2.toFixed(2)}</td>
         `;
       });
+      
+      // 추가 정보 표시
+      if (selectedLaneData) {
+        const infoDiv = document.getElementById('laneAdditionalInfo');
+        if (infoDiv) {
+          infoDiv.innerHTML = `
+            <div class="bg-purple-50 p-4 rounded-lg mt-4">
+              <h4 class="font-bold text-lg mb-2">📊 선택한 레인 분석</h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white p-3 rounded">
+                  <div class="text-xs text-gray-600">평균 속도</div>
+                  <div class="text-xl font-bold text-purple-700">${selectedSpeed.toFixed(2)} km/h</div>
+                </div>
+                <div class="bg-white p-3 rounded">
+                  <div class="text-xs text-gray-600">km당 페이스</div>
+                  <div class="text-xl font-bold text-purple-700">${formatPace(selectedLaneData.pacePerKm)}</div>
+                </div>
+                <div class="bg-white p-3 rounded">
+                  <div class="text-xs text-gray-600">400m 환산</div>
+                  <div class="text-xl font-bold text-purple-700">${(400 / selectedLaneData.speedInSelectedLane).toFixed(2)}초</div>
+                </div>
+                <div class="bg-white p-3 rounded">
+                  <div class="text-xs text-gray-600">100m 평균</div>
+                  <div class="text-xl font-bold text-purple-700">${(targetTime / (selectedLaneData.distance / 100)).toFixed(2)}초</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        // 훈련 페이스 가이드 생성
+        const guideDiv = document.getElementById('trainingPaceGuide');
+        if (guideDiv && selectedLaneData) {
+          const lane1Time = 400 / selectedLaneData.speedInSelectedLane;
+          const paces = [
+            { name: '이지 페이스 (60-70%)', time: lane1Time * 1.43, desc: '회복/준비운동' },
+            { name: '템포 페이스 (80-85%)', time: lane1Time * 1.18, desc: '유산소 능력 향상' },
+            { name: '역치 페이스 (85-90%)', time: lane1Time * 1.11, desc: '젖산 역치 개선' },
+            { name: '인터벌 페이스 (95%)', time: lane1Time * 1.05, desc: '스피드 향상' },
+            { name: '목표 페이스 (100%)', time: lane1Time, desc: '레이스 페이스' }
+          ];
+          
+          let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">';
+          paces.forEach(pace => {
+            html += `
+              <div class="flex justify-between items-center bg-white p-2 rounded">
+                <div>
+                  <div class="font-semibold">${pace.name}</div>
+                  <div class="text-xs text-gray-600">${pace.desc}</div>
+                </div>
+                <div class="text-lg font-bold text-green-700">${pace.time.toFixed(1)}초</div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          guideDiv.innerHTML = html;
+        }
+        
+        // 거리별 예상 기록
+        const predictDiv = document.getElementById('distancePredictions');
+        if (predictDiv && selectedLaneData) {
+          const speed = selectedLaneData.speedInSelectedLane;
+          const predictions = [
+            { dist: '100m', time: 100 / speed },
+            { dist: '200m', time: 200 / speed },
+            { dist: '800m', time: 800 / speed },
+            { dist: '1500m', time: 1500 / speed },
+            { dist: '3000m', time: 3000 / speed },
+            { dist: '5000m', time: 5000 / speed },
+            { dist: '10km', time: 10000 / speed }
+          ];
+          
+          let html = '<div class="grid grid-cols-4 md:grid-cols-7 gap-2">';
+          predictions.forEach(pred => {
+            html += `
+              <div class="text-center bg-white p-2 rounded">
+                <div class="text-xs text-gray-600">${pred.dist}</div>
+                <div class="font-bold text-yellow-700">${formatTime(pred.time)}</div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          predictDiv.innerHTML = html;
+        }
+        
+        // 200m 스플릿 타임
+        const splitDiv = document.getElementById('splitTimes');
+        if (splitDiv && selectedLaneData) {
+          const laneDistance = selectedLaneData.distance;
+          const speed = selectedLaneData.speedInSelectedLane;
+          
+          // 선택한 레인에서의 200m 지점 계산
+          let splits = [];
+          if (laneDistance >= 200) {
+            splits.push({ lap: '0-200m', time: 200 / speed, desc: '첫 200m' });
+          }
+          if (laneDistance >= 400) {
+            splits.push({ lap: '200-400m', time: 200 / speed, desc: '두번째 200m' });
+          }
+          
+          // 여러 바퀴의 경우
+          const laps = [800, 1200, 1600];
+          laps.forEach((dist, idx) => {
+            if (targetTime > 120) { // 2분 이상인 경우 여러 바퀴 가능성
+              const lapTime = laneDistance / speed;
+              splits.push({ 
+                lap: `${dist-laneDistance}-${dist}m`, 
+                time: lapTime / 2, 
+                desc: `${idx+2}번째 랩 전반` 
+              });
+            }
+          });
+          
+          let html = '<div class="grid grid-cols-2 md:grid-cols-3 gap-2">';
+          splits.slice(0, 6).forEach(split => {
+            html += `
+              <div class="bg-white p-2 rounded">
+                <div class="text-xs text-gray-600">${split.lap}</div>
+                <div class="font-bold text-indigo-700">${split.time.toFixed(2)}초</div>
+                <div class="text-xs text-gray-500">${split.desc}</div>
+              </div>
+            `;
+          });
+          html += '</div>';
+          splitDiv.innerHTML = html;
+        }
+      }
     }
 
     // 차트 1: KM 페이스별 거리 환산표
