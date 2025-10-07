@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>레인 계산기 테스트</title>
+</head>
+<body>
+  <h1>레인 계산기 테스트</h1>
+  
+  <div>
+    <label>목표 시간 (초): <input type="number" id="laneTargetTime" value="72"></label><br>
+    <label>레인 선택: 
+      <select id="laneLaneSelector">
+        <option value="1">레인 1</option>
+        <option value="2">레인 2</option>
+        <option value="3">레인 3</option>
+        <option value="4" selected>레인 4</option>
+        <option value="5">레인 5</option>
+        <option value="6">레인 6</option>
+        <option value="7">레인 7</option>
+        <option value="8">레인 8</option>
+      </select>
+    </label><br>
+    <button onclick="testCalculate()">계산 테스트</button>
+  </div>
+  
+  <div id="result"></div>
+
+  <script>
+    function testCalculate() {
+      const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
+      const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
+      
+      console.log('Input values:', { targetTime, selectedLane });
+      
+      // IAAF 표준
+      const STRAIGHT_LENGTH = 84.39;
+      const LANE_WIDTH = 1.22;
+      const KERB_RADIUS = 36.50;
+      const MEASUREMENT_OFFSET_LANE1 = 0.30;
+      const MEASUREMENT_OFFSET_OTHER = 0.20;
+      
+      // 레인별 계산
+      let measurementRadius;
+      if (selectedLane === 1) {
+        measurementRadius = KERB_RADIUS + MEASUREMENT_OFFSET_LANE1; // 36.80m
+      } else {
+        measurementRadius = KERB_RADIUS + (LANE_WIDTH * (selectedLane - 1)) + MEASUREMENT_OFFSET_OTHER;
+      }
+      
+      const curveLength = Math.PI * measurementRadius * 2;
+      const totalDistance = (STRAIGHT_LENGTH * 2) + curveLength;
+      const stagger = selectedLane === 1 ? 0 : totalDistance - 400;
+      
+      // 속도 계산
+      const speedInSelectedLane = totalDistance / targetTime; // m/s
+      const speedKMH = speedInSelectedLane * 3.6;
+      
+      // 구간별 시간
+      const straightTime = STRAIGHT_LENGTH / speedInSelectedLane;
+      const curveTime = (curveLength / 2) / speedInSelectedLane;
+      
+      const result = {
+        lane: selectedLane,
+        radius: measurementRadius,
+        totalDistance: totalDistance,
+        stagger: stagger,
+        speed: speedKMH,
+        straightTime: straightTime,
+        curveTime: curveTime,
+        totalTime: targetTime
+      };
+      
+      console.log('Calculation result:', result);
+      
+      document.getElementById('result').innerHTML = `
+        <h2>계산 결과:</h2>
+        <ul>
+          <li>레인 ${selectedLane}</li>
+          <li>총 거리: ${totalDistance.toFixed(2)}m</li>
+          <li>스태거: ${stagger.toFixed(2)}m</li>
+          <li>속도: ${speedKMH.toFixed(2)} km/h</li>
+          <li>직선 구간 시간: ${straightTime.toFixed(2)}초</li>
+          <li>곡선 구간 시간: ${curveTime.toFixed(2)}초</li>
+          <li>총 시간: ${targetTime}초</li>
+        </ul>
+      `;
+    }
+  </script>
+</body>
+</html>
