@@ -172,6 +172,60 @@
       box-shadow: 0 2px 8px rgba(255, 59, 48, 0.6);
     }
     
+    /* 베타 배지 */
+    .beta-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+    }
+    
+    .beta-badge.open {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+    
+    /* 준비중 오버레이 */
+    .coming-soon-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    
+    .service-card.beta:hover .coming-soon-overlay {
+      opacity: 1;
+    }
+    
+    .coming-soon-text {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fbbf24;
+    }
+    
     /* 하단 설명 섹션 */
     .about-section {
       background: #000;
@@ -409,7 +463,21 @@
 
   <!-- 메인 서비스 그리드 -->
   <div class="service-grid">
-    <!-- 익명 게시판 -->
+    <!-- 페이스 계산기 (정식 오픈) -->
+    <div class="service-card card-pace" onclick="openService('pace')">
+      <i class="fas fa-calculator service-icon"></i>
+      <div class="service-title">페이스 계산기</div>
+      <div class="service-desc">목표 시간별<br>구간 스플릿</div>
+    </div>
+    
+    <!-- 훈련 계산기 (정식 오픈) -->
+    <div class="service-card card-training" onclick="openService('training')">
+      <i class="fas fa-dumbbell service-icon"></i>
+      <div class="service-title">훈련 계산기</div>
+      <div class="service-desc">VDOT 기반<br>맞춤 훈련 페이스</div>
+    </div>
+    
+    <!-- 익명 게시판 (정식 오픈) -->
     <div class="service-card card-board" onclick="openService('board')">
       <div class="new-badge">5</div>
       <i class="fas fa-comments service-icon"></i>
@@ -417,8 +485,9 @@
       <div class="service-desc">자유롭게 소통하는<br>러너들의 공간</div>
     </div>
     
-    <!-- 실시간 채팅 -->
+    <!-- 실시간 채팅 (오픈 베타) -->
     <div class="service-card card-chat" onclick="openService('chat')">
+      <div class="beta-badge open">오픈베타</div>
       <div class="live-indicator">
         <div class="live-dot"></div>
         LIVE
@@ -428,51 +497,48 @@
       <div class="service-desc">지금 접속 중인<br>러너들과 대화</div>
     </div>
     
-    <!-- 실시간 경기 결과 -->
-    <div class="service-card card-result" onclick="openService('result')">
-      <div class="live-indicator">
-        <div class="live-dot"></div>
-        실시간
-      </div>
+    <!-- 실시간 경기 결과 (베타) -->
+    <div class="service-card card-result beta" onclick="openService('result')">
+      <div class="beta-badge">베타</div>
       <i class="fas fa-trophy service-icon"></i>
       <div class="service-title">경기 결과</div>
       <div class="service-desc">국내외 마라톤<br>실시간 기록</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
     </div>
     
-    <!-- 대회 일정 -->
-    <div class="service-card card-schedule" onclick="openService('schedule')">
+    <!-- 대회 일정 (베타) -->
+    <div class="service-card card-schedule beta" onclick="openService('schedule')">
+      <div class="beta-badge">베타</div>
       <i class="fas fa-calendar-alt service-icon"></i>
       <div class="service-title">대회 일정</div>
       <div class="service-desc">2024-2025<br>마라톤 대회 캘린더</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
     </div>
     
-    <!-- 훈련 계산기 -->
-    <div class="service-card card-training" onclick="openService('training')">
-      <i class="fas fa-dumbbell service-icon"></i>
-      <div class="service-title">훈련 계산기</div>
-      <div class="service-desc">VDOT 기반<br>맞춤 훈련 페이스</div>
-    </div>
-    
-    <!-- 페이스 계산기 -->
-    <div class="service-card card-pace" onclick="openService('pace')">
-      <i class="fas fa-calculator service-icon"></i>
-      <div class="service-title">페이스 계산기</div>
-      <div class="service-desc">목표 시간별<br>구간 스플릿</div>
-    </div>
-    
-    <!-- 중고 거래 -->
-    <div class="service-card card-market" onclick="openService('market')">
-      <div class="new-badge">12</div>
+    <!-- 중고 거래 (베타) -->
+    <div class="service-card card-market beta" onclick="openService('market')">
+      <div class="beta-badge">베타</div>
       <i class="fas fa-shopping-bag service-icon"></i>
       <div class="service-title">중고 거래</div>
       <div class="service-desc">러닝화 & 장비<br>직거래 마켓</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
     </div>
     
-    <!-- 더보기 -->
-    <div class="service-card card-more" onclick="openService('more')">
+    <!-- 더보기 (베타) -->
+    <div class="service-card card-more beta" onclick="openService('more')">
+      <div class="beta-badge">베타</div>
       <i class="fas fa-ellipsis-h service-icon"></i>
       <div class="service-title">더보기</div>
       <div class="service-desc">기록 관리<br>코스 추천</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
     </div>
   </div>
 
@@ -567,56 +633,64 @@
         title: '익명 게시판',
         desc: '자유롭게 의견을 나누고 정보를 공유하는 러너들의 익명 커뮤니티입니다.',
         url: 'community.html',
-        color: '#8b5cf6'
+        color: '#8b5cf6',
+        status: 'open'
       },
       chat: {
         icon: 'fas fa-comment-dots',
-        title: '실시간 채팅',
-        desc: '지금 접속 중인 러너들과 실시간으로 대화를 나눠보세요.',
+        title: '실시간 채팅 (오픈베타)',
+        desc: '지금 접속 중인 러너들과 실시간으로 대화를 나눠보세요.\n\n⚠️ 오픈베타 기간 중 일부 기능이 제한될 수 있습니다.',
         url: 'chat-websocket.html',
-        color: '#ec4899'
+        color: '#ec4899',
+        status: 'open-beta'
       },
       result: {
         icon: 'fas fa-trophy',
-        title: '경기 결과',
-        desc: '국내외 마라톤 대회의 실시간 결과와 기록을 확인하세요.',
-        url: 'results.html',
-        color: '#f59e0b'
+        title: '경기 결과 (베타)',
+        desc: '국내외 마라톤 대회의 실시간 결과와 기록 서비스를 준비 중입니다.\n\n🚧 현재 데이터를 수집하고 있으며, 곧 서비스를 시작합니다.',
+        url: '#',
+        color: '#f59e0b',
+        status: 'beta'
       },
       schedule: {
         icon: 'fas fa-calendar-alt',
-        title: '대회 일정',
-        desc: '2024-2025 시즌 마라톤 대회 일정을 한눈에 확인하세요.',
-        url: 'schedule.html',
-        color: '#10b981'
+        title: '대회 일정 (베타)',
+        desc: '2024-2025 시즌 마라톤 대회 일정 서비스를 준비 중입니다.\n\n🚧 대회 주최측과 협의 중이며, 곧 정확한 일정을 제공할 예정입니다.',
+        url: '#',
+        color: '#10b981',
+        status: 'beta'
       },
       training: {
         icon: 'fas fa-dumbbell',
         title: '훈련 계산기',
         desc: 'VDOT 기반으로 당신에게 맞는 최적의 훈련 페이스를 계산합니다.',
         url: 'training-calculator.html',
-        color: '#3b82f6'
+        color: '#3b82f6',
+        status: 'open'
       },
       pace: {
         icon: 'fas fa-calculator',
         title: '페이스 계산기',
         desc: '목표 시간에 맞는 구간별 스플릿과 페이스를 계산합니다.',
         url: 'pace-calculator.html',
-        color: '#ef4444'
+        color: '#ef4444',
+        status: 'open'
       },
       market: {
         icon: 'fas fa-shopping-bag',
-        title: '중고 거래',
-        desc: '러닝화, 시계, 장비 등을 안전하게 거래하는 러너 전용 마켓입니다.',
-        url: 'market.html',
-        color: '#6366f1'
+        title: '중고 거래 (베타)',
+        desc: '러닝화, 시계, 장비 등을 안전하게 거래하는 러너 전용 마켓을 준비 중입니다.\n\n🚧 안전 거래 시스템을 구축 중이며, 곧 오픈 예정입니다.',
+        url: '#',
+        color: '#6366f1',
+        status: 'beta'
       },
       more: {
         icon: 'fas fa-ellipsis-h',
-        title: '더 많은 기능',
-        desc: '기록 관리, 코스 추천, 날씨 정보 등 더 많은 서비스를 이용하세요.',
-        url: 'more.html',
-        color: '#6b7280'
+        title: '더 많은 기능 (베타)',
+        desc: '기록 관리, 코스 추천, 날씨 정보 등 더 많은 서비스를 준비 중입니다.\n\n🚧 사용자 피드백을 수집하여 필요한 기능을 추가할 예정입니다.',
+        url: '#',
+        color: '#6b7280',
+        status: 'beta'
       }
     };
     
@@ -625,17 +699,36 @@
       currentService = serviceKey;
       const service = services[serviceKey];
       
-      // 즉시 이동 (채팅, 페이스 계산기는 바로 이동)
-      if (serviceKey === 'chat' || serviceKey === 'pace') {
+      // 정식 오픈 서비스는 바로 이동
+      if (service.status === 'open') {
         window.location.href = service.url;
         return;
       }
       
-      // 모달 표시
+      // 오픈베타 서비스 (채팅)도 바로 이동
+      if (service.status === 'open-beta') {
+        if (confirm('오픈베타 서비스입니다.\n일부 기능이 제한될 수 있습니다.\n\n계속하시겠습니까?')) {
+          window.location.href = service.url;
+        }
+        return;
+      }
+      
+      // 베타 서비스는 모달 표시
       document.getElementById('modalIcon').className = service.icon + ' modal-icon';
       document.getElementById('modalIcon').style.color = service.color;
       document.getElementById('modalTitle').textContent = service.title;
       document.getElementById('modalDesc').textContent = service.desc;
+      document.getElementById('modalDesc').style.whiteSpace = 'pre-line';
+      
+      // 베타 서비스는 바로가기 버튼 숨기기
+      if (service.status === 'beta') {
+        document.getElementById('modalPrimary').style.display = 'none';
+        document.querySelector('.modal-buttons').style.justifyContent = 'center';
+      } else {
+        document.getElementById('modalPrimary').style.display = 'block';
+        document.querySelector('.modal-buttons').style.justifyContent = 'space-between';
+      }
+      
       document.getElementById('serviceModal').classList.add('active');
     }
     
@@ -683,17 +776,23 @@
       }
     });
     
-    // 실시간 숫자 업데이트 (데모)
+    // 실시간 숫자 업데이트 (익명게시판만)
     setInterval(() => {
       const badges = document.querySelectorAll('.new-badge');
       badges.forEach(badge => {
         const current = parseInt(badge.textContent);
-        const change = Math.random() > 0.7 ? 1 : 0;
+        const change = Math.random() > 0.8 ? 1 : 0;
         if (change && current < 99) {
           badge.textContent = current + change;
         }
       });
-    }, 10000);
+    }, 15000);
+    
+    // 베타 서비스 안내
+    console.log('%c🚀 ATHLETE TIME 베타 서비스', 'font-size: 20px; font-weight: bold; color: #8b5cf6;');
+    console.log('%c현재 오픈된 서비스: 페이스 계산기, 훈련 계산기, 익명 게시판', 'color: #10b981;');
+    console.log('%c오픈베타: 실시간 채팅', 'color: #ec4899;');
+    console.log('%c준비중: 경기 결과, 대회 일정, 중고 거래', 'color: #f59e0b;');
   </script>
 </body>
 </html>
