@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lane Table Fix Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .pace-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .pace-table th, .pace-table td {
+      border: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: center;
+    }
+    .pace-table thead th {
+      background-color: #f3f4f6;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Testing Lane Table Rendering</h1>
+    
+    <div class="bg-white rounded-lg shadow p-4 mb-4">
+      <button onclick="testDirectTableUpdate()" class="bg-blue-500 text-white px-4 py-2 rounded">
+        Test Direct Table Update
+      </button>
+      <button onclick="testInnerHTMLUpdate()" class="bg-green-500 text-white px-4 py-2 rounded ml-2">
+        Test innerHTML Update
+      </button>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-4">
+      <h3 class="font-bold text-lg mb-2">Table with Complex Header</h3>
+      <div class="overflow-x-auto">
+        <table class="pace-table">
+          <thead>
+            <tr>
+              <th rowspan="2">레인</th>
+              <th rowspan="2">총 거리</th>
+              <th rowspan="2">스태거</th>
+              <th rowspan="2">총 시간</th>
+              <th rowspan="2">시차</th>
+              <th colspan="4" class="bg-gray-50">구간별 시간 (초)</th>
+            </tr>
+            <tr>
+              <th class="bg-blue-50">직선①</th>
+              <th class="bg-red-50">곡선①</th>
+              <th class="bg-blue-50">직선②</th>
+              <th class="bg-red-50">곡선②</th>
+            </tr>
+          </thead>
+          <tbody id="laneTimeTable">
+            <tr>
+              <td colspan="9">Table will be populated here...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="bg-yellow-50 p-4 mt-4 rounded">
+      <h3 class="font-bold">Debug Info:</h3>
+      <div id="debugInfo"></div>
+    </div>
+  </div>
+
+  <script>
+    function testDirectTableUpdate() {
+      const tbody = document.getElementById('laneTimeTable');
+      const debug = document.getElementById('debugInfo');
+      
+      debug.innerHTML = 'Testing insertRow method...<br>';
+      
+      // Clear existing rows
+      tbody.innerHTML = '';
+      
+      // Add test rows using insertRow
+      for (let i = 1; i <= 8; i++) {
+        const row = tbody.insertRow();
+        
+        // Add cells one by one
+        const cell1 = row.insertCell();
+        cell1.textContent = `Lane ${i}`;
+        
+        const cell2 = row.insertCell();
+        cell2.textContent = `${400 + i * 7.67}m`;
+        
+        const cell3 = row.insertCell();
+        cell3.textContent = `+${i * 7.67}m`;
+        
+        const cell4 = row.insertCell();
+        cell4.textContent = `${90 + i * 2}s`;
+        
+        const cell5 = row.insertCell();
+        cell5.textContent = i === 1 ? '-' : `+${i * 2}`;
+        
+        const cell6 = row.insertCell();
+        cell6.textContent = '10.5';
+        cell6.className = 'text-blue-600';
+        
+        const cell7 = row.insertCell();
+        cell7.textContent = '20.5';
+        cell7.className = 'text-red-600';
+        
+        const cell8 = row.insertCell();
+        cell8.textContent = '10.5';
+        cell8.className = 'text-blue-600';
+        
+        const cell9 = row.insertCell();
+        cell9.textContent = '20.5';
+        cell9.className = 'text-red-600';
+        
+        if (i === 4) {
+          row.className = 'bg-purple-100 font-semibold';
+        }
+      }
+      
+      debug.innerHTML += `Added ${tbody.rows.length} rows using insertRow<br>`;
+      debug.innerHTML += 'Success!';
+    }
+    
+    function testInnerHTMLUpdate() {
+      const tbody = document.getElementById('laneTimeTable');
+      const debug = document.getElementById('debugInfo');
+      
+      debug.innerHTML = 'Testing innerHTML method...<br>';
+      
+      // Clear existing rows
+      tbody.innerHTML = '';
+      
+      // Create HTML string
+      let htmlContent = '';
+      for (let i = 1; i <= 8; i++) {
+        const rowClass = i === 4 ? 'bg-purple-100 font-semibold' : '';
+        htmlContent += `
+          <tr class="${rowClass}">
+            <td class="font-bold">레인 ${i}</td>
+            <td>${400 + i * 7.67}m</td>
+            <td>+${(i * 7.67).toFixed(2)}m</td>
+            <td class="font-bold">${90 + i * 2}초</td>
+            <td class="text-xs">${i === 1 ? '-' : '+' + (i * 2)}</td>
+            <td class="text-blue-600">10.50</td>
+            <td class="text-red-600">20.50</td>
+            <td class="text-blue-600">10.50</td>
+            <td class="text-red-600">20.50</td>
+          </tr>
+        `;
+      }
+      
+      tbody.innerHTML = htmlContent;
+      
+      debug.innerHTML += `Added ${tbody.rows.length} rows using innerHTML<br>`;
+      debug.innerHTML += 'Success!';
+    }
+    
+    // Test on load
+    window.addEventListener('DOMContentLoaded', function() {
+      testInnerHTMLUpdate();
+    });
+  </script>
+</body>
+</html>

@@ -1051,8 +1051,20 @@
     // 레인 계산기 함수
     // 트랙 레인별 계산 함수들
     function calculateLaneAll() {
-      const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
-      const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
+      console.log('calculateLaneAll 함수 호출됨 (모바일)');
+      
+      const targetTimeInput = document.getElementById('laneTargetTime');
+      const selectedLaneInput = document.getElementById('laneLaneSelector');
+      
+      if (!targetTimeInput || !selectedLaneInput) {
+        console.error('Input elements not found!');
+        return;
+      }
+      
+      const targetTime = parseFloat(targetTimeInput.value);
+      const selectedLane = parseInt(selectedLaneInput.value);
+      
+      console.log('입력값:', { targetTime, selectedLane });
       
       // 입력값 검증
       if (isNaN(targetTime) || targetTime <= 0) {
@@ -1131,11 +1143,24 @@
         });
       }
       
+      console.log('계산된 레인 데이터:', lanes.length, '개 레인');
+      
       // 트랙 시각화 업데이트
-      drawTrackLanes(lanes, selectedLane);
+      try {
+        drawTrackLanes(lanes, selectedLane);
+        console.log('트랙 시각화 완료');
+      } catch (error) {
+        console.error('트랙 시각화 에러:', error);
+      }
       
       // 테이블 업데이트
-      updateLaneTable(lanes, targetTime);
+      try {
+        updateLaneTable(lanes, targetTime);
+        console.log('테이블 업데이트 완료');
+        console.log('테이블 tbody 상태:', document.getElementById('laneTimeTable')?.rows.length, '개 행');
+      } catch (error) {
+        console.error('테이블 업데이트 에러:', error);
+      }
     }
     
     function drawTrackLanes(lanes, selectedLane) {
@@ -1227,14 +1252,21 @@
     
     function updateLaneTable(lanes, targetTime) {
       const tbody = document.getElementById('laneTimeTable');
-      if (!tbody) return;
+      console.log('updateLaneTable 호출됨 (모바일), tbody 존재:', !!tbody);
+      
+      if (!tbody) {
+        console.error('laneTimeTable tbody를 찾을 수 없음!');
+        return;
+      }
       
       tbody.innerHTML = '';
+      console.log('tbody 초기화 완료');
       
       // 선택된 레인 정보
       const selectedLaneData = lanes.find(l => l.isSelected);
       
-      lanes.forEach(lane => {
+      lanes.forEach((lane, index) => {
+        console.log(`레인 ${lane.lane} 행 추가 중...`);
         const row = tbody.insertRow();
         if (lane.isSelected) {
           row.className = 'bg-purple-100 font-semibold';
@@ -1252,6 +1284,8 @@
           <td class="text-xs text-red-600">${lane.sectionTimes.curve2.toFixed(1)}</td>
         `;
       });
+      
+      console.log(`테이블 업데이트 완료: ${tbody.rows.length}개 행 추가됨`);
       
       // 추가 정보 표시 영역 생성
       const infoContainer = document.getElementById('laneInfoContainer');
@@ -1541,6 +1575,14 @@
     // 페이지 로드 시 초기화
     window.addEventListener('DOMContentLoaded', () => {
       switchTab('chart');
+      
+      // 트랙 레인 계산기 초기화
+      setTimeout(() => {
+        if (document.getElementById('laneTargetTime') && document.getElementById('laneLaneSelector')) {
+          console.log('트랙 레인 계산기 초기화 중 (모바일)...');
+          calculateLaneAll();
+        }
+      }, 100);
     });
   </script>
 </body>

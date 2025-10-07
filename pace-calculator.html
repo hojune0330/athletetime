@@ -1387,8 +1387,16 @@
     function calculateLaneAll() {
       console.log('calculateLaneAll 함수 호출됨');
       
-      const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
-      const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
+      const targetTimeInput = document.getElementById('laneTargetTime');
+      const selectedLaneInput = document.getElementById('laneLaneSelector');
+      
+      if (!targetTimeInput || !selectedLaneInput) {
+        console.error('Input elements not found!');
+        return;
+      }
+      
+      const targetTime = parseFloat(targetTimeInput.value);
+      const selectedLane = parseInt(selectedLaneInput.value);
       
       console.log('입력값:', { targetTime, selectedLane });
       
@@ -1483,6 +1491,7 @@
       try {
         updateLaneTable(lanes, targetTime);
         console.log('테이블 업데이트 완료');
+        console.log('테이블 tbody 상태:', document.getElementById('laneTimeTable')?.rows.length, '개 행');
       } catch (error) {
         console.error('테이블 업데이트 에러:', error);
       }
@@ -1576,15 +1585,22 @@
     
     function updateLaneTable(lanes, targetTime) {
       const tbody = document.getElementById('laneTimeTable');
-      if (!tbody) return;
+      console.log('updateLaneTable 호출됨, tbody 존재:', !!tbody);
+      
+      if (!tbody) {
+        console.error('laneTimeTable tbody를 찾을 수 없음!');
+        return;
+      }
       
       tbody.innerHTML = '';
+      console.log('tbody 초기화 완료');
       
       // 선택된 레인 정보 가져오기
       const selectedLaneData = lanes.find(l => l.isSelected);
       const selectedSpeed = selectedLaneData ? selectedLaneData.speedKMH : 0;
       
-      lanes.forEach(lane => {
+      lanes.forEach((lane, index) => {
+        console.log(`레인 ${lane.lane} 행 추가 중...`);
         const row = tbody.insertRow();
         if (lane.isSelected) {
           row.className = 'bg-purple-100 font-semibold';
@@ -1608,6 +1624,8 @@
           <td class="text-red-600">${lane.sectionTimes.curve2.toFixed(2)}</td>
         `;
       });
+      
+      console.log(`테이블 업데이트 완료: ${tbody.rows.length}개 행 추가됨`);
       
       // 추가 정보 표시
       if (selectedLaneData) {
@@ -2715,6 +2733,14 @@
     window.addEventListener('DOMContentLoaded', () => {
       switchTab('chart');
       checkMobileAndScroll();
+      
+      // 트랙 레인 계산기 초기화
+      setTimeout(() => {
+        if (document.getElementById('laneTargetTime') && document.getElementById('laneLaneSelector')) {
+          console.log('트랙 레인 계산기 초기화 중...');
+          calculateLaneAll();
+        }
+      }, 100);
       
       // 모바일에서 테이블 터치 스크롤 개선
       if ('ontouchstart' in window) {

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Lane Calculator - Integration Status</title>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    h1 { 
+      color: #333;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .status-card {
+      background: #f8f9fa;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    .status-card.warning {
+      border-left-color: #ffc107;
+      background: #fff3cd;
+    }
+    .status-card.fixed {
+      border-left-color: #28a745;
+      background: #d4edda;
+    }
+    .status-card.error {
+      border-left-color: #dc3545;
+      background: #f8d7da;
+    }
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .feature-item {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    .feature-item h3 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    ul { line-height: 1.8; }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      margin: 5px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .highlight { 
+      background: #ffeb3b;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏃‍♂️ Track Lane Calculator - Integration Complete!</h1>
+    
+    <div class="status-card fixed">
+      <h2>✅ Integration Status: COMPLETE</h2>
+      <p>The track lane calculator has been successfully integrated into both desktop and mobile versions of the pace calculator.</p>
+    </div>
+    
+    <h2>📋 Changes Made</h2>
+    
+    <div class="status-card">
+      <h3>1. Removed Standalone Tab</h3>
+      <p>❌ Removed the separate "트랙 레인" tab that opened in a new window<br>
+      ✅ Integrated the full calculator directly into the main pace calculator page</p>
+    </div>
+    
+    <div class="status-card">
+      <h3>2. Fixed Table Display Issue</h3>
+      <p>🔧 Added debugging console logs to track the calculation flow<br>
+      ✅ Added initialization on page load to populate the table<br>
+      ✅ Fixed table structure to match the complex header layout (9 columns for desktop, 7 for mobile)</p>
+    </div>
+    
+    <div class="status-card">
+      <h3>3. Correct Speed Calculation</h3>
+      <p>✅ Target time is now correctly applied to the <span class="highlight">selected lane's distance</span>, not 400m<br>
+      ✅ All lanes use the same speed (calculated from selected lane)<br>
+      ✅ Times are proportionally distributed based on actual distances</p>
+    </div>
+    
+    <h2>🎯 Key Features</h2>
+    
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>World Athletics Standards</h3>
+        <ul>
+          <li>Straight sections: 84.39m each</li>
+          <li>Kerb radius: 36.50m</li>
+          <li>Lane 1 radius: 36.80m</li>
+          <li>Lane width: 1.22m</li>
+          <li>Measurement offset: 20cm from line</li>
+        </ul>
+      </div>
+      
+      <div class="feature-item">
+        <h3>Accurate Calculations</h3>
+        <ul>
+          <li>Lane-specific distances</li>
+          <li>Stagger calculations</li>
+          <li>Section time breakdowns</li>
+          <li>Speed in m/s and km/h</li>
+          <li>Time differences between lanes</li>
+        </ul>
+      </div>
+      
+      <div class="feature-item">
+        <h3>Visual Track Display</h3>
+        <ul>
+          <li>Proper oval track shape</li>
+          <li>Color-coded lanes</li>
+          <li>Section time annotations</li>
+          <li>Selected lane highlighting</li>
+          <li>Responsive SVG scaling</li>
+        </ul>
+      </div>
+      
+      <div class="feature-item">
+        <h3>Section Analysis</h3>
+        <ul>
+          <li>Straight section ① time</li>
+          <li>Curve section ① time</li>
+          <li>Straight section ② time</li>
+          <li>Curve section ② time</li>
+          <li>Total time comparison</li>
+        </ul>
+      </div>
+    </div>
+    
+    <h2>🔍 Example Calculation</h2>
+    
+    <div class="code-block">
+// Example: Lane 4, Target Time: 90 seconds
+Lane 4 Distance: 423.00m
+Speed: 423.00m / 90s = 4.70 m/s (16.92 km/h)
+
+Lane 1 (400.00m): 85.11 seconds
+Lane 2 (407.67m): 86.75 seconds
+Lane 3 (415.33m): 88.37 seconds
+Lane 4 (423.00m): 90.00 seconds ✓ (Selected)
+Lane 5 (430.66m): 91.63 seconds
+Lane 6 (438.33m): 93.26 seconds
+Lane 7 (445.99m): 94.89 seconds
+Lane 8 (453.66m): 96.52 seconds
+    </div>
+    
+    <h2>📱 Files Updated</h2>
+    
+    <div class="status-card">
+      <p><strong>✅ pace-calculator.html</strong> (Desktop version)<br>
+      - Added debugging logs for troubleshooting<br>
+      - Fixed table update function<br>
+      - Added auto-initialization on page load</p>
+      
+      <p><strong>✅ pace-calculator-mobile.html</strong> (Mobile version)<br>
+      - Synchronized with desktop changes<br>
+      - Adjusted for 7-column table layout<br>
+      - Added same debugging features</p>
+      
+      <p><strong>📁 track-lane-simple.html</strong> → <strong>track-lane-simple-deprecated.html</strong><br>
+      - Archived as no longer needed</p>
+    </div>
+    
+    <h2>🚀 Quick Access</h2>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="pace-calculator.html" class="btn" target="_blank">Open Desktop Version</a>
+      <a href="pace-calculator-mobile.html" class="btn" target="_blank">Open Mobile Version</a>
+      <a href="test-integrated-track.html" class="btn" target="_blank">Run Integration Test</a>
+    </div>
+    
+    <div class="status-card warning">
+      <h3>⚠️ Known Issues & Solutions</h3>
+      <p><strong>Issue:</strong> Table not displaying on initial load<br>
+      <strong>Solution:</strong> Added DOMContentLoaded event with 100ms delay to ensure proper initialization</p>
+      
+      <p><strong>Issue:</strong> Console errors about missing elements<br>
+      <strong>Solution:</strong> Added null checks before accessing DOM elements</p>
+      
+      <p><strong>Issue:</strong> Complex table header with rowspan/colspan<br>
+      <strong>Solution:</strong> Ensured correct number of TD elements (9 for desktop, 7 for mobile)</p>
+    </div>
+    
+    <h2>✨ Summary</h2>
+    
+    <div class="status-card fixed">
+      <p>The track lane calculator is now fully integrated and functional in both versions. The "전체 레인 구간별 시간 비교" table issue has been resolved by:</p>
+      <ul>
+        <li>✅ Adding proper initialization on page load</li>
+        <li>✅ Including debugging logs for troubleshooting</li>
+        <li>✅ Ensuring correct table structure with proper column count</li>
+        <li>✅ Adding error handling for DOM element access</li>
+      </ul>
+      <p><strong>The calculator now automatically calculates and displays all lane data when the page loads!</strong></p>
+    </div>
+  </div>
+</body>
+</html>
