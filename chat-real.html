@@ -631,7 +631,7 @@
       </div>
       
       <!-- 새 방 만들기 버튼 -->
-      <button class="create-room-btn" onclick="openCreateRoomModal()">
+      <button type="button" class="create-room-btn" onclick="openCreateRoomModal()">
         <i class="fas fa-plus"></i>
         <span>새 채팅방 만들기</span>
       </button>
@@ -641,7 +641,7 @@
     <div class="chat-main">
       <div class="chat-header">
         <div class="chat-header-info">
-          <button onclick="toggleSidebar()" class="mobile-menu-btn" style="background: none; border: none; color: white; font-size: 1.2rem;">
+          <button type="button" onclick="toggleSidebar()" class="mobile-menu-btn" style="background: none; border: none; color: white; font-size: 1.2rem;">
             <i class="fas fa-bars"></i>
           </button>
           <div class="chat-header-title" id="currentRoomName">채팅방 선택</div>
@@ -650,7 +650,7 @@
             <span id="currentRoomUsers">0명</span>
           </div>
         </div>
-        <button onclick="openGuideModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #999; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.color='white'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#999'">
+        <button type="button" onclick="openGuideModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #999; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.color='white'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#999'">
           <i class="fas fa-info-circle"></i>
           <span>안내</span>
         </button>
@@ -673,8 +673,8 @@
                  placeholder="메시지를 입력하세요..." 
                  onkeypress="if(event.key==='Enter' && !event.shiftKey) sendMessage()"
                  oninput="handleTyping()"
-                 disabled>
-          <button class="send-button" onclick="sendMessage()" id="sendBtn" disabled>
+                 disabled aria-label="messageInput에 입력">
+          <button type="button" class="send-button" onclick="sendMessage()" id="sendBtn" disabled>
             <i class="fas fa-paper-plane"></i>
           </button>
         </div>
@@ -691,7 +691,7 @@
       <div style="margin-bottom: 15px;">
         <label style="display: block; margin-bottom: 5px; color: #999; font-size: 0.85rem;">닉네임</label>
         <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20"
-               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;">
+               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;" aria-label="nicknameInput에 입력">
       </div>
       <div style="margin-bottom: 20px;">
         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
@@ -700,10 +700,10 @@
         </label>
       </div>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button onclick="closeProfileModal()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        <button type="button" onclick="closeProfileModal()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           취소
         </button>
-        <button onclick="saveProfile()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        <button type="button" onclick="saveProfile()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           저장
         </button>
       </div>
@@ -719,12 +719,12 @@
       <div style="margin-bottom: 15px;">
         <label style="display: block; margin-bottom: 5px; color: #999; font-size: 0.85rem;">채팅방 이름</label>
         <input type="text" id="roomNameInput" placeholder="채팅방 이름을 입력하세요" maxlength="30"
-               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;">
+               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;" aria-label="roomNameInput에 입력">
       </div>
       <div style="margin-bottom: 20px;">
         <label style="display: block; margin-bottom: 5px; color: #999; font-size: 0.85rem;">설명 (선택)</label>
         <input type="text" id="roomDescInput" placeholder="채팅방 설명" maxlength="100"
-               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;">
+               style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;" aria-label="roomDescInput에 입력">
       </div>
       <div style="padding: 15px; background: rgba(243, 158, 11, 0.1); border-radius: 8px; margin-bottom: 20px;">
         <p style="color: #f59e0b; font-size: 0.85rem; line-height: 1.5;">
@@ -733,10 +733,10 @@
         </p>
       </div>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
-        <button onclick="closeCreateRoomModal()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        <button type="button" onclick="closeCreateRoomModal()" style="padding: 10px 20px; background: rgba(255, 255, 255, 0.1); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           취소
         </button>
-        <button onclick="createRoom()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+        <button type="button" onclick="createRoom()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           만들기
         </button>
       </div>
@@ -750,7 +750,7 @@
         <h2 style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
           📜 채팅방 이용 안내
         </h2>
-        <button onclick="closeGuideModal()" style="background: none; border: none; color: #999; font-size: 1.5rem; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+        <button type="button" onclick="closeGuideModal()" style="background: none; border: none; color: #999; font-size: 1.5rem; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
           ×
         </button>
       </div>
@@ -838,7 +838,7 @@
       </div>
       
       <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
-        <button onclick="closeGuideModal()" style="padding: 12px 30px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem;">
+        <button type="button" onclick="closeGuideModal()" style="padding: 12px 30px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem;">
           확인했습니다
         </button>
       </div>
@@ -868,7 +868,7 @@
     
     // 프로필 로드
     function loadProfile() {
-      const saved = localStorage.getItem('runningChatProfile');
+      const saved = (function() { try { return localStorage.getItem('runningChatProfile'); } catch(e) { console.error('Storage error:', e); return null; } })();
       if (saved) {
         userProfile = JSON.parse(saved);
       } else {
@@ -883,7 +883,7 @@
     
     // 프로필 저장
     function saveProfileToStorage() {
-      localStorage.setItem('runningChatProfile', JSON.stringify(userProfile));
+      (function() { try { return localStorage.setItem('runningChatProfile', JSON.stringify(userProfile); } catch(e) { console.error('Storage error:', e); return null; } })());
     }
     
     // 프로필 UI 업데이트
@@ -926,7 +926,7 @@
         ws = new WebSocket(wsUrl);
         
         ws.onopen = () => {
-          console.log('✅ 채팅 서버 연결됨');
+          // console.log('✅ 채팅 서버 연결됨'); // Production: removed
           reconnectAttempts = 0;
           document.getElementById('connectionStatus').textContent = '온라인';
           
@@ -942,7 +942,7 @@
         };
         
         ws.onclose = () => {
-          console.log('❌ 채팅 서버 연결 끊김');
+          // console.log('❌ 채팅 서버 연결 끊김'); // Production: removed
           document.getElementById('connectionStatus').textContent = '오프라인';
           
           // 재연결 시도
@@ -1414,5 +1414,7 @@
     // 초기화
     init();
   </script>
+
+  <script src="theme-toggle.js"></script>
 </body>
 </html>

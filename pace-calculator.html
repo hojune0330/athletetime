@@ -380,7 +380,7 @@
   <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-10 no-print">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3 md:gap-4">
-        <button onclick="goBack()" class="p-1">
+        <button type="button" onclick="goBack()" class="p-1">
           <i class="fas fa-arrow-left text-xl"></i>
         </button>
         <div class="h-12 md:h-14 bg-white rounded-lg p-1 flex items-center">
@@ -401,7 +401,7 @@
         <a href="pace-calculator-selector.html?force=true" class="p-2 hover:bg-white/20 rounded-lg" title="버전 선택">
           <i class="fas fa-exchange-alt text-xl"></i>
         </a>
-        <button onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg" title="인쇄">
+        <button type="button" onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg" title="인쇄">
           <i class="fas fa-print text-xl"></i>
         </button>
       </div>
@@ -420,16 +420,16 @@
     
     <!-- 탭 메뉴 -->
     <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container">
-      <button onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
+      <button type="button" onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
         <i class="fas fa-table mr-2"></i>페이스 차트
       </button>
-      <button onclick="switchTab('lane')" id="tab-lane" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+      <button type="button" onclick="switchTab('lane')" id="tab-lane" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
         <i class="fas fa-road mr-2"></i>트랙 레인
       </button>
-      <button onclick="switchTab('target')" id="tab-target" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+      <button type="button" onclick="switchTab('target')" id="tab-target" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
         <i class="fas fa-bullseye mr-2"></i>목표 페이스
       </button>
-      <button onclick="switchTab('split')" id="tab-split" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+      <button type="button" onclick="switchTab('split')" id="tab-split" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
         <i class="fas fa-chart-line mr-2"></i>스플릿 계산
       </button>
 
@@ -461,15 +461,15 @@
       <!-- 차트 1: KM 페이스별 거리 환산표 -->
       <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart1">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
-          <button onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'png')" 
+          <button type="button" onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-image mr-1"></i>PNG
           </button>
-          <button onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'pdf')" 
+          <button type="button" onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'pdf')" 
                   class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-file-pdf mr-1"></i>PDF
           </button>
-          <button onclick="printChart('chart1')" 
+          <button type="button" onclick="printChart('chart1')" 
                   class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-print mr-1"></i>인쇄
           </button>
@@ -542,15 +542,15 @@
       <!-- 차트 2: 목표 기록별 페이스 분석표 -->
       <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart2">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
-          <button onclick="downloadChart('chart2', '목표_기록별_페이스', 'png')" 
+          <button type="button" onclick="downloadChart('chart2', '목표_기록별_페이스', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-image mr-1"></i>PNG
           </button>
-          <button onclick="downloadChart('chart2', '목표_기록별_페이스', 'pdf')" 
+          <button type="button" onclick="downloadChart('chart2', '목표_기록별_페이스', 'pdf')" 
                   class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-file-pdf mr-1"></i>PDF
           </button>
-          <button onclick="printChart('chart2')" 
+          <button type="button" onclick="printChart('chart2')" 
                   class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-print mr-1"></i>인쇄
           </button>
@@ -679,15 +679,15 @@
       <!-- 차트 3: 400m 트랙 레인별 보정 시간 -->
       <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart3">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
-          <button onclick="downloadChart('chart3', '트랙_레인별_보정표', 'png')" 
+          <button type="button" onclick="downloadChart('chart3', '트랙_레인별_보정표', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-image mr-1"></i>PNG
           </button>
-          <button onclick="downloadChart('chart3', '트랙_레인별_보정표', 'pdf')" 
+          <button type="button" onclick="downloadChart('chart3', '트랙_레인별_보정표', 'pdf')" 
                   class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-file-pdf mr-1"></i>PDF
           </button>
-          <button onclick="printChart('chart3')" 
+          <button type="button" onclick="printChart('chart3')" 
                   class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-print mr-1"></i>인쇄
           </button>
@@ -762,15 +762,15 @@
       <!-- 차트 4: 3000m 장애물 페이스 계산표 -->
       <div class="bg-white rounded-lg shadow-md p-4 chart-container" id="chart4">
         <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
-          <button onclick="downloadChart('chart4', '3000m_장애물_페이스', 'png')" 
+          <button type="button" onclick="downloadChart('chart4', '3000m_장애물_페이스', 'png')" 
                   class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-image mr-1"></i>PNG
           </button>
-          <button onclick="downloadChart('chart4', '3000m_장애물_페이스', 'pdf')" 
+          <button type="button" onclick="downloadChart('chart4', '3000m_장애물_페이스', 'pdf')" 
                   class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-file-pdf mr-1"></i>PDF
           </button>
-          <button onclick="printChart('chart4')" 
+          <button type="button" onclick="printChart('chart4')" 
                   class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
             <i class="fas fa-print mr-1"></i>인쇄
           </button>
@@ -978,7 +978,7 @@
           <p class="text-gray-600 mb-6">
             트랙 레인 계산기가 새 창에서 열립니다.
           </p>
-          <button onclick="window.open('track-lane-simple.html', '_blank')" 
+          <button type="button" onclick="window.open('track-lane-simple.html', '_blank')" 
                   class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg font-medium text-lg hover:opacity-90 transition">
             <i class="fas fa-external-link-alt mr-2"></i>
             트랙 레인 계산기 열기
@@ -1015,23 +1015,23 @@
               <option value="custom">직접 입력</option>
             </select>
             <input type="number" id="customDistance" placeholder="거리 입력 (m)" 
-                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mt-2 hidden">
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mt-2 hidden" aria-label="customDistance에 입력">
           </div>
           
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">목표 시간</label>
             <div class="flex gap-2">
               <input type="number" id="targetHours" placeholder="시" min="0" max="23" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="targetHours에 입력">
               <input type="number" id="targetMinutes" placeholder="분" min="0" max="59" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="targetMinutes에 입력">
               <input type="number" id="targetSeconds" placeholder="초" min="0" max="59" step="0.1" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="targetSeconds에 입력">
             </div>
           </div>
         </div>
         
-        <button onclick="calculateTargetPace()" 
+        <button type="button" onclick="calculateTargetPace()" 
                 class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
           페이스 계산하기
         </button>
@@ -1081,12 +1081,12 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">총 거리 (m)</label>
               <input type="number" id="splitTotalDistance" value="5000" 
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg" aria-label="splitTotalDistance에 입력">
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">구간 거리 (m)</label>
               <input type="number" id="splitInterval" value="1000" 
-                     class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg" aria-label="splitInterval에 입력">
             </div>
           </div>
           
@@ -1094,11 +1094,11 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">목표 시간</label>
             <div class="flex gap-2">
               <input type="number" id="splitHours" placeholder="시" min="0" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="splitHours에 입력">
               <input type="number" id="splitMinutes" placeholder="분" min="0" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="splitMinutes에 입력">
               <input type="number" id="splitSeconds" placeholder="초" min="0" step="0.1" 
-                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg" aria-label="splitSeconds에 입력">
             </div>
           </div>
           
@@ -1112,7 +1112,7 @@
           </div>
         </div>
         
-        <button onclick="calculateSplits()" 
+        <button type="button" onclick="calculateSplits()" 
                 class="w-full mt-4 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
           스플릿 계산하기
         </button>
@@ -1134,8 +1134,8 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">해당 레인 목표 시간 (초)</label>
             <div class="flex gap-2">
               <input type="number" id="laneTargetTime" value="72" min="30" max="120" step="0.1"
-                     class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <button onclick="calculateLaneAll()" 
+                     class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" aria-label="laneTargetTime에 입력">
+              <button type="button" onclick="calculateLaneAll()" 
                       class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition">
                 계산하기
               </button>
@@ -1385,7 +1385,7 @@
 
     // 트랙 레인별 계산 함수들
     function calculateLaneAll() {
-      console.log('calculateLaneAll 함수 호출됨');
+      // console.log('calculateLaneAll 함수 호출됨'); // Production: removed
       
       const targetTimeInput = document.getElementById('laneTargetTime');
       const selectedLaneInput = document.getElementById('laneLaneSelector');
@@ -1482,7 +1482,7 @@
       // 트랙 시각화 업데이트
       try {
         drawTrackLanes(lanes, selectedLane);
-        console.log('트랙 시각화 완료');
+        // console.log('트랙 시각화 완료'); // Production: removed
       } catch (error) {
         console.error('트랙 시각화 에러:', error);
       }
@@ -1490,7 +1490,7 @@
       // 테이블 업데이트
       try {
         updateLaneTable(lanes, targetTime);
-        console.log('테이블 업데이트 완료');
+        // console.log('테이블 업데이트 완료'); // Production: removed
         console.log('테이블 tbody 상태:', document.getElementById('laneTimeTable')?.rows.length, '개 행');
       } catch (error) {
         console.error('테이블 업데이트 에러:', error);
@@ -1593,14 +1593,14 @@
       }
       
       tbody.innerHTML = '';
-      console.log('tbody 초기화 완료');
+      // console.log('tbody 초기화 완료'); // Production: removed
       
       // 선택된 레인 정보 가져오기
       const selectedLaneData = lanes.find(l => l.isSelected);
       const selectedSpeed = selectedLaneData ? selectedLaneData.speedKMH : 0;
       
       lanes.forEach((lane, index) => {
-        console.log(`레인 ${lane.lane} 행 추가 중...`);
+        // console.log(`레인 ${lane.lane} 행 추가 중...`); // Production: removed
         const row = tbody.insertRow();
         if (lane.isSelected) {
           row.className = 'bg-purple-100 font-semibold';
@@ -1625,7 +1625,7 @@
         `;
       });
       
-      console.log(`테이블 업데이트 완료: ${tbody.rows.length}개 행 추가됨`);
+      // console.log(`테이블 업데이트 완료: ${tbody.rows.length}개 행 추가됨`); // Production: removed
       
       // 추가 정보 표시
       if (selectedLaneData) {
@@ -2688,7 +2688,9 @@
             <div style="text-align: center; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd;">
               © ATHLETE TIME · 제작: 장호준 코치 · ${new Date().toLocaleDateString('ko-KR')}
             </div>
-          </body>
+          
+  <script src="theme-toggle.js"></script>
+</body>
         </html>
       `;
       
@@ -2746,7 +2748,7 @@
       // 트랙 레인 계산기 초기화
       setTimeout(() => {
         if (document.getElementById('laneTargetTime') && document.getElementById('laneLaneSelector')) {
-          console.log('트랙 레인 계산기 초기화 중...');
+          // console.log('트랙 레인 계산기 초기화 중...'); // Production: removed
           calculateLaneAll();
         }
       }, 100);
@@ -2802,7 +2804,7 @@
           <div class="mini-chat-header">
             <span>💬 러닝톡</span>
             <span class="chat-online">● 온라인</span>
-            <button onclick="toggleMiniChat()" style="color: white;">✕</button>
+            <button type="button" onclick="toggleMiniChat()" style="color: white;">✕</button>
           </div>
           <div class="mini-chat-messages" id="miniChatMessages">
             <div style="text-align: center; padding: 10px; color: #999;">
@@ -2811,8 +2813,8 @@
           </div>
           <div class="mini-chat-input">
             <input type="text" id="miniChatInput" placeholder="메시지 입력..." 
-                   onkeypress="if(event.key==='Enter') sendMiniMessage()">
-            <button onclick="sendMiniMessage()">전송</button>
+                   onkeypress="if(event.key==='Enter') sendMiniMessage()" aria-label="miniChatInput에 입력">
+            <button type="button" onclick="sendMiniMessage()">전송</button>
           </div>
         `;
         document.body.appendChild(miniChat);
@@ -2840,7 +2842,7 @@
       const text = input.value.trim();
       if (!text) return;
       
-      const username = localStorage.getItem('username') || '나';
+      const username = (function() { try { return localStorage.getItem('username'); } catch(e) { console.error('Storage error:', e); return null; } })() || '나';
       
       // 메시지 표시
       addMiniMessage(username, text, true);
@@ -2858,10 +2860,10 @@
         }));
       } else if (window.chatFallback) {
         // 폴백 모드: 로컬 스토리지에 저장
-        const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
+        const messages = JSON.parse((function() { try { return localStorage.getItem('fallbackMessages'); } catch(e) { console.error('Storage error:', e); return null; } })() || '[]');
         messages.push({ username, text, timestamp: new Date().toISOString() });
         if (messages.length > 100) messages.shift(); // 최대 100개 메시지 유지
-        localStorage.setItem('fallbackMessages', JSON.stringify(messages));
+        (function() { try { return localStorage.setItem('fallbackMessages', JSON.stringify(messages); } catch(e) { console.error('Storage error:', e); return null; } })());
       }
       
       input.value = '';
@@ -2873,7 +2875,7 @@
         return;
       }
       
-      const username = localStorage.getItem('username') || '익명 러너';
+      const username = (function() { try { return localStorage.getItem('username'); } catch(e) { console.error('Storage error:', e); return null; } })() || '익명 러너';
       let message = '';
       
       switch(activity) {
@@ -2936,13 +2938,13 @@
         window.chatWs = new WebSocket(`${protocol}//${window.location.hostname}:3002`);
         
         window.chatWs.onopen = () => {
-          console.log('채팅 서버 연결됨');
+          // console.log('채팅 서버 연결됨'); // Production: removed
           reconnectAttempts = 0;
           addMiniMessage('시스템', '채팅 서버 연결됨 ✅');
           
           // 사용자명 설정
-          const username = localStorage.getItem('username') || `러너${Math.floor(Math.random() * 1000)}`;
-          localStorage.setItem('username', username);
+          const username = (function() { try { return localStorage.getItem('username'); } catch(e) { console.error('Storage error:', e); return null; } })() || `러너${Math.floor(Math.random() * 1000)}`;
+          (function() { try { return localStorage.setItem('username', username); } catch(e) { console.error('Storage error:', e); return null; } })();
           
           window.chatWs.send(JSON.stringify({
             type: 'join',
@@ -2979,7 +2981,7 @@
         };
         
         window.chatWs.onclose = () => {
-          console.log('채팅 연결 종료');
+          // console.log('채팅 연결 종료'); // Production: removed
           addMiniMessage('시스템', '채팅 서버 연결 끊김 ⚠️');
           
           // 자동 재연결
@@ -2988,7 +2990,7 @@
             const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
             
             reconnectTimeout = setTimeout(() => {
-              console.log(`재연결 시도 ${reconnectAttempts}/${maxReconnectAttempts}`);
+              // console.log(`재연결 시도 ${reconnectAttempts}/${maxReconnectAttempts}`); // Production: removed
               connectChatWebSocket();
             }, delay);
           }
@@ -3017,7 +3019,7 @@
       window.chatFallback = true;
       
       // 기존 메시지 로드
-      const messages = JSON.parse(localStorage.getItem('fallbackMessages') || '[]');
+      const messages = JSON.parse((function() { try { return localStorage.getItem('fallbackMessages'); } catch(e) { console.error('Storage error:', e); return null; } })() || '[]');
       messages.forEach(msg => {
         addMiniMessage(msg.username, msg.text);
       });

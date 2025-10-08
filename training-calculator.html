@@ -107,6 +107,36 @@
       background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
     }
   </style>
+
+  <style>
+    /* 커스텀 스크롤바 스타일 */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #764ba2, #667eea);
+    }
+    
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #667eea rgba(0, 0, 0, 0.1);
+    }
+  </style>
+
 </head>
 <body class="bg-gray-50">
   <div class="max-w-7xl mx-auto p-6">
@@ -118,10 +148,10 @@
           <p class="opacity-90">Jack Daniels VDOT 시스템 기반 과학적 훈련</p>
         </div>
         <div class="flex gap-2">
-          <button onclick="window.location.href='system-documentation.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="시스템 문서">
+          <button type="button" onclick="window.location.href='system-documentation.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="시스템 문서">
             <i class="fas fa-book text-xl"></i>
           </button>
-          <button onclick="window.location.href='index.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="홈으로">
+          <button type="button" onclick="window.location.href='index.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="홈으로">
             <i class="fas fa-home text-xl"></i>
           </button>
         </div>
@@ -135,7 +165,7 @@
           <span class="bg-purple-100 text-purple-600 w-10 h-10 rounded-full flex items-center justify-center mr-3">1</span>
           선수 프로필 설정
         </h2>
-        <button onclick="showQuickHelp()" class="text-purple-600 hover:text-purple-800 transition" title="도움말">
+        <button type="button" onclick="showQuickHelp()" class="text-purple-600 hover:text-purple-800 transition" title="도움말">
           <i class="fas fa-question-circle text-xl"></i>
         </button>
       </div>
@@ -148,12 +178,12 @@
           <div class="mb-4">
             <label class="block text-sm font-medium mb-2">성별</label>
             <div class="grid grid-cols-2 gap-2">
-              <button onclick="selectGender('male')" id="btn-male" 
+              <button type="button" onclick="selectGender('male')" id="btn-male" 
                 class="p-3 border-2 rounded-lg transition text-center hover:border-purple-500">
                 <i class="fas fa-mars text-blue-500 text-xl"></i>
                 <div class="text-sm mt-1">남성</div>
               </button>
-              <button onclick="selectGender('female')" id="btn-female"
+              <button type="button" onclick="selectGender('female')" id="btn-female"
                 class="p-3 border-2 rounded-lg transition text-center hover:border-purple-500">
                 <i class="fas fa-venus text-pink-500 text-xl"></i>
                 <div class="text-sm mt-1">여성</div>
@@ -252,16 +282,16 @@
           <label class="block text-sm font-medium mb-2">기록 입력</label>
           <div class="grid grid-cols-3 gap-2">
             <input type="number" id="hours" placeholder="시" min="0" max="23" 
-              class="p-3 border rounded-lg text-center">
+              class="p-3 border rounded-lg text-center" aria-label="hours에 입력">
             <input type="number" id="minutes" placeholder="분" min="0" max="59" 
-              class="p-3 border rounded-lg text-center">
+              class="p-3 border rounded-lg text-center" aria-label="minutes에 입력">
             <input type="number" id="seconds" placeholder="초" min="0" max="59" step="0.1"
-              class="p-3 border rounded-lg text-center">
+              class="p-3 border rounded-lg text-center" aria-label="seconds에 입력">
           </div>
         </div>
       </div>
       
-      <button onclick="calculateTraining()" 
+      <button type="button" onclick="calculateTraining()" 
         class="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition">
         <i class="fas fa-calculator mr-2"></i>훈련 계획 생성
       </button>
@@ -285,7 +315,7 @@
             <span id="paceValue" class="font-bold text-lg">100%</span>
           </div>
           <input type="range" id="paceAdjust" min="85" max="115" value="100" step="0.5"
-            class="custom-slider pace-slider w-full" oninput="updateFineTuning('pace')">
+            class="custom-slider pace-slider w-full" oninput="updateFineTuning('pace')" aria-label="paceAdjust에 입력">
           <div class="flex justify-between text-xs text-gray-500 mt-1">
             <span>느리게 (-15%)</span>
             <span>기준</span>
@@ -303,7 +333,7 @@
             <span id="volumeValue" class="font-bold text-lg">100%</span>
           </div>
           <input type="range" id="volumeAdjust" min="60" max="140" value="100" step="1"
-            class="custom-slider volume-slider w-full" oninput="updateFineTuning('volume')">
+            class="custom-slider volume-slider w-full" oninput="updateFineTuning('volume')" aria-label="volumeAdjust에 입력">
           <div class="flex justify-between text-xs text-gray-500 mt-1">
             <span>감소 (-40%)</span>
             <span>기준</span>
@@ -321,7 +351,7 @@
             <span id="intensityValue" class="font-bold text-lg">100%</span>
           </div>
           <input type="range" id="intensityAdjust" min="70" max="130" value="100" step="0.5"
-            class="custom-slider intensity-slider w-full" oninput="updateFineTuning('intensity')">
+            class="custom-slider intensity-slider w-full" oninput="updateFineTuning('intensity')" aria-label="intensityAdjust에 입력">
           <div class="flex justify-between text-xs text-gray-500 mt-1">
             <span>낮춤 (-30%)</span>
             <span>기준</span>
@@ -330,7 +360,7 @@
         </div>
         
         <!-- 리셋 버튼 -->
-        <button onclick="resetFineTuning()" 
+        <button type="button" onclick="resetFineTuning()" 
           class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition">
           <i class="fas fa-undo mr-2"></i>기본값으로 재설정
         </button>
@@ -1568,10 +1598,10 @@
       // Create tabs for templates and custom workouts
       workoutDetails.innerHTML = `
         <div class="mb-4 border-b">
-          <button onclick="showWorkoutTab('templates')" id="templatesTab" class="px-4 py-2 font-semibold text-purple-600 border-b-2 border-purple-600">
+          <button type="button" onclick="showWorkoutTab('templates')" id="templatesTab" class="px-4 py-2 font-semibold text-purple-600 border-b-2 border-purple-600">
             표준 템플릿 (${templates.length})
           </button>
-          <button onclick="showWorkoutTab('custom')" id="customTab" class="px-4 py-2 font-semibold text-gray-600 hover:text-purple-600 ml-4">
+          <button type="button" onclick="showWorkoutTab('custom')" id="customTab" class="px-4 py-2 font-semibold text-gray-600 hover:text-purple-600 ml-4">
             맞춤 훈련 (${workouts.length})
           </button>
         </div>
@@ -2005,7 +2035,7 @@
             <h3 class="text-xl font-bold text-purple-700">
               <i class="fas fa-info-circle mr-2"></i>시스템 사용 안내
             </h3>
-            <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+            <button type="button" onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
               <i class="fas fa-times text-xl"></i>
             </button>
           </div>
@@ -2041,7 +2071,7 @@
           </div>
           
           <div class="mt-6 text-center">
-            <button onclick="this.closest('.fixed').remove()" 
+            <button type="button" onclick="this.closest('.fixed').remove()" 
               class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">
               확인
             </button>
@@ -2064,8 +2094,8 @@
       resetFineTuning();
       
       // 첫 방문자를 위한 안내 (localStorage 체크)
-      if (!localStorage.getItem('trainingCalcVisited')) {
-        localStorage.setItem('trainingCalcVisited', 'true');
+      if (!(function() { try { return localStorage.getItem('trainingCalcVisited'); } catch(e) { console.error('Storage error:', e); return null; } })()) {
+        (function() { try { return localStorage.setItem('trainingCalcVisited', 'true'); } catch(e) { console.error('Storage error:', e); return null; } })();
         setTimeout(() => {
           const infoBtn = document.createElement('div');
           infoBtn.className = 'fixed bottom-4 right-4 bg-purple-600 text-white px-4 py-2 rounded-full shadow-lg cursor-pointer hover:bg-purple-700 transition animate-pulse';
@@ -2080,5 +2110,7 @@
       }
     });
   </script>
+
+  <script src="theme-toggle.js"></script>
 </body>
 </html>

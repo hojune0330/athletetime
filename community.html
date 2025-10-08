@@ -210,16 +210,16 @@
   <header class="sticky top-0 z-40 bg-gradient-to-r from-red-500 to-blue-600 text-white safe-top">
     <div class="flex items-center justify-between p-4">
       <div class="flex items-center gap-3">
-        <button onclick="goBack()" class="text-white p-1">
+        <button type="button" onclick="goBack()" class="text-white p-1">
           <i class="fas fa-arrow-left text-lg"></i>
         </button>
         <h1 class="text-xl font-bold">익명게시판</h1>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="searchToggle()" class="p-2">
+        <button type="button" onclick="searchToggle()" class="p-2">
           <i class="fas fa-search"></i>
         </button>
-        <button onclick="showNavMenu()" class="p-2" title="메뉴">
+        <button type="button" onclick="showNavMenu()" class="p-2" title="메뉴">
           <i class="fas fa-bars"></i>
         </button>
         <span class="text-xs bg-yellow-400 text-black px-2 py-1 rounded-full font-bold">BETA</span>
@@ -241,7 +241,7 @@
           placeholder="검색어를 입력하세요"
           class="w-full px-4 py-2 rounded-full text-black pl-10"
           onkeyup="handleSearch(event)"
-        >
+         aria-label="searchInput에 입력">
         <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
       </div>
     </div>
@@ -254,7 +254,7 @@
       <div class="p-4 border-b">
         <div class="flex items-center justify-between">
           <h3 class="font-bold text-lg">메뉴</h3>
-          <button onclick="hideNavMenu()" class="text-gray-500">
+          <button type="button" onclick="hideNavMenu()" class="text-gray-500">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -289,26 +289,26 @@
   <!-- Categories -->
   <div class="sticky top-16 z-30 bg-white border-b">
     <div class="flex gap-2 p-3 overflow-x-auto hide-scrollbar">
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-blue-500 text-white" onclick="filterCategory('전체')">전체</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('공지')">공지</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('자유')">자유</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('질문')">질문</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('정보')">정보</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('훈련')">훈련</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('대회')">대회</button>
-      <button class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('거래')">거래</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-blue-500 text-white" onclick="filterCategory('전체')">전체</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('공지')">공지</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('자유')">자유</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('질문')">질문</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('정보')">정보</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('훈련')">훈련</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('대회')">대회</button>
+      <button type="button" class="category-btn px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap bg-gray-100" onclick="filterCategory('거래')">거래</button>
     </div>
   </div>
 
   <!-- Sort Options -->
   <div class="bg-white border-b px-4 py-2 flex justify-between items-center text-sm">
     <div class="flex gap-3">
-      <button id="sortLatest" class="text-blue-600 font-medium" onclick="sortPosts('latest')">최신순</button>
-      <button id="sortPopular" class="text-gray-500" onclick="sortPosts('popular')">인기순</button>
-      <button id="sortViews" class="text-gray-500" onclick="sortPosts('views')">조회순</button>
-      <button id="sortComments" class="text-gray-500" onclick="sortPosts('comments')">댓글순</button>
+      <button type="button" id="sortLatest" class="text-blue-600 font-medium" onclick="sortPosts('latest')">최신순</button>
+      <button type="button" id="sortPopular" class="text-gray-500" onclick="sortPosts('popular')">인기순</button>
+      <button type="button" id="sortViews" class="text-gray-500" onclick="sortPosts('views')">조회순</button>
+      <button type="button" id="sortComments" class="text-gray-500" onclick="sortPosts('comments')">댓글순</button>
     </div>
-    <button onclick="refreshPosts()" class="text-gray-400">
+    <button type="button" onclick="refreshPosts()" class="text-gray-400">
       <i class="fas fa-sync-alt"></i>
     </button>
   </div>
@@ -336,7 +336,7 @@
   </div>
 
   <!-- Write Button (FAB) -->
-  <button id="writeBtn" onclick="openWriteModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full fab-shadow z-50 touch-feedback flex items-center justify-center">
+  <button type="button" id="writeBtn" onclick="openWriteModal()" class="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 text-white rounded-full fab-shadow z-50 touch-feedback flex items-center justify-center">
     <i class="fas fa-pen"></i>
   </button>
 
@@ -347,11 +347,11 @@
       
       <!-- Modal Header -->
       <div class="sticky top-0 bg-white border-b px-4 py-3 flex justify-between items-center rounded-t-3xl">
-        <button onclick="closeWriteModal()" class="p-1">
+        <button type="button" onclick="closeWriteModal()" class="p-1">
           <i class="fas fa-times text-xl text-gray-600"></i>
         </button>
         <h2 class="font-bold text-lg">게시물 작성</h2>
-        <button onclick="submitPost()" class="text-blue-500 font-bold">완료</button>
+        <button type="button" onclick="submitPost()" class="text-blue-500 font-bold">완료</button>
       </div>
       
       <!-- Modal Body -->
@@ -370,7 +370,7 @@
           </div>
           <div>
             <label class="text-xs text-gray-600 mb-1 block">작성자</label>
-            <input id="postAuthor" type="text" placeholder="익명" class="w-full px-3 py-2 border rounded-lg text-sm">
+            <input id="postAuthor" type="text" placeholder="익명" class="w-full px-3 py-2 border rounded-lg text-sm" aria-label="postAuthor에 입력">
           </div>
         </div>
         
@@ -384,14 +384,14 @@
             <input id="postInstagram" type="text" placeholder="instagram_id" 
                    class="flex-1 px-3 py-2 border rounded-lg text-sm"
                    pattern="[A-Za-z0-9._]+"
-                   title="영문, 숫자, 마침표(.), 언더스코어(_)만 사용 가능">
+                   title="영문, 숫자, 마침표(.), 언더스코어(_)만 사용 가능" aria-label="postInstagram에 입력">
           </div>
           <p class="text-xs text-gray-500 mt-1">@ 없이 아이디만 입력 (예: athlete_time)</p>
         </div>
         
         <div>
           <label class="text-xs text-gray-600 mb-1 block">제목 <span class="text-red-500">*</span></label>
-          <input id="postTitle" type="text" placeholder="제목을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
+          <input id="postTitle" type="text" placeholder="제목을 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm" aria-label="postTitle에 입력">
         </div>
         
         <div>
@@ -438,7 +438,7 @@
         
         <div>
           <label class="text-xs text-gray-600 mb-1 block">비밀번호 (수정/삭제용)</label>
-          <input id="postPassword" type="password" placeholder="비밀번호를 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm">
+          <input id="postPassword" type="password" placeholder="비밀번호를 입력하세요" class="w-full px-3 py-2 border rounded-lg text-sm" aria-label="postPassword에 입력">
         </div>
         
         <div class="text-xs text-gray-500">
@@ -453,11 +453,11 @@
   <div id="postModal" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
     <!-- Post Header (고정) -->
     <div class="bg-white border-b p-4 flex items-center gap-3 safe-top flex-shrink-0">
-      <button onclick="closePostModal()" class="p-1">
+      <button type="button" onclick="closePostModal()" class="p-1">
         <i class="fas fa-arrow-left text-xl"></i>
       </button>
       <h2 class="font-bold text-lg flex-1">게시물</h2>
-      <button onclick="showPostMenu()" class="p-1">
+      <button type="button" onclick="showPostMenu()" class="p-1">
         <i class="fas fa-ellipsis-v"></i>
       </button>
     </div>
@@ -495,21 +495,21 @@
             type="text" 
             placeholder="닉네임" 
             class="w-20 sm:w-24 px-2 sm:px-3 py-2 border rounded-lg text-sm"
-          >
+           aria-label="commentAuthor에 입력">
           <input 
             id="commentInstagram" 
             type="text" 
             placeholder="@인스타" 
             class="w-24 sm:w-32 px-2 sm:px-3 py-2 border rounded-lg text-sm"
-          >
+           aria-label="commentInstagram에 입력">
           <input 
             id="commentInput" 
             type="text" 
             placeholder="댓글 입력" 
             class="flex-1 min-w-0 px-2 sm:px-3 py-2 border rounded-lg text-sm"
             onkeypress="if(event.key==='Enter') submitComment()"
-          >
-          <button onclick="submitComment()" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
+           aria-label="commentInput에 입력">
+          <button type="button" onclick="submitComment()" class="px-3 sm:px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium">
             등록
           </button>
         </div>
@@ -522,16 +522,16 @@
     <div class="absolute inset-0 bg-black bg-opacity-50" onclick="hidePostMenu()"></div>
     <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-4 safe-bottom slide-up">
       <div class="space-y-3">
-        <button onclick="editPost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
+        <button type="button" onclick="editPost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
           <i class="fas fa-edit mr-3"></i> 수정
         </button>
-        <button onclick="deletePost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg text-red-600">
+        <button type="button" onclick="deletePost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg text-red-600">
           <i class="fas fa-trash mr-3"></i> 삭제
         </button>
-        <button onclick="sharePost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
+        <button type="button" onclick="sharePost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
           <i class="fas fa-share mr-3"></i> 공유
         </button>
-        <button onclick="reportPost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
+        <button type="button" onclick="reportPost()" class="w-full text-left py-3 px-4 hover:bg-gray-50 rounded-lg">
           <i class="fas fa-exclamation-triangle mr-3"></i> 신고
         </button>
       </div>
@@ -563,10 +563,10 @@
       </div>
       
       <div class="flex gap-2 mt-4">
-        <button onclick="closeCommentWarning()" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+        <button type="button" onclick="closeCommentWarning()" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
           취소
         </button>
-        <button onclick="confirmSubmitComment()" class="flex-1 px-4 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
+        <button type="button" onclick="confirmSubmitComment()" class="flex-1 px-4 py-2.5 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition">
           작성하기
         </button>
       </div>
@@ -597,10 +597,10 @@
     
     // 사용자 ID 가져오기/생성
     function getUserId() {
-      let userId = localStorage.getItem(USER_KEY);
+      let userId = (function() { try { return localStorage.getItem(USER_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
       if (!userId) {
         userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem(USER_KEY, userId);
+        (function() { try { return localStorage.setItem(USER_KEY, userId); } catch(e) { console.error('Storage error:', e); return null; } })();
       }
       return userId;
     }
@@ -650,12 +650,12 @@
     
     // ===== 데이터 관리 =====
     function loadPosts() {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = (function() { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
       posts = saved ? JSON.parse(saved) : [];
     }
     
     function savePosts() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+      (function() { try { return localStorage.setItem(STORAGE_KEY, JSON.stringify(posts); } catch(e) { console.error('Storage error:', e); return null; } })());
     }
     
     // ===== 게시물 렌더링 =====
@@ -703,7 +703,7 @@
                 </div>
               </div>
               ${post.images && post.images.length > 0 ? 
-                `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3">` : ''}
+                `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3" alt="${post">` : ''}
             </div>
             ${post.poll ? PollHandler.renderPollUI(post.poll, userId, true) : ''}
           </div>
@@ -822,14 +822,14 @@
           
           <!-- 투표 버튼 -->
           <div class="flex gap-2 py-4 border-y">
-            <button 
+            <button type="button" 
               onclick="vote('like')" 
               class="flex-1 py-2.5 rounded-lg border transition-colors ${userVote === 'like' ? 'bg-blue-50 border-blue-500 text-blue-600' : 'border-gray-300'}"
             >
               <i class="${userVote === 'like' ? 'fas' : 'far'} fa-thumbs-up"></i>
               <span class="ml-2 font-medium">${currentPost.likes.length}</span>
             </button>
-            <button 
+            <button type="button" 
               onclick="vote('dislike')" 
               class="flex-1 py-2.5 rounded-lg border transition-colors ${userVote === 'dislike' ? 'bg-red-50 border-red-500 text-red-600' : 'border-gray-300'}"
             >
@@ -895,7 +895,7 @@
                 <span class="text-xs text-gray-500">${formatTime(comment.date)}</span>
               </div>
             </div>
-            <button onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1 hover:text-gray-600">
+            <button type="button" onclick="reportComment(${comment.id})" class="text-xs text-gray-400 p-1 hover:text-gray-600">
               <i class="fas fa-ellipsis-v"></i>
             </button>
           </div>
@@ -988,7 +988,7 @@
       };
       
       // 경고 모달 표시
-      const warningShown = localStorage.getItem('commentWarningShown');
+      const warningShown = (function() { try { return localStorage.getItem('commentWarningShown'); } catch(e) { console.error('Storage error:', e); return null; } })();
       if (!warningShown) {
         // 처음 댓글을 작성하는 경우 경고 표시
         document.getElementById('dontShowAgain').checked = false; // 체크박스 초기화
@@ -1021,7 +1021,7 @@
       // "다시 보지 않기" 체크 확인
       const dontShowAgain = document.getElementById('dontShowAgain').checked;
       if (dontShowAgain) {
-        localStorage.setItem('commentWarningShown', 'true');
+        (function() { try { return localStorage.setItem('commentWarningShown', 'true'); } catch(e) { console.error('Storage error:', e); return null; } })();
       }
       
       // 입력 필드 초기화
@@ -1893,7 +1893,7 @@
     // ===== 자동 이미지 정리 =====
     function performAutoCleanup() {
       const storage = ImageHandler.checkStorageSpace();
-      console.log(`Storage check: ${storage.percent}% used (${storage.used}MB / ${storage.max}MB)`);
+      // console.log(`Storage check: ${storage.percent}% used (${storage.used}MB / ${storage.max}MB)`); // Production: removed
       
       // 저장소 사용률이 50% 이상이면 자동 정리 시작
       if (storage.percent > 50) {
@@ -1944,5 +1944,7 @@
       setInterval(performAutoCleanup, 60 * 60 * 1000);
     });
   </script>
+
+  <script src="theme-toggle.js"></script>
 </body>
 </html>

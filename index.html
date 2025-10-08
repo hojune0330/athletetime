@@ -545,7 +545,7 @@
   <!-- 플로팅 헤더 -->
   <div class="floating-header" id="floatingHeader">
     <div class="logo">ATHLETE TIME</div>
-    <button onclick="showMenu()" style="background: none; border: none; color: white; font-size: 1.2rem;">
+    <button type="button" onclick="showMenu()" style="background: none; border: none; color: white; font-size: 1.2rem;">
       <i class="fas fa-bars"></i>
     </button>
   </div>
@@ -651,7 +651,7 @@
         <div class="widget-stat-label">메시지</div>
       </div>
     </div>
-    <button class="widget-join-btn" onclick="window.location.href='chat-real.html'">
+    <button type="button" class="widget-join-btn" onclick="window.location.href='chat-real.html'">
       채팅 참여하기 <i class="fas fa-arrow-right"></i>
     </button>
   </div>
@@ -731,8 +731,8 @@
       <div class="modal-title" id="modalTitle"></div>
       <div class="modal-desc" id="modalDesc"></div>
       <div class="modal-buttons">
-        <button class="modal-button primary" id="modalPrimary" onclick="goToService()">바로가기</button>
-        <button class="modal-button secondary" onclick="closeModal()">닫기</button>
+        <button type="button" class="modal-button primary" id="modalPrimary" onclick="goToService()">바로가기</button>
+        <button type="button" class="modal-button secondary" onclick="closeModal()">닫기</button>
       </div>
     </div>
   </div>
@@ -924,7 +924,14 @@
       }
       
       fetch(apiUrl)
-        .then(res => res.json())
+        .then
+        .catch(error => {
+          console.error('네트워크 오류:', error);
+          // 사용자에게 오류 알림
+          if (typeof alert !== 'undefined') {
+            // alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+        })(res => res.json())
         .then(data => {
           document.getElementById('widgetOnline').textContent = data.onlineUsers || 0;
           document.getElementById('widgetRooms').textContent = data.totalRooms || 0;
@@ -935,7 +942,7 @@
           document.getElementById('chatWidget').classList.add('show');
         })
         .catch(err => {
-          console.log('채팅 서버 오프라인');
+          // console.log('채팅 서버 오프라인'); // Production: removed
         });
     }
     
@@ -951,5 +958,7 @@
       setInterval(fetchChatStats, 10000);
     });
   </script>
+
+  <script src="theme-toggle.js"></script>
 </body>
 </html>
