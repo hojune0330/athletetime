@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>육상톡 - 실시간 채팅 | 애슬리트 타임</title>
   
   <!-- PWA 메타 태그 -->
@@ -29,13 +29,20 @@
       background: #0a0a0a;
       color: #ffffff;
       height: 100vh;
+      height: 100dvh; /* Dynamic viewport height for mobile */
       overflow: hidden;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
     }
     
     /* 레이아웃 */
     .chat-container {
       display: flex;
       height: 100vh;
+      height: 100dvh; /* Dynamic viewport height for mobile */
+      position: relative;
     }
     
     /* 사이드바 */
@@ -269,6 +276,8 @@
       display: flex;
       flex-direction: column;
       background: #0a0a0a;
+      position: relative;
+      min-height: 0; /* Important for flex children */
     }
     
     .chat-header {
@@ -319,10 +328,13 @@
     .messages-container {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 15px;
+      min-height: 0; /* Important for proper scrolling */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     
     /* 메시지 스타일 */
@@ -526,6 +538,9 @@
       padding: 20px;
       background: #111111;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0; /* Prevent shrinking */
+      position: relative;
+      z-index: 10; /* Ensure it stays above other content */
     }
     
     .input-wrapper {
@@ -701,11 +716,30 @@
     
     /* 모바일 대응 */
     @media (max-width: 768px) {
+      body {
+        height: 100vh;
+        height: 100dvh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      
+      .chat-container {
+        height: 100vh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      
       .sidebar {
         position: fixed;
         left: -280px;
         z-index: 100;
         transition: left 0.3s;
+        height: 100vh;
+        height: 100dvh;
       }
       
       .sidebar.open {
@@ -714,6 +748,30 @@
       
       .chat-main {
         width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .chat-header {
+        flex-shrink: 0;
+      }
+      
+      .messages-container {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px;
+      }
+      
+      .input-container {
+        flex-shrink: 0;
+        padding: 15px;
+        padding-bottom: env(safe-area-inset-bottom, 15px); /* iOS safe area */
+        position: relative;
+        background: #111111;
       }
       
       .mobile-menu-btn {
@@ -722,6 +780,44 @@
       
       .stats-section {
         display: none;
+      }
+      
+      /* Adjust message spacing for mobile */
+      .message-text {
+        max-width: 85%;
+      }
+      
+      /* Adjust image preview for mobile */
+      .image-preview {
+        max-width: 150px;
+      }
+      
+      /* Keyboard visible adjustment */
+      .keyboard-visible .messages-container {
+        padding-bottom: 100px; /* Extra space when keyboard is visible */
+      }
+      
+      .keyboard-visible .input-container {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+      }
+      
+      /* iOS specific fixes */
+      @supports (-webkit-touch-callout: none) {
+        .chat-container {
+          height: -webkit-fill-available;
+        }
+        
+        .chat-main {
+          height: -webkit-fill-available;
+        }
+        
+        .messages-container {
+          padding-bottom: 80px;
+        }
       }
     }
     
@@ -1098,6 +1194,68 @@
       // UI 초기 설정
       document.getElementById('currentRoomName').textContent = '메인 채팅방';
       document.getElementById('messageInput').placeholder = '연결 중...';
+      
+      // 모바일 키보드 감지
+      setupMobileKeyboardDetection();
+    }
+    
+    // 모바일 키보드 감지 설정
+    function setupMobileKeyboardDetection() {
+      const isMobile = window.innerWidth <= 768;
+      if (!isMobile) return;
+      
+      const input = document.getElementById('messageInput');
+      
+      // Visual Viewport API 사용 (더 정확한 키보드 감지)
+      if ('visualViewport' in window) {
+        window.visualViewport.addEventListener('resize', () => {
+          const hasKeyboard = window.visualViewport.height < window.screen.height * 0.8;
+          
+          if (hasKeyboard) {
+            document.body.classList.add('keyboard-visible');
+            // 입력창을 viewport 안에 유지
+            const inputContainer = document.querySelector('.input-container');
+            if (inputContainer) {
+              inputContainer.style.transform = `translateY(${window.screen.height - window.visualViewport.height}px)`;
+            }
+            scrollToBottom();
+          } else {
+            document.body.classList.remove('keyboard-visible');
+            const inputContainer = document.querySelector('.input-container');
+            if (inputContainer) {
+              inputContainer.style.transform = 'translateY(0)';
+            }
+          }
+        });
+      } else {
+        // Fallback for older browsers
+        let initialHeight = window.innerHeight;
+        
+        input.addEventListener('focus', function() {
+          setTimeout(() => {
+            const currentHeight = window.innerHeight;
+            if (currentHeight < initialHeight * 0.8) {
+              document.body.classList.add('keyboard-visible');
+              scrollToBottom();
+            }
+          }, 300);
+        });
+        
+        input.addEventListener('blur', function() {
+          document.body.classList.remove('keyboard-visible');
+          initialHeight = window.innerHeight;
+        });
+      }
+    }
+    
+    // 메시지 영역 스크롤을 맨 아래로
+    function scrollToBottom() {
+      const container = document.getElementById('messagesContainer');
+      if (container) {
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight;
+        }, 100);
+      }
     }
     
     // 프로필 로드
@@ -1464,7 +1622,16 @@
       `;
       
       container.appendChild(messageDiv);
-      container.scrollTop = container.scrollHeight;
+      
+      // 스크롤을 맨 아래로 (모바일 대응)
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+        
+        // 모바일에서 추가 스크롤 보정
+        if (window.innerWidth <= 768) {
+          container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }, 50);
     }
     
     // 알림음 재생
@@ -1504,7 +1671,16 @@
       messageDiv.className = 'message system';
       messageDiv.innerHTML = `<span>${text}</span>`;
       container.appendChild(messageDiv);
-      container.scrollTop = container.scrollHeight;
+      
+      // 스크롤을 맨 아래로 (모바일 대응)
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+        
+        // 모바일에서 추가 스크롤 보정
+        if (window.innerWidth <= 768) {
+          container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+      }, 50);
     }
     
     // 채팅방 목록 업데이트
