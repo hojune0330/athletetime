@@ -1769,7 +1769,7 @@
         document.body.appendChild(miniChat);
       }
       
-      // WebSocket 연결 시도
+      // Connect WebSocket
       connectChatWebSocket();
     }
     
@@ -1940,7 +1940,7 @@
       });
     }
     
-    // 계산기 활동을 채팅에 자동으로 공유하는 함수
+    // Share calculator activity to chat
     function shareToChat(activity, details) {
       if (!window.chatWs || window.chatWs.readyState !== WebSocket.OPEN) {
         return;
