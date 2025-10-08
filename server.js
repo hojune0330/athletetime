@@ -254,6 +254,7 @@ app.post('/api/posts/:id/vote', async (req, res) => {
 const rooms = new Map();
 const ROOM_INACTIVE_TIMEOUT = 30 * 60 * 1000; // 30분
 const MESSAGE_RETENTION_TIME = 24 * 60 * 60 * 1000; // 24시간
+let totalMessageCount = 0;
 
 // 메인 채팅방 초기화
 rooms.set('main', {
@@ -262,6 +263,7 @@ rooms.set('main', {
   lastActivity: Date.now(),
   name: '메인 채팅방',
   description: '모든 육상인들이 함께하는 공간',
+  icon: '🏃',
   permanent: true // 영구 채팅방 표시
 });
 
@@ -269,23 +271,33 @@ wss.on('connection', (ws) => {
   let currentRoom = null;
   let userId = null;
 
-  // 연결 시 즉시 메인 채팅방 정보 전송
-  ws.send(JSON.stringify({
-    type: 'connected',
-    data: {
-      rooms: [{
-        id: 'main',
-        name: '메인 채팅방',
-        description: '모든 육상인들이 함께하는 공간',
-        userCount: rooms.get('main').users.size,
-        active: true
-      }],
-      stats: {
-        totalUsers: wss.clients.size,
-        activeRooms: rooms.size
+  // 연결 시 즉시 전체 정보 전송
+  const sendInitialData = () => {
+    const roomList = Array.from(rooms.entries()).map(([id, room]) => ({
+      id,
+      name: room.name || `채팅방 ${id}`,
+      description: room.description || '',
+      userCount: room.users.size,
+      icon: room.icon || '💬',
+      permanent: room.permanent || false,
+      lastActivity: room.lastActivity,
+      active: room.users.size > 0
+    }));
+
+    ws.send(JSON.stringify({
+      type: 'connected',
+      data: {
+        rooms: roomList,
+        stats: {
+          onlineUsers: wss.clients.size,
+          totalRooms: rooms.size,
+          totalMessages: totalMessageCount
+        }
       }
-    }
-  }));
+    }));
+  };
+
+  sendInitialData();
 
   ws.on('message', async (data) => {
     try {
@@ -331,6 +343,10 @@ wss.on('connection', (ws) => {
               userCount: room.users.size
             }
           });
+          
+          // 방 정보 및 통계 업데이트
+          broadcastRoomUpdate(currentRoom);
+          broadcastStats();
           break;
 
         case 'message':
@@ -363,6 +379,12 @@ wss.on('connection', (ws) => {
             
             // 브로드캐스트
             broadcast(currentRoom, messageData);
+            
+            // 전체 메시지 카운트 증가 및 통계 업데이트
+            totalMessageCount++;
+            if (totalMessageCount % 10 === 0) { // 10개마다 한 번 업데이트
+              broadcastStats();
+            }
           }
           break;
 
@@ -398,11 +420,17 @@ wss.on('connection', (ws) => {
       const room = rooms.get(currentRoom);
       room.users.delete(ws);
       
-      broadcast(currentRoom, {
-        type: 'user-left',
-        userId: userId,
-        userCount: room.users.size
+      broadcastToOthers(currentRoom, ws, {
+        type: 'user_left',
+        data: {
+          userId: userId,
+          userCount: room.users.size
+        }
       });
+      
+      // 방 정보 및 통계 업데이트
+      broadcastRoomUpdate(currentRoom);
+      broadcastStats();
     }
   });
 });
@@ -431,6 +459,48 @@ function broadcastToOthers(roomName, excludeWs, message) {
   });
 }
 
+// 전체 클라이언트에게 통계 업데이트 브로드캐스트
+function broadcastStats() {
+  const stats = {
+    type: 'stats_update',
+    data: {
+      onlineUsers: wss.clients.size,
+      totalRooms: rooms.size,
+      totalMessages: totalMessageCount
+    }
+  };
+  
+  const statsStr = JSON.stringify(stats);
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) {
+      client.send(statsStr);
+    }
+  });
+}
+
+// 방 정보 업데이트 브로드캐스트
+function broadcastRoomUpdate(roomId) {
+  const room = rooms.get(roomId);
+  if (!room) return;
+  
+  const update = {
+    type: 'room_update',
+    data: {
+      roomId,
+      userCount: room.users.size,
+      name: room.name || `채팅방 ${roomId}`,
+      active: room.users.size > 0
+    }
+  };
+  
+  const updateStr = JSON.stringify(update);
+  wss.clients.forEach(client => {
+    if (client.readyState === 1) {
+      client.send(updateStr);
+    }
+  });
+}
+
 // 24시간 지난 메시지 삭제 (1시간마다)
 setInterval(async () => {
   if (pool) {
@@ -452,6 +522,24 @@ initDB().then(() => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
     console.log(`💾 Redis: ${process.env.REDIS_URL ? 'Connected' : 'Not configured'}`);
+    
+    // 정기적으로 통계 업데이트 (30초마다)
+    setInterval(() => {
+      broadcastStats();
+      
+      // 비활성 방 정리
+      const now = Date.now();
+      rooms.forEach((room, roomId) => {
+        if (!room.permanent && room.users.size === 0) {
+          const inactiveTime = now - room.lastActivity;
+          if (inactiveTime > ROOM_INACTIVE_TIMEOUT) {
+            rooms.delete(roomId);
+            console.log(`Room ${roomId} deleted due to inactivity`);
+            broadcastStats();
+          }
+        }
+      });
+    }, 30000);
   });
 });
 

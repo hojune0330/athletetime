@@ -694,10 +694,16 @@
         <input type="text" id="nicknameInput" placeholder="닉네임을 입력하세요" maxlength="20"
                style="width: 100%; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-size: 0.95rem; outline: none;" aria-label="nicknameInput에 입력">
       </div>
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom: 15px;">
         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
           <input type="checkbox" id="anonymousCheck" style="width: 18px; height: 18px;">
           <span style="color: #999; font-size: 0.9rem;">익명으로 활동하기</span>
+        </label>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="soundCheck" style="width: 18px; height: 18px;" checked>
+          <span style="color: #999; font-size: 0.9rem;">🔔 새 메시지 알림음</span>
         </label>
       </div>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
@@ -854,12 +860,15 @@
       nickname: null,
       avatar: '?',
       anonymous: false,
-      userId: null
+      userId: null,
+      soundEnabled: true  // 알림음 기본 활성화
     };
     let typingTimeout = null;
     let isTyping = false;
     let reconnectAttempts = 0;
     let roomTimers = new Map();
+    let unreadCount = 0;
+    let isPageVisible = true;
     
     // 초기화
     function init() {
@@ -999,13 +1008,21 @@
           break;
           
         case 'user_joined':
-          addSystemMessage(`${data.data.nickname}님이 입장했습니다.`);
-          updateRoomUserCount(data.data.count);
+          if (data.data.nickname) {
+            addSystemMessage(`${data.data.nickname}님이 입장했습니다.`);
+          }
+          if (data.data.userCount !== undefined) {
+            updateRoomUserCount(data.data.userCount);
+          }
           break;
           
         case 'user_left':
-          addSystemMessage(`${data.data.nickname}님이 퇴장했습니다.`);
-          updateRoomUserCount(data.data.count);
+          if (data.data.nickname) {
+            addSystemMessage(`${data.data.nickname}님이 퇴장했습니다.`);
+          }
+          if (data.data.userCount !== undefined) {
+            updateRoomUserCount(data.data.userCount);
+          }
           break;
           
         case 'room_created':
@@ -1022,6 +1039,7 @@
           
         case 'room_update':
           updateRoomInfo(data.data);
+          updateRoomInList(data.data);
           break;
           
         case 'stats_update':
@@ -1152,6 +1170,12 @@
         isOwn = true;
       }
       
+      // 다른 사용자의 메시지이고 페이지가 보이지 않을 때 알림
+      if (!isOwn && (!isPageVisible || !document.hasFocus())) {
+        playNotificationSound();
+        updateUnreadCount(1);
+      }
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${isOwn ? 'own' : ''}`;
       
@@ -1173,6 +1197,36 @@
       
       container.appendChild(messageDiv);
       container.scrollTop = container.scrollHeight;
+    }
+    
+    // 알림음 재생
+    function playNotificationSound() {
+      if (!userProfile.soundEnabled) return;
+      
+      // 간단한 비프음 생성
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800; // 주파수
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+    
+    // 읽지 않은 메시지 카운트 업데이트
+    function updateUnreadCount(increment) {
+      if (!isPageVisible) {
+        unreadCount += increment;
+        if (unreadCount > 0) {
+          document.title = `(${unreadCount}) 육상톡 - 애슬리트 타임`;
+        }
+      }
     }
     
     // 시스템 메시지
@@ -1263,15 +1317,36 @@
     
     // 통계 업데이트
     function updateStats(stats) {
+      console.log('Updating stats:', stats);
       if (stats.onlineUsers !== undefined) {
-        document.getElementById('onlineCount').textContent = stats.onlineUsers;
+        const onlineEl = document.getElementById('onlineCount');
+        if (onlineEl) onlineEl.textContent = stats.onlineUsers;
       }
       if (stats.totalRooms !== undefined) {
-        document.getElementById('roomCount').textContent = stats.totalRooms;
+        const roomEl = document.getElementById('roomCount');
+        if (roomEl) roomEl.textContent = stats.totalRooms;
       }
       if (stats.totalMessages !== undefined) {
-        document.getElementById('messageCount').textContent = 
-          stats.totalMessages > 999 ? '999+' : stats.totalMessages;
+        const msgEl = document.getElementById('messageCount');
+        if (msgEl) msgEl.textContent = stats.totalMessages > 999 ? '999+' : stats.totalMessages;
+      }
+    }
+    
+    // 방 목록에서 특정 방 업데이트
+    function updateRoomInList(roomData) {
+      const roomElement = document.querySelector(`.room-item[data-room-id="${roomData.roomId}"]`);
+      if (roomElement) {
+        const userCountEl = roomElement.querySelector('.room-users span');
+        if (userCountEl) {
+          userCountEl.textContent = roomData.userCount || 0;
+        }
+      }
+    }
+    
+    // 방 정보 업데이트
+    function updateRoomInfo(roomData) {
+      if (roomData.roomId === currentRoom) {
+        updateRoomUserCount(roomData.userCount);
       }
     }
     
@@ -1320,6 +1395,7 @@
     function openProfileModal() {
       document.getElementById('nicknameInput').value = userProfile.nickname;
       document.getElementById('anonymousCheck').checked = userProfile.anonymous;
+      document.getElementById('soundCheck').checked = userProfile.soundEnabled !== false;
       document.getElementById('profileModal').classList.add('active');
     }
     
@@ -1330,6 +1406,7 @@
     function saveProfile() {
       userProfile.nickname = document.getElementById('nicknameInput').value || `육상인${Math.floor(Math.random() * 10000)}`;
       userProfile.anonymous = document.getElementById('anonymousCheck').checked;
+      userProfile.soundEnabled = document.getElementById('soundCheck').checked;
       userProfile.avatar = userProfile.nickname.substring(0, 1);
       
       saveProfileToStorage();
@@ -1459,6 +1536,27 @@
       
       // 초기화 (프로필 로드와 WebSocket 연결 포함)
       init();
+    });
+    
+    // 페이지 가시성 변경 감지
+    document.addEventListener('visibilitychange', function() {
+      isPageVisible = !document.hidden;
+      if (isPageVisible) {
+        // 페이지가 다시 보일 때 읽지 않은 카운트 초기화
+        unreadCount = 0;
+        document.title = '육상톡 - 실시간 채팅 | 애슬리트 타임';
+      }
+    });
+    
+    // 페이지 포커스 감지
+    window.addEventListener('focus', function() {
+      isPageVisible = true;
+      unreadCount = 0;
+      document.title = '육상톡 - 실시간 채팅 | 애슬리트 타임';
+    });
+    
+    window.addEventListener('blur', function() {
+      isPageVisible = false;
     });
   </script>
 
