@@ -908,6 +908,18 @@
     console.log('%c오픈베타: 실시간 채팅', 'color: #ec4899;');
     console.log('%c준비중: 경기 결과, 대회 일정, 중고 거래', 'color: #f59e0b;');
     
+    // 채팅 위젯 업데이트
+    function updateChatWidget(data) {
+      const widget = document.getElementById('chatWidget');
+      if (!widget) return;
+      
+      const userCount = widget.querySelector('.text-purple-600');
+      const roomCount = widget.querySelector('.text-pink-600');
+      
+      if (userCount) userCount.textContent = data.activeUsers || 0;
+      if (roomCount) roomCount.textContent = data.activeRooms || 0;
+    }
+    
     // 실시간 채팅 통계 가져오기
     function fetchChatStats() {
       // Sandbox 환경 체크
@@ -924,9 +936,12 @@
       }
       
       fetch(apiUrl)
-        .then
+        .then(response => response.json())
+        .then(data => {
+          updateChatWidget(data);
+        })
         .catch(error => {
-          console.error('네트워크 오류:', error);
+          // console.error('네트워크 오류:', error);
           // 사용자에게 오류 알림
           if (typeof alert !== 'undefined') {
             // alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
