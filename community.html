@@ -663,7 +663,7 @@
     }
     
     function savePosts() {
-      (function() { try { return localStorage.setItem(STORAGE_KEY, JSON.stringify(posts); } catch(e) { console.error('Storage error:', e); return null; } })());
+      (function() { try { return localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); } catch(e) { console.error('Storage error:', e); return null; } })();
     }
     
     // ===== 게시물 렌더링 =====
