@@ -711,7 +711,7 @@
                 </div>
               </div>
               ${post.images && post.images.length > 0 ? 
-                `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3" alt="${post">` : ''}
+                `<img src="${post.images[0].thumbnail}" class="w-16 h-16 rounded object-cover ml-3" alt="">` : ''}
             </div>
             ${post.poll ? PollHandler.renderPollUI(post.poll, userId, true) : ''}
           </div>
