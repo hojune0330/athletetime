@@ -913,12 +913,11 @@
         wsUrl = `ws://${hostname}:3004`;
       } else if (protocol === 'https:') {
         // HTTPS 호스팅 환경 (Vercel, Netlify 등)
-        // 실제 배포 시 WebSocket 서버 URL로 교체 필요
-        // 예: wss://your-chat-server.herokuapp.com 또는 wss://chat.yourdomain.com
-        wsUrl = `wss://${hostname}:3004`;
+        // Render.com WebSocket 서버
+        wsUrl = 'wss://athletetime-backend.onrender.com';
       } else {
         // HTTP 호스팅 환경
-        wsUrl = `ws://${hostname}:3004`;
+        wsUrl = 'wss://athletetime-backend.onrender.com';
       }
       
       console.log('🔌 WebSocket 연결 시도:', wsUrl);
