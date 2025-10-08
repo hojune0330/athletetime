@@ -137,10 +137,146 @@
       scrollbar-width: thin;
       scrollbar-color: #667eea rgba(0, 0, 0, 0.1);
     }
+    /* 환경 선택 모달 스타일 */
+    .env-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .env-modal.active {
+      display: flex;
+    }
+    
+    .env-modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .env-button {
+      border: 2px solid #e5e7eb;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .env-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .env-button.selected {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+    }
+    
+    /* 플로팅 환경 변경 버튼 (모바일) */
+    .env-floating-btn {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .env-floating-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+    }
+    
+    @media (max-width: 768px) {
+      .env-floating-btn {
+        display: flex;
+      }
+    }
   </style>
 
 </head>
 <body class="bg-gray-50">
+  <!-- 플로팅 환경 변경 버튼 (모바일) -->
+  <button type="button" class="env-floating-btn" onclick="showEnvironmentModal()" title="환경 변경">
+    <i class="fas fa-exchange-alt text-xl"></i>
+  </button>
+  
+  <!-- 환경 선택 모달 -->
+  <div id="envModal" class="env-modal">
+    <div class="env-modal-content">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold mb-2">
+          <span style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            환경을 선택해주세요
+          </span>
+        </h2>
+        <p class="text-gray-600">사용 중인 기기에 맞는 환경을 선택하면 최적화된 화면을 제공합니다</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="env-button rounded-lg p-6 text-center" onclick="selectEnvironment('mobile')">
+          <i class="fas fa-mobile-alt text-5xl mb-4" style="color: #8b5cf6;"></i>
+          <h3 class="text-xl font-bold mb-2">모바일</h3>
+          <p class="text-sm text-gray-600">스마트폰, 태블릿</p>
+          <ul class="text-xs text-gray-500 mt-3 text-left">
+            <li>• 터치 최적화 인터페이스</li>
+            <li>• 세로 화면에 최적화</li>
+            <li>• 스크롤 가능한 테이블</li>
+          </ul>
+        </div>
+        
+        <div class="env-button rounded-lg p-6 text-center" onclick="selectEnvironment('desktop')">
+          <i class="fas fa-desktop text-5xl mb-4" style="color: #7c3aed;"></i>
+          <h3 class="text-xl font-bold mb-2">데스크톱</h3>
+          <p class="text-sm text-gray-600">노트북, 데스크톱 PC</p>
+          <ul class="text-xs text-gray-500 mt-3 text-left">
+            <li>• 전체 화면 활용</li>
+            <li>• 마우스 조작 최적화</li>
+            <li>• 한 번에 모든 정보 표시</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2 mb-4">
+        <input type="checkbox" id="rememberChoice" checked>
+        <label for="rememberChoice" class="text-sm text-gray-600">이 선택 기억하기 (30일간)</label>
+      </div>
+      
+      <div class="text-center">
+        <button type="button" onclick="confirmEnvironment()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
   <div class="max-w-7xl mx-auto p-6">
     <!-- Header -->
     <div class="gradient-bg text-white p-6 rounded-xl mb-6">
@@ -150,6 +286,12 @@
           <p class="opacity-90">Jack Daniels VDOT 시스템 기반 과학적 훈련</p>
         </div>
         <div class="flex gap-2">
+          <!-- 환경 변경 버튼 -->
+          <button type="button" onclick="showEnvironmentModal()" class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition" title="환경 변경">
+            <span class="hidden md:inline text-sm">환경 변경</span>
+            <i class="fas fa-mobile-alt text-lg md:hidden" id="envIconMobile"></i>
+            <i class="fas fa-desktop text-lg hidden md:inline" id="envIconDesktop"></i>
+          </button>
           <button type="button" onclick="window.location.href='system-documentation.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="시스템 문서">
             <i class="fas fa-book text-xl"></i>
           </button>
@@ -675,6 +817,125 @@
   </div>
 
   <script>
+    // 환경 설정 관련 변수
+    let selectedEnvironment = null;
+    
+    // 페이지 로드 시 환경 체크
+    window.addEventListener('DOMContentLoaded', function() {
+      checkEnvironment();
+    });
+    
+    // 환경 체크 및 모달 표시
+    function checkEnvironment() {
+      const savedEnv = localStorage.getItem('trainingCalculatorEnv');
+      const envExpiry = localStorage.getItem('trainingCalculatorEnvExpiry');
+      
+      // 저장된 환경이 있고 유효기간이 남아있으면 적용
+      if (savedEnv && envExpiry && new Date().getTime() < parseInt(envExpiry)) {
+        applyEnvironment(savedEnv);
+        updateEnvironmentIcon(savedEnv);
+      } else {
+        // 자동 감지
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        // 모달 표시
+        showEnvironmentModal(true);
+        
+        // 기본 선택 표시
+        if (isMobile) {
+          document.querySelector('.env-button[onclick*="mobile"]').classList.add('selected');
+          selectedEnvironment = 'mobile';
+        } else {
+          document.querySelector('.env-button[onclick*="desktop"]').classList.add('selected');
+          selectedEnvironment = 'desktop';
+        }
+      }
+    }
+    
+    // 환경 선택 모달 표시
+    function showEnvironmentModal(isInitial = false) {
+      document.getElementById('envModal').classList.add('active');
+      
+      // 현재 환경 표시
+      const currentEnv = localStorage.getItem('trainingCalculatorEnv') || 
+                        (window.innerWidth <= 768 ? 'mobile' : 'desktop');
+      
+      document.querySelectorAll('.env-button').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      
+      document.querySelector(`.env-button[onclick*="${currentEnv}"]`).classList.add('selected');
+      selectedEnvironment = currentEnv;
+    }
+    
+    // 환경 선택
+    function selectEnvironment(env) {
+      selectedEnvironment = env;
+      
+      // UI 업데이트
+      document.querySelectorAll('.env-button').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      event.currentTarget.classList.add('selected');
+    }
+    
+    // 환경 확인
+    function confirmEnvironment() {
+      if (!selectedEnvironment) {
+        alert('환경을 선택해주세요.');
+        return;
+      }
+      
+      // 기억하기 체크 시 로컬 스토리지에 저장
+      if (document.getElementById('rememberChoice').checked) {
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+        localStorage.setItem('trainingCalculatorEnv', selectedEnvironment);
+        localStorage.setItem('trainingCalculatorEnvExpiry', expiryDate.getTime());
+      }
+      
+      // 환경 적용
+      applyEnvironment(selectedEnvironment);
+      updateEnvironmentIcon(selectedEnvironment);
+      
+      // 모달 닫기
+      document.getElementById('envModal').classList.remove('active');
+      
+      // 모바일/데스크톱 버전 리다이렉트
+      if (selectedEnvironment === 'mobile' && window.innerWidth > 768) {
+        // 데스크톱에서 모바일 버전 보기
+        window.location.href = 'training-calculator-mobile.html';
+      } else if (selectedEnvironment === 'desktop' && window.innerWidth <= 768) {
+        // 모바일에서 데스크톱 버전 보기
+        document.body.classList.add('force-desktop');
+      }
+    }
+    
+    // 환경 적용
+    function applyEnvironment(env) {
+      if (env === 'mobile') {
+        document.body.classList.add('mobile-env');
+        document.body.classList.remove('desktop-env');
+      } else {
+        document.body.classList.add('desktop-env');
+        document.body.classList.remove('mobile-env');
+      }
+    }
+    
+    // 환경 아이콘 업데이트
+    function updateEnvironmentIcon(env) {
+      const mobileIcon = document.getElementById('envIconMobile');
+      const desktopIcon = document.getElementById('envIconDesktop');
+      
+      if (env === 'mobile') {
+        if (mobileIcon) mobileIcon.style.display = 'inline';
+        if (desktopIcon) desktopIcon.style.display = 'none';
+      } else {
+        if (mobileIcon) mobileIcon.style.display = 'none';
+        if (desktopIcon) desktopIcon.style.display = 'inline';
+      }
+    }
+    
     // User profile
     let userProfile = {
       gender: null,
