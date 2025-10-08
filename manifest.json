@@ -1,0 +1,25 @@
+{
+  "name": "애슬리트 타임 - 육상톡",
+  "short_name": "육상톡",
+  "description": "육상인들을 위한 실시간 채팅 서비스",
+  "start_url": "/chat-real.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["sports", "social"],
+  "lang": "ko-KR",
+  "dir": "ltr"
+}

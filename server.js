@@ -352,15 +352,19 @@ wss.on('connection', (ws) => {
         case 'message':
           if (currentRoom && rooms.has(currentRoom)) {
             const msgData = message.data || message;
+            const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const messageData = {
               type: 'new_message',
               data: {
+                messageId: messageId,
                 userId: msgData.userId,
                 nickname: msgData.nickname || '익명',
-                text: msgData.text || msgData.message,
+                text: msgData.text || msgData.message || '',
                 avatar: msgData.avatar || msgData.nickname?.substring(0, 1) || '?',
                 timestamp: new Date().toISOString(),
-                room: currentRoom
+                room: currentRoom,
+                image: msgData.image,  // 이미지 데이터
+                replyTo: msgData.replyTo  // 답장 정보
               }
             };
             
@@ -369,11 +373,13 @@ wss.on('connection', (ws) => {
             room.messages.push(messageData.data);
             room.lastActivity = Date.now();
             
-            // DB에도 저장 (24시간 후 삭제용)
+            // DB에도 저장 (이미지는 별도 처리 필요)
             if (pool) {
+              const messageText = msgData.text || msgData.message || '';
+              const messageContent = msgData.image ? `[이미지] ${messageText}` : messageText;
               await pool.query(
                 'INSERT INTO chat_messages (room_id, user_id, nickname, message) VALUES ($1, $2, $3, $4)',
-                [currentRoom, msgData.userId, msgData.nickname, msgData.text || msgData.message]
+                [currentRoom, msgData.userId, msgData.nickname, messageContent]
               );
             }
             
@@ -385,6 +391,23 @@ wss.on('connection', (ws) => {
             if (totalMessageCount % 10 === 0) { // 10개마다 한 번 업데이트
               broadcastStats();
             }
+          }
+          break;
+          
+        case 'reaction':
+          if (currentRoom && rooms.has(currentRoom)) {
+            const reactionData = {
+              type: 'reaction_added',
+              data: {
+                messageId: message.data.messageId,
+                emoji: message.data.emoji,
+                userId: message.data.userId,
+                room: currentRoom
+              }
+            };
+            
+            // 브로드캐스트
+            broadcast(currentRoom, reactionData);
           }
           break;
 
