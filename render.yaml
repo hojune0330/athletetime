@@ -4,20 +4,17 @@ services:
     name: athletetime-backend
     env: node
     region: singapore
-    plan: starter # $7/month
+    plan: starter
     buildCommand: npm install
     startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: CORS_ORIGIN
+        value: https://athlete-time.netlify.app
       - key: DATABASE_URL
         fromDatabase:
           name: athletetime-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: athletetime-redis
           property: connectionString
 
   # 정적 사이트 호스팅
@@ -41,11 +38,4 @@ databases:
     databaseName: athletetime
     user: athletetime
     region: singapore
-    plan: starter # $7/month
-
-  # Redis 캐싱
-  - name: athletetime-redis
-    type: redis
-    region: singapore
-    plan: starter # $10/month
-    maxmemoryPolicy: allkeys-lru
+    plan: starter
