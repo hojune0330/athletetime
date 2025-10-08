@@ -780,17 +780,27 @@
     
     // WebSocket 연결
     function connectWebSocket() {
-      // Sandbox 환경에서는 특정 URL 사용
-      const isSandbox = window.location.hostname.includes('e2b.dev');
+      // WebSocket URL 자동 감지 - 실제 호스팅 환경 지원
       let wsUrl;
+      const hostname = window.location.hostname;
+      const protocol = window.location.protocol;
       
-      if (isSandbox) {
+      // 다양한 호스팅 환경 처리
+      if (hostname.includes('e2b.dev')) {
         // E2B sandbox 환경
-        wsUrl = 'wss://3004-iyqwm3hj0cgb3tlwwo7v5-6532622b.e2b.dev';
+        const sandboxId = hostname.split('.')[0].split('-').slice(1).join('-');
+        wsUrl = `wss://3004-${sandboxId}.e2b.dev`;
+      } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // 로컬 개발 환경
+        wsUrl = `ws://${hostname}:3004`;
+      } else if (protocol === 'https:') {
+        // HTTPS 호스팅 환경 (Vercel, Netlify 등)
+        // 실제 배포 시 WebSocket 서버 URL로 교체 필요
+        // 예: wss://your-chat-server.herokuapp.com 또는 wss://chat.yourdomain.com
+        wsUrl = `wss://${hostname}:3004`;
       } else {
-        // 일반 환경
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        wsUrl = `${protocol}//${window.location.hostname}:3004`;
+        // HTTP 호스팅 환경
+        wsUrl = `ws://${hostname}:3004`;
       }
       
       console.log('🔌 WebSocket 연결 시도:', wsUrl);
@@ -803,9 +813,9 @@
           reconnectAttempts = 0;
           document.getElementById('connectionStatus').textContent = '온라인';
           
-          // 일반 대화방 자동 입장
+          // 메인 채팅방 자동 입장
           setTimeout(() => {
-            joinRoom('general');
+            joinRoom('main');
           }, 500);
         };
         
@@ -968,18 +978,13 @@
           text,
           nickname: displayName,
           avatar: displayAvatar,
-          room: currentRoom
+          room: currentRoom,
+          userId: userProfile.userId  // userId 추가
         }
       }));
       
-      // 자신의 메시지 표시
-      displayMessage({
-        text,
-        nickname: displayName,
-        avatar: displayAvatar,
-        userId: userProfile.userId,
-        timestamp: new Date().toISOString()
-      }, true);
+      // 자신의 메시지는 서버에서 받아서 표시 (중복 방지)
+      // displayMessage 호출 제거
       
       input.value = '';
     }

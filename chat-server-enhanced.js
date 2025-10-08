@@ -28,14 +28,11 @@ const activeUsers = new Map(); // userId -> {nickname, lastSeen, rooms}
 
 // 상수
 const ROOM_INACTIVE_TIMEOUT = 30 * 60 * 1000; // 30분
-const PERMANENT_ROOMS = ['general', 'beginner', 'marathon', 'equipment'];
+const PERMANENT_ROOMS = ['main'];
 
-// 기본 채팅방 초기화
+// 기본 채팅방 초기화 - 메인 채팅방 1개만
 const defaultRooms = [
-  { id: 'general', name: '일반 대화방', desc: '모두 환영', icon: '🏠' },
-  { id: 'beginner', name: '초보 러너', desc: '입문자 환영', icon: '🌱' },
-  { id: 'marathon', name: '마라톤 대회', desc: '대회 정보', icon: '🏅' },
-  { id: 'equipment', name: '장비 리뷰', desc: '러닝화 & 장비', icon: '👟' }
+  { id: 'main', name: '메인 채팅방', desc: '모든 러너 환영', icon: '💬' }
 ];
 
 defaultRooms.forEach(room => {
@@ -55,7 +52,7 @@ let stats = {
   totalMessages: 0,
   totalUsers: 0,
   peakUsers: 0,
-  roomsCreated: 4
+  roomsCreated: 1
 };
 
 // WebSocket 연결 처리
@@ -603,14 +600,14 @@ app.get('/api/stats', (req, res) => {
 server.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════╗
-║     🚀 향상된 다중 채팅 서버 시작됨        ║
+║     🚀 채팅 서버 시작됨                  ║
 ╠════════════════════════════════════════════╣
 ║  포트: ${PORT}                              ║
 ║  URL: http://localhost:${PORT}              ║
 ║  WebSocket: ws://localhost:${PORT}          ║
 ╠════════════════════════════════════════════╣
 ║  기능:                                      ║
-║  ✅ 다중 채팅방 지원                       ║
+║  ✅ 메인 채팅방 + 사용자 채팅방          ║
 ║  ✅ 30분 무응답 시 방 자동 삭제           ║
 ║  ✅ 실시간 통계                            ║
 ║  ✅ 메시지 히스토리                        ║
@@ -618,10 +615,7 @@ server.listen(PORT, () => {
 ║  ✅ 연결 상태 체크                         ║
 ╠════════════════════════════════════════════╣
 ║  기본 채팅방:                               ║
-║  • 일반 대화방 (영구)                      ║
-║  • 초보 러너 (영구)                        ║
-║  • 마라톤 대회 (영구)                      ║
-║  • 장비 리뷰 (영구)                        ║
+║  • 메인 채팅방 (영구)                     ║
 ╚════════════════════════════════════════════╝
   `);
 });
