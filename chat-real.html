@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>러닝톡 - 실시간 채팅 | 애슬리트 타임</title>
+  <title>육상톡 - 실시간 채팅 | 애슬리트 타임</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
@@ -581,7 +581,7 @@
       <div class="sidebar-header">
         <div class="logo">
           <i class="fas fa-running"></i>
-          <span>러닝톡</span>
+          <span>육상톡</span>
         </div>
         <a href="index.html" class="home-button">
           <i class="fas fa-home"></i> 메인
@@ -874,7 +874,7 @@
         userProfile = JSON.parse(saved);
       } else {
         userProfile.userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        userProfile.nickname = `러너${Math.floor(Math.random() * 10000)}`;
+        userProfile.nickname = `육상인${Math.floor(Math.random() * 10000)}`;
         userProfile.avatar = userProfile.nickname.substring(0, 1);
         userProfile.anonymous = false;
         saveProfileToStorage();
@@ -889,7 +889,7 @@
     
     // 프로필 UI 업데이트
     function updateProfileUI() {
-      const displayName = userProfile.anonymous ? '익명러너' : userProfile.nickname;
+      const displayName = userProfile.anonymous ? '익명선수' : userProfile.nickname;
       const displayAvatar = userProfile.anonymous ? '익' : userProfile.avatar;
       
       document.getElementById('userNickname').textContent = displayName;
@@ -1087,7 +1087,7 @@
       
       if (!text || !ws || ws.readyState !== WebSocket.OPEN || !currentRoom) return;
       
-      const displayName = userProfile.anonymous ? '익명러너' : userProfile.nickname;
+      const displayName = userProfile.anonymous ? '익명선수' : userProfile.nickname;
       const displayAvatar = userProfile.anonymous ? '익' : userProfile.avatar;
       
       ws.send(JSON.stringify({
@@ -1292,7 +1292,7 @@
     }
     
     function saveProfile() {
-      userProfile.nickname = document.getElementById('nicknameInput').value || `러너${Math.floor(Math.random() * 10000)}`;
+      userProfile.nickname = document.getElementById('nicknameInput').value || `육상인${Math.floor(Math.random() * 10000)}`;
       userProfile.anonymous = document.getElementById('anonymousCheck').checked;
       userProfile.avatar = userProfile.nickname.substring(0, 1);
       

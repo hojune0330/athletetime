@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>애슬리트 타임 - 러너들의 실시간 공간</title>
+  <title>애슬리트 타임 - 육상인들의 실시간 공간</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <style>
@@ -552,6 +552,26 @@
 
   <!-- 메인 서비스 그리드 -->
   <div class="service-grid">
+    <!-- 익명 게시판 (정식 오픈) - 우선순위 1 -->
+    <div class="service-card card-board" onclick="openService('board')">
+      <div class="new-badge">New</div>
+      <i class="fas fa-comments service-icon"></i>
+      <div class="service-title">익명 게시판</div>
+      <div class="service-desc">자유롭게 소통하는<br>육상인들의 공간</div>
+    </div>
+    
+    <!-- 실시간 채팅 (오픈 베타) - 우선순위 2 -->
+    <div class="service-card card-chat" onclick="openService('chat')">
+      <div class="beta-badge open">오픈베타</div>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <i class="fas fa-comment-dots service-icon"></i>
+      <div class="service-title">실시간 채팅</div>
+      <div class="service-desc">지금 접속 중인<br>육상인들과 대화</div>
+    </div>
+    
     <!-- 페이스 계산기 (정식 오픈) -->
     <div class="service-card card-pace" onclick="openService('pace')">
       <i class="fas fa-calculator service-icon"></i>
@@ -566,32 +586,12 @@
       <div class="service-desc">VDOT 기반<br>맞춤 훈련 페이스</div>
     </div>
     
-    <!-- 익명 게시판 (정식 오픈) -->
-    <div class="service-card card-board" onclick="openService('board')">
-      <div class="new-badge">5</div>
-      <i class="fas fa-comments service-icon"></i>
-      <div class="service-title">익명 게시판</div>
-      <div class="service-desc">자유롭게 소통하는<br>러너들의 공간</div>
-    </div>
-    
-    <!-- 실시간 채팅 (오픈 베타) -->
-    <div class="service-card card-chat" onclick="openService('chat')">
-      <div class="beta-badge open">오픈베타</div>
-      <div class="live-indicator">
-        <div class="live-dot"></div>
-        LIVE
-      </div>
-      <i class="fas fa-comment-dots service-icon"></i>
-      <div class="service-title">실시간 채팅</div>
-      <div class="service-desc">지금 접속 중인<br>러너들과 대화</div>
-    </div>
-    
     <!-- 실시간 경기 결과 (베타) -->
     <div class="service-card card-result beta" onclick="openService('result')">
       <div class="beta-badge">베타</div>
       <i class="fas fa-trophy service-icon"></i>
       <div class="service-title">경기 결과</div>
-      <div class="service-desc">국내외 마라톤<br>실시간 기록</div>
+      <div class="service-desc">전국육상대회<br>실시간 기록</div>
       <div class="coming-soon-overlay">
         <div class="coming-soon-text">🚧 준비 중</div>
       </div>
@@ -602,7 +602,7 @@
       <div class="beta-badge">베타</div>
       <i class="fas fa-calendar-alt service-icon"></i>
       <div class="service-title">대회 일정</div>
-      <div class="service-desc">2024-2025<br>마라톤 대회 캘린더</div>
+      <div class="service-desc">2025 전국육상<br>대회 캘린더</div>
       <div class="coming-soon-overlay">
         <div class="coming-soon-text">🚧 준비 중</div>
       </div>
@@ -613,7 +613,7 @@
       <div class="beta-badge">베타</div>
       <i class="fas fa-shopping-bag service-icon"></i>
       <div class="service-title">중고 거래</div>
-      <div class="service-desc">러닝화 & 장비<br>직거래 마켓</div>
+      <div class="service-desc">육상화 & 장비<br>직거래 마켓</div>
       <div class="coming-soon-overlay">
         <div class="coming-soon-text">🚧 준비 중</div>
       </div>
@@ -624,7 +624,7 @@
       <div class="beta-badge">베타</div>
       <i class="fas fa-ellipsis-h service-icon"></i>
       <div class="service-title">더보기</div>
-      <div class="service-desc">기록 관리<br>코스 추천</div>
+      <div class="service-desc">기록 관리<br>훈련 일지</div>
       <div class="coming-soon-overlay">
         <div class="coming-soon-text">🚧 준비 중</div>
       </div>
@@ -660,7 +660,7 @@
   <div class="about-section">
     <h2>ATHLETE TIME</h2>
     <p>
-      대한민국 러너들을 위한 올인원 플랫폼<br>
+      대한민국 육상인들을 위한 올인원 플랫폼<br>
       훈련부터 대회, 커뮤니티까지 모든 것을 한 곳에서
     </p>
     
@@ -670,7 +670,7 @@
           <i class="fas fa-users" style="color: #8b5cf6;"></i>
           활발한 커뮤니티
         </h3>
-        <p>매일 수백 명의 러너들이 정보를 공유하고 서로를 응원합니다. 익명 게시판과 실시간 채팅으로 부담 없이 소통하세요.</p>
+        <p>매일 수백 명의 육상인들이 정보를 공유하고 서로를 응원합니다. 익명 게시판과 실시간 채팅으로 부담 없이 소통하세요.</p>
       </div>
       
       <div class="feature-item">
@@ -686,7 +686,7 @@
           <i class="fas fa-bolt" style="color: #f59e0b;"></i>
           실시간 정보 제공
         </h3>
-        <p>국내외 마라톤 대회 결과를 실시간으로 확인하고, 다가오는 대회 일정을 한눈에 파악하세요.</p>
+        <p>전국육상대회 결과를 실시간으로 확인하고, 다가오는 대회 일정을 한눈에 파악하세요.</p>
       </div>
       
       <div class="feature-item">
@@ -702,7 +702,7 @@
           <i class="fas fa-shield-alt" style="color: #3b82f6;"></i>
           안전한 거래
         </h3>
-        <p>러닝화와 장비를 안전하게 거래할 수 있는 중고 마켓을 운영합니다. 직거래와 안전결제를 지원합니다.</p>
+        <p>육상화와 장비를 안전하게 거래할 수 있는 중고 마켓을 운영합니다. 직거래와 안전결제를 지원합니다.</p>
       </div>
       
       <div class="feature-item">
@@ -710,13 +710,13 @@
           <i class="fas fa-globe" style="color: #6366f1;"></i>
           글로벌 네트워크
         </h3>
-        <p>전 세계 러닝 정보와 트렌드를 빠르게 접하고, 글로벌 러너들과 교류할 수 있습니다.</p>
+        <p>전 세계 육상 정보와 트렌드를 빠르게 접하고, 글로벌 육상인들과 교류할 수 있습니다.</p>
       </div>
     </div>
     
     <div style="margin-top: 60px; padding-top: 40px; border-top: 1px solid #222;">
       <p style="color: #666; font-size: 0.9rem;">
-        © 2024 Athlete Time. All rights reserved.<br>
+        © 2025 Athlete Time. All rights reserved. | 최종 업데이트: 2025.01.08<br>
         <a href="#" style="color: #888; text-decoration: none;">이용약관</a> · 
         <a href="#" style="color: #888; text-decoration: none;">개인정보처리방침</a> · 
         <a href="#" style="color: #888; text-decoration: none;">문의하기</a>
@@ -745,7 +745,7 @@
       board: {
         icon: 'fas fa-comments',
         title: '익명 게시판',
-        desc: '자유롭게 의견을 나누고 정보를 공유하는 러너들의 익명 커뮤니티입니다.',
+        desc: '자유롭게 의견을 나누고 정보를 공유하는 육상인들의 익명 커뮤니티입니다.',
         url: 'community.html',
         color: '#8b5cf6',
         status: 'open'
@@ -753,7 +753,7 @@
       chat: {
         icon: 'fas fa-comment-dots',
         title: '실시간 채팅 (오픈베타)',
-        desc: '지금 접속 중인 러너들과 실시간으로 대화를 나눠보세요.\n\n✨ NEW: 다중 채팅방, 닉네임 설정, 30분 자동 삭제!',
+        desc: '지금 접속 중인 육상인들과 실시간으로 대화를 나눠보세요.\n\n✨ NEW: 다중 채팅방, 닉네임 설정, 30분 자동 삭제!',
         url: 'chat-real.html',
         color: '#ec4899',
         status: 'open-beta'
@@ -761,7 +761,7 @@
       result: {
         icon: 'fas fa-trophy',
         title: '경기 결과 (베타)',
-        desc: '국내외 마라톤 대회의 실시간 결과와 기록 서비스를 준비 중입니다.\n\n🚧 현재 데이터를 수집하고 있으며, 곧 서비스를 시작합니다.',
+        desc: '전국육상대회의 실시간 결과와 기록 서비스를 준비 중입니다.\n\n🚧 대한육상연맹과 협의 중이며, 곧 서비스를 시작합니다.',
         url: '#',
         color: '#f59e0b',
         status: 'beta'
@@ -769,7 +769,7 @@
       schedule: {
         icon: 'fas fa-calendar-alt',
         title: '대회 일정 (베타)',
-        desc: '2024-2025 시즌 마라톤 대회 일정 서비스를 준비 중입니다.\n\n🚧 대회 주최측과 협의 중이며, 곧 정확한 일정을 제공할 예정입니다.',
+        desc: '2025 시즌 전국육상대회 일정 서비스를 준비 중입니다.\n\n🚧 대한육상연맹과 협의 중이며, 곧 정확한 일정을 제공할 예정입니다.',
         url: '#',
         color: '#10b981',
         status: 'beta'
@@ -793,7 +793,7 @@
       market: {
         icon: 'fas fa-shopping-bag',
         title: '중고 거래 (베타)',
-        desc: '러닝화, 시계, 장비 등을 안전하게 거래하는 러너 전용 마켓을 준비 중입니다.\n\n🚧 안전 거래 시스템을 구축 중이며, 곧 오픈 예정입니다.',
+        desc: '육상화, 스파이크, 장비 등을 안전하게 거래하는 육상인 전용 마켓을 준비 중입니다.\n\n🚧 안전 거래 시스템을 구축 중이며, 곧 오픈 예정입니다.',
         url: '#',
         color: '#6366f1',
         status: 'beta'
