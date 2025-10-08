@@ -36,6 +36,18 @@
       table-layout: fixed;
     }
     
+    /* 트랙 레인 계산기 테이블 스타일 추가 */
+    .lane-table-wrapper {
+      position: relative;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .lane-calculation-table {
+      min-width: 600px;
+    }
+    
     /* 모바일 반응형 개선 */
     @media (max-width: 768px) {
       /* 테이블 기본 스타일 */
@@ -56,6 +68,25 @@
         max-width: 100vw;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+      }
+      
+      /* 레인 계산기 테이블 sticky 첫번째 열 */
+      .lane-calculation-table thead th.lane-first-col,
+      .lane-calculation-table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 10;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        font-weight: bold;
+      }
+      
+      .lane-calculation-table tbody tr.bg-purple-100 td:first-child {
+        background: rgb(243 232 255) !important;
+      }
+      
+      .lane-calculation-table tbody tr.bg-green-50 td:first-child {
+        background: rgb(240 253 244) !important;
       }
       
       .pace-table thead th:first-child,
@@ -1378,9 +1409,9 @@
     
     <!-- 트랙 레인 계산기 탭 -->
     <div id="lane-calculator-content" class="tab-content hidden">
-      <!-- 목표 시간 입력 섹션 -->
-      <div class="bg-white rounded-lg shadow p-6 mb-4">
-        <div class="flex flex-wrap items-center gap-4">
+      <!-- 목표 시간 입력 섹션 (모바일 최적화) -->
+      <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-4">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">해당 레인 목표 시간 (초)</label>
             <div class="flex gap-2">
@@ -1410,13 +1441,13 @@
         </div>
       </div>
 
-      <!-- 큰 트랙 시각화 -->
-      <div class="bg-white rounded-lg shadow p-6 mb-4">
+      <!-- 큰 트랙 시각화 (모바일 반응형) -->
+      <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-4">
         <h3 class="font-bold text-xl mb-4">트랙 구간별 시간 시각화</h3>
         
-        <!-- SVG 트랙 (실제 비율) -->
+        <!-- SVG 트랙 (실제 비율 - 모바일 반응형) -->
         <div class="w-full overflow-x-auto">
-          <svg viewBox="0 0 800 400" class="w-full" style="min-width: 700px; min-height: 350px;">
+          <svg viewBox="0 0 800 400" class="w-full max-w-full" style="min-height: 250px;">
             <!-- 배경 -->
             <rect width="800" height="400" fill="#f0f0f0"/>
             
@@ -1492,14 +1523,19 @@
         </div>
       </div>
 
-      <!-- 레인별 시간 테이블 -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="font-bold text-xl mb-4">레인별 구간 시간 분석</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full pace-table">
+      <!-- 레인별 시간 테이블 (모바일 최적화) -->
+      <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-lg md:text-xl">레인별 구간 시간 분석</h3>
+          <button onclick="downloadLaneCalculation()" class="bg-purple-600 text-white px-3 py-1 rounded text-xs md:text-sm hover:bg-purple-700 transition">
+            <i class="fas fa-download mr-1"></i> 다운로드
+          </button>
+        </div>
+        <div class="table-container lane-table-wrapper">
+          <table class="w-full pace-table lane-calculation-table">
             <thead>
               <tr>
-                <th rowspan="2">레인</th>
+                <th rowspan="2" class="lane-first-col">레인</th>
                 <th rowspan="2">총 거리</th>
                 <th rowspan="2">스태거</th>
                 <th rowspan="2">총 시간</th>
@@ -1524,9 +1560,9 @@
           <!-- 동적으로 생성됨 -->
         </div>
         
-        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 class="font-bold text-lg mb-2">💡 사용 방법</h4>
-          <ul class="space-y-1 text-sm">
+        <div class="mt-6 p-3 md:p-4 bg-blue-50 rounded-lg">
+          <h4 class="font-bold text-base md:text-lg mb-2">💡 사용 방법</h4>
+          <ul class="space-y-1 text-xs md:text-sm">
             <li>• <strong>목표 시간</strong>은 <strong>선택한 레인에서의 실제 시간</strong>입니다</li>
             <li>• 예: 4레인에서 90초 = 4레인(422.37m)을 90초에 완주</li>
             <li>• 동일한 속도로 1레인을 달리면 약 85.17초가 됩니다</li>
@@ -1535,29 +1571,37 @@
           </ul>
         </div>
         
-        <!-- 훈련 페이스 추천 -->
-        <div class="mt-4 p-4 bg-green-50 rounded-lg">
-          <h4 class="font-bold text-lg mb-2">🏃 훈련 페이스 가이드</h4>
+        <!-- 훈련 페이스 추천 (모바일 최적화) -->
+        <div class="mt-4 p-3 md:p-4 bg-green-50 rounded-lg">
+          <h4 class="font-bold text-base md:text-lg mb-2">🏃 훈련 페이스 가이드</h4>
           <div id="trainingPaceGuide">
             <!-- 동적으로 생성됨 -->
           </div>
         </div>
         
-        <!-- 예상 기록 계산기 -->
-        <div class="mt-4 p-4 bg-yellow-50 rounded-lg">
-          <h4 class="font-bold text-lg mb-2">🎯 거리별 예상 기록</h4>
+        <!-- 예상 기록 계산기 (모바일 최적화) -->
+        <div class="mt-4 p-3 md:p-4 bg-yellow-50 rounded-lg">
+          <h4 class="font-bold text-base md:text-lg mb-2">🎯 거리별 예상 기록</h4>
           <div id="distancePredictions">
             <!-- 동적으로 생성됨 -->
           </div>
         </div>
         
-        <!-- 200m 스플릿 계산 -->
-        <div class="mt-4 p-4 bg-indigo-50 rounded-lg">
-          <h4 class="font-bold text-lg mb-2">⏱️ 200m 스플릿 타임</h4>
-          <p class="text-sm text-gray-600 mb-2">선택한 레인에서 일정 페이스로 달릴 때의 200m 통과 시간</p>
+        <!-- 200m 스플릿 계산 (모바일 최적화) -->
+        <div class="mt-4 p-3 md:p-4 bg-indigo-50 rounded-lg">
+          <h4 class="font-bold text-base md:text-lg mb-2">⏱️ 200m 스플릿 타임</h4>
+          <p class="text-xs md:text-sm text-gray-600 mb-2">선택한 레인에서 일정 페이스로 달릴 때의 200m 통과 시간</p>
           <div id="splitTimes">
             <!-- 동적으로 생성됨 -->
           </div>
+        </div>
+        
+        <!-- 업데이트 정보 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-500">
+            <span class="font-semibold">최신 버전</span> · 모바일/PC 자동 감지 · 
+            <span class="text-purple-600">World Athletics 공식 규격 적용</span>
+          </p>
         </div>
       </div>
     </div>
@@ -1870,7 +1914,122 @@
       }
     }
 
-    // 트랙 레인별 계산 함수들
+    // 트랙 레인 계산기 다운로드 함수
+    function downloadLaneCalculation() {
+      const targetTime = document.getElementById('laneTargetTime').value;
+      const selectedLane = document.getElementById('laneLaneSelector').value;
+      
+      // 캔버스 생성
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 800;
+      canvas.height = 1200;
+      
+      // 배경
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // 타이틀
+      ctx.fillStyle = '#6B46C1';
+      ctx.font = 'bold 24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('400m 트랙 레인별 구간 시간 분석', 400, 40);
+      
+      // 설정 정보
+      ctx.fillStyle = '#333';
+      ctx.font = '16px Arial';
+      ctx.fillText(`선택 레인: ${selectedLane}레인 / 목표 시간: ${targetTime}초`, 400, 70);
+      
+      // 테이블 헤더
+      const startY = 100;
+      const rowHeight = 30;
+      const colWidths = [60, 80, 80, 80, 60, 70, 70, 70, 70];
+      const headers = ['레인', '총 거리', '스태거', '총 시간', '시차', '직선①', '곡선①', '직선②', '곡선②'];
+      
+      ctx.fillStyle = '#F3F4F6';
+      ctx.fillRect(20, startY, 760, rowHeight);
+      
+      ctx.fillStyle = '#333';
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'left';
+      let xPos = 30;
+      headers.forEach((header, i) => {
+        ctx.fillText(header, xPos, startY + 20);
+        xPos += colWidths[i];
+      });
+      
+      // 테이블 데이터
+      const tbody = document.getElementById('laneTimeTable');
+      if (tbody && tbody.rows.length > 0) {
+        ctx.font = '12px Arial';
+        let yPos = startY + rowHeight;
+        
+        for (let i = 0; i < tbody.rows.length; i++) {
+          const row = tbody.rows[i];
+          const cells = row.cells;
+          
+          // 선택된 레인 강조
+          if (row.classList.contains('bg-purple-100')) {
+            ctx.fillStyle = '#F3E8FF';
+            ctx.fillRect(20, yPos, 760, rowHeight);
+          }
+          
+          ctx.fillStyle = '#333';
+          xPos = 30;
+          for (let j = 0; j < cells.length && j < 9; j++) {
+            const text = cells[j].textContent.trim();
+            ctx.fillText(text, xPos, yPos + 20);
+            xPos += colWidths[j];
+          }
+          
+          yPos += rowHeight;
+        }
+      }
+      
+      // 추가 정보
+      const infoY = startY + (tbody.rows.length + 2) * rowHeight;
+      ctx.fillStyle = '#6B46C1';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('📊 선택한 레인 분석', 400, infoY);
+      
+      // 속도 정보 가져오기
+      const selectedLaneData = document.querySelector('#laneAdditionalInfo .grid');
+      if (selectedLaneData) {
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#333';
+        const speedInfo = selectedLaneData.querySelectorAll('.bg-white');
+        let infoX = 100;
+        const infoYStart = infoY + 30;
+        
+        speedInfo.forEach((info, i) => {
+          const label = info.querySelector('.text-xs').textContent;
+          const value = info.querySelector('.text-xl').textContent;
+          
+          if (i % 2 === 0 && i > 0) {
+            infoX = 100;
+          }
+          
+          ctx.textAlign = 'left';
+          ctx.fillText(`${label}: ${value}`, infoX, infoYStart + Math.floor(i / 2) * 25);
+          infoX += 300;
+        });
+      }
+      
+      // 푸터
+      ctx.fillStyle = '#666';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(`생성: ${new Date().toLocaleDateString('ko-KR')} - ATHLETE TIME © 장호준 코치`, 400, canvas.height - 20);
+      
+      // 다운로드
+      const link = document.createElement('a');
+      link.download = `lane-calculation-${selectedLane}lane-${targetTime}sec.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // 트랙 레인별 계산 함수들 (최신 버전 - 모바일/PC 대응)
     function calculateLaneAll() {
       // console.log('calculateLaneAll 함수 호출됨'); // Production: removed
       
@@ -2099,17 +2258,39 @@
         const timeDiff = lane.lane === 1 ? 0 : lane.adjustedTime - lanes[0].adjustedTime;
         const timeDiffStr = timeDiff > 0 ? `+${timeDiff.toFixed(2)}` : timeDiff.toFixed(2);
         
-        row.innerHTML = `
-          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.lane}${lane.isSelected ? ' ✓' : ''}</td>
-          <td>${lane.distance.toFixed(2)}m</td>
-          <td>${lane.stagger > 0 ? '+' + lane.stagger.toFixed(2) : lane.stagger.toFixed(2)}m</td>
-          <td class="font-bold ${lane.isSelected ? 'text-purple-700' : ''}">${lane.adjustedTime.toFixed(2)}초</td>
-          <td class="text-xs">${timeDiff === 0 ? '-' : timeDiffStr}</td>
-          <td class="text-blue-600">${lane.sectionTimes.straight1.toFixed(2)}</td>
-          <td class="text-red-600">${lane.sectionTimes.curve1.toFixed(2)}</td>
-          <td class="text-blue-600">${lane.sectionTimes.straight2.toFixed(2)}</td>
-          <td class="text-red-600">${lane.sectionTimes.curve2.toFixed(2)}</td>
-        `;
+        // 첫 번째 셀은 sticky를 위해 별도 처리
+        let cellIndex = 0;
+        const firstCell = row.insertCell(cellIndex++);
+        firstCell.className = `font-bold ${lane.isSelected ? 'text-purple-700' : ''}`;
+        firstCell.innerHTML = `${lane.lane}${lane.isSelected ? ' ✓' : ''}`;
+        
+        // 나머지 셀들
+        row.insertCell(cellIndex++).innerHTML = `${lane.distance.toFixed(2)}m`;
+        row.insertCell(cellIndex++).innerHTML = `${lane.stagger > 0 ? '+' + lane.stagger.toFixed(2) : lane.stagger.toFixed(2)}m`;
+        
+        const timeCell = row.insertCell(cellIndex++);
+        timeCell.className = `font-bold ${lane.isSelected ? 'text-purple-700' : ''}`;
+        timeCell.innerHTML = `${lane.adjustedTime.toFixed(2)}초`;
+        
+        const diffCell = row.insertCell(cellIndex++);
+        diffCell.className = 'text-xs';
+        diffCell.innerHTML = timeDiff === 0 ? '-' : timeDiffStr;
+        
+        const straight1Cell = row.insertCell(cellIndex++);
+        straight1Cell.className = 'text-blue-600';
+        straight1Cell.innerHTML = lane.sectionTimes.straight1.toFixed(2);
+        
+        const curve1Cell = row.insertCell(cellIndex++);
+        curve1Cell.className = 'text-red-600';
+        curve1Cell.innerHTML = lane.sectionTimes.curve1.toFixed(2);
+        
+        const straight2Cell = row.insertCell(cellIndex++);
+        straight2Cell.className = 'text-blue-600';
+        straight2Cell.innerHTML = lane.sectionTimes.straight2.toFixed(2);
+        
+        const curve2Cell = row.insertCell(cellIndex++);
+        curve2Cell.className = 'text-red-600';
+        curve2Cell.innerHTML = lane.sectionTimes.curve2.toFixed(2);
       });
       
       // console.log(`테이블 업데이트 완료: ${tbody.rows.length}개 행 추가됨`); // Production: removed
