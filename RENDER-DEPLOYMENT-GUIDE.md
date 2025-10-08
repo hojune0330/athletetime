@@ -62,7 +62,8 @@ Dashboard → athletetime-backend → Environment
 추가할 환경 변수:
 ```
 NODE_ENV=production
-CORS_ORIGIN=https://athletetime.netlify.app
+CORS_ORIGIN=https://athlete-time.netlify.app
+FRONTEND_URL=https://athlete-time.netlify.app
 ```
 
 ### 4.2 데이터베이스 연결 확인
@@ -165,7 +166,7 @@ wss://athletetime-backend.onrender.com
 
 ### 프론트엔드 (Netlify)
 ```
-https://athletetime.netlify.app
+https://athlete-time.netlify.app
 ```
 
 ---
