@@ -780,8 +780,20 @@
     
     // WebSocket 연결
     function connectWebSocket() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.hostname}:3004`;
+      // Sandbox 환경에서는 특정 URL 사용
+      const isSandbox = window.location.hostname.includes('e2b.dev');
+      let wsUrl;
+      
+      if (isSandbox) {
+        // E2B sandbox 환경
+        wsUrl = 'wss://3004-iyqwm3hj0cgb3tlwwo7v5-6532622b.e2b.dev';
+      } else {
+        // 일반 환경
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${protocol}//${window.location.hostname}:3004`;
+      }
+      
+      console.log('🔌 WebSocket 연결 시도:', wsUrl);
       
       try {
         ws = new WebSocket(wsUrl);

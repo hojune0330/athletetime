@@ -910,8 +910,20 @@
     
     // 실시간 채팅 통계 가져오기
     function fetchChatStats() {
-      const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-      fetch(`${protocol}//${window.location.hostname}:3004/api/stats`)
+      // Sandbox 환경 체크
+      const isSandbox = window.location.hostname.includes('e2b.dev');
+      let apiUrl;
+      
+      if (isSandbox) {
+        // E2B sandbox 환경
+        apiUrl = 'https://3004-iyqwm3hj0cgb3tlwwo7v5-6532622b.e2b.dev/api/stats';
+      } else {
+        // 일반 환경
+        const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+        apiUrl = `${protocol}//${window.location.hostname}:3004/api/stats`;
+      }
+      
+      fetch(apiUrl)
         .then(res => res.json())
         .then(data => {
           document.getElementById('widgetOnline').textContent = data.onlineUsers || 0;
