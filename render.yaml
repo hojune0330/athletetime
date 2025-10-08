@@ -4,7 +4,7 @@ services:
     name: athletetime-backend
     env: node
     region: singapore
-    plan: starter
+    plan: free
     buildCommand: npm install
     startCommand: node server.js
     envVars:
@@ -38,4 +38,4 @@ databases:
     databaseName: athletetime
     user: athletetime
     region: singapore
-    plan: starter
+    # Free tier database (no plan specification needed for free tier)
