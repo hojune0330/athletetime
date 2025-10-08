@@ -1251,27 +1251,7 @@
       </div>
     </div>
 
-    <!-- 레인 계산기 탭 (클릭시 새 창으로 열림) -->
-    <div id="lane-content" class="tab-content hidden">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="text-center py-12">
-          <i class="fas fa-road text-orange-500 text-6xl mb-4"></i>
-          <h2 class="text-2xl font-bold mb-4">400m 트랙 레인별 구간 시간 계산기</h2>
-          <p class="text-gray-600 mb-6">
-            트랙 레인 계산기가 새 창에서 열립니다.
-          </p>
-          <button type="button" onclick="window.open('track-lane-simple.html', '_blank')" 
-                  class="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 py-3 rounded-lg font-medium text-lg hover:opacity-90 transition">
-            <i class="fas fa-external-link-alt mr-2"></i>
-            트랙 레인 계산기 열기
-          </button>
-          <div class="mt-8 text-sm text-gray-500">
-            <p>트랙 레인별 4구간 (직선×2, 공선×2) 시간 분석</p>
-            <p>각 레인의 실제 거리와 구간별 시간 자동 계산</p>
-          </div>
-        </div>
-      </div>
-    </div>
+
 
     <!-- 목표 페이스 탭 -->
     <div id="target-content" class="tab-content hidden">
@@ -1407,8 +1387,8 @@
       </div>
     </div>
     
-    <!-- 트랙 레인 계산기 탭 -->
-    <div id="lane-calculator-content" class="tab-content hidden">
+    <!-- 트랙 레인 계산기 탭 (내장 버전) -->
+    <div id="lane-content" class="tab-content hidden">
       <!-- 목표 시간 입력 섹션 (모바일 최적화) -->
       <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-4">
         <div class="flex flex-col md:flex-row md:items-center gap-4">
