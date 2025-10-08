@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>페이스 계산기 & 차트 | 애슬리트 타임</title>
+  <title>페이스 계산기 | 애슬리트 타임</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -34,6 +34,28 @@
       font-size: 12px;
       width: 100%;
       table-layout: fixed;
+    }
+    
+    /* 모바일 반응형 스타일 */
+    @media (max-width: 768px) {
+      .pace-table {
+        font-size: 11px;
+      }
+      
+      .pace-table td, .pace-table th {
+        padding: 4px 2px;
+      }
+      
+      /* 테이블 스크롤 */
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* 카드 간격 줄이기 */
+      .card {
+        margin-bottom: 1rem;
+      }
     }
     
     .pace-table td, .pace-table th {
@@ -395,9 +417,6 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="pace-calculator-mobile.html" class="p-2 hover:bg-white/20 rounded-lg" title="모바일 버전">
-          <i class="fas fa-mobile-alt text-xl"></i>
-        </a>
         <a href="pace-calculator-selector.html?force=true" class="p-2 hover:bg-white/20 rounded-lg" title="버전 선택">
           <i class="fas fa-exchange-alt text-xl"></i>
         </a>
@@ -1326,6 +1345,117 @@
       8: 453.03
     };
 
+    // 킬로미터 페이스 테이블 업데이트
+    function updateKmPaceTable() {
+      const tbody = document.querySelector('#kmPaceTable tbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      // 페이스 범위: 3:00 ~ 7:00 (분:초/km)
+      const paces = [
+        { pace: '3:00', seconds: 180 },
+        { pace: '3:30', seconds: 210 },
+        { pace: '4:00', seconds: 240 },
+        { pace: '4:30', seconds: 270 },
+        { pace: '5:00', seconds: 300 },
+        { pace: '5:30', seconds: 330 },
+        { pace: '6:00', seconds: 360 },
+        { pace: '6:30', seconds: 390 },
+        { pace: '7:00', seconds: 420 }
+      ];
+      
+      const distances = [
+        { name: '5km', meters: 5000 },
+        { name: '10km', meters: 10000 },
+        { name: '하프', meters: 21097.5 },
+        { name: '풀', meters: 42195 }
+      ];
+      
+      paces.forEach(paceData => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td class="font-bold">${paceData.pace}</td>
+          ${distances.map(dist => {
+            const totalSeconds = (dist.meters / 1000) * paceData.seconds;
+            return `<td>${formatTime(totalSeconds)}</td>`;
+          }).join('')}
+        `;
+      });
+    }
+    
+    // 목표 기록 테이블 업데이트
+    function updateGoalTable() {
+      // 5km 목표 테이블
+      updateSpecificGoalTable('goal5kmTable', 5000, [
+        15 * 60, // 15:00
+        16 * 60, // 16:00
+        17 * 60, // 17:00
+        18 * 60, // 18:00
+        19 * 60, // 19:00
+        20 * 60, // 20:00
+        22 * 60, // 22:00
+        25 * 60, // 25:00
+        30 * 60  // 30:00
+      ]);
+      
+      // 10km 목표 테이블
+      updateSpecificGoalTable('goal10kmTable', 10000, [
+        32 * 60, // 32:00
+        35 * 60, // 35:00
+        37 * 60, // 37:00
+        40 * 60, // 40:00
+        43 * 60, // 43:00
+        45 * 60, // 45:00
+        50 * 60, // 50:00
+        55 * 60, // 55:00
+        60 * 60  // 60:00
+      ]);
+      
+      // 하프마라톤 목표 테이블
+      updateSpecificGoalTable('goalHalfTable', 21097.5, [
+        70 * 60,   // 1:10:00
+        75 * 60,   // 1:15:00
+        80 * 60,   // 1:20:00
+        85 * 60,   // 1:25:00
+        90 * 60,   // 1:30:00
+        100 * 60,  // 1:40:00
+        110 * 60,  // 1:50:00
+        120 * 60,  // 2:00:00
+        150 * 60   // 2:30:00
+      ]);
+      
+      // 풀마라톤 목표 테이블
+      updateSpecificGoalTable('goalFullTable', 42195, [
+        150 * 60,  // 2:30:00
+        165 * 60,  // 2:45:00
+        180 * 60,  // 3:00:00
+        195 * 60,  // 3:15:00
+        210 * 60,  // 3:30:00
+        225 * 60,  // 3:45:00
+        240 * 60,  // 4:00:00
+        270 * 60,  // 4:30:00
+        300 * 60   // 5:00:00
+      ]);
+    }
+    
+    // 특정 목표 테이블 업데이트
+    function updateSpecificGoalTable(tableId, distanceMeters, goalTimes) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      if (!tbody) return;
+      
+      tbody.innerHTML = '';
+      
+      goalTimes.forEach(totalSeconds => {
+        const paceSeconds = totalSeconds / (distanceMeters / 1000);
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(totalSeconds)}</td>
+          <td>${formatPace(paceSeconds)}</td>
+        `;
+      });
+    }
+    
     // 시간 포맷팅 함수
     function formatTime(seconds, forceHours = false) {
       if (isNaN(seconds) || seconds === null) return '-';
@@ -2689,7 +2819,7 @@
               © ATHLETE TIME · 제작: 장호준 코치 · ${new Date().toLocaleDateString('ko-KR')}
             </div>
           
-  <script src="theme-toggle.js"></script>
+
 </body>
         </html>
       `;
@@ -2863,7 +2993,7 @@
         const messages = JSON.parse((function() { try { return localStorage.getItem('fallbackMessages'); } catch(e) { console.error('Storage error:', e); return null; } })() || '[]');
         messages.push({ username, text, timestamp: new Date().toISOString() });
         if (messages.length > 100) messages.shift(); // 최대 100개 메시지 유지
-        (function() { try { return localStorage.setItem('fallbackMessages', JSON.stringify(messages); } catch(e) { console.error('Storage error:', e); return null; } })());
+        (function() { try { return localStorage.setItem('fallbackMessages', JSON.stringify(messages)); } catch(e) { console.error('Storage error:', e); return null; } })();
       }
       
       input.value = '';
@@ -3025,9 +3155,24 @@
       });
     }
     
-    // 페이지 로드 시 채팅 초기화
-    setTimeout(initializeChatIntegration, 1000);
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      // 초기 테이블 업데이트
+      updateKmPaceTable();
+      updateGoalTable();
+      
+      // 트랙 레인 계산기 초기화
+      if (document.getElementById('trackLaneTime')) {
+        document.getElementById('trackLaneTime').value = '50';
+        calculateLaneDifferences();
+      }
+      
+      // 채팅 초기화
+      setTimeout(initializeChatIntegration, 1000);
+    });
   </script>
+  
+  <script src="theme-toggle.js"></script>
   
   <style>
     /* 채팅 통합 스타일 */
