@@ -1,0 +1,51 @@
+services:
+  # 백엔드 서버 (채팅 + API)
+  - type: web
+    name: athletetime-backend
+    env: node
+    region: singapore
+    plan: starter # $7/month
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: athletetime-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: athletetime-redis
+          property: connectionString
+
+  # 정적 사이트 호스팅
+  - type: web
+    name: athletetime-frontend
+    env: static
+    buildCommand: echo "No build needed"
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://athletetime-backend.onrender.com/api/*
+
+databases:
+  # PostgreSQL 데이터베이스
+  - name: athletetime-db
+    databaseName: athletetime
+    user: athletetime
+    region: singapore
+    plan: starter # $7/month
+
+  # Redis 캐싱
+  - name: athletetime-redis
+    type: redis
+    region: singapore
+    plan: starter # $10/month
+    maxmemoryPolicy: allkeys-lru
