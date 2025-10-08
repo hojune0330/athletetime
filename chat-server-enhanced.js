@@ -598,7 +598,7 @@ const interval = setInterval(() => {
 // 24시간 지난 메시지 정리 (1시간마다)
 setInterval(() => {
   cleanupOldMessages();
-}, MESSAGE_CLEANUP_INTERVAL);
+}, 60 * 60 * 1000); // 1시간마다 메시지 정리
 
 // 서버 시작 시 한 번 실행
 cleanupOldMessages();

@@ -1415,11 +1415,8 @@
     
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
-      // 프로필 초기화
-      loadProfile();
-      
-      // WebSocket 연결
-      connectWebSocket();
+      // init 함수 호출 (loadProfile과 connectWebSocket 포함)
+      init();
       
       // 메인 채팅방 자동 입장
       setTimeout(() => {
