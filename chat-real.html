@@ -865,6 +865,10 @@
     function init() {
       loadProfile();
       connectWebSocket();
+      
+      // UI 초기 설정
+      document.getElementById('currentRoomName').textContent = '메인 채팅방';
+      document.getElementById('messageInput').placeholder = '연결 중...';
     }
     
     // 프로필 로드
@@ -930,10 +934,22 @@
           reconnectAttempts = 0;
           document.getElementById('connectionStatus').textContent = '온라인';
           
+          // 메인 채팅방 표시 및 자동 입장
+          const mainRoom = {
+            id: 'main',
+            name: '메인 채팅방',
+            description: '모든 육상인들이 함께하는 공간',
+            userCount: 0,
+            active: true
+          };
+          
+          // 방 목록에 메인 채팅방 추가
+          updateRoomList([mainRoom]);
+          
           // 메인 채팅방 자동 입장
           setTimeout(() => {
             joinRoom('main');
-          }, 500);
+          }, 300);
         };
         
         ws.onmessage = (event) => {
@@ -1033,13 +1049,23 @@
         });
       }
       
-      addSystemMessage('채팅방에 입장했습니다.');
+      // 환영 메시지
+      if (currentRoom === 'main') {
+        addSystemMessage('🏃 메인 채팅방에 오신 것을 환영합니다!');
+        addSystemMessage('모든 육상인들과 자유롭게 대화를 나눠보세요.');
+      } else {
+        addSystemMessage('채팅방에 입장했습니다.');
+      }
+      
       updateRoomUserCount(data.userCount);
       
       // 입력 활성화
       document.getElementById('messageInput').disabled = false;
       document.getElementById('sendBtn').disabled = false;
       document.getElementById('messageInput').focus();
+      
+      // 입력창에 placeholder 업데이트
+      document.getElementById('messageInput').placeholder = '메시지를 입력하세요... (Enter로 전송)';
     }
     
     // 방 입장
@@ -1413,24 +1439,16 @@
     
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
-      // init 함수 호출 (loadProfile과 connectWebSocket 포함)
-      init();
+      // 처음 방문한 사용자에게만 가이드 표시
+      const hasVisited = localStorage.getItem('chatGuideShown');
+      if (!hasVisited) {
+        openGuideModal();
+        localStorage.setItem('chatGuideShown', 'true');
+      }
       
-      // 메인 채팅방 자동 입장
-      setTimeout(() => {
-        currentRoom = 'main';
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({
-            type: 'join_room',
-            room: 'main',
-            username: userProfile.nickname
-          }));
-        }
-      }, 1000);
+      // 초기화 (프로필 로드와 WebSocket 연결 포함)
+      init();
     });
-    
-    // 초기화
-    init();
   </script>
 
 

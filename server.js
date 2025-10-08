@@ -242,9 +242,37 @@ const rooms = new Map();
 const ROOM_INACTIVE_TIMEOUT = 30 * 60 * 1000; // 30분
 const MESSAGE_RETENTION_TIME = 24 * 60 * 60 * 1000; // 24시간
 
+// 메인 채팅방 초기화
+rooms.set('main', {
+  users: new Set(),
+  messages: [],
+  lastActivity: Date.now(),
+  name: '메인 채팅방',
+  description: '모든 육상인들이 함께하는 공간',
+  permanent: true // 영구 채팅방 표시
+});
+
 wss.on('connection', (ws) => {
   let currentRoom = null;
   let userId = null;
+
+  // 연결 시 즉시 메인 채팅방 정보 전송
+  ws.send(JSON.stringify({
+    type: 'connected',
+    data: {
+      rooms: [{
+        id: 'main',
+        name: '메인 채팅방',
+        description: '모든 육상인들이 함께하는 공간',
+        userCount: rooms.get('main').users.size,
+        active: true
+      }],
+      stats: {
+        totalUsers: wss.clients.size,
+        activeRooms: rooms.size
+      }
+    }
+  }));
 
   ws.on('message', async (data) => {
     try {
@@ -252,55 +280,70 @@ wss.on('connection', (ws) => {
 
       switch (message.type) {
         case 'join':
-          currentRoom = message.room || 'main';
-          userId = message.userId;
+          currentRoom = message.data?.room || message.room || 'main';
+          userId = message.data?.userId || message.userId;
+          const nickname = message.data?.nickname || message.nickname || '익명';
           
           if (!rooms.has(currentRoom)) {
             rooms.set(currentRoom, {
               users: new Set(),
               messages: [],
-              lastActivity: Date.now()
+              lastActivity: Date.now(),
+              name: currentRoom === 'main' ? '메인 채팅방' : `채팅방 ${currentRoom}`
             });
           }
           
           const room = rooms.get(currentRoom);
           room.users.add(ws);
+          room.lastActivity = Date.now();
           
-          // 입장 메시지
-          broadcast(currentRoom, {
-            type: 'user-joined',
-            userId: userId,
-            nickname: message.nickname,
-            userCount: room.users.size
-          });
-          
-          // 최근 메시지 전송
+          // 입장 응답 전송
           ws.send(JSON.stringify({
-            type: 'recent-messages',
-            messages: room.messages.slice(-50)
+            type: 'room_joined',
+            data: {
+              roomId: currentRoom,
+              roomName: room.name,
+              messages: room.messages.slice(-50),
+              userCount: room.users.size
+            }
           }));
+          
+          // 다른 사용자들에게 입장 알림
+          broadcastToOthers(currentRoom, ws, {
+            type: 'user_joined',
+            data: {
+              userId: userId,
+              nickname: nickname,
+              userCount: room.users.size
+            }
+          });
           break;
 
         case 'message':
           if (currentRoom && rooms.has(currentRoom)) {
+            const msgData = message.data || message;
             const messageData = {
-              type: 'message',
-              userId: message.userId,
-              nickname: message.nickname,
-              message: message.message,
-              timestamp: new Date().toISOString()
+              type: 'new_message',
+              data: {
+                userId: msgData.userId,
+                nickname: msgData.nickname || '익명',
+                text: msgData.text || msgData.message,
+                avatar: msgData.avatar || msgData.nickname?.substring(0, 1) || '?',
+                timestamp: new Date().toISOString(),
+                room: currentRoom
+              }
             };
             
             // 메시지 저장
             const room = rooms.get(currentRoom);
-            room.messages.push(messageData);
+            room.messages.push(messageData.data);
             room.lastActivity = Date.now();
             
             // DB에도 저장 (24시간 후 삭제용)
             if (pool) {
               await pool.query(
                 'INSERT INTO chat_messages (room_id, user_id, nickname, message) VALUES ($1, $2, $3, $4)',
-                [currentRoom, message.userId, message.nickname, message.message]
+                [currentRoom, msgData.userId, msgData.nickname, msgData.text || msgData.message]
               );
             }
             
@@ -357,6 +400,18 @@ function broadcast(roomName, message) {
   const messageStr = JSON.stringify(message);
   room.users.forEach(client => {
     if (client.readyState === 1) { // WebSocket.OPEN
+      client.send(messageStr);
+    }
+  });
+}
+
+function broadcastToOthers(roomName, excludeWs, message) {
+  const room = rooms.get(roomName);
+  if (!room) return;
+  
+  const messageStr = JSON.stringify(message);
+  room.users.forEach(client => {
+    if (client !== excludeWs && client.readyState === 1) { // WebSocket.OPEN
       client.send(messageStr);
     }
   });
