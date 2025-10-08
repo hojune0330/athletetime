@@ -979,6 +979,7 @@
     
     // WebSocket 메시지 처리
     function handleWebSocketMessage(data) {
+      console.log('Received message:', data); // 디버깅용
       switch(data.type) {
         case 'connected':
           updateRoomList(data.data.rooms);
@@ -990,6 +991,10 @@
           break;
           
         case 'message':
+          displayMessage(data.data);
+          break;
+          
+        case 'new_message':
           displayMessage(data.data);
           break;
           
@@ -1110,26 +1115,32 @@
       const input = document.getElementById('messageInput');
       const text = input.value.trim();
       
-      if (!text || !ws || ws.readyState !== WebSocket.OPEN || !currentRoom) return;
+      if (!text || !ws || ws.readyState !== WebSocket.OPEN || !currentRoom) {
+        console.log('Cannot send message:', { text: !!text, ws: !!ws, wsState: ws?.readyState, room: currentRoom });
+        return;
+      }
       
       const displayName = userProfile.anonymous ? '익명선수' : userProfile.nickname;
       const displayAvatar = userProfile.anonymous ? '익' : userProfile.avatar;
       
-      ws.send(JSON.stringify({
+      const messageData = {
         type: 'message',
         data: {
           text,
           nickname: displayName,
           avatar: displayAvatar,
           room: currentRoom,
-          userId: userProfile.userId  // userId 추가
+          userId: userProfile.userId
         }
-      }));
+      };
+      
+      console.log('Sending message:', messageData); // 디버깅용
+      ws.send(JSON.stringify(messageData));
       
       // 자신의 메시지는 서버에서 받아서 표시 (중복 방지)
-      // displayMessage 호출 제거
       
       input.value = '';
+      input.focus();
     }
     
     // 메시지 표시

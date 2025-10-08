@@ -26,7 +26,10 @@ if (process.env.REDIS_URL) {
 }
 
 // 미들웨어
-app.use(cors());
+app.use(cors({
+  origin: ['https://athlete-time.netlify.app', 'http://localhost:3000', 'http://localhost:5000'],
+  credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('public'));
 
@@ -88,6 +91,16 @@ async function initDB() {
 }
 
 // ===== API 엔드포인트 =====
+
+// Health Check
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    wsClients: wss.clients.size,
+    rooms: rooms.size
+  });
+});
 
 // 게시물 목록
 app.get('/api/posts', async (req, res) => {
@@ -277,6 +290,7 @@ wss.on('connection', (ws) => {
   ws.on('message', async (data) => {
     try {
       const message = JSON.parse(data);
+      console.log('Received message:', message.type, message.data?.room || message.room);
 
       switch (message.type) {
         case 'join':
