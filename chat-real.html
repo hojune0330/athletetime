@@ -24,25 +24,36 @@
       -webkit-tap-highlight-color: transparent;
     }
     
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
       background: #0a0a0a;
       color: #ffffff;
+      height: 100%;
       height: 100vh;
       height: 100dvh; /* Dynamic viewport height for mobile */
+      height: -webkit-fill-available;
       overflow: hidden;
       position: fixed;
       width: 100%;
       top: 0;
       left: 0;
+      display: flex;
+      flex-direction: column;
     }
     
     /* 레이아웃 */
     .chat-container {
       display: flex;
-      height: 100vh;
-      height: 100dvh; /* Dynamic viewport height for mobile */
+      height: 100%;
+      width: 100%;
       position: relative;
+      overflow: hidden;
+      flex: 1;
     }
     
     /* 사이드바 */
@@ -278,6 +289,8 @@
       background: #0a0a0a;
       position: relative;
       min-height: 0; /* Important for flex children */
+      overflow: hidden; /* Prevent overflow */
+      height: 100%;
     }
     
     .chat-header {
@@ -541,6 +554,7 @@
       flex-shrink: 0; /* Prevent shrinking */
       position: relative;
       z-index: 10; /* Ensure it stays above other content */
+      margin-top: auto; /* Push to bottom */
     }
     
     .input-wrapper {
@@ -719,18 +733,23 @@
       body {
         height: 100vh;
         height: 100dvh;
+        height: -webkit-fill-available;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        overflow: hidden;
       }
       
       .chat-container {
         height: 100vh;
         height: 100dvh;
+        height: -webkit-fill-available;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        position: relative;
+        overflow: hidden;
       }
       
       .sidebar {
@@ -740,6 +759,9 @@
         transition: left 0.3s;
         height: 100vh;
         height: 100dvh;
+        height: -webkit-fill-available;
+        top: 0;
+        bottom: 0;
       }
       
       .sidebar.open {
@@ -750,28 +772,44 @@
         width: 100%;
         height: 100vh;
         height: 100dvh;
+        height: -webkit-fill-available;
         display: flex;
         flex-direction: column;
+        position: relative;
+        overflow: hidden;
       }
       
       .chat-header {
         flex-shrink: 0;
+        flex-grow: 0;
+        height: 60px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
       }
       
       .messages-container {
-        flex: 1;
+        flex: 1 1 auto;
         min-height: 0;
         overflow-y: auto;
+        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 20px;
+        padding: 20px;
+        padding-bottom: 30px;
+        position: relative;
       }
       
       .input-container {
         flex-shrink: 0;
-        padding: 15px;
-        padding-bottom: env(safe-area-inset-bottom, 15px); /* iOS safe area */
-        position: relative;
+        flex-grow: 0;
+        padding: 12px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0)); /* iOS safe area */
+        position: sticky;
+        bottom: 0;
         background: #111111;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 100;
+        width: 100%;
       }
       
       .mobile-menu-btn {
@@ -792,17 +830,39 @@
         max-width: 150px;
       }
       
+      /* Input styling for mobile */
+      .message-input {
+        font-size: 16px !important; /* Prevent zoom on iOS */
+      }
+      
+      .input-wrapper {
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      
+      .attachment-button,
+      .send-button {
+        flex-shrink: 0;
+        padding: 8px;
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
       /* Keyboard visible adjustment */
       .keyboard-visible .messages-container {
-        padding-bottom: 100px; /* Extra space when keyboard is visible */
+        padding-bottom: 60px; /* Extra space when keyboard is visible */
       }
       
       .keyboard-visible .input-container {
-        position: sticky;
+        position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 1000;
+        transform: translateY(0);
       }
       
       /* iOS specific fixes */
@@ -813,11 +873,40 @@
         
         .chat-main {
           height: -webkit-fill-available;
+          display: grid;
+          grid-template-rows: auto 1fr auto;
+          grid-template-areas: 
+            "header"
+            "messages"
+            "input";
+        }
+        
+        .chat-header {
+          grid-area: header;
         }
         
         .messages-container {
-          padding-bottom: 80px;
+          grid-area: messages;
+          padding-bottom: 20px;
         }
+        
+        .input-container {
+          grid-area: input;
+        }
+      }
+      
+      /* Alternative layout using flexbox with better constraints */
+      .chat-main {
+        max-height: 100vh;
+        max-height: 100dvh;
+      }
+      
+      /* Ensure input is always visible */
+      .input-container {
+        position: sticky;
+        bottom: 0;
+        min-height: 60px;
+        max-height: 120px;
       }
     }
     
@@ -1205,27 +1294,32 @@
       if (!isMobile) return;
       
       const input = document.getElementById('messageInput');
+      const chatMain = document.querySelector('.chat-main');
       
       // Visual Viewport API 사용 (더 정확한 키보드 감지)
       if ('visualViewport' in window) {
+        let lastHeight = window.visualViewport.height;
+        
         window.visualViewport.addEventListener('resize', () => {
-          const hasKeyboard = window.visualViewport.height < window.screen.height * 0.8;
+          const currentHeight = window.visualViewport.height;
+          const hasKeyboard = currentHeight < window.screen.height * 0.75;
           
           if (hasKeyboard) {
             document.body.classList.add('keyboard-visible');
-            // 입력창을 viewport 안에 유지
-            const inputContainer = document.querySelector('.input-container');
-            if (inputContainer) {
-              inputContainer.style.transform = `translateY(${window.screen.height - window.visualViewport.height}px)`;
+            // 채팅 영역 높이 조절
+            if (chatMain) {
+              const keyboardHeight = window.screen.height - currentHeight;
+              chatMain.style.paddingBottom = `${keyboardHeight}px`;
             }
             scrollToBottom();
           } else {
             document.body.classList.remove('keyboard-visible');
-            const inputContainer = document.querySelector('.input-container');
-            if (inputContainer) {
-              inputContainer.style.transform = 'translateY(0)';
+            if (chatMain) {
+              chatMain.style.paddingBottom = '0';
             }
           }
+          
+          lastHeight = currentHeight;
         });
       } else {
         // Fallback for older browsers
@@ -1234,7 +1328,7 @@
         input.addEventListener('focus', function() {
           setTimeout(() => {
             const currentHeight = window.innerHeight;
-            if (currentHeight < initialHeight * 0.8) {
+            if (currentHeight < initialHeight * 0.75) {
               document.body.classList.add('keyboard-visible');
               scrollToBottom();
             }
@@ -1246,12 +1340,29 @@
           initialHeight = window.innerHeight;
         });
       }
+      
+      // iOS specific: prevent viewport bounce
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        document.addEventListener('touchmove', function(e) {
+          if (e.target.closest('.messages-container')) return;
+          e.preventDefault();
+        }, { passive: false });
+      }
     }
     
     // 메시지 영역 스크롤을 맨 아래로
     function scrollToBottom() {
       const container = document.getElementById('messagesContainer');
       if (container) {
+        // 즉시 실행
+        container.scrollTop = container.scrollHeight;
+        
+        // 애니메이션 후 다시 실행
+        requestAnimationFrame(() => {
+          container.scrollTop = container.scrollHeight;
+        });
+        
+        // 이미지 로드 등을 위해 지연 실행
         setTimeout(() => {
           container.scrollTop = container.scrollHeight;
         }, 100);
