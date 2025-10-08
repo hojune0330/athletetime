@@ -14,15 +14,16 @@ app.use(express.static('.'));
 
 // 데이터 구조
 const clients = new Map(); // clientId -> {ws, user, currentRoom}
-const rooms = new Map(); // roomId -> {id, name, users: Set, messages: [], created, private}
+const rooms = new Map(); // roomId -> {id, name, users: Set, messages: [], created, private, lastActivity, isPermanent}
 const userProfiles = new Map(); // userId -> profile data
+const roomTimers = new Map(); // roomId -> timeout handle
 
-// 기본 채팅방 초기화
+// 기본 채팅방 초기화 (영구 채팅방)
 const defaultRooms = [
-  { id: 'general', name: '일반 대화방', desc: '모두 환영' },
-  { id: 'beginner', name: '초보 러너', desc: '입문자 환영' },
-  { id: 'marathon', name: '마라톤 대회', desc: '대회 정보' },
-  { id: 'equipment', name: '장비 리뷰', desc: '러닝화 & 장비' }
+  { id: 'general', name: '일반 대화방', desc: '모두 환영', isPermanent: true },
+  { id: 'beginner', name: '초보 러너', desc: '입문자 환영', isPermanent: true },
+  { id: 'marathon', name: '마라톤 대회', desc: '대회 정보', isPermanent: true },
+  { id: 'equipment', name: '장비 리뷰', desc: '러닝화 & 장비', isPermanent: true }
 ];
 
 defaultRooms.forEach(room => {
@@ -31,9 +32,67 @@ defaultRooms.forEach(room => {
     users: new Set(),
     messages: [],
     created: new Date().toISOString(),
-    private: false
+    lastActivity: new Date().toISOString(),
+    private: false,
+    isPermanent: true
   });
 });
+
+// 30분 타이머 (밀리초)
+const ROOM_TIMEOUT = 30 * 60 * 1000; // 30분
+
+// 방 활동 업데이트
+function updateRoomActivity(roomId) {
+  const room = rooms.get(roomId);
+  if (!room || room.isPermanent) return;
+  
+  room.lastActivity = new Date().toISOString();
+  
+  // 기존 타이머 취소
+  if (roomTimers.has(roomId)) {
+    clearTimeout(roomTimers.get(roomId));
+  }
+  
+  // 새 타이머 설정 (30분 후 삭제)
+  const timer = setTimeout(() => {
+    deleteRoom(roomId);
+  }, ROOM_TIMEOUT);
+  
+  roomTimers.set(roomId, timer);
+}
+
+// 방 삭제
+function deleteRoom(roomId) {
+  const room = rooms.get(roomId);
+  if (!room || room.isPermanent) return;
+  
+  console.log(`채팅방 자동 삭제: ${room.name} (30분 무활동)`);
+  
+  // 방 안의 모든 사용자 강제 퇴장
+  room.users.forEach(clientId => {
+    const client = clients.get(clientId);
+    if (client) {
+      client.currentRoom = null;
+      client.ws.send(JSON.stringify({
+        type: 'room_deleted',
+        data: {
+          roomId,
+          message: '30분 동안 활동이 없어 채팅방이 삭제되었습니다.'
+        }
+      }));
+    }
+  });
+  
+  // 모든 사용자에게 방 삭제 알림
+  broadcastToAll({
+    type: 'room_removed',
+    data: { roomId }
+  });
+  
+  // 방 삭제
+  rooms.delete(roomId);
+  roomTimers.delete(roomId);
+}
 
 // WebSocket 연결 처리
 wss.on('connection', (ws, req) => {
@@ -243,6 +302,9 @@ function handleChatMessage(clientId, data) {
     room.messages.shift();
   }
   
+  // 방 활동 시간 업데이트
+  updateRoomActivity(client.currentRoom);
+  
   // 같은 방 사용자들에게 브로드캐스트
   broadcastToRoom(client.currentRoom, {
     type: 'message',
@@ -268,7 +330,7 @@ function createRoom(clientId, data) {
     return;
   }
   
-  // 새 방 생성
+  // 새 방 생성 (사용자 생성 방은 임시)
   const newRoom = {
     id: roomId,
     name: data.name,
@@ -277,10 +339,15 @@ function createRoom(clientId, data) {
     owner: client.user?.id || clientId,
     users: new Set(),
     messages: [],
-    created: new Date().toISOString()
+    created: new Date().toISOString(),
+    lastActivity: new Date().toISOString(),
+    isPermanent: false // 사용자 생성 방은 임시
   };
   
   rooms.set(roomId, newRoom);
+  
+  // 30분 타이머 시작
+  updateRoomActivity(roomId);
   
   // 모든 사용자에게 새 방 알림
   broadcastToAll({
@@ -290,11 +357,13 @@ function createRoom(clientId, data) {
       name: newRoom.name,
       desc: newRoom.desc,
       private: newRoom.private,
-      userCount: 0
+      userCount: 0,
+      isPermanent: false,
+      timeLeft: ROOM_TIMEOUT
     }
   });
   
-  console.log(`새 채팅방 생성: ${newRoom.name} by ${client.user?.nickname}`);
+  console.log(`새 임시 채팅방 생성: ${newRoom.name} by ${client.user?.nickname} (30분 후 자동 삭제)`);
 }
 
 // 프로필 업데이트
