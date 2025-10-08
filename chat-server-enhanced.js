@@ -561,6 +561,27 @@ function broadcastStats() {
   });
 }
 
+// 24시간 지난 메시지 삭제 함수
+function cleanupOldMessages() {
+  const now = Date.now();
+  let deletedCount = 0;
+  
+  rooms.forEach((room) => {
+    const initialLength = room.messages.length;
+    room.messages = room.messages.filter(msg => {
+      const msgTime = new Date(msg.createdAt || msg.timestamp).getTime();
+      const age = now - msgTime;
+      return age < MESSAGE_RETENTION_TIME;
+    });
+    deletedCount += initialLength - room.messages.length;
+  });
+  
+  if (deletedCount > 0) {
+    stats.messagesDeleted += deletedCount;
+    console.log(`🗑️ ${deletedCount}개의 24시간 지난 메시지 삭제`);
+  }
+}
+
 // 연결 상태 체크 (30초마다)
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
@@ -573,6 +594,14 @@ const interval = setInterval(() => {
   // 통계 로그
   console.log(`📊 현재 상태: ${clients.size}명 접속, ${rooms.size}개 방, ${stats.totalMessages}개 메시지`);
 }, 30000);
+
+// 24시간 지난 메시지 정리 (1시간마다)
+setInterval(() => {
+  cleanupOldMessages();
+}, MESSAGE_CLEANUP_INTERVAL);
+
+// 서버 시작 시 한 번 실행
+cleanupOldMessages();
 
 // 서버 종료 시 정리
 wss.on('close', () => {

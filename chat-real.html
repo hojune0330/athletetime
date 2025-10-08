@@ -650,6 +650,10 @@
             <span id="currentRoomUsers">0명</span>
           </div>
         </div>
+        <button onclick="openGuideModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #999; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 5px;" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.color='white'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.color='#999'">
+          <i class="fas fa-info-circle"></i>
+          <span>안내</span>
+        </button>
       </div>
       
       <!-- 메시지 영역 -->
@@ -734,6 +738,108 @@
         </button>
         <button onclick="createRoom()" style="padding: 10px 20px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
           만들기
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 채팅 안내사항 모달 -->
+  <div id="guideModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+        <h2 style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+          📜 채팅방 이용 안내
+        </h2>
+        <button onclick="closeGuideModal()" style="background: none; border: none; color: #999; font-size: 1.5rem; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+          ×
+        </button>
+      </div>
+      
+      <div style="space-y: 20px;">
+        <!-- 기본 정보 -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #667eea; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-clock"></i> 메시지 보관 정책
+          </h3>
+          <div style="background: rgba(102, 126, 234, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #667eea;">
+            <p style="color: #e0e0e0; line-height: 1.6; font-size: 0.9rem;">
+              • 모든 채팅 메시지는 <strong style="color: #ec4899;">24시간 후 자동 삭제</strong>됩니다.<br>
+              • 사용자 생성 채팅방은 <strong style="color: #ec4899;">30분간 활동이 없으면 자동 삭제</strong>됩니다.<br>
+              • 중요한 대화는 개인적으로 저장해 주시기 바랍니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 경고 사항 -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #ef4444; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-exclamation-triangle"></i> 금지 행위 및 처벌
+          </h3>
+          <div style="background: rgba(239, 68, 68, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444;">
+            <p style="color: #fca5a5; line-height: 1.8; font-size: 0.9rem; font-weight: 500;">
+              다음 행위는 <strong>엄격히 금지</strong>되며, 위반 시 <strong>검찰 고발 및 법적 처벌</strong>을 받을 수 있습니다:
+            </p>
+            <ul style="color: #fca5a5; line-height: 1.8; font-size: 0.85rem; margin-top: 10px; padding-left: 20px;">
+              <li>🚫 <strong>불법 콘텐츠</strong>: 음란물, 도박, 약물 거래 등</li>
+              <li>📢 <strong>스팸 및 광고</strong>: 무단 홍보, 상업적 광고</li>
+              <li>🤬 <strong>욕설 및 비방</strong>: 타인에 대한 모욕, 명예훼손</li>
+              <li>🙅 <strong>성희롱</strong>: 성적 모욕, 협박, 스토킹</li>
+              <li>🆘 <strong>개인정보 유출</strong>: 타인의 개인정보 무단 공개</li>
+              <li>⚠️ <strong>허위 사실 유포</strong>: 가짜뉴스, 잘못된 정보 확산</li>
+            </ul>
+            <p style="color: #fbbf24; margin-top: 15px; font-size: 0.85rem; padding: 10px; background: rgba(251, 191, 36, 0.1); border-radius: 4px;">
+              ⚠️ <strong>처벌</strong>: 형법 및 관련 법률에 따라 <strong>징역 또는 벌금형</strong>에 처해질 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 개인정보 보호 -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #10b981; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-shield-alt"></i> 개인정보 보호
+          </h3>
+          <div style="background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #10b981;">
+            <p style="color: #e0e0e0; line-height: 1.6; font-size: 0.9rem;">
+              • 닉네임과 채팅 내용만 저장되며, 개인 식별 정보는 수집하지 않습니다.<br>
+              • 익명 모드를 사용하여 완전한 익명성을 보장받을 수 있습니다.<br>
+              • IP 주소는 법적 요청 시에만 제공됩니다.<br>
+              • 모든 데이터는 SSL 암호화를 통해 안전하게 전송됩니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 이용 팁 -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #f59e0b; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-lightbulb"></i> 이용 팁
+          </h3>
+          <div style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b;">
+            <ul style="color: #e0e0e0; line-height: 1.6; font-size: 0.9rem; padding-left: 20px;">
+              <li>새 채팅방 생성: 하단 "+" 버튼 클릭</li>
+              <li>프로필 변경: 좌측 상단 프로필 클릭</li>
+              <li>익명 모드: 프로필 설정에서 활성화</li>
+              <li>방 나가기: 다른 방 선택 시 자동 퇴장</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 문의 정보 -->
+        <div>
+          <h3 style="color: #8b5cf6; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-envelope"></i> 문의 및 신고
+          </h3>
+          <div style="background: rgba(139, 92, 246, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #8b5cf6;">
+            <p style="color: #e0e0e0; line-height: 1.6; font-size: 0.9rem;">
+              부적절한 행위를 발견하신 경우 즉시 신고해 주세요.<br>
+              문의: admin@athletetime.com
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center;">
+        <button onclick="closeGuideModal()" style="padding: 12px 30px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem;">
+          확인했습니다
         </button>
       </div>
     </div>
@@ -1295,6 +1401,15 @@
         // 타이머 업데이트 로직
       });
     }, 60000);
+    
+    // 안내 모달
+    function openGuideModal() {
+      document.getElementById('guideModal').classList.add('active');
+    }
+    
+    function closeGuideModal() {
+      document.getElementById('guideModal').classList.remove('active');
+    }
     
     // 초기화
     init();
