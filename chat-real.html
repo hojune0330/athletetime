@@ -885,7 +885,7 @@
     
     // 프로필 저장
     function saveProfileToStorage() {
-      (function() { try { return localStorage.setItem('runningChatProfile', JSON.stringify(userProfile); } catch(e) { console.error('Storage error:', e); return null; } })());
+      (function() { try { return localStorage.setItem('runningChatProfile', JSON.stringify(userProfile)); } catch(e) { console.error('Storage error:', e); return null; } })();
     }
     
     // 프로필 UI 업데이트
@@ -1412,6 +1412,27 @@
     function closeGuideModal() {
       document.getElementById('guideModal').classList.remove('active');
     }
+    
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      // 프로필 초기화
+      loadProfile();
+      
+      // WebSocket 연결
+      connectWebSocket();
+      
+      // 메인 채팅방 자동 입장
+      setTimeout(() => {
+        currentRoom = 'main';
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: 'join_room',
+            room: 'main',
+            username: userProfile.nickname
+          }));
+        }
+      }, 1000);
+    });
     
     // 초기화
     init();
