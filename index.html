@@ -948,8 +948,10 @@
     
     // 페이지 로드 시 실행
     window.addEventListener('load', () => {
-      // 디바이스 감지
-      detectDevice();
+      // 디바이스 감지 (함수가 없으면 건너뛰기)
+      if (typeof detectDevice === 'function') {
+        detectDevice();
+      }
       
       // 채팅 통계 가져오기
       fetchChatStats();
