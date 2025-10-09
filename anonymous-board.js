@@ -1,7 +1,23 @@
 // 익명 게시판 JavaScript
 class AnonymousBoard {
     constructor() {
-        this.posts = JSON.parse(localStorage.getItem('anonymousPosts')) || [];
+        // 기존 더미 데이터 체크 및 제거
+        const existingPosts = JSON.parse(localStorage.getItem('anonymousPosts')) || [];
+        const hasDummyData = existingPosts.some(post => 
+            post.title === "육상 훈련 루틴 공유합니다" || 
+            post.title === "100m 기록 단축 팁" ||
+            post.title === "마라톤 대회 준비 중인데 조언 부탁드려요"
+        );
+        
+        if (hasDummyData) {
+            // 더미 데이터가 있으면 초기화
+            localStorage.removeItem('anonymousPosts');
+            this.posts = [];
+        } else {
+            // 공지사항이 아닌 실제 사용자 게시글만 유지
+            this.posts = existingPosts;
+        }
+        
         this.currentPage = 1;
         this.postsPerPage = 10;
         this.sortBy = 'latest';
@@ -84,65 +100,24 @@ class AnonymousBoard {
     }
 
     loadSampleData() {
-        // 샘플 데이터가 없으면 생성
+        // 공지사항만 기본으로 생성
         if (this.posts.length === 0) {
-            const samplePosts = [
+            const noticePosts = [
                 {
-                    id: Date.now() - 1000000,
-                    title: "육상 훈련 루틴 공유합니다",
-                    content: "매일 아침 6시에 일어나서 10km 달리기를 하고 있습니다. 처음엔 힘들었지만 이제는 습관이 되었네요. 여러분들은 어떤 루틴으로 훈련하시나요?",
-                    author: this.generateAnonymousName(),
-                    date: new Date(Date.now() - 86400000 * 3).toISOString(),
-                    views: 142,
-                    likes: 23,
-                    comments: [
-                        {
-                            id: Date.now() - 900000,
-                            content: "저도 비슷한 루틴입니다! 아침 운동이 최고죠",
-                            author: this.generateAnonymousName(),
-                            date: new Date(Date.now() - 86400000 * 2).toISOString()
-                        }
-                    ],
-                    password: null
-                },
-                {
-                    id: Date.now() - 2000000,
-                    title: "100m 기록 단축 팁",
-                    content: "스타트 블록 세팅과 첫 30m 구간이 정말 중요한 것 같아요. 특히 발목 각도를 조절하니 0.2초 정도 단축되더라고요.",
-                    author: this.generateAnonymousName(),
-                    date: new Date(Date.now() - 86400000 * 7).toISOString(),
-                    views: 256,
-                    likes: 45,
-                    comments: [
-                        {
-                            id: Date.now() - 800000,
-                            content: "발목 각도 조절이 그렇게 중요한가요? 자세히 알려주세요!",
-                            author: this.generateAnonymousName(),
-                            date: new Date(Date.now() - 86400000 * 6).toISOString()
-                        },
-                        {
-                            id: Date.now() - 700000,
-                            content: "스타트 연습은 정말 중요하죠. 좋은 팁 감사합니다!",
-                            author: this.generateAnonymousName(),
-                            date: new Date(Date.now() - 86400000 * 5).toISOString()
-                        }
-                    ],
-                    password: null
-                },
-                {
-                    id: Date.now() - 3000000,
-                    title: "마라톤 대회 준비 중인데 조언 부탁드려요",
-                    content: "다음 달에 첫 풀코스 마라톤을 뛰는데 너무 긴장되네요. 페이스 조절이나 영양 보충에 대한 조언 부탁드립니다.",
-                    author: this.generateAnonymousName(),
-                    date: new Date(Date.now() - 86400000).toISOString(),
-                    views: 89,
-                    likes: 12,
+                    id: 1,
+                    title: "📢 [공지] 익명 게시판 이용 안내",
+                    content: "안녕하세요, ATHLETIA 익명 게시판입니다.\n\n이곳은 육상인들이 자유롭게 소통할 수 있는 공간입니다.\n\n📋 게시판 이용 규칙:\n1. 상호 존중과 배려를 기본으로 합니다\n2. 욕설, 비방, 허위 정보 작성을 금지합니다\n3. 광고, 스팸 게시글은 즉시 삭제됩니다\n4. 개인정보 노출에 주의해주세요\n5. 건전한 육상 문화 조성에 동참해주세요\n\n💡 주요 기능:\n- 익명으로 자유롭게 글 작성 가능\n- 비밀번호 설정으로 본인 글 삭제 가능\n- 댓글로 활발한 소통\n- 검색 및 정렬 기능\n\n모두가 즐거운 커뮤니티를 만들어갑시다! 🏃‍♂️",
+                    author: "관리자",
+                    date: new Date().toISOString(),
+                    views: 0,
+                    likes: 0,
                     comments: [],
-                    password: null
+                    password: "admin2025",
+                    isPinned: true
                 }
             ];
             
-            this.posts = samplePosts;
+            this.posts = noticePosts;
             this.savePosts();
         }
     }
@@ -191,16 +166,26 @@ class AnonymousBoard {
 
     sortPosts(posts) {
         const sorted = [...posts];
+        
+        // 공지사항과 일반 게시글 분리
+        const pinned = sorted.filter(p => p.isPinned || p.title.includes('[공지]'));
+        const regular = sorted.filter(p => !p.isPinned && !p.title.includes('[공지]'));
+        
+        // 일반 게시글만 정렬
         switch(this.sortBy) {
             case 'latest':
-                return sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+                regular.sort((a, b) => new Date(b.date) - new Date(a.date));
+                break;
             case 'oldest':
-                return sorted.sort((a, b) => new Date(a.date) - new Date(b.date));
+                regular.sort((a, b) => new Date(a.date) - new Date(b.date));
+                break;
             case 'popular':
-                return sorted.sort((a, b) => (b.views + b.likes) - (a.views + a.likes));
-            default:
-                return sorted;
+                regular.sort((a, b) => (b.views + b.likes) - (a.views + a.likes));
+                break;
         }
+        
+        // 공지사항을 항상 위에 표시
+        return [...pinned, ...regular];
     }
 
     filterPosts() {
@@ -219,11 +204,18 @@ class AnonymousBoard {
         const end = start + this.postsPerPage;
         const pagePosts = sorted.slice(start, end);
         
-        if (pagePosts.length === 0) {
+        if (pagePosts.length === 0 && filtered.length === 0) {
             this.postsList.innerHTML = `
                 <div class="empty-state">
-                    <h3>📝 게시글이 없습니다</h3>
-                    <p>첫 번째 게시글을 작성해보세요!</p>
+                    <h3>🏃‍♂️ 육상인들의 이야기를 시작해보세요!</h3>
+                    <p>훈련 팁, 대회 후기, 질문 등 자유롭게 공유해주세요</p>
+                </div>
+            `;
+        } else if (pagePosts.length === 0) {
+            this.postsList.innerHTML = `
+                <div class="empty-state">
+                    <h3>🔍 검색 결과가 없습니다</h3>
+                    <p>다른 검색어로 시도해보세요</p>
                 </div>
             `;
         } else {
@@ -241,8 +233,12 @@ class AnonymousBoard {
             post.content.substring(0, 150) + '...' : 
             post.content;
         
+        // 공지사항 스타일 추가
+        const isPinned = post.isPinned || post.title.includes('[공지]');
+        const pinnedClass = isPinned ? 'pinned-post' : '';
+        
         return `
-            <div class="post-item" data-id="${post.id}">
+            <div class="post-item ${pinnedClass}" data-id="${post.id}">
                 <div class="post-header">
                     <h3 class="post-title">${post.title}</h3>
                     <div class="post-meta">
@@ -513,6 +509,14 @@ class AnonymousBoard {
 document.addEventListener('DOMContentLoaded', () => {
     new AnonymousBoard();
 });
+
+// 모바일 메뉴 토글
+function toggleMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    if (navMenu) {
+        navMenu.classList.toggle('mobile-active');
+    }
+}
 
 // Add animations
 const style = document.createElement('style');

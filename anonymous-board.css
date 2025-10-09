@@ -193,6 +193,17 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
 }
 
+/* 공지사항 스타일 */
+.post-item.pinned-post {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.post-item.pinned-post .post-title {
+    color: #667eea;
+    font-weight: bold;
+}
+
 .post-header {
     display: flex;
     justify-content: space-between;
