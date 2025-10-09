@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Test - AthleteTime</title>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .timestamp {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .warning {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 AthleteTime Deployment Status</h1>
+    
+    <div class="status-card">
+        <h2>📅 Latest Deployment</h2>
+        <p class="timestamp">Deployed at: <span id="deploy-time"></span></p>
+        <p>Version: Event Chat Rooms Feature (91d89bb)</p>
+    </div>
+
+    <div class="status-card">
+        <h2>✅ Recent Updates</h2>
+        <ul class="feature-list">
+            <li class="success">✓ Pace calculator rolled back to stable version</li>
+            <li class="success">✓ Project cleanup - removed 43 test/backup files</li>
+            <li class="success">✓ Added .gitignore for better file management</li>
+            <li class="success">✓ Implemented seasonal/event-based chat rooms</li>
+            <li class="success">✓ Added 7 major athletic events for 2025</li>
+        </ul>
+    </div>
+
+    <div class="status-card">
+        <h2>🎯 Event Chat Rooms</h2>
+        <ul class="feature-list">
+            <li>🏃 2025 전국체전 (부산) - Oct 19-22</li>
+            <li>🎽 JTBC 마라톤 - Nov 2</li>
+            <li>🏃‍♀️ 파리 마라톤 - Apr 6</li>
+            <li>🏃‍♂️ 춘천마라톤 - Oct 26</li>
+            <li>🌏 KBC 전국마라톤 - Mar 23</li>
+            <li>🏅 서울국제마라톤 - Mar 16</li>
+            <li>⚡ 한국실업육상 - Apr 20-23</li>
+        </ul>
+    </div>
+
+    <div class="status-card">
+        <h2>🔗 Quick Links</h2>
+        <p><a href="pace-calculator.html" style="color: white;">Pace Calculator</a></p>
+        <p><a href="chat-real.html" style="color: white;">Chat Rooms</a></p>
+        <p><a href="index.html" style="color: white;">Main Page</a></p>
+    </div>
+
+    <script>
+        document.getElementById('deploy-time').textContent = new Date().toLocaleString('ko-KR');
+    </script>
+</body>
+</html>
