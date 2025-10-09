@@ -28,6 +28,7 @@ const activeUsers = new Map(); // userId -> {nickname, lastSeen, rooms}
 
 // 상수
 const ROOM_INACTIVE_TIMEOUT = 30 * 60 * 1000; // 30분
+const MESSAGE_RETENTION_TIME = 24 * 60 * 60 * 1000; // 24시간
 const PERMANENT_ROOMS = ['main'];
 
 // 기본 채팅방 초기화 - 메인 채팅방 1개만
