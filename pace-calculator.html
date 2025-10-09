@@ -2279,125 +2279,511 @@
       if (selectedLaneData) {
         const infoDiv = document.getElementById('laneAdditionalInfo');
         if (infoDiv) {
+          // 개선된 선택 레인 분석 정보
+          const mps = selectedLaneData.speedInSelectedLane;
+          const kmh = mps * 3.6;
+          const mph = kmh * 0.621371;
+          const pace400 = 400 / mps;
+          const pace100 = targetTime / (selectedLaneData.distance / 100);
+          const pacePerKm = selectedLaneData.pacePerKm;
+          const pacePerMile = pacePerKm * 1.60934;
+          const straight = 84.39; // World Athletics 표준 직선 구간
+          
+          // 경기력 수준 판단
+          let level = '';
+          let levelColor = '';
+          let levelIcon = '';
+          
+          if (pace400 < 50) {
+            level = '엘리트 선수급';
+            levelColor = 'text-purple-700 bg-purple-50';
+            levelIcon = '🏆';
+          } else if (pace400 < 60) {
+            level = '상급 선수';
+            levelColor = 'text-blue-700 bg-blue-50';
+            levelIcon = '🥇';
+          } else if (pace400 < 70) {
+            level = '중급 선수';
+            levelColor = 'text-green-700 bg-green-50';
+            levelIcon = '🥈';
+          } else if (pace400 < 80) {
+            level = '초급 선수';
+            levelColor = 'text-yellow-700 bg-yellow-50';
+            levelIcon = '🥉';
+          } else {
+            level = '취미 러너';
+            levelColor = 'text-orange-700 bg-orange-50';
+            levelIcon = '🏃';
+          }
+          
           infoDiv.innerHTML = `
-            <div class="bg-purple-50 p-4 rounded-lg mt-4">
-              <h4 class="font-bold text-lg mb-2">📊 선택한 레인 분석</h4>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="bg-white p-3 rounded">
-                  <div class="text-xs text-gray-600">평균 속도</div>
-                  <div class="text-xl font-bold text-purple-700">${selectedSpeed.toFixed(2)} km/h</div>
+            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-lg mt-4">
+              <h4 class="font-bold text-lg mb-3">📊 ${selectedLaneData.lane}레인 종합 분석</h4>
+              
+              <!-- 메인 지표 -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                  <div class="text-xs text-gray-600 mb-1">평균 속도</div>
+                  <div class="text-xl font-bold text-purple-700">${kmh.toFixed(2)} km/h</div>
+                  <div class="text-xs text-gray-500">${mph.toFixed(1)} mph</div>
                 </div>
-                <div class="bg-white p-3 rounded">
-                  <div class="text-xs text-gray-600">km당 페이스</div>
-                  <div class="text-xl font-bold text-purple-700">${formatPace(selectedLaneData.pacePerKm)}</div>
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                  <div class="text-xs text-gray-600 mb-1">km당 페이스</div>
+                  <div class="text-xl font-bold text-purple-700">${formatPace(pacePerKm)}</div>
+                  <div class="text-xs text-gray-500">mile: ${formatPace(pacePerMile)}</div>
                 </div>
-                <div class="bg-white p-3 rounded">
-                  <div class="text-xs text-gray-600">400m 환산</div>
-                  <div class="text-xl font-bold text-purple-700">${(400 / selectedLaneData.speedInSelectedLane).toFixed(2)}초</div>
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                  <div class="text-xs text-gray-600 mb-1">400m 기준</div>
+                  <div class="text-xl font-bold text-purple-700">${pace400.toFixed(2)}초</div>
+                  <div class="text-xs text-gray-500">1레인: ${(400/mps).toFixed(2)}초</div>
                 </div>
-                <div class="bg-white p-3 rounded">
-                  <div class="text-xs text-gray-600">100m 평균</div>
-                  <div class="text-xl font-bold text-purple-700">${(targetTime / (selectedLaneData.distance / 100)).toFixed(2)}초</div>
+                <div class="bg-white p-3 rounded-lg border border-purple-200">
+                  <div class="text-xs text-gray-600 mb-1">100m 평균</div>
+                  <div class="text-xl font-bold text-purple-700">${pace100.toFixed(2)}초</div>
+                  <div class="text-xs text-gray-500">${(mps).toFixed(2)} m/s</div>
+                </div>
+              </div>
+              
+              <!-- 경기력 수준 -->
+              <div class="p-3 rounded-lg ${levelColor} mb-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">${levelIcon}</span>
+                    <div>
+                      <div class="font-bold">경기력 수준</div>
+                      <div class="text-sm">${level}</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-sm">400m 기준</div>
+                    <div class="text-2xl font-bold">${pace400.toFixed(1)}초</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 구간별 상세 분석 -->
+              <div class="bg-white p-3 rounded-lg">
+                <div class="text-sm font-bold mb-2">⚙️ 구간별 전략</div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div class="flex justify-between p-2 bg-blue-50 rounded">
+                    <span class="text-gray-600">직선 구간 (${straight}m):</span>
+                    <span class="font-bold text-blue-700">${selectedLaneData.sectionTimes.straight1.toFixed(2)}초</span>
+                  </div>
+                  <div class="flex justify-between p-2 bg-red-50 rounded">
+                    <span class="text-gray-600">곡선 구간 (${(selectedLaneData.distance/2 - straight).toFixed(1)}m):</span>
+                    <span class="font-bold text-red-700">${selectedLaneData.sectionTimes.curve1.toFixed(2)}초</span>
+                  </div>
+                </div>
+                <div class="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                  <strong>코치 조언:</strong> 
+                  ${selectedLaneData.lane <= 4 ? 
+                    '안쪽 레인은 곡선이 급하므로 코너링시 보폭을 줄이고 보속을 높이세요.' : 
+                    '바깥 레인은 거리가 길지만 곡선이 완만해 일정한 보폭을 유지할 수 있습니다.'}
                 </div>
               </div>
             </div>
           `;
         }
         
-        // 훈련 페이스 가이드 생성
+        // 훈련 페이스 가이드 생성 (개선된 버전)
         const guideDiv = document.getElementById('trainingPaceGuide');
         if (guideDiv && selectedLaneData) {
           const lane1Time = 400 / selectedLaneData.speedInSelectedLane;
+          const speed = selectedLaneData.speedInSelectedLane;
           const paces = [
-            { name: '이지 페이스 (60-70%)', time: lane1Time * 1.43, desc: '회복/준비운동' },
-            { name: '템포 페이스 (80-85%)', time: lane1Time * 1.18, desc: '유산소 능력 향상' },
-            { name: '역치 페이스 (85-90%)', time: lane1Time * 1.11, desc: '젖산 역치 개선' },
-            { name: '인터벌 페이스 (95%)', time: lane1Time * 1.05, desc: '스피드 향상' },
-            { name: '목표 페이스 (100%)', time: lane1Time, desc: '레이스 페이스' }
+            { 
+              name: '회복 조깅', 
+              percent: '50-60%', 
+              time: lane1Time * 1.67, 
+              desc: '워밍업/쿨다운',
+              color: 'blue',
+              icon: '🚶',
+              heartRate: '120-140 bpm',
+              distance: '200m 기준: ' + (200 / speed * 1.67).toFixed(1) + '초'
+            },
+            { 
+              name: '이지 러닝', 
+              percent: '60-70%', 
+              time: lane1Time * 1.43, 
+              desc: '기초 체력 향상',
+              color: 'green',
+              icon: '🏃',
+              heartRate: '140-150 bpm',
+              distance: '200m 기준: ' + (200 / speed * 1.43).toFixed(1) + '초'
+            },
+            { 
+              name: '템포 런', 
+              percent: '75-85%', 
+              time: lane1Time * 1.18, 
+              desc: '유산소 능력',
+              color: 'yellow',
+              icon: '💪',
+              heartRate: '150-165 bpm',
+              distance: '200m 기준: ' + (200 / speed * 1.18).toFixed(1) + '초'
+            },
+            { 
+              name: '역치 페이스', 
+              percent: '85-90%', 
+              time: lane1Time * 1.11, 
+              desc: '젖산 역치',
+              color: 'orange',
+              icon: '🔥',
+              heartRate: '165-175 bpm',
+              distance: '200m 기준: ' + (200 / speed * 1.11).toFixed(1) + '초'
+            },
+            { 
+              name: '인터벌/VO2max', 
+              percent: '90-95%', 
+              time: lane1Time * 1.05, 
+              desc: '최대산소섭취량',
+              color: 'red',
+              icon: '⚡',
+              heartRate: '175-185 bpm',
+              distance: '200m 기준: ' + (200 / speed * 1.05).toFixed(1) + '초'
+            },
+            { 
+              name: '레이스/스프린트', 
+              percent: '95-100%', 
+              time: lane1Time, 
+              desc: '목표 경기 페이스',
+              color: 'purple',
+              icon: '🏁',
+              heartRate: '185+ bpm',
+              distance: '200m 기준: ' + (200 / speed).toFixed(1) + '초'
+            }
           ];
           
-          let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">';
+          let html = `
+            <div class="space-y-2">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+          `;
+          
           paces.forEach(pace => {
+            const colorMap = {
+              blue: 'bg-blue-50 border-blue-300 text-blue-700',
+              green: 'bg-green-50 border-green-300 text-green-700',
+              yellow: 'bg-yellow-50 border-yellow-300 text-yellow-700',
+              orange: 'bg-orange-50 border-orange-300 text-orange-700',
+              red: 'bg-red-50 border-red-300 text-red-700',
+              purple: 'bg-purple-50 border-purple-300 text-purple-700'
+            };
+            
             html += `
-              <div class="flex justify-between items-center bg-white p-2 rounded">
-                <div>
-                  <div class="font-semibold">${pace.name}</div>
-                  <div class="text-xs text-gray-600">${pace.desc}</div>
+              <div class="border rounded-lg p-3 ${colorMap[pace.color]}">
+                <div class="flex justify-between items-start mb-1">
+                  <div>
+                    <div class="font-bold flex items-center gap-1">
+                      <span>${pace.icon}</span>
+                      <span>${pace.name}</span>
+                      <span class="text-xs font-normal">(${pace.percent})</span>
+                    </div>
+                    <div class="text-xs opacity-80">${pace.desc}</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-lg font-bold">${pace.time.toFixed(1)}초</div>
+                    <div class="text-xs">400m 기준</div>
+                  </div>
                 </div>
-                <div class="text-lg font-bold text-green-700">${pace.time.toFixed(1)}초</div>
+                <div class="mt-2 pt-2 border-t border-current opacity-50">
+                  <div class="text-xs flex justify-between">
+                    <span>${pace.heartRate}</span>
+                    <span>${pace.distance}</span>
+                  </div>
+                </div>
               </div>
             `;
           });
-          html += '</div>';
+          
+          html += `
+              </div>
+              <div class="mt-3 p-2 bg-gray-100 rounded text-xs text-gray-600">
+                <strong>💡 활용 팁:</strong> 
+                트랙 훈련시 구간별로 다른 페이스를 적용해보세요. 
+                직선구간은 빠르게, 곡선구간은 리듬을 유지하며 달리는 것이 효과적입니다.
+              </div>
+            </div>
+          `;
+          
           guideDiv.innerHTML = html;
         }
         
-        // 거리별 예상 기록
+        // 거리별 예상 기록 (개선된 버전)
         const predictDiv = document.getElementById('distancePredictions');
         if (predictDiv && selectedLaneData) {
           const speed = selectedLaneData.speedInSelectedLane;
+          const speedKMH = speed * 3.6;
+          
+          // 실제 육상 경기 거리 및 세계기록 비교
           const predictions = [
-            { dist: '100m', time: 100 / speed },
-            { dist: '200m', time: 200 / speed },
-            { dist: '800m', time: 800 / speed },
-            { dist: '1500m', time: 1500 / speed },
-            { dist: '3000m', time: 3000 / speed },
-            { dist: '5000m', time: 5000 / speed },
-            { dist: '10km', time: 10000 / speed }
+            { 
+              dist: '100m', 
+              time: 100 / speed,
+              category: '단거리',
+              worldRecord: { male: 9.58, female: 10.49 },
+              icon: '⚡'
+            },
+            { 
+              dist: '200m', 
+              time: 200 / speed,
+              category: '단거리',
+              worldRecord: { male: 19.19, female: 21.34 },
+              icon: '🏃'
+            },
+            { 
+              dist: '400m', 
+              time: 400 / speed,
+              category: '단거리',
+              worldRecord: { male: 43.03, female: 47.60 },
+              icon: '🔄'
+            },
+            { 
+              dist: '800m', 
+              time: 800 / speed,
+              category: '중거리',
+              worldRecord: { male: 100.91, female: 113.28 },
+              icon: '🎯'
+            },
+            { 
+              dist: '1500m', 
+              time: 1500 / speed,
+              category: '중거리',
+              worldRecord: { male: 206.00, female: 230.07 },
+              icon: '💨'
+            },
+            { 
+              dist: '3000m', 
+              time: 3000 / speed,
+              category: '장거리',
+              worldRecord: { male: 444.79, female: 502.62 },
+              icon: '🏅'
+            },
+            { 
+              dist: '5000m', 
+              time: 5000 / speed,
+              category: '장거리',
+              worldRecord: { male: 757.35, female: 851.15 },
+              icon: '🎖️'
+            },
+            { 
+              dist: '10000m', 
+              time: 10000 / speed,
+              category: '장거리',
+              worldRecord: { male: 1577.53, female: 1771.78 },
+              icon: '🏆'
+            }
           ];
           
-          let html = '<div class="grid grid-cols-4 md:grid-cols-7 gap-2">';
-          predictions.forEach(pred => {
+          let html = `
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+          `;
+          
+          predictions.forEach((pred, index) => {
+            const predictedTime = pred.time;
+            const maleRatio = (predictedTime / pred.worldRecord.male * 100).toFixed(1);
+            const femaleRatio = (predictedTime / pred.worldRecord.female * 100).toFixed(1);
+            
+            // 색상 결정 (세계기록 대비 퍼센트)
+            let colorClass = 'bg-gray-50';
+            if (maleRatio < 110) colorClass = 'bg-purple-50 border-purple-200';
+            else if (maleRatio < 120) colorClass = 'bg-blue-50 border-blue-200';
+            else if (maleRatio < 130) colorClass = 'bg-green-50 border-green-200';
+            else if (maleRatio < 150) colorClass = 'bg-yellow-50 border-yellow-200';
+            else colorClass = 'bg-orange-50 border-orange-200';
+            
             html += `
-              <div class="text-center bg-white p-2 rounded">
-                <div class="text-xs text-gray-600">${pred.dist}</div>
-                <div class="font-bold text-yellow-700">${formatTime(pred.time)}</div>
+              <div class="border rounded-lg p-2 ${colorClass}">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-xs font-semibold">${pred.icon} ${pred.dist}</span>
+                  <span class="text-xs text-gray-500">${pred.category}</span>
+                </div>
+                <div class="text-lg font-bold text-center mb-1">${formatTime(predictedTime)}</div>
+                <div class="text-xs text-gray-600 text-center">
+                  <div>WR 대비: M ${maleRatio}%</div>
+                  <div class="opacity-75">F ${femaleRatio}%</div>
+                </div>
               </div>
             `;
           });
-          html += '</div>';
+          
+          html += `
+              </div>
+              <div class="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
+                <div class="text-sm">
+                  <div class="font-bold mb-1">📈 경기력 분석</div>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span class="text-gray-600">예상 속도:</span>
+                      <span class="font-semibold ml-1">${speedKMH.toFixed(2)} km/h</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">100m당:</span>
+                      <span class="font-semibold ml-1">${(100/speed).toFixed(2)}초</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">마라톤 예상:</span>
+                      <span class="font-semibold ml-1">${formatTime(42195/speed)}</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">하프 예상:</span>
+                      <span class="font-semibold ml-1">${formatTime(21097.5/speed)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          
           predictDiv.innerHTML = html;
         }
         
-        // 200m 스플릿 타임
+        // 200m 스플릿 타임 (개선된 버전)
         const splitDiv = document.getElementById('splitTimes');
         if (splitDiv && selectedLaneData) {
           const laneDistance = selectedLaneData.distance;
           const speed = selectedLaneData.speedInSelectedLane;
+          const lane = selectedLaneData.lane;
           
-          // 선택한 레인에서의 200m 지점 계산
+          // 구간별 정확한 계산
+          const straight = 84.39; // 직선 구간 길이
+          const curveLength = (laneDistance - straight * 2) / 2; // 각 곡선 구간 길이
+          
+          // 실제 트랙 구간별 분석
           let splits = [];
-          if (laneDistance >= 200) {
-            splits.push({ lap: '0-200m', time: 200 / speed, desc: '첫 200m' });
-          }
-          if (laneDistance >= 400) {
-            splits.push({ lap: '200-400m', time: 200 / speed, desc: '두번째 200m' });
-          }
           
-          // 여러 바퀴의 경우
-          const laps = [800, 1200, 1600];
-          laps.forEach((dist, idx) => {
-            if (targetTime > 120) { // 2분 이상인 경우 여러 바퀴 가능성
-              const lapTime = laneDistance / speed;
-              splits.push({ 
-                lap: `${dist-laneDistance}-${dist}m`, 
-                time: lapTime / 2, 
-                desc: `${idx+2}번째 랩 전반` 
-              });
+          // 첫 바퀴 상세 분석
+          const sections = [
+            {
+              name: 'Start → 100m',
+              distance: 100,
+              time: 100 / speed,
+              desc: '출발 가속 구간',
+              icon: '🚀',
+              tips: '폭발적 출발, 점진적 가속'
+            },
+            {
+              name: '100m → 200m',
+              distance: 100,
+              time: 100 / speed,
+              desc: '최고 속도 도달',
+              icon: '⚡',
+              tips: '최대 속도 유지, 자세 안정화'
+            },
+            {
+              name: '200m → 300m',
+              distance: 100,
+              time: 100 / speed,
+              desc: '백스트레치',
+              icon: '💨',
+              tips: '리듬 유지, 호흡 조절'
+            },
+            {
+              name: '300m → 400m',
+              distance: 100,
+              time: 100 / speed,
+              desc: '홈스트레치 피니시',
+              icon: '🏁',
+              tips: '킥 타이밍, 마지막 스퍼트'
             }
-          });
+          ];
           
-          let html = '<div class="grid grid-cols-2 md:grid-cols-3 gap-2">';
-          splits.slice(0, 6).forEach(split => {
+          // 장거리 경기인 경우 추가 랩 정보
+          if (targetTime > 90) {
+            sections.push(
+              {
+                name: '400m → 600m',
+                distance: 200,
+                time: 200 / speed,
+                desc: '2번째 랩 전반',
+                icon: '🔄',
+                tips: '페이스 안정화'
+              },
+              {
+                name: '600m → 800m',
+                distance: 200,
+                time: 200 / speed,
+                desc: '2번째 랩 후반',
+                icon: '🎯',
+                tips: '중간 체크포인트'
+              }
+            );
+          }
+          
+          let html = `
+            <div class="space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          `;
+          
+          sections.forEach((section, index) => {
+            const progressPercent = ((index + 1) / 4 * 100).toFixed(0);
+            const isFirstLap = index < 4;
+            const bgColor = isFirstLap ? 
+              (index % 2 === 0 ? 'bg-blue-50 border-blue-200' : 'bg-red-50 border-red-200') :
+              'bg-gray-50 border-gray-200';
+            
             html += `
-              <div class="bg-white p-2 rounded">
-                <div class="text-xs text-gray-600">${split.lap}</div>
-                <div class="font-bold text-indigo-700">${split.time.toFixed(2)}초</div>
-                <div class="text-xs text-gray-500">${split.desc}</div>
+              <div class="border rounded-lg p-3 ${bgColor}">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <div class="font-semibold text-sm flex items-center gap-1">
+                      <span>${section.icon}</span>
+                      <span>${section.name}</span>
+                    </div>
+                    <div class="text-xs text-gray-600 mt-1">${section.desc}</div>
+                    <div class="text-xs text-gray-500 italic mt-1">${section.tips}</div>
+                  </div>
+                  <div class="text-right ml-2">
+                    <div class="text-lg font-bold">${section.time.toFixed(2)}초</div>
+                    <div class="text-xs text-gray-600">${section.distance}m</div>
+                  </div>
+                </div>
+                ${isFirstLap ? `
+                  <div class="mt-2 pt-2 border-t border-gray-300">
+                    <div class="flex justify-between text-xs">
+                      <span class="text-gray-500">누적: ${(section.distance * (index + 1))m}</span>
+                      <span class="text-gray-500">진행: ${progressPercent}%</span>
+                    </div>
+                  </div>
+                ` : ''}
               </div>
             `;
           });
-          html += '</div>';
+          
+          html += `
+              </div>
+              
+              <!-- 레인별 특성 정보 -->
+              <div class="p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
+                <div class="text-sm">
+                  <div class="font-bold mb-2">📍 ${lane}레인 특성</div>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span class="text-gray-600">곡선 반경:</span>
+                      <span class="font-semibold ml-1">${selectedLaneData.radius.toFixed(2)}m</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">총 거리:</span>
+                      <span class="font-semibold ml-1">${laneDistance.toFixed(2)}m</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">직선 구간:</span>
+                      <span class="font-semibold ml-1">${straight}m × 2</span>
+                    </div>
+                    <div>
+                      <span class="text-gray-600">곡선 구간:</span>
+                      <span class="font-semibold ml-1">${curveLength.toFixed(2)}m × 2</span>
+                    </div>
+                  </div>
+                  <div class="mt-2 text-xs text-gray-600">
+                    💡 <strong>Tip:</strong> ${lane <= 3 ? '안쪽 레인은 곡선이 급해 코너링 기술이 중요합니다.' : 
+                      lane <= 6 ? '중간 레인은 균형잡힌 주행이 가능합니다.' : 
+                      '바깥 레인은 곡선이 완만해 속도 유지가 쉽습니다.'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          
           splitDiv.innerHTML = html;
         }
       }
