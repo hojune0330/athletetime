@@ -584,6 +584,8 @@
   <script src="image-handler.js"></script>
 
   <script src="poll-handler.js"></script>
+  
+  <script src="community-api.js"></script>
 
   <script>
     // ===== 상태 관리 =====
@@ -612,53 +614,27 @@
     const userId = getUserId();
     
     // ===== 초기화 =====
-    function init() {
-      loadPosts();
-      
-      // 초기 공지사항이 없으면 생성
-      if (posts.length === 0) {
-        const notice = {
-          id: Date.now(),
-          category: '공지',
-          title: '🎉 애슬리트 타임 커뮤니티 오픈!',
-          author: '관리자',
-          content: `안녕하세요, 육상인 여러분!
-          
-애슬리트 타임이 오픈했습니다.
-자유롭게 소통하고 정보를 공유해주세요!
-
-📌 이용 규칙:
-• 욕설, 비방 금지
-• 광고, 스팸 금지
-• 10명 이상 신고 시 자동 블라인드
-• 서로 존중하는 문화 만들기
-
-모두 함께 건전한 육상 커뮤니티를 만들어가요! 🏃‍♂️`,
-          password: 'admin',
-          date: new Date().toISOString(),
-          views: 0,
-          likes: [],
-          dislikes: [],
-          comments: [],
-          reports: [],
-          isNotice: true,
-          isAdmin: true,
-          isBlinded: false
-        };
-        posts.push(notice);
-        savePosts();
-      }
-      
+    async function init() {
+      await loadPosts();
       renderPosts();
     }
     
     // ===== 데이터 관리 =====
-    function loadPosts() {
-      const saved = (function() { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
-      posts = saved ? JSON.parse(saved) : [];
+    async function loadPosts() {
+      try {
+        // API에서 게시글 가져오기
+        posts = await CommunityAPI.getPosts();
+        console.log(`📥 서버에서 ${posts.length}개 게시글 로드`);
+      } catch (error) {
+        console.error('API 로드 실패, localStorage 사용:', error);
+        // 폴백: localStorage 사용
+        const saved = (function() { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
+        posts = saved ? JSON.parse(saved) : [];
+      }
     }
     
     function savePosts() {
+      // localStorage에 백업 (오프라인 지원)
       (function() { try { return localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); } catch(e) { console.error('Storage error:', e); return null; } })();
     }
     
@@ -1062,7 +1038,7 @@
     }
     
     // ===== 게시물 작성 =====
-    function submitPost() {
+    async function submitPost() {
       const category = document.getElementById('postCategory').value;
       const author = document.getElementById('postAuthor').value.trim() || '익명';
       const title = document.getElementById('postTitle').value.trim();
@@ -1129,29 +1105,25 @@
         return;
       }
       
-      const newPost = {
-        id: Date.now(),
-        category: category,
-        title: title,
-        author: author,
-        instagram: instagram || null, // 인스타그램 아이디 추가
-        content: content,
-        password: password,
-        images: selectedImages, // 이미지 추가
-        poll: poll, // 투표 추가
-        date: new Date().toISOString(),
-        views: 0,
-        likes: [],
-        dislikes: [],
-        comments: [],
-        reports: [],
-        isNotice: false,
-        isAdmin: false,
-        isBlinded: false
-      };
-      
-      posts.unshift(newPost);
-      savePosts();
+      try {
+        const newPost = await CommunityAPI.createPost({
+          category: category,
+          title: title,
+          author: author,
+          instagram: instagram || null,
+          content: content,
+          password: password,
+          images: selectedImages,
+          poll: poll
+        });
+        
+        posts.unshift(newPost);
+        savePosts(); // 로컬 백업
+      } catch (error) {
+        console.error('게시글 작성 실패:', error);
+        showToast('게시글 작성에 실패했습니다. 다시 시도해주세요.');
+        return;
+      }
       
       closeWriteModal();
       renderPosts();

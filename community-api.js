@@ -1,124 +1,261 @@
-// community.html API 연동 코드
-// 이 스크립트를 community.html에 추가하세요
-
-// API 설정
-const API_BASE = window.location.hostname === 'localhost' 
-  ? 'http://localhost:3000' 
-  : 'https://athletetime-backend.onrender.com';
-
-// localStorage 대신 API 사용하도록 함수 오버라이드
-const originalLoadPosts = window.loadPosts;
-const originalSavePosts = window.savePosts;
-
-// 게시물 불러오기 (API)
-window.loadPosts = async function() {
-  try {
-    const response = await fetch(`${API_BASE}/api/posts`);
-    if (response.ok) {
-      const data = await response.json();
-      posts = data;
-      console.log('Posts loaded from API:', posts.length);
+// 익명 게시판 API 연동 스크립트
+const CommunityAPI = {
+  // API 엔드포인트
+  getAPIUrl() {
+    // 환경에 따라 URL 변경
+    if (window.location.hostname.includes('localhost')) {
+      return 'http://localhost:3005';
+    } else if (window.location.hostname.includes('e2b.dev')) {
+      return 'https://3005-' + window.location.hostname.split('-')[1];
     } else {
-      // API 실패시 localStorage 폴백
-      originalLoadPosts();
+      // 실제 배포 서버 URL (나중에 설정)
+      return 'https://your-api-server.com';
     }
-  } catch (error) {
-    console.error('API error, falling back to localStorage:', error);
-    originalLoadPosts();
-  }
-};
+  },
 
-// 게시물 저장 (API)
-window.savePosts = async function() {
-  // 새 게시물이면 API로 전송
-  const lastPost = posts[0]; // 가장 최근 게시물
-  
-  if (!lastPost.id || lastPost.id > Date.now() - 1000) {
+  // 모든 게시글 가져오기
+  async getPosts() {
     try {
-      const response = await fetch(`${API_BASE}/api/posts`, {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts`);
+      const data = await response.json();
+      return data.success ? data.posts : [];
+    } catch (error) {
+      console.error('게시글 로드 실패:', error);
+      // localStorage 폴백
+      const saved = localStorage.getItem('athletetime_posts');
+      return saved ? JSON.parse(saved) : [];
+    }
+  },
+
+  // 게시글 상세 보기
+  async getPost(id) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${id}`);
+      const data = await response.json();
+      return data.success ? data.post : null;
+    } catch (error) {
+      console.error('게시글 로드 실패:', error);
+      return null;
+    }
+  },
+
+  // 게시글 작성
+  async createPost(postData) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(lastPost)
+        body: JSON.stringify(postData)
       });
+      const data = await response.json();
       
-      if (response.ok) {
-        const savedPost = await response.json();
-        posts[0] = savedPost;
-        console.log('Post saved to API');
-      }
+      if (!data.success) throw new Error(data.message);
+      
+      // localStorage에도 저장 (백업)
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      posts.unshift(data.post);
+      localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      
+      return data.post;
     } catch (error) {
-      console.error('API save failed, using localStorage:', error);
+      console.error('게시글 작성 실패:', error);
+      
+      // 오프라인 폴백: localStorage에만 저장
+      const newPost = {
+        ...postData,
+        id: Date.now(),
+        date: new Date().toISOString(),
+        views: 0,
+        likes: [],
+        dislikes: [],
+        comments: [],
+        reports: [],
+        isBlinded: false
+      };
+      
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      posts.unshift(newPost);
+      localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      
+      return newPost;
+    }
+  },
+
+  // 게시글 수정
+  async updatePost(id, updateData) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+      const data = await response.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      // localStorage도 업데이트
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const index = posts.findIndex(p => p.id === id);
+      if (index !== -1) {
+        posts[index] = data.post;
+        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      }
+      
+      return data.post;
+    } catch (error) {
+      console.error('게시글 수정 실패:', error);
+      throw error;
+    }
+  },
+
+  // 게시글 삭제
+  async deletePost(id, password) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await response.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      // localStorage에서도 삭제
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const filtered = posts.filter(p => p.id !== id);
+      localStorage.setItem('athletetime_posts', JSON.stringify(filtered));
+      
+      return true;
+    } catch (error) {
+      console.error('게시글 삭제 실패:', error);
+      throw error;
+    }
+  },
+
+  // 좋아요/싫어요
+  async vote(postId, userId, type) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${postId}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, type })
+      });
+      const data = await response.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      // localStorage 업데이트
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const index = posts.findIndex(p => p.id === postId);
+      if (index !== -1) {
+        posts[index] = data.post;
+        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      }
+      
+      return data.post;
+    } catch (error) {
+      console.error('투표 실패:', error);
+      
+      // 오프라인 폴백
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        // 기존 투표 제거
+        post.likes = post.likes.filter(id => id !== userId);
+        post.dislikes = post.dislikes.filter(id => id !== userId);
+        
+        // 새 투표 추가
+        if (type === 'like') {
+          post.likes.push(userId);
+        } else if (type === 'dislike') {
+          post.dislikes.push(userId);
+        }
+        
+        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+        return post;
+      }
+      
+      throw error;
+    }
+  },
+
+  // 댓글 작성
+  async addComment(postId, commentData) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(commentData)
+      });
+      const data = await response.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      // localStorage 업데이트
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        if (!post.comments) post.comments = [];
+        post.comments.push(data.comment);
+        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      }
+      
+      return data.comment;
+    } catch (error) {
+      console.error('댓글 작성 실패:', error);
+      
+      // 오프라인 폴백
+      const comment = {
+        id: Date.now(),
+        ...commentData,
+        date: new Date().toISOString(),
+        reports: [],
+        isBlinded: false
+      };
+      
+      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
+      const post = posts.find(p => p.id === postId);
+      if (post) {
+        if (!post.comments) post.comments = [];
+        post.comments.push(comment);
+        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      }
+      
+      return comment;
+    }
+  },
+
+  // 신고
+  async reportPost(postId, userId) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${postId}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await response.json();
+      
+      if (!data.success) throw new Error(data.message);
+      
+      return data.reports;
+    } catch (error) {
+      console.error('신고 실패:', error);
+      throw error;
+    }
+  },
+
+  // 통계 가져오기
+  async getStats() {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/stats`);
+      const data = await response.json();
+      return data.success ? data.stats : null;
+    } catch (error) {
+      console.error('통계 로드 실패:', error);
+      return null;
     }
   }
-  
-  // localStorage에도 백업
-  originalSavePosts();
 };
 
-// 댓글 작성 API 연동
-const originalSubmitComment = window.confirmSubmitComment;
-
-window.confirmSubmitComment = async function() {
-  if (!pendingComment || !currentPost) return;
-  
-  try {
-    // API로 댓글 전송
-    const response = await fetch(`${API_BASE}/api/posts/${currentPost.id}/comments`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(pendingComment)
-    });
-    
-    if (response.ok) {
-      const savedComment = await response.json();
-      pendingComment = savedComment;
-    }
-  } catch (error) {
-    console.error('Comment API error:', error);
-  }
-  
-  // 원래 함수 실행
-  originalSubmitComment();
-};
-
-// 투표 API 연동
-const originalVote = window.vote;
-
-window.vote = async function(type) {
-  if (!currentPost) return;
-  
-  try {
-    const response = await fetch(`${API_BASE}/api/posts/${currentPost.id}/vote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, userId })
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      currentPost.likes = new Array(result.likes);
-      currentPost.dislikes = new Array(result.dislikes);
-      currentPost.isBlinded = result.isBlinded;
-    }
-  } catch (error) {
-    console.error('Vote API error:', error);
-  }
-  
-  // 원래 함수도 실행 (UI 업데이트)
-  originalVote(type);
-};
-
-// 페이지 로드시 API 초기화
-document.addEventListener('DOMContentLoaded', async () => {
-  // API 연결 테스트
-  try {
-    const response = await fetch(`${API_BASE}/api/posts?limit=1`);
-    if (response.ok) {
-      console.log('✅ API connected successfully');
-      document.getElementById('apiStatus')?.classList.add('text-green-500');
-    }
-  } catch (error) {
-    console.log('⚠️ API not available, using localStorage');
-    document.getElementById('apiStatus')?.classList.add('text-yellow-500');
-  }
-});
+// 전역 객체로 등록
+window.CommunityAPI = CommunityAPI;

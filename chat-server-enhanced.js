@@ -355,18 +355,11 @@ function joinRoom(clientId, data) {
   // 방 정보 업데이트 브로드캐스트
   broadcastRoomUpdate(room.id);
   
-  // 24시간 내의 모든 메시지 전송
-  const now = Date.now();
-  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
-  
-  // 24시간 이내의 메시지만 필터링
-  const recentMessages = room.messages.filter(msg => {
-    const msgTime = new Date(msg.timestamp).getTime();
-    return msgTime > twentyFourHoursAgo;
-  });
+  // 모든 메시지 전송 (전체 누적 메시지)
+  const recentMessages = room.messages;
   
   // 디버깅: 메시지 개수 로그
-  console.log(`📨 [${room.name}] 24시간 내 메시지 ${recentMessages.length}개 전송 (전체: ${room.messages.length}개)`);
+  console.log(`📨 [${room.name}] 전체 메시지 ${recentMessages.length}개 전송`);
   
   client.ws.send(JSON.stringify({
     type: 'room_joined',
@@ -439,27 +432,11 @@ function handleChatMessage(clientId, data) {
     room: client.currentRoom
   };
   
-  // 메시지 저장 (24시간 기준으로 관리)
+  // 메시지 저장 (누적 저장)
   room.messages.push(message);
   
-  // 24시간이 지난 메시지 자동 삭제
-  const now = Date.now();
-  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
-  
-  // 오래된 메시지 필터링
-  const beforeCount = room.messages.length;
-  room.messages = room.messages.filter(msg => {
-    const msgTime = new Date(msg.timestamp).getTime();
-    return msgTime > twentyFourHoursAgo;
-  });
-  
-  const removedCount = beforeCount - room.messages.length;
-  if (removedCount > 0) {
-    console.log(`🗑️ [${room.name}] 24시간 경과 메시지 ${removedCount}개 삭제`);
-  }
-  
   // 디버깅: 메시지 저장 확인
-  console.log(`💾 [${room.name}] 총 메시지: ${room.messages.length}개`);
+  console.log(`💾 [${room.name}] 메시지 저장됨. 총 메시지: ${room.messages.length}개`);
   
   // 활동 시간 업데이트
   updateRoomActivity(client.currentRoom);
