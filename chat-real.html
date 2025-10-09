@@ -1596,25 +1596,64 @@
       
       // 히스토리 표시
       if (data.messages && data.messages.length > 0) {
-        console.log(`📥 이전 메시지 ${data.messages.length}개 로드`);
+        console.log(`📥 24시간 내 메시지 ${data.messages.length}개 로드`);
         
-        // 이전 메시지임을 표시하는 구분선 추가
-        if (data.messages.length >= 5) {
-          addSystemMessage(`━━━━━ 이전 대화 내역 (${data.messages.length}개) ━━━━━`);
+        // 메시지가 많을 때 로딩 표시
+        if (data.messages.length > 20) {
+          addSystemMessage(`⏳ 메시지 ${data.messages.length}개를 불러오는 중...`);
         }
         
-        // 메시지 표시
-        data.messages.forEach(msg => {
-          // 이전 메시지는 알림 없이 표시
-          displayMessage(msg, false);
-        });
+        // 가장 오래된 메시지 시간 계산
+        const oldestMsg = data.messages[0];
+        const oldestTime = new Date(oldestMsg.timestamp);
+        const now = new Date();
+        const hoursDiff = Math.floor((now - oldestTime) / (1000 * 60 * 60));
         
-        // 구분선 추가
+        // 시간 정보와 함께 구분선 추가
         if (data.messages.length >= 5) {
-          addSystemMessage('━━━━━ 여기까지 이전 대화 ━━━━━');
+          if (hoursDiff >= 1) {
+            addSystemMessage(`━━━━━ 최근 ${hoursDiff}시간 대화 내역 (${data.messages.length}개) ━━━━━`);
+          } else {
+            const minutesDiff = Math.floor((now - oldestTime) / (1000 * 60));
+            addSystemMessage(`━━━━━ 최근 ${minutesDiff}분 대화 내역 (${data.messages.length}개) ━━━━━`);
+          }
         }
+        
+        // 메시지를 청크로 나누어 렌더링 (성능 최적화)
+        const chunkSize = 20;
+        let messageIndex = 0;
+        
+        function renderMessageChunk() {
+          const chunk = data.messages.slice(messageIndex, messageIndex + chunkSize);
+          chunk.forEach(msg => {
+            // 이전 메시지는 알림 없이 표시
+            displayMessage(msg, false);
+          });
+          
+          messageIndex += chunkSize;
+          
+          // 다음 청크가 있으면 계속 렌더링
+          if (messageIndex < data.messages.length) {
+            setTimeout(renderMessageChunk, 10); // 10ms 간격으로 청크 렌더링
+          } else {
+            // 모든 메시지 로드 완료
+            if (data.messages.length >= 5) {
+              addSystemMessage('━━━━━ 새로운 대화 시작 ━━━━━');
+            }
+            
+            // 스크롤을 맨 아래로
+            setTimeout(() => {
+              const container = document.getElementById('messagesContainer');
+              container.scrollTop = container.scrollHeight;
+            }, 100);
+          }
+        }
+        
+        // 첫 청크 렌더링 시작
+        renderMessageChunk();
+        
       } else {
-        console.log('📥 이전 메시지 없음');
+        console.log('📥 24시간 내 메시지 없음');
       }
       
       // 환영 메시지

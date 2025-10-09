@@ -41,9 +41,90 @@ defaultRooms.forEach(room => {
     ...room,
     users: new Set(),
     messages: [
-      // 테스트용 이전 메시지 추가
+      // 24시간 테스트용 메시지들 (다양한 시간대)
       {
         id: 'test_msg_1',
+        text: '🌅 어제 아침 러닝 완료! 상쾌한 하루 시작!',
+        nickname: '새벽러너',
+        avatar: '🌅',
+        userId: 'morning_runner',
+        timestamp: new Date(Date.now() - 23 * 3600000).toISOString(), // 23시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_2',
+        text: '오늘 대회 잘 마쳤습니다! 개인 기록 갱신! 🎉',
+        nickname: '마라토너',
+        avatar: '🏃',
+        userId: 'marathoner',
+        timestamp: new Date(Date.now() - 20 * 3600000).toISOString(), // 20시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_3',
+        text: '축하드려요! 얼마나 단축하셨어요?',
+        nickname: '러닝맨',
+        avatar: '👟',
+        userId: 'runner3',
+        timestamp: new Date(Date.now() - 19.5 * 3600000).toISOString(), // 19.5시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_4',
+        text: '3분 단축했어요! 꾸준한 훈련의 결과네요 💪',
+        nickname: '마라토너',
+        avatar: '🏃',
+        userId: 'marathoner',
+        timestamp: new Date(Date.now() - 19 * 3600000).toISOString(), // 19시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_5',
+        text: '대단하시네요! 비결이 뭔가요?',
+        nickname: '초보러너',
+        avatar: '🔰',
+        userId: 'beginner',
+        timestamp: new Date(Date.now() - 12 * 3600000).toISOString(), // 12시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_6',
+        text: '인터벌 트레이닝과 LSD를 병행했어요',
+        nickname: '마라토너',
+        avatar: '🏃',
+        userId: 'marathoner',
+        timestamp: new Date(Date.now() - 11 * 3600000).toISOString(), // 11시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_7',
+        text: '저녁에 한강 러닝 하실 분?',
+        nickname: '한강러너',
+        avatar: '🌉',
+        userId: 'hangang',
+        timestamp: new Date(Date.now() - 6 * 3600000).toISOString(), // 6시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_8',
+        text: '저 갈게요! 몇 시에 모일까요?',
+        nickname: '러닝메이트',
+        avatar: '🤝',
+        userId: 'mate1',
+        timestamp: new Date(Date.now() - 5.5 * 3600000).toISOString(), // 5.5시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_9',
+        text: '7시 반월드컵대교 아래서 만나요!',
+        nickname: '한강러너',
+        avatar: '🌉',
+        userId: 'hangang',
+        timestamp: new Date(Date.now() - 5 * 3600000).toISOString(), // 5시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_10',
         text: '👋 환영합니다! 애슬리트 타임 채팅방입니다.',
         nickname: '관리자',
         avatar: '👨‍💼',
@@ -52,21 +133,39 @@ defaultRooms.forEach(room => {
         room: room.id
       },
       {
-        id: 'test_msg_2',
-        text: '오늘 날씨 좋네요! 러닝하기 딱 좋은 날씨예요 🏃‍♂️',
-        nickname: '러너A',
-        avatar: '🏃',
-        userId: 'runner1',
+        id: 'test_msg_11',
+        text: '방금 5km 완주! 오늘도 목표 달성 ✅',
+        nickname: '저녁러너',
+        avatar: '🌆',
+        userId: 'evening',
         timestamp: new Date(Date.now() - 1800000).toISOString(), // 30분 전
         room: room.id
       },
       {
-        id: 'test_msg_3',
-        text: '맞아요! 저도 아침에 10km 뛰고 왔어요 💪',
-        nickname: '러너B',
-        avatar: '💪',
-        userId: 'runner2',
+        id: 'test_msg_12',
+        text: '수고하셨어요! 페이스는 어떠셨나요?',
+        nickname: '러너K',
+        avatar: '🎯',
+        userId: 'runnerk',
         timestamp: new Date(Date.now() - 900000).toISOString(), // 15분 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_13',
+        text: '킬로 5분 30초 페이스로 뛰었어요!',
+        nickname: '저녁러너',
+        avatar: '🌆',
+        userId: 'evening',
+        timestamp: new Date(Date.now() - 600000).toISOString(), // 10분 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_14',
+        text: '좋은 페이스네요! 저도 내일 아침 뛰어야겠어요',
+        nickname: '러너K',
+        avatar: '🎯',
+        userId: 'runnerk',
+        timestamp: new Date(Date.now() - 300000).toISOString(), // 5분 전
         room: room.id
       }
     ],
@@ -256,11 +355,18 @@ function joinRoom(clientId, data) {
   // 방 정보 업데이트 브로드캐스트
   broadcastRoomUpdate(room.id);
   
-  // 최근 메시지 전송 (최근 50개)
-  const recentMessages = room.messages.slice(-50);
+  // 24시간 내의 모든 메시지 전송
+  const now = Date.now();
+  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
+  
+  // 24시간 이내의 메시지만 필터링
+  const recentMessages = room.messages.filter(msg => {
+    const msgTime = new Date(msg.timestamp).getTime();
+    return msgTime > twentyFourHoursAgo;
+  });
   
   // 디버깅: 메시지 개수 로그
-  console.log(`📨 [${room.name}] 이전 메시지 ${recentMessages.length}개 전송`);
+  console.log(`📨 [${room.name}] 24시간 내 메시지 ${recentMessages.length}개 전송 (전체: ${room.messages.length}개)`);
   
   client.ws.send(JSON.stringify({
     type: 'room_joined',
@@ -333,10 +439,23 @@ function handleChatMessage(clientId, data) {
     room: client.currentRoom
   };
   
-  // 메시지 저장 (최대 200개로 증가)
+  // 메시지 저장 (24시간 기준으로 관리)
   room.messages.push(message);
-  if (room.messages.length > 200) {
-    room.messages.shift();
+  
+  // 24시간이 지난 메시지 자동 삭제
+  const now = Date.now();
+  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
+  
+  // 오래된 메시지 필터링
+  const beforeCount = room.messages.length;
+  room.messages = room.messages.filter(msg => {
+    const msgTime = new Date(msg.timestamp).getTime();
+    return msgTime > twentyFourHoursAgo;
+  });
+  
+  const removedCount = beforeCount - room.messages.length;
+  if (removedCount > 0) {
+    console.log(`🗑️ [${room.name}] 24시간 경과 메시지 ${removedCount}개 삭제`);
   }
   
   // 디버깅: 메시지 저장 확인
@@ -602,21 +721,29 @@ function broadcastStats() {
 // 24시간 지난 메시지 삭제 함수
 function cleanupOldMessages() {
   const now = Date.now();
-  let deletedCount = 0;
+  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
+  let totalDeleted = 0;
   
   rooms.forEach((room) => {
     const initialLength = room.messages.length;
     room.messages = room.messages.filter(msg => {
-      const msgTime = new Date(msg.createdAt || msg.timestamp).getTime();
-      const age = now - msgTime;
-      return age < MESSAGE_RETENTION_TIME;
+      const msgTime = new Date(msg.timestamp || msg.createdAt).getTime();
+      return msgTime > twentyFourHoursAgo;
     });
-    deletedCount += initialLength - room.messages.length;
+    
+    const deletedFromRoom = initialLength - room.messages.length;
+    if (deletedFromRoom > 0) {
+      console.log(`🗑️ [${room.name}] ${deletedFromRoom}개 메시지 삭제 (${initialLength} → ${room.messages.length})`);
+      totalDeleted += deletedFromRoom;
+    }
   });
   
-  if (deletedCount > 0) {
-    stats.messagesDeleted += deletedCount;
-    console.log(`🗑️ ${deletedCount}개의 24시간 지난 메시지 삭제`);
+  if (totalDeleted > 0) {
+    if (!stats.messagesDeleted) stats.messagesDeleted = 0;
+    stats.messagesDeleted += totalDeleted;
+    console.log(`🧹 총 ${totalDeleted}개의 24시간 지난 메시지 정리 완료`);
+  } else {
+    console.log('✨ 정리할 오래된 메시지 없음');
   }
 }
 
