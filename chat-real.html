@@ -13,6 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="육상톡">
   <link rel="apple-touch-icon" href="/icon-192.png">
   
+  <script src="event-chat-rooms.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
@@ -257,6 +258,33 @@
       display: flex;
       align-items: center;
       gap: 3px;
+    }
+    
+    /* 이벤트 룸 스타일 */
+    .event-room {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .event-room::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.2), transparent);
+      animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
     
     /* 새 방 만들기 버튼 */
@@ -1441,8 +1469,16 @@
             active: true
           };
           
-          // 방 목록에 메인 채팅방 추가
-          updateRoomList([mainRoom]);
+          // 기본 채팅방 목록
+          const defaultRooms = [
+            { id: 'main', name: '메인 채팅방', icon: '🏠', desc: '모두의 채팅방', permanent: true, userCount: 0 },
+            { id: 'general', name: '자유채팅', icon: '💬', desc: '자유롭게 대화해요', permanent: true, userCount: 0 },
+            { id: 'running', name: '러닝 크루', icon: '🏃', desc: '함께 달려요', permanent: true, userCount: 0 },
+            { id: 'track', name: '트랙 훈련', icon: '🏟️', desc: '트랙 훈련 정보 공유', permanent: true, userCount: 0 }
+          ];
+          
+          // 방 목록 업데이트 (이벤트 룸은 updateRoomList에서 자동 추가됨)
+          updateRoomList(defaultRooms);
           
           // 메인 채팅방 자동 입장
           setTimeout(() => {
@@ -1797,7 +1833,28 @@
     // 채팅방 목록 업데이트
     function updateRoomList(rooms) {
       const container = document.getElementById('roomList');
-      container.innerHTML = '<div class="room-section-title">메인 채팅방</div>';
+      container.innerHTML = '';
+      
+      // 이벤트/시즌 채팅방 추가
+      const activeEventRooms = getActiveEventRooms();
+      if (activeEventRooms.length > 0) {
+        const eventTitle = document.createElement('div');
+        eventTitle.className = 'room-section-title';
+        eventTitle.innerHTML = '🎉 이벤트/대회 채팅방';
+        eventTitle.style.color = '#f59e0b';
+        container.appendChild(eventTitle);
+        
+        activeEventRooms.forEach(eventRoom => {
+          container.appendChild(createEventRoomElement(eventRoom));
+        });
+      }
+      
+      // 메인 채팅방
+      const mainTitle = document.createElement('div');
+      mainTitle.className = 'room-section-title';
+      mainTitle.style.marginTop = activeEventRooms.length > 0 ? '20px' : '0';
+      mainTitle.textContent = '💬 메인 채팅방';
+      container.appendChild(mainTitle);
       
       const permanentRooms = [];
       const customRooms = [];
@@ -1820,13 +1877,63 @@
         const title = document.createElement('div');
         title.className = 'room-section-title';
         title.style.marginTop = '20px';
-        title.textContent = '사용자 채팅방';
+        title.textContent = '👥 사용자 채팅방';
         container.appendChild(title);
         
         customRooms.forEach(room => {
           container.appendChild(createRoomElement(room));
         });
       }
+    }
+    
+    // 이벤트 채팅방 엘리먼트 생성
+    function createEventRoomElement(eventRoom) {
+      const div = document.createElement('div');
+      div.className = 'room-item event-room';
+      div.dataset.roomId = eventRoom.id;
+      div.onclick = () => joinRoom(eventRoom.id);
+      
+      const status = getEventRoomStatus(eventRoom);
+      const dday = getEventDDay(eventRoom);
+      const style = getEventTypeStyle(eventRoom.type);
+      
+      // 스타일 추가
+      div.style.background = 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1))';
+      div.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+      
+      div.innerHTML = `
+        <div class="room-icon" style="background: ${style.background}; font-size: 1.5rem;">
+          ${eventRoom.icon}
+        </div>
+        <div class="room-info">
+          <div class="room-name" style="display: flex; align-items: center; gap: 8px;">
+            ${eventRoom.name}
+            <span style="font-size: 0.7rem; padding: 2px 6px; background: ${style.background}; color: white; border-radius: 4px;">
+              ${style.badge}
+            </span>
+            ${dday !== '상시' ? `<span style="font-size: 0.7rem; color: #f59e0b;">${dday}</span>` : ''}
+          </div>
+          <div class="room-meta">
+            <span style="color: #999; font-size: 0.75rem;">${eventRoom.description}</span>
+          </div>
+          <div style="margin-top: 4px;">
+            <span style="font-size: 0.65rem; color: #667eea;">
+              <i class="fas fa-calendar"></i> ${eventRoom.eventDate}
+            </span>
+            ${status.status === 'active' ? 
+              `<span style="margin-left: 10px; font-size: 0.65rem; color: #10b981;">
+                <i class="fas fa-circle"></i> ${status.message}
+              </span>` : ''}
+          </div>
+        </div>
+      `;
+      
+      // 곧 시작되는 이벤트는 깜빡이는 효과
+      if (status.status === 'upcoming' && parseInt(status.message.match(/\d+/)[0]) <= 3) {
+        div.style.animation = 'pulse 2s infinite';
+      }
+      
+      return div;
     }
     
     // 채팅방 엘리먼트 생성
