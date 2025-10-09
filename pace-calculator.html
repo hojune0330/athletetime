@@ -2877,14 +2877,11 @@
       ];
       
       const tbody5km = document.getElementById('target5kmTable');
-      if (!tbody5km) {
-        console.warn('target5kmTable element not found');
-        return;
-      }
-      tbody5km.innerHTML = '';
+      if (tbody5km) {
+        tbody5km.innerHTML = '';
       
-      targets5km.forEach(target => {
-        const row = tbody5km.insertRow();
+        targets5km.forEach(target => {
+          const row = tbody5km.insertRow();
         if (target.highlight) row.className = 'highlight-row';
         
         const pacePerKm = target.time / 5;
@@ -2900,7 +2897,8 @@
           <td>${speed.toFixed(1)}</td>
           <td class="text-xs">${target.label}</td>
         `;
-      });
+        });
+      }
       
       // 10km 목표 기록
       const targets10km = [
@@ -2920,13 +2918,10 @@
       ];
       
       const tbody10km = document.getElementById('target10kmTable');
-      if (!tbody10km) {
-        console.warn('target10kmTable element not found');
-        return;
-      }
-      tbody10km.innerHTML = '';
-      
-      targets10km.forEach(target => {
+      if (tbody10km) {
+        tbody10km.innerHTML = '';
+        
+        targets10km.forEach(target => {
         const row = tbody10km.insertRow();
         if (target.highlight) row.className = 'highlight-row';
         
@@ -2943,7 +2938,8 @@
           <td>${speed.toFixed(1)}</td>
           <td class="text-xs">${target.label}</td>
         `;
-      });
+        });
+      }
       
       // 하프마라톤 목표 기록
       const targetsHalf = [
@@ -2965,13 +2961,10 @@
       ];
       
       const tbodyHalf = document.getElementById('targetHalfTable');
-      if (!tbodyHalf) {
-        console.warn('targetHalfTable element not found');
-        return;
-      }
-      tbodyHalf.innerHTML = '';
-      
-      targetsHalf.forEach(target => {
+      if (tbodyHalf) {
+        tbodyHalf.innerHTML = '';
+        
+        targetsHalf.forEach(target => {
         const row = tbodyHalf.insertRow();
         if (target.highlight) row.className = 'highlight-row';
         
@@ -2990,7 +2983,8 @@
           <td>${speed.toFixed(1)}</td>
           <td class="text-xs">${target.label}</td>
         `;
-      });
+        });
+      }
       
       // 풀마라톤 목표 기록
       const targetsFull = [
@@ -3014,13 +3008,10 @@
       ];
       
       const tbodyFull = document.getElementById('targetFullTable');
-      if (!tbodyFull) {
-        console.warn('targetFullTable element not found');
-        return;
-      }
-      tbodyFull.innerHTML = '';
-      
-      targetsFull.forEach(target => {
+      if (tbodyFull) {
+        tbodyFull.innerHTML = '';
+        
+        targetsFull.forEach(target => {
         const row = tbodyFull.insertRow();
         if (target.highlight) row.className = 'highlight-row';
         
@@ -3041,7 +3032,8 @@
           <td>${speed.toFixed(1)}</td>
           <td class="text-xs">${target.label}</td>
         `;
-      });
+        });
+      }
     }
 
     // 차트 3: 레인별 보정 시간

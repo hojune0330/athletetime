@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>에러 테스트</title>
+</head>
+<body>
+  <h1>JavaScript 에러 테스트</h1>
+  
+  <div id="test-output"></div>
+  
+  <script>
+    // 에러 캐치
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+      document.getElementById('test-output').innerHTML += 
+        `<div style="color: red;">Error: ${event.message} at line ${event.lineno}</div>`;
+    });
+    
+    // 테스트 코드
+    try {
+      // formatPace 함수 없이 호출해보기
+      const result = formatPace(240);
+      console.log('Result:', result);
+    } catch (error) {
+      console.error('Caught error:', error);
+      document.getElementById('test-output').innerHTML += 
+        `<div style="color: orange;">Caught: ${error.message}</div>`;
+    }
+    
+    // undefined 변수 참조
+    try {
+      const value = laneDistances[4];
+      console.log('Value:', value);
+    } catch (error) {
+      console.error('Caught error:', error);
+      document.getElementById('test-output').innerHTML += 
+        `<div style="color: orange;">Caught: ${error.message}</div>`;
+    }
+  </script>
+</body>
+</html>
