@@ -1596,9 +1596,25 @@
       
       // 히스토리 표시
       if (data.messages && data.messages.length > 0) {
+        console.log(`📥 이전 메시지 ${data.messages.length}개 로드`);
+        
+        // 이전 메시지임을 표시하는 구분선 추가
+        if (data.messages.length >= 5) {
+          addSystemMessage(`━━━━━ 이전 대화 내역 (${data.messages.length}개) ━━━━━`);
+        }
+        
+        // 메시지 표시
         data.messages.forEach(msg => {
+          // 이전 메시지는 알림 없이 표시
           displayMessage(msg, false);
         });
+        
+        // 구분선 추가
+        if (data.messages.length >= 5) {
+          addSystemMessage('━━━━━ 여기까지 이전 대화 ━━━━━');
+        }
+      } else {
+        console.log('📥 이전 메시지 없음');
       }
       
       // 환영 메시지
@@ -1606,7 +1622,7 @@
         addSystemMessage('🏃 메인 채팅방에 오신 것을 환영합니다!');
         addSystemMessage('모든 육상인들과 자유롭게 대화를 나눠보세요.');
       } else {
-        addSystemMessage('채팅방에 입장했습니다.');
+        addSystemMessage(`💬 "${data.roomName || currentRoom}" 채팅방에 입장했습니다.`);
       }
       
       updateRoomUserCount(data.userCount);
@@ -1619,6 +1635,12 @@
       
       // 입력창에 placeholder 업데이트
       document.getElementById('messageInput').placeholder = '메시지를 입력하세요... (Enter로 전송)';
+      
+      // 스크롤을 맨 아래로
+      setTimeout(() => {
+        const container = document.getElementById('messagesContainer');
+        container.scrollTop = container.scrollHeight;
+      }, 100);
     }
     
     // 방 입장

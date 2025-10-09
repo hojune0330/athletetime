@@ -39,7 +39,36 @@ defaultRooms.forEach(room => {
   rooms.set(room.id, {
     ...room,
     users: new Set(),
-    messages: [],
+    messages: [
+      // 테스트용 이전 메시지 추가
+      {
+        id: 'test_msg_1',
+        text: '👋 환영합니다! 애슬리트 타임 채팅방입니다.',
+        nickname: '관리자',
+        avatar: '👨‍💼',
+        userId: 'admin',
+        timestamp: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_2',
+        text: '오늘 날씨 좋네요! 러닝하기 딱 좋은 날씨예요 🏃‍♂️',
+        nickname: '러너A',
+        avatar: '🏃',
+        userId: 'runner1',
+        timestamp: new Date(Date.now() - 1800000).toISOString(), // 30분 전
+        room: room.id
+      },
+      {
+        id: 'test_msg_3',
+        text: '맞아요! 저도 아침에 10km 뛰고 왔어요 💪',
+        nickname: '러너B',
+        avatar: '💪',
+        userId: 'runner2',
+        timestamp: new Date(Date.now() - 900000).toISOString(), // 15분 전
+        room: room.id
+      }
+    ],
     created: new Date().toISOString(),
     lastActivity: new Date().toISOString(),
     permanent: true,
@@ -228,10 +257,15 @@ function joinRoom(clientId, data) {
   
   // 최근 메시지 전송 (최근 50개)
   const recentMessages = room.messages.slice(-50);
+  
+  // 디버깅: 메시지 개수 로그
+  console.log(`📨 [${room.name}] 이전 메시지 ${recentMessages.length}개 전송`);
+  
   client.ws.send(JSON.stringify({
     type: 'room_joined',
     data: {
       room: room.id,
+      roomName: room.name,
       messages: recentMessages,
       userCount: room.users.size
     }
@@ -298,11 +332,14 @@ function handleChatMessage(clientId, data) {
     room: client.currentRoom
   };
   
-  // 메시지 저장 (최대 100개)
+  // 메시지 저장 (최대 200개로 증가)
   room.messages.push(message);
-  if (room.messages.length > 100) {
+  if (room.messages.length > 200) {
     room.messages.shift();
   }
+  
+  // 디버깅: 메시지 저장 확인
+  console.log(`💾 [${room.name}] 총 메시지: ${room.messages.length}개`);
   
   // 활동 시간 업데이트
   updateRoomActivity(client.currentRoom);
