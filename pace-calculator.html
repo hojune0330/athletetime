@@ -1881,10 +1881,31 @@
       
       // 차트가 선택되면 차트 생성
       if (tabName === 'chart') {
-        generatePaceChart1();
-        generateTargetTables();
-        generateLaneChart();
-        generateSteeplechaseChart();
+        setTimeout(() => {
+          try {
+            generatePaceChart1();
+          } catch (error) {
+            console.error('Error generating pace chart 1:', error);
+          }
+          
+          try {
+            generateTargetTables();
+          } catch (error) {
+            console.error('Error generating target tables:', error);
+          }
+          
+          try {
+            generateLaneChart();
+          } catch (error) {
+            console.error('Error generating lane chart:', error);
+          }
+          
+          try {
+            generateSteeplechaseChart();
+          } catch (error) {
+            console.error('Error generating steeplechase chart:', error);
+          }
+        }, 50);
       } else if (tabName === 'lane') {
         // 트랙 레인 계산기 직접 표시
         // 약간의 지연 후 초기 계산 실행
@@ -2792,6 +2813,10 @@
     // 차트 1: KM 페이스별 거리 환산표
     function generatePaceChart1() {
       const tbody = document.getElementById('paceChartBody1');
+      if (!tbody) {
+        console.warn('paceChartBody1 element not found');
+        return;
+      }
       tbody.innerHTML = '';
       
       // km 페이스 목록 (2:30부터 8:00까지 10초 간격)
@@ -2852,6 +2877,10 @@
       ];
       
       const tbody5km = document.getElementById('target5kmTable');
+      if (!tbody5km) {
+        console.warn('target5kmTable element not found');
+        return;
+      }
       tbody5km.innerHTML = '';
       
       targets5km.forEach(target => {
@@ -2891,6 +2920,10 @@
       ];
       
       const tbody10km = document.getElementById('target10kmTable');
+      if (!tbody10km) {
+        console.warn('target10kmTable element not found');
+        return;
+      }
       tbody10km.innerHTML = '';
       
       targets10km.forEach(target => {
@@ -2932,6 +2965,10 @@
       ];
       
       const tbodyHalf = document.getElementById('targetHalfTable');
+      if (!tbodyHalf) {
+        console.warn('targetHalfTable element not found');
+        return;
+      }
       tbodyHalf.innerHTML = '';
       
       targetsHalf.forEach(target => {
@@ -2977,6 +3014,10 @@
       ];
       
       const tbodyFull = document.getElementById('targetFullTable');
+      if (!tbodyFull) {
+        console.warn('targetFullTable element not found');
+        return;
+      }
       tbodyFull.innerHTML = '';
       
       targetsFull.forEach(target => {
@@ -3006,6 +3047,10 @@
     // 차트 3: 레인별 보정 시간
     function generateLaneChart() {
       const tbody = document.getElementById('laneChartTable');
+      if (!tbody) {
+        console.warn('laneChartTable element not found');
+        return;
+      }
       tbody.innerHTML = '';
       
       // km 페이스 목록 (2:30부터 6:00까지 10초 간격)
@@ -3817,7 +3862,11 @@
     
     // 페이지 로드 시 초기화
     window.addEventListener('DOMContentLoaded', () => {
-      switchTab('chart');
+      // DOM이 완전히 로드된 후 차트 탭 활성화
+      setTimeout(() => {
+        switchTab('chart');
+      }, 100);
+      
       checkMobileAndScroll();
       
       // 트랙 레인 계산기 초기화
@@ -3826,7 +3875,7 @@
           // console.log('트랙 레인 계산기 초기화 중...'); // Production: removed
           calculateLaneAll();
         }
-      }, 100);
+      }, 200);
       
       // 모바일에서 테이블 터치 스크롤 개선
       if ('ontouchstart' in window) {
