@@ -1,36 +1,25 @@
-// 익명 게시판 API 연동 스크립트
+// 익명 게시판 API - Render 백엔드 전용
 const CommunityAPI = {
-  // API 엔드포인트 - 항상 백엔드 서버 사용
+  // API 엔드포인트 - Render 백엔드만 사용
   getAPIUrl() {
-    // 로컬 개발 환경
-    if (window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1') {
-      return 'http://localhost:3005';
-    }
-    
-    // 프로덕션 환경 - Render 백엔드 사용
-    // Netlify, Vercel, 또는 어떤 프론트엔드 호스팅이든 Render 백엔드 연결
+    // 프로덕션 환경 - 항상 Render 백엔드 사용
     return 'https://athletetime-backend.onrender.com';
   },
 
   // 모든 게시글 가져오기
   async getPosts() {
     const apiUrl = this.getAPIUrl();
-    console.log('🌐 API URL:', apiUrl);
     
     try {
-      console.log('📡 API URL:', apiUrl);
       const response = await fetch(`${apiUrl}/api/posts`);
-      console.log('📡 Response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      console.log('📡 Response data:', data);
       return data.success ? data.posts : [];
     } catch (error) {
-      console.error('게시글 로드 실패:', error);
-      console.error('Error details:', error.message);
-      // localStorage 폴백
-      const saved = localStorage.getItem('athletetime_posts');
-      return saved ? JSON.parse(saved) : [];
+      console.error('❌ 게시글 로드 실패:', error);
+      throw error;
     }
   },
 
@@ -38,11 +27,14 @@ const CommunityAPI = {
   async getPost(id) {
     try {
       const response = await fetch(`${this.getAPIUrl()}/api/posts/${id}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       return data.success ? data.post : null;
     } catch (error) {
-      console.error('게시글 로드 실패:', error);
-      return null;
+      console.error('❌ 게시글 로드 실패:', error);
+      throw error;
     }
   },
 
@@ -61,11 +53,10 @@ const CommunityAPI = {
       }
       
       const data = await response.json();
-      console.log('✅ 조회수 증가 성공:', data);
       return data;
     } catch (error) {
-      console.error('❌ 조회수 증가 API 오류:', error);
-      throw error; // 에러를 상위로 전파
+      console.error('❌ 조회수 증가 실패:', error);
+      throw error;
     }
   },
 
@@ -73,47 +64,24 @@ const CommunityAPI = {
   async createPost(postData) {
     try {
       const apiUrl = this.getAPIUrl();
-      console.log('📤 Creating post at:', apiUrl);
-      console.log('📤 Post data:', postData);
       
       const response = await fetch(`${apiUrl}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData)
       });
-      console.log('📤 Create response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      console.log('📤 Create response data:', data);
-      
       if (!data.success) throw new Error(data.message);
-      
-      // localStorage에도 저장 (백업)
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      posts.unshift(data.post);
-      localStorage.setItem('athletetime_posts', JSON.stringify(posts));
       
       return data.post;
     } catch (error) {
-      console.error('게시글 작성 실패:', error);
-      
-      // 오프라인 폴백: localStorage에만 저장
-      const newPost = {
-        ...postData,
-        id: Date.now(),
-        date: new Date().toISOString(),
-        views: 0,
-        likes: [],
-        dislikes: [],
-        comments: [],
-        reports: [],
-        isBlinded: false
-      };
-      
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      posts.unshift(newPost);
-      localStorage.setItem('athletetime_posts', JSON.stringify(posts));
-      
-      return newPost;
+      console.error('❌ 게시글 작성 실패:', error);
+      throw error;
     }
   },
 
@@ -125,21 +93,17 @@ const CommunityAPI = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData)
       });
-      const data = await response.json();
       
-      if (!data.success) throw new Error(data.message);
-      
-      // localStorage도 업데이트
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const index = posts.findIndex(p => p.id === id);
-      if (index !== -1) {
-        posts[index] = data.post;
-        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
       
       return data.post;
     } catch (error) {
-      console.error('게시글 수정 실패:', error);
+      console.error('❌ 게시글 수정 실패:', error);
       throw error;
     }
   },
@@ -148,7 +112,6 @@ const CommunityAPI = {
   async deletePost(id, password) {
     try {
       const apiUrl = this.getAPIUrl();
-      console.log('🗑️ Deleting post:', { id, apiUrl });
       
       const response = await fetch(`${apiUrl}/api/posts/${id}`, {
         method: 'DELETE',
@@ -156,28 +119,20 @@ const CommunityAPI = {
         body: JSON.stringify({ password })
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      console.log('🗑️ Delete response:', data);
       
       if (!data.success) {
-        // 서버에서 반환한 정확한 메시지를 에러로 전달
         throw new Error(data.message || '게시글 삭제에 실패했습니다');
       }
       
-      // localStorage에서도 삭제
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const filtered = posts.filter(p => p.id !== id);
-      localStorage.setItem('athletetime_posts', JSON.stringify(filtered));
-      
       return true;
     } catch (error) {
-      console.error('게시글 삭제 실패:', error);
-      // fetch 에러가 아닌 경우 그대로 전달
-      if (error.message) {
-        throw error;
-      }
-      // fetch 에러인 경우 일반 메시지
-      throw new Error('네트워크 오류로 삭제에 실패했습니다');
+      console.error('❌ 게시글 삭제 실패:', error);
+      throw error;
     }
   },
 
@@ -189,41 +144,17 @@ const CommunityAPI = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, type })
       });
-      const data = await response.json();
       
-      if (!data.success) throw new Error(data.message);
-      
-      // localStorage 업데이트
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const index = posts.findIndex(p => p.id === postId);
-      if (index !== -1) {
-        posts[index] = data.post;
-        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
       
       return data.post;
     } catch (error) {
-      console.error('투표 실패:', error);
-      
-      // 오프라인 폴백
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const post = posts.find(p => p.id === postId);
-      if (post) {
-        // 기존 투표 제거
-        post.likes = post.likes.filter(id => id !== userId);
-        post.dislikes = post.dislikes.filter(id => id !== userId);
-        
-        // 새 투표 추가
-        if (type === 'like') {
-          post.likes.push(userId);
-        } else if (type === 'dislike') {
-          post.dislikes.push(userId);
-        }
-        
-        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
-        return post;
-      }
-      
+      console.error('❌ 투표 실패:', error);
       throw error;
     }
   },
@@ -236,41 +167,41 @@ const CommunityAPI = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(commentData)
       });
-      const data = await response.json();
       
-      if (!data.success) throw new Error(data.message);
-      
-      // localStorage 업데이트
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const post = posts.find(p => p.id === postId);
-      if (post) {
-        if (!post.comments) post.comments = [];
-        post.comments.push(data.comment);
-        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
       
       return data.comment;
     } catch (error) {
-      console.error('댓글 작성 실패:', error);
+      console.error('❌ 댓글 작성 실패:', error);
+      throw error;
+    }
+  },
+
+  // 댓글 삭제
+  async deleteComment(postId, commentId, password) {
+    try {
+      const response = await fetch(`${this.getAPIUrl()}/api/posts/${postId}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
       
-      // 오프라인 폴백
-      const comment = {
-        id: Date.now(),
-        ...commentData,
-        date: new Date().toISOString(),
-        reports: [],
-        isBlinded: false
-      };
-      
-      const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
-      const post = posts.find(p => p.id === postId);
-      if (post) {
-        if (!post.comments) post.comments = [];
-        post.comments.push(comment);
-        localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return comment;
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message);
+      
+      return true;
+    } catch (error) {
+      console.error('❌ 댓글 삭제 실패:', error);
+      throw error;
     }
   },
 
@@ -282,13 +213,17 @@ const CommunityAPI = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })
       });
-      const data = await response.json();
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
       if (!data.success) throw new Error(data.message);
       
       return data.reports;
     } catch (error) {
-      console.error('신고 실패:', error);
+      console.error('❌ 신고 실패:', error);
       throw error;
     }
   },
@@ -297,11 +232,16 @@ const CommunityAPI = {
   async getStats() {
     try {
       const response = await fetch(`${this.getAPIUrl()}/api/stats`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       return data.success ? data.stats : null;
     } catch (error) {
-      console.error('통계 로드 실패:', error);
-      return null;
+      console.error('❌ 통계 로드 실패:', error);
+      throw error;
     }
   }
 };

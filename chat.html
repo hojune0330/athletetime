@@ -683,9 +683,8 @@
     
     // WebSocket 연결
     function connectWebSocket() {
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:3000/ws'
-        : 'wss://athletetime-backend.onrender.com/ws';
+      // Render 백엔드 WebSocket 전용
+      const wsUrl = 'wss://athletetime-backend.onrender.com/ws';
       
       ws = new WebSocket(wsUrl);
       

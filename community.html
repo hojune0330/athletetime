@@ -600,21 +600,18 @@
     let selectedImages = []; // 선택된 이미지들
     let currentPoll = null; // 현재 생성중인 투표
     
-    // 로컬 스토리지 키
-    const STORAGE_KEY = 'athletetime_posts';
-    const USER_KEY = 'athletetime_user';
-    
-    // 사용자 ID 가져오기/생성
-    function getUserId() {
-      let userId = (function() { try { return localStorage.getItem(USER_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
-      if (!userId) {
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        (function() { try { return localStorage.setItem(USER_KEY, userId); } catch(e) { console.error('Storage error:', e); return null; } })();
-      }
-      return userId;
+    // 사용자 ID 생성 (세션 기반)
+    function generateUserId() {
+      // 세션 동안만 유지되는 고유 ID
+      return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
     
-    const userId = getUserId();
+    // 세션 스토리지 사용 (브라우저 닫으면 초기화)
+    let userId = sessionStorage.getItem('athletetime_user');
+    if (!userId) {
+      userId = generateUserId();
+      sessionStorage.setItem('athletetime_user', userId);
+    }
     
     // ===== 초기화 =====
     async function init() {
@@ -990,7 +987,7 @@
       };
       
       // 경고 모달 표시
-      const warningShown = (function() { try { return localStorage.getItem('commentWarningShown'); } catch(e) { console.error('Storage error:', e); return null; } })();
+      const warningShown = sessionStorage.getItem('commentWarningShown');
       if (!warningShown) {
         // 처음 댓글을 작성하는 경우 경고 표시
         document.getElementById('dontShowAgain').checked = false; // 체크박스 초기화
@@ -1041,7 +1038,7 @@
       // "다시 보지 않기" 체크 확인
       const dontShowAgain = document.getElementById('dontShowAgain').checked;
       if (dontShowAgain) {
-        (function() { try { return localStorage.setItem('commentWarningShown', 'true'); } catch(e) { console.error('Storage error:', e); return null; } })();
+        sessionStorage.setItem('commentWarningShown', 'true');
       }
       
       // 입력 필드 초기화
