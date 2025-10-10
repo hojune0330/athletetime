@@ -13,11 +13,10 @@ const CommunityAPI = {
       return `https://3005-${parts.slice(1).join('-')}`;
     } else if (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('athlete-time')) {
       // Netlify 및 athlete-time 도메인에서 Render 백엔드 사용
-      // 여기에 Render.com에 배포한 백엔드 URL을 입력하세요
-      return 'https://your-render-backend.onrender.com'; // 🔴 이 부분을 실제 Render URL로 변경하세요!
+      return 'https://athletetime-backend.onrender.com';
     } else {
       // 기타 배포 환경도 Render 백엔드 사용
-      return 'https://your-render-backend.onrender.com'; // 🔴 이 부분을 실제 Render URL로 변경하세요!
+      return 'https://athletetime-backend.onrender.com';
     }
   },
 

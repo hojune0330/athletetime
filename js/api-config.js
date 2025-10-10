@@ -1,15 +1,14 @@
 // API 설정 파일
 const API_CONFIG = {
-  // Render.com 배포 후 URL 업데이트
-  // 예: https://athletetime-backend.onrender.com
+  // Render.com 백엔드 URL
   baseURL: window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
     : 'https://athletetime-backend.onrender.com',
     
   // WebSocket URL
   wsURL: window.location.hostname === 'localhost'
-    ? 'ws://localhost:3000'
-    : 'wss://athletetime-backend.onrender.com',
+    ? 'ws://localhost:3000/ws'
+    : 'wss://athletetime-backend.onrender.com/ws',
 
   // API 엔드포인트
   endpoints: {

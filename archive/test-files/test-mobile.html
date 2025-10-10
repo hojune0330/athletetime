@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모바일 버전 테스트</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .test-links {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .test-link {
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      transition: opacity 0.3s;
+    }
+    .test-link:hover {
+      opacity: 0.9;
+    }
+    .info {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    .status.complete {
+      background: #10b981;
+      color: white;
+    }
+    .status.in-progress {
+      background: #f59e0b;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>페이스 계산기 버전 테스트</h1>
+  
+  <div class="info">
+    <h3>현재 구조:</h3>
+    <ul>
+      <li><strong>index.html</strong> - 메인 랜딩 페이지 (원본) <span class="status complete">완료</span></li>
+      <li><strong>pace-calculator-selector.html</strong> - 버전 선택 페이지 <span class="status complete">완료</span></li>
+      <li><strong>pace-calculator.html</strong> - PC 버전 <span class="status complete">완료</span></li>
+      <li><strong>pace-calculator-mobile.html</strong> - 모바일 버전 <span class="status complete">완료</span></li>
+    </ul>
+  </div>
+  
+  <div class="info">
+    <h3>주요 개선사항:</h3>
+    <ul>
+      <li>✅ 워터마크 제거 및 푸터 크레딧 추가</li>
+      <li>✅ html2canvas로 다운로드 기능 수정</li>
+      <li>✅ 모바일 테이블 첫 열 고정 (sticky)</li>
+      <li>✅ 터치 친화적인 큰 버튼</li>
+      <li>✅ 스크롤 인디케이터</li>
+      <li>✅ 7일간 버전 선택 저장</li>
+    </ul>
+  </div>
+  
+  <div class="test-links">
+    <a href="index.html" class="test-link">
+      메인 페이지로 이동
+    </a>
+    <a href="pace-calculator-selector.html" class="test-link">
+      버전 선택 페이지로 이동
+    </a>
+    <a href="pace-calculator-mobile.html" class="test-link">
+      모바일 버전 직접 열기
+    </a>
+    <a href="pace-calculator.html" class="test-link">
+      PC 버전 직접 열기
+    </a>
+  </div>
+  
+  <div class="info" style="margin-top: 30px;">
+    <h3>테스트 방법:</h3>
+    <ol>
+      <li>메인 페이지에서 "페이스 계산기 & 차트" 클릭</li>
+      <li>버전 선택 화면에서 원하는 버전 선택</li>
+      <li>선택한 버전이 7일간 기억됨</li>
+      <li>각 버전에서 PNG/PDF 다운로드 테스트</li>
+    </ol>
+  </div>
+</body>
+</html>

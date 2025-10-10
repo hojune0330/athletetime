@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 
 // 환경 변수
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Render는 자동으로 PORT 환경변수 설정
 const CHAT_DATA_FILE = path.join(__dirname, 'chat-messages.json');
 const COMMUNITY_DATA_FILE = path.join(__dirname, 'community-posts.json');
 

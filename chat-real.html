@@ -1444,10 +1444,10 @@
       } else if (protocol === 'https:') {
         // HTTPS 호스팅 환경 (Vercel, Netlify 등)
         // Render.com WebSocket 서버
-        wsUrl = 'wss://athletetime-backend.onrender.com';
+        wsUrl = 'wss://athletetime-backend.onrender.com/ws';
       } else {
         // HTTP 호스팅 환경
-        wsUrl = 'wss://athletetime-backend.onrender.com';
+        wsUrl = 'wss://athletetime-backend.onrender.com/ws';
       }
       
       console.log('🔌 WebSocket 연결 시도:', wsUrl);

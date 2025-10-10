@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VDOT 페이스 계산 검증</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Jack Daniels VDOT 훈련 페이스 검증</h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4">VDOT 입력</h2>
+      <div class="flex gap-4 items-center">
+        <input type="number" id="vdotInput" value="50" min="30" max="85" step="1"
+          class="p-2 border rounded w-32">
+        <button onclick="calculatePaces()" 
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          계산하기
+        </button>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4">계산된 페이스</h2>
+      <div id="paceResults" class="space-y-2"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-bold mb-4">Jack Daniels 공식 VDOT 페이스 테이블</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-2 text-left">VDOT</th>
+              <th class="px-4 py-2 text-left">Easy (min-max)</th>
+              <th class="px-4 py-2 text-left">Marathon</th>
+              <th class="px-4 py-2 text-left">Threshold</th>
+              <th class="px-4 py-2 text-left">Interval</th>
+              <th class="px-4 py-2 text-left">Repetition</th>
+            </tr>
+          </thead>
+          <tbody id="vdotTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Jack Daniels 공식 VDOT 페이스 테이블 (초/km)
+    const vdotPaceTable = {
+      30: { easy: { min: 417, max: 458 }, marathon: 374, threshold: 354, interval: 320, repetition: 296 },
+      35: { easy: { min: 372, max: 409 }, marathon: 333, threshold: 315, interval: 285, repetition: 264 },
+      40: { easy: { min: 337, max: 370 }, marathon: 301, threshold: 285, interval: 258, repetition: 239 },
+      45: { easy: { min: 308, max: 339 }, marathon: 275, threshold: 260, interval: 236, repetition: 218 },
+      50: { easy: { min: 284, max: 312 }, marathon: 253, threshold: 239, interval: 217, repetition: 201 },
+      55: { easy: { min: 263, max: 290 }, marathon: 235, threshold: 222, interval: 201, repetition: 186 },
+      60: { easy: { min: 246, max: 270 }, marathon: 219, threshold: 207, interval: 188, repetition: 174 },
+      65: { easy: { min: 230, max: 253 }, marathon: 205, threshold: 194, interval: 176, repetition: 163 },
+      70: { easy: { min: 217, max: 238 }, marathon: 193, threshold: 182, interval: 165, repetition: 153 },
+      75: { easy: { min: 205, max: 225 }, marathon: 182, threshold: 172, interval: 156, repetition: 144 },
+      80: { easy: { min: 194, max: 213 }, marathon: 172, threshold: 163, interval: 148, repetition: 137 },
+      85: { easy: { min: 185, max: 203 }, marathon: 164, threshold: 155, interval: 140, repetition: 130 }
+    };
+    
+    function formatPace(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec.toString().padStart(2, '0')}`;
+    }
+    
+    function calculateTrainingPaces(vdot) {
+      // VDOT 값에 가장 가까운 테이블 값 찾기 및 보간
+      const vdotKeys = Object.keys(vdotPaceTable).map(k => parseInt(k)).sort((a, b) => a - b);
+      let lowerVdot = 30, upperVdot = 30;
+      
+      for (let i = 0; i < vdotKeys.length - 1; i++) {
+        if (vdot >= vdotKeys[i] && vdot <= vdotKeys[i + 1]) {
+          lowerVdot = vdotKeys[i];
+          upperVdot = vdotKeys[i + 1];
+          break;
+        }
+      }
+      
+      if (vdot < 30) {
+        lowerVdot = upperVdot = 30;
+      } else if (vdot > 85) {
+        lowerVdot = upperVdot = 85;
+      }
+      
+      // 선형 보간으로 정확한 페이스 계산
+      let paces;
+      if (lowerVdot === upperVdot) {
+        paces = vdotPaceTable[lowerVdot];
+      } else {
+        const ratio = (vdot - lowerVdot) / (upperVdot - lowerVdot);
+        const lowerPaces = vdotPaceTable[lowerVdot];
+        const upperPaces = vdotPaceTable[upperVdot];
+        
+        paces = {
+          easy: {
+            min: Math.round(lowerPaces.easy.min - (lowerPaces.easy.min - upperPaces.easy.min) * ratio),
+            max: Math.round(lowerPaces.easy.max - (lowerPaces.easy.max - upperPaces.easy.max) * ratio)
+          },
+          marathon: Math.round(lowerPaces.marathon - (lowerPaces.marathon - upperPaces.marathon) * ratio),
+          threshold: Math.round(lowerPaces.threshold - (lowerPaces.threshold - upperPaces.threshold) * ratio),
+          interval: Math.round(lowerPaces.interval - (lowerPaces.interval - upperPaces.interval) * ratio),
+          repetition: Math.round(lowerPaces.repetition - (lowerPaces.repetition - upperPaces.repetition) * ratio)
+        };
+      }
+      
+      return paces;
+    }
+    
+    function calculatePaces() {
+      const vdot = parseFloat(document.getElementById('vdotInput').value);
+      const paces = calculateTrainingPaces(vdot);
+      
+      const resultsHTML = `
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-3 bg-green-50 rounded">
+            <div class="font-semibold text-green-700">Easy (E)</div>
+            <div class="text-lg">${formatPace(paces.easy.max)} - ${formatPace(paces.easy.min)}/km</div>
+            <div class="text-xs text-gray-600">회복 및 기초 지구력</div>
+          </div>
+          <div class="p-3 bg-blue-50 rounded">
+            <div class="font-semibold text-blue-700">Marathon (M)</div>
+            <div class="text-lg">${formatPace(paces.marathon)}/km</div>
+            <div class="text-xs text-gray-600">마라톤 목표 페이스</div>
+          </div>
+          <div class="p-3 bg-orange-50 rounded">
+            <div class="font-semibold text-orange-700">Threshold (T)</div>
+            <div class="text-lg">${formatPace(paces.threshold)}/km</div>
+            <div class="text-xs text-gray-600">젖산 역치 (20-60분)</div>
+          </div>
+          <div class="p-3 bg-red-50 rounded">
+            <div class="font-semibold text-red-700">Interval (I)</div>
+            <div class="text-lg">${formatPace(paces.interval)}/km</div>
+            <div class="text-xs text-gray-600">VO₂max (3-5분 반복)</div>
+          </div>
+          <div class="p-3 bg-purple-50 rounded col-span-2">
+            <div class="font-semibold text-purple-700">Repetition (R)</div>
+            <div class="text-lg">${formatPace(paces.repetition)}/km</div>
+            <div class="text-xs text-gray-600">스피드/폼 (완전 회복)</div>
+          </div>
+        </div>
+        
+        <div class="mt-4 p-3 bg-gray-100 rounded">
+          <div class="text-sm">
+            <strong>VDOT ${vdot}</strong>에 대한 훈련 페이스
+            ${vdot < 30 || vdot > 85 ? '<br><span class="text-red-600">* 범위를 벗어난 VDOT (30-85 권장)</span>' : ''}
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('paceResults').innerHTML = resultsHTML;
+    }
+    
+    function displayVdotTable() {
+      const tableHTML = Object.entries(vdotPaceTable).map(([vdot, paces]) => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">${vdot}</td>
+          <td class="px-4 py-2">${formatPace(paces.easy.max)}-${formatPace(paces.easy.min)}</td>
+          <td class="px-4 py-2">${formatPace(paces.marathon)}</td>
+          <td class="px-4 py-2">${formatPace(paces.threshold)}</td>
+          <td class="px-4 py-2">${formatPace(paces.interval)}</td>
+          <td class="px-4 py-2">${formatPace(paces.repetition)}</td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('vdotTable').innerHTML = tableHTML;
+    }
+    
+    // 페이지 로드시 초기 계산 및 테이블 표시
+    window.addEventListener('DOMContentLoaded', () => {
+      displayVdotTable();
+      calculatePaces();
+    });
+    
+    // 엔터키 지원
+    document.getElementById('vdotInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        calculatePaces();
+      }
+    });
+  </script>
+</body>
+</html>

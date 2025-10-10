@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>레인 계산기 디버그</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .lane-1 { stroke: #ef4444; fill: none; }
+    .lane-2 { stroke: #f97316; fill: none; }
+    .lane-3 { stroke: #eab308; fill: none; }
+    .lane-4 { stroke: #84cc16; fill: none; }
+    .lane-5 { stroke: #22c55e; fill: none; }
+    .lane-6 { stroke: #06b6d4; fill: none; }
+    .lane-7 { stroke: #3b82f6; fill: none; }
+    .lane-8 { stroke: #8b5cf6; fill: none; }
+    .lane-selected { stroke-width: 3; opacity: 1; }
+    .lane-unselected { stroke-width: 1.5; opacity: 0.4; }
+  </style>
+</head>
+<body class="p-8">
+  <h1 class="text-2xl font-bold mb-4">트랙 레인 계산기 디버그 테스트</h1>
+  
+  <div class="mb-4">
+    <label>목표 시간: <input type="number" id="laneTargetTime" value="72" class="border p-1"></label>
+    <label class="ml-4">레인: 
+      <select id="laneLaneSelector" class="border p-1">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4" selected>4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+    </label>
+    <button onclick="calculateLaneAll()" class="ml-4 bg-blue-500 text-white px-4 py-1 rounded">계산</button>
+  </div>
+
+  <!-- SVG -->
+  <svg viewBox="0 0 800 400" class="border mb-4" style="width: 100%; max-width: 800px;">
+    <rect width="800" height="400" fill="#f0f0f0"/>
+    <g id="laneTrackLanes"></g>
+  </svg>
+
+  <!-- 테이블 -->
+  <table class="w-full border-collapse mb-4">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border p-2">레인</th>
+        <th class="border p-2">총거리</th>
+        <th class="border p-2">스태거</th>
+        <th class="border p-2">총시간</th>
+        <th class="border p-2">직선①</th>
+        <th class="border p-2">곡선①</th>
+        <th class="border p-2">직선②</th>
+        <th class="border p-2">곡선②</th>
+      </tr>
+    </thead>
+    <tbody id="laneTimeTable"></tbody>
+  </table>
+
+  <div id="laneAdditionalInfo"></div>
+
+  <script>
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function calculateLaneAll() {
+      console.log('calculateLaneAll 시작');
+      
+      const targetTime = parseFloat(document.getElementById('laneTargetTime').value);
+      const selectedLane = parseInt(document.getElementById('laneLaneSelector').value);
+      
+      console.log('입력:', { targetTime, selectedLane });
+      
+      if (isNaN(targetTime) || targetTime <= 0) {
+        alert('올바른 시간을 입력하세요');
+        return;
+      }
+      
+      // IAAF 표준
+      const STRAIGHT_LENGTH = 84.39;
+      const LANE_WIDTH = 1.22;
+      const KERB_RADIUS = 36.50;
+      const MEASUREMENT_OFFSET_LANE1 = 0.30;
+      const MEASUREMENT_OFFSET_OTHER = 0.20;
+      
+      // 선택된 레인의 거리 계산
+      let selectedLaneDistance = 0;
+      if (selectedLane === 1) {
+        const radius = KERB_RADIUS + MEASUREMENT_OFFSET_LANE1;
+        selectedLaneDistance = (STRAIGHT_LENGTH * 2) + (Math.PI * radius * 2);
+      } else {
+        const radius = KERB_RADIUS + (LANE_WIDTH * (selectedLane - 1)) + MEASUREMENT_OFFSET_OTHER;
+        selectedLaneDistance = (STRAIGHT_LENGTH * 2) + (Math.PI * radius * 2);
+      }
+      
+      const speedInSelectedLane = selectedLaneDistance / targetTime;
+      console.log('선택 레인 거리:', selectedLaneDistance, '속도:', speedInSelectedLane);
+      
+      const lanes = [];
+      
+      for (let lane = 1; lane <= 8; lane++) {
+        let measurementRadius;
+        if (lane === 1) {
+          measurementRadius = KERB_RADIUS + MEASUREMENT_OFFSET_LANE1;
+        } else {
+          measurementRadius = KERB_RADIUS + (LANE_WIDTH * (lane - 1)) + MEASUREMENT_OFFSET_OTHER;
+        }
+        
+        const curveLength = Math.PI * measurementRadius * 2;
+        const totalDistance = (STRAIGHT_LENGTH * 2) + curveLength;
+        const stagger = lane === 1 ? 0 : totalDistance - 400;
+        
+        const sectionDistances = {
+          straight1: STRAIGHT_LENGTH,
+          curve1: curveLength / 2,
+          straight2: STRAIGHT_LENGTH,
+          curve2: curveLength / 2
+        };
+        
+        const sectionTimes = {
+          straight1: sectionDistances.straight1 / speedInSelectedLane,
+          curve1: sectionDistances.curve1 / speedInSelectedLane,
+          straight2: sectionDistances.straight2 / speedInSelectedLane,
+          curve2: sectionDistances.curve2 / speedInSelectedLane
+        };
+        
+        const adjustedTime = totalDistance / speedInSelectedLane;
+        
+        lanes.push({
+          lane,
+          radius: measurementRadius,
+          distance: totalDistance,
+          stagger,
+          adjustedTime,
+          sectionDistances,
+          sectionTimes,
+          isSelected: lane === selectedLane,
+          speedMPS: speedInSelectedLane,
+          speedKMH: speedInSelectedLane * 3.6,
+          pacePerKm: 1000 / speedInSelectedLane
+        });
+        
+        console.log(`레인 ${lane}:`, {
+          거리: totalDistance.toFixed(2),
+          시간: adjustedTime.toFixed(2),
+          직선: sectionTimes.straight1.toFixed(2),
+          곡선: sectionTimes.curve1.toFixed(2)
+        });
+      }
+      
+      drawTrackLanes(lanes, selectedLane);
+      updateLaneTable(lanes, targetTime);
+    }
+
+    function drawTrackLanes(lanes, selectedLane) {
+      const svg = document.getElementById('laneTrackLanes');
+      svg.innerHTML = '';
+      
+      const scaleFactor = 2.5;
+      const straightLength = 84.39 * scaleFactor;
+      const centerX = 400;
+      const centerY = 200;
+      
+      lanes.forEach(lane => {
+        const radius = lane.radius * scaleFactor;
+        const leftCenterX = centerX - straightLength / 2;
+        const rightCenterX = centerX + straightLength / 2;
+        
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const d = `
+          M ${leftCenterX} ${centerY - radius}
+          L ${rightCenterX} ${centerY - radius}
+          A ${radius} ${radius} 0 0 1 ${rightCenterX} ${centerY + radius}
+          L ${leftCenterX} ${centerY + radius}
+          A ${radius} ${radius} 0 0 1 ${leftCenterX} ${centerY - radius}
+        `;
+        
+        path.setAttribute('d', d);
+        path.setAttribute('class', `lane-${lane.lane} ${lane.isSelected ? 'lane-selected' : 'lane-unselected'}`);
+        svg.appendChild(path);
+      });
+    }
+
+    function updateLaneTable(lanes, targetTime) {
+      const tbody = document.getElementById('laneTimeTable');
+      tbody.innerHTML = '';
+      
+      lanes.forEach(lane => {
+        const row = tbody.insertRow();
+        if (lane.isSelected) row.className = 'bg-yellow-100';
+        
+        row.innerHTML = `
+          <td class="border p-2">${lane.lane}</td>
+          <td class="border p-2">${lane.distance.toFixed(2)}</td>
+          <td class="border p-2">${lane.stagger.toFixed(2)}</td>
+          <td class="border p-2">${lane.adjustedTime.toFixed(2)}</td>
+          <td class="border p-2">${lane.sectionTimes.straight1.toFixed(2)}</td>
+          <td class="border p-2">${lane.sectionTimes.curve1.toFixed(2)}</td>
+          <td class="border p-2">${lane.sectionTimes.straight2.toFixed(2)}</td>
+          <td class="border p-2">${lane.sectionTimes.curve2.toFixed(2)}</td>
+        `;
+      });
+    }
+    
+    // 초기 실행
+    calculateLaneAll();
+  </script>
+</body>
+</html>

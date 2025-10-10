@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시판 API 테스트</title>
+</head>
+<body>
+  <h1>익명 게시판 API 테스트</h1>
+  
+  <div id="apiUrl"></div>
+  <div id="result"></div>
+  
+  <button onclick="testCreate()">테스트 게시글 작성</button>
+  
+  <script>
+    // API URL 결정
+    function getAPIUrl() {
+      if (window.location.hostname.includes('localhost')) {
+        return 'http://localhost:3005';
+      } else if (window.location.hostname.includes('e2b.dev')) {
+        const hostname = window.location.hostname;
+        const parts = hostname.split('-');
+        return `https://3005-${parts.slice(1).join('-')}`;
+      } else {
+        return 'https://your-api-server.com';
+      }
+    }
+    
+    const apiUrl = getAPIUrl();
+    document.getElementById('apiUrl').innerHTML = `
+      <p><strong>Current hostname:</strong> ${window.location.hostname}</p>
+      <p><strong>API URL:</strong> ${apiUrl}</p>
+    `;
+    
+    // 페이지 로드 시 게시글 가져오기
+    async function loadPosts() {
+      try {
+        console.log('Loading posts from:', apiUrl);
+        const response = await fetch(`${apiUrl}/api/posts`);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Data received:', data);
+        
+        document.getElementById('result').innerHTML = `
+          <h2>서버 응답:</h2>
+          <p>✅ 성공: ${data.success}</p>
+          <p>📝 게시글 수: ${data.posts ? data.posts.length : 0}</p>
+          <h3>게시글 목록:</h3>
+          <ul>
+            ${data.posts ? data.posts.map(p => `
+              <li>
+                <strong>[${p.category}]</strong> ${p.title} - ${p.author}
+                <br><small>${p.content.substring(0, 50)}...</small>
+              </li>
+            `).join('') : '게시글 없음'}
+          </ul>
+        `;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = `
+          <h2>❌ 오류 발생:</h2>
+          <p style="color: red;">${error.message}</p>
+          <p>API URL: ${apiUrl}</p>
+          <p>콘솔을 확인하세요.</p>
+        `;
+      }
+    }
+    
+    // 테스트 게시글 작성
+    async function testCreate() {
+      try {
+        const testPost = {
+          category: '자유',
+          title: '테스트 게시글 ' + new Date().toLocaleTimeString(),
+          author: '웹테스터',
+          content: '브라우저에서 작성한 테스트 게시글입니다.',
+          password: 'test123'
+        };
+        
+        console.log('Creating post:', testPost);
+        const response = await fetch(`${apiUrl}/api/posts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(testPost)
+        });
+        
+        console.log('Create response status:', response.status);
+        const data = await response.json();
+        console.log('Create response data:', data);
+        
+        if (data.success) {
+          alert('게시글 작성 성공!');
+          loadPosts(); // 다시 로드
+        } else {
+          alert('게시글 작성 실패: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Create error:', error);
+        alert('오류: ' + error.message);
+      }
+    }
+    
+    // 페이지 로드 시 실행
+    loadPosts();
+  </script>
+</body>
+</html>

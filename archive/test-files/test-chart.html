@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>차트 테스트</title>
+</head>
+<body>
+  <h1>페이스 차트 테스트</h1>
+  
+  <script>
+    // formatTime 함수 테스트
+    function formatTime(seconds, forceHours = false) {
+      if (isNaN(seconds) || seconds === null) return '-';
+      
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0 || forceHours) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else if (mins > 0) {
+        return `${mins}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else {
+        return secs.toFixed(1);
+      }
+    }
+    
+    // formatPace 함수 테스트
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+    
+    // laneDistances 정의 확인
+    const laneDistances = {
+      1: 400.00,
+      2: 407.04,
+      3: 414.70,
+      4: 422.37,
+      5: 430.03,
+      6: 437.70,
+      7: 445.37,
+      8: 453.03
+    };
+    
+    console.log('formatTime(90):', formatTime(90));
+    console.log('formatPace(240):', formatPace(240));
+    console.log('laneDistances[4]:', laneDistances[4]);
+    
+    // 테이블이 없을 때 에러 체크
+    const tbody = document.getElementById('nonExistentTable');
+    if (tbody) {
+      console.log('테이블 존재');
+    } else {
+      console.log('테이블 없음 - 에러 방지 필요');
+    }
+  </script>
+</body>
+</html>

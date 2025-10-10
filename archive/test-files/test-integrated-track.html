@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Lane Integration Test</title>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .pass { background: #d4edda; color: #155724; }
+    .fail { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+    button {
+      padding: 8px 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #0056b3; }
+    iframe {
+      width: 100%;
+      height: 800px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏃‍♂️ Track Lane Calculator Integration Test</h1>
+    
+    <div class="test-section info">
+      <h3>Test Information</h3>
+      <p>This page tests if the track lane calculator is properly integrated and working in both desktop and mobile versions.</p>
+      <p>Expected behavior:</p>
+      <ul>
+        <li>✅ Track lane calculator should appear in main pace calculator pages</li>
+        <li>✅ Table should populate with 8 lanes when calculated</li>
+        <li>✅ Track visualization should show oval shape with correct proportions</li>
+        <li>✅ Lane-specific speed calculation should be correct</li>
+        <li>✅ Section times should be displayed in the table</li>
+      </ul>
+    </div>
+    
+    <div class="test-section">
+      <h3>Quick Tests</h3>
+      <button onclick="testDesktop()">Test Desktop Version</button>
+      <button onclick="testMobile()">Test Mobile Version</button>
+      <button onclick="checkConsole()">Check Console Logs</button>
+    </div>
+    
+    <div id="testResults" class="test-section" style="display:none;">
+      <h3>Test Results</h3>
+      <div id="results"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3>Live Preview</h3>
+      <div>
+        <button onclick="loadDesktop()">Load Desktop Version</button>
+        <button onclick="loadMobile()">Load Mobile Version</button>
+      </div>
+      <iframe id="preview" src="pace-calculator.html"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function loadDesktop() {
+      document.getElementById('preview').src = 'pace-calculator.html#track';
+      setTimeout(() => {
+        // Try to scroll to track section
+        const iframe = document.getElementById('preview');
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const trackSection = iframeDoc.querySelector('[id*="track"], [id*="lane"]');
+          if (trackSection) {
+            trackSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch(e) {
+          console.log('Could not scroll to track section:', e);
+        }
+      }, 1000);
+    }
+    
+    function loadMobile() {
+      document.getElementById('preview').src = 'pace-calculator-mobile.html#track';
+    }
+    
+    function testDesktop() {
+      const results = document.getElementById('results');
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.style.display = 'block';
+      results.innerHTML = '<p>Testing Desktop Version...</p>';
+      
+      const iframe = document.getElementById('preview');
+      iframe.src = 'pace-calculator.html';
+      
+      setTimeout(() => {
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const tests = [];
+          
+          // Test 1: Check if lane calculator inputs exist
+          const targetTimeInput = iframeDoc.getElementById('laneTargetTime');
+          const laneSelectorInput = iframeDoc.getElementById('laneLaneSelector');
+          tests.push({
+            name: 'Lane Calculator Inputs',
+            passed: !!(targetTimeInput && laneSelectorInput),
+            details: targetTimeInput ? 'Found inputs' : 'Inputs not found'
+          });
+          
+          // Test 2: Check if table exists
+          const table = iframeDoc.getElementById('laneTimeTable');
+          tests.push({
+            name: 'Lane Time Table',
+            passed: !!table,
+            details: table ? `Table found with ${table.rows.length} rows` : 'Table not found'
+          });
+          
+          // Test 3: Check if SVG track exists
+          const svg = iframeDoc.getElementById('laneTrackLanes');
+          tests.push({
+            name: 'Track Visualization SVG',
+            passed: !!svg,
+            details: svg ? 'SVG element found' : 'SVG not found'
+          });
+          
+          // Test 4: Check if calculateLaneAll function exists
+          const hasFunction = typeof iframe.contentWindow.calculateLaneAll === 'function';
+          tests.push({
+            name: 'calculateLaneAll Function',
+            passed: hasFunction,
+            details: hasFunction ? 'Function exists' : 'Function not found'
+          });
+          
+          // Display results
+          let html = '<h4>Desktop Test Results:</h4>';
+          tests.forEach(test => {
+            const status = test.passed ? '✅' : '❌';
+            const className = test.passed ? 'pass' : 'fail';
+            html += `<div class="${className}" style="margin: 5px 0; padding: 5px;">
+              ${status} ${test.name}: ${test.details}
+            </div>`;
+          });
+          
+          // Try to trigger calculation
+          if (hasFunction && targetTimeInput && laneSelectorInput) {
+            html += '<p>Triggering calculation...</p>';
+            iframe.contentWindow.calculateLaneAll();
+            
+            setTimeout(() => {
+              const tableAfter = iframeDoc.getElementById('laneTimeTable');
+              html += `<div class="info" style="margin: 5px 0; padding: 5px;">
+                Table after calculation: ${tableAfter ? tableAfter.rows.length : 0} rows
+              </div>`;
+              results.innerHTML = html;
+            }, 500);
+          } else {
+            results.innerHTML = html;
+          }
+          
+        } catch(e) {
+          results.innerHTML = `<div class="fail">Error testing desktop version: ${e.message}</div>`;
+        }
+      }, 2000);
+    }
+    
+    function testMobile() {
+      const results = document.getElementById('results');
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.style.display = 'block';
+      results.innerHTML = '<p>Testing Mobile Version...</p>';
+      
+      const iframe = document.getElementById('preview');
+      iframe.src = 'pace-calculator-mobile.html';
+      
+      setTimeout(() => {
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const tests = [];
+          
+          // Test 1: Check if lane calculator inputs exist
+          const targetTimeInput = iframeDoc.getElementById('laneTargetTime');
+          const laneSelectorInput = iframeDoc.getElementById('laneLaneSelector');
+          tests.push({
+            name: 'Lane Calculator Inputs',
+            passed: !!(targetTimeInput && laneSelectorInput),
+            details: targetTimeInput ? 'Found inputs' : 'Inputs not found'
+          });
+          
+          // Test 2: Check if table exists
+          const table = iframeDoc.getElementById('laneTimeTable');
+          tests.push({
+            name: 'Lane Time Table',
+            passed: !!table,
+            details: table ? `Table found with ${table.rows.length} rows` : 'Table not found'
+          });
+          
+          // Test 3: Check if SVG track exists
+          const svg = iframeDoc.getElementById('laneTrackLanes');
+          tests.push({
+            name: 'Track Visualization SVG',
+            passed: !!svg,
+            details: svg ? 'SVG element found' : 'SVG not found'
+          });
+          
+          // Test 4: Check if calculateLaneAll function exists
+          const hasFunction = typeof iframe.contentWindow.calculateLaneAll === 'function';
+          tests.push({
+            name: 'calculateLaneAll Function',
+            passed: hasFunction,
+            details: hasFunction ? 'Function exists' : 'Function not found'
+          });
+          
+          // Display results
+          let html = '<h4>Mobile Test Results:</h4>';
+          tests.forEach(test => {
+            const status = test.passed ? '✅' : '❌';
+            const className = test.passed ? 'pass' : 'fail';
+            html += `<div class="${className}" style="margin: 5px 0; padding: 5px;">
+              ${status} ${test.name}: ${test.details}
+            </div>`;
+          });
+          
+          // Try to trigger calculation
+          if (hasFunction && targetTimeInput && laneSelectorInput) {
+            html += '<p>Triggering calculation...</p>';
+            iframe.contentWindow.calculateLaneAll();
+            
+            setTimeout(() => {
+              const tableAfter = iframeDoc.getElementById('laneTimeTable');
+              html += `<div class="info" style="margin: 5px 0; padding: 5px;">
+                Table after calculation: ${tableAfter ? tableAfter.rows.length : 0} rows
+              </div>`;
+              results.innerHTML = html;
+            }, 500);
+          } else {
+            results.innerHTML = html;
+          }
+          
+        } catch(e) {
+          results.innerHTML = `<div class="fail">Error testing mobile version: ${e.message}</div>`;
+        }
+      }, 2000);
+    }
+    
+    function checkConsole() {
+      const results = document.getElementById('results');
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.style.display = 'block';
+      
+      results.innerHTML = `
+        <div class="info">
+          <h4>How to Check Console Logs:</h4>
+          <ol>
+            <li>Right-click on the iframe below and select "Inspect"</li>
+            <li>Go to the "Console" tab</li>
+            <li>Click the "계산하기" button in the track calculator</li>
+            <li>Look for these messages:
+              <ul>
+                <li>"calculateLaneAll 함수 호출됨"</li>
+                <li>"계산된 레인 데이터: 8개 레인"</li>
+                <li>"테이블 업데이트 완료: 8개 행 추가됨"</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      `;
+    }
+    
+    // Load desktop version on start
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDesktop();
+    });
+  </script>
+</body>
+</html>
