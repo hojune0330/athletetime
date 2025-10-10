@@ -8,7 +8,7 @@
       "content": "이것은 테스트입니다",
       "password": "test123",
       "date": "2025-10-10T05:40:02.774Z",
-      "views": 0,
+      "views": 2,
       "likes": [],
       "dislikes": [],
       "comments": [],
@@ -61,5 +61,5 @@
       }
     ]
   },
-  "savedAt": "2025-10-10T08:09:52.848Z"
+  "savedAt": "2025-10-10T08:57:37.718Z"
 }

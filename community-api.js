@@ -1,31 +1,22 @@
 // 익명 게시판 API 연동 스크립트
 const CommunityAPI = {
-  // API 엔드포인트 - BackendConfig 사용 (있으면)
+  // API 엔드포인트 - 항상 백엔드 서버 사용
   getAPIUrl() {
-    // BackendConfig가 로드되었으면 사용
-    if (typeof BackendConfig !== 'undefined') {
-      return BackendConfig.getBackendURL();
+    // 로컬 개발 환경
+    if (window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:3005';
     }
     
-    // BackendConfig가 없으면 기존 로직 사용 (폴백)
-    if (window.location.hostname.includes('localhost')) {
-      return 'http://localhost:3000';
-    } else {
-      // 모든 프로덕션 환경에서 Render 백엔드 사용
-      return 'https://athletetime-backend.onrender.com';
-    }
+    // 프로덕션 환경 - Render 백엔드 사용
+    // Netlify, Vercel, 또는 어떤 프론트엔드 호스팅이든 Render 백엔드 연결
+    return 'https://athletetime-backend.onrender.com';
   },
 
   // 모든 게시글 가져오기
   async getPosts() {
     const apiUrl = this.getAPIUrl();
-    
-    // API URL이 없으면 localStorage만 사용
-    if (!apiUrl) {
-      console.log('📦 localStorage 모드 (Netlify 등 정적 호스팅)');
-      const saved = localStorage.getItem('athletetime_posts');
-      return saved ? JSON.parse(saved) : [];
-    }
+    console.log('🌐 API URL:', apiUrl);
     
     try {
       console.log('📡 API URL:', apiUrl);
@@ -58,21 +49,23 @@ const CommunityAPI = {
   // 조회수 증가
   async increaseViews(id) {
     const apiUrl = this.getAPIUrl();
-    if (!apiUrl) {
-      // localStorage 모드에서는 로컬 처리
-      return { success: true };
-    }
     
     try {
       const response = await fetch(`${apiUrl}/api/posts/${id}/views`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' }
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('✅ 조회수 증가 성공:', data);
       return data;
     } catch (error) {
-      console.error('조회수 증가 실패:', error);
-      return { success: false };
+      console.error('❌ 조회수 증가 API 오류:', error);
+      throw error; // 에러를 상위로 전파
     }
   },
 
