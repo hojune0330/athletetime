@@ -714,7 +714,8 @@
         ws.send(JSON.stringify({
           type: 'join',
           room: room,
-          nickname: nickname
+          nickname: nickname,
+          userId: userId
         }));
         
         currentRoom = room;
@@ -782,7 +783,10 @@
     // 메시지 추가
     function addMessage(msg, animate = true) {
       const container = document.getElementById('messagesContainer');
-      const isOwn = msg.nickname === nickname;
+      // userId로 먼저 비교하고, 없으면 nickname으로 비교
+      const isOwn = (msg.userId && msg.userId === userId) || 
+                    (msg.user_id && msg.user_id === userId) ||
+                    (msg.nickname === nickname && nickname !== '');
       
       const messageWrapper = document.createElement('div');
       messageWrapper.className = `message-wrapper ${isOwn ? 'own' : 'other'}`;
@@ -844,7 +848,8 @@
         ws.send(JSON.stringify({
           type: 'message',
           text: text,
-          nickname: nickname
+          nickname: nickname,
+          userId: userId
         }));
         
         input.value = '';
