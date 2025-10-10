@@ -8,7 +8,7 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3000;
 
 // CORS 설정
 app.use(cors({

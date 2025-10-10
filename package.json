@@ -4,7 +4,8 @@
   "description": "Athletic Time Backend Server",
   "main": "server-fixed.js",
   "scripts": {
-    "start": "node server-postgres.js",
+    "start": "node server-simple.js",
+    "start:postgres": "node server-postgres.js",
     "dev": "nodemon server.js",
     "chat": "node chat-server-enhanced.js",
     "community": "node community-server.js"
