@@ -1,0 +1,90 @@
+# Athletic Time - 육상인들을 위한 커뮤니티
+
+## 🔧 최근 수정 사항 (2025-10-10)
+
+### ✅ 게시글 삭제 기능 수정 완료
+- **문제**: "러닝 정보" 게시물 등을 비밀번호를 입력해도 삭제할 수 없었던 문제
+- **원인**: 
+  1. 클라이언트에서 API 호출 대신 로컬 배열만 수정
+  2. 서버에서 비밀번호 검증 없이 삭제 처리
+- **해결**:
+  1. `community.html`의 `deletePost()` 함수를 API 기반으로 변경
+  2. `server.js`의 DELETE 엔드포인트에 비밀번호 검증 추가
+  3. 에러 처리 및 사용자 피드백 개선
+
+### 테스트 방법
+```bash
+# 로컬 테스트
+node test-deletion.js
+
+# 프로덕션(Render) 테스트
+PROD=1 node test-deletion.js
+```
+
+## 🚀 배포 정보
+
+### Frontend (Netlify)
+- URL: https://athletetime.netlify.app
+- 자동 배포: GitHub main 브랜치 푸시 시
+
+### Backend (Render)
+- URL: https://athletetime-backend.onrender.com
+- 자동 배포: GitHub main 브랜치 푸시 시
+- 서비스: 통합 백엔드 (채팅 + 게시판)
+- 포트: 환경 변수 PORT (Render가 자동 설정)
+
+## 📁 프로젝트 구조
+
+```
+/home/user/webapp/
+├── index.html           # 메인 페이지
+├── community.html       # 커뮤니티 게시판
+├── chat.html           # 채팅방
+├── server.js           # 통합 백엔드 서버 (Render 배포용)
+├── community-api.js    # 게시판 API 클라이언트
+├── backend-config.js   # 백엔드 URL 설정
+├── test-deletion.js    # 삭제 기능 테스트 스크립트
+└── package.json        # 의존성 관리
+```
+
+## 🛠️ 주요 기능
+
+### 익명 게시판
+- ✅ 게시글 CRUD (생성, 읽기, 수정, 삭제)
+- ✅ 비밀번호 기반 수정/삭제
+- ✅ 댓글 기능
+- ✅ 좋아요/싫어요
+- ✅ 신고 및 자동 블라인드 (10회 이상)
+- ✅ 서버 기반 데이터 저장
+
+### 실시간 채팅
+- ✅ WebSocket 기반 실시간 통신
+- ✅ 모든 메시지 영구 저장
+- ✅ 입장 시 전체 메시지 히스토리 표시
+- ✅ 닉네임 및 아바타 설정
+
+## 📝 개발 노트
+
+### 데이터 저장
+- 게시판: `community-posts.json`
+- 채팅: `chat-messages.json`
+- 자동 저장: 5분마다 + 서버 종료 시
+
+### CORS 설정
+- 모든 도메인 허용 (`*`)
+- Netlify ↔ Render 통신 가능
+
+### 에러 처리
+- 네트워크 오류 시 localStorage 폴백
+- 서버 오류 시 사용자 친화적 메시지 표시
+
+## 🐛 알려진 이슈
+
+### 베타 서비스 안내
+- 간헐적인 서버 연결 지연 (Render 무료 플랜)
+- 첫 요청 시 서버 콜드 스타트 (최대 30초)
+
+## 📧 문의
+
+- Instagram: @athletic_time
+- GitHub: https://github.com/hojune0330/athletetime
