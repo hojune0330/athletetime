@@ -1,27 +1,24 @@
 {
-  "name": "athletetime",
-  "version": "2.0.0",
-  "description": "Athletic Time - Full Stack Web Application",
+  "name": "athlete-time-backend",
+  "version": "1.0.0",
+  "description": "Athletic Time Backend Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'No build needed for static files'"
+    "chat": "node chat-server-enhanced.js",
+    "community": "node community-server.js"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.21.2",
-    "pg": "^8.11.3",
-    "redis": "^4.6.10",
-    "ws": "^8.18.3"
+    "ws": "^8.14.2",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=18.0.0"
-  },
-  "author": "Athlete Time Team",
-  "license": "MIT"
+    "node": ">=14.0.0"
+  }
 }

@@ -1,41 +1,11 @@
 services:
-  # 백엔드 서버 (채팅 + API)
   - type: web
-    name: athletetime-backend
-    env: node
-    region: singapore
-    plan: free
+    name: athlete-time-backend
+    runtime: node
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: CORS_ORIGIN
-        value: https://athlete-time.netlify.app
-      - key: DATABASE_URL
-        fromDatabase:
-          name: athletetime-db
-          property: connectionString
-
-  # 정적 사이트 호스팅
-  - type: web
-    name: athletetime-frontend
-    env: static
-    buildCommand: echo "No build needed"
-    staticPublishPath: .
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: SAMEORIGIN
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://athletetime-backend.onrender.com/api/*
-
-databases:
-  # PostgreSQL 데이터베이스
-  - name: athletetime-db
-    databaseName: athletetime
-    user: athletetime
-    region: singapore
-    # Free tier database (no plan specification needed for free tier)
+    healthCheckPath: /
+    autoDeploy: true

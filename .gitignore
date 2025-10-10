@@ -1,28 +1,7 @@
-# 테스트 및 임시 파일
-test-*.html
-*-test.html
-*-backup*.html
-*-broken.html
-*-fixed.html
-*-temp.html
-debug-*.html
-
-# 아카이브 디렉토리
-/archive/
-
-# 개발 중 생성되는 파일
-*.log
-*.tmp
+node_modules/
+.env
 .DS_Store
-
-# 에디터 설정
-.vscode/
-.idea/
-
-# 백업 폴더
-/backup/
-/backups/
-
-# 로컬 개발 파일
-local-*.html
-dev-*.html
+*.log
+chat-messages.json
+community-posts.json
+*.backup
