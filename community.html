@@ -634,6 +634,16 @@
         const saved = (function() { try { return localStorage.getItem(STORAGE_KEY); } catch(e) { console.error('Storage error:', e); return null; } })();
         posts = saved ? JSON.parse(saved) : [];
       }
+      
+      // 모든 게시글의 views 필드 초기화 (없으면 0으로)
+      posts.forEach(post => {
+        if (post.views === undefined || post.views === null) {
+          post.views = 0;
+        }
+      });
+      
+      // 초기화된 데이터 저장
+      savePosts();
     }
     
     function savePosts() {
@@ -678,7 +688,7 @@
                   <span>•</span>
                   <span>${formatTime(post.date)}</span>
                   <span>•</span>
-                  <span><i class="far fa-eye"></i> ${post.views}</span>
+                  <span><i class="far fa-eye"></i> ${post.views || 0}</span>
                   <span><i class="far fa-comment"></i> ${post.comments.filter(c => !c.isBlinded).length}</span>
                   <span><i class="far fa-thumbs-up"></i> ${post.likes.length}</span>
                   ${post.images && post.images.length > 0 ? `<span><i class="far fa-image"></i> ${post.images.length}</span>` : ''}
@@ -746,19 +756,24 @@
         currentPost.comments = [];
       }
       
-      // 조회수 증가 - 서버 API 호출
+      // 조회수 증가 - 서버 API 호출 또는 로컬 처리
+      // views가 undefined나 null인 경우 0으로 초기화
+      if (currentPost.views === undefined || currentPost.views === null) {
+        currentPost.views = 0;
+      }
+      
       try {
         const result = await CommunityAPI.increaseViews(postId);
-        if (result.success && result.views) {
+        if (result.success && result.views !== undefined) {
           currentPost.views = result.views;
         } else {
           // 서버 응답이 없으면 로컬에서만 증가
-          currentPost.views++;
+          currentPost.views = (currentPost.views || 0) + 1;
         }
       } catch (error) {
         console.error('조회수 API 호출 실패:', error);
         // 오류 발생시 로컬에서만 증가
-        currentPost.views++;
+        currentPost.views = (currentPost.views || 0) + 1;
       }
       
       savePosts();
@@ -792,7 +807,7 @@
               <span>•</span>
               <span>${formatTime(currentPost.date)}</span>
               <span>•</span>
-              <span>조회 ${currentPost.views}</span>
+              <span>조회 ${currentPost.views || 0}</span>
             </div>
           </div>
           
