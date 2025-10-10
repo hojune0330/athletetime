@@ -1,21 +1,17 @@
 // 익명 게시판 API 연동 스크립트
 const CommunityAPI = {
-  // API 엔드포인트
+  // API 엔드포인트 - BackendConfig 사용 (있으면)
   getAPIUrl() {
-    // 환경에 따라 URL 변경
+    // BackendConfig가 로드되었으면 사용
+    if (typeof BackendConfig !== 'undefined') {
+      return BackendConfig.getBackendURL();
+    }
+    
+    // BackendConfig가 없으면 기존 로직 사용 (폴백)
     if (window.location.hostname.includes('localhost')) {
-      return 'http://localhost:3005';
-    } else if (window.location.hostname.includes('e2b.dev')) {
-      // e2b.dev 환경에서는 포트만 바꿔서 사용
-      const hostname = window.location.hostname;
-      const parts = hostname.split('-');
-      // 3000-xxx-xxx.e2b.dev를 3005-xxx-xxx.e2b.dev로 변경
-      return `https://3005-${parts.slice(1).join('-')}`;
-    } else if (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('athlete-time')) {
-      // Netlify 및 athlete-time 도메인에서 Render 백엔드 사용
-      return 'https://athletetime-backend.onrender.com';
+      return 'http://localhost:3000';
     } else {
-      // 기타 배포 환경도 Render 백엔드 사용
+      // 모든 프로덕션 환경에서 Render 백엔드 사용
       return 'https://athletetime-backend.onrender.com';
     }
   },
