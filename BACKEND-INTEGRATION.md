@@ -1,4 +1,4 @@
-# 🔧 Athletic Time 백엔드 통합 문서
+# 🔧 Athlete Time 백엔드 통합 문서
 
 ## 📍 백엔드 서버 정보
 - **URL**: `https://athletetime-backend.onrender.com`

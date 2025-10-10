@@ -1,5 +1,5 @@
 /**
- * Athletic Time 백엔드 통합 설정
+ * Athlete Time 백엔드 통합 설정
  * 이 파일에서 모든 백엔드 URL을 중앙 관리합니다.
  * 
  * Render Starter 플랜 사용 중 - 24/7 운영
@@ -157,7 +157,7 @@ const BackendConfig = {
    * 초기화 및 디버깅 정보
    */
   init() {
-    console.log('🔧 Athletic Time Backend Configuration');
+    console.log('🔧 Athlete Time Backend Configuration');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📍 Current Host:', window.location.hostname);
     console.log('🌍 Environment:', this.isProduction() ? 'Production' : 

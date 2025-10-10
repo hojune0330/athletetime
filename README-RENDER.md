@@ -1,4 +1,4 @@
-# Athletic Time 백엔드 서버 - Render 배포 가이드
+# Athlete Time 백엔드 서버 - Render 배포 가이드
 
 ## 🚀 Render.com 배포 방법
 

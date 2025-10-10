@@ -592,7 +592,7 @@ app.get('/', (req, res) => {
   
   res.json({
     status: 'running',
-    service: 'Athletic Time Backend (Improved)',
+    service: 'Athlete Time Backend (Improved)',
     version: '2.0',
     endpoints: {
       websocket: '/ws',
@@ -611,7 +611,7 @@ async function startServer() {
   server.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════════╗
-║     🚀 Athletic Time 백엔드 서버 v2.0      ║
+║     🚀 Athlete Time 백엔드 서버 v2.0      ║
 ╠════════════════════════════════════════════╣
 ║  포트: ${PORT}                              ║
 ║  WebSocket: ws://localhost:${PORT}/ws       ║
