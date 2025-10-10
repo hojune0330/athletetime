@@ -737,7 +737,7 @@
     }
     
     // ===== 게시물 보기 =====
-    function viewPost(postId) {
+    async function viewPost(postId) {
       currentPost = posts.find(p => p.id === postId);
       if (!currentPost) return;
       
@@ -746,8 +746,21 @@
         currentPost.comments = [];
       }
       
-      // 조회수 증가
-      currentPost.views++;
+      // 조회수 증가 - 서버 API 호출
+      try {
+        const result = await CommunityAPI.increaseViews(postId);
+        if (result.success && result.views) {
+          currentPost.views = result.views;
+        } else {
+          // 서버 응답이 없으면 로컬에서만 증가
+          currentPost.views++;
+        }
+      } catch (error) {
+        console.error('조회수 API 호출 실패:', error);
+        // 오류 발생시 로컬에서만 증가
+        currentPost.views++;
+      }
+      
       savePosts();
       
       // 게시물 상세 렌더링

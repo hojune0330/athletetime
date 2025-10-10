@@ -55,6 +55,27 @@ const CommunityAPI = {
     }
   },
 
+  // 조회수 증가
+  async increaseViews(id) {
+    const apiUrl = this.getAPIUrl();
+    if (!apiUrl) {
+      // localStorage 모드에서는 로컬 처리
+      return { success: true };
+    }
+    
+    try {
+      const response = await fetch(`${apiUrl}/api/posts/${id}/views`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('조회수 증가 실패:', error);
+      return { success: false };
+    }
+  },
+
   // 게시글 작성
   async createPost(postData) {
     try {

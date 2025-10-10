@@ -436,6 +436,29 @@ app.post('/api/posts/:id/comments', async (req, res) => {
   }
 });
 
+// 조회수 증가
+app.put('/api/posts/:id/views', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // 조회수 증가 및 현재 조회수 반환
+    const { rows } = await pool.query(
+      'UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING views',
+      [id]
+    );
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
+    }
+    
+    console.log(`👁️ 조회수 증가: Post ${id} - ${rows[0].views} views`);
+    res.json({ success: true, views: rows[0].views });
+  } catch (error) {
+    console.error('조회수 증가 오류:', error);
+    res.status(500).json({ success: false, message: '서버 오류' });
+  }
+});
+
 // 투표
 app.post('/api/posts/:id/vote', async (req, res) => {
   try {
