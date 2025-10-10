@@ -113,10 +113,10 @@ async function initDatabase() {
       console.log('posts 테이블 password 컬럼 이미 변경됨 또는 테이블 없음');
     });
 
-    // posts 테이블 생성
+    // posts 테이블 생성 (ID를 BIGINT로 변경하여 JavaScript Date.now()와 호환)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS posts (
-        id SERIAL PRIMARY KEY,
+        id BIGINT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         author VARCHAR(100) NOT NULL,
         content TEXT,
@@ -133,11 +133,11 @@ async function initDatabase() {
       )
     `);
 
-    // comments 테이블 생성
+    // comments 테이블 생성 (post_id를 BIGINT로 맞춤)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS comments (
-        id SERIAL PRIMARY KEY,
-        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        id BIGINT PRIMARY KEY,
+        post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
         author VARCHAR(100) NOT NULL,
         content TEXT NOT NULL,
         password VARCHAR(255), -- bcrypt 해시용
@@ -198,6 +198,7 @@ app.get('/api/posts', async (req, res) => {
 app.get('/api/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log(`🔍 게시글 상세 조회: ID ${id}`);
     
     const { rows: postRows } = await pool.query(
       'SELECT * FROM posts WHERE id = $1',
@@ -205,23 +206,34 @@ app.get('/api/posts/:id', async (req, res) => {
     );
     
     if (postRows.length === 0) {
+      console.log(`⚠️ 게시글 없음: ID ${id}`);
       return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
     }
     
+    console.log(`✅ 게시글 찾음: "${postRows[0].title}"`);
+    
+    // 댓글 조회 (비밀번호 제외)
     const { rows: commentRows } = await pool.query(
       'SELECT id, post_id, author, content, instagram, created_at FROM comments WHERE post_id = $1 ORDER BY created_at DESC',
       [id]
     );
     
+    console.log(`💬 댓글 ${commentRows.length}개 조회됨`);
+    
     const post = {
       ...postRows[0],
       password: undefined, // 비밀번호 제거
-      comments: commentRows
+      likes: postRows[0].likes || [],
+      dislikes: postRows[0].dislikes || [],
+      images: postRows[0].images || [],
+      comments: commentRows || []
     };
     
+    console.log(`📤 응답 전송: 게시글 + 댓글 ${post.comments.length}개`);
     res.json({ success: true, post });
   } catch (error) {
     console.error('게시글 상세 조회 오류:', error);
+    console.error('오류 상세:', error.stack);
     res.status(500).json({ success: false, message: '서버 오류' });
   }
 });
@@ -250,10 +262,13 @@ app.post('/api/posts', createPostLimiter, async (req, res) => {
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     
+    // ID를 명시적으로 생성 (JavaScript의 Date.now()와 호환성 유지)
+    const postId = Date.now();
+    
     const { rows } = await pool.query(
-      `INSERT INTO posts (title, author, content, category, password, images)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [cleanTitle, cleanAuthor, cleanContent, category, hashedPassword, JSON.stringify(images || [])]
+      `INSERT INTO posts (id, title, author, content, category, password, images)
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [postId, cleanTitle, cleanAuthor, cleanContent, category, hashedPassword, JSON.stringify(images || [])]
     );
     
     // 비밀번호 제거 후 응답
@@ -444,12 +459,18 @@ app.post('/api/posts/:id/comments', commentLimiter, async (req, res) => {
     // 비밀번호 해싱 (있는 경우)
     const hashedPassword = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
     
+    // 댓글 ID 명시적 생성
+    const commentId = Date.now();
+    
     const { rows } = await pool.query(
-      `INSERT INTO comments (post_id, author, content, password, instagram) 
-       VALUES ($1, $2, $3, $4, $5) 
+      `INSERT INTO comments (id, post_id, author, content, password, instagram) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
        RETURNING id, post_id, author, content, instagram, created_at`,
-      [id, cleanAuthor, cleanContent, hashedPassword, cleanInstagram]
+      [commentId, id, cleanAuthor, cleanContent, hashedPassword, cleanInstagram]
     );
+    
+    console.log(`✅ 댓글 작성 성공: Post ${id}, 작성자 "${cleanAuthor}"`);
+    console.log(`   댓글 ID: ${rows[0].id}`);
     
     res.json({ success: true, comment: rows[0] });
   } catch (error) {
