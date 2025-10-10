@@ -8,7 +8,7 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
 
 // CORS 설정
 app.use(cors({
@@ -336,6 +336,25 @@ app.post('/api/posts/:id/comments', async (req, res) => {
   await saveData();
   
   res.json({ success: true, comment: newComment, post });
+});
+
+// 조회수 증가
+app.put('/api/posts/:id/views', async (req, res) => {
+  const postId = parseInt(req.params.id);
+  const post = posts.find(p => p.id === postId);
+  
+  if (!post) {
+    return res.status(404).json({ 
+      success: false, 
+      message: '게시글을 찾을 수 없습니다' 
+    });
+  }
+  
+  post.views = (post.views || 0) + 1;
+  await saveData();
+  
+  console.log(`✅ 조회수 증가: ID ${postId} → ${post.views}회`);
+  res.json({ success: true, views: post.views });
 });
 
 // 투표
