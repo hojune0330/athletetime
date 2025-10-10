@@ -6,21 +6,42 @@ const CommunityAPI = {
     if (window.location.hostname.includes('localhost')) {
       return 'http://localhost:3005';
     } else if (window.location.hostname.includes('e2b.dev')) {
-      return 'https://3005-' + window.location.hostname.split('-')[1];
+      // e2b.dev 환경에서는 포트만 바꿔서 사용
+      const hostname = window.location.hostname;
+      const parts = hostname.split('-');
+      // 3000-xxx-xxx.e2b.dev를 3005-xxx-xxx.e2b.dev로 변경
+      return `https://3005-${parts.slice(1).join('-')}`;
+    } else if (window.location.hostname.includes('netlify.app') || window.location.hostname.includes('athlete-time')) {
+      // Netlify 및 athlete-time 도메인에서 Render 백엔드 사용
+      // 여기에 Render.com에 배포한 백엔드 URL을 입력하세요
+      return 'https://your-render-backend.onrender.com'; // 🔴 이 부분을 실제 Render URL로 변경하세요!
     } else {
-      // 실제 배포 서버 URL (나중에 설정)
-      return 'https://your-api-server.com';
+      // 기타 배포 환경도 Render 백엔드 사용
+      return 'https://your-render-backend.onrender.com'; // 🔴 이 부분을 실제 Render URL로 변경하세요!
     }
   },
 
   // 모든 게시글 가져오기
   async getPosts() {
+    const apiUrl = this.getAPIUrl();
+    
+    // API URL이 없으면 localStorage만 사용
+    if (!apiUrl) {
+      console.log('📦 localStorage 모드 (Netlify 등 정적 호스팅)');
+      const saved = localStorage.getItem('athletetime_posts');
+      return saved ? JSON.parse(saved) : [];
+    }
+    
     try {
-      const response = await fetch(`${this.getAPIUrl()}/api/posts`);
+      console.log('📡 API URL:', apiUrl);
+      const response = await fetch(`${apiUrl}/api/posts`);
+      console.log('📡 Response status:', response.status);
       const data = await response.json();
+      console.log('📡 Response data:', data);
       return data.success ? data.posts : [];
     } catch (error) {
       console.error('게시글 로드 실패:', error);
+      console.error('Error details:', error.message);
       // localStorage 폴백
       const saved = localStorage.getItem('athletetime_posts');
       return saved ? JSON.parse(saved) : [];
@@ -42,12 +63,18 @@ const CommunityAPI = {
   // 게시글 작성
   async createPost(postData) {
     try {
-      const response = await fetch(`${this.getAPIUrl()}/api/posts`, {
+      const apiUrl = this.getAPIUrl();
+      console.log('📤 Creating post at:', apiUrl);
+      console.log('📤 Post data:', postData);
+      
+      const response = await fetch(`${apiUrl}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postData)
       });
+      console.log('📤 Create response status:', response.status);
       const data = await response.json();
+      console.log('📤 Create response data:', data);
       
       if (!data.success) throw new Error(data.message);
       

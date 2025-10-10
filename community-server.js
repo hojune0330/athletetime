@@ -2,9 +2,12 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const fs = require('fs').promises;
+const path = require('path');
 
 const app = express();
 const PORT = 3005;
+const DATA_FILE = path.join(__dirname, 'community-posts.json');
 
 // CORS 설정
 app.use(cors({
@@ -17,13 +20,35 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // 게시글 데이터 (메모리 저장)
-let posts = [
-  {
-    id: Date.now() - 1000000,
-    category: '공지',
-    title: '🎉 애슬리트 타임 커뮤니티 오픈!',
-    author: '관리자',
-    content: `안녕하세요, 육상인 여러분!
+let posts = [];
+
+// 데이터 저장 함수
+async function savePosts() {
+  try {
+    await fs.writeFile(DATA_FILE, JSON.stringify(posts, null, 2));
+    console.log(`💾 ${posts.length}개 게시글 저장 완료`);
+  } catch (error) {
+    console.error('❌ 게시글 저장 실패:', error);
+  }
+}
+
+// 데이터 로드 함수
+async function loadPosts() {
+  try {
+    const data = await fs.readFile(DATA_FILE, 'utf-8');
+    posts = JSON.parse(data);
+    console.log(`📂 ${posts.length}개 게시글 로드 완료`);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('📝 저장된 게시글 없음 - 기본 게시글로 시작');
+      // 기본 공지사항 추가
+      posts = [
+        {
+          id: Date.now() - 1000000,
+          category: '공지',
+          title: '🎉 애슬리트 타임 커뮤니티 오픈!',
+          author: '관리자',
+          content: `안녕하세요, 육상인 여러분!
     
 애슬리트 타임이 오픈했습니다.
 자유롭게 소통하고 정보를 공유해주세요!
@@ -35,18 +60,27 @@ let posts = [
 • 서로 존중하는 문화 만들기
 
 모두 함께 건전한 육상 커뮤니티를 만들어가요! 🏃‍♂️`,
-    password: 'admin',
-    date: new Date().toISOString(),
-    views: 0,
-    likes: [],
-    dislikes: [],
-    comments: [],
-    reports: [],
-    isNotice: true,
-    isAdmin: true,
-    isBlinded: false
+          password: 'admin',
+          date: new Date().toISOString(),
+          views: 0,
+          likes: [],
+          dislikes: [],
+          comments: [],
+          reports: [],
+          isNotice: true,
+          isAdmin: true,
+          isBlinded: false
+        }
+      ];
+      await savePosts();
+    } else {
+      console.error('❌ 게시글 로드 실패:', error);
+    }
   }
-];
+}
+
+// 서버 시작 시 데이터 로드
+loadPosts();
 
 // 통계
 let stats = {
@@ -80,7 +114,7 @@ app.get('/api/posts/:id', (req, res) => {
 });
 
 // 게시글 작성
-app.post('/api/posts', (req, res) => {
+app.post('/api/posts', async (req, res) => {
   const { category, title, author, content, password, instagram, images, poll } = req.body;
   
   const newPost = {
@@ -106,6 +140,9 @@ app.post('/api/posts', (req, res) => {
   
   posts.unshift(newPost);
   stats.totalPosts++;
+  
+  // 데이터 저장
+  await savePosts();
   
   res.json({ success: true, post: newPost });
   
@@ -135,7 +172,7 @@ app.put('/api/posts/:id', (req, res) => {
 });
 
 // 게시글 삭제
-app.delete('/api/posts/:id', (req, res) => {
+app.delete('/api/posts/:id', async (req, res) => {
   const { password } = req.body;
   const postIndex = posts.findIndex(p => p.id == req.params.id);
   
@@ -152,6 +189,9 @@ app.delete('/api/posts/:id', (req, res) => {
   
   posts.splice(postIndex, 1);
   stats.totalPosts--;
+  
+  // 데이터 저장
+  await savePosts();
   
   res.json({ success: true, message: '게시글이 삭제되었습니다.' });
   
@@ -270,9 +310,24 @@ server.listen(PORT, () => {
   console.log(`📊 초기 데이터: ${posts.length}개 게시글`);
 });
 
+// 5분마다 자동 저장
+setInterval(() => {
+  savePosts().catch(err => console.error('자동 저장 실패:', err));
+}, 5 * 60 * 1000);
+
 // 정리 작업
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('\n🛑 서버 종료 중...');
+  await savePosts(); // 종료 전 저장
+  server.close(() => {
+    console.log('✅ 게시판 서버가 정상적으로 종료되었습니다.');
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 서버 종료 중...');
+  await savePosts(); // 종료 전 저장
   server.close(() => {
     console.log('✅ 게시판 서버가 정상적으로 종료되었습니다.');
     process.exit(0);

@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
+const fs = require('fs').promises;
 
 const app = express();
 const server = http.createServer(app);
@@ -28,153 +29,95 @@ const activeUsers = new Map(); // userId -> {nickname, lastSeen, rooms}
 
 // 상수
 const ROOM_INACTIVE_TIMEOUT = 30 * 60 * 1000; // 30분
-const MESSAGE_RETENTION_TIME = 24 * 60 * 60 * 1000; // 24시간
+const MESSAGE_RETENTION_TIME = 24 * 60 * 60 * 1000; // 24시간 (사용 안 함)
 const PERMANENT_ROOMS = ['main'];
+const MESSAGE_SAVE_FILE = path.join(__dirname, 'chat-messages.json');
+
+// 메시지 저장 함수
+async function saveMessages() {
+  try {
+    const messageData = {};
+    rooms.forEach((room, roomId) => {
+      messageData[roomId] = room.messages;
+    });
+    
+    await fs.writeFile(MESSAGE_SAVE_FILE, JSON.stringify(messageData, null, 2));
+    console.log(`💾 메시지 저장 완료: ${Object.keys(messageData).reduce((sum, key) => sum + messageData[key].length, 0)}개`);
+  } catch (error) {
+    console.error('❌ 메시지 저장 실패:', error);
+  }
+}
+
+// 메시지 복원 함수
+async function loadMessages() {
+  try {
+    const data = await fs.readFile(MESSAGE_SAVE_FILE, 'utf-8');
+    const messageData = JSON.parse(data);
+    
+    let totalLoaded = 0;
+    Object.keys(messageData).forEach(roomId => {
+      if (rooms.has(roomId)) {
+        const room = rooms.get(roomId);
+        room.messages = messageData[roomId] || [];
+        totalLoaded += room.messages.length;
+        console.log(`📂 [${room.name}] ${room.messages.length}개 메시지 복원`);
+      }
+    });
+    
+    console.log(`✅ 총 ${totalLoaded}개 메시지 복원 완료`);
+    return messageData;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('📝 저장된 메시지 파일 없음 - 새로 시작');
+    } else {
+      console.error('❌ 메시지 복원 실패:', error);
+    }
+    return {};
+  }
+}
 
 // 기본 채팅방 초기화 - 메인 채팅방 1개만
 const defaultRooms = [
   { id: 'main', name: '메인 채팅방', desc: '모든 러너 환영', icon: '💬' }
 ];
 
-defaultRooms.forEach(room => {
-  rooms.set(room.id, {
-    ...room,
-    users: new Set(),
-    messages: [
-      // 24시간 테스트용 메시지들 (다양한 시간대)
-      {
-        id: 'test_msg_1',
-        text: '🌅 어제 아침 러닝 완료! 상쾌한 하루 시작!',
-        nickname: '새벽러너',
-        avatar: '🌅',
-        userId: 'morning_runner',
-        timestamp: new Date(Date.now() - 23 * 3600000).toISOString(), // 23시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_2',
-        text: '오늘 대회 잘 마쳤습니다! 개인 기록 갱신! 🎉',
-        nickname: '마라토너',
-        avatar: '🏃',
-        userId: 'marathoner',
-        timestamp: new Date(Date.now() - 20 * 3600000).toISOString(), // 20시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_3',
-        text: '축하드려요! 얼마나 단축하셨어요?',
-        nickname: '러닝맨',
-        avatar: '👟',
-        userId: 'runner3',
-        timestamp: new Date(Date.now() - 19.5 * 3600000).toISOString(), // 19.5시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_4',
-        text: '3분 단축했어요! 꾸준한 훈련의 결과네요 💪',
-        nickname: '마라토너',
-        avatar: '🏃',
-        userId: 'marathoner',
-        timestamp: new Date(Date.now() - 19 * 3600000).toISOString(), // 19시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_5',
-        text: '대단하시네요! 비결이 뭔가요?',
-        nickname: '초보러너',
-        avatar: '🔰',
-        userId: 'beginner',
-        timestamp: new Date(Date.now() - 12 * 3600000).toISOString(), // 12시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_6',
-        text: '인터벌 트레이닝과 LSD를 병행했어요',
-        nickname: '마라토너',
-        avatar: '🏃',
-        userId: 'marathoner',
-        timestamp: new Date(Date.now() - 11 * 3600000).toISOString(), // 11시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_7',
-        text: '저녁에 한강 러닝 하실 분?',
-        nickname: '한강러너',
-        avatar: '🌉',
-        userId: 'hangang',
-        timestamp: new Date(Date.now() - 6 * 3600000).toISOString(), // 6시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_8',
-        text: '저 갈게요! 몇 시에 모일까요?',
-        nickname: '러닝메이트',
-        avatar: '🤝',
-        userId: 'mate1',
-        timestamp: new Date(Date.now() - 5.5 * 3600000).toISOString(), // 5.5시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_9',
-        text: '7시 반월드컵대교 아래서 만나요!',
-        nickname: '한강러너',
-        avatar: '🌉',
-        userId: 'hangang',
-        timestamp: new Date(Date.now() - 5 * 3600000).toISOString(), // 5시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_10',
-        text: '👋 환영합니다! 애슬리트 타임 채팅방입니다.',
-        nickname: '관리자',
-        avatar: '👨‍💼',
-        userId: 'admin',
-        timestamp: new Date(Date.now() - 3600000).toISOString(), // 1시간 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_11',
-        text: '방금 5km 완주! 오늘도 목표 달성 ✅',
-        nickname: '저녁러너',
-        avatar: '🌆',
-        userId: 'evening',
-        timestamp: new Date(Date.now() - 1800000).toISOString(), // 30분 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_12',
-        text: '수고하셨어요! 페이스는 어떠셨나요?',
-        nickname: '러너K',
-        avatar: '🎯',
-        userId: 'runnerk',
-        timestamp: new Date(Date.now() - 900000).toISOString(), // 15분 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_13',
-        text: '킬로 5분 30초 페이스로 뛰었어요!',
-        nickname: '저녁러너',
-        avatar: '🌆',
-        userId: 'evening',
-        timestamp: new Date(Date.now() - 600000).toISOString(), // 10분 전
-        room: room.id
-      },
-      {
-        id: 'test_msg_14',
-        text: '좋은 페이스네요! 저도 내일 아침 뛰어야겠어요',
-        nickname: '러너K',
-        avatar: '🎯',
-        userId: 'runnerk',
-        timestamp: new Date(Date.now() - 300000).toISOString(), // 5분 전
-        room: room.id
-      }
-    ],
-    created: new Date().toISOString(),
-    lastActivity: new Date().toISOString(),
-    permanent: true,
-    private: false
+// 방 초기화 함수
+async function initializeRooms() {
+  // 기본 방 생성
+  defaultRooms.forEach(room => {
+    rooms.set(room.id, {
+      ...room,
+      users: new Set(),
+      messages: [], // 빈 배열로 시작 (나중에 복원)
+      created: new Date().toISOString(),
+      lastActivity: new Date().toISOString(),
+      permanent: PERMANENT_ROOMS.includes(room.id)
+    });
   });
-});
+  
+  // 저장된 메시지 복원
+  const savedMessages = await loadMessages();
+  
+  // 복원된 메시지가 없는 경우에만 테스트 메시지 추가
+  const mainRoom = rooms.get('main');
+  if (mainRoom && (!mainRoom.messages || mainRoom.messages.length === 0)) {
+    mainRoom.messages = [
+      // 초기 환영 메시지만 추가
+      {
+        id: 'welcome_msg',
+        text: '🎉 채팅방에 오신 것을 환영합니다! 모든 메시지는 영구 보존됩니다.',
+        nickname: '시스템',
+        avatar: '📢',
+        userId: 'system',
+        timestamp: new Date().toISOString(),
+        room: 'main'
+      }
+    ];
+  }
+}
+
+// 서버 시작 시 방 초기화
+initializeRooms();
 
 // 통계 데이터
 let stats = {
@@ -438,6 +381,9 @@ function handleChatMessage(clientId, data) {
   // 디버깅: 메시지 저장 확인
   console.log(`💾 [${room.name}] 메시지 저장됨. 총 메시지: ${room.messages.length}개`);
   
+  // 파일에 저장 (비동기)
+  saveMessages().catch(err => console.error('메시지 저장 실패:', err));
+  
   // 활동 시간 업데이트
   updateRoomActivity(client.currentRoom);
   
@@ -695,33 +641,19 @@ function broadcastStats() {
   });
 }
 
-// 24시간 지난 메시지 삭제 함수
+// 메시지 정리 함수 - 비활성화됨 (모든 메시지 영구 보존)
 function cleanupOldMessages() {
-  const now = Date.now();
-  const twentyFourHoursAgo = now - MESSAGE_RETENTION_TIME;
-  let totalDeleted = 0;
+  // 메시지 삭제 비활성화 - 모든 메시지를 영구적으로 보존
+  console.log('✨ 메시지 영구 보존 모드 - 삭제하지 않음');
   
+  // 통계 정보만 출력
+  let totalMessages = 0;
   rooms.forEach((room) => {
-    const initialLength = room.messages.length;
-    room.messages = room.messages.filter(msg => {
-      const msgTime = new Date(msg.timestamp || msg.createdAt).getTime();
-      return msgTime > twentyFourHoursAgo;
-    });
-    
-    const deletedFromRoom = initialLength - room.messages.length;
-    if (deletedFromRoom > 0) {
-      console.log(`🗑️ [${room.name}] ${deletedFromRoom}개 메시지 삭제 (${initialLength} → ${room.messages.length})`);
-      totalDeleted += deletedFromRoom;
-    }
+    totalMessages += room.messages.length;
+    console.log(`📊 [${room.name}] 보존된 메시지: ${room.messages.length}개`);
   });
   
-  if (totalDeleted > 0) {
-    if (!stats.messagesDeleted) stats.messagesDeleted = 0;
-    stats.messagesDeleted += totalDeleted;
-    console.log(`🧹 총 ${totalDeleted}개의 24시간 지난 메시지 정리 완료`);
-  } else {
-    console.log('✨ 정리할 오래된 메시지 없음');
-  }
+  console.log(`💾 전체 보존된 메시지: ${totalMessages}개`);
 }
 
 // 연결 상태 체크 (30초마다)
@@ -737,12 +669,18 @@ const interval = setInterval(() => {
   console.log(`📊 현재 상태: ${clients.size}명 접속, ${rooms.size}개 방, ${stats.totalMessages}개 메시지`);
 }, 30000);
 
-// 24시간 지난 메시지 정리 (1시간마다)
+// 메시지 통계 확인 및 저장 (1시간마다)
 setInterval(() => {
-  cleanupOldMessages();
-}, 60 * 60 * 1000); // 1시간마다 메시지 정리
+  cleanupOldMessages(); // 통계만 출력, 삭제하지 않음
+  saveMessages().catch(err => console.error('주기적 저장 실패:', err)); // 메시지 백업
+}, 60 * 60 * 1000); // 1시간마다
 
-// 서버 시작 시 한 번 실행
+// 5분마다 메시지 자동 저장 (더 자주 저장)
+setInterval(() => {
+  saveMessages().catch(err => console.error('자동 저장 실패:', err));
+}, 5 * 60 * 1000); // 5분마다
+
+// 서버 시작 시 메시지 통계 확인
 cleanupOldMessages();
 
 // 서버 종료 시 정리
@@ -781,7 +719,7 @@ server.listen(PORT, () => {
 ║  ✅ 메인 채팅방 + 사용자 채팅방          ║
 ║  ✅ 30분 무응답 시 방 자동 삭제           ║
 ║  ✅ 실시간 통계                            ║
-║  ✅ 메시지 히스토리                        ║
+║  ✅ 메시지 영구 보존 (파일 저장)         ║
 ║  ✅ 타이핑 표시                            ║
 ║  ✅ 연결 상태 체크                         ║
 ╠════════════════════════════════════════════╣
@@ -789,6 +727,19 @@ server.listen(PORT, () => {
 ║  • 메인 채팅방 (영구)                     ║
 ╚════════════════════════════════════════════╝
   `);
+});
+
+// 프로세스 종료 시 메시지 저장
+process.on('SIGINT', async () => {
+  console.log('\n🔴 서버 종료 중...');
+  await saveMessages();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n🔴 서버 종료 중...');
+  await saveMessages();
+  process.exit(0);
 });
 
 // 정리 작업
