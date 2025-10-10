@@ -889,27 +889,37 @@
     }
     
     // ===== 투표 기능 =====
-    function vote(type) {
+    async function vote(type) {
       if (!currentPost) return;
       
-      // 배열 초기화
-      if (!currentPost.likes) currentPost.likes = [];
-      if (!currentPost.dislikes) currentPost.dislikes = [];
-      
-      // 기존 투표 제거
-      currentPost.likes = currentPost.likes.filter(id => id !== userId);
-      currentPost.dislikes = currentPost.dislikes.filter(id => id !== userId);
-      
-      // 새 투표 추가
-      if (type === 'like') {
-        currentPost.likes.push(userId);
-      } else if (type === 'dislike') {
-        currentPost.dislikes.push(userId);
+      try {
+        console.log(`👍 투표 시작: ${type}`);
+        // API를 통해 투표
+        const updatedPost = await CommunityAPI.vote(currentPost.id, userId, type);
         
-        // 비추천 10개 이상시 블라인드
-        if (currentPost.dislikes.length >= 10) {
-          currentPost.isBlinded = true;
-          showToast('게시물이 블라인드 처리되었습니다');
+        if (updatedPost) {
+          console.log('👍 투표 성공:', updatedPost);
+          
+          // currentPost 업데이트
+          currentPost.likes = updatedPost.likes || [];
+          currentPost.dislikes = updatedPost.dislikes || [];
+          
+          // 비추천 10개 이상시 블라인드
+          if (currentPost.dislikes.length >= 10) {
+            currentPost.isBlinded = true;
+            showToast('게시물이 블라인드 처리되었습니다');
+            
+            // posts 배열 업데이트
+            const postIndex = posts.findIndex(p => p.id === currentPost.id);
+            if (postIndex !== -1) {
+              posts[postIndex] = currentPost;
+            }
+            
+            savePosts();
+            closePostModal();
+            renderPosts();
+            return;
+          }
           
           // posts 배열 업데이트
           const postIndex = posts.findIndex(p => p.id === currentPost.id);
@@ -918,20 +928,12 @@
           }
           
           savePosts();
-          closePostModal();
-          renderPosts();
-          return;
+          viewPost(currentPost.id); // 화면 새로고침
         }
+      } catch (error) {
+        console.error('투표 실패:', error);
+        showToast('투표에 실패했습니다. 다시 시도해주세요.');
       }
-      
-      // posts 배열 업데이트
-      const postIndex = posts.findIndex(p => p.id === currentPost.id);
-      if (postIndex !== -1) {
-        posts[postIndex] = currentPost;
-      }
-      
-      savePosts();
-      viewPost(currentPost.id); // 화면 새로고침
     }
     
     // ===== 댓글 작성 =====
@@ -983,23 +985,41 @@
     }
     
     // 댓글 작성 확인
-    function confirmSubmitComment() {
+    async function confirmSubmitComment() {
       if (!pendingComment || !currentPost) return;
       
-      // currentPost에 댓글 추가
-      if (!currentPost.comments) {
-        currentPost.comments = [];
+      try {
+        console.log('💬 댓글 작성 시작...');
+        // API를 통해 댓글 작성
+        const newComment = await CommunityAPI.addComment(currentPost.id, pendingComment);
+        
+        if (newComment) {
+          console.log('💬 댓글 작성 성공:', newComment);
+          
+          // currentPost에 댓글 추가
+          if (!currentPost.comments) {
+            currentPost.comments = [];
+          }
+          currentPost.comments.push(newComment);
+          
+          // posts 배열에서 해당 게시물 찾아서 업데이트
+          const postIndex = posts.findIndex(p => p.id === currentPost.id);
+          if (postIndex !== -1) {
+            posts[postIndex] = currentPost;
+          }
+          
+          // 로컬 저장 (백업)
+          savePosts();
+        } else {
+          console.error('❌ 댓글이 null입니다');
+          showToast('댓글 작성에 실패했습니다.');
+          return;
+        }
+      } catch (error) {
+        console.error('댓글 작성 실패:', error);
+        showToast('댓글 작성에 실패했습니다. 다시 시도해주세요.');
+        return;
       }
-      currentPost.comments.push(pendingComment);
-      
-      // posts 배열에서 해당 게시물 찾아서 업데이트
-      const postIndex = posts.findIndex(p => p.id === currentPost.id);
-      if (postIndex !== -1) {
-        posts[postIndex] = currentPost;
-      }
-      
-      // 저장
-      savePosts();
       
       // "다시 보지 않기" 체크 확인
       const dontShowAgain = document.getElementById('dontShowAgain').checked;
@@ -1109,6 +1129,7 @@
       }
       
       try {
+        console.log('📝 게시글 작성 시작...');
         const newPost = await CommunityAPI.createPost({
           category: category,
           title: title,
@@ -1120,8 +1141,17 @@
           poll: poll
         });
         
-        posts.unshift(newPost);
-        savePosts(); // 로컬 백업
+        console.log('📝 작성된 게시글:', newPost);
+        
+        if (newPost) {
+          posts.unshift(newPost);
+          savePosts(); // 로컬 백업
+          console.log('✅ 게시글 추가 완료');
+        } else {
+          console.error('❌ 게시글이 null입니다');
+          showToast('게시글 작성에 실패했습니다.');
+          return;
+        }
       } catch (error) {
         console.error('게시글 작성 실패:', error);
         showToast('게시글 작성에 실패했습니다. 다시 시도해주세요.');
