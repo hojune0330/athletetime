@@ -12,8 +12,24 @@ const server = http.createServer(app);
 
 // 환경 변수
 const PORT = process.env.PORT || 3000;
-const CHAT_DATA_FILE = path.join(__dirname, 'chat-messages.json');
-const COMMUNITY_DATA_FILE = path.join(__dirname, 'community-posts.json');
+
+// Render 환경에서 영구 저장을 위한 경로 설정
+// Render Starter는 /opt/render/project/src 에 파일을 저장해야 영구적
+const DATA_DIR = process.env.RENDER 
+  ? '/opt/render/project/src/data'
+  : path.join(__dirname, 'data');
+
+// 데이터 디렉토리 생성
+const fsSync = require('fs');
+if (!fsSync.existsSync(DATA_DIR)) {
+  fsSync.mkdirSync(DATA_DIR, { recursive: true });
+  console.log(`📁 데이터 디렉토리 생성: ${DATA_DIR}`);
+}
+
+const CHAT_DATA_FILE = path.join(DATA_DIR, 'chat-messages.json');
+const COMMUNITY_DATA_FILE = path.join(DATA_DIR, 'community-posts.json');
+
+console.log(`💾 데이터 저장 경로: ${DATA_DIR}`);
 
 // CORS 설정
 app.use(cors({
@@ -441,7 +457,7 @@ async function loadPosts() {
         category: '공지',
         title: '🎉 애슬리트 타임 커뮤니티 오픈!',
         author: '관리자',
-        content: '안녕하세요! 애슬리트 타임이 오픈했습니다.',
+        content: '안녕하세요! 애슬리트 타임이 오픈했습니다.\n\n베타 서비스 중이며, 서버 재시작 시 데이터가 초기화될 수 있습니다.',
         date: new Date().toISOString(),
         password: 'admin',
         views: 0,
@@ -451,6 +467,51 @@ async function loadPosts() {
         reports: [],
         isNotice: true,
         isAdmin: true,
+        isBlinded: false
+      },
+      {
+        id: Date.now() + 1,
+        category: '정보',
+        title: '🏃 러닝 초보자를 위한 기초 가이드',
+        author: '러닝코치',
+        content: '러닝을 처음 시작하시는 분들을 위한 가이드입니다!\n\n1. 준비운동 필수\n2. 올바른 자세 유지\n3. 호흡법 연습\n4. 페이스 조절',
+        date: new Date().toISOString(),
+        password: 'sample',
+        views: 15,
+        likes: [1, 2, 3],
+        dislikes: [],
+        comments: [],
+        reports: [],
+        isBlinded: false
+      },
+      {
+        id: Date.now() + 2,
+        category: '질문',
+        title: '마라톤 대회 추천해주세요!',
+        author: '초보러너',
+        content: '첫 마라톤 대회 참가하려는데 초보자에게 좋은 대회 추천 부탁드려요!',
+        date: new Date().toISOString(),
+        password: 'sample',
+        views: 8,
+        likes: [1],
+        dislikes: [],
+        comments: [],
+        reports: [],
+        isBlinded: false
+      },
+      {
+        id: Date.now() + 3,
+        category: '자유',
+        title: '오늘 한강 러닝 완료! 🌅',
+        author: '한강러너',
+        content: '새벽 러닝 최고예요! 날씨도 좋고 공기도 맑고~',
+        date: new Date().toISOString(),
+        password: 'sample',
+        views: 23,
+        likes: [1, 2, 3, 4, 5],
+        dislikes: [],
+        comments: [],
+        reports: [],
         isBlinded: false
       }
     ];
