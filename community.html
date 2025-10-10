@@ -1076,11 +1076,12 @@
     // ===== 게시물 작성 =====
     async function submitPost() {
       const category = document.getElementById('postCategory').value;
-      const author = document.getElementById('postAuthor').value.trim() || '익명';
-      const title = document.getElementById('postTitle').value.trim();
-      const content = document.getElementById('postContent').value.trim();
-      const password = document.getElementById('postPassword').value.trim();
-      const instagram = document.getElementById('postInstagram').value.trim().replace('@', '');
+      // 입력값 길이 제한 (보안 강화)
+      const author = (document.getElementById('postAuthor').value.trim() || '익명').substring(0, 50);
+      const title = document.getElementById('postTitle').value.trim().substring(0, 200);
+      const content = document.getElementById('postContent').value.trim().substring(0, 10000);
+      const password = document.getElementById('postPassword').value.trim().substring(0, 100);
+      const instagram = document.getElementById('postInstagram').value.trim().replace('@', '').substring(0, 50);
       
       if (!title) {
         showToast('제목을 입력해주세요');
@@ -1471,10 +1472,20 @@
       }, 300);
     }
     
+    // HTML 이스케이핑 (보안 강화)
     function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+      if (!text) return '';
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+      };
+      return String(text).replace(/[&<>"'`=\/]/g, m => map[m]);
     }
     
     // URL을 링크로 변환하는 함수
