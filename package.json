@@ -2,9 +2,9 @@
   "name": "athlete-time-backend",
   "version": "1.0.0",
   "description": "Athletic Time Backend Server",
-  "main": "server.js",
+  "main": "server-postgres.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server-postgres.js",
     "dev": "nodemon server.js",
     "chat": "node chat-server-enhanced.js",
     "community": "node community-server.js"
