@@ -133,14 +133,22 @@ const CommunityAPI = {
   // 게시글 삭제
   async deletePost(id, password) {
     try {
-      const response = await fetch(`${this.getAPIUrl()}/api/posts/${id}`, {
+      const apiUrl = this.getAPIUrl();
+      console.log('🗑️ Deleting post:', { id, apiUrl });
+      
+      const response = await fetch(`${apiUrl}/api/posts/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
       });
-      const data = await response.json();
       
-      if (!data.success) throw new Error(data.message);
+      const data = await response.json();
+      console.log('🗑️ Delete response:', data);
+      
+      if (!data.success) {
+        // 서버에서 반환한 정확한 메시지를 에러로 전달
+        throw new Error(data.message || '게시글 삭제에 실패했습니다');
+      }
       
       // localStorage에서도 삭제
       const posts = JSON.parse(localStorage.getItem('athletetime_posts') || '[]');
@@ -150,7 +158,12 @@ const CommunityAPI = {
       return true;
     } catch (error) {
       console.error('게시글 삭제 실패:', error);
-      throw error;
+      // fetch 에러가 아닌 경우 그대로 전달
+      if (error.message) {
+        throw error;
+      }
+      // fetch 에러인 경우 일반 메시지
+      throw new Error('네트워크 오류로 삭제에 실패했습니다');
     }
   },
 

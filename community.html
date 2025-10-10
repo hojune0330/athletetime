@@ -1195,26 +1195,34 @@
     }
     
     // ===== 게시물 삭제 =====
-    function deletePost() {
+    async function deletePost() {
       if (!currentPost) return;
       
       const password = prompt('비밀번호를 입력하세요:');
       if (!password) return;
       
-      if (password !== currentPost.password && password !== 'admin') {
-        showToast('비밀번호가 일치하지 않습니다');
-        return;
-      }
-      
       if (confirm('정말 삭제하시겠습니까?')) {
-        const index = posts.findIndex(p => p.id === currentPost.id);
-        if (index > -1) {
-          posts.splice(index, 1);
-          savePosts();
+        try {
+          // API 호출로 삭제
+          await CommunityAPI.deletePost(currentPost.id, password);
+          
+          // 로컬 배열에서도 삭제
+          const index = posts.findIndex(p => p.id === currentPost.id);
+          if (index > -1) {
+            posts.splice(index, 1);
+          }
+          
           hidePostMenu();
           closePostModal();
           renderPosts();
           showToast('게시물이 삭제되었습니다');
+        } catch (error) {
+          console.error('삭제 실패:', error);
+          if (error.message === '비밀번호가 일치하지 않습니다') {
+            showToast('비밀번호가 일치하지 않습니다');
+          } else {
+            showToast('게시물 삭제에 실패했습니다');
+          }
         }
       }
     }

@@ -277,12 +277,23 @@ app.put('/api/posts/:id', async (req, res) => {
 
 app.delete('/api/posts/:id', async (req, res) => {
   const postId = parseInt(req.params.id);
+  const { password } = req.body;
+  
   const postIndex = posts.findIndex(p => p.id === postId);
   
   if (postIndex === -1) {
     return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
   }
   
+  const post = posts[postIndex];
+  
+  // 비밀번호 확인 (관리자 비밀번호 포함)
+  if (password !== post.password && password !== 'admin') {
+    console.log(`❌ 삭제 실패 - 비밀번호 불일치: 입력=${password}, 저장=${post.password}`);
+    return res.status(403).json({ success: false, message: '비밀번호가 일치하지 않습니다' });
+  }
+  
+  console.log(`🗑️ 게시글 삭제: ID=${postId}, 제목="${post.title}"`);
   posts.splice(postIndex, 1);
   await savePosts();
   
