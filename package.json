@@ -2,7 +2,7 @@
   "name": "athlete-time-backend",
   "version": "1.0.0",
   "description": "Athletic Time Backend Server",
-  "main": "server-postgres.js",
+  "main": "server-fixed.js",
   "scripts": {
     "start": "node server-postgres.js",
     "dev": "nodemon server.js",
