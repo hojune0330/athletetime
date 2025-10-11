@@ -1,4 +1,5 @@
 // PostgreSQL 연동 + 보안 강화 서버
+// 중요: Render 유료 플랜 사용 중 (데이터 제한 없음!)
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -8,6 +9,9 @@ const bcrypt = require('bcrypt');
 const DOMPurify = require('isomorphic-dompurify');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+
+// Render 유료 플랜 설정 로드
+const { validateRenderPlan, RENDER_PLAN } = require('./config/render-config');
 
 const app = express();
 const server = http.createServer(app);
@@ -697,21 +701,29 @@ async function sendChatMessage(clientId, messageData) {
 // ============================================
 
 initDatabase().then(() => {
+  // Render 유료 플랜 검증
+  validateRenderPlan();
+  
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`
     ╔════════════════════════════════════════╗
-    ║                                        ║
-    ║   🔒 보안 강화 서버 실행 중            ║
+    ║     🎯 RENDER 유료 플랜 서버           ║
+    ╠════════════════════════════════════════╣
+    ║   플랜: ${RENDER_PLAN.plan.name}      ║
     ║   포트: ${PORT}                        ║
     ║   환경: ${process.env.NODE_ENV || 'development'}                   ║
-    ║                                        ║
-    ║   적용된 보안 기능:                    ║
+    ║   DB: PostgreSQL (영구 저장)           ║
+    ╠════════════════════════════════════════╣
+    ║   💾 데이터 저장:                      ║
+    ║   ✅ PostgreSQL 영구 저장             ║
+    ║   ✅ 자동 백업                        ║
+    ║   ✅ 데이터 제한 없음                 ║
+    ╠════════════════════════════════════════╣
+    ║   🔒 보안 기능:                        ║
     ║   ✅ bcrypt 비밀번호 해싱             ║
     ║   ✅ DOMPurify XSS 방지               ║
     ║   ✅ Rate Limiting                    ║
     ║   ✅ Helmet 보안 헤더                 ║
-    ║   ✅ 조회수 중복 방지                 ║
-    ║                                        ║
     ╚════════════════════════════════════════╝
     `);
   });
