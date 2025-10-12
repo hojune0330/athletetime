@@ -6,9 +6,11 @@
     X-XSS-Protection = "1; mode=block"
 
 [build]
-  publish = "."
+  base = "src/community-app"
+  command = "npm install && npm run build"
+  publish = "dist"
 
 [[redirects]]
-  from = "/"
+  from = "/*"
   to = "/index.html"
   status = 200
