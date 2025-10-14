@@ -85,6 +85,25 @@ PROD=1 node test-deletion.js
 
 ## 📝 개발 노트
 
+### 프론트엔드 프리뷰/검수 방법
+- `src/community-app` 기준으로 **`npm run build` → Python 정적 서버** 조합이 가장 안정적인 미리보기 방식입니다.
+  ```bash
+  cd src/community-app
+  npm run build
+  cd dist
+  python3 -m http.server 4000
+  ```
+- 위 서버는 호스트 화이트리스트 검사 없이 동작하므로, 다음 URL로 바로 접속할 수 있습니다.
+  - Novita: https://4000-ilair62djyh3cmtl13rke-b9b802c4.sandbox.novita.ai
+  - e2b: https://4000-iyqwm3hj0cgb3tlwwo7v5-6532622b.e2b.dev
+- Vite `npm run preview`의 경우 포트(5173) + 도메인이 자주 바뀌며 `vite.config.ts` 의 `allowedHosts` 업데이트가 매번 필요하여, 샌드박스에서는 Python 정적 서버 방식을 기본으로 사용합니다.
+
+### 최신 커뮤니티 UI 주요 특징
+- 다크 테마(배경 `#0a0a0a`)와 청록색 헤더를 사용해 침하하 UX를 재현했습니다.
+- 반응형 레이아웃으로 모바일/태블릿/PC 환경을 모두 지원합니다.
+- 게시판/카테고리, 썸네일 미리보기, 댓글 UI, 검색, 즐겨찾기 사이드바, 실시간 인기글·최근 댓글·통계 위젯을 포함합니다.
+- 우측 배너는 광고 및 커뮤니티 공지/통계 노출 용도로 설계했습니다.
+
 ### 데이터 저장
 - 게시판: `community-posts.json` (Render Starter 플랜 서버에서 영구 저장)
 - 채팅: `chat-messages.json`
