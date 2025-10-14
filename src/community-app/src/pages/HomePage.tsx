@@ -1,16 +1,15 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
+import { FireIcon, ClockIcon, ChatBubbleLeftIcon, EyeIcon } from '@heroicons/react/24/outline'
 import { useBoardNavigation, usePosts } from '../features/board/hooks'
-import PostCard from '../components/common/PostCard'
 import Pagination from '../components/common/Pagination'
 import { cn } from '../lib/utils'
 
 const sortOptions = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-  { value: 'comments', label: '댓글순' },
-  { value: 'views', label: '조회순' },
+  { value: 'popular', label: '인기', icon: FireIcon },
+  { value: 'latest', label: '전체', icon: ClockIcon },
+  { value: 'week', label: '주간', icon: EyeIcon },
+  { value: 'month', label: '월간', icon: ChatBubbleLeftIcon },
 ] as const
 
 type SortOption = (typeof sortOptions)[number]['value']
@@ -19,8 +18,9 @@ function HomePage() {
   const params = useParams<{ boardSlug?: string }>()
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page') ?? '1') || 1
-  const sort = (searchParams.get('sort') as SortOption | null) ?? 'latest'
+  const sort = (searchParams.get('sort') as SortOption | null) ?? 'popular'
   const query = searchParams.get('q') ?? undefined
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
   const { boards, activeBoard } = useBoardNavigation(params.boardSlug)
   const { data, isLoading, isFetching } = usePosts({
@@ -35,81 +35,145 @@ function HomePage() {
   const posts = useMemo(() => data?.data.filter((post) => !post.isNotice) ?? [], [data])
 
   return (
-    <div className="space-y-6">
-      <section className="card border-brand-100/80 bg-gradient-to-br from-brand-50 via-white to-white p-6">
-        <div className="flex flex-col gap-3">
-          <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-brand-600">
-            <AdjustmentsHorizontalIcon className="h-4 w-4" />
-            {params.boardSlug ? 'Board' : 'Community'}
-          </span>
-          <h1 className="text-2xl font-bold text-ink-900 md:text-3xl">
-            {activeBoard ? activeBoard.name : '전체 게시글'}
-          </h1>
-          <p className="max-w-2xl text-sm text-ink-600">
-            {activeBoard
-              ? activeBoard.description ?? '러너들의 생생한 이야기를 한 곳에서 만나보세요.'
-              : '러닝을 사랑하는 사람들이 모인 AthleteTime 커뮤니티입니다. 자유롭게 질문하고, 정보를 나누고, 경험을 공유하세요.'}
-          </p>
-          <div className="flex flex-wrap gap-3 text-xs text-ink-400">
-            <span>오늘 게시판 {activeBoard ? activeBoard.todayPostCount : boards.reduce((acc, board) => acc + board.todayPostCount, 0)}건</span>
-            <span>실시간 업데이트 {isFetching ? '동기화 중...' : '완료'}</span>
-            {query ? <span className="rounded-full bg-white px-3 py-1 text-ink-500">검색어: {query}</span> : null}
-          </div>
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label="게시글 정렬">
-            {sortOptions.map((option) => (
-              <Link
-                key={option.value}
-                to={{ pathname: params.boardSlug ? `/boards/${params.boardSlug}` : '/', search: `?${new URLSearchParams({ ...Object.fromEntries(searchParams.entries()), sort: option.value, page: '1' }).toString()}` }}
-                className={cn(
-                  'rounded-full border px-4 py-1.5 text-sm transition',
-                  sort === option.value
-                    ? 'border-brand-300 bg-brand-50 text-brand-700 shadow-subtle'
-                    : 'border-slate-200 bg-white text-ink-500 hover:bg-slate-100',
-                )}
-                role="tab"
-                aria-selected={sort === option.value}
-              >
-                {option.label}
-              </Link>
-            ))}
+    <div className="space-y-4">
+      {/* 침하하 스타일 상단 탭 */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="flex items-center gap-6 px-4 py-3">
+          <h2 className="text-lg font-bold text-slate-900">
+            {sort === 'popular' ? '최~~~~고로 인기!' : activeBoard ? activeBoard.name : '전체 게시글'}
+          </h2>
+          <div className="flex gap-1 ml-auto">
+            {sortOptions.map((option) => {
+              const Icon = option.icon
+              return (
+                <Link
+                  key={option.value}
+                  to={{ pathname: params.boardSlug ? `/boards/${params.boardSlug}` : '/', search: `?${new URLSearchParams({ ...Object.fromEntries(searchParams.entries()), sort: option.value, page: '1' }).toString()}` }}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors rounded-md',
+                    sort === option.value
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-100'
+                  )}
+                >
+                  {option.value === 'popular' && '👍'}
+                  {option.label}
+                </Link>
+              )
+            })}
           </div>
         </div>
-      </section>
+      </div>
 
-      {notices.length > 0 ? (
-        <section className="space-y-3" aria-label="공지사항">
-          <header className="flex items-center justify-between text-sm font-semibold text-ink-500">
-            <span>공지사항</span>
-            <Link to="/boards/general" className="text-brand-600 hover:text-brand-500">
-              더보기
-            </Link>
-          </header>
-          <div className="space-y-3">
-            {notices.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
+      {/* 공지사항 - 침하하 스타일 */}
+      {notices.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm font-bold text-yellow-800">필독</span>
           </div>
-        </section>
-      ) : null}
+          {notices.map((post) => (
+            <Link
+              key={post.id}
+              to={`/post/${post.id}`}
+              className="block py-2 border-t border-yellow-200 first:border-t-0 hover:bg-yellow-100 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-slate-900">{post.title}</span>
+                <div className="flex items-center gap-3 text-xs text-slate-500">
+                  <span>{post.commentCount}</span>
+                  <span>{post.likeCount}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
-      <section className="space-y-3" aria-label="게시글 목록">
+      {/* 게시글 목록 - 침하하 스타일 테이블/카드 */}
+      <section className="bg-white rounded-lg overflow-hidden">
         {isLoading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="card h-32 animate-pulse bg-slate-100/70" />
+          <div className="p-4 space-y-2">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <div key={index} className="h-16 animate-pulse bg-slate-100 rounded" />
             ))}
           </div>
         ) : posts.length > 0 ? (
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
+          <>
+            {/* 데스크톱: 테이블 뷰 */}
+            <div className="hidden md:block">
+              <table className="w-full">
+                <tbody>
+                  {posts.map((post, index) => (
+                    <tr key={post.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <Link to={`/post/${post.id}`} className="block">
+                          <div className="flex items-start gap-3">
+                            <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">
+                              {post.boardName || '일반'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-slate-900 truncate">{post.title}</span>
+                                {post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
+                                {post.commentCount > 0 && (
+                                  <span className="text-xs text-orange-500 font-medium">{post.commentCount}</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                                <span>{post.author}</span>
+                                <span>{post.viewCount} 조회</span>
+                                <span>{post.createdAtRelative}</span>
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-sm font-medium text-orange-500">{post.likeCount}</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 모바일: 카드 뷰 */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {posts.map((post) => (
+                <Link key={post.id} to={`/post/${post.id}`} className="block p-4 hover:bg-slate-50">
+                  <div className="flex items-start gap-2 mb-1">
+                    <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">
+                      {post.boardName || '일반'}
+                    </span>
+                    {post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
+                  </div>
+                  <h3 className="font-medium text-slate-900 mb-2">{post.title}</h3>
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className="flex items-center gap-3">
+                      <span>{post.author}</span>
+                      <span>{post.createdAtRelative}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1">
+                        <EyeIcon className="w-3 h-3" />
+                        {post.viewCount}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <ChatBubbleLeftIcon className="w-3 h-3" />
+                        {post.commentCount}
+                      </span>
+                      <span className="text-orange-500 font-medium">{post.likeCount}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </>
         ) : (
-          <div className="card flex flex-col items-center justify-center gap-3 py-12 text-center text-ink-400">
-            <p className="text-lg font-semibold">아직 게시글이 없습니다.</p>
-            <p className="text-sm">첫 글의 주인공이 되어보세요! 베타 기간에는 로그인 없이 바로 작성할 수 있습니다.</p>
-            <Link to="/write" className="btn-primary">
+          <div className="p-12 text-center">
+            <p className="text-lg font-medium text-slate-500 mb-2">아직 게시글이 없습니다</p>
+            <p className="text-sm text-slate-400 mb-4">첫 글의 주인공이 되어보세요!</p>
+            <Link to="/write" className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">
               새 글쓰기
             </Link>
           </div>
