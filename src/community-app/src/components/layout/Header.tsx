@@ -1,11 +1,10 @@
 import { Link, useLocation } from 'react-router-dom'
-import { HomeIcon, Bars3Icon, UserIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 
 function Header() {
   const location = useLocation()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const isActive = (path: string) => location.pathname === path
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200">

@@ -75,7 +75,7 @@ export default function BoardNav() {
             >
               <span>전체</span>
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
-                {boards.reduce((acc, board) => acc + board.postCount, 0)}
+                {boards.reduce((acc, board) => acc + board.todayPostCount, 0)}
               </span>
             </Link>
 
@@ -91,9 +91,9 @@ export default function BoardNav() {
                 )}
               >
                 <span>{board.name}</span>
-                {board.postCount > 0 && (
+                {board.todayPostCount > 0 && (
                   <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
-                    {board.postCount}
+                    {board.todayPostCount}
                   </span>
                 )}
                 {board.isNew && (

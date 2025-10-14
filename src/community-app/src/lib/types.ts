@@ -12,6 +12,8 @@ export interface Board {
 export interface BoardSummary extends Board {
   todayPostCount: number
   todayCommentCount: number
+  postCount?: number
+  isNew?: boolean
 }
 
 export interface Attachment {
@@ -31,9 +33,12 @@ export interface PostSummary {
   title: string
   excerpt: string
   authorNick: string
+  author?: string // For display
   createdAt: string
+  createdAtRelative?: string // For display (e.g., "2시간 전")
   updatedAt?: string
   views: number
+  viewCount?: number // Alias for views
   likeCount: number
   dislikeCount: number
   commentCount: number
@@ -42,6 +47,7 @@ export interface PostSummary {
   isHot: boolean
   hasPoll: boolean
   thumbnailUrl?: string
+  imageCount?: number // Number of images in post
 }
 
 export interface PostDetail extends PostSummary {

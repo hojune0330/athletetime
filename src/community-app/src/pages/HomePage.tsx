@@ -1,15 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { FireIcon, ClockIcon, ChatBubbleLeftIcon, EyeIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleLeftIcon, EyeIcon } from '@heroicons/react/24/outline'
 import { useBoardNavigation, usePosts } from '../features/board/hooks'
 import Pagination from '../components/common/Pagination'
 import { cn } from '../lib/utils'
 
 const sortOptions = [
-  { value: 'popular', label: '인기', icon: FireIcon },
-  { value: 'latest', label: '전체', icon: ClockIcon },
-  { value: 'week', label: '주간', icon: EyeIcon },
-  { value: 'month', label: '월간', icon: ChatBubbleLeftIcon },
+  { value: 'popular', label: '인기' },
+  { value: 'latest', label: '전체' },
+  { value: 'comments', label: '주간' },
+  { value: 'views', label: '월간' },
 ] as const
 
 type SortOption = (typeof sortOptions)[number]['value']
@@ -20,10 +20,9 @@ function HomePage() {
   const page = Number(searchParams.get('page') ?? '1') || 1
   const sort = (searchParams.get('sort') as SortOption | null) ?? 'popular'
   const query = searchParams.get('q') ?? undefined
-  const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
 
-  const { boards, activeBoard } = useBoardNavigation(params.boardSlug)
-  const { data, isLoading, isFetching } = usePosts({
+  const { activeBoard } = useBoardNavigation(params.boardSlug)
+  const { data, isLoading } = usePosts({
     boardSlug: params.boardSlug,
     page,
     sort,
@@ -44,7 +43,6 @@ function HomePage() {
           </h2>
           <div className="flex gap-1 ml-auto">
             {sortOptions.map((option) => {
-              const Icon = option.icon
               return (
                 <Link
                   key={option.value}
@@ -93,8 +91,8 @@ function HomePage() {
       <section className="bg-white rounded-lg overflow-hidden">
         {isLoading ? (
           <div className="p-4 space-y-2">
-            {Array.from({ length: 10 }).map((_, index) => (
-              <div key={index} className="h-16 animate-pulse bg-slate-100 rounded" />
+            {Array.from({ length: 10 }).map((_, idx) => (
+              <div key={`skeleton-${idx}`} className="h-16 animate-pulse bg-slate-100 rounded" />
             ))}
           </div>
         ) : posts.length > 0 ? (
@@ -103,7 +101,7 @@ function HomePage() {
             <div className="hidden md:block">
               <table className="w-full">
                 <tbody>
-                  {posts.map((post, index) => (
+                  {posts.map((post) => (
                     <tr key={post.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3">
                         <Link to={`/post/${post.id}`} className="block">
@@ -114,15 +112,15 @@ function HomePage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-slate-900 truncate">{post.title}</span>
-                                {post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
+                                {post.imageCount && post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
                                 {post.commentCount > 0 && (
                                   <span className="text-xs text-orange-500 font-medium">{post.commentCount}</span>
                                 )}
                               </div>
                               <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
-                                <span>{post.author}</span>
-                                <span>{post.viewCount} 조회</span>
-                                <span>{post.createdAtRelative}</span>
+                                <span>{post.author || post.authorNick}</span>
+                                <span>{post.viewCount || post.views} 조회</span>
+                                <span>{post.createdAtRelative || new Date(post.createdAt).toLocaleDateString()}</span>
                               </div>
                             </div>
                             <div className="text-center">
@@ -145,18 +143,18 @@ function HomePage() {
                     <span className="inline-block px-2 py-0.5 text-xs font-medium rounded bg-slate-100 text-slate-600">
                       {post.boardName || '일반'}
                     </span>
-                    {post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
+                    {post.imageCount && post.imageCount > 0 && <span className="text-xs text-blue-500">📷</span>}
                   </div>
                   <h3 className="font-medium text-slate-900 mb-2">{post.title}</h3>
                   <div className="flex items-center justify-between text-xs text-slate-500">
                     <div className="flex items-center gap-3">
-                      <span>{post.author}</span>
-                      <span>{post.createdAtRelative}</span>
+                      <span>{post.author || post.authorNick}</span>
+                      <span>{post.createdAtRelative || new Date(post.createdAt).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
                         <EyeIcon className="w-3 h-3" />
-                        {post.viewCount}
+                        {post.viewCount || post.views}
                       </span>
                       <span className="flex items-center gap-1">
                         <ChatBubbleLeftIcon className="w-3 h-3" />
