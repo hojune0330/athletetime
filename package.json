@@ -9,7 +9,9 @@
     "start:postgres": "node server-postgres.js",
     "dev": "nodemon server.js",
     "chat": "node chat-server-enhanced.js",
-    "community": "node community-server.js"
+    "community": "node community-server.js",
+    "build:web": "npm run build --prefix src/community-app",
+    "postinstall": "npm install --prefix src/community-app --no-fund --no-audit"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",

@@ -3,6 +3,8 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const path = require('path');
+const fs = require('fs');
 const WebSocket = require('ws');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
@@ -558,6 +560,38 @@ app.post('/api/posts/:id/report', async (req, res) => {
     res.status(500).json({ success: false, message: '서버 오류' });
   }
 });
+
+// ============================================
+// 정적 프런트엔드 제공 (빌드 결과물 존재 시)
+// ============================================
+
+const CLIENT_DIST_PATH = path.join(__dirname, 'src/community-app/dist');
+const CLIENT_INDEX_PATH = path.join(CLIENT_DIST_PATH, 'index.html');
+
+if (fs.existsSync(CLIENT_INDEX_PATH)) {
+  console.log('✅ 정적 프런트엔드 제공 준비 완료:', CLIENT_DIST_PATH);
+
+  app.use(
+    express.static(CLIENT_DIST_PATH, {
+      index: 'index.html',
+      setHeaders: (res, filePath) => {
+        if (path.extname(filePath) === '.html') {
+          res.setHeader('Cache-Control', 'no-cache');
+        }
+      },
+    }),
+  );
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
+      return next();
+    }
+
+    return res.sendFile(CLIENT_INDEX_PATH);
+  });
+} else {
+  console.log('ℹ️ 정적 프런트엔드 빌드 파일이 없어 SPA 라우팅을 비활성화합니다.');
+}
 
 // ============================================
 // WebSocket 채팅 서버 (기존 코드 유지)
