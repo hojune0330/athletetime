@@ -8,7 +8,21 @@ import type {
   PostSummary,
   VoteRequest,
 } from '../../lib/types'
-import { mockBoards, mockPopularPosts, mockPostDetail, mockPosts } from './mocks'
+
+const DEFAULT_BOARDS: BoardSummary[] = [
+  {
+    id: 'anonymous',
+    name: '익명 게시판',
+    slug: 'anonymous',
+    description: '로그인 없이 이용 가능한 기본 게시판',
+    icon: '💬',
+    order: 1,
+    isActive: true,
+    createdAt: '2025-10-13T00:00:00+09:00',
+    todayPostCount: 0,
+    todayCommentCount: 0,
+  },
+]
 
 type FetchPostsParams = {
   boardSlug?: string
@@ -31,52 +45,32 @@ const toQueryString = (params: FetchPostsParams) => {
 export async function fetchBoards(): Promise<BoardSummary[]> {
   try {
     const response = await apiRequest<ListResponse<BoardSummary>>('/boards')
-    return response.data
+    if (Array.isArray(response.data) && response.data.length > 0) {
+      return response.data
+    }
+    return DEFAULT_BOARDS
   } catch (error) {
-    console.warn('Falling back to mock board data:', error)
-    return mockBoards
+    console.warn('Falling back to default board configuration:', error)
+    return DEFAULT_BOARDS
   }
 }
 
 export async function fetchPosts(params: FetchPostsParams = {}): Promise<ListResponse<PostSummary>> {
-  try {
-    const query = toQueryString(params)
-    const response = await apiRequest<ListResponse<PostSummary>>(
-      query ? `/posts?${query}` : '/posts',
-    )
-    return response
-  } catch (error) {
-    console.warn('Falling back to mock post data:', error)
-    return {
-      data: mockPosts,
-      meta: {
-        page: params.page ?? 1,
-        pageSize: params.pageSize ?? 20,
-        totalItems: mockPosts.length,
-        totalPages: 1,
-      },
-    }
-  }
+  const query = toQueryString(params)
+  return apiRequest<ListResponse<PostSummary>>(query ? `/posts?${query}` : '/posts')
 }
 
 export async function fetchPopularPosts(): Promise<PostSummary[]> {
   try {
-    const response = await apiRequest<PostSummary[]>('/posts/popular')
-    return response
+    return await apiRequest<PostSummary[]>('/posts/popular')
   } catch (error) {
-    console.warn('Falling back to mock popular post data:', error)
-    return mockPopularPosts
+    console.warn('Popular posts endpoint unavailable:', error)
+    return []
   }
 }
 
 export async function fetchPostDetail(postId: string): Promise<PostDetail> {
-  try {
-    const response = await apiRequest<PostDetail>(`/posts/${postId}`)
-    return response
-  } catch (error) {
-    console.warn('Falling back to mock post detail data:', error)
-    return mockPostDetail
-  }
+  return apiRequest<PostDetail>(`/posts/${postId}`)
 }
 
 export async function createPost(payload: CreatePostPayload) {

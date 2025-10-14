@@ -2,9 +2,9 @@
 
 ## 🎯 호스팅 환경 (중요!)
 - **프론트엔드**: Netlify (무료 플랜)
-- **백엔드**: Render (**유료 플랜** - Starter $7/month)
-- **데이터베이스**: PostgreSQL (Render 유료 플랜 포함)
-- **데이터 저장**: 영구 저장 (제한 없음)
+- **백엔드**: Render (Starter 유료 플랜, 월 $7) – 실서버 상시 기동 + 콜드스타트 완화
+- **데이터베이스**: Render PostgreSQL (Starter 플랜 포함, 영구 디스크)
+- **데이터 저장**: 백엔드 API가 Render 영구 스토리지를 직접 사용 (클라이언트 더미/로컬 폴백 없음)
 
 ## 🔧 최근 수정 사항 (2025-10-10)
 
@@ -56,12 +56,12 @@ PROD=1 node test-deletion.js
 
 ## 🛠️ 주요 기능
 
-> ℹ️ **베타 프론트엔드 안내**: `src/community-app/` 이하의 Vite 애플리케이션이 새로운 베타 커뮤니티 경험을 제공합니다. 현재 Netlify 배포는 기존 정적 페이지를 사용하고 있으므로 점진적으로 전환 예정입니다.
+> ℹ️ **베타 프론트엔드 안내**: `src/community-app/` 이하의 Vite 애플리케이션이 침하하(chimhaha) UX를 거의 동일하게 재현하도록 전면 리디자인되었습니다. 기본 API 엔드포인트는 Render Starter 유료 플랜에서 운영 중인 실서버(`https://athletetime-backend.onrender.com/community`)로 고정되어 있으며, 베타 UI에서도 더미 데이터를 사용하지 않습니다. 현재 Netlify 배포는 기존 정적 페이지를 사용하고 있으므로 점진적으로 전환 예정입니다.
 
 ### 익명 게시판
 - ✅ 게시글 CRUD (생성, 읽기, 수정, 삭제)
 - ✅ 비밀번호 기반 수정/삭제
-- ✅ 댓글 기능
+- ✅ 댓글 기능 (베타에서는 단계적 오픈)
 - ✅ 좋아요/싫어요
 - ✅ 신고 및 자동 블라인드 (10회 이상)
 - ✅ 서버 기반 데이터 저장
@@ -75,13 +75,14 @@ PROD=1 node test-deletion.js
 ## 📝 개발 노트
 
 ### 데이터 저장
-- 게시판: `community-posts.json`
+- 게시판: `community-posts.json` (Render Starter 플랜 서버에서 영구 저장)
 - 채팅: `chat-messages.json`
 - 자동 저장: 5분마다 + 서버 종료 시
 
-### CORS 설정
+### CORS 및 환경 변수
 - 모든 도메인 허용 (`*`)
 - Netlify ↔ Render 통신 가능
+- 프론트엔드 `.env` 기본값은 Render Starter 실서버 URL을 가리키며, 별도 설정이 없으면 항상 실서비스 API가 사용됩니다.
 
 ### 에러 처리
 - 네트워크 오류 시 localStorage 폴백
@@ -90,8 +91,9 @@ PROD=1 node test-deletion.js
 ## 🐛 알려진 이슈
 
 ### 베타 서비스 안내
-- 간헐적인 서버 연결 지연 (Render 무료 플랜)
+- 간헐적인 서버 연결 지연 (Render Starter 플랜이라도 초기 접근 시 지연 가능)
 - 첫 요청 시 서버 콜드 스타트 (최대 30초)
+- 익명 게시판 베타 UI는 필수 공지 외 더미 데이터를 사용하지 않으며, 백엔드 연결 실패 시 최소한의 보드 정보만 노출됩니다.
 
 ## 📧 문의
 
