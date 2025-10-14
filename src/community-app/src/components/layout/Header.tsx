@@ -8,10 +8,13 @@ type NavItem = {
   to?: string
   end?: boolean
   disabled?: boolean
+  external?: boolean
 }
 
 const NAV_ITEMS: ReadonlyArray<NavItem> = [
   { label: '전체글', to: '/', end: true },
+  { label: '대회 일정', to: 'https://athletetime.netlify.app/competitions-calendar', external: true },
+  { label: '경기 시간표', to: '/events/timetable' },
   { label: '공지사항', to: '/?section=notices' },
   { label: '서비스 업데이트', disabled: true },
   { label: '계정 준비중', disabled: true },
@@ -60,16 +63,34 @@ function Header() {
         </Link>
 
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="주요 메뉴">
-          {activeNavItems.map((item) =>
-            item.disabled || !item.to ? (
-              <span
-                key={item.key}
-                className="cursor-not-allowed rounded-lg px-3 py-2 text-sm font-semibold text-ink-300"
-                title="준비 중"
-              >
-                {item.label}
-              </span>
-            ) : (
+          {activeNavItems.map((item) => {
+            if (item.disabled || !item.to) {
+              return (
+                <span
+                  key={item.key}
+                  className="cursor-not-allowed rounded-lg px-3 py-2 text-sm font-semibold text-ink-300"
+                  title="준비 중"
+                >
+                  {item.label}
+                </span>
+              )
+            }
+
+            if (item.external) {
+              return (
+                <a
+                  key={item.key}
+                  href={item.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-lg px-3 py-2 text-sm font-semibold text-ink-500 transition hover:bg-slate-100"
+                >
+                  {item.label}
+                </a>
+              )
+            }
+
+            return (
               <NavLink
                 key={item.key}
                 to={item.to}
@@ -82,8 +103,8 @@ function Header() {
               >
                 {item.label}
               </NavLink>
-            ),
-          )}
+            )
+          })}
         </nav>
 
         <div className="ml-auto hidden min-w-[200px] items-center md:flex">

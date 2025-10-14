@@ -107,3 +107,45 @@ export interface CreateCommentPayload {
   content: string
   password: string
 }
+
+export interface CompetitionTimetableDocument {
+  id: string
+  title?: string
+  url: string
+  fileName?: string
+  fileSize?: number
+  mimeType?: string
+  uploadedAt?: string
+  description?: string
+}
+
+export interface CompetitionTimetableSession {
+  id: string
+  date: string
+  startTime?: string
+  endTime?: string
+  discipline: string
+  gender?: string
+  round?: string
+  note?: string
+  laneInfo?: string
+}
+
+export interface CompetitionTimetable {
+  id: string
+  title: string
+  competitionName: string
+  startDate: string
+  endDate: string
+  publishedAt: string
+  updatedAt?: string
+  hostOrganization?: string
+  venue?: string
+  status?: 'scheduled' | 'ongoing' | 'completed'
+  highlightText?: string
+  summary?: string
+  notice?: string
+  primaryDocument?: CompetitionTimetableDocument | null
+  attachments?: CompetitionTimetableDocument[]
+  sessions?: CompetitionTimetableSession[]
+}
