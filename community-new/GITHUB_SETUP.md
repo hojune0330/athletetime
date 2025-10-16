@@ -42,5 +42,6 @@ git push origin feature/community-vite-rebuild
 
 ---
 *Last updated: 2025-01-16*
+*Token updated: 2025-01-16 (athletetime push token)*
 *Token: athletetime push token 사용*
 *이 파일은 Claude와 GPT가 협업시 참고하는 문서입니다.*
