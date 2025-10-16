@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Athlete Time 애타 - 육상인들을 위한 커뮤니티</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: #0f172a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    /* 메인 서비스 그리드 */
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 12px;
+      min-height: calc(100vh - 120px);
+      background: #0f172a;
+      max-width: 768px;
+      margin: 0 auto;
+    }
+    
+    .service-card {
+      background: #1e293b;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      min-height: 140px;
+      border: 1px solid #334155;
+    }
+    
+    .service-card:active {
+      transform: scale(0.95);
+    }
+    
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.05));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .service-card:hover::before {
+      opacity: 1;
+    }
+    
+    /* 카드별 색상 테마 - 애타 브랜드 컬러 */
+    .card-community {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: 1px solid #3b82f6;
+    }
+    
+    .card-board {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border: 1px solid #6366f1;
+    }
+    
+    .card-chat {
+      background: linear-gradient(135deg, #ec4899, #db2777);
+    }
+    
+    .card-result {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+    
+    .card-schedule {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .card-training {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+    }
+    
+    .card-pace {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border: 1px solid #ef4444;
+    }
+    
+    .card-market {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+    }
+    
+    .card-more {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+    
+    .service-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    
+    .service-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+    
+    .service-desc {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      line-height: 1.3;
+    }
+    
+    /* 실시간 인디케이터 */
+    .live-indicator {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: pulse 2s infinite;
+    }
+    
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    /* 새 알림 배지 */
+    .new-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #ff3b30;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.6);
+    }
+    
+    /* 베타 배지 */
+    .beta-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+    }
+    
+    .beta-badge.open {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+    }
+    
+    /* 준비중 오버레이 */
+    .coming-soon-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    
+    .service-card.beta:hover .coming-soon-overlay {
+      opacity: 1;
+    }
+    
+    .coming-soon-text {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fbbf24;
+    }
+    
+    /* 하단 설명 섹션 */
+    .about-section {
+      background: #000;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    
+    .about-section h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .about-section p {
+      color: #999;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .feature-item {
+      text-align: left;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .feature-item h3 {
+      color: #fff;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .feature-item p {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    /* 플로팅 헤더 (스크롤 시 나타남) */
+    .floating-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      transform: translateY(-100%);
+      transition: transform 0.3s;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .floating-header.show {
+      transform: translateY(0);
+    }
+    
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .modal.active {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      animation: modalSlideUp 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    
+    .modal-desc {
+      color: #999;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .modal-button {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .modal-button.primary {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: white;
+    }
+    
+    .modal-button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    /* 태블릿 및 데스크톱 */
+    @media (min-width: 768px) {
+      .service-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 8px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      
+      .service-card {
+        min-height: 200px;
+      }
+      
+      .service-icon {
+        font-size: 3rem;
+      }
+      
+      .service-title {
+        font-size: 1.2rem;
+      }
+      
+      .service-desc {
+        font-size: 0.85rem;
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .service-grid {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1200px;
+      }
+    }
+    
+    /* 실시간 채팅 상태 위젯 */
+    .chat-status-widget {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(17, 17, 17, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 12px;
+      padding: 15px;
+      width: 280px;
+      display: none;
+      animation: slideInLeft 0.5s ease-out;
+      z-index: 100;
+    }
+    
+    .chat-status-widget.show {
+      display: block;
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .widget-title {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .widget-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .widget-stat {
+      text-align: center;
+    }
+    
+    .widget-stat-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .widget-stat-label {
+      font-size: 0.65rem;
+      color: #666;
+    }
+    
+    .widget-join-btn {
+      width: 100%;
+      padding: 8px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .widget-join-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    @media (max-width: 768px) {
+      .chat-status-widget {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        bottom: 10px;
+      }
+    }
+    
+    /* 다크 모드 스크롤바 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #111;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #444;
+    }
+  </style>
+  
+  <!-- 백엔드 통합 설정 -->
+  <script src="js/backend-config.js"></script>
+</head>
+<body>
+  <!-- 플로팅 헤더 -->
+  <div class="floating-header" id="floatingHeader">
+    <div class="logo">ATHLETE TIME</div>
+    <button type="button" onclick="showMenu()" style="background: none; border: none; color: white; font-size: 1.2rem;">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- 메인 서비스 그리드 -->
+  <div class="service-grid">
+    <!-- 익명 게시판 (정식 오픈) - 우선순위 1 -->
+    <div class="service-card card-board" onclick="window.location.href='community.html'">
+      <div class="new-badge">New</div>
+      <i class="fas fa-comments service-icon"></i>
+      <div class="service-title">익명 게시판</div>
+      <div class="service-desc">자유롭게 소통하는<br>육상인들의 공간</div>
+    </div>
+    
+    <!-- 실시간 채팅 (오픈 베타) - 우선순위 2 -->
+    <div class="service-card card-chat" onclick="openService('chat')">
+      <div class="beta-badge open">오픈베타</div>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        LIVE
+      </div>
+      <i class="fas fa-comment-dots service-icon"></i>
+      <div class="service-title">실시간 채팅</div>
+      <div class="service-desc">지금 접속 중인<br>육상인들과 대화</div>
+    </div>
+    
+    <!-- 대회 일정 (NEW) -->
+    <div class="service-card card-schedule" onclick="window.location.href='competitions-calendar.html'">
+      <div class="new-badge">NEW</div>
+      <i class="fas fa-calendar-alt service-icon"></i>
+      <div class="service-title">대회 일정</div>
+      <div class="service-desc">KAAF 2025<br>공식 대회 일정</div>
+    </div>
+    
+    <!-- 페이스 계산기 (정식 오픈) -->
+    <div class="service-card card-pace" onclick="openService('pace')">
+      <i class="fas fa-calculator service-icon"></i>
+      <div class="service-title">페이스 계산기</div>
+      <div class="service-desc">목표 시간별<br>구간 스플릿</div>
+    </div>
+    
+    <!-- 훈련 계산기 (정식 오픈) -->
+    <div class="service-card card-training" onclick="openService('training')">
+      <i class="fas fa-dumbbell service-icon"></i>
+      <div class="service-title">훈련 계산기</div>
+      <div class="service-desc">VDOT 기반<br>맞춤 훈련 페이스</div>
+    </div>
+    
+    <!-- 실시간 경기 결과 (베타) -->
+    <div class="service-card card-result beta" onclick="openService('result')">
+      <div class="beta-badge">베타</div>
+      <i class="fas fa-trophy service-icon"></i>
+      <div class="service-title">경기 결과</div>
+      <div class="service-desc">전국육상대회<br>실시간 기록</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
+    </div>
+    
+    <!-- 중고 거래 (베타) -->
+    <div class="service-card card-market beta" onclick="openService('market')">
+      <div class="beta-badge">베타</div>
+      <i class="fas fa-shopping-bag service-icon"></i>
+      <div class="service-title">중고 거래</div>
+      <div class="service-desc">육상화 & 장비<br>직거래 마켓</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
+    </div>
+    
+    <!-- 더보기 (베타) -->
+    <div class="service-card card-more beta" onclick="openService('more')">
+      <div class="beta-badge">베타</div>
+      <i class="fas fa-ellipsis-h service-icon"></i>
+      <div class="service-title">더보기</div>
+      <div class="service-desc">기록 관리<br>훈련 일지</div>
+      <div class="coming-soon-overlay">
+        <div class="coming-soon-text">🚧 준비 중</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 실시간 채팅 상태 위젯 -->
+  <div class="chat-status-widget" id="chatWidget">
+    <div class="widget-title">
+      <div class="live-dot"></div>
+      실시간 채팅 현황
+    </div>
+    <div class="widget-stats">
+      <div class="widget-stat">
+        <div class="widget-stat-value" id="widgetOnline">0</div>
+        <div class="widget-stat-label">접속자</div>
+      </div>
+      <div class="widget-stat">
+        <div class="widget-stat-value" id="widgetRooms">0</div>
+        <div class="widget-stat-label">채팅방</div>
+      </div>
+      <div class="widget-stat">
+        <div class="widget-stat-value" id="widgetMessages">0</div>
+        <div class="widget-stat-label">메시지</div>
+      </div>
+    </div>
+    <button type="button" class="widget-join-btn" onclick="window.location.href='chat-real.html'">
+      채팅 참여하기 <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- 소개 섹션 -->
+  <div class="about-section">
+    <h2>ATHLETE TIME</h2>
+    <p>
+      대한민국 육상인들을 위한 올인원 플랫폼<br>
+      훈련부터 대회, 커뮤니티까지 모든 것을 한 곳에서
+    </p>
+    
+    <div class="feature-list">
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-users" style="color: #8b5cf6;"></i>
+          활발한 커뮤니티
+        </h3>
+        <p>매일 수백 명의 육상인들이 정보를 공유하고 서로를 응원합니다. 익명 게시판과 실시간 채팅으로 부담 없이 소통하세요.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-chart-line" style="color: #ec4899;"></i>
+          과학적 훈련 도구
+        </h3>
+        <p>VDOT 기반 훈련 계산기와 페이스 차트로 체계적인 훈련 계획을 세우세요. 목표 달성을 위한 최적의 페이스를 제공합니다.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-bolt" style="color: #f59e0b;"></i>
+          실시간 정보 제공
+        </h3>
+        <p>전국육상대회 결과를 실시간으로 확인하고, 다가오는 대회 일정을 한눈에 파악하세요.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-mobile-alt" style="color: #10b981;"></i>
+          모바일 최적화
+        </h3>
+        <p>언제 어디서나 편리하게 이용할 수 있도록 모바일에 최적화된 인터페이스를 제공합니다.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-shield-alt" style="color: #3b82f6;"></i>
+          안전한 거래
+        </h3>
+        <p>육상화와 장비를 안전하게 거래할 수 있는 중고 마켓을 운영합니다. 직거래와 안전결제를 지원합니다.</p>
+      </div>
+      
+      <div class="feature-item">
+        <h3>
+          <i class="fas fa-globe" style="color: #6366f1;"></i>
+          글로벌 네트워크
+        </h3>
+        <p>전 세계 육상 정보와 트렌드를 빠르게 접하고, 글로벌 육상인들과 교류할 수 있습니다.</p>
+      </div>
+    </div>
+    
+    <div style="margin-top: 60px; padding-top: 40px; border-top: 1px solid #222;">
+      <p style="color: #666; font-size: 0.9rem;">
+        © 2025 Athlete Time. All rights reserved. | 최종 업데이트: 2025.01.08<br>
+        <a href="#" style="color: #888; text-decoration: none;">이용약관</a> · 
+        <a href="#" style="color: #888; text-decoration: none;">개인정보처리방침</a> · 
+        <a href="#" style="color: #888; text-decoration: none;">문의하기</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- 서비스 모달 -->
+  <div class="modal" id="serviceModal">
+    <div class="modal-content">
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-buttons">
+        <button type="button" class="modal-button primary" id="modalPrimary" onclick="goToService()">바로가기</button>
+        <button type="button" class="modal-button secondary" onclick="closeModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentService = null;
+    
+    // 서비스 정보
+    const services = {
+      board: {
+        icon: 'fas fa-comments',
+        title: '익명 게시판',
+        desc: '자유롭게 의견을 나누고 정보를 공유하는 육상인들의 익명 커뮤니티입니다.',
+        url: 'community.html',
+        color: '#8b5cf6',
+        status: 'open'
+      },
+      chat: {
+        icon: 'fas fa-comment-dots',
+        title: '실시간 채팅 (오픈베타)',
+        desc: '지금 접속 중인 육상인들과 실시간으로 대화를 나눠보세요.\n\n✨ NEW: 다중 채팅방, 닉네임 설정, 30분 자동 삭제!',
+        url: 'chat-real.html',
+        color: '#ec4899',
+        status: 'open-beta'
+      },
+      result: {
+        icon: 'fas fa-trophy',
+        title: '경기 결과 (베타)',
+        desc: '전국육상대회의 실시간 결과와 기록 서비스를 준비 중입니다.\n\n🚧 대한육상연맹과 협의 중이며, 곧 서비스를 시작합니다.',
+        url: '#',
+        color: '#f59e0b',
+        status: 'beta'
+      },
+      schedule: {
+        icon: 'fas fa-calendar-alt',
+        title: '대회 일정 (베타)',
+        desc: '2025 시즌 전국육상대회 일정 서비스를 준비 중입니다.\n\n🚧 대한육상연맹과 협의 중이며, 곧 정확한 일정을 제공할 예정입니다.',
+        url: '#',
+        color: '#10b981',
+        status: 'beta'
+      },
+      training: {
+        icon: 'fas fa-dumbbell',
+        title: '훈련 계산기',
+        desc: 'VDOT 기반으로 당신에게 맞는 최적의 훈련 페이스를 계산합니다.',
+        url: 'training-calculator.html',
+        color: '#3b82f6',
+        status: 'open'
+      },
+      pace: {
+        icon: 'fas fa-calculator',
+        title: '페이스 계산기',
+        desc: '목표 시간에 맞는 구간별 스플릿과 페이스를 계산합니다.',
+        url: 'pace-calculator.html',
+        color: '#ef4444',
+        status: 'open'
+      },
+      market: {
+        icon: 'fas fa-shopping-bag',
+        title: '중고 거래 (베타)',
+        desc: '육상화, 스파이크, 장비 등을 안전하게 거래하는 육상인 전용 마켓을 준비 중입니다.\n\n🚧 안전 거래 시스템을 구축 중이며, 곧 오픈 예정입니다.',
+        url: '#',
+        color: '#6366f1',
+        status: 'beta'
+      },
+      more: {
+        icon: 'fas fa-ellipsis-h',
+        title: '더 많은 기능 (베타)',
+        desc: '기록 관리, 코스 추천, 날씨 정보 등 더 많은 서비스를 준비 중입니다.\n\n🚧 사용자 피드백을 수집하여 필요한 기능을 추가할 예정입니다.',
+        url: '#',
+        color: '#6b7280',
+        status: 'beta'
+      }
+    };
+    
+    // 서비스 열기
+    function openService(serviceKey) {
+      currentService = serviceKey;
+      const service = services[serviceKey];
+      
+      // 정식 오픈 서비스는 바로 이동
+      if (service.status === 'open') {
+        window.location.href = service.url;
+        return;
+      }
+      
+      // 오픈베타 서비스 (채팅)도 바로 이동
+      if (service.status === 'open-beta') {
+        if (confirm('오픈베타 서비스입니다.\n일부 기능이 제한될 수 있습니다.\n\n계속하시겠습니까?')) {
+          window.location.href = service.url;
+        }
+        return;
+      }
+      
+      // 베타 서비스는 모달 표시
+      document.getElementById('modalIcon').className = service.icon + ' modal-icon';
+      document.getElementById('modalIcon').style.color = service.color;
+      document.getElementById('modalTitle').textContent = service.title;
+      document.getElementById('modalDesc').textContent = service.desc;
+      document.getElementById('modalDesc').style.whiteSpace = 'pre-line';
+      
+      // 베타 서비스는 바로가기 버튼 숨기기
+      if (service.status === 'beta') {
+        document.getElementById('modalPrimary').style.display = 'none';
+        document.querySelector('.modal-buttons').style.justifyContent = 'center';
+      } else {
+        document.getElementById('modalPrimary').style.display = 'block';
+        document.querySelector('.modal-buttons').style.justifyContent = 'space-between';
+      }
+      
+      document.getElementById('serviceModal').classList.add('active');
+    }
+    
+    // 서비스로 이동
+    function goToService() {
+      if (currentService && services[currentService]) {
+        window.location.href = services[currentService].url;
+      }
+    }
+    
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('serviceModal').classList.remove('active');
+      currentService = null;
+    }
+    
+    // 메뉴 표시
+    function showMenu() {
+      alert('메뉴 기능은 준비 중입니다.');
+    }
+    
+    // 스크롤 이벤트
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const currentScroll = window.pageYOffset;
+      const header = document.getElementById('floatingHeader');
+      
+      if (currentScroll > 100) {
+        if (currentScroll < lastScroll) {
+          header.classList.add('show');
+        } else {
+          header.classList.remove('show');
+        }
+      } else {
+        header.classList.remove('show');
+      }
+      
+      lastScroll = currentScroll;
+    });
+    
+    // 모달 외부 클릭 시 닫기
+    document.getElementById('serviceModal').addEventListener('click', (e) => {
+      if (e.target.id === 'serviceModal') {
+        closeModal();
+      }
+    });
+    
+    // 실시간 숫자 업데이트 (익명게시판만)
+    setInterval(() => {
+      const badges = document.querySelectorAll('.new-badge');
+      badges.forEach(badge => {
+        const current = parseInt(badge.textContent);
+        const change = Math.random() > 0.8 ? 1 : 0;
+        if (change && current < 99) {
+          badge.textContent = current + change;
+        }
+      });
+    }, 15000);
+    
+    // 베타 서비스 안내
+    console.log('%c🚀 ATHLETE TIME 베타 서비스', 'font-size: 20px; font-weight: bold; color: #8b5cf6;');
+    console.log('%c현재 오픈된 서비스: 페이스 계산기, 훈련 계산기, 익명 게시판', 'color: #10b981;');
+    console.log('%c오픈베타: 실시간 채팅', 'color: #ec4899;');
+    console.log('%c준비중: 경기 결과, 대회 일정, 중고 거래', 'color: #f59e0b;');
+    
+    // 채팅 위젯 업데이트
+    function updateChatWidget(data) {
+      const widget = document.getElementById('chatWidget');
+      if (!widget) return;
+      
+      const userCount = widget.querySelector('.text-purple-600');
+      const roomCount = widget.querySelector('.text-pink-600');
+      
+      if (userCount) userCount.textContent = data.activeUsers || 0;
+      if (roomCount) roomCount.textContent = data.activeRooms || 0;
+    }
+    
+    // 실시간 채팅 통계 가져오기
+    function fetchChatStats() {
+      // Render 백엔드 API 전용
+      const apiUrl = 'https://athletetime-backend.onrender.com/api/stats';
+      
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          updateChatWidget(data);
+        })
+        .catch(error => {
+          // console.error('네트워크 오류:', error);
+          // 사용자에게 오류 알림
+          if (typeof alert !== 'undefined') {
+            // alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+          }
+        })(res => res.json())
+        .then(data => {
+          document.getElementById('widgetOnline').textContent = data.onlineUsers || 0;
+          document.getElementById('widgetRooms').textContent = data.totalRooms || 0;
+          document.getElementById('widgetMessages').textContent = 
+            data.totalMessages > 999 ? '999+' : (data.totalMessages || 0);
+          
+          // 위젯 표시
+          document.getElementById('chatWidget').classList.add('show');
+        })
+        .catch(err => {
+          // console.log('채팅 서버 오프라인'); // Production: removed
+        });
+    }
+    
+    // 페이지 로드 시 실행
+    window.addEventListener('load', () => {
+      // 디바이스 감지 (함수가 없으면 건너뛰기)
+      if (typeof detectDevice === 'function') {
+        detectDevice();
+      }
+      
+      // 채팅 통계 가져오기
+      fetchChatStats();
+      
+      // 10초마다 업데이트
+      setInterval(fetchChatStats, 10000);
+    });
+  </script>
+
+</body>
+</html>
