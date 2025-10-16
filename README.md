@@ -6,6 +6,17 @@
 - **데이터베이스**: PostgreSQL (Render 유료 플랜 포함)
 - **데이터 저장**: 영구 저장 (제한 없음)
 
+## 🤝 협업 규칙
+
+- **프론트엔드 UI/UX**: Claude가 전담합니다.
+- **백엔드/디버깅**: ChatGPT가 오류 분석, 서버 로직, 환경 설정을 담당합니다.
+- **작업 순서**:
+  1. 백엔드/디버깅 변경을 먼저 커밋 & 푸시합니다.
+  2. 프론트엔드 담당자가 최신 변경 사항을 `git pull` 후 UI 작업을 진행합니다.
+  3. 각자 작업 전 `git pull origin main`, 작업 후 `git push` 규칙을 지킵니다.
+- **중복 질의 방지**: 위 역할 분담과 순서는 고정이며, 재확인 없이 이 절차를 기본으로 따릅니다.
+- **협업 참여자**: ChatGPT(백엔드/디버깅), Claude(프론트엔드 UI/UX)
+
 ## 🔧 최근 수정 사항 (2025-10-10)
 
 ### ✅ 게시글 삭제 기능 수정 완료
@@ -43,17 +54,20 @@ PROD=1 node test-deletion.js
 
 ```
 /home/user/webapp/
+├── src/community-app/   # 신규 Vite 기반 커뮤니티 프론트엔드 (chimhaha 스타일)
+├── community.html       # 기존 레거시 커뮤니티 페이지 (추후 제거 예정)
 ├── index.html           # 메인 페이지
-├── community.html       # 커뮤니티 게시판
-├── chat.html           # 채팅방
-├── server.js           # 통합 백엔드 서버 (Render 배포용)
-├── community-api.js    # 게시판 API 클라이언트
-├── backend-config.js   # 백엔드 URL 설정
-├── test-deletion.js    # 삭제 기능 테스트 스크립트
-└── package.json        # 의존성 관리
+├── chat.html            # 채팅방
+├── server.js            # 통합 백엔드 서버 (Render 배포용)
+├── community-api.js     # 게시판 API 클라이언트 (레거시)
+├── backend-config.js    # 백엔드 URL 설정
+├── test-deletion.js     # 삭제 기능 테스트 스크립트
+└── package.json         # 의존성 관리
 ```
 
 ## 🛠️ 주요 기능
+
+> ℹ️ **베타 프론트엔드 안내**: `src/community-app/` 이하의 Vite 애플리케이션이 새로운 베타 커뮤니티 경험을 제공합니다. 현재 Netlify 배포는 기존 정적 페이지를 사용하고 있으므로 점진적으로 전환 예정입니다.
 
 ### 익명 게시판
 - ✅ 게시글 CRUD (생성, 읽기, 수정, 삭제)
@@ -83,12 +97,6 @@ PROD=1 node test-deletion.js
 ### 에러 처리
 - 네트워크 오류 시 localStorage 폴백
 - 서버 오류 시 사용자 친화적 메시지 표시
-
-## 🐛 알려진 이슈
-
-### 베타 서비스 안내
-- 간헐적인 서버 연결 지연 (Render 무료 플랜)
-- 첫 요청 시 서버 콜드 스타트 (최대 30초)
 
 ## 📧 문의
 
