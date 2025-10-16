@@ -4,29 +4,6 @@ import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
 import { useBoardNavigation, usePosts } from '../features/board/hooks'
 import Pagination from '../components/common/Pagination'
 import { cn, formatDate, formatNumber } from '../lib/utils'
-import type { PostSummary } from '../lib/types'
-
-const ESSENTIAL_NOTICE: PostSummary = {
-  id: 'beta-policy-notice',
-  boardId: 'notice',
-  boardSlug: 'notice',
-  boardName: '공지',
-  title: '베타 운영 정책 안내',
-  excerpt:
-    'AthleteTime 익명 게시판은 2025년 10월 13일 기준 베타 운영 중입니다. 작성 시 설정한 비밀번호를 분실하면 수정/삭제가 불가능합니다.',
-  authorNick: '운영팀',
-  createdAt: '2025-10-13T00:00:00+09:00',
-  updatedAt: '2025-10-13T00:00:00+09:00',
-  views: 0,
-  likeCount: 0,
-  dislikeCount: 0,
-  commentCount: 0,
-  tags: ['공지'],
-  isNotice: true,
-  isHot: false,
-  hasPoll: false,
-}
-
 const sortOptions = [
   { value: 'latest', label: '최신순' },
   { value: 'popular', label: '인기순' },
@@ -55,14 +32,7 @@ function HomePage() {
   const apiNotices = useMemo(() => data?.data.filter((post) => post.isNotice) ?? [], [data])
   const posts = useMemo(() => data?.data.filter((post) => !post.isNotice) ?? [], [data])
 
-  const notices = useMemo(() => {
-    const map = new Map<string, PostSummary>()
-    map.set(ESSENTIAL_NOTICE.id, ESSENTIAL_NOTICE)
-    for (const notice of apiNotices) {
-      map.set(notice.id, notice)
-    }
-    return Array.from(map.values())
-  }, [apiNotices])
+  const notices = useMemo(() => apiNotices, [apiNotices])
 
   const totalTodayPosts = boards.reduce((acc, board) => acc + (board.todayPostCount ?? 0), 0)
 
@@ -243,7 +213,7 @@ function HomePage() {
         ) : (
           <div className="flex flex-col items-center gap-3 px-6 py-16 text-center text-ink-500">
             <p className="text-lg font-semibold">아직 게시글이 없습니다.</p>
-            <p className="text-sm">첫 글을 작성하고 커뮤니티를 시작해보세요. 베타 기간에는 로그인 없이 바로 이용할 수 있습니다.</p>
+            <p className="text-sm">첫 글을 작성하고 커뮤니티를 시작해보세요. 로그인 없이도 바로 참여할 수 있습니다.</p>
             <Link to="/write" className="btn-primary">
               글쓰기
             </Link>

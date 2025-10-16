@@ -1,6 +1,6 @@
-# AthleteTime Community App (Beta)
+# AthleteTime Community App
 
-This package contains the new anonymous board experience for AthleteTime, rebuilt with modern tooling to mirror the UX patterns of chimhaha.net while keeping the service in beta mode.
+This package contains the production anonymous board experience for AthleteTime, rebuilt with modern tooling to mirror the UX patterns of chimhaha.net while connecting directly to the live Render backend.
 
 ## Tech Stack
 
@@ -60,14 +60,15 @@ The build artifacts are emitted to `dist/` and consumed by the Netlify deploymen
 
 ## Development Notes
 
-- 게시판 데이터는 `src/features/board/api.ts`에서 TanStack Query를 통해 바로 API에 연결됩니다. 기본값은 Render Starter 유료 플랜 실서버(`https://athletetime-backend.onrender.com/community`)를 바라보며, 베타 운영을 위해 최소한의 기본 게시판만 로컬에서 보장합니다.
-- 필수 공지(베타 운영 정책)는 `HomePage`에서 기본 제공되어 더미 게시물 없이도 첫 화면이 완성됩니다.
+- 게시판 데이터는 `src/features/board/api.ts`에서 TanStack Query를 통해 바로 API에 연결됩니다. 기본값은 Render Starter 플랜의 실서버(`https://athletetime-backend.onrender.com/community`)이며, 장애 시 최소한의 기본 게시판만 로컬에서 보장합니다.
+- 서비스 공지와 상단 배너는 공지 게시판의 최신 글을 실시간으로 불러와 표시합니다.
+- Vite dev/preview 서버는 `.sandbox.novita.ai` 및 `.e2b.dev` 도메인을 와일드카드로 허용하도록 `vite.config.ts`의 `allowedHosts` 설정을 사용합니다.
 - 레이아웃은 `src/app/AppLayout.tsx`에서 헤더 · 보드 네비게이션 · 좌측 안내 패널로 구성됩니다.
 - Utility helpers (e.g. `formatRelativeTime`, `cn`) are under `src/lib`.
 - Tailwind v4 no longer supports `@apply`; custom component styles are defined declaratively in `index.css`.
 
 ## Next Steps
 
-- Connect additional backend endpoints (예: 통계/알림) after 베타 검증이 완료되면 됩니다.
+- Connect additional backend endpoints (예: 통계/알림) as soon as 관련 API가 준비되는 대로 확장 가능합니다.
 - Introduce authentication and 개인화 기능 after 계정 시스템 오픈.
 - Add integration tests and visual regression coverage for critical flows.

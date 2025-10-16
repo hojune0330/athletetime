@@ -90,9 +90,14 @@ export async function createPost(payload: CreatePostPayload) {
 }
 
 export async function submitVote(payload: VoteRequest) {
+  const body: Record<string, unknown> = { type: payload.type }
+  if (payload.userId) {
+    body.userId = payload.userId
+  }
+
   return apiRequest(`/posts/${payload.postId}/vote`, {
     method: 'POST',
-    body: JSON.stringify({ type: payload.type }),
+    body: JSON.stringify(body),
   })
 }
 

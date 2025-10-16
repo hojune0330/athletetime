@@ -1,20 +1,15 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import {
-  BookmarkIcon,
-  ChatBubbleLeftRightIcon,
-  HandThumbDownIcon,
-  HandThumbUpIcon,
-  ShareIcon,
-} from '@heroicons/react/24/outline'
+import { ChatBubbleLeftRightIcon, HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { usePostDetail, postKeys } from '../features/board/hooks'
 import { formatDate, formatNumber } from '../lib/utils'
 import CommentThread from '../components/common/CommentThread'
-import { submitComment } from '../features/board/api'
+import { submitComment, submitVote } from '../features/board/api'
+import { getAnonymousUserId } from '../lib/user'
 
 function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>()
@@ -24,13 +19,37 @@ function PostDetailPage() {
   const [nickname, setNickname] = useState('익명')
   const [password, setPassword] = useState('')
   const [content, setContent] = useState('')
+  const [commentStatus, setCommentStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [voteError, setVoteError] = useState<string | null>(null)
+  const [userId] = useState(() => getAnonymousUserId())
 
   const commentMutation = useMutation({
     mutationFn: submitComment,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: postKeys.detail(postId ?? '') })
+      if (postId) {
+        await queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) })
+      }
       setContent('')
       setPassword('')
+      setCommentStatus({ type: 'success', message: '댓글이 등록되었습니다.' })
+    },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : '댓글 등록 중 오류가 발생했습니다.'
+      setCommentStatus({ type: 'error', message })
+    },
+  })
+
+  const voteMutation = useMutation({
+    mutationFn: submitVote,
+    onSuccess: async () => {
+      if (postId) {
+        await queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) })
+      }
+      setVoteError(null)
+    },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : '추천 처리 중 문제가 발생했습니다.'
+      setVoteError(message)
     },
   })
 
@@ -40,12 +59,22 @@ function PostDetailPage() {
       return
     }
 
+    setCommentStatus(null)
     commentMutation.mutate({
       postId,
       authorNick: nickname.trim() || '익명',
       content: content.trim(),
       password: password.trim() || Math.random().toString(36).slice(-8),
     })
+  }
+
+  const handleVote = (type: 'like' | 'dislike') => {
+    if (!postId) {
+      return
+    }
+
+    setVoteError(null)
+    voteMutation.mutate({ postId, type, userId })
   }
 
   if (isLoading) {
@@ -117,17 +146,27 @@ function PostDetailPage() {
 
           {post.attachments.length > 0 ? (
             <section className="rounded-2xl border border-slate-100 bg-ink-50/70 p-4">
-              <h2 className="text-sm font-semibold text-ink-700">첨부 파일 (베타: 다운로드 제한)</h2>
+              <h2 className="text-sm font-semibold text-ink-700">첨부 파일</h2>
               <ul className="mt-3 space-y-2 text-sm text-ink-600">
                 {post.attachments.map((file) => (
                   <li key={file.id} className="flex items-center justify-between gap-3 rounded-lg bg-white px-4 py-3 shadow-subtle">
-                    <span className="line-clamp-1 font-medium">{file.fileName}</span>
-                    <span className="text-xs text-ink-400">{Math.round(file.fileSize / 1024)}KB</span>
+                    <a
+                      href={file.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download={file.fileName ?? true}
+                      className="line-clamp-1 font-medium text-brand-600 hover:underline"
+                    >
+                      {file.fileName ?? file.fileUrl}
+                    </a>
+                    <span className="text-xs text-ink-400">
+                      {typeof file.fileSize === 'number' ? `${Math.max(1, Math.round(file.fileSize / 1024))}KB` : '—'}
+                    </span>
                   </li>
                 ))}
               </ul>
               <p className="mt-2 text-xs text-ink-400">
-                베타 기간에는 파일 다운로드가 제한됩니다. 정식 오픈 후 원본 다운로드가 가능해집니다.
+                업로드된 자료는 암호화되어 저장되며, 신고 접수 시 운영팀이 즉시 검토합니다.
               </p>
             </section>
           ) : null}
@@ -135,24 +174,32 @@ function PostDetailPage() {
 
         <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 bg-white px-6 py-4 text-sm">
           <div className="flex flex-wrap items-center gap-3">
-            <button type="button" className="btn-primary px-5" disabled title="베타 기간에는 추천 기능이 비활성화되어 있습니다.">
+            <button
+              type="button"
+              className="btn-primary px-5 disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={() => handleVote('like')}
+              disabled={voteMutation.isPending}
+            >
               <HandThumbUpIcon className="mr-2 h-5 w-5" />
               추천 {formatNumber(post.likeCount)}
             </button>
-            <button type="button" className="btn-ghost" disabled>
+            <button
+              type="button"
+              className="btn-ghost disabled:cursor-not-allowed disabled:opacity-70"
+              onClick={() => handleVote('dislike')}
+              disabled={voteMutation.isPending}
+            >
               <HandThumbDownIcon className="mr-2 h-5 w-5" />
               비추천 {formatNumber(post.dislikeCount)}
             </button>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-ink-400">
-            <button type="button" className="btn-ghost" disabled>
-              <ShareIcon className="mr-2 h-4 w-4" />
-              공유 준비중
-            </button>
-            <button type="button" className="btn-ghost" disabled>
-              <BookmarkIcon className="mr-2 h-4 w-4" />
-              찜하기 준비중
-            </button>
+          <div className="flex flex-col items-end gap-1 text-xs text-ink-400">
+            <span>추천·비추천은 IP 기준으로 1시간에 한 번만 가능합니다.</span>
+            {voteError ? (
+              <span className="text-rose-500" role="alert" aria-live="assertive">
+                {voteError}
+              </span>
+            ) : null}
           </div>
         </footer>
       </article>
@@ -163,7 +210,7 @@ function PostDetailPage() {
             댓글 {formatNumber(post.commentCount)}
           </h2>
           <span className="text-xs text-ink-400">
-            베타 기간 동안 댓글 작성은 순차적으로 열릴 예정입니다.
+            커뮤니티 가이드라인을 준수하고 서로를 존중하는 댓글 문화를 만들어주세요.
           </span>
         </header>
 
@@ -201,11 +248,23 @@ function PostDetailPage() {
           </label>
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-ink-400">
             <span>신고 10회 이상 누적 시 자동으로 블라인드 처리됩니다.</span>
-            <button type="submit" className="btn-primary cursor-not-allowed" disabled>
+            <button
+              type="submit"
+              className="btn-primary disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={commentMutation.isPending}
+            >
               <ChatBubbleLeftRightIcon className="mr-2 h-4 w-4" />
-              댓글 준비중
+              {commentMutation.isPending ? '등록 중…' : '댓글 등록'}
             </button>
           </div>
+          {commentStatus ? (
+            <p
+              className={`text-xs ${commentStatus.type === 'success' ? 'text-emerald-600' : 'text-rose-500'}`}
+              aria-live="polite"
+            >
+              {commentStatus.message}
+            </p>
+          ) : null}
         </form>
 
         {post.comments.length > 0 ? (
@@ -216,7 +275,7 @@ function PostDetailPage() {
           </ul>
         ) : (
           <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-ink-50/60 px-6 py-10 text-center text-sm text-ink-400">
-            첫 댓글을 남겨보세요. 베타 기간에는 댓글 기능이 단계적으로 열립니다.
+            첫 댓글을 남겨보세요. 로그인 없이도 자유롭게 참여할 수 있습니다.
           </div>
         )}
       </section>

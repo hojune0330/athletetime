@@ -1,4 +1,4 @@
-import { ChatBubbleBottomCenterTextIcon, HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
+import { HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
 import type { CommentThread as CommentThreadModel } from '../../lib/types'
 import { formatRelativeTime } from '../../lib/utils'
 
@@ -36,11 +36,15 @@ function CommentThread({ comment, depth = 0 }: CommentThreadProps) {
         {comment.isHidden ? '신고 누적으로 숨겨진 댓글입니다.' : comment.content}
       </p>
 
-      <div className="flex flex-wrap items-center gap-2 text-xs text-ink-400">
-        <button type="button" className="inline-flex items-center gap-1" disabled>
-          <ChatBubbleBottomCenterTextIcon className="h-4 w-4" />
-          답글 준비중
-        </button>
+      <div className="flex flex-wrap items-center gap-3 text-xs text-ink-400">
+        <span className="inline-flex items-center gap-1">
+          <HandThumbUpIcon className="h-4 w-4" />
+          {comment.likeCount}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <HandThumbDownIcon className="h-4 w-4" />
+          {comment.dislikeCount}
+        </span>
         <span>신고 {comment.reportCount}</span>
       </div>
 

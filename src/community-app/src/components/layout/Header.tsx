@@ -7,17 +7,14 @@ type NavItem = {
   label: string
   to?: string
   end?: boolean
-  disabled?: boolean
   external?: boolean
 }
 
 const NAV_ITEMS: ReadonlyArray<NavItem> = [
   { label: '전체글', to: '/', end: true },
-  { label: '대회 일정', to: 'https://athletetime.netlify.app/competitions-calendar', external: true },
+  { label: '공지사항', to: '/boards/notice' },
   { label: '경기 시간표', to: '/events/timetable' },
-  { label: '공지사항', to: '/?section=notices' },
-  { label: '서비스 업데이트', disabled: true },
-  { label: '계정 준비중', disabled: true },
+  { label: '대회 일정', to: 'https://athletetime.netlify.app/competitions-calendar', external: true },
 ]
 
 function Header() {
@@ -44,16 +41,6 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-ink-100/60 bg-white/95 shadow-sm backdrop-blur">
-      <div className="border-b border-ink-100/80 bg-ink-900/95">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-1.5 text-[11px] font-medium text-ink-100 sm:px-6 lg:px-8">
-          <span className="uppercase tracking-wide text-brand-100">Beta 운영 중</span>
-          <div className="flex items-center gap-4">
-            <span className="hidden sm:inline text-ink-200">로그인 없이도 익명으로 이용 가능합니다.</span>
-            <span className="text-brand-200">계정 기능은 준비 중입니다.</span>
-          </div>
-        </div>
-      </div>
-
       <div className="mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
           <span className="inline-flex items-center rounded-full bg-brand-500 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white shadow-subtle">
@@ -64,16 +51,8 @@ function Header() {
 
         <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="주요 메뉴">
           {activeNavItems.map((item) => {
-            if (item.disabled || !item.to) {
-              return (
-                <span
-                  key={item.key}
-                  className="cursor-not-allowed rounded-lg px-3 py-2 text-sm font-semibold text-ink-300"
-                  title="준비 중"
-                >
-                  {item.label}
-                </span>
-              )
+            if (!item.to) {
+              return null
             }
 
             if (item.external) {
@@ -130,14 +109,14 @@ function Header() {
             <PencilSquareIcon className="mr-2 h-4 w-4" />
             글쓰기
           </Link>
-          <button
-            type="button"
-            className="btn-ghost cursor-not-allowed text-ink-400"
-            title="베타 기간 동안 회원 기능 준비 중"
-            disabled
+          <Link
+            to="/write"
+            className="btn-primary sm:hidden inline-flex items-center gap-1 px-3 py-1.5 text-xs"
+            aria-label="새 글 작성"
           >
-            로그인 준비중
-          </button>
+            <PencilSquareIcon className="h-4 w-4" />
+            작성
+          </Link>
         </div>
       </div>
 

@@ -28,7 +28,7 @@ function WritePage() {
     },
     onError: (error) => {
       console.error(error)
-      setStatusMessage('베타 서버 준비 중입니다. 잠시 후 다시 시도해주세요.')
+      setStatusMessage('게시글 등록 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.')
     },
   })
 
@@ -74,7 +74,7 @@ function WritePage() {
         <header className="border-b border-slate-100 bg-white px-6 py-6">
           <h1 className="text-2xl font-bold text-ink-900">새 글 작성</h1>
           <p className="mt-2 text-sm text-ink-500">
-            베타 기간에는 로그인 없이 비밀번호만으로 게시글을 관리할 수 있습니다. 비밀번호를 분실하면 운영팀에서도 복구가 어려우니 안전한 곳에 기록해 주세요.
+            로그인 없이 비밀번호만으로 게시글을 관리할 수 있습니다. 비밀번호를 분실하면 운영팀에서도 복구가 어렵습니다. 반드시 안전한 곳에 보관해 주세요.
           </p>
         </header>
 
@@ -151,14 +151,14 @@ function WritePage() {
               value={content}
               onChange={(event) => setContent(event.target.value)}
               rows={12}
-              placeholder="커뮤니티 수칙을 준수하여 내용을 작성해주세요. 베타 기간에는 이미지 업로드가 제한됩니다."
+              placeholder="커뮤니티 수칙을 준수하여 내용을 작성해주세요. 저작권을 침해하는 내용은 삭제될 수 있습니다."
               disabled={!hasAvailableBoard}
               className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink-700 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-slate-100"
             />
           </label>
 
           <label className="flex flex-col gap-2 text-sm text-ink-500">
-            첨부 이미지 (최대 3개, 베타에서는 임시 저장)
+            첨부 이미지 (최대 3개, JPG/PNG 지원)
             <input
               type="file"
               accept="image/*"
@@ -177,7 +177,7 @@ function WritePage() {
               </ul>
             ) : null}
             <p className="text-[11px] text-ink-400">
-              이미지 본문 삽입은 정식 오픈 시 적용됩니다. 현재는 참고용으로만 업로드해주세요.
+              이미지는 게시글 상단에 노출될 수 있습니다. 부적절한 이미지는 운영팀이 즉시 삭제합니다.
             </p>
           </label>
 

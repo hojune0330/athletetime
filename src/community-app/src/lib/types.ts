@@ -88,6 +88,7 @@ export interface ApiError {
 export interface VoteRequest {
   postId: string
   type: 'like' | 'dislike'
+  userId?: string
 }
 
 export interface CreatePostPayload {

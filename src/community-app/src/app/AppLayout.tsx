@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import Header from '../components/layout/Header'
-import BetaNotice from '../components/layout/BetaNotice'
+import AnnouncementBar from '../components/layout/AnnouncementBar'
 import BoardNav from '../components/layout/BoardNav'
 import LeftSidebar from '../components/layout/LeftSidebar'
 
@@ -9,7 +9,7 @@ function AppLayout() {
     <div className="min-h-screen bg-ink-50/60">
       <Header />
       <BoardNav />
-      <BetaNotice />
+      <AnnouncementBar />
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
           <aside className="hidden lg:block">
