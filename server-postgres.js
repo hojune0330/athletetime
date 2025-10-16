@@ -5,12 +5,15 @@ const cors = require('cors');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const fsp = fs.promises;
 const WebSocket = require('ws');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const DOMPurify = require('isomorphic-dompurify');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const multer = require('multer');
+const crypto = require('crypto');
 
 // Render 유료 플랜 설정 로드
 const { validateRenderPlan, RENDER_PLAN } = require('./config/render-config');
@@ -19,6 +22,46 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const SALT_ROUNDS = 10;
+const UPLOAD_DIR = path.join(__dirname, 'uploads');
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB per file
+const MAX_UPLOAD_FILES = 5;
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, callback) => {
+    callback(null, UPLOAD_DIR);
+  },
+  filename: (_req, file, callback) => {
+    const ext = path.extname(file.originalname || '');
+    const unique = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    callback(null, `${unique}${ext}`);
+  },
+});
+
+const ALLOWED_MIME_TYPES = new Set([
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+]);
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: MAX_UPLOAD_SIZE,
+    files: MAX_UPLOAD_FILES,
+  },
+  fileFilter: (_req, file, callback) => {
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      return callback(new Error('지원되지 않는 파일 형식입니다. (이미지 또는 PDF만 업로드 가능)'));
+    }
+    callback(null, true);
+  },
+});
 
 // PostgreSQL 연결
 const pool = new Pool({
@@ -26,6 +69,195 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? 
     { rejectUnauthorized: false } : false
 });
+
+const DEFAULT_BOARD_DEFINITIONS = [
+  {
+    id: 'notice',
+    slug: 'notice',
+    name: '서비스 공지',
+    description: 'AthleteTime 운영팀 안내와 점검 소식을 전합니다.',
+    icon: '📢',
+    orderIndex: 0,
+  },
+  {
+    id: 'anonymous',
+    slug: 'anonymous',
+    name: '익명 게시판',
+    description: '로그인 없이 러너들과 실시간으로 소통하세요.',
+    icon: '💬',
+    orderIndex: 1,
+  },
+  {
+    id: 'qna',
+    slug: 'qna',
+    name: '질문 · 답변',
+    description: '러닝 관련 궁금한 점을 질문하고 답변을 받아보세요.',
+    icon: '❓',
+    orderIndex: 2,
+  },
+  {
+    id: 'training',
+    slug: 'training',
+    name: '훈련 · 노하우',
+    description: '훈련일지와 노하우를 공유하고 피드백을 받아보세요.',
+    icon: '🏃',
+    orderIndex: 3,
+  },
+  {
+    id: 'gear',
+    slug: 'gear',
+    name: '장비 · 리뷰',
+    description: '러닝화와 웨어, 기어 사용 후기를 나눠보세요.',
+    icon: '🎽',
+    orderIndex: 4,
+  },
+  {
+    id: 'competition',
+    slug: 'competition',
+    name: '대회 · 모임',
+    description: '주요 대회 정보와 커뮤니티 번개를 공유합니다.',
+    icon: '🏅',
+    orderIndex: 5,
+  },
+];
+
+async function ensureExtendedSchema() {
+  const statements = [
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}'::TEXT[]`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]'::jsonb`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS poll JSONB`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS summary TEXT`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS board_id VARCHAR(50) DEFAULT 'anonymous'`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS user_id VARCHAR(100)`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_notice BOOLEAN DEFAULT false`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS is_blinded BOOLEAN DEFAULT false`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS reports INTEGER DEFAULT 0`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS likes TEXT[] DEFAULT '{}'::TEXT[]`,
+    `ALTER TABLE posts ADD COLUMN IF NOT EXISTS dislikes TEXT[] DEFAULT '{}'::TEXT[]`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS parent_id BIGINT`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS instagram VARCHAR(100)`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS user_id VARCHAR(100)`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS like_count INTEGER DEFAULT 0`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS dislike_count INTEGER DEFAULT 0`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS report_count INTEGER DEFAULT 0`,
+    `ALTER TABLE comments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP`,
+    `ALTER TABLE post_attachments ADD COLUMN IF NOT EXISTS thumbnail_url TEXT`,
+    `ALTER TABLE post_attachments ADD COLUMN IF NOT EXISTS file_url TEXT`,
+    `ALTER TABLE post_attachments ADD COLUMN IF NOT EXISTS file_size INTEGER`,
+    `ALTER TABLE post_attachments ADD COLUMN IF NOT EXISTS mime_type TEXT`
+  ];
+
+  for (const statement of statements) {
+    try {
+      await pool.query(statement);
+    } catch (error) {
+      console.error('스키마 확장 쿼리 실패:', statement, error.message);
+    }
+  }
+
+  const defaultStatements = [
+    `ALTER TABLE posts ALTER COLUMN likes SET DEFAULT '{}'::TEXT[]`,
+    `ALTER TABLE posts ALTER COLUMN dislikes SET DEFAULT '{}'::TEXT[]`,
+    `ALTER TABLE posts ALTER COLUMN board_id SET DEFAULT 'anonymous'`,
+    `ALTER TABLE comments ALTER COLUMN like_count SET DEFAULT 0`,
+    `ALTER TABLE comments ALTER COLUMN dislike_count SET DEFAULT 0`,
+    `ALTER TABLE comments ALTER COLUMN report_count SET DEFAULT 0`
+  ];
+
+  for (const statement of defaultStatements) {
+    try {
+      await pool.query(statement);
+    } catch (error) {
+      console.error('스키마 기본값 설정 실패:', statement, error.message);
+    }
+  }
+
+  console.log('✅ posts/comments 확장 스키마 동기화 완료');
+}
+
+async function seedDefaultBoards() {
+  for (const board of DEFAULT_BOARD_DEFINITIONS) {
+    try {
+      await pool.query(
+        `INSERT INTO boards (id, name, slug, description, icon, order_index, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, TRUE)
+         ON CONFLICT (id) DO UPDATE
+           SET name = EXCLUDED.name,
+               slug = EXCLUDED.slug,
+               description = EXCLUDED.description,
+               icon = EXCLUDED.icon,
+               order_index = EXCLUDED.order_index,
+               is_active = TRUE`,
+        [
+          board.id,
+          board.name,
+          board.slug,
+          board.description,
+          board.icon,
+          board.orderIndex,
+        ],
+      );
+    } catch (error) {
+      console.error(`기본 게시판 시드 실패 (${board.id}):`, error.message);
+    }
+  }
+
+  console.log('✅ 기본 게시판 시드 완료');
+}
+
+async function backfillPostBoardRelations() {
+  try {
+    await pool.query(`
+      UPDATE posts p
+      SET board_id = b.id
+      FROM boards b
+      WHERE (p.board_id IS NULL OR p.board_id = '' OR p.board_id NOT IN (SELECT id FROM boards))
+        AND (p.category = b.slug OR p.category = b.id)
+    `);
+  } catch (error) {
+    console.error('게시글 게시판 매핑 갱신 실패 (카테고리 매핑):', error.message);
+  }
+
+  try {
+    await pool.query(`
+      UPDATE posts
+      SET board_id = 'notice',
+          is_notice = TRUE
+      WHERE (board_id IS NULL OR board_id = '' OR board_id NOT IN (SELECT id FROM boards))
+        AND (
+          category ILIKE '%notice%'
+          OR category ILIKE '%공지%'
+          OR is_notice IS TRUE
+        )
+    `);
+  } catch (error) {
+    console.error('공지 게시판 백필 실패:', error.message);
+  }
+
+  try {
+    await pool.query(`
+      UPDATE posts
+      SET board_id = 'anonymous'
+      WHERE board_id IS NULL OR board_id = '' OR board_id NOT IN (SELECT id FROM boards)
+    `);
+  } catch (error) {
+    console.error('기본 게시판 백필 실패:', error.message);
+  }
+
+  try {
+    await pool.query(`
+      UPDATE posts
+      SET is_notice = TRUE
+      WHERE board_id = 'notice' AND (is_notice IS DISTINCT FROM TRUE)
+    `);
+  } catch (error) {
+    console.error('공지 플래그 동기화 실패:', error.message);
+  }
+
+  console.log('✅ 게시글-게시판 매핑 동기화 완료');
+}
 
 // ============================================
 // 보안 미들웨어
@@ -45,6 +277,7 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '10mb' })); // 크기 제한
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 // ============================================
 // Rate Limiting 설정
@@ -83,6 +316,7 @@ const commentLimiter = rateLimit({
 
 // Rate Limiting 적용
 app.use('/api/', generalLimiter);
+app.use('/community', generalLimiter);
 
 // ============================================
 // 보안 유틸리티 함수
@@ -129,10 +363,17 @@ async function initDatabase() {
         category VARCHAR(50),
         password VARCHAR(255), -- bcrypt 해시용 길이
         created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP,
         views INTEGER DEFAULT 0,
         likes TEXT[] DEFAULT '{}',
         dislikes TEXT[] DEFAULT '{}',
         images JSONB DEFAULT '[]',
+        tags TEXT[] DEFAULT '{}',
+        attachments JSONB DEFAULT '[]',
+        poll JSONB,
+        summary TEXT,
+        board_id VARCHAR(50),
+        user_id VARCHAR(100),
         is_notice BOOLEAN DEFAULT false,
         is_blinded BOOLEAN DEFAULT false,
         reports INTEGER DEFAULT 0
@@ -144,11 +385,17 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS comments (
         id BIGINT PRIMARY KEY,
         post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+        parent_id BIGINT REFERENCES comments(id) ON DELETE CASCADE,
         author VARCHAR(100) NOT NULL,
         content TEXT NOT NULL,
         password VARCHAR(255), -- bcrypt 해시용
         instagram VARCHAR(100),
-        created_at TIMESTAMP DEFAULT NOW()
+        user_id VARCHAR(100),
+        like_count INTEGER DEFAULT 0,
+        dislike_count INTEGER DEFAULT 0,
+        report_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP
       )
     `);
 
@@ -163,11 +410,90 @@ async function initDatabase() {
       )
     `);
 
+    // boards, votes, polls, attachments 보조 테이블 생성
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS boards (
+        id VARCHAR(50) PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        slug VARCHAR(100) UNIQUE NOT NULL,
+        description TEXT,
+        icon VARCHAR(10),
+        order_index INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_votes (
+        post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+        user_id VARCHAR(100) NOT NULL,
+        vote_type VARCHAR(10) NOT NULL CHECK (vote_type IN ('like', 'dislike')),
+        created_at TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (post_id, user_id)
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_polls (
+        id BIGSERIAL PRIMARY KEY,
+        post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+        question TEXT NOT NULL,
+        multiple BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_poll_options (
+        id BIGSERIAL PRIMARY KEY,
+        poll_id BIGINT REFERENCES post_polls(id) ON DELETE CASCADE,
+        label TEXT NOT NULL,
+        order_index INTEGER DEFAULT 0,
+        vote_count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_poll_votes (
+        poll_id BIGINT REFERENCES post_polls(id) ON DELETE CASCADE,
+        option_id BIGINT REFERENCES post_poll_options(id) ON DELETE CASCADE,
+        user_id VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (poll_id, user_id)
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_attachments (
+        id BIGSERIAL PRIMARY KEY,
+        post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+        file_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        file_url TEXT,
+        thumbnail_url TEXT,
+        file_size INTEGER,
+        mime_type TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `);
+
+    await ensureExtendedSchema();
+    await seedDefaultBoards();
+    await backfillPostBoardRelations();
+
     // 인덱스 생성
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_posts_board ON posts(board_id);
       CREATE INDEX IF NOT EXISTS idx_chat_room ON chat_messages(room, created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
+      CREATE INDEX IF NOT EXISTS idx_comments_parent_id ON comments(parent_id);
+      CREATE INDEX IF NOT EXISTS idx_post_votes_post_id ON post_votes(post_id);
+      CREATE INDEX IF NOT EXISTS idx_post_votes_user_id ON post_votes(user_id);
+      CREATE INDEX IF NOT EXISTS idx_post_poll_post_id ON post_polls(post_id);
+      CREATE INDEX IF NOT EXISTS idx_post_attachment_post_id ON post_attachments(post_id);
     `);
 
     console.log('✅ 보안 강화된 데이터베이스 초기화 완료');
@@ -175,6 +501,754 @@ async function initDatabase() {
     console.error('데이터베이스 초기화 오류:', error);
   }
 }
+
+// ============================================
+// 커뮤니티 API 유틸리티
+// ============================================
+
+function toISOString(value) {
+  if (!value) {
+    return null;
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  try {
+    return new Date(value).toISOString();
+  } catch (error) {
+    return null;
+  }
+}
+
+function createListMeta(totalItems, page, pageSize) {
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+  const safePageSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 1;
+  const totalPages = Math.max(1, Math.ceil((totalItems || 0) / safePageSize));
+  return {
+    page: safePage,
+    pageSize: safePageSize,
+    totalItems: Number(totalItems || 0),
+    totalPages,
+  };
+}
+
+function mapBoardRow(row) {
+  return {
+    id: String(row.id),
+    name: row.name,
+    slug: row.slug,
+    description: row.description ?? null,
+    icon: row.icon ?? null,
+    order: Number(row.order_index ?? 0),
+    isActive: row.is_active ?? true,
+    createdAt: toISOString(row.created_at),
+    todayPostCount: Number(row.today_post_count ?? 0),
+    todayCommentCount: Number(row.today_comment_count ?? 0),
+  };
+}
+
+function mapAttachmentRow(row) {
+  return {
+    id: String(row.id),
+    fileName: row.file_name,
+    fileSize: row.file_size ? Number(row.file_size) : null,
+    fileUrl: row.file_url ?? `/uploads/${row.file_path}`,
+    thumbnailUrl: row.thumbnail_url ?? undefined,
+    mimeType: row.mime_type ?? 'application/octet-stream',
+  };
+}
+
+function mapPostSummaryRow(row) {
+  const tags = Array.isArray(row.tags) ? row.tags : [];
+  return {
+    id: String(row.id),
+    boardId: String(row.board_id),
+    boardSlug: row.board_slug,
+    boardName: row.board_name,
+    title: row.title,
+    excerpt: row.excerpt ?? '',
+    authorNick: row.author_nick,
+    createdAt: toISOString(row.created_at),
+    updatedAt: row.updated_at ? toISOString(row.updated_at) : undefined,
+    views: Number(row.views ?? 0),
+    likeCount: Number(row.like_count ?? 0),
+    dislikeCount: Number(row.dislike_count ?? 0),
+    commentCount: Number(row.comment_count ?? 0),
+    tags,
+    isNotice: row.is_notice ?? false,
+    isHot: row.is_hot ?? false,
+    hasPoll: row.has_poll ?? false,
+    thumbnailUrl: row.thumbnail_url ?? undefined,
+  };
+}
+
+function mapPostDetail(row, attachments, comments) {
+  const summary = mapPostSummaryRow(row);
+  return {
+    ...summary,
+    content: row.content ?? '',
+    attachments,
+    comments,
+    reportCount: Number(row.report_count ?? 0),
+    isBookmarked: false,
+  };
+}
+
+function buildCommentTree(rows) {
+  const nodes = new Map();
+  const roots = [];
+
+  rows.forEach((row) => {
+    const node = {
+      id: String(row.id),
+      postId: String(row.post_id),
+      parentId: row.parent_id ? String(row.parent_id) : null,
+      authorNick: row.author_nick ?? row.author,
+      authorBadge: row.author_badge ?? null,
+      content: row.is_hidden ? '' : row.content,
+      createdAt: toISOString(row.created_at),
+      likeCount: Number(row.like_count ?? 0),
+      dislikeCount: Number(row.dislike_count ?? 0),
+      reportCount: Number(row.report_count ?? 0),
+      isHidden: row.is_hidden ?? false,
+      children: [],
+    };
+    nodes.set(node.id, node);
+  });
+
+  nodes.forEach((node) => {
+    if (node.parentId && nodes.has(node.parentId)) {
+      nodes.get(node.parentId).children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+
+  nodes.forEach((node) => {
+    node.children.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  });
+  roots.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
+  return roots;
+}
+
+function getPostSortClause(sort) {
+  switch (sort) {
+    case 'popular':
+      return 'ORDER BY p.is_notice DESC, COALESCE(vc.like_count, 0) DESC, p.views DESC, p.created_at DESC';
+    case 'comments':
+      return 'ORDER BY p.is_notice DESC, COALESCE(cc.comment_count, 0) DESC, p.created_at DESC';
+    case 'views':
+      return 'ORDER BY p.is_notice DESC, p.views DESC, p.created_at DESC';
+    default:
+      return 'ORDER BY p.is_notice DESC, p.created_at DESC';
+  }
+}
+
+function buildPostListQuery({ boardSlug, searchTerm, sort, page, pageSize }) {
+  const whereClauses = ['(p.is_blinded IS DISTINCT FROM TRUE)'];
+  const values = [];
+
+  if (boardSlug) {
+    values.push(boardSlug);
+    whereClauses.push(`(b.slug = $${values.length} OR b.id = $${values.length})`);
+  }
+
+  if (searchTerm) {
+    values.push(`%${searchTerm}%`);
+    const index = values.length;
+    whereClauses.push(`(p.title ILIKE $${index} OR p.content ILIKE $${index})`);
+  }
+
+  const limitIndex = values.push(pageSize);
+  const offsetIndex = values.push(Math.max(0, (page - 1) * pageSize));
+
+  const sql = `
+WITH vote_counts AS (
+  SELECT post_id,
+         COUNT(*) FILTER (WHERE vote_type = 'like') AS like_count,
+         COUNT(*) FILTER (WHERE vote_type = 'dislike') AS dislike_count
+  FROM post_votes
+  GROUP BY post_id
+),
+comment_counts AS (
+  SELECT post_id, COUNT(*) AS comment_count
+  FROM comments
+  GROUP BY post_id
+),
+poll_status AS (
+  SELECT DISTINCT post_id, TRUE AS has_poll
+  FROM post_polls
+),
+attachment_preview AS (
+  SELECT DISTINCT ON (post_id) post_id, file_url
+  FROM post_attachments
+  ORDER BY post_id, created_at ASC
+)
+SELECT
+  p.id,
+  p.board_id,
+  b.slug AS board_slug,
+  b.name AS board_name,
+  p.title,
+  p.author AS author_nick,
+  p.content,
+  p.created_at,
+  p.updated_at,
+  p.views,
+  COALESCE(vc.like_count, 0) AS like_count,
+  COALESCE(vc.dislike_count, 0) AS dislike_count,
+  COALESCE(cc.comment_count, 0) AS comment_count,
+  p.tags,
+  p.is_notice,
+  (p.poll IS NOT NULL) OR (ps.has_poll IS TRUE) AS has_poll,
+  CASE
+    WHEN COALESCE(vc.like_count, 0) >= 10 OR COALESCE(cc.comment_count, 0) >= 20 OR p.views >= 500 THEN TRUE
+    ELSE FALSE
+  END AS is_hot,
+  ap.file_url AS thumbnail_url,
+  p.reports AS report_count,
+  SUBSTRING(COALESCE(p.summary, p.content) FOR 180) AS excerpt,
+  COUNT(*) OVER() AS total_count
+FROM posts p
+JOIN boards b ON b.id = p.board_id
+LEFT JOIN vote_counts vc ON vc.post_id = p.id
+LEFT JOIN comment_counts cc ON cc.post_id = p.id
+LEFT JOIN poll_status ps ON ps.post_id = p.id
+LEFT JOIN attachment_preview ap ON ap.post_id = p.id
+${whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : ''}
+${getPostSortClause(sort)}
+LIMIT $${limitIndex}
+OFFSET $${offsetIndex}
+`.trim();
+
+  return { sql, values };
+}
+
+async function fetchPostDetailFromDb(postId, client = pool) {
+  const { rows } = await client.query(
+    `
+WITH vote_counts AS (
+  SELECT post_id,
+         COUNT(*) FILTER (WHERE vote_type = 'like') AS like_count,
+         COUNT(*) FILTER (WHERE vote_type = 'dislike') AS dislike_count
+  FROM post_votes
+  GROUP BY post_id
+),
+comment_counts AS (
+  SELECT post_id, COUNT(*) AS comment_count
+  FROM comments
+  GROUP BY post_id
+),
+poll_status AS (
+  SELECT DISTINCT post_id, TRUE AS has_poll
+  FROM post_polls
+),
+attachment_preview AS (
+  SELECT DISTINCT ON (post_id) post_id, file_url
+  FROM post_attachments
+  ORDER BY post_id, created_at ASC
+)
+SELECT
+  p.id,
+  p.board_id,
+  b.slug AS board_slug,
+  b.name AS board_name,
+  p.title,
+  p.author AS author_nick,
+  p.content,
+  p.created_at,
+  p.updated_at,
+  p.views,
+  COALESCE(vc.like_count, 0) AS like_count,
+  COALESCE(vc.dislike_count, 0) AS dislike_count,
+  COALESCE(cc.comment_count, 0) AS comment_count,
+  p.tags,
+  p.is_notice,
+  (p.poll IS NOT NULL) OR (ps.has_poll IS TRUE) AS has_poll,
+  CASE
+    WHEN COALESCE(vc.like_count, 0) >= 10 OR COALESCE(cc.comment_count, 0) >= 20 OR p.views >= 500 THEN TRUE
+    ELSE FALSE
+  END AS is_hot,
+  ap.file_url AS thumbnail_url,
+  p.reports AS report_count
+FROM posts p
+JOIN boards b ON b.id = p.board_id
+LEFT JOIN vote_counts vc ON vc.post_id = p.id
+LEFT JOIN comment_counts cc ON cc.post_id = p.id
+LEFT JOIN poll_status ps ON ps.post_id = p.id
+LEFT JOIN attachment_preview ap ON ap.post_id = p.id
+WHERE p.id = $1
+LIMIT 1
+`,
+    [postId],
+  );
+
+  if (rows.length === 0) {
+    return null;
+  }
+
+  const attachmentsResult = await client.query(
+    `SELECT id, post_id, file_name, file_path, file_url, file_size, mime_type, thumbnail_url, created_at
+     FROM post_attachments
+     WHERE post_id = $1
+     ORDER BY created_at ASC`,
+    [postId],
+  );
+
+  const commentsResult = await client.query(
+    `SELECT id, post_id, parent_id, author AS author_nick, content, created_at, like_count, dislike_count, report_count
+     FROM comments
+     WHERE post_id = $1
+     ORDER BY created_at ASC`,
+    [postId],
+  );
+
+  const attachments = attachmentsResult.rows.map(mapAttachmentRow);
+  const comments = buildCommentTree(commentsResult.rows);
+  return mapPostDetail(rows[0], attachments, comments);
+}
+
+async function cleanupUploadedFiles(files) {
+  if (!files || files.length === 0) {
+    return;
+  }
+  await Promise.allSettled(
+    files.map((file) =>
+      fsp
+        .unlink(file.path)
+        .catch((error) => console.warn('업로드 파일 정리 실패:', error.message)),
+    ),
+  );
+}
+
+// ============================================
+// 커뮤니티 API (Vite 프런트엔드 연동)
+// ============================================
+
+const communityRouter = express.Router();
+
+communityRouter.get('/boards', async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        b.id,
+        b.name,
+        b.slug,
+        b.description,
+        b.icon,
+        b.order_index,
+        b.is_active,
+        b.created_at,
+        COALESCE(post_counts.today_posts, 0) AS today_post_count,
+        COALESCE(comment_counts.today_comments, 0) AS today_comment_count
+      FROM boards b
+      LEFT JOIN (
+        SELECT board_id, COUNT(*) AS today_posts
+        FROM posts
+        WHERE created_at >= (CURRENT_DATE)
+        GROUP BY board_id
+      ) post_counts ON post_counts.board_id = b.id
+      LEFT JOIN (
+        SELECT p.board_id, COUNT(*) AS today_comments
+        FROM comments c
+        JOIN posts p ON p.id = c.post_id
+        WHERE c.created_at >= (CURRENT_DATE)
+        GROUP BY p.board_id
+      ) comment_counts ON comment_counts.board_id = b.id
+      ORDER BY b.order_index ASC, b.created_at ASC
+    `);
+
+    const data = rows.map(mapBoardRow);
+    res.json({
+      data,
+      meta: createListMeta(data.length, 1, data.length || 1),
+    });
+  } catch (error) {
+    console.error('게시판 목록 조회 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '게시판 정보를 불러오지 못했습니다.',
+    });
+  }
+});
+
+communityRouter.get('/posts', async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const pageSize = Math.min(Math.max(1, parseInt(req.query.pageSize, 10) || 20), 100);
+    const sort = typeof req.query.sort === 'string' ? req.query.sort : 'latest';
+    const boardSlug = typeof req.query.board === 'string' ? req.query.board.trim() : undefined;
+    const searchTerm = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
+
+    const { sql, values } = buildPostListQuery({ boardSlug, searchTerm, sort, page, pageSize });
+    const { rows } = await pool.query(sql, values);
+    const totalItems = rows.length > 0 ? Number(rows[0].total_count ?? 0) : 0;
+    const data = rows.map(mapPostSummaryRow);
+
+    res.json({
+      data,
+      meta: createListMeta(totalItems, page, pageSize),
+    });
+  } catch (error) {
+    console.error('게시글 목록 조회 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '게시글을 불러오지 못했습니다.',
+    });
+  }
+});
+
+communityRouter.get('/posts/popular', async (_req, res) => {
+  try {
+    const { sql, values } = buildPostListQuery({
+      boardSlug: undefined,
+      searchTerm: undefined,
+      sort: 'popular',
+      page: 1,
+      pageSize: 20,
+    });
+
+    const { rows } = await pool.query(sql, values);
+    res.json(rows.map(mapPostSummaryRow).slice(0, 20));
+  } catch (error) {
+    console.error('인기글 조회 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '인기글을 불러오지 못했습니다.',
+    });
+  }
+});
+
+communityRouter.get('/posts/:postId', async (req, res) => {
+  try {
+    const detail = await fetchPostDetailFromDb(req.params.postId);
+    if (!detail) {
+      return res.status(404).json({
+        status: 404,
+        message: '게시글을 찾을 수 없습니다.',
+      });
+    }
+    res.json(detail);
+  } catch (error) {
+    console.error('게시글 상세 조회 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '게시글을 불러오는 중 오류가 발생했습니다.',
+    });
+  }
+});
+
+communityRouter.post('/posts', createPostLimiter, (req, res) => {
+  upload.array('attachments', MAX_UPLOAD_FILES)(req, res, async (uploadError) => {
+    if (uploadError) {
+      console.error('게시글 첨부 파일 처리 오류:', uploadError);
+      return res.status(400).json({
+        status: 400,
+        message: uploadError.message || '첨부 파일을 처리하지 못했습니다.',
+      });
+    }
+
+    const files = Array.isArray(req.files) ? req.files : [];
+    const boardInput = typeof req.body.boardId === 'string' && req.body.boardId.trim().length > 0
+      ? req.body.boardId.trim()
+      : typeof req.body.board === 'string' && req.body.board.trim().length > 0
+        ? req.body.board.trim()
+        : '';
+
+    const title = typeof req.body.title === 'string' ? req.body.title.trim() : '';
+    const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+    const authorNick = typeof req.body.authorNick === 'string' ? req.body.authorNick.trim() : '익명';
+    const password = typeof req.body.password === 'string' ? req.body.password.trim() : '';
+
+    if (!boardInput || !title || !content) {
+      await cleanupUploadedFiles(files);
+      return res.status(400).json({
+        status: 400,
+        message: '게시판, 제목, 내용을 모두 입력해주세요.',
+      });
+    }
+
+    const tagField = req.body['tags[]'] ?? req.body.tags;
+    const tags = Array.isArray(tagField)
+      ? tagField.map((tag) => String(tag).trim()).filter(Boolean)
+      : typeof tagField === 'string'
+        ? tagField
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean)
+        : [];
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const { rows: boardRows } = await client.query(
+        'SELECT id FROM boards WHERE id = $1 OR slug = $1 LIMIT 1',
+        [boardInput],
+      );
+
+      if (boardRows.length === 0) {
+        await client.query('ROLLBACK');
+        await cleanupUploadedFiles(files);
+        return res.status(400).json({
+          status: 400,
+          message: '존재하지 않는 게시판입니다.',
+        });
+      }
+
+      const boardId = boardRows[0].id;
+      const postId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+      const hashedPassword = await bcrypt.hash(password || crypto.randomUUID(), SALT_ROUNDS);
+
+      const sanitizedTitle = sanitizeInput(title);
+      const sanitizedAuthor = sanitizeInput(authorNick);
+      const sanitizedContent = sanitizeInput(content, {
+        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre'],
+        ALLOWED_ATTR: ['href', 'target', 'rel'],
+      });
+
+      await client.query(
+        `INSERT INTO posts (
+          id,
+          title,
+          author,
+          content,
+          category,
+          password,
+          board_id,
+          tags,
+          created_at,
+          updated_at,
+          views,
+          likes,
+          dislikes,
+          attachments
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          NOW(), NOW(), 0, '{}', '{}', '[]'
+        )`,
+        [
+          postId,
+          sanitizedTitle,
+          sanitizedAuthor,
+          sanitizedContent,
+          null,
+          hashedPassword,
+          boardId,
+          tags,
+        ],
+      );
+
+      for (const file of files) {
+        await client.query(
+          `INSERT INTO post_attachments (post_id, file_name, file_path, file_url, file_size, mime_type)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            postId,
+            file.originalname ?? file.filename,
+            file.filename,
+            `/uploads/${file.filename}`,
+            file.size ?? null,
+            file.mimetype ?? null,
+          ],
+        );
+      }
+
+      await client.query('COMMIT');
+      let detail = await fetchPostDetailFromDb(postId, client);
+      if (!detail) {
+        detail = await fetchPostDetailFromDb(postId);
+      }
+      res.status(201).json(detail);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      await cleanupUploadedFiles(files);
+      console.error('게시글 생성 오류:', error);
+      res.status(500).json({
+        status: 500,
+        message: '게시글을 등록하지 못했습니다.',
+      });
+    } finally {
+      client.release();
+    }
+  });
+});
+
+communityRouter.post('/posts/:postId/comments', commentLimiter, async (req, res) => {
+  const postId = req.params.postId;
+  const parentIdInput = req.body.parentId ?? req.body.parent_id;
+  const authorNick = typeof req.body.authorNick === 'string' ? req.body.authorNick.trim() : '익명';
+  const content = typeof req.body.content === 'string' ? req.body.content.trim() : '';
+  const password = typeof req.body.password === 'string' ? req.body.password.trim() : '';
+  const parentId = parentIdInput ? String(parentIdInput) : null;
+
+  if (!content) {
+    return res.status(400).json({
+      status: 400,
+      message: '댓글 내용을 입력해주세요.',
+    });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: postRows } = await client.query('SELECT id FROM posts WHERE id = $1', [postId]);
+    if (postRows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        status: 404,
+        message: '게시글을 찾을 수 없습니다.',
+      });
+    }
+
+    if (parentId) {
+      const { rows: parentRows } = await client.query(
+        'SELECT id FROM comments WHERE id = $1 AND post_id = $2',
+        [parentId, postId],
+      );
+      if (parentRows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          status: 400,
+          message: '대상 댓글을 찾을 수 없습니다.',
+        });
+      }
+    }
+
+    const sanitizedAuthor = sanitizeInput(authorNick);
+    const sanitizedContent = sanitizeInput(content, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'code'],
+      ALLOWED_ATTR: [],
+    });
+    const hashedPassword = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
+    const commentId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+
+    const { rows } = await client.query(
+      `INSERT INTO comments (
+        id,
+        post_id,
+        parent_id,
+        author,
+        content,
+        password,
+        created_at,
+        like_count,
+        dislike_count,
+        report_count
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        NOW(), 0, 0, 0
+      ) RETURNING id, post_id, parent_id, author, content, created_at, like_count, dislike_count, report_count`,
+      [commentId, postId, parentId, sanitizedAuthor, sanitizedContent, hashedPassword],
+    );
+
+    await client.query('COMMIT');
+
+    const comment = {
+      id: String(rows[0].id),
+      postId: String(rows[0].post_id),
+      parentId: rows[0].parent_id ? String(rows[0].parent_id) : null,
+      authorNick: rows[0].author,
+      content: rows[0].content,
+      createdAt: toISOString(rows[0].created_at),
+      likeCount: Number(rows[0].like_count ?? 0),
+      dislikeCount: Number(rows[0].dislike_count ?? 0),
+      reportCount: Number(rows[0].report_count ?? 0),
+      children: [],
+      isHidden: false,
+    };
+
+    res.status(201).json(comment);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('댓글 등록 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '댓글을 등록하지 못했습니다.',
+    });
+  } finally {
+    client.release();
+  }
+});
+
+communityRouter.post('/posts/:postId/vote', async (req, res) => {
+  const postId = req.params.postId;
+  const type = typeof req.body.type === 'string' ? req.body.type : undefined;
+  const userId = typeof req.body.userId === 'string' ? req.body.userId.trim() : '';
+
+  if (!userId) {
+    return res.status(400).json({
+      status: 400,
+      message: 'userId가 필요합니다.',
+    });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const { rows: postRows } = await client.query('SELECT id FROM posts WHERE id = $1', [postId]);
+    if (postRows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({
+        status: 404,
+        message: '게시글을 찾을 수 없습니다.',
+      });
+    }
+
+    await client.query('DELETE FROM post_votes WHERE post_id = $1 AND user_id = $2', [postId, userId]);
+
+    if (type === 'like' || type === 'dislike') {
+      await client.query(
+        `INSERT INTO post_votes (post_id, user_id, vote_type, created_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (post_id, user_id) DO UPDATE
+           SET vote_type = EXCLUDED.vote_type,
+               created_at = NOW()`,
+        [postId, userId, type],
+      );
+    }
+
+    const { rows } = await client.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE vote_type = 'like') AS like_count,
+         COUNT(*) FILTER (WHERE vote_type = 'dislike') AS dislike_count
+       FROM post_votes
+       WHERE post_id = $1`,
+      [postId],
+    );
+
+    await client.query('UPDATE posts SET updated_at = NOW() WHERE id = $1', [postId]);
+    await client.query('COMMIT');
+
+    res.json({
+      likeCount: Number(rows[0]?.like_count ?? 0),
+      dislikeCount: Number(rows[0]?.dislike_count ?? 0),
+    });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('게시글 추천/비추천 처리 오류:', error);
+    res.status(500).json({
+      status: 500,
+      message: '추천 정보를 갱신하지 못했습니다.',
+    });
+  } finally {
+    client.release();
+  }
+});
+
+communityRouter.get('/events/timetables', async (_req, res) => {
+  res.json({
+    data: [],
+    meta: createListMeta(0, 1, 0),
+  });
+});
+
+app.use('/community', communityRouter);
 
 // ============================================
 // 게시판 REST API (보안 강화)
