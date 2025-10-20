@@ -4,10 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write 'src/**/*.{ts,tsx,css}'",
+    "clean": "rm -rf dist node_modules",
+    "analyze": "vite build --mode analyze"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

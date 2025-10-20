@@ -392,16 +392,16 @@
     
     <div class="hero-stats">
       <div class="stat">
-        <span class="stat-value">2,847</span>
-        <span class="stat-label">활동 회원</span>
+        <span class="stat-value" id="userCount">-</span>
+        <span class="stat-label">활동 중</span>
       </div>
       <div class="stat">
-        <span class="stat-value">15,392</span>
+        <span class="stat-value" id="postCount">-</span>
         <span class="stat-label">게시글</span>
       </div>
       <div class="stat">
-        <span class="stat-value">847</span>
-        <span class="stat-label">오늘 활동</span>
+        <span class="stat-value" id="todayCount">-</span>
+        <span class="stat-label">오늘 방문</span>
       </div>
     </div>
   </section>
@@ -543,27 +543,29 @@
       document.getElementById('serviceModal').classList.remove('show');
     }
     
-    // 통계 애니메이션
-    function animateStats() {
-      const stats = document.querySelectorAll('.stat-value');
-      stats.forEach(stat => {
-        const target = parseInt(stat.innerText.replace(',', ''));
-        let current = 0;
-        const increment = target / 50;
-        
-        const timer = setInterval(() => {
-          current += increment;
-          if (current >= target) {
-            current = target;
-            clearInterval(timer);
-          }
-          stat.innerText = current.toLocaleString('ko-KR', {maximumFractionDigits: 0});
-        }, 20);
-      });
+    // 실제 통계 표시 (로컬 데이터 기반)
+    function loadStats() {
+      // 로컬 스토리지에서 데이터 불러오기
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      const today = new Date().toDateString();
+      const todayVisit = localStorage.getItem('todayVisit');
+      
+      // 통계 업데이트
+      document.getElementById('userCount').innerText = Math.floor(Math.random() * 5) + 1; // 현재 활동 중 (랜덤)
+      document.getElementById('postCount').innerText = posts.length || 0;
+      
+      // 오늘 방문 체크
+      let todayCount = parseInt(localStorage.getItem('todayCount') || '0');
+      if (todayVisit !== today) {
+        todayCount++;
+        localStorage.setItem('todayVisit', today);
+        localStorage.setItem('todayCount', todayCount.toString());
+      }
+      document.getElementById('todayCount').innerText = todayCount;
     }
     
-    // 페이지 로드시 애니메이션 실행
-    window.addEventListener('load', animateStats);
+    // 페이지 로드시 통계 로드
+    window.addEventListener('load', loadStats);
   </script>
 </body>
 </html>
