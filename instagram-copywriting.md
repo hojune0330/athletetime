@@ -102,7 +102,7 @@ FINALLY!
 
 ━━━━━━━━━━━━━━━━━━━
 👉 지금 바로 사용해보세요!
-🔗 athletetime.netlify.app
+🔗 athlete-time.netlify.app
 ```
 
 ---
@@ -133,7 +133,7 @@ Athlete Time 🏃‍♂️
    대회까지 남은 날 체크
 
 ━━━━━━━━━━━━━━━━━━━
-🔗 athletetime.netlify.app
+🔗 athlete-time.netlify.app
 📲 지금 접속하세요!
 ```
 
@@ -162,7 +162,7 @@ Athlete Time 🏃‍♂️
 이제 러닝 이야기를
 마음껏 나눠보세요 💬
 
-👉 athletetime.netlify.app
+👉 athlete-time.netlify.app
 
 #애슬리트타임 #러닝커뮤니티
 ```
@@ -175,7 +175,7 @@ Athlete Time 🏃‍♂️
 서버 기반으로 완전히 새로 구축!
 
 지금 바로 확인하세요
-👉 athletetime.netlify.app
+👉 athlete-time.netlify.app
 
 #애슬리트타임 #러닝 #익명게시판
 ```
@@ -192,7 +192,7 @@ Athlete Time 🏃‍♂️
 Athlete Time 익명 게시판
 정식 오픈 🎊
 
-athletetime.netlify.app
+athlete-time.netlify.app
 
 #러닝커뮤니티 #애슬리트타임
 ```
@@ -226,7 +226,7 @@ athletetime.netlify.app
 "익명 게시판 사용법 📝"
 
 [스토리 2]
-"1. athletetime.netlify.app 접속"
+"1. athlete-time.netlify.app 접속"
 (URL 스크린샷)
 
 [스토리 3]
@@ -306,7 +306,7 @@ athletetime.netlify.app
 ## 📱 연락처 및 링크
 
 ### 공식 링크
-- 웹사이트: athletetime.netlify.app
+- 웹사이트: athlete-time.netlify.app
 - 인스타그램: @athlete_time
 - GitHub: github.com/hojune0330/athletetime
 

@@ -30,7 +30,7 @@ PROD=1 node test-deletion.js
 ## 🚀 배포 정보
 
 ### Frontend (Netlify)
-- URL: https://athletetime.netlify.app
+- URL: https://athlete-time.netlify.app
 - 자동 배포: GitHub main 브랜치 푸시 시
 
 ### Backend (Render)

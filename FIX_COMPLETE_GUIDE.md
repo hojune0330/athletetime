@@ -87,7 +87,7 @@ PROD=1 node test-all-features.js
 ```
 
 ### 수동 테스트
-1. https://athletetime.netlify.app 접속
+1. https://athlete-time.netlify.app 접속
 2. 게시글 작성 → 새로고침 → 유지 확인
 3. 댓글 작성 → 새로고침 → 유지 확인
 4. 게시글 클릭 → 조회수 증가 확인

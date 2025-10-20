@@ -101,7 +101,7 @@
 
 [하단 CTA]
 지금 바로 사용해보세요! 
-athletetime.netlify.app
+athlete-time.netlify.app
 ```
 
 ---
@@ -132,7 +132,7 @@ Athlete Time 🏃‍♂️
    대회까지 남은 날 체크
 
 [하단 CTA]
-🔗 athletetime.netlify.app
+🔗 athlete-time.netlify.app
 📲 지금 접속하세요!
 
 [해시태그]
@@ -181,7 +181,7 @@ Athlete Time 🏃‍♂️
 ✅ 24/7 안정적인 서비스
 
 지금 바로 확인해보세요!
-👉 athletetime.netlify.app
+👉 athlete-time.netlify.app
 
 여러분의 피드백으로 
 더 나은 서비스를 만들어갑니다 💪
