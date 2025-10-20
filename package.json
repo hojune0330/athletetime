@@ -11,7 +11,8 @@
     "chat": "node chat-server-enhanced.js",
     "community": "node community-server.js",
     "build:web": "npm run build --prefix src/community-app",
-    "postinstall": "npm install --prefix src/community-app --no-fund --no-audit"
+    "postinstall": "npm install --prefix src/community-app --no-fund --no-audit",
+    "test:votes": "node test-votes-and-attachments.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
@@ -23,6 +24,7 @@
     "isomorphic-dompurify": "^2.0.0",
     "multer": "^2.0.2",
     "pg": "^8.11.0",
+    "sharp": "^0.34.4",
     "ws": "^8.14.2"
   },
   "devDependencies": {
