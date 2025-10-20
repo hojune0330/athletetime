@@ -2,7 +2,7 @@ services:
   - type: web
     name: athlete-time-backend
     runtime: node
-    buildCommand: npm install
+    buildCommand: npm install && npm run build:web
     startCommand: npm start
     envVars:
       - key: NODE_ENV
