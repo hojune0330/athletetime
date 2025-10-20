@@ -39,6 +39,28 @@ PROD=1 node test-deletion.js
 - 서비스: 통합 백엔드 (채팅 + 게시판)
 - 포트: 환경 변수 PORT (Render가 자동 설정)
 
+## 🌐 임시 파일 다운로드 서버 (Sandbox)
+
+Sandbox 환경에서 최신 결과물을 내려받을 수 있도록 HTTP 파일 서버를 실행 중입니다.
+
+- **명령어**: `cd /home/user/webapp && python3 -m http.server 8000`
+- **작업 ID**: `bash_7d98a6de`
+- **PID**: `3980`
+- **접속 URL**: [https://8000-ie7amj0wfqyguzcld5kut-02b9cc79.sandbox.novita.ai/](https://8000-ie7amj0wfqyguzcld5kut-02b9cc79.sandbox.novita.ai/)
+- **주요 제공 파일**:
+  - `athletetime/` (현재 작업 디렉터리 전체)
+  - `athletetime-final-deploy.zip`
+  - `athletetime-deployment.tar.gz`
+  - `athletetime-for-netlify.zip`
+  - `athletetime-netlify.zip`
+  - `athletetime-websocket.zip`
+  - 기타 `/home/user/webapp` 하위 모든 문서 및 아카이브
+- **종료 방법**:
+  - `kill 3980` (또는 `pkill -f "python3 -m http.server 8000"`)
+  - Sandbox 제어 도구에서 `bash_7d98a6de` 프로세스 종료
+
+> ⚠️ Sandbox는 재시작 또는 종료 시 서버와 파일이 초기화되므로, 필요한 자료는 즉시 로컬에 백업하세요.
+
 ## 📁 프로젝트 구조
 
 ```
