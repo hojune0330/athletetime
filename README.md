@@ -50,6 +50,16 @@ PROD=1 node test-deletion.js
 - 서비스: 통합 백엔드 (채팅 + 게시판)
 - 포트: 환경 변수 PORT (Render가 자동 설정)
 
+### 임시 파일 다운로드 서버 (Sandbox)
+- 실행 명령: `cd /home/user/webapp && python3 -m http.server 8000`
+- 백그라운드 작업 ID: `bash_ee4ade97` (PID `33813`)
+- 접속 URL: https://8000-ilair62djyh3cmtl13rke-b9b802c4.sandbox.novita.ai/
+- 제공 파일 예시:
+  - `athletetime_clean_2025-10-20.zip` (약 2 MB, `node_modules`/`.git` 제외)
+  - `athletetime_src_2025-10-20.zip` (약 59 MB, `.git` 포함, `node_modules` 제외)
+  - `athletetime_full_2025-10-20.tar.gz` (약 62 MB, 전체 스냅샷)
+- 종료 방법: `kill 33813` 또는 `python3 -m http.server` 프로세스 종료
+
 ## 📁 프로젝트 구조
 
 ```
