@@ -5,3 +5,5 @@ node_modules/
 chat-messages.json
 community-posts.json
 *.backup
+package.json.backend
+package-lock.json.backend
