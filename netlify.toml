@@ -1,14 +1,13 @@
+# Netlify 배포 설정
+# Athlete Time - 메인 사이트 (정적 HTML)
+
+[build]
+  publish = "."
+
+# 보안 헤더
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
-
-[build]
-  publish = "."
-
-[[redirects]]
-  from = "/"
-  to = "/index.html"
-  status = 200
