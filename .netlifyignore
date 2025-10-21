@@ -1,8 +1,14 @@
-# Netlify 빌드에서 제외할 파일들
+# Exclude unnecessary files from Netlify
 community-new/node_modules
 community-new/dist
+community-new/.git
 node_modules
 *.log
 .env
 .env.*
 !.env.example
+server*.js
+test*.js
+*.sql
+*.md
+!README.md
