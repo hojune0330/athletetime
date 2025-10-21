@@ -1,14 +1,6 @@
-# Exclude unnecessary files from Netlify
-community-new/node_modules
-community-new/dist
-community-new/.git
 node_modules
+.git
 *.log
-.env
-.env.*
-!.env.example
+.env*
 server*.js
 test*.js
-*.sql
-*.md
-!README.md
