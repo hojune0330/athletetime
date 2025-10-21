@@ -1049,7 +1049,8 @@
             <strong>3000m 장애물 경주</strong>의 정확한 페이스를 계산할 때 사용합니다.<br>
             • 물 장애물 위치에 따라 랩 거리가 달라집니다 (내측: 396.084m, 외측: 419.407m)<br>
             • 7랩 + 시작 구간으로 총 28개 장애물과 7개 물 장애물을 통과합니다.<br>
-            • 두 가지 구성을 동시에 비교하여 대회별 차이를 확인할 수 있습니다.
+            • 각 랩별 누적 시간과 랩당 페이스를 표시하여 정확한 스플릿을 확인할 수 있습니다.<br>
+            • <strong>5초 간격</strong>으로 빠짐하게 기록을 표시하여 세밀한 페이스 계획이 가능합니다.
           </p>
         </div>
 
@@ -1119,41 +1120,41 @@
             color: white;
             font-weight: bold;
           }
-          .steeplechase-inside-cell {
-            background-color: #eff6ff;
-            border-left: 2px solid #3b82f6;
-            border-right: 2px solid #3b82f6;
+          /* 테이블 크기 조정 */
+          #steeplechaseInsideTable td,
+          #steeplechaseOutsideTable td {
+            padding: 2px 4px;
+            white-space: nowrap;
           }
-          .steeplechase-outside-cell {
-            background-color: #faf5ff;
-            border-left: 2px solid #a855f7;
-            border-right: 2px solid #a855f7;
+          #steeplechaseInsideTable th,
+          #steeplechaseOutsideTable th {
+            padding: 4px 4px;
+            font-size: 10px;
           }
-          .steeplechase-inside-cell:first-of-type {
-            border-left: 3px solid #3b82f6;
+          /* 스크롤 가능하게 */
+          .table-container {
+            overflow-x: auto;
           }
-          .steeplechase-inside-cell:last-of-type {
-            border-right: 3px solid #3b82f6;
+          .pace-table {
+            min-width: 100%;
           }
-          .steeplechase-outside-cell:first-of-type {
-            border-left: 3px solid #a855f7;
-          }
-          .steeplechase-outside-cell:last-of-type {
-            border-right: 3px solid #a855f7;
-          }
-          .steeplechase-table-divider {
-            width: 20px;
-            background: linear-gradient(to right, #3b82f6, #a855f7);
-            border: none !important;
+          /* 모바일에서 테이블 크기 */
+          @media (max-width: 768px) {
+            .steeplechase-tables {
+              grid-template-columns: 1fr;
+            }
+            .pace-table {
+              font-size: 10px;
+            }
           }
         </style>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 steeplechase-tables">
+        <div class="grid grid-cols-1 gap-6 steeplechase-tables">
           <!-- 내측 구성 테이블 -->
           <div class="border-4 border-blue-500 rounded-lg overflow-hidden shadow-xl">
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 text-center">
               <h4 class="font-bold text-lg">🏃 내측 구성 (INSIDE)</h4>
-              <p class="text-sm opacity-90">랩당 396.084m • 시작 227.4m</p>
+              <p class="text-sm opacity-90">랩당 396.084m • 시작 227.4m • 모든 랩 표시</p>
             </div>
             <div class="table-container" style="position: relative;">
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
@@ -1163,8 +1164,12 @@
                     <th class="text-xs">km페이스</th>
                     <th class="text-xs">시작구간</th>
                     <th class="text-xs">1랩</th>
+                    <th class="text-xs">2랩</th>
                     <th class="text-xs">3랩</th>
+                    <th class="text-xs">4랩</th>
                     <th class="text-xs">5랩</th>
+                    <th class="text-xs">6랩</th>
+                    <th class="text-xs">7랩</th>
                     <th class="text-xs bg-blue-200 font-bold">완주</th>
                   </tr>
                 </thead>
@@ -1179,7 +1184,7 @@
           <div class="border-4 border-purple-500 rounded-lg overflow-hidden shadow-xl">
             <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-3 text-center">
               <h4 class="font-bold text-lg">🏃 외측 구성 (OUTSIDE)</h4>
-              <p class="text-sm opacity-90">랩당 419.407m • 시작 64.2m</p>
+              <p class="text-sm opacity-90">랩당 419.407m • 시작 64.2m • 모든 랩 표시</p>
             </div>
             <div class="table-container" style="position: relative;">
               <table class="pace-table w-full" style="position: relative; z-index: 3;">
@@ -1189,8 +1194,12 @@
                     <th class="text-xs">km페이스</th>
                     <th class="text-xs">시작구간</th>
                     <th class="text-xs">1랩</th>
+                    <th class="text-xs">2랩</th>
                     <th class="text-xs">3랩</th>
+                    <th class="text-xs">4랩</th>
                     <th class="text-xs">5랩</th>
+                    <th class="text-xs">6랩</th>
+                    <th class="text-xs">7랩</th>
                     <th class="text-xs bg-purple-200 font-bold">완주</th>
                   </tr>
                 </thead>
@@ -2495,7 +2504,7 @@
       });
     }
 
-    // 차트 4: 3000m 장애물 페이스 계산
+    // 차트 4: 3000m 장애물 페이스 계산 (강화 버전 - 5초 간격, 모든 랩)
     function generateSteeplechaseChart() {
       const tbodyInside = document.getElementById('steeplechaseInsideTable');
       const tbodyOutside = document.getElementById('steeplechaseOutsideTable');
@@ -2505,32 +2514,25 @@
       tbodyInside.innerHTML = '';
       tbodyOutside.innerHTML = '';
       
-      // 3000m 장애물 목표 기록들 (7분부터 13분까지)
-      const targetTimes = [
-        { time: 7 * 60 + 30, label: '세계 엘리트', highlight: true },
-        { time: 8 * 60, label: '국가대표급' },
-        { time: 8 * 60 + 30, label: '엘리트', highlight: true },
-        { time: 9 * 60, label: '준엘리트' },
-        { time: 9 * 60 + 30, label: '상급', highlight: true },
-        { time: 10 * 60, label: '서브 10' },
-        { time: 10 * 60 + 30, label: '중상급', highlight: true },
-        { time: 11 * 60, label: '중급' },
-        { time: 11 * 60 + 30, label: '초중급', highlight: true },
-        { time: 12 * 60, label: '초급' },
-        { time: 12 * 60 + 30, label: '입문' },
-        { time: 13 * 60, label: '완주 목표', highlight: true }
-      ];
+      // 5초 간격으로 7분부터 13분까지
+      const targetTimes = [];
+      for (let seconds = 7 * 60; seconds <= 13 * 60; seconds += 5) {
+        targetTimes.push({
+          time: seconds,
+          highlight: seconds % 30 === 0 // 30초마다 하이라이트
+        });
+      }
       
       // 장애물 구성별 거리 정의
       const insideConfig = {
         lapDistance: 396.084,  // 내측 물장애물 시 랩 거리
-        startSection: 227.412,  // 시작 구간 거리 (3000 - 7랩)
+        startSection: 227.412,  // 시작 구간 거리
         totalLapDistance: 2772.588  // 7랩 총 거리
       };
       
       const outsideConfig = {
         lapDistance: 419.407,  // 외측 물장애물 시 랩 거리
-        startSection: 64.151,  // 시작 구간 거리 (3000 - 7랩)
+        startSection: 64.151,  // 시작 구간 거리
         totalLapDistance: 2935.849  // 7랩 총 거리
       };
       
@@ -2538,45 +2540,61 @@
         // 기본 페이스 계산
         const pacePerKm = target.time / 3;
         
-        // 내측 테이블 행 추가
-        const rowInside = tbodyInside.insertRow();
-        if (target.highlight) rowInside.className = 'bg-blue-50';
-        
         // 내측 구성 계산
         const insideStartTime = (target.time / 3000) * insideConfig.startSection;
         const insideLapTime = (target.time / 3000) * insideConfig.lapDistance;
-        const inside3Laps = insideStartTime + (insideLapTime * 3);
-        const inside5Laps = insideStartTime + (insideLapTime * 5);
         
-        rowInside.innerHTML = `
-          <td class="font-bold text-blue-700">${formatTime(target.time)}</td>
-          <td>${formatPace(pacePerKm)}</td>
-          <td>${formatTime(insideStartTime)}</td>
-          <td>${formatTime(insideLapTime)}</td>
-          <td>${formatTime(inside3Laps)}</td>
-          <td>${formatTime(inside5Laps)}</td>
-          <td class="font-bold bg-blue-200">${formatTime(target.time)}</td>
-        `;
+        // 내측 테이블 행 추가
+        const rowInside = tbodyInside.insertRow();
+        if (target.highlight) {
+          rowInside.className = 'bg-blue-50 font-semibold';
+        }
         
-        // 외측 테이블 행 추가
-        const rowOutside = tbodyOutside.insertRow();
-        if (target.highlight) rowOutside.className = 'bg-purple-50';
+        // 내측 HTML - 모든 랩 표시
+        let insideHTML = `
+          <td class="text-xs font-bold text-blue-700">${formatTime(target.time)}</td>
+          <td class="text-xs">${formatPace(pacePerKm)}</td>
+          <td class="text-xs" title="시작 구간: ${insideConfig.startSection.toFixed(1)}m">${formatTime(insideStartTime)}</td>`;
+        
+        // 1-7랩 표시 (누적 시간 + 랩 페이스)
+        for (let lap = 1; lap <= 7; lap++) {
+          const cumulativeTime = insideStartTime + (insideLapTime * lap);
+          insideHTML += `<td class="text-xs">
+            <div class="font-semibold">${formatTime(cumulativeTime)}</div>
+            <div class="text-gray-500" style="font-size: 10px;">${formatTime(insideLapTime)}/랩</div>
+          </td>`;
+        }
+        
+        insideHTML += `<td class="text-xs font-bold bg-blue-200">${formatTime(target.time)}</td>`;
+        rowInside.innerHTML = insideHTML;
         
         // 외측 구성 계산
         const outsideStartTime = (target.time / 3000) * outsideConfig.startSection;
         const outsideLapTime = (target.time / 3000) * outsideConfig.lapDistance;
-        const outside3Laps = outsideStartTime + (outsideLapTime * 3);
-        const outside5Laps = outsideStartTime + (outsideLapTime * 5);
         
-        rowOutside.innerHTML = `
-          <td class="font-bold text-purple-700">${formatTime(target.time)}</td>
-          <td>${formatPace(pacePerKm)}</td>
-          <td>${formatTime(outsideStartTime)}</td>
-          <td>${formatTime(outsideLapTime)}</td>
-          <td>${formatTime(outside3Laps)}</td>
-          <td>${formatTime(outside5Laps)}</td>
-          <td class="font-bold bg-purple-200">${formatTime(target.time)}</td>
-        `;
+        // 외측 테이블 행 추가
+        const rowOutside = tbodyOutside.insertRow();
+        if (target.highlight) {
+          rowOutside.className = 'bg-purple-50 font-semibold';
+        }
+        
+        // 외측 HTML - 모든 랩 표시
+        let outsideHTML = `
+          <td class="text-xs font-bold text-purple-700">${formatTime(target.time)}</td>
+          <td class="text-xs">${formatPace(pacePerKm)}</td>
+          <td class="text-xs" title="시작 구간: ${outsideConfig.startSection.toFixed(1)}m">${formatTime(outsideStartTime)}</td>`;
+        
+        // 1-7랩 표시 (누적 시간 + 랩 페이스)
+        for (let lap = 1; lap <= 7; lap++) {
+          const cumulativeTime = outsideStartTime + (outsideLapTime * lap);
+          outsideHTML += `<td class="text-xs">
+            <div class="font-semibold">${formatTime(cumulativeTime)}</div>
+            <div class="text-gray-500" style="font-size: 10px;">${formatTime(outsideLapTime)}/랩</div>
+          </td>`;
+        }
+        
+        outsideHTML += `<td class="text-xs font-bold bg-purple-200">${formatTime(target.time)}</td>`;
+        rowOutside.innerHTML = outsideHTML;
       });
     }
 
