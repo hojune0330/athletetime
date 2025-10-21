@@ -1,0 +1,37 @@
+# Netlify 배포 설정 - 메인 사이트
+# Athlete Time 메인 페이지 (정적 HTML)
+
+[build]
+  # 메인 사이트는 정적 파일이므로 빌드 명령어 불필요
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# 헤더 설정
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Cache-Control = "public, max-age=3600"
+
+# 이미지 캐싱
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# API 프록시 설정 (백엔드 연결)
+[[redirects]]
+  from = "/api/*"
+  to = "https://athletetime-backend.onrender.com/api/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
