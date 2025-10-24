@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClockIcon, TrophyIcon } from '@heroicons/react/24/outline'
+import { useCreatePost } from '../hooks/usePosts'
 
 export default function WritePage() {
   const navigate = useNavigate()
+  const createPost = useCreatePost()
+
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('track-sprint')
@@ -11,11 +14,50 @@ export default function WritePage() {
   const [record, setRecord] = useState('')
   const [recordDate, setRecordDate] = useState('')
   const [isOfficial, setIsOfficial] = useState(false)
+  const [author, setAuthor] = useState('')
+  const [password, setPassword] = useState('')
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const isSubmitting = createPost.isPending
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log({ title, content, category, eventType, record, recordDate, isOfficial })
-    navigate('/')
+    setSubmitError(null)
+    setSubmitSuccess(null)
+
+    if (!password.trim()) {
+      setSubmitError('삭제용 비밀번호를 입력해주세요.')
+      return
+    }
+
+    try {
+      await createPost.mutateAsync({
+        title: title.trim() || '제목 없음',
+        content: content.trim(),
+        author: author.trim() || '익명',
+        password: password.trim(),
+        category,
+      })
+
+      setSubmitSuccess('게시글이 등록됐어요! 잠시 후 메인으로 이동합니다.')
+      setTitle('')
+      setContent('')
+      setCategory('track-sprint')
+      setEventType('')
+      setRecord('')
+      setRecordDate('')
+      setIsOfficial(false)
+      setAuthor('')
+      setPassword('')
+
+      setTimeout(() => {
+        navigate('/')
+      }, 800)
+    } catch (error) {
+      console.error(error)
+      setSubmitError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
+    }
   }
 
   // 종목별 이벤트 목록
@@ -102,6 +144,35 @@ export default function WritePage() {
                 </select>
               </div>
             )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                작성자 닉네임 (선택)
+              </label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="닉네임을 입력하세요"
+                className="input-dark"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                삭제용 비밀번호 <span className="text-primary-400">*</span>
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="게시글 삭제 시 필요한 비밀번호"
+                className="input-dark"
+                required
+              />
+              <p className="mt-1 text-xs text-gray-500">※ 비밀번호는 잊지 않도록 주의해주세요.</p>
+            </div>
           </div>
 
           {/* 기록 입력 (육상/러닝 카테고리일 때만) */}
@@ -256,6 +327,9 @@ export default function WritePage() {
             </div>
           </div>
 
+          {submitError && <p className="text-sm text-red-400">{submitError}</p>}
+          {submitSuccess && <p className="text-sm text-green-400">{submitSuccess}</p>}
+
           {/* 버튼 영역 */}
           <div className="flex items-center justify-between pt-4">
             <button
@@ -274,9 +348,10 @@ export default function WritePage() {
               </button>
               <button
                 type="submit"
-                className="btn-primary"
+                disabled={isSubmitting}
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                게시글 작성
+                {isSubmitting ? '작성 중...' : '게시글 작성'}
               </button>
             </div>
           </div>

@@ -1,21 +1,96 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import AnonymousPostList from '../components/post/AnonymousPostList'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { useCreatePost, usePosts } from '../hooks/usePosts'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
-  const [showWriteForm, setShowWriteForm] = useState(false)
-  const [newPost, setNewPost] = useState({ title: '', content: '', hasImage: false, hasPoll: false })
-  const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { data: postsData = [], isLoading, isError, refetch } = usePosts()
+  const createPost = useCreatePost()
+
+  const [showWriteForm, setShowWriteForm] = useState(false)
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    author: '',
+    password: '',
+    hasImage: false,
+    hasPoll: false,
+  })
+  const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
+  const [formError, setFormError] = useState<string | null>(null)
+  const [formSuccess, setFormSuccess] = useState<string | null>(null)
+
+  const filteredPosts = useMemo(
+    () => postsData.filter((post) => !post.isBlinded),
+    [postsData]
+  )
+
+  const sortedPosts = useMemo(() => {
+    const posts = [...filteredPosts]
+    if (sortBy === 'hot') {
+      return posts.sort((a, b) => {
+        const likeDiff = (b.likes?.length ?? 0) - (a.likes?.length ?? 0)
+        if (likeDiff !== 0) return likeDiff
+        const commentDiff = (b.comments?.length ?? 0) - (a.comments?.length ?? 0)
+        if (commentDiff !== 0) return commentDiff
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      })
+    }
+    if (sortBy === 'comment') {
+      return posts.sort((a, b) => {
+        const commentDiff = (b.comments?.length ?? 0) - (a.comments?.length ?? 0)
+        if (commentDiff !== 0) return commentDiff
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      })
+    }
+    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  }, [filteredPosts, sortBy])
+
+  const isSubmitting = createPost.isPending
+
+  const handleToggleWriteForm = () => {
+    setShowWriteForm((prev) => !prev)
+    setFormError(null)
+    setFormSuccess(null)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('새 익명 게시글:', newPost)
-    setNewPost({ title: '', content: '', hasImage: false, hasPoll: false })
-    setShowWriteForm(false)
+    setFormError(null)
+    setFormSuccess(null)
+
+    if (!newPost.content.trim()) {
+      setFormError('내용을 입력해주세요.')
+      return
+    }
+
+    if (!newPost.password.trim()) {
+      setFormError('삭제용 비밀번호를 입력해주세요.')
+      return
+    }
+
+    try {
+      await createPost.mutateAsync({
+        title: newPost.title.trim() || '제목 없음',
+        content: newPost.content.trim(),
+        author: newPost.author.trim() || '익명',
+        password: newPost.password.trim(),
+        category: '익명',
+      })
+
+      setFormSuccess('게시글이 등록됐어요!')
+      setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false })
+      setShowWriteForm(false)
+      await refetch()
+    } catch (error) {
+      console.error(error)
+      setFormError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
+    }
   }
 
   return (
@@ -34,7 +109,7 @@ export default function HomePage() {
           
           {/* 글쓰기 버튼 - 모바일 최적화 */}
           <button
-            onClick={() => setShowWriteForm(!showWriteForm)}
+            onClick={handleToggleWriteForm}
             className="flex items-center gap-1 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             <PlusIcon className="w-5 h-5" />
@@ -77,6 +152,12 @@ export default function HomePage() {
         </div>
       </div>
 
+      {formSuccess && (
+        <div className="bg-green-600/10 border border-green-500/40 text-green-200 rounded-lg px-4 py-3 mb-4">
+          {formSuccess}
+        </div>
+      )}
+
       {/* 빠른 글쓰기 폼 */}
       {showWriteForm && (
         <div className="bg-dark-700 rounded-lg p-4 mb-4 animate-fadeIn">
@@ -91,12 +172,30 @@ export default function HomePage() {
             <textarea
               placeholder="내용을 입력하세요..."
               value={newPost.content}
-              onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+              onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
               className="w-full px-3 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 resize-none"
               rows={4}
               required
             />
-            
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <input
+                type="text"
+                placeholder="닉네임 (선택)"
+                value={newPost.author}
+                onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
+                className="w-full px-3 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+              />
+              <input
+                type="password"
+                placeholder="삭제용 비밀번호 (필수)"
+                value={newPost.password}
+                onChange={(e) => setNewPost({ ...newPost, password: e.target.value })}
+                className="w-full px-3 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+                required
+              />
+            </div>
+
             {/* 옵션 버튼들 */}
             <div className="flex items-center justify-between">
               <div className="flex gap-2">
@@ -129,19 +228,27 @@ export default function HomePage() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowWriteForm(false)}
+                  onClick={() => {
+                    setShowWriteForm(false)
+                    setFormError(null)
+                  }}
                   className="px-4 py-2 text-sm bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-sm bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  익명으로 작성
+                  {isSubmitting ? '작성 중...' : '익명으로 작성'}
                 </button>
               </div>
             </div>
+
+            {formError && (
+              <p className="text-sm text-red-400">{formError}</p>
+            )}
             
             {/* 이미지 업로드 영역 */}
             {newPost.hasImage && (
@@ -191,7 +298,13 @@ export default function HomePage() {
       </div>
 
       {/* 익명 게시글 목록 */}
-      <AnonymousPostList sortBy={sortBy} />
+      <AnonymousPostList
+        sortBy={sortBy}
+        posts={sortedPosts}
+        isLoading={isLoading}
+        isError={isError}
+        onRetry={() => refetch()}
+      />
 
       {/* 페이지네이션 */}
       <div className="mt-6">

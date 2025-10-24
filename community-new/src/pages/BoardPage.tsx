@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import PostList from '../components/post/PostList'
+import PostListReal from '../components/post/PostListReal'
 
 const boardInfo: Record<string, { name: string; description: string }> = {
   free: { name: '자유게시판', description: '자유롭게 이야기를 나누는 공간' },
@@ -30,8 +30,8 @@ export default function BoardPage() {
       </div>
 
       {/* Post List */}
-      <div className="card">
-        <PostList />
+      <div className="card-dark">
+        <PostListReal />
       </div>
     </div>
   )
