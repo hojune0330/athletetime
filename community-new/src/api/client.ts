@@ -10,12 +10,14 @@ import axios, { type AxiosError, type AxiosInstance } from 'axios';
 // 
 // 프로젝트 이름: athlete-time (하이픈 있음)
 // 프론트엔드: https://athlete-time.netlify.app
-// 백엔드: https://athlete-time-backend.onrender.com
+// 백엔드 (프로덕션): https://athlete-time-backend.onrender.com
+// 백엔드 (개발): http://localhost:3005
+// 백엔드 (샌드박스): https://3005-iq027ecuq0v4g69kga779-2e77fc33.sandbox.novita.ai
 // 
 // ⚠️ 중요: 모든 URL에 하이픈(-) 사용으로 통일되었습니다.
 const API_BASE_URL = import.meta.env.PROD 
   ? 'https://athlete-time-backend.onrender.com'
-  : 'http://localhost:3000';
+  : 'http://localhost:3005';
 
 /**
  * Axios 인스턴스 생성
