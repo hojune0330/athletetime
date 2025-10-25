@@ -292,14 +292,21 @@ function broadcastToRoom(room, message, excludeUserId = null) {
   });
 }
 
-// 특정 방의 사용자 수 브로드캐스트
+// 특정 방의 사용자 수 브로드캐스트 (본인 포함)
 function broadcastUserCount(room) {
   if (!rooms[room]) return;
   
-  broadcastToRoom(room, {
+  const message = JSON.stringify({
     type: 'userCount',
     room: room,
     count: rooms[room].users.size
+  });
+  
+  // 모든 사용자에게 전송 (본인 포함)
+  rooms[room].users.forEach(user => {
+    if (user.ws.readyState === WebSocket.OPEN) {
+      user.ws.send(message);
+    }
   });
 }
 
