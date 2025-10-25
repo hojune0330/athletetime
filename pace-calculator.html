@@ -2410,22 +2410,29 @@
         `;
       });
       
-      // 풀마라톤 목표 기록 (1:59-5시간)
-      const targetsFull = [
-        { time: 119 * 60, label: '세계 엘리트', highlight: true },
-        { time: 130 * 60, label: '국가대표' },
-        { time: 145 * 60, label: '엘리트', highlight: true },
-        { time: 160 * 60, label: '준엘리트' },
-        { time: 180 * 60, label: '서브 3', highlight: true },
-        { time: 195 * 60, label: '중상급' },
-        { time: 210 * 60, label: '서브 3:30', highlight: true },
-        { time: 225 * 60, label: '중급' },
-        { time: 240 * 60, label: '서브 4', highlight: true },
-        { time: 255 * 60, label: '초중급' },
-        { time: 270 * 60, label: '서브 4:30', highlight: true },
-        { time: 285 * 60, label: '초급' },
-        { time: 300 * 60, label: '서브 5', highlight: true }
-      ];
+      // 풀마라톤 목표 기록 (1:59-3:30, 5분 단위)
+      const targetsFull = [];
+      
+      // 1:59:00부터 3:30:00까지 5분 단위로 생성
+      for (let mins = 119; mins <= 210; mins += 5) {
+        let label = '';
+        let highlight = false;
+        
+        // 주요 기록에 레이블 추가
+        if (mins === 119) { label = '세계 엘리트'; highlight = true; }
+        else if (mins === 130) { label = '국가대표'; highlight = true; }
+        else if (mins === 145) { label = '엘리트'; highlight = true; }
+        else if (mins === 160) { label = '준엘리트'; highlight = true; }
+        else if (mins === 180) { label = '서브 3'; highlight = true; }
+        else if (mins === 195) { label = '중상급'; }
+        else if (mins === 210) { label = '서브 3:30'; highlight = true; }
+        
+        targetsFull.push({
+          time: mins * 60,
+          label: label || '',
+          highlight: highlight
+        });
+      }
       
       const tbodyFull = document.getElementById('targetFullTable');
       tbodyFull.innerHTML = '';
