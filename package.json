@@ -1,0 +1,29 @@
+{
+  "name": "athlete-time-community",
+  "version": "1.0.0",
+  "description": "Athlete Time - 육상 커뮤니티 백엔드",
+  "main": "community-server.js",
+  "scripts": {
+    "start": "node community-server.js",
+    "dev": "nodemon community-server.js"
+  },
+  "keywords": [
+    "athletics",
+    "track-and-field",
+    "community",
+    "running"
+  ],
+  "author": "Athlete Time",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sharp": "^0.33.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
