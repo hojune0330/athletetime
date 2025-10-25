@@ -2410,22 +2410,44 @@
         `;
       });
       
-      // 풀마라톤 목표 기록 (1:59-3:30, 5분 단위)
+      // 풀마라톤 목표 기록 (1:59-5:00, 5분/10분 단위)
       const targetsFull = [];
       
-      // 1:59:00부터 3:30:00까지 5분 단위로 생성
+      // 1:59:00부터 3:30:00까지 5분 단위
       for (let mins = 119; mins <= 210; mins += 5) {
         let label = '';
         let highlight = false;
         
         // 주요 기록에 레이블 추가
-        if (mins === 119) { label = '세계 엘리트'; highlight = true; }
-        else if (mins === 130) { label = '국가대표'; highlight = true; }
-        else if (mins === 145) { label = '엘리트'; highlight = true; }
-        else if (mins === 160) { label = '준엘리트'; highlight = true; }
-        else if (mins === 180) { label = '서브 3'; highlight = true; }
-        else if (mins === 195) { label = '중상급'; }
-        else if (mins === 210) { label = '서브 3:30'; highlight = true; }
+        if (mins === 119) { label = '🌟 세계 엘리트'; highlight = true; }
+        else if (mins === 130) { label = '🥇 국가대표급'; highlight = true; }
+        else if (mins === 145) { label = '🏅 엘리트'; highlight = true; }
+        else if (mins === 160) { label = '⭐ 준엘리트'; highlight = true; }
+        else if (mins === 180) { label = '🎯 서브 3', highlight = true; }
+        else if (mins === 195) { label = '💪 중상급'; }
+        else if (mins === 210) { label = '🎯 서브 3:30'; highlight = true; }
+        
+        targetsFull.push({
+          time: mins * 60,
+          label: label || '',
+          highlight: highlight
+        });
+      }
+      
+      // 3:40:00부터 5:00:00까지 10분 단위
+      for (let mins = 220; mins <= 300; mins += 10) {
+        let label = '';
+        let highlight = false;
+        
+        if (mins === 220) { label = '💚 중급'; }
+        else if (mins === 230) { label = '💚 중급'; }
+        else if (mins === 240) { label = '🎯 서브 4'; highlight = true; }
+        else if (mins === 250) { label = '💙 초중급'; }
+        else if (mins === 260) { label = '💙 초중급'; }
+        else if (mins === 270) { label = '🎯 서브 4:30'; highlight = true; }
+        else if (mins === 280) { label = '🧡 초급'; }
+        else if (mins === 290) { label = '🧡 초급'; }
+        else if (mins === 300) { label = '🎯 서브 5'; highlight = true; }
         
         targetsFull.push({
           time: mins * 60,
@@ -2439,7 +2461,13 @@
       
       targetsFull.forEach(target => {
         const row = tbodyFull.insertRow();
-        if (target.highlight) row.className = 'highlight-row';
+        
+        // 색상 클래스 적용
+        if (target.highlight) {
+          row.className = 'highlight-row';
+        } else if (target.label.includes('엘리트') || target.label.includes('국가대표')) {
+          row.className = 'sub-highlight';
+        }
         
         const pacePerKm = target.time / 42.195;
         const pace400m = pacePerKm * 0.4;
@@ -2447,6 +2475,26 @@
         const timeHalf = pacePerKm * 21.0975;
         const time30km = pacePerKm * 30;
         const speed = 42195 / target.time * 3.6;
+        
+        // 비고란 스타일링
+        let labelStyle = '';
+        if (target.label) {
+          if (target.label.includes('🌟') || target.label.includes('🥇')) {
+            labelStyle = 'style="font-weight: bold; color: #dc2626;"'; // 빨강
+          } else if (target.label.includes('🏅') || target.label.includes('⭐')) {
+            labelStyle = 'style="font-weight: bold; color: #ea580c;"'; // 주황
+          } else if (target.label.includes('🎯')) {
+            labelStyle = 'style="font-weight: bold; color: #7c3aed;"'; // 보라
+          } else if (target.label.includes('💪')) {
+            labelStyle = 'style="font-weight: 600; color: #0284c7;"'; // 하늘
+          } else if (target.label.includes('💚')) {
+            labelStyle = 'style="font-weight: 600; color: #16a34a;"'; // 녹색
+          } else if (target.label.includes('💙')) {
+            labelStyle = 'style="font-weight: 600; color: #2563eb;"'; // 파랑
+          } else if (target.label.includes('🧡')) {
+            labelStyle = 'style="font-weight: 600; color: #f97316;"'; // 오렌지
+          }
+        }
         
         row.innerHTML = `
           <td class="font-bold">${formatTime(target.time, true)}</td>
@@ -2456,7 +2504,7 @@
           <td>${formatTime(timeHalf)}</td>
           <td>${formatTime(time30km)}</td>
           <td>${speed.toFixed(1)}</td>
-          <td class="text-xs">${target.label}</td>
+          <td class="text-xs" ${labelStyle}>${target.label}</td>
         `;
       });
     }
