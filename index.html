@@ -494,21 +494,24 @@
   </div>
 
   <script>
-    // 커뮤니티로 이동
+    // 커뮤니티로 이동 (새로운 React 앱)
     function goToCommunity() {
-      // 개발 환경에서는 포트 5000으로, 프로덕션에서는 /community로
+      // 개발/sandbox 환경에서는 포트 5173-5175 중 하나로, 프로덕션에서는 /community로
       if (window.location.hostname === 'localhost' || window.location.hostname.includes('e2b.dev')) {
         // 현재 sandbox 환경 확인
         const currentHost = window.location.hostname;
         if (currentHost.includes('e2b.dev')) {
-          // sandbox 환경에서는 포트 5000 서비스로 이동
+          // sandbox 환경에서는 Vite dev server 포트로 이동
           const parts = currentHost.split('-');
-          const sandboxId = parts[1] + '-' + parts[2];
-          window.location.href = `https://5000-${sandboxId}.e2b.dev`;
+          const sandboxId = parts[parts.length - 2] + '-' + parts[parts.length - 1].replace('.e2b.dev', '');
+          // Vite dev server는 보통 5173-5175 포트 사용
+          window.location.href = `https://5175-${sandboxId}.e2b.dev`;
         } else {
-          window.location.href = 'http://localhost:5000';
+          // 로컬 환경에서는 Vite dev server 포트로
+          window.location.href = 'http://localhost:5173';
         }
       } else {
+        // 프로덕션: Netlify의 community-new 앱으로 이동
         window.location.href = '/community';
       }
     }

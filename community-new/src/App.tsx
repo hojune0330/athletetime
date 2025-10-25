@@ -13,9 +13,12 @@ function App() {
     document.documentElement.classList.add('dark')
   }, [])
 
+  // Production에서는 /community basename 사용
+  const basename = import.meta.env.PROD ? '/community' : '/'
+
   return (
     <div className="min-h-screen bg-dark-800">
-      <Router>
+      <Router basename={basename}>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
