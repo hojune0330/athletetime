@@ -2503,9 +2503,9 @@
       tbodyInside.innerHTML = '';
       tbodyOutside.innerHTML = '';
       
-      // 5초 간격으로 7:45부터 13:50까지
+      // 5초 간격으로 7:45부터 11:20까지
       const targetTimes = [];
-      for (let seconds = 7 * 60 + 45; seconds <= 13 * 60 + 50; seconds += 5) {
+      for (let seconds = 7 * 60 + 45; seconds <= 11 * 60 + 20; seconds += 5) {
         targetTimes.push({
           time: seconds,
           highlight: seconds % 30 === 0 // 30초마다 하이라이트
