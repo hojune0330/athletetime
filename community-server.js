@@ -7,7 +7,7 @@ const path = require('path');
 const sharp = require('sharp'); // 이미지 최적화
 
 const app = express();
-const PORT = 3005;
+const PORT = process.env.PORT || 3005;
 const DATA_FILE = path.join(__dirname, 'community-posts.json');
 
 // 운영 정책 설정
