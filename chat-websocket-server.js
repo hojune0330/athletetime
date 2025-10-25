@@ -7,7 +7,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-const PORT = 3006;
+const PORT = process.env.PORT || 3006;
 const DATA_DIR = path.join(__dirname, 'chat-data');
 
 // CORS 설정

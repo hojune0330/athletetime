@@ -1,4 +1,5 @@
 services:
+  # 커뮤니티 백엔드 서버 (HTTP)
   - type: web
     name: athlete-time-backend
     runtime: node
@@ -8,4 +9,17 @@ services:
       - key: NODE_ENV
         value: production
     healthCheckPath: /
+    autoDeploy: true
+    
+  # 채팅 WebSocket 서버
+  - type: web
+    name: athlete-time-chat
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm run start:chat
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3006
     autoDeploy: true

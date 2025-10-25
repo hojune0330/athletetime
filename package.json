@@ -5,13 +5,18 @@
   "main": "community-server.js",
   "scripts": {
     "start": "node community-server.js",
-    "dev": "nodemon community-server.js"
+    "start:chat": "node chat-websocket-server.js",
+    "start:all": "node community-server.js & node chat-websocket-server.js",
+    "dev": "nodemon community-server.js",
+    "dev:chat": "nodemon chat-websocket-server.js"
   },
   "keywords": [
     "athletics",
     "track-and-field",
     "community",
-    "running"
+    "running",
+    "websocket",
+    "chat"
   ],
   "author": "Athlete Time",
   "license": "MIT",

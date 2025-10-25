@@ -626,8 +626,14 @@
     
     /* 모바일 반응형 */
     @media (max-width: 768px) {
+      body {
+        /* iOS Safari에서 주소창 숨김 시 높이 조정 */
+        height: 100dvh;
+      }
+      
       .chat-container {
         flex-direction: column;
+        height: 100dvh;
       }
       
       .room-sidebar {
@@ -643,10 +649,26 @@
         max-height: 70vh;
         border-right: none;
         border-top: 1px solid #27272a;
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
       }
       
       .room-sidebar.show {
         bottom: 0;
+      }
+      
+      /* 사이드바 오픈 시 배경 오버레이 */
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 99;
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s;
+      }
+      
+      .sidebar-overlay.show {
+        display: block;
       }
       
       .mobile-menu-toggle {
@@ -667,6 +689,7 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         cursor: pointer;
         transition: all 0.2s;
+        -webkit-tap-highlight-color: transparent;
       }
       
       .mobile-menu-toggle:active {
@@ -679,20 +702,142 @@
       
       .chat-header {
         padding: 0 16px;
+        height: 56px;
+      }
+      
+      .chat-title {
+        font-size: 15px;
+      }
+      
+      .online-badge {
+        font-size: 11px;
+        padding: 3px 8px;
       }
       
       .messages-container {
         padding: 16px;
+        /* 모바일에서 부드러운 스크롤 */
+        -webkit-overflow-scrolling: touch;
+        /* iOS에서 키보드 올라올 때 스크롤 유지 */
+        scroll-padding-bottom: 100px;
       }
       
       .input-area {
-        padding: 16px;
+        padding: 12px 16px;
+        /* iOS 키보드 위로 올리기 */
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+      }
+      
+      .input-container {
+        padding: 4px 6px 4px 16px;
+      }
+      
+      .chat-input {
+        font-size: 16px; /* iOS zoom 방지 */
+        padding: 12px 0;
+      }
+      
+      .send-button {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      
+      /* 메시지 버블 터치 개선 */
+      .message-bubble {
+        padding: 10px 14px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+      
+      .message-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
       }
       
       .modal-header,
       .modal-body,
       .modal-footer {
-        padding: 24px;
+        padding: 20px;
+      }
+      
+      .modal-title {
+        font-size: 20px;
+      }
+      
+      .modal-content {
+        max-width: calc(100% - 32px);
+        margin: 16px;
+      }
+      
+      /* 터치 액션 최적화 */
+      .room-item,
+      .header-btn,
+      .btn {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      
+      /* 스크롤바 모바일에서 숨김 */
+      .messages-container::-webkit-scrollbar,
+      .room-list::-webkit-scrollbar {
+        display: none;
+      }
+    }
+    
+    /* 아주 작은 화면 (iPhone SE 등) */
+    @media (max-width: 375px) {
+      .chat-header {
+        height: 52px;
+      }
+      
+      .chat-title {
+        font-size: 14px;
+      }
+      
+      .online-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+      }
+      
+      .header-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      
+      .mobile-menu-toggle {
+        width: 52px;
+        height: 52px;
+        bottom: 20px;
+        left: 20px;
+        font-size: 18px;
+      }
+      
+      .message-bubble {
+        font-size: 13px;
+        padding: 8px 12px;
+      }
+      
+      .message-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+    }
+    
+    /* 가로 모드 최적화 */
+    @media (max-width: 768px) and (orientation: landscape) {
+      .room-sidebar {
+        max-height: 85vh;
+      }
+      
+      .messages-container {
+        padding: 12px 16px;
+      }
+      
+      .input-area {
+        padding: 8px 16px;
       }
     }
     
@@ -705,6 +850,9 @@
   </style>
 </head>
 <body>
+  <!-- 모바일 사이드바 오버레이 -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
   <!-- 채팅 컨테이너 -->
   <div class="chat-container">
     <!-- 방 목록 사이드바 -->
@@ -869,10 +1017,20 @@
     // 모바일 메뉴 토글
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const roomSidebar = document.getElementById('roomSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
     
     if (mobileMenuToggle) {
-      mobileMenuToggle.addEventListener('click', () => {
+      // 메뉴 토글 버튼
+      mobileMenuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
         roomSidebar.classList.toggle('show');
+        sidebarOverlay.classList.toggle('show');
+      });
+      
+      // 오버레이 클릭 시 사이드바 닫기
+      sidebarOverlay.addEventListener('click', () => {
+        roomSidebar.classList.remove('show');
+        sidebarOverlay.classList.remove('show');
       });
       
       // 방 선택 시 모바일에서 사이드바 닫기
@@ -880,10 +1038,59 @@
         item.addEventListener('click', () => {
           if (window.innerWidth <= 768) {
             roomSidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
           }
         });
       });
+      
+      // 스와이프 다운으로 사이드바 닫기
+      let touchStartY = 0;
+      let touchEndY = 0;
+      
+      roomSidebar.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+      
+      roomSidebar.addEventListener('touchmove', (e) => {
+        touchEndY = e.touches[0].clientY;
+      }, { passive: true });
+      
+      roomSidebar.addEventListener('touchend', () => {
+        if (touchEndY > touchStartY + 50) { // 50px 이상 아래로 스와이프
+          roomSidebar.classList.remove('show');
+          sidebarOverlay.classList.remove('show');
+        }
+      });
     }
+    
+    // 모바일에서 키보드 올라올 때 스크롤 처리
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      const messageInput = document.getElementById('messageInput');
+      const messagesContainer = document.getElementById('messagesContainer');
+      
+      messageInput.addEventListener('focus', () => {
+        setTimeout(() => {
+          scrollToBottom();
+        }, 300); // 키보드 애니메이션 대기
+      });
+      
+      // iOS에서 입력 시 자동 스크롤
+      messageInput.addEventListener('input', () => {
+        if (window.innerWidth <= 768) {
+          setTimeout(scrollToBottom, 100);
+        }
+      });
+    }
+    
+    // Prevent double-tap zoom on buttons
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
     
     // 닉네임 설정
     function setNickname() {
@@ -910,9 +1117,16 @@
     
     // WebSocket 연결
     function connectWebSocket() {
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:3006'
-        : 'wss://athlete-time-chat.onrender.com';
+      // 자동으로 환경 감지
+      let wsUrl;
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        wsUrl = 'ws://localhost:3006';
+      } else {
+        // 프로덕션: Render.com 배포 URL
+        wsUrl = 'wss://athlete-time-chat.onrender.com';
+      }
+      
+      console.log('🔌 WebSocket 연결 시도:', wsUrl);
       
       try {
         ws = new WebSocket(wsUrl);
