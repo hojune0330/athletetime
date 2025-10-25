@@ -5,16 +5,15 @@
  */
 
 import { apiClient } from './client';
-import {
+import type {
   Post,
   PostsResponse,
   CreatePostRequest,
   UpdatePostRequest,
-  DeletePostRequest,
   CreateCommentRequest,
   VoteRequest,
   ApiResponse,
-} from '../types/post';
+} from '../types';
 
 /**
  * 게시글 목록 조회

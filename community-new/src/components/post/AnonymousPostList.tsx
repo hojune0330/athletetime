@@ -86,7 +86,7 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
         const likes = post.likes?.length ?? 0
         const dislikes = post.dislikes?.length ?? 0
         const comments = post.comments?.length ?? 0
-        const hasImages = Boolean(post.images && post.images.length > 0)
+        const hasImages = Boolean(post.imageUrl)
         const isHot = likes >= 10 || comments >= 15 || (post.views ?? 0) >= 300
 
         return (

@@ -4,7 +4,7 @@
  * 백엔드 서버와의 HTTP 통신을 담당하는 Axios 클라이언트 설정
  */
 
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { type AxiosError, type AxiosInstance } from 'axios';
 
 // 환경별 API URL 설정
 // 

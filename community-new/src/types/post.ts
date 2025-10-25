@@ -5,7 +5,7 @@
 /**
  * 게시글 타입
  */
-export interface Post {
+export type Post = {
   id: number;
   category: string;
   title: string;
@@ -16,7 +16,7 @@ export interface Post {
   views: number;
   likes: string[];
   dislikes: string[];
-  comments: Comment[];
+  comments: PostComment[];
   reports: Report[];
   isNotice?: boolean;
   isBlinded?: boolean;
@@ -26,7 +26,7 @@ export interface Post {
 /**
  * 댓글 타입
  */
-export interface Comment {
+export interface PostComment {
   id: number;
   author: string;
   content: string;
@@ -88,7 +88,7 @@ export interface CreateCommentRequest {
  */
 export interface VoteRequest {
   userId: string;
-  type: 'like' | 'dislike' | null;
+  voteType: 'up' | 'down';
 }
 
 /**

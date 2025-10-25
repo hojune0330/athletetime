@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams, useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import PostListReal from '../components/post/PostListReal'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
@@ -8,7 +8,6 @@ import { useCreatePost } from '../hooks/usePosts'
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
-  const navigate = useNavigate()
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({ title: '', content: '', hasImage: false, hasPoll: false })
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')

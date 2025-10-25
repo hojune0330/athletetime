@@ -10,7 +10,7 @@ import {
   ChatBubbleLeftIcon,
 } from '@heroicons/react/24/outline';
 import { usePosts } from '../../hooks/usePosts';
-import { Post } from '../../types/post';
+import type { Post } from '../../types';
 
 // 시간 포맷팅 유틸리티
 function formatDate(dateString: string): string {

@@ -12,12 +12,12 @@ import {
   createComment,
   votePost,
 } from '../api/posts';
-import {
+import type {
   CreatePostRequest,
   UpdatePostRequest,
   CreateCommentRequest,
   VoteRequest,
-} from '../types/post';
+} from '../types';
 
 /**
  * Query Keys
