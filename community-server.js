@@ -21,7 +21,10 @@ const POLICY = {
   BLIND_DISLIKE_COUNT: 20, // 비추천 20개 이상 블라인드
   MAX_IMAGES_PER_POST: 5, // 게시글당 최대 이미지 5개
   MAX_CONTENT_LENGTH: 10000, // 최대 글자 수 10,000자
-  COMMENT_MAX_LENGTH: 500 // 댓글 최대 500자
+  COMMENT_MAX_LENGTH: 500, // 댓글 최대 500자
+  RATE_LIMIT_WINDOW: 60 * 1000, // 1분
+  RATE_LIMIT_MAX_POSTS: 3, // 1분당 최대 3개 게시글
+  RATE_LIMIT_MAX_COMMENTS: 10 // 1분당 최대 10개 댓글
 };
 
 // CORS 설정
@@ -264,6 +267,45 @@ let stats = {
   totalComments: 0
 };
 
+// Rate limiting 추적
+const rateLimitMap = new Map();
+
+// Rate limit 체크 함수
+function checkRateLimit(userId, action) {
+  const key = `${userId}_${action}`;
+  const now = Date.now();
+  
+  if (!rateLimitMap.has(key)) {
+    rateLimitMap.set(key, []);
+  }
+  
+  const timestamps = rateLimitMap.get(key);
+  const recentTimestamps = timestamps.filter(t => now - t < POLICY.RATE_LIMIT_WINDOW);
+  
+  const maxAllowed = action === 'post' ? POLICY.RATE_LIMIT_MAX_POSTS : POLICY.RATE_LIMIT_MAX_COMMENTS;
+  
+  if (recentTimestamps.length >= maxAllowed) {
+    return false;
+  }
+  
+  recentTimestamps.push(now);
+  rateLimitMap.set(key, recentTimestamps);
+  return true;
+}
+
+// Rate limit 정리 (5분마다)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamps] of rateLimitMap.entries()) {
+    const recent = timestamps.filter(t => now - t < POLICY.RATE_LIMIT_WINDOW * 5);
+    if (recent.length === 0) {
+      rateLimitMap.delete(key);
+    } else {
+      rateLimitMap.set(key, recent);
+    }
+  }
+}, 5 * 60 * 1000);
+
 // 모든 게시글 가져오기
 app.get('/api/posts', (req, res) => {
   const visiblePosts = posts.filter(p => !p.isBlinded);
@@ -319,7 +361,15 @@ async function optimizeImage(base64Image) {
 // 게시글 작성
 app.post('/api/posts', async (req, res) => {
   try {
-    const { category, title, author, content, password, instagram, images, poll } = req.body;
+    const { category, title, author, content, password, instagram, images, poll, userId } = req.body;
+    
+    // Rate limiting 체크
+    if (userId && !checkRateLimit(userId, 'post')) {
+      return res.status(429).json({ 
+        success: false, 
+        message: '너무 많은 게시글을 작성했습니다. 잠시 후 다시 시도해주세요.' 
+      });
+    }
     
     // 유효성 검사
     if (content && content.length > POLICY.MAX_CONTENT_LENGTH) {
@@ -468,7 +518,15 @@ app.post('/api/posts/:id/vote', (req, res) => {
 
 // 댓글 작성
 app.post('/api/posts/:id/comments', (req, res) => {
-  const { author, content, instagram } = req.body;
+  const { author, content, instagram, userId } = req.body;
+  
+  // Rate limiting 체크
+  if (userId && !checkRateLimit(userId, 'comment')) {
+    return res.status(429).json({ 
+      success: false, 
+      message: '너무 많은 댓글을 작성했습니다. 잠시 후 다시 시도해주세요.' 
+    });
+  }
   const post = posts.find(p => p.id == req.params.id);
   
   if (!post) {
@@ -525,12 +583,76 @@ app.post('/api/posts/:id/report', (req, res) => {
 
 // 통계 API
 app.get('/api/stats', (req, res) => {
+  const totalLikes = posts.reduce((sum, p) => sum + (p.likes?.length || 0), 0);
+  const totalDislikes = posts.reduce((sum, p) => sum + (p.dislikes?.length || 0), 0);
+  const blindedPosts = posts.filter(p => p.isBlinded).length;
+  
   res.json({
     success: true,
     stats: {
       ...stats,
-      activePosts: posts.filter(p => !p.isBlinded).length
+      activePosts: posts.filter(p => !p.isBlinded).length,
+      totalLikes,
+      totalDislikes,
+      blindedPosts,
+      noticeCount: posts.filter(p => p.isNotice).length
     }
+  });
+});
+
+// 헬스 체크 API
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    postsCount: posts.length,
+    policy: POLICY
+  });
+});
+
+// 카테고리별 게시글 조회
+app.get('/api/posts/category/:category', (req, res) => {
+  const category = decodeURIComponent(req.params.category);
+  const categoryPosts = posts.filter(p => !p.isBlinded && p.category === category);
+  
+  res.json({
+    success: true,
+    posts: categoryPosts,
+    count: categoryPosts.length
+  });
+});
+
+// 인기 게시글 (좋아요 많은 순)
+app.get('/api/posts/popular', (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const popularPosts = posts
+    .filter(p => !p.isBlinded)
+    .sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0))
+    .slice(0, limit);
+  
+  res.json({
+    success: true,
+    posts: popularPosts
+  });
+});
+
+// 최신 댓글이 달린 게시글
+app.get('/api/posts/active', (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const activePosts = posts
+    .filter(p => !p.isBlinded && p.comments?.length > 0)
+    .sort((a, b) => {
+      const aLastComment = a.comments[a.comments.length - 1]?.date || a.date;
+      const bLastComment = b.comments[b.comments.length - 1]?.date || b.date;
+      return new Date(bLastComment) - new Date(aLastComment);
+    })
+    .slice(0, limit);
+  
+  res.json({
+    success: true,
+    posts: activePosts
   });
 });
 
@@ -563,6 +685,9 @@ server.listen(PORT, () => {
   
   console.log(`📊 초기 데이터: ${posts.length}개 게시글`);
   console.log(`🏃 육상 커뮤니티 준비 완료!`);
+  console.log(`\n🔗 서버 접속: http://localhost:${PORT}`);
+  console.log(`🔗 헬스 체크: http://localhost:${PORT}/api/health`);
+  console.log(`🔗 통계: http://localhost:${PORT}/api/stats\n`);
 });
 
 // 오래된 게시글 자동 삭제 함수
