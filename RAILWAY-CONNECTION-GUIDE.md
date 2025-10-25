@@ -78,7 +78,7 @@ function connectWebSocket() {
     wsUrl = `ws://${hostname}:3004`;
   } else if (protocol === 'https:') {
     // Railway WebSocket 서버 URL
-    wsUrl = 'wss://athletetime-chat.up.railway.app';  // ✅ 여기가 변경된 부분!
+    wsUrl = 'wss://athlete-time-chat.up.railway.app';  // ✅ 여기가 변경된 부분!
   } else {
     // HTTP 호스팅 환경
     wsUrl = `ws://${hostname}:3004`;
@@ -92,7 +92,7 @@ function connectWebSocket() {
 1. **Railway 대시보드에서 URL 복사**
    - Railway 프로젝트 페이지로 이동
    - Settings → Domains 섹션에서 생성된 URL 확인
-   - 예: `athletetime-chat.up.railway.app`
+   - 예: `athlete-time-chat.up.railway.app`
 
 2. **chat-real.html 수정**
    - 텍스트 에디터로 파일 열기
@@ -107,7 +107,7 @@ function connectWebSocket() {
    - Ctrl+S (Windows) 또는 Cmd+S (Mac)로 저장
 
 4. **Netlify에 재배포**
-   - 수정된 `athletetime-netlify` 폴더를 다시 압축
+   - 수정된 `athlete-time-netlify` 폴더를 다시 압축
    - Netlify 대시보드에서 새 ZIP 파일 업로드
 
 ## ⚠️ 주의사항

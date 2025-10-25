@@ -128,7 +128,7 @@ async function initDatabase() {
 app.get('/', (req, res) => {
   res.json({ 
     status: 'ok', 
-    service: 'athletetime-backend',
+    service: 'athlete-time-backend',
     timestamp: new Date().toISOString()
   });
 });

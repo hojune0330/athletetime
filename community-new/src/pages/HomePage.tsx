@@ -1,21 +1,43 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import AnonymousPostList from '../components/post/AnonymousPostList'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import PostListReal from '../components/post/PostListReal'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { useCreatePost } from '../hooks/usePosts'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
+  const navigate = useNavigate()
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({ title: '', content: '', hasImage: false, hasPoll: false })
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 게시글 작성 mutation
+  const createPostMutation = useCreatePost()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('새 익명 게시글:', newPost)
-    setNewPost({ title: '', content: '', hasImage: false, hasPoll: false })
-    setShowWriteForm(false)
+    
+    try {
+      await createPostMutation.mutateAsync({
+        title: newPost.title || '무제',
+        content: newPost.content,
+        category: '자유',
+        author: '익명',
+        password: 'anonymous', // 익명 게시글용 기본 비밀번호
+      })
+      
+      // 성공 시 폼 초기화
+      setNewPost({ title: '', content: '', hasImage: false, hasPoll: false })
+      setShowWriteForm(false)
+      
+      // 성공 알림 (선택적)
+      alert('게시글이 작성되었습니다!')
+    } catch (error) {
+      console.error('게시글 작성 실패:', error)
+      alert('게시글 작성에 실패했습니다. 다시 시도해주세요.')
+    }
   }
 
   return (
@@ -190,8 +212,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 익명 게시글 목록 */}
-      <AnonymousPostList sortBy={sortBy} />
+      {/* 익명 게시글 목록 - 실제 API 연동 */}
+      <PostListReal />
 
       {/* 페이지네이션 */}
       <div className="mt-6">

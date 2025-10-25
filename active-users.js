@@ -1,7 +1,7 @@
 // 활성 사용자 추적 시스템
 const ActiveUsers = {
-  STORAGE_KEY: 'athletetime_active_users',
-  SESSION_KEY: 'athletetime_session',
+  STORAGE_KEY: 'athlete-time_active_users',
+  SESSION_KEY: 'athlete-time_session',
   HEARTBEAT_INTERVAL: 30000, // 30초마다 활성 상태 업데이트
   INACTIVE_THRESHOLD: 120000, // 2분 동안 활동 없으면 비활성으로 간주
   

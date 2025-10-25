@@ -151,7 +151,7 @@ db.collection('posts')
 ```javascript
 // package.json 생성
 {
-  "name": "athletetime-chat",
+  "name": "athlete-time-chat",
   "version": "1.0.0",
   "scripts": {
     "start": "node chat-server-enhanced.js"

@@ -94,7 +94,7 @@
 ## 📁 프로젝트 구조
 
 ```
-athletetime/
+athlete-time/
 ├── community-new/           # React 커뮤니티 앱
 │   ├── src/
 │   │   ├── components/     # 재사용 가능한 컴포넌트
@@ -125,7 +125,7 @@ athletetime/
 1. **저장소 클론**
 ```bash
 git clone https://github.com/hojune0330/athletetime.git
-cd athletetime
+cd athlete-time
 ```
 
 2. **의존성 설치**

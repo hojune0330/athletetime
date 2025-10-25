@@ -1269,7 +1269,7 @@
           <div style="background: rgba(139, 92, 246, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #8b5cf6;">
             <p style="color: #e0e0e0; line-height: 1.6; font-size: 0.9rem;">
               부적절한 행위를 발견하신 경우 즉시 신고해 주세요.<br>
-              문의: admin@athletetime.com
+              문의: admin@athlete-time.com
             </p>
           </div>
         </div>
@@ -1447,10 +1447,10 @@
       } else if (protocol === 'https:') {
         // HTTPS 호스팅 환경 (Vercel, Netlify 등)
         // Render.com WebSocket 서버
-        wsUrl = 'wss://athletetime-backend.onrender.com/ws';
+        wsUrl = 'wss://athlete-time-backend.onrender.com/ws';
       } else {
         // HTTP 호스팅 환경
-        wsUrl = 'wss://athletetime-backend.onrender.com/ws';
+        wsUrl = 'wss://athlete-time-backend.onrender.com/ws';
       }
       
       console.log('🔌 WebSocket 연결 시도:', wsUrl);
@@ -2464,7 +2464,7 @@
       const img = document.getElementById('lightboxImage');
       const link = document.createElement('a');
       link.href = img.src;
-      link.download = 'athletetime-image.jpg';
+      link.download = 'athlete-time-image.jpg';
       link.click();
     }
     

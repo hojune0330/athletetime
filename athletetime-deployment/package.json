@@ -1,5 +1,5 @@
 {
-  "name": "athletetime",
+  "name": "athlete-time",
   "version": "1.0.0",
   "description": "Athlete Time - Running Calculator & Community Platform",
   "main": "chat-server-enhanced.js",

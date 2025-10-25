@@ -4,7 +4,7 @@
 
 ### Heroku
 ```bash
-heroku create athletetime-chat
+heroku create athlete-time-chat
 git init
 git add .
 git commit -m "WebSocket server"

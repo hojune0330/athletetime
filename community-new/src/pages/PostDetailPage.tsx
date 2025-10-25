@@ -1,41 +1,118 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { usePost, useVotePost, useCreateComment, useDeletePost } from '../hooks/usePosts'
+import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline'
 
 export default function PostDetailPage() {
-  const { id: postId } = useParams()
-  const [liked, setLiked] = useState(false)
-  const [bookmarked, setBookmarked] = useState(false)
+  const { id: postIdParam } = useParams()
+  const navigate = useNavigate()
+  const postId = Number(postIdParam)
   
-  // 나중에 postId를 사용해서 게시글 데이터를 가져올 예정
-  console.log('Post ID:', postId)
-
-  // 샘플 댓글 데이터
-  const [comments] = useState([
-    {
-      id: 1,
-      author: '유저1',
-      content: 'ㅋㅋㅋㅋㅋ 진짜 웃기네요',
-      time: '2024.10.14 15:30',
-      likes: 12,
-      replies: [
-        {
-          id: 11,
-          author: '유저2',
-          content: '인정합니다 ㅋㅋㅋ',
-          time: '2024.10.14 15:35',
-          likes: 3,
+  const [commentText, setCommentText] = useState('')
+  const [commentAuthor, setCommentAuthor] = useState('')
+  const [commentPassword, setCommentPassword] = useState('')
+  const [deletePassword, setDeletePassword] = useState('')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  
+  // API 훅
+  const { data: post, isLoading, isError } = usePost(postId)
+  const votePostMutation = useVotePost()
+  const createCommentMutation = useCreateComment()
+  const deletePostMutation = useDeletePost()
+  
+  // 시간 포맷팅
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+  
+  // 투표 핸들러
+  const handleVote = async (voteType: 'up' | 'down') => {
+    try {
+      await votePostMutation.mutateAsync({
+        postId,
+        data: {
+          voteType,
+          userId: 'anonymous' // 실제로는 세션에서 가져와야 함
         }
-      ]
-    },
-    {
-      id: 2,
-      author: '유저3',
-      content: '이런 게시글 더 올려주세요!',
-      time: '2024.10.14 15:25',
-      likes: 5,
-      replies: []
+      })
+    } catch (error) {
+      console.error('투표 실패:', error)
     }
-  ])
+  }
+  
+  // 댓글 작성 핸들러
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!commentText.trim() || !commentAuthor.trim() || !commentPassword.trim()) {
+      alert('모든 필드를 입력해주세요.')
+      return
+    }
+    
+    try {
+      await createCommentMutation.mutateAsync({
+        postId,
+        data: {
+          content: commentText,
+          author: commentAuthor,
+          password: commentPassword
+        }
+      })
+      
+      // 성공 시 입력 필드 초기화
+      setCommentText('')
+      setCommentPassword('')
+      alert('댓글이 작성되었습니다!')
+    } catch (error) {
+      console.error('댓글 작성 실패:', error)
+      alert('댓글 작성에 실패했습니다.')
+    }
+  }
+  
+  // 게시글 삭제 핸들러
+  const handleDelete = async () => {
+    if (!deletePassword.trim()) {
+      alert('비밀번호를 입력해주세요.')
+      return
+    }
+    
+    try {
+      await deletePostMutation.mutateAsync({ id: postId, password: deletePassword })
+      alert('게시글이 삭제되었습니다.')
+      navigate('/')
+    } catch (error) {
+      console.error('게시글 삭제 실패:', error)
+      alert('비밀번호가 일치하지 않거나 삭제에 실패했습니다.')
+    }
+    setShowDeleteModal(false)
+  }
+  
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+      </div>
+    )
+  }
+  
+  // 에러 상태
+  if (isError || !post) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-red-500 text-6xl mb-4">⚠️</div>
+        <h3 className="text-xl font-bold text-gray-200 mb-2">게시글을 찾을 수 없습니다</h3>
+        <Link to="/" className="text-primary-400 hover:underline">목록으로 돌아가기</Link>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -46,24 +123,36 @@ export default function PostDetailPage() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <Link to="/board/chimchak" className="px-2 py-0.5 text-xs font-medium bg-teal-500/20 text-teal-400 rounded">
-                  침착맨
-                </Link>
+                <span className="px-2 py-0.5 text-xs font-medium bg-primary-500/20 text-primary-400 rounded">
+                  {post.category}
+                </span>
+                {post.isNotice && (
+                  <span className="text-yellow-500 text-sm">📌</span>
+                )}
                 <span className="text-gray-500 text-xs">·</span>
-                <span className="text-xs text-gray-400">2024.10.14 14:30</span>
+                <span className="text-xs text-gray-400">{formatDate(post.date)}</span>
               </div>
               <h1 className="text-2xl font-bold text-white mb-3">
-                오늘 방송 레전드였음 ㅋㅋㅋㅋ
+                {post.title}
               </h1>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500" />
-                  <span className="text-sm font-medium text-white">작성자닉네임</span>
+                  <span className="text-sm font-medium text-white">{post.author}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-400">
-                  <span>조회 1,234</span>
-                  <span>추천 56</span>
-                  <span>댓글 23</span>
+                  <span className="flex items-center gap-1">
+                    <EyeIcon className="w-3.5 h-3.5" />
+                    {post.views}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <HandThumbUpIcon className="w-3.5 h-3.5" />
+                    {post.likes.length}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
+                    {post.comments.length}
+                  </span>
                 </div>
               </div>
             </div>
@@ -73,24 +162,18 @@ export default function PostDetailPage() {
         {/* 게시글 내용 */}
         <div className="p-6">
           <div className="prose prose-invert max-w-none">
-            <p className="text-gray-300 leading-relaxed mb-4">
-              오늘 침착맨 방송 진짜 레전드였음 ㅋㅋㅋㅋ
-            </p>
-            <p className="text-gray-300 leading-relaxed mb-4">
-              특히 그 부분에서 완전 빵터짐 ㅋㅋㅋㅋㅋㅋ
-              다들 클립 만들어서 올릴 듯
-            </p>
-            <div className="my-6">
-              <img 
-                src="https://via.placeholder.com/600x400" 
-                alt="게시글 이미지"
-                className="rounded-lg w-full"
-              />
+            {post.imageUrl && (
+              <div className="my-6">
+                <img 
+                  src={post.imageUrl} 
+                  alt={post.title}
+                  className="rounded-lg w-full"
+                />
+              </div>
+            )}
+            <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+              {post.content}
             </div>
-            <p className="text-gray-300 leading-relaxed mb-4">
-              이런 방송 자주 했으면 좋겠다 진짜로...
-              요즘 침착맨 폼 미쳤음 ㅋㅋㅋ
-            </p>
           </div>
         </div>
 
@@ -99,27 +182,21 @@ export default function PostDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <button 
-                onClick={() => setLiked(!liked)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 ${
-                  liked 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-dark-600 text-gray-300 hover:bg-dark-500'
-                }`}
+                onClick={() => handleVote('up')}
+                disabled={votePostMutation.isPending}
+                className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-dark-600 text-gray-300 hover:bg-primary-600 hover:text-white disabled:opacity-50"
               >
-                <span>{liked ? '❤️' : '🤍'}</span>
+                <span>👍</span>
                 <span>추천</span>
-                <span className="font-bold">56</span>
+                <span className="font-bold">{post.likes.length}</span>
               </button>
               <button 
-                onClick={() => setBookmarked(!bookmarked)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 ${
-                  bookmarked
-                    ? 'bg-yellow-500 text-black'
-                    : 'bg-dark-600 text-gray-300 hover:bg-dark-500'
-                }`}
+                onClick={() => handleVote('down')}
+                disabled={votePostMutation.isPending}
+                className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-dark-600 text-gray-300 hover:bg-red-600 hover:text-white disabled:opacity-50"
               >
-                <span>{bookmarked ? '⭐' : '☆'}</span>
-                <span>북마크</span>
+                <span>👎</span>
+                <span>비추천</span>
               </button>
               <button className="px-4 py-2 rounded-lg bg-dark-600 text-gray-300 hover:bg-dark-500 font-medium text-sm transition-colors flex items-center gap-2">
                 <span>🔗</span>
@@ -127,86 +204,121 @@ export default function PostDetailPage() {
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-4 py-2 rounded-lg bg-dark-600 text-gray-300 hover:bg-dark-500 font-medium text-sm">
-                수정
-              </button>
-              <button className="px-4 py-2 rounded-lg bg-dark-600 text-red-400 hover:bg-dark-500 font-medium text-sm">
+              <button 
+                onClick={() => setShowDeleteModal(true)}
+                className="px-4 py-2 rounded-lg bg-dark-600 text-red-400 hover:bg-dark-500 font-medium text-sm"
+              >
                 삭제
               </button>
             </div>
           </div>
         </div>
       </article>
+      
+      {/* 삭제 확인 모달 */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-700 rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-white mb-4">게시글 삭제</h3>
+            <p className="text-gray-400 mb-4">게시글을 삭제하려면 비밀번호를 입력하세요.</p>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              placeholder="비밀번호"
+              className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white mb-4"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false)
+                  setDeletePassword('')
+                }}
+                className="flex-1 px-4 py-2 bg-dark-600 text-white rounded-lg hover:bg-dark-500"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deletePostMutation.isPending}
+                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+              >
+                {deletePostMutation.isPending ? '삭제 중...' : '삭제'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 댓글 섹션 */}
       <section className="card-dark p-6">
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <span>💬</span>
           <span>댓글</span>
-          <span className="text-teal-400">{comments.length}</span>
+          <span className="text-primary-400">{post.comments.length}</span>
         </h2>
 
         {/* 댓글 작성 */}
-        <div className="mb-6">
+        <form onSubmit={handleCommentSubmit} className="mb-6">
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            <input
+              type="text"
+              value={commentAuthor}
+              onChange={(e) => setCommentAuthor(e.target.value)}
+              placeholder="닉네임"
+              className="px-3 py-2 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
+              required
+            />
+            <input
+              type="password"
+              value={commentPassword}
+              onChange={(e) => setCommentPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="px-3 py-2 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
+              required
+            />
+          </div>
           <textarea
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
             placeholder="댓글을 입력하세요..."
-            className="w-full p-3 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-teal-500"
+            className="w-full p-3 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-primary-500"
             rows={3}
+            required
           />
           <div className="flex justify-end mt-2">
-            <button className="px-4 py-2 rounded-lg bg-teal-500 text-white font-medium text-sm hover:bg-teal-600">
-              댓글 작성
+            <button 
+              type="submit"
+              disabled={createCommentMutation.isPending}
+              className="px-4 py-2 rounded-lg bg-primary-500 text-white font-medium text-sm hover:bg-primary-600 disabled:opacity-50"
+            >
+              {createCommentMutation.isPending ? '작성 중...' : '댓글 작성'}
             </button>
           </div>
-        </div>
+        </form>
 
         {/* 댓글 목록 */}
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="border-b border-dark-600 last:border-0 pb-4 last:pb-0">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shrink-0" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-white">{comment.author}</span>
-                    <span className="text-xs text-gray-500">{comment.time}</span>
-                  </div>
-                  <p className="text-gray-300 mb-2">{comment.content}</p>
-                  <div className="flex items-center gap-3">
-                    <button className="text-xs text-gray-400 hover:text-teal-400 flex items-center gap-1">
-                      <span>👍</span>
-                      <span>{comment.likes}</span>
-                    </button>
-                    <button className="text-xs text-gray-400 hover:text-teal-400">
-                      답글
-                    </button>
-                  </div>
-                  
-                  {/* 대댓글 */}
-                  {comment.replies.length > 0 && (
-                    <div className="mt-3 space-y-3">
-                      {comment.replies.map((reply) => (
-                        <div key={reply.id} className="flex gap-3 pl-4 border-l-2 border-dark-600">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-500 shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-white text-sm">{reply.author}</span>
-                              <span className="text-xs text-gray-500">{reply.time}</span>
-                            </div>
-                            <p className="text-gray-300 text-sm">{reply.content}</p>
-                            <button className="text-xs text-gray-400 hover:text-teal-400 flex items-center gap-1 mt-1">
-                              <span>👍</span>
-                              <span>{reply.likes}</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+          {post.comments.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">
+              <p>첫 번째 댓글을 작성해보세요!</p>
+            </div>
+          ) : (
+            post.comments.map((comment) => (
+              <div key={comment.id} className="border-b border-dark-600 last:border-0 pb-4 last:pb-0">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shrink-0" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-white">{comment.author}</span>
+                      <span className="text-xs text-gray-500">{formatDate(comment.date)}</span>
                     </div>
-                  )}
+                    <p className="text-gray-300 mb-2 whitespace-pre-wrap">{comment.content}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 

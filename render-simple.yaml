@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: athletetime-backend
+    name: athlete-time-backend
     env: node
     buildCommand: npm install
     startCommand: node server.js
@@ -11,6 +11,6 @@ services:
         value: https://athlete-time.netlify.app
 
 databases:
-  - name: athletetime-db
-    databaseName: athletetime
-    user: athletetime
+  - name: athlete-time-db
+    databaseName: athlete-time
+    user: athlete-time

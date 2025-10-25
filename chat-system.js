@@ -1,8 +1,8 @@
 // 채팅 시스템 모듈
 const ChatSystem = {
   // 상수
-  STORAGE_KEY: 'athletetime_chat',
-  USER_KEY: 'athletetime_chat_user',
+  STORAGE_KEY: 'athlete-time_chat',
+  USER_KEY: 'athlete-time_chat_user',
   THREAD_LIFETIME: 30 * 60 * 1000, // 30분
   UPDATE_INTERVAL: 1000, // 1초마다 업데이트
   TYPING_TIMEOUT: 3000, // 3초 후 타이핑 표시 제거
@@ -701,7 +701,7 @@ const ChatSystem = {
       const notification = new Notification('애슬리트 타임 - 새 메시지', {
         body: `${message.nickname}: ${message.content.substring(0, 50)}...`,
         icon: '/favicon.ico',
-        tag: 'athletetime-chat'
+        tag: 'athlete-time-chat'
       });
       
       notification.onclick = () => {

@@ -3,10 +3,10 @@
 ## 현재 보이는 화면 구성
 
 ### 1. 서비스 정보
-- **이름**: "운동선수 시간" (athletetime-backend)
+- **이름**: "운동선수 시간" (athlete-time-backend)
 - **타입**: Web Service
 - **상태**: 실행 중 (초록색 점)
-- **URL**: athletetime-backend.onrender.com
+- **URL**: athlete-time-backend.onrender.com
 
 ### 2. 노란색 알림 메시지
 ```
@@ -39,7 +39,7 @@
 드롭다운 메뉴에서 PostgreSQL 선택
 
 #### 3️⃣ 데이터베이스 생성
-- Name: `athletetime-db`
+- Name: `athlete-time-db`
 - 나머지는 기본값 사용
 - Create Database 클릭
 

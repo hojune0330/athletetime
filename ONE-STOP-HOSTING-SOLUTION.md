@@ -159,21 +159,21 @@ amplify publish
 # render.yaml
 services:
   - type: web
-    name: athletetime-backend
+    name: athlete-time-backend
     env: node
     buildCommand: npm install
     startCommand: node chat-server-enhanced.js
     
   - type: web
-    name: athletetime-frontend
+    name: athlete-time-frontend
     env: static
     buildCommand: npm run build
     staticPublishPath: ./dist
 
 databases:
-  - name: athletetime-db
-    databaseName: athletetime
-    user: athletetime
+  - name: athlete-time-db
+    databaseName: athlete-time
+    user: athlete-time
 
 # GitHub 연동 후 자동 배포
 ```
@@ -233,7 +233,7 @@ databases:
 # 1. package.json 생성
 cat > package.json << 'EOF'
 {
-  "name": "athletetime",
+  "name": "athlete-time",
   "version": "1.0.0",
   "scripts": {
     "start": "node chat-server-enhanced.js",

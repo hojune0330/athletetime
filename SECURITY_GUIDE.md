@@ -47,7 +47,7 @@
   fetch('/api/posts/1', { method: 'DELETE' });
   
   // 3. 피싱 사이트로 리다이렉트
-  window.location = 'https://fake-athletetime.com';
+  window.location = 'https://fake-athlete-time.com';
 </script>
 
 // 또는 이미지 태그 악용:

@@ -10,9 +10,9 @@
 ### 데이터베이스 설정:
 
 ```
-Name: athletetime-db
-Database: athletetimedb  
-User: athletetime
+Name: athlete-time-db
+Database: athlete-timedb  
+User: athlete-time
 Region: Singapore (또는 가까운 지역)
 PostgreSQL Version: 15 (또는 최신)
 Plan: Free (또는 Starter)

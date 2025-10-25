@@ -49,14 +49,14 @@ export const SessionManager = {
   // 세션 저장
   setSession: (token: string) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('athletetime_session', token)
+      localStorage.setItem('athlete-time_session', token)
     }
   },
   
   // 세션 가져오기
   getSession: (): UserSession | null => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('athletetime_session')
+      const token = localStorage.getItem('athlete-time_session')
       if (token) {
         return verifySessionToken(token)
       }
@@ -67,7 +67,7 @@ export const SessionManager = {
   // 세션 제거 (로그아웃)
   clearSession: () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('athletetime_session')
+      localStorage.removeItem('athlete-time_session')
     }
   },
   

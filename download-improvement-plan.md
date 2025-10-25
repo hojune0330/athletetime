@@ -102,7 +102,7 @@ async function downloadChart(chartElement, chartName, format = 'png') {
   const footer = document.createElement('div');
   footer.innerHTML = `
     <p style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 12px;">
-      © 2024 Athlete Time | athletetime.com
+      © 2024 Athlete Time | athlete-time.com
     </p>
   `;
   downloadContainer.appendChild(footer);
@@ -124,7 +124,7 @@ async function downloadChart(chartElement, chartName, format = 'png') {
     canvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = `athletetime-${chartName}-${Date.now()}.png`;
+      link.download = `athlete-time-${chartName}-${Date.now()}.png`;
       link.href = url;
       link.click();
       URL.revokeObjectURL(url);

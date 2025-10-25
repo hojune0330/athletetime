@@ -131,7 +131,7 @@ ORDER BY p.created_at DESC;
 
 3. **수동 테스트**:
    ```bash
-   curl -X POST https://athletetime-backend.onrender.com/api/posts/1760080171788/comments \
+   curl -X POST https://athlete-time-backend.onrender.com/api/posts/1760080171788/comments \
      -H "Content-Type: application/json" \
      -d '{"author":"테스트","content":"테스트 댓글"}'
    ```

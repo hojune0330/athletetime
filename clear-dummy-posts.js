@@ -3,7 +3,7 @@
 
 const fetch = require('node-fetch');
 
-const API_URL = 'https://athletetime-backend.onrender.com';
+const API_URL = 'https://athlete-time-backend.onrender.com';
 
 async function clearDummyPosts() {
   try {

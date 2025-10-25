@@ -1,7 +1,7 @@
 # 🔧 Athlete Time 백엔드 통합 문서
 
 ## 📍 백엔드 서버 정보
-- **URL**: `https://athletetime-backend.onrender.com`
+- **URL**: `https://athlete-time-backend.onrender.com`
 - **플랜**: Render Starter (유료) - 24/7 운영
 - **GitHub**: https://github.com/hojune0330/athletetime
 - **자동 배포**: GitHub push 시 자동 배포
@@ -9,11 +9,11 @@
 ## 🌐 백엔드 서비스 엔드포인트
 
 ### 1. 채팅 서비스 (WebSocket)
-- **WebSocket URL**: `wss://athletetime-backend.onrender.com/ws`
+- **WebSocket URL**: `wss://athlete-time-backend.onrender.com/ws`
 - **기능**: 실시간 채팅, 메시지 영구 저장
 
 ### 2. 익명 게시판 API (REST)
-- **Base URL**: `https://athletetime-backend.onrender.com`
+- **Base URL**: `https://athlete-time-backend.onrender.com`
 - **엔드포인트**:
   - `GET /api/posts` - 게시글 목록
   - `POST /api/posts` - 게시글 작성
@@ -43,7 +43,7 @@ getAPIUrl() {
     return 'http://localhost:3000';
   } else {
     // 모든 프로덕션 환경에서 Render 백엔드 사용
-    return 'https://athletetime-backend.onrender.com';
+    return 'https://athlete-time-backend.onrender.com';
   }
 }
 ```
@@ -53,7 +53,7 @@ getAPIUrl() {
 // WebSocket URL 설정
 const wsUrl = window.location.hostname === 'localhost'
   ? 'ws://localhost:3000/ws'
-  : 'wss://athletetime-backend.onrender.com/ws';
+  : 'wss://athlete-time-backend.onrender.com/ws';
 ```
 
 ### 3. API Config (js/api-config.js)
@@ -61,11 +61,11 @@ const wsUrl = window.location.hostname === 'localhost'
 const API_CONFIG = {
   baseURL: window.location.hostname === 'localhost' 
     ? 'http://localhost:3000' 
-    : 'https://athletetime-backend.onrender.com',
+    : 'https://athlete-time-backend.onrender.com',
     
   wsURL: window.location.hostname === 'localhost'
     ? 'ws://localhost:3000/ws'
-    : 'wss://athletetime-backend.onrender.com/ws'
+    : 'wss://athlete-time-backend.onrender.com/ws'
 };
 ```
 
@@ -121,7 +121,7 @@ npm start
 
 ### Render Dashboard
 1. https://dashboard.render.com 접속
-2. athletetime-backend 서비스 선택
+2. athlete-time-backend 서비스 선택
 3. Logs 탭에서 실시간 로그 확인
 4. Metrics 탭에서 성능 모니터링
 

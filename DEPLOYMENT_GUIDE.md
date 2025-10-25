@@ -42,7 +42,7 @@ netlify login
 ### 2. 프로젝트 연결
 ```bash
 # 프로젝트 디렉토리에서
-cd athletetime
+cd athlete-time
 netlify init
 ```
 
@@ -57,7 +57,7 @@ netlify init
 
 [[redirects]]
   from = "/api/*"
-  to = "https://athletetime-backend.onrender.com/api/:splat"
+  to = "https://athlete-time-backend.onrender.com/api/:splat"
   status = 200
 
 [[headers]]
@@ -83,7 +83,7 @@ netlify deploy --prod
 ```yaml
 services:
   - type: web
-    name: athletetime-backend
+    name: athlete-time-backend
     env: node
     region: oregon
     plan: starter # $7/month
@@ -94,15 +94,15 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: athletetime-db
+          name: athlete-time-db
           property: connectionString
 
 databases:
-  - name: athletetime-db
+  - name: athlete-time-db
     region: oregon
     plan: starter # included
-    databaseName: athletetime
-    user: athletetime
+    databaseName: athlete-time
+    user: athlete-time
 ```
 
 ### 2. 환경 변수 설정
@@ -112,7 +112,7 @@ NODE_ENV=production
 PORT=3000
 DATABASE_URL=postgresql://user:pass@host:5432/dbname
 JWT_SECRET=your-secret-key
-CORS_ORIGIN=https://athletetime.netlify.app
+CORS_ORIGIN=https://athlete-time.netlify.app
 ```
 
 ### 3. 데이터베이스 마이그레이션
@@ -127,8 +127,8 @@ npm run seed
 ## 도메인 설정
 
 ### 1. 도메인 구매 (Namecheap/Google Domains)
-- athletetime.com
-- athletetime.kr
+- athlete-time.com
+- athlete-time.kr
 
 ### 2. Cloudflare DNS 설정
 ```
@@ -137,7 +137,7 @@ npm run seed
 www   CNAME @
 
 # API 서브도메인
-api   CNAME athletetime-backend.onrender.com
+api   CNAME athlete-time-backend.onrender.com
 ```
 
 ### 3. SSL 인증서
@@ -149,8 +149,8 @@ api   CNAME athletetime-backend.onrender.com
 
 ### Frontend (.env.production)
 ```env
-VITE_API_URL=https://api.athletetime.com
-VITE_WS_URL=wss://api.athletetime.com
+VITE_API_URL=https://api.athlete-time.com
+VITE_WS_URL=wss://api.athlete-time.com
 VITE_GA_ID=G-XXXXXXXXXX
 ```
 
@@ -176,7 +176,7 @@ SMTP_PASS=...
 # Storage
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
-AWS_BUCKET=athletetime-uploads
+AWS_BUCKET=athlete-time-uploads
 ```
 
 ## CI/CD 설정
@@ -345,7 +345,7 @@ psql $DATABASE_URL < backup_20250116.sql
 
 배포 관련 문의:
 - GitHub Issues: [문제 제기](https://github.com/hojune0330/athletetime/issues)
-- Discord: [개발자 커뮤니티](https://discord.gg/athletetime)
+- Discord: [개발자 커뮤니티](https://discord.gg/athlete-time)
 
 ---
 

@@ -181,7 +181,7 @@
 - 관할: 서울중앙지방법원
 
 ### 신고 및 문의
-- 이메일: admin@athletetime.com
+- 이메일: admin@athlete-time.com
 - 응답 시간: 영업일 기준 24시간 이내
 
 ### 개정 이력

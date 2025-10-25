@@ -126,7 +126,7 @@ A: 모든 메시지는 영구 보존됩니다.
 
   for (const post of posts) {
     try {
-      const response = await fetch('https://athletetime-backend.onrender.com/api/posts', {
+      const response = await fetch('https://athlete-time-backend.onrender.com/api/posts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(post)

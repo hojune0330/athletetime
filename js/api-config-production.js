@@ -3,11 +3,11 @@
 
 const API_CONFIG = {
   // ⚠️ 여기에 실제 Render URL을 넣으세요!
-  // 예: https://athletetime-backend-xxxx.onrender.com
-  baseURL: 'https://athletetime-backend.onrender.com',  // <- 실제 URL로 변경
+  // 예: https://athlete-time-backend-xxxx.onrender.com
+  baseURL: 'https://athlete-time-backend.onrender.com',  // <- 실제 URL로 변경
   
   // WebSocket URL (https를 wss로 변경)
-  wsURL: 'wss://athletetime-backend.onrender.com',  // <- 실제 URL로 변경
+  wsURL: 'wss://athlete-time-backend.onrender.com',  // <- 실제 URL로 변경
 
   // API 엔드포인트
   endpoints: {

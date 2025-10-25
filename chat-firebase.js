@@ -32,7 +32,7 @@ class ChatFirebase {
 
   // 사용자 초기화
   initUser() {
-    let user = localStorage.getItem('athletetime_chat_user');
+    let user = localStorage.getItem('athlete-time_chat_user');
     
     if (!user) {
       const nicknameParts = {
@@ -51,7 +51,7 @@ class ChatFirebase {
         createdAt: Date.now()
       };
       
-      localStorage.setItem('athletetime_chat_user', JSON.stringify(user));
+      localStorage.setItem('athlete-time_chat_user', JSON.stringify(user));
     } else {
       user = JSON.parse(user);
     }
@@ -372,7 +372,7 @@ class ChatFirebase {
   // localStorage 저장/로드
   saveToLocalStorage() {
     try {
-      localStorage.setItem('athletetime_chat_rooms', JSON.stringify(this.rooms));
+      localStorage.setItem('athlete-time_chat_rooms', JSON.stringify(this.rooms));
     } catch (e) {
       console.error('localStorage save error:', e);
     }
@@ -380,7 +380,7 @@ class ChatFirebase {
 
   loadFromLocalStorage() {
     try {
-      const saved = localStorage.getItem('athletetime_chat_rooms');
+      const saved = localStorage.getItem('athlete-time_chat_rooms');
       if (saved) {
         this.rooms = JSON.parse(saved);
       }

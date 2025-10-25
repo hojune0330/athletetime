@@ -1,10 +1,10 @@
 // API 설정 - Render 백엔드 전용
 const APIConfig = {
   // Render 백엔드 URL
-  baseURL: 'https://athletetime-backend.onrender.com',
+  baseURL: 'https://athlete-time-backend.onrender.com',
   
   // WebSocket URL
-  wsURL: 'wss://athletetime-backend.onrender.com/ws',
+  wsURL: 'wss://athlete-time-backend.onrender.com/ws',
   
   // API 엔드포인트
   endpoints: {

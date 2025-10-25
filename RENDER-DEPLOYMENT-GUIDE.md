@@ -31,7 +31,7 @@
 - "Connect GitHub repository" 클릭
 
 ### 2.3 저장소 선택
-- "hojune0330/athletetime" 저장소 선택
+- "hojune0330/athlete-time" 저장소 선택
 - "Connect" 클릭
 
 ---
@@ -43,10 +43,10 @@ Render가 자동으로 `render.yaml` 파일을 감지합니다.
 
 ### 3.2 서비스 확인
 자동 생성될 서비스들:
-- ✅ athletetime-backend (Node.js 서버)
-- ✅ athletetime-frontend (정적 사이트)
-- ✅ athletetime-db (PostgreSQL)
-- ✅ athletetime-redis (Redis 캐시)
+- ✅ athlete-time-backend (Node.js 서버)
+- ✅ athlete-time-frontend (정적 사이트)
+- ✅ athlete-time-db (PostgreSQL)
+- ✅ athlete-time-redis (Redis 캐시)
 
 ### 3.3 배포 시작
 - "Apply" 버튼 클릭
@@ -57,7 +57,7 @@ Render가 자동으로 `render.yaml` 파일을 감지합니다.
 ## 🔧 Step 4: 환경 변수 설정 (2분)
 
 ### 4.1 Backend 서비스 설정
-Dashboard → athletetime-backend → Environment
+Dashboard → athlete-time-backend → Environment
 
 추가할 환경 변수:
 ```
@@ -75,14 +75,14 @@ FRONTEND_URL=https://athlete-time.netlify.app
 ## 🌐 Step 5: 프론트엔드 연결 (1분)
 
 ### 5.1 백엔드 URL 확인
-- athletetime-backend 서비스 클릭
-- URL 복사: `https://athletetime-backend.onrender.com`
+- athlete-time-backend 서비스 클릭
+- URL 복사: `https://athlete-time-backend.onrender.com`
 
 ### 5.2 프론트엔드 코드 업데이트
 `js/api-config.js` 파일에서:
 ```javascript
-baseURL: 'https://athletetime-backend.onrender.com'
-wsURL: 'wss://athletetime-backend.onrender.com'
+baseURL: 'https://athlete-time-backend.onrender.com'
+wsURL: 'wss://athlete-time-backend.onrender.com'
 ```
 
 ### 5.3 GitHub 푸시
@@ -102,13 +102,13 @@ Dashboard에서 모든 서비스가 "Live" 상태인지 확인
 ### 6.2 API 테스트
 브라우저에서 접속:
 ```
-https://athletetime-backend.onrender.com/api/posts
+https://athlete-time-backend.onrender.com/api/posts
 ```
 
 ### 6.3 채팅 테스트
 WebSocket 연결 테스트:
 ```javascript
-const ws = new WebSocket('wss://athletetime-backend.onrender.com');
+const ws = new WebSocket('wss://athlete-time-backend.onrender.com');
 ws.onopen = () => console.log('Connected!');
 ```
 
@@ -156,12 +156,12 @@ ws.onopen = () => console.log('Connected!');
 
 ### Backend API
 ```
-https://athletetime-backend.onrender.com
+https://athlete-time-backend.onrender.com
 ```
 
 ### WebSocket
 ```
-wss://athletetime-backend.onrender.com
+wss://athlete-time-backend.onrender.com
 ```
 
 ### 프론트엔드 (Netlify)

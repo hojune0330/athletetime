@@ -1,8 +1,8 @@
 // Simple API simulator using localStorage for GitHub Pages
 const API = {
   // Storage keys
-  POSTS_KEY: 'athletetime_posts',
-  USER_KEY: 'athletetime_user',
+  POSTS_KEY: 'athlete-time_posts',
+  USER_KEY: 'athlete-time_user',
   
   // Initialize user
   initUser() {

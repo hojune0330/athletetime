@@ -96,7 +96,7 @@ Thank you & Keep Running! 🏃‍♂️💨
     console.log('✅ 로컬 서버에 공지 추가:', localData.success);
 
     // Render 서버에 추가
-    const renderResponse = await fetch('https://athletetime-backend.onrender.com/api/posts', {
+    const renderResponse = await fetch('https://athlete-time-backend.onrender.com/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(notice)

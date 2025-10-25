@@ -92,7 +92,7 @@
 ## 🔗 관련 링크
 
 - GitHub: https://github.com/hojune0330/athletetime
-- 라이브 데모: https://athletetime.pages.dev/
+- 라이브 데모: https://athlete-time.pages.dev/
 
 ---
 

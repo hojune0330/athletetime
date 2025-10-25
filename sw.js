@@ -1,5 +1,5 @@
 // Service Worker for PWA
-const CACHE_NAME = 'athletetime-chat-v1';
+const CACHE_NAME = 'athlete-time-chat-v1';
 const urlsToCache = [
   '/chat-real.html',
   '/manifest.json',

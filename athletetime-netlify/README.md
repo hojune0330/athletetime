@@ -14,13 +14,13 @@ Netlify는 정적 사이트 호스팅만 지원하므로:
 1. **Heroku에 WebSocket 서버 배포**
 ```bash
 # 별도 폴더에서
-mkdir athletetime-websocket
-cd athletetime-websocket
+mkdir athlete-time-websocket
+cd athlete-time-websocket
 cp ../chat-server-enhanced.js .
 cp ../package.json .
 
 # Heroku 배포
-heroku create athletetime-chat
+heroku create athlete-time-chat
 git init
 git add .
 git commit -m "WebSocket server"
@@ -33,7 +33,7 @@ git push heroku main
 wsUrl = 'ws://localhost:3004';
 
 // 변경
-wsUrl = 'wss://athletetime-chat.herokuapp.com';
+wsUrl = 'wss://athlete-time-chat.herokuapp.com';
 ```
 
 ## 📦 Netlify 배포 방법

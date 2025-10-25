@@ -3,8 +3,8 @@
 ## 📦 배포 패키지 정보
 
 ### 파일 위치
-- **배포 디렉토리**: `/home/user/webapp/athletetime-deployment/`
-- **압축 파일**: `/home/user/webapp/athletetime-deployment.tar.gz` (1MB)
+- **배포 디렉토리**: `/home/user/webapp/athlete-time-deployment/`
+- **압축 파일**: `/home/user/webapp/athlete-time-deployment.tar.gz` (1MB)
 
 ### 포함된 파일
 
@@ -37,12 +37,12 @@
 
 ```bash
 # 1. 압축 파일 업로드
-scp athletetime-deployment.tar.gz user@your-server:/home/user/
+scp athlete-time-deployment.tar.gz user@your-server:/home/user/
 
 # 2. 서버에서 압축 해제
 ssh user@your-server
-tar -xzf athletetime-deployment.tar.gz
-cd athletetime-deployment
+tar -xzf athlete-time-deployment.tar.gz
+cd athlete-time-deployment
 
 # 3. 의존성 설치 및 시작
 npm install
@@ -53,11 +53,11 @@ npm install
 
 ```bash
 # 1. Docker 이미지 빌드
-cd athletetime-deployment
-docker build -t athletetime .
+cd athlete-time-deployment
+docker build -t athlete-time .
 
 # 2. 컨테이너 실행
-docker run -d -p 8080:8080 -p 3004:3004 --name athletetime athletetime
+docker run -d -p 8080:8080 -p 3004:3004 --name athlete-time athlete-time
 ```
 
 ### 방법 3: Vercel 배포 (정적 파일만)
@@ -67,7 +67,7 @@ docker run -d -p 8080:8080 -p 3004:3004 --name athletetime athletetime
 npm i -g vercel
 
 # 2. 배포
-cd athletetime-deployment
+cd athlete-time-deployment
 vercel
 ```
 
@@ -75,10 +75,10 @@ vercel
 
 ```bash
 # 1. Heroku CLI로 앱 생성
-heroku create athletetime
+heroku create athlete-time
 
 # 2. Git 초기화 및 푸시
-cd athletetime-deployment
+cd athlete-time-deployment
 git init
 git add .
 git commit -m "Initial deployment"
@@ -97,11 +97,11 @@ PORT=8080
 WS_PORT=3004
 
 # 도메인 (실제 도메인으로 변경)
-DOMAIN=athletetime.com
-WEBSOCKET_URL=wss://chat.athletetime.com
+DOMAIN=athlete-time.com
+WEBSOCKET_URL=wss://chat.athlete-time.com
 
 # 보안 설정
-CORS_ORIGIN=https://athletetime.com
+CORS_ORIGIN=https://athlete-time.com
 NODE_ENV=production
 ```
 
@@ -184,7 +184,7 @@ ws.onopen = () => console.log('Connected!');
 
 문제 발생 시:
 1. GitHub Issues: https://github.com/hojune0330/athletetime/issues
-2. 이메일: admin@athletetime.com
+2. 이메일: admin@athlete-time.com
 
 ---
 

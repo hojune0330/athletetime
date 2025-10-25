@@ -19,7 +19,7 @@
 
 ### 🔸 파일 업로드
 ```
-📂 athletetime-netlify.zip
+📂 athlete-time-netlify.zip
     ↓ 드래그
 🔲 점선 박스에 놓기
     ↓ 
@@ -82,7 +82,7 @@ Empty Project
 
 📄 **server.js** 만들기:
 ```javascript
-// athletetime-websocket.zip 안의 
+// athlete-time-websocket.zip 안의 
 // chat-server-enhanced.js 내용을 복사-붙여넣기
 ```
 
@@ -108,7 +108,7 @@ chat-app-production.up.railway.app ← 이런 주소 생김
 
 ### 🔸 수정할 내용
 
-1. **athletetime-netlify 폴더** 열기
+1. **athlete-time-netlify 폴더** 열기
 2. **chat-real.html** 파일 찾기
 3. **메모장**으로 열기
 4. **Ctrl+F** 눌러서 찾기: `localhost:3004`

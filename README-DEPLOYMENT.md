@@ -127,9 +127,9 @@ services:
 
 ```javascript
 // 프로덕션 환경 예시
-if (hostname === 'athletetime.com') {
+if (hostname === 'athlete-time.com') {
     // 실제 도메인
-    wsUrl = 'wss://chat.athletetime.com';
+    wsUrl = 'wss://chat.athlete-time.com';
 } else if (hostname.includes('herokuapp.com')) {
     // Heroku
     wsUrl = `wss://${hostname}`;

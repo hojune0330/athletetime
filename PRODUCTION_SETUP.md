@@ -10,8 +10,8 @@
 ## 🌐 프로덕션 URL
 
 - **프론트엔드 (Netlify)**: https://athlete-time.netlify.app
-- **백엔드 API (Render)**: https://athletetime-backend.onrender.com
-- **WebSocket**: wss://athletetime-backend.onrender.com
+- **백엔드 API (Render)**: https://athlete-time-backend.onrender.com
+- **WebSocket**: wss://athlete-time-backend.onrender.com
 
 ## 🔧 Render 백엔드 설정
 
@@ -124,7 +124,7 @@ CREATE INDEX idx_posts_views ON posts(views DESC);
 
 ### WebSocket
 - `ws://localhost:3004` (개발)
-- `wss://athletetime-backend.onrender.com` (프로덕션)
+- `wss://athlete-time-backend.onrender.com` (프로덕션)
 
 ## 🐛 문제 해결
 
@@ -135,7 +135,7 @@ getAPIUrl() {
   if (window.location.hostname === 'localhost') {
     return 'http://localhost:3005';
   }
-  return 'https://athletetime-backend.onrender.com';
+  return 'https://athlete-time-backend.onrender.com';
 }
 ```
 

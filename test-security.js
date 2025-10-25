@@ -1,6 +1,6 @@
 // 보안 기능 테스트 스크립트
 const TEST_URL = process.env.PROD ? 
-  'https://athletetime-backend.onrender.com' : 
+  'https://athlete-time-backend.onrender.com' : 
   'http://localhost:3000';
 
 console.log('🔒 보안 테스트 시작');

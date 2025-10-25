@@ -41,10 +41,10 @@ export const renderer = jsxRenderer(({ children }) => {
           
           // 세션 관리
           const SessionManager = {
-            setSession: (token) => localStorage.setItem('athletetime_session', token),
-            getSession: () => localStorage.getItem('athletetime_session'),
-            clearSession: () => localStorage.removeItem('athletetime_session'),
-            isLoggedIn: () => !!localStorage.getItem('athletetime_session')
+            setSession: (token) => localStorage.setItem('athlete-time_session', token),
+            getSession: () => localStorage.getItem('athlete-time_session'),
+            clearSession: () => localStorage.removeItem('athlete-time_session'),
+            isLoggedIn: () => !!localStorage.getItem('athlete-time_session')
           };
           
           // 카카오 SDK 초기화

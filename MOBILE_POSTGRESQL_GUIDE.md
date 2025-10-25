@@ -13,9 +13,9 @@ https://dashboard.render.com/new/database
 데이터베이스 생성 페이지에서:
 
 ### 필수 입력 항목:
-- **Name**: `athletetime-db`
-- **Database**: `athletetimedb` (자동 입력됨)
-- **User**: `athletetime` (자동 입력됨)
+- **Name**: `athlete-time-db`
+- **Database**: `athlete-timedb` (자동 입력됨)
+- **User**: `athlete-time` (자동 입력됨)
 
 ### 선택 항목 (기본값 사용):
 - **Region**: Singapore (또는 가장 가까운 곳)
@@ -40,7 +40,7 @@ PostgreSQL 생성 완료되면:
 
 URL 형태:
 ```
-postgres://athletetime:비밀번호@dpg-xxxxx/athletetimedb
+postgres://athlete-time:비밀번호@dpg-xxxxx/athlete-timedb
 ```
 
 ### 2단계: 백엔드 서비스에 연결

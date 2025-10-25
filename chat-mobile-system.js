@@ -1,8 +1,8 @@
 // 모바일 최적화 채팅 시스템
 const MobileChatSystem = {
   // 상수
-  STORAGE_KEY: 'athletetime_chat',
-  USER_KEY: 'athletetime_chat_user',
+  STORAGE_KEY: 'athlete-time_chat',
+  USER_KEY: 'athlete-time_chat_user',
   THREAD_LIFETIME: 30 * 60 * 1000, // 30분
   UPDATE_INTERVAL: 1000,
   

@@ -27,7 +27,7 @@ Networking 섹션 찾기
 
 ### 1-3. 생성된 주소 예시
 ```
-athletetime-chat-production-up.railway.app
+athlete-time-chat-production-up.railway.app
     ↑ 이런 형태의 주소가 생성됩니다
 ```
 
@@ -39,7 +39,7 @@ athletetime-chat-production-up.railway.app
 
 ### 2-1. 파일 위치 찾기
 ```
-📁 athletetime-netlify 폴더
+📁 athlete-time-netlify 폴더
   └── 📄 chat-real.html  ← 이 파일!
 ```
 
@@ -116,10 +116,10 @@ function connectWebSocket() {
 } else if (protocol === 'https:') {
   // HTTPS 호스팅 환경 (Vercel, Netlify 등)
   // Railway 서버 주소로 직접 연결
-  wsUrl = 'wss://athletetime-chat-production-up.railway.app';
+  wsUrl = 'wss://athlete-time-chat-production-up.railway.app';
 } else {
   // HTTP 호스팅 환경
-  wsUrl = 'wss://athletetime-chat-production-up.railway.app';
+  wsUrl = 'wss://athlete-time-chat-production-up.railway.app';
 }
 ```
 
@@ -131,7 +131,7 @@ function connectWebSocket() {
 // WebSocket 연결
 function connectWebSocket() {
   // Railway 서버로 직접 연결
-  let wsUrl = 'wss://athletetime-chat-production-up.railway.app';
+  let wsUrl = 'wss://athlete-time-chat-production-up.railway.app';
   
   // localhost에서 테스트할 때만 로컬 사용
   if (window.location.hostname === 'localhost') {
@@ -155,7 +155,7 @@ function connectWebSocket() {
 
 ### 3-1. 폴더 선택
 ```
-📁 athletetime-netlify 폴더 전체 선택
+📁 athlete-time-netlify 폴더 전체 선택
    (chat-real.html이 들어있는 폴더)
 ```
 
@@ -171,7 +171,7 @@ function connectWebSocket() {
 
 ### 3-3. 파일명
 ```
-athletetime-netlify-updated.zip (또는 아무 이름)
+athlete-time-netlify-updated.zip (또는 아무 이름)
 ```
 
 ---
@@ -187,7 +187,7 @@ athletetime-netlify-updated.zip (또는 아무 이름)
 #### 방법 A: Drag & Drop (쉬움)
 1. **Deploys** 탭 클릭
 2. 페이지 하단 점선 박스 찾기
-3. **athletetime-netlify-updated.zip** 드래그 & 드롭
+3. **athlete-time-netlify-updated.zip** 드래그 & 드롭
 
 #### 방법 B: 덮어쓰기
 1. 사이트 메인 페이지
@@ -240,29 +240,29 @@ F12 → Console 탭
 #### ❌ 실수 1: ws vs wss
 ```javascript
 // 틀림
-wsUrl = 'ws://athletetime-chat.railway.app';
+wsUrl = 'ws://athlete-time-chat.railway.app';
 
 // 맞음
-wsUrl = 'wss://athletetime-chat.railway.app';
+wsUrl = 'wss://athlete-time-chat.railway.app';
         ↑ s 꼭 넣기!
 ```
 
 #### ❌ 실수 2: 포트 번호
 ```javascript
 // 틀림
-wsUrl = 'wss://athletetime-chat.railway.app:3004';
+wsUrl = 'wss://athlete-time-chat.railway.app:3004';
                                             ↑ 빼기!
 // 맞음
-wsUrl = 'wss://athletetime-chat.railway.app';
+wsUrl = 'wss://athlete-time-chat.railway.app';
 ```
 
 #### ❌ 실수 3: 따옴표
 ```javascript
 // 틀림
-wsUrl = wss://athletetime-chat.railway.app;  // 따옴표 없음
+wsUrl = wss://athlete-time-chat.railway.app;  // 따옴표 없음
 
 // 맞음
-wsUrl = 'wss://athletetime-chat.railway.app';  // 따옴표 있음
+wsUrl = 'wss://athlete-time-chat.railway.app';  // 따옴표 있음
         ↑                                   ↑
 ```
 
@@ -275,7 +275,7 @@ chat-real.html 맨 위에 이것만 추가:
 ```html
 <script>
   // Railway 서버 주소 설정
-  window.WEBSOCKET_URL = 'wss://athletetime-chat-production-up.railway.app';
+  window.WEBSOCKET_URL = 'wss://athlete-time-chat-production-up.railway.app';
 </script>
 ```
 

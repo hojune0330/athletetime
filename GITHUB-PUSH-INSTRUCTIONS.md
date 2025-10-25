@@ -57,7 +57,7 @@ cat ~/.ssh/id_ed25519.pub
 
 4. 푸시:
 ```bash
-git remote set-url origin git@github.com:hojune0330/athletetime.git
+git remote set-url origin git@github.com:hojune0330/athlete-time.git
 git push origin main
 ```
 

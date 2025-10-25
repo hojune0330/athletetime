@@ -27,7 +27,7 @@ npm run production
 
 ## 📦 파일 구조
 ```
-athletetime-deployment/
+athlete-time-deployment/
 ├── index.html              # 메인 페이지
 ├── pace-calculator.html    # 페이스 계산기
 ├── training-calculator.html # 훈련 계산기
@@ -49,14 +49,14 @@ vercel
 
 ### Heroku (전체 앱)
 ```bash
-heroku create athletetime
+heroku create athlete-time
 git push heroku main
 ```
 
 ### Docker
 ```bash
-docker build -t athletetime .
-docker run -p 8080:8080 -p 3004:3004 athletetime
+docker build -t athlete-time .
+docker run -p 8080:8080 -p 3004:3004 athlete-time
 ```
 
 ## ⚙️ 포트 설정

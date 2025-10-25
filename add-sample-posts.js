@@ -4,7 +4,7 @@
 const fetch = require('node-fetch');
 
 const API_URL = process.env.PROD 
-  ? 'https://athletetime-backend.onrender.com' 
+  ? 'https://athlete-time-backend.onrender.com' 
   : 'http://localhost:3000';
 
 console.log(`🎯 타겟 서버: ${API_URL}\n`);

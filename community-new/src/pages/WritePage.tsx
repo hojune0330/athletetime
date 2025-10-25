@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ClockIcon, TrophyIcon } from '@heroicons/react/24/outline'
+import { useCreatePost } from '../hooks/usePosts'
 
 export default function WritePage() {
   const navigate = useNavigate()
@@ -11,11 +12,59 @@ export default function WritePage() {
   const [record, setRecord] = useState('')
   const [recordDate, setRecordDate] = useState('')
   const [isOfficial, setIsOfficial] = useState(false)
+  const [author, setAuthor] = useState('')
+  const [password, setPassword] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 게시글 작성 mutation
+  const createPostMutation = useCreatePost()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log({ title, content, category, eventType, record, recordDate, isOfficial })
-    navigate('/')
+    
+    if (!author || !password) {
+      alert('작성자명과 비밀번호를 입력해주세요.')
+      return
+    }
+    
+    try {
+      await createPostMutation.mutateAsync({
+        title,
+        content,
+        category: getCategoryName(category),
+        author,
+        password,
+      })
+      
+      alert('게시글이 작성되었습니다!')
+      navigate('/')
+    } catch (error) {
+      console.error('게시글 작성 실패:', error)
+      alert('게시글 작성에 실패했습니다. 다시 시도해주세요.')
+    }
+  }
+
+  // 카테고리 코드를 이름으로 변환
+  const getCategoryName = (code: string): string => {
+    const categoryMap: { [key: string]: string } = {
+      'track-sprint': '단거리',
+      'track-middle': '중거리',
+      'track-distance': '장거리',
+      'track-hurdles': '허들',
+      'field-jumps': '도약',
+      'field-throws': '투척',
+      'running-marathon': '마라톤',
+      'running-trail': '트레일',
+      'running-crew': '크루',
+      'events-schedule': '대회정보',
+      'events-review': '대회후기',
+      'events-recruit': '참가모집',
+      'records-personal': '내기록',
+      'training-log': '훈련일지',
+      'community-free': '자유',
+      'community-qna': '질문',
+      'community-proof': '인증',
+    }
+    return categoryMap[code] || '자유'
   }
 
   // 종목별 이벤트 목록
@@ -144,6 +193,37 @@ export default function WritePage() {
               </div>
             </div>
           )}
+
+          {/* 작성자 정보 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                작성자명
+              </label>
+              <input
+                type="text"
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+                placeholder="닉네임을 입력하세요"
+                className="input-dark"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                비밀번호 (수정/삭제용)
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="비밀번호 (4자 이상)"
+                className="input-dark"
+                minLength={4}
+                required
+              />
+            </div>
+          </div>
 
           {/* 제목 입력 */}
           <div>

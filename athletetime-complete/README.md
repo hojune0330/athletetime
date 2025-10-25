@@ -20,13 +20,13 @@
 
 ### 1. Netlify Drop으로 배포
 1. https://app.netlify.com/drop 접속
-2. `athletetime-complete` 폴더를 드래그 & 드롭
+2. `athlete-time-complete` 폴더를 드래그 & 드롭
 3. 자동으로 사이트 생성 및 배포
 
 ### 2. 기존 사이트 업데이트
 1. Netlify 대시보드 접속
 2. Site Overview → Deploys 탭
-3. athletetime-complete.zip 파일 드래그 & 드롭
+3. athlete-time-complete.zip 파일 드래그 & 드롭
 
 ## ⚙️ WebSocket 서버 연결
 

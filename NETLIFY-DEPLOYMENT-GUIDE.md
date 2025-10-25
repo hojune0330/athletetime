@@ -2,10 +2,10 @@
 
 ## 준비된 파일
 
-### 1. **athletetime-netlify.zip** (82KB)
+### 1. **athlete-time-netlify.zip** (82KB)
 Netlify에 직접 업로드할 수 있는 정적 파일 패키지
 
-### 2. **athletetime-websocket.zip** (6KB)
+### 2. **athlete-time-websocket.zip** (6KB)
 채팅 기능을 위한 WebSocket 서버 (별도 배포 필요)
 
 ---
@@ -17,7 +17,7 @@ Netlify에 직접 업로드할 수 있는 정적 파일 패키지
 1. **Netlify 접속**: https://app.netlify.com
 2. **로그인** (GitHub, GitLab, 이메일 등)
 3. **Sites 탭**에서 하단의 점선 박스 찾기
-4. **athletetime-netlify.zip** 파일을 드래그 & 드롭
+4. **athlete-time-netlify.zip** 파일을 드래그 & 드롭
 5. 자동 배포 완료! (1-2분 소요)
 
 ### 방법 2: Netlify CLI
@@ -27,8 +27,8 @@ Netlify에 직접 업로드할 수 있는 정적 파일 패키지
 npm install -g netlify-cli
 
 # 압축 해제
-unzip athletetime-netlify.zip
-cd athletetime-netlify
+unzip athlete-time-netlify.zip
+cd athlete-time-netlify
 
 # 배포
 netlify deploy
@@ -44,10 +44,10 @@ Netlify는 정적 호스팅만 지원하므로 채팅을 위해 **별도 WebSock
 ### 옵션 1: Heroku (무료 크레딧)
 
 1. **Heroku 계정 생성**: https://heroku.com
-2. **athletetime-websocket.zip** 압축 해제
+2. **athlete-time-websocket.zip** 압축 해제
 3. 배포:
 ```bash
-cd athletetime-websocket-server
+cd athlete-time-websocket-server
 heroku create your-app-name
 git init
 git add .
@@ -60,7 +60,7 @@ git push heroku main
 
 1. **Railway 접속**: https://railway.app
 2. **New Project** → **Deploy from GitHub** 또는 **Deploy Local Directory**
-3. **athletetime-websocket.zip** 내용 업로드
+3. **athlete-time-websocket.zip** 내용 업로드
 4. 자동 배포 완료
 5. Settings에서 도메인 생성
 
@@ -89,7 +89,7 @@ WebSocket 서버 배포 후:
 wsUrl = 'ws://localhost:3004';
 
 // 변경 (예시)
-wsUrl = 'wss://athletetime-chat.herokuapp.com';
+wsUrl = 'wss://athlete-time-chat.herokuapp.com';
 ```
 
 ---
@@ -122,7 +122,7 @@ wsUrl = 'wss://athletetime-chat.herokuapp.com';
 
 ## 📝 체크리스트
 
-- [ ] athletetime-netlify.zip을 Netlify에 업로드
+- [ ] athlete-time-netlify.zip을 Netlify에 업로드
 - [ ] WebSocket 서버 배포 (Heroku/Railway/Render)
 - [ ] chat-real.html에 WebSocket URL 업데이트
 - [ ] 모든 페이지 테스트
@@ -149,4 +149,4 @@ wsUrl = 'wss://athletetime-chat.herokuapp.com';
 
 **준비 완료!** 🎉
 
-이제 **athletetime-netlify.zip**을 Netlify에 드래그 & 드롭하면 즉시 배포됩니다!
+이제 **athlete-time-netlify.zip**을 Netlify에 드래그 & 드롭하면 즉시 배포됩니다!

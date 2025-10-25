@@ -2,12 +2,12 @@
 const BackendConfig = {
   // Render 백엔드 URL 반환
   getBackendURL() {
-    return 'https://athletetime-backend.onrender.com';
+    return 'https://athlete-time-backend.onrender.com';
   },
   
   // WebSocket URL 반환
   getWebSocketURL() {
-    return 'wss://athletetime-backend.onrender.com/ws';
+    return 'wss://athlete-time-backend.onrender.com/ws';
   },
   
   // API 엔드포인트 생성

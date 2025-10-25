@@ -1,5 +1,5 @@
 {
-  "name": "athletetime-websocket",
+  "name": "athlete-time-websocket",
   "version": "1.0.0",
   "description": "WebSocket server for Athlete Time chat",
   "main": "chat-server-enhanced.js",

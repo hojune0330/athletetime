@@ -27,7 +27,7 @@
 # API 프록시 설정 (백엔드 연결)
 [[redirects]]
   from = "/api/*"
-  to = "https://athletetime-backend.onrender.com/api/:splat"
+  to = "https://athlete-time-backend.onrender.com/api/:splat"
   status = 200
   force = true
   headers = {X-From = "Netlify"}

@@ -192,7 +192,7 @@ CREATE INDEX idx_chat_room ON chat_messages(room, timestamp);
 
 #### Render 설정
 - **플랜**: Starter (유료, $7/월)
-- **URL**: https://athletetime-backend.onrender.com
+- **URL**: https://athlete-time-backend.onrender.com
 - **자동 배포**: GitHub push 시 자동
 - **환경 변수**: 
   - `PORT` (자동 설정)
@@ -203,7 +203,7 @@ CREATE INDEX idx_chat_room ON chat_messages(room, timestamp);
 ```yaml
 services:
   - type: web
-    name: athletetime-backend
+    name: athlete-time-backend
     env: node
     buildCommand: npm install
     startCommand: npm start
@@ -343,8 +343,8 @@ theme: {
 ### 4.1 백엔드 URL 설정
 
 #### 프로덕션
-- **Backend URL**: `https://athletetime-backend.onrender.com`
-- **WebSocket URL**: `wss://athletetime-backend.onrender.com/ws`
+- **Backend URL**: `https://athlete-time-backend.onrender.com`
+- **WebSocket URL**: `wss://athlete-time-backend.onrender.com/ws`
 
 #### 로컬 개발
 - **Backend URL**: `http://localhost:3000`
@@ -391,7 +391,7 @@ const posts: Post[] = [
 #### 백엔드
 - **호스팅**: Render
 - **플랜**: Starter ($7/월)
-- **URL**: https://athletetime-backend.onrender.com
+- **URL**: https://athlete-time-backend.onrender.com
 - **자동 배포**: GitHub push → 자동 배포
 - **상태**: ✅ 정상 작동
 
@@ -455,7 +455,7 @@ c7a7ad3 fix: netlify.toml 완전 제거 - Netlify UI에서 설정하도록 변�
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://athletetime-backend.onrender.com'
+  ? 'https://athlete-time-backend.onrender.com'
   : 'http://localhost:3000';
 
 export const apiClient = axios.create({
@@ -554,8 +554,8 @@ npm install pg bcrypt isomorphic-dompurify helmet express-rate-limit
 ### 7.1 생성된 백업
 
 ```bash
-파일명: athletetime_backup_2025-10-24.tar.gz
-경로: /home/user/athletetime_backup_2025-10-24.tar.gz
+파일명: athlete-time_backup_2025-10-24.tar.gz
+경로: /home/user/athlete-time_backup_2025-10-24.tar.gz
 크기: 1.3MB
 생성일: 2025-10-24
 
@@ -581,7 +581,7 @@ npm install pg bcrypt isomorphic-dompurify helmet express-rate-limit
 ```bash
 # 백업 복원
 cd /home/user
-tar -xzf athletetime_backup_2025-10-24.tar.gz
+tar -xzf athlete-time_backup_2025-10-24.tar.gz
 
 # 의존성 재설치
 cd webapp
@@ -612,8 +612,8 @@ npm install
 
 ```bash
 # .env 파일 생성
-VITE_API_URL=https://athletetime-backend.onrender.com
-VITE_WS_URL=wss://athletetime-backend.onrender.com/ws
+VITE_API_URL=https://athlete-time-backend.onrender.com
+VITE_WS_URL=wss://athlete-time-backend.onrender.com/ws
 ```
 
 #### 작업 3: Netlify 배포

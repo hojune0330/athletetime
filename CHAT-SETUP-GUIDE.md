@@ -17,7 +17,7 @@
 ### 1-2. 웹사이트 업로드
 1. 로그인 후 메인 화면
 2. 하단에 점선 박스 보임 ("Drag and drop your site folder here")
-3. **athletetime-netlify.zip** 파일을 드래그 & 드롭
+3. **athlete-time-netlify.zip** 파일을 드래그 & 드롭
 4. 자동으로 업로드 시작 (1-2분)
 5. 완료되면 URL 생성됨 (예: https://amazing-site-123.netlify.app)
 
@@ -50,7 +50,7 @@
 
 #### 방법 A: GitHub 연동한 경우
 1. Repository 선택 또는 새로 만들기
-2. athletetime-websocket.zip 압축 해제한 파일들 업로드
+2. athlete-time-websocket.zip 압축 해제한 파일들 업로드
 3. 자동 배포 시작
 
 #### 방법 B: Empty Project 선택한 경우
@@ -60,7 +60,7 @@
 **파일 1: package.json**
 ```json
 {
-  "name": "athletetime-chat",
+  "name": "athlete-time-chat",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -81,7 +81,7 @@
 ### 2-4. 도메인 생성
 1. Settings 탭
 2. **Generate Domain** 클릭
-3. 생성된 주소 복사 (예: athletetime-chat-production.up.railway.app)
+3. 생성된 주소 복사 (예: athlete-time-chat-production.up.railway.app)
 
 ---
 
@@ -98,7 +98,7 @@
 
 ### 🎯 더 쉬운 방법: 직접 수정
 
-athletetime-netlify 폴더에서:
+athlete-time-netlify 폴더에서:
 
 1. **chat-real.html** 파일을 메모장/텍스트에디터로 열기
 2. `Ctrl+F`로 "localhost:3004" 찾기
@@ -111,7 +111,7 @@ wsUrl = 'ws://localhost:3004';
 
 **변경 후:**
 ```javascript
-wsUrl = 'wss://athletetime-chat-production.up.railway.app';
+wsUrl = 'wss://athlete-time-chat-production.up.railway.app';
 ```
 (실제 Railway 도메인으로 교체)
 
@@ -211,4 +211,4 @@ Railway 서버 (채팅 처리)
 
 **지원:**
 - GitHub Issues: https://github.com/hojune0330/athletetime
-- 이메일: admin@athletetime.com
+- 이메일: admin@athlete-time.com

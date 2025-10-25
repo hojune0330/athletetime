@@ -685,7 +685,7 @@
     function connectWebSocket() {
       const wsUrl = window.location.hostname === 'localhost' 
         ? 'ws://localhost:3000/ws'
-        : 'wss://athletetime-backend.onrender.com/ws';
+        : 'wss://athlete-time-backend.onrender.com/ws';
       
       ws = new WebSocket(wsUrl);
       

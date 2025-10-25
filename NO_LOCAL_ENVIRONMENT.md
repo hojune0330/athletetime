@@ -6,7 +6,7 @@
 - **community-api.js**
   - ❌ 모든 localStorage 코드 제거
   - ❌ 로컬 개발 환경 분기 제거
-  - ✅ Render 백엔드만 사용: `https://athletetime-backend.onrender.com`
+  - ✅ Render 백엔드만 사용: `https://athlete-time-backend.onrender.com`
 
 - **js/api-config.js**
   - ❌ localhost 분기 제거
@@ -24,7 +24,7 @@
 
 - **chat.html**
   - ❌ localhost WebSocket 제거
-  - ✅ Render WebSocket만 사용: `wss://athletetime-backend.onrender.com/ws`
+  - ✅ Render WebSocket만 사용: `wss://athlete-time-backend.onrender.com/ws`
 
 - **index.html**
   - ❌ sandbox 및 localhost 분기 제거
@@ -37,10 +37,10 @@
 // 이전 (조건부)
 const apiUrl = window.location.hostname === 'localhost' 
   ? 'http://localhost:3000' 
-  : 'https://athletetime-backend.onrender.com';
+  : 'https://athlete-time-backend.onrender.com';
 
 // 현재 (Render 전용)
-const apiUrl = 'https://athletetime-backend.onrender.com';
+const apiUrl = 'https://athlete-time-backend.onrender.com';
 ```
 
 ### WebSocket 연결
@@ -48,16 +48,16 @@ const apiUrl = 'https://athletetime-backend.onrender.com';
 // 이전 (조건부)
 const wsUrl = window.location.hostname === 'localhost'
   ? 'ws://localhost:3000/ws'
-  : 'wss://athletetime-backend.onrender.com/ws';
+  : 'wss://athlete-time-backend.onrender.com/ws';
 
 // 현재 (Render 전용)
-const wsUrl = 'wss://athletetime-backend.onrender.com/ws';
+const wsUrl = 'wss://athlete-time-backend.onrender.com/ws';
 ```
 
 ### 데이터 저장
 ```javascript
 // 이전 (localStorage 사용)
-localStorage.setItem('athletetime_posts', JSON.stringify(posts));
+localStorage.setItem('athlete-time_posts', JSON.stringify(posts));
 
 // 현재 (API만 사용, 로컬 저장 없음)
 // 모든 데이터는 Render PostgreSQL에만 저장
@@ -84,8 +84,8 @@ localStorage.setItem('athletetime_posts', JSON.stringify(posts));
 - **Netlify**: https://athlete-time.netlify.app
 
 ### 백엔드 (Render)
-- **REST API**: https://athletetime-backend.onrender.com
-- **WebSocket**: wss://athletetime-backend.onrender.com/ws
+- **REST API**: https://athlete-time-backend.onrender.com
+- **WebSocket**: wss://athlete-time-backend.onrender.com/ws
 
 ### API 엔드포인트
 - `/api/posts` - 게시글 CRUD
