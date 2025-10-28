@@ -118,6 +118,36 @@
       background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
     }
   </style>
+    
+    /* PWA 간단한 설치 버튼 */
+    .simple-install-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 10px 18px;
+      border-radius: 25px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 255, 163, 0.4);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+    
+    .simple-install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 255, 163, 0.6);
+    }
+    
+    .simple-install-btn.show {
+      display: inline-flex;
+    }
 
   <style>
     /* 커스텀 스크롤바 스타일 */
@@ -230,6 +260,36 @@
       }
     }
   </style>
+    
+    /* PWA 간단한 설치 버튼 */
+    .simple-install-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 10px 18px;
+      border-radius: 25px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 255, 163, 0.4);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+    
+    .simple-install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 255, 163, 0.6);
+    }
+    
+    .simple-install-btn.show {
+      display: inline-flex;
+    }
 
 </head>
 <body class="bg-gray-50">
@@ -2444,6 +2504,7 @@
   </script>
   
   <!-- PWA 등록 스크립트 -->
+  <script src="/install-ui-patch.js"></script>
   <script src="/pwa-register.js"></script>
 </body>
 </html>

@@ -88,6 +88,125 @@
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     }
     
+    /* PWA 설치 버튼 (헤더) */
+    .install-button {
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0, 255, 163, 0.3);
+    }
+    
+    .install-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 255, 163, 0.5);
+    }
+    
+    .install-button:active {
+      transform: translateY(0);
+    }
+    
+    /* PWA 설치 배너 (상단 고정) */
+    .pwa-top-banner {
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 12px 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 1001;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      animation: slideDown 0.5s ease-out;
+    }
+    
+    .pwa-top-banner.show {
+      display: flex;
+    }
+    
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .banner-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .banner-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .banner-text-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    
+    .banner-text-desc {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    
+    .banner-button {
+      background: rgba(15, 23, 42, 0.9);
+      color: #00ffa3;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .banner-button:hover {
+      background: #0f172a;
+      transform: scale(1.05);
+    }
+    
+    .banner-close {
+      background: rgba(15, 23, 42, 0.2);
+      border: none;
+      color: #0f0f0f;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    
+    .banner-close:hover {
+      background: rgba(15, 23, 42, 0.4);
+      transform: rotate(90deg);
+    }
+    
     /* 히어로 섹션 */
     .hero-section {
       padding: 40px 20px;
@@ -108,6 +227,43 @@
       color: #94a3b8;
       font-size: 1rem;
       margin-bottom: 24px;
+    }
+    
+    /* PWA CTA 버튼 (히어로 섹션) */
+    .hero-install-cta {
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 255, 163, 0.4);
+      transition: all 0.3s;
+      margin-bottom: 24px;
+      animation: pulse 2s infinite;
+    }
+    
+    .hero-install-cta:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 255, 163, 0.6);
+    }
+    
+    .hero-install-cta:active {
+      transform: translateY(-2px);
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 8px 24px rgba(0, 255, 163, 0.4);
+      }
+      50% {
+        box-shadow: 0 8px 32px rgba(0, 255, 163, 0.6);
+      }
     }
     
     .hero-stats {
@@ -383,6 +539,104 @@
   </style>
 </head>
 <body>
+<!-- PWA 설치 UI - 모든 HTML 페이지 body 태그 직후에 붙여넣기 -->
+
+<!-- 상단 고정 배너 -->
+<div id="pwaInstallBanner" style="display: none; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #00ffa3, #00d4ff); color: #0f0f0f; padding: 12px 20px; z-index: 10000; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+  <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 12px; justify-content: space-between; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px;">
+      <span style="font-size: 24px;">📱</span>
+      <div>
+        <div style="font-weight: 700; font-size: 0.95rem;">애슬리트 타임 앱으로 설치!</div>
+        <div style="font-size: 0.8rem; opacity: 0.9;">홈 화면에 추가하세요</div>
+      </div>
+    </div>
+    <button id="pwaInstallBtn" style="background: #0f172a; color: #00ffa3; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; white-space: nowrap; margin-right: 8px;">지금 설치</button>
+    <button id="pwaCloseBanner" style="background: rgba(15,23,42,0.2); border: none; color: #0f0f0f; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold;">×</button>
+  </div>
+</div>
+
+<!-- 우측 하단 플로팅 버튼 -->
+<button id="pwaFloatingBtn" style="display: none; position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #00ffa3, #00d4ff); color: #0f0f0f; border: none; padding: 14px 24px; border-radius: 50px; font-weight: 700; font-size: 0.95rem; cursor: pointer; box-shadow: 0 8px 24px rgba(0,255,163,0.5); z-index: 9999;">
+  📱 앱 설치
+</button>
+
+<style>
+@keyframes pwaPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0,255,163,0.4); }
+  50% { box-shadow: 0 8px 32px rgba(0,255,163,0.7); }
+}
+#pwaFloatingBtn {
+  animation: pwaPulse 2s infinite;
+}
+#pwaFloatingBtn:hover {
+  transform: translateY(-2px);
+}
+</style>
+
+<script>
+// PWA 설치 스크립트
+(function() {
+  let deferredPrompt;
+  const banner = document.getElementById('pwaInstallBanner');
+  const floatingBtn = document.getElementById('pwaFloatingBtn');
+  const installBtn = document.getElementById('pwaInstallBtn');
+  const closeBtn = document.getElementById('pwaCloseBanner');
+  
+  if (!banner || !floatingBtn) return;
+  
+  const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isInstalled) {
+    console.log('✅ PWA 이미 설치됨');
+    return;
+  }
+  
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showUI();
+  });
+  
+  setTimeout(() => showUI(), 1500);
+  
+  function showUI() {
+    const dismissed = localStorage.getItem('pwa-banner-dismissed');
+    if (dismissed && (Date.now() - parseInt(dismissed)) / 3600000 < 24) return;
+    banner.style.display = 'block';
+    floatingBtn.style.display = 'block';
+  }
+  
+  async function handleInstall() {
+    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    
+    if (isIOS) {
+      alert('📱 iOS 설치 방법:\n\n1. 하단 중앙의 공유 버튼(□↑)을 탭하세요\n2. "홈 화면에 추가"를 선택하세요\n3. "추가" 버튼을 탭하세요\n\n홈 화면에 앱 아이콘이 생성됩니다!');
+    } else if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') hideUI();
+      deferredPrompt = null;
+    } else {
+      alert('💻 설치 방법:\n\n1. 브라우저 메뉴(⋮)를 여세요\n2. "홈 화면에 추가" 또는 "설치"를 선택하세요\n\n앱처럼 사용할 수 있습니다!');
+    }
+  }
+  
+  function hideUI() {
+    banner.style.display = 'none';
+    floatingBtn.style.display = 'none';
+  }
+  
+  if (installBtn) installBtn.onclick = handleInstall;
+  if (floatingBtn) floatingBtn.onclick = handleInstall;
+  if (closeBtn) closeBtn.onclick = () => {
+    hideUI();
+    localStorage.setItem('pwa-banner-dismissed', Date.now().toString());
+  };
+  
+  window.addEventListener('appinstalled', hideUI);
+  console.log('✅ PWA 설치 UI 준비 완료');
+})();
+</script>
   <!-- 헤더 -->
   <header class="header">
     <div class="header-content">
@@ -401,6 +655,12 @@
   <section class="hero-section">
     <h1 class="hero-title">육상인들을 위한 모든 것</h1>
     <p class="hero-subtitle">훈련, 대회, 소통까지 한 곳에서</p>
+    
+    <!-- PWA 설치 CTA 버튼 -->
+    <button class="hero-install-cta" id="heroInstallBtn" style="display: none;">
+      <i class="fas fa-mobile-alt" style="font-size: 1.3rem;"></i>
+      <span>앱으로 빠르게 시작하기</span>
+    </button>
     
     <div class="hero-stats">
       <div class="stat">
@@ -568,6 +828,25 @@
       // 통계 업데이트
       document.getElementById('userCount').innerText = Math.floor(Math.random() * 5) + 1; // 현재 활동 중 (랜덤)
       document.getElementById('postCount').innerText = posts.length || 0;
+      
+      // 오늘 방문 체크
+      let todayCount = parseInt(localStorage.getItem('todayCount') || '0');
+      if (todayVisit !== today) {
+        todayCount++;
+        localStorage.setItem('todayVisit', today);
+        localStorage.setItem('todayCount', todayCount.toString());
+      }
+      document.getElementById('todayCount').innerText = todayCount;
+    }
+    
+    // 페이지 로드시 통계 로드
+    window.addEventListener('load', loadStats);
+  </script>
+  
+  <!-- PWA 등록 스크립트 -->
+  <script src="/pwa-register.js"></script>
+</body>
+</html>xt = posts.length || 0;
       
       // 오늘 방문 체크
       let todayCount = parseInt(localStorage.getItem('todayCount') || '0');
