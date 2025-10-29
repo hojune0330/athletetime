@@ -58,10 +58,10 @@ const categoryIcons: Record<string, string> = {
  * 게시글 아이템 컴포넌트
  */
 function PostItem({ post }: { post: Post }) {
-  const categoryColor = categoryColors[post.category] || 'text-gray-500';
-  const categoryIcon = categoryIcons[post.category] || '📝';
-  const isHot = post.likes.length >= 10 || post.views >= 100;
-  const isNew = new Date(post.date).getTime() > Date.now() - 24 * 60 * 60 * 1000;
+  const categoryColor = categoryColors[post.category_name] || 'text-gray-500';
+  const categoryIcon = categoryIcons[post.category_name] || '📝';
+  const isHot = post.likes_count >= 10 || post.views_count >= 100;
+  const isNew = new Date(post.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000;
   
   return (
     <Link
@@ -71,10 +71,10 @@ function PostItem({ post }: { post: Post }) {
       <article className="card-dark hover:bg-dark-500 transition-all duration-200 p-4 border-l-4 hover:border-l-primary-400 border-l-transparent">
         <div className="flex gap-4">
           {/* 썸네일 (이미지가 있는 경우) */}
-          {post.imageUrl && (
+          {post.images[0]?.cloudinary_url && (
             <div className="shrink-0">
               <img 
-                src={post.imageUrl} 
+                src={post.images[0]?.cloudinary_url} 
                 alt={post.title}
                 className="w-24 h-16 object-cover rounded-lg"
               />
@@ -87,14 +87,14 @@ function PostItem({ post }: { post: Post }) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   {/* 고정 게시글 */}
-                  {post.isNotice && (
+                  {post.is_notice && (
                     <span className="text-track-yellow text-sm">📌</span>
                   )}
                   
                   {/* 카테고리 */}
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-dark-700 ${categoryColor}`}>
                     <span>{categoryIcon}</span>
-                    <span>{post.category}</span>
+                    <span>{post.category_name}</span>
                   </span>
                   
                   {/* 뱃지 */}
@@ -120,21 +120,21 @@ function PostItem({ post }: { post: Post }) {
             <div className="flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 <span className="text-gray-400">{post.author}</span>
-                <span>{formatDate(post.date)}</span>
+                <span>{formatDate(post.created_at)}</span>
               </div>
               
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <EyeIcon className="w-3.5 h-3.5" />
-                  {post.views}
+                  {post.views_count}
                 </span>
                 <span className="flex items-center gap-1 text-primary-400">
                   <HandThumbUpIcon className="w-3.5 h-3.5" />
-                  {post.likes.length}
+                  {post.likes_count}
                 </span>
                 <span className="flex items-center gap-1">
                   <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
-                  {post.comments.length}
+                  {post.comments_count}
                 </span>
               </div>
             </div>

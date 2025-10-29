@@ -1,12 +1,12 @@
 /**
- * 게시글 관련 React Query 훅
+ * 게시글 관련 React Query 훅 (v3.0.0)
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   getPosts,
   getPost,
-  createPost,
+  createPost as apiCreatePost,
   updatePost,
   deletePost,
   createComment,
@@ -33,10 +33,10 @@ export const postKeys = {
 /**
  * 게시글 목록 조회 훅
  */
-export function usePosts() {
+export function usePosts(category?: string, limit?: number, offset?: number) {
   return useQuery({
-    queryKey: postKeys.lists(),
-    queryFn: getPosts,
+    queryKey: postKeys.list({ category, limit, offset }),
+    queryFn: () => getPosts(category, limit, offset),
     staleTime: 1000 * 60 * 5, // 5분
   });
 }
@@ -48,7 +48,8 @@ export function usePost(id: number) {
   return useQuery({
     queryKey: postKeys.detail(id),
     queryFn: () => getPost(id),
-    enabled: !!id,
+    staleTime: 1000 * 60 * 5, // 5분
+    retry: 1,
   });
 }
 
@@ -57,11 +58,11 @@ export function usePost(id: number) {
  */
 export function useCreatePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (data: CreatePostRequest) => createPost(data),
+    mutationFn: ({ data, images }: { data: CreatePostRequest; images?: File[] }) =>
+      apiCreatePost(data, images),
     onSuccess: () => {
-      // 게시글 목록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });
@@ -72,14 +73,12 @@ export function useCreatePost() {
  */
 export function useUpdatePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdatePostRequest }) => 
+    mutationFn: ({ id, data }: { id: number; data: UpdatePostRequest }) =>
       updatePost(id, data),
-    onSuccess: (_, variables) => {
-      // 해당 게시글 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
-      // 목록도 무효화
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });
@@ -90,12 +89,11 @@ export function useUpdatePost() {
  */
 export function useDeletePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, password }: { id: number; password: string }) => 
+    mutationFn: ({ id, password }: { id: number; password: string }) =>
       deletePost(id, password),
     onSuccess: () => {
-      // 게시글 목록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });
@@ -106,15 +104,12 @@ export function useDeletePost() {
  */
 export function useCreateComment() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: CreateCommentRequest }) => 
+    mutationFn: ({ postId, data }: { postId: number; data: CreateCommentRequest }) =>
       createComment(postId, data),
-    onSuccess: (_, variables) => {
-      // 해당 게시글 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      // 목록도 무효화 (댓글 수 업데이트)
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    onSuccess: (_, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
     },
   });
 }
@@ -124,14 +119,12 @@ export function useCreateComment() {
  */
 export function useVotePost() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: VoteRequest }) => 
+    mutationFn: ({ postId, data }: { postId: number; data: VoteRequest }) =>
       votePost(postId, data),
-    onSuccess: (_, variables) => {
-      // 해당 게시글 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.postId) });
-      // 목록도 무효화 (좋아요 수 업데이트)
+    onSuccess: (_, { postId }) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
     },
   });

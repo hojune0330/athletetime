@@ -1,232 +1,254 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ClockIcon, TrophyIcon } from '@heroicons/react/24/outline'
-import { useCreatePost } from '../hooks/usePosts'
+/**
+ * 게시글 작성 페이지 (v3.0.0)
+ * 
+ * - Cloudinary 이미지 업로드 지원 (최대 5개)
+ * - PostgreSQL API 통합
+ * - 익명 사용자 ID 자동 관리
+ * - 회원 시스템 대비 구조
+ */
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Send, AlertCircle } from 'lucide-react';
+import ImageUploader from '../components/post/ImageUploader';
+import { createPost, getCategories } from '../api/posts';
+import { getAnonymousId, getUsername, setUsername } from '../utils/anonymousUser';
+import type { Category } from '../types/post';
 
 export default function WritePage() {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [category, setCategory] = useState('track-sprint')
-  const [eventType, setEventType] = useState('')
-  const [record, setRecord] = useState('')
-  const [recordDate, setRecordDate] = useState('')
-  const [isOfficial, setIsOfficial] = useState(false)
-  const [author, setAuthor] = useState('')
-  const [password, setPassword] = useState('')
+  const navigate = useNavigate();
+  
+  // 폼 상태
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [categoryId, setCategoryId] = useState<number>(2); // 기본: 자유게시판
+  const [author, setAuthor] = useState('');
+  const [password, setPassword] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [images, setImages] = useState<File[]>([]);
+  
+  // 카테고리 목록
+  const [categories, setCategories] = useState<Category[]>([]);
+  
+  // 로딩 & 에러 상태
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // 익명 사용자 ID
+  const anonymousId = getAnonymousId();
 
-  // 게시글 작성 mutation
-  const createPostMutation = useCreatePost()
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  /**
+   * 컴포넌트 마운트 시 카테고리 로드 & 사용자명 불러오기
+   */
+  useEffect(() => {
+    loadCategories();
     
-    if (!author || !password) {
-      alert('작성자명과 비밀번호를 입력해주세요.')
-      return
+    // 이전에 저장된 사용자명 불러오기
+    const savedUsername = getUsername();
+    if (savedUsername) {
+      setAuthor(savedUsername);
     }
-    
+  }, []);
+
+  /**
+   * 카테고리 목록 로드
+   */
+  const loadCategories = async () => {
     try {
-      await createPostMutation.mutateAsync({
-        title,
-        content,
-        category: getCategoryName(category),
-        author,
-        password,
-      })
-      
-      alert('게시글이 작성되었습니다!')
-      navigate('/')
-    } catch (error) {
-      console.error('게시글 작성 실패:', error)
-      alert('게시글 작성에 실패했습니다. 다시 시도해주세요.')
+      const data = await getCategories();
+      setCategories(data.filter(c => c.is_active));
+    } catch (err) {
+      console.error('카테고리 로드 실패:', err);
+      // 기본 카테고리 사용
+      setCategories([
+        { id: 1, name: '공지사항', icon: '📢', color: '#FF4444', description: '', sort_order: 1, is_active: true },
+        { id: 2, name: '자유게시판', icon: '💬', color: '#4CAF50', description: '', sort_order: 2, is_active: true },
+      ]);
     }
-  }
+  };
 
-  // 카테고리 코드를 이름으로 변환
-  const getCategoryName = (code: string): string => {
-    const categoryMap: { [key: string]: string } = {
-      'track-sprint': '단거리',
-      'track-middle': '중거리',
-      'track-distance': '장거리',
-      'track-hurdles': '허들',
-      'field-jumps': '도약',
-      'field-throws': '투척',
-      'running-marathon': '마라톤',
-      'running-trail': '트레일',
-      'running-crew': '크루',
-      'events-schedule': '대회정보',
-      'events-review': '대회후기',
-      'events-recruit': '참가모집',
-      'records-personal': '내기록',
-      'training-log': '훈련일지',
-      'community-free': '자유',
-      'community-qna': '질문',
-      'community-proof': '인증',
+  /**
+   * 폼 유효성 검사
+   */
+  const validateForm = (): string | null => {
+    if (!title.trim()) return '제목을 입력해주세요.';
+    if (title.length > 200) return '제목은 200자 이내로 입력해주세요.';
+    
+    if (!content.trim()) return '내용을 입력해주세요.';
+    if (content.length > 10000) return '내용은 10000자 이내로 입력해주세요.';
+    
+    if (!author.trim()) return '작성자명을 입력해주세요.';
+    if (author.length > 50) return '작성자명은 50자 이내로 입력해주세요.';
+    
+    if (!password) return '비밀번호를 입력해주세요.';
+    if (password.length < 4) return '비밀번호는 4자 이상 입력해주세요.';
+    
+    if (images.length > 5) return '이미지는 최대 5개까지 업로드할 수 있습니다.';
+    
+    return null;
+  };
+
+  /**
+   * 게시글 작성 제출
+   */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    // 유효성 검사
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
     }
-    return categoryMap[code] || '자유'
-  }
 
-  // 종목별 이벤트 목록
-  const eventsByCategory: { [key: string]: string[] } = {
-    'track-sprint': ['100m', '200m', '400m', '4x100m 릴레이'],
-    'track-middle': ['800m', '1500m', '3000m'],
-    'track-distance': ['5000m', '10000m', '3000m 장애물'],
-    'track-hurdles': ['110m 허들', '100m 허들', '400m 허들'],
-    'field-jumps': ['높이뛰기', '멀리뛰기', '세단뛰기', '장대높이뛰기'],
-    'field-throws': ['포환던지기', '원반던지기', '창던지기', '해머던지기'],
-    'running-marathon': ['풀코스', '하프', '10K', '5K'],
-  }
+    setLoading(true);
+
+    try {
+      // 사용자명 저장 (다음에도 사용할 수 있도록)
+      setUsername(author);
+
+      // 게시글 작성
+      const post = await createPost(
+        {
+          title: title.trim(),
+          content: content.trim(),
+          author: author.trim(),
+          password,
+          category: categoryId.toString(),
+          instagram: instagram.trim() || undefined,
+          anonymousId,
+        },
+        images
+      );
+
+      alert('게시글이 작성되었습니다!');
+      navigate(`/post/${post.id}`);
+    } catch (err: any) {
+      console.error('게시글 작성 실패:', err);
+      setError(err.message || '게시글 작성에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * 취소
+   */
+  const handleCancel = () => {
+    if (title || content || images.length > 0) {
+      if (!confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
+        return;
+      }
+    }
+    navigate(-1);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="card-dark">
-        <div className="p-6 border-b border-dark-500">
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <ClockIcon className="w-6 h-6 text-primary-400" />
-            <span>게시글 작성</span>
+    <div className="min-h-screen bg-dark-800 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* 헤더 */}
+        <div className="mb-6 flex items-center justify-between">
+          <button
+            onClick={handleCancel}
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>돌아가기</span>
+          </button>
+          
+          <h1 className="text-2xl font-bold text-white">
+            게시글 작성
           </h1>
+          
+          <div className="w-24" /> {/* Spacer for centering */}
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* 카테고리 선택 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                게시판 선택
-              </label>
-              <select
-                value={category}
-                onChange={(e) => {
-                  setCategory(e.target.value)
-                  setEventType('') // 카테고리 변경시 종목 초기화
-                }}
-                className="input-dark"
-              >
-                <optgroup label="🏃 육상 (Track & Field)">
-                  <option value="track-sprint">단거리 (Sprint)</option>
-                  <option value="track-middle">중거리</option>
-                  <option value="track-distance">장거리</option>
-                  <option value="track-hurdles">허들</option>
-                  <option value="field-jumps">도약 (점프)</option>
-                  <option value="field-throws">투척</option>
-                </optgroup>
-                <optgroup label="👟 러닝">
-                  <option value="running-marathon">마라톤/로드</option>
-                  <option value="running-trail">트레일러닝</option>
-                  <option value="running-crew">러닝크루</option>
-                </optgroup>
-                <optgroup label="🏆 대회/이벤트">
-                  <option value="events-schedule">대회 정보</option>
-                  <option value="events-review">대회 후기</option>
-                  <option value="events-recruit">참가 모집</option>
-                </optgroup>
-                <optgroup label="📊 기록/훈련">
-                  <option value="records-personal">내 기록</option>
-                  <option value="training-log">훈련일지</option>
-                </optgroup>
-                <optgroup label="💬 커뮤니티">
-                  <option value="community-free">자유게시판</option>
-                  <option value="community-qna">질문/답변</option>
-                  <option value="community-proof">인증/자랑</option>
-                </optgroup>
-              </select>
-            </div>
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-red-200 text-sm">{error}</p>
+          </div>
+        )}
 
-            {/* 종목 선택 (육상/러닝 카테고리일 때만) */}
-            {eventsByCategory[category] && (
+        {/* 작성 폼 */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 카테고리 & 작성자 정보 */}
+          <div className="bg-dark-700 rounded-lg p-6 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 카테고리 선택 */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  종목 선택
+                  게시판
                 </label>
                 <select
-                  value={eventType}
-                  onChange={(e) => setEventType(e.target.value)}
-                  className="input-dark"
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(Number(e.target.value))}
+                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                  disabled={loading}
                 >
-                  <option value="">종목 선택...</option>
-                  {eventsByCategory[category].map(event => (
-                    <option key={event} value={event}>{event}</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
                   ))}
                 </select>
               </div>
-            )}
-          </div>
 
-          {/* 기록 입력 (육상/러닝 카테고리일 때만) */}
-          {(category.includes('track') || category.includes('field') || category.includes('running')) && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 작성자명 */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  <TrophyIcon className="w-4 h-4 inline mr-1" />
-                  기록
+                  작성자명
                 </label>
                 <input
                   type="text"
-                  value={record}
-                  onChange={(e) => setRecord(e.target.value)}
-                  placeholder="예: 10.23, 2:15:30"
-                  className="input-dark"
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  placeholder="닉네임"
+                  maxLength={50}
+                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  disabled={loading}
+                  required
                 />
               </div>
+
+              {/* 비밀번호 */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  기록 날짜
+                  비밀번호
                 </label>
                 <input
-                  type="date"
-                  value={recordDate}
-                  onChange={(e) => setRecordDate(e.target.value)}
-                  className="input-dark"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="4자 이상"
+                  minLength={4}
+                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                  disabled={loading}
+                  required
                 />
               </div>
-              <div className="flex items-end">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isOfficial}
-                    onChange={(e) => setIsOfficial(e.target.checked)}
-                    className="w-4 h-4 rounded text-primary-500 bg-dark-700 border-dark-500 focus:ring-primary-500"
-                  />
-                  <span className="text-sm text-gray-300">공식 기록</span>
-                </label>
-              </div>
             </div>
-          )}
 
-          {/* 작성자 정보 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Instagram (선택) */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                작성자명
+                Instagram (선택)
               </label>
               <input
                 type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="닉네임을 입력하세요"
-                className="input-dark"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                비밀번호 (수정/삭제용)
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호 (4자 이상)"
-                className="input-dark"
-                minLength={4}
-                required
+                value={instagram}
+                onChange={(e) => setInstagram(e.target.value)}
+                placeholder="@username"
+                className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                disabled={loading}
               />
             </div>
           </div>
 
-          {/* 제목 입력 */}
-          <div>
+          {/* 제목 */}
+          <div className="bg-dark-700 rounded-lg p-6">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               제목
             </label>
@@ -234,146 +256,107 @@ export default function WritePage() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="제목을 입력하세요"
-              className="input-dark"
+              placeholder="제목을 입력하세요 (최대 200자)"
+              maxLength={200}
+              className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+              disabled={loading}
               required
             />
+            <p className="mt-2 text-xs text-gray-500 text-right">
+              {title.length} / 200
+            </p>
           </div>
 
-          {/* 내용 입력 */}
-          <div>
+          {/* 내용 */}
+          <div className="bg-dark-700 rounded-lg p-6">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               내용
             </label>
-            
-            {/* 에디터 툴바 */}
-            <div className="flex flex-wrap items-center gap-1 p-2 bg-dark-700 border border-dark-500 border-b-0 rounded-t-lg">
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm font-bold">B</span>
-              </button>
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm italic">I</span>
-              </button>
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm underline">U</span>
-              </button>
-              <div className="w-px h-6 bg-dark-500 mx-1" />
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm">🔗</span>
-              </button>
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm">🖼️</span>
-              </button>
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm">📹</span>
-              </button>
-              <div className="w-px h-6 bg-dark-500 mx-1" />
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm">⏱️</span>
-              </button>
-              <button type="button" className="p-2 hover:bg-dark-600 rounded text-gray-400 hover:text-white">
-                <span className="text-sm">🏃</span>
-              </button>
-            </div>
-            
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="내용을 입력하세요... (훈련 내용, 대회 후기, 기록 분석 등)"
-              className="w-full px-4 py-3 bg-dark-700 border border-dark-500 border-t-0 rounded-b-lg text-gray-200 placeholder-gray-500 resize-none focus:outline-none focus:border-primary-500"
+              placeholder="내용을 입력하세요 (최대 10000자)"
+              maxLength={10000}
               rows={15}
+              className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 resize-none focus:outline-none focus:border-blue-500"
+              disabled={loading}
               required
+            />
+            <p className="mt-2 text-xs text-gray-500 text-right">
+              {content.length} / 10000
+            </p>
+          </div>
+
+          {/* 이미지 업로드 */}
+          <div className="bg-dark-700 rounded-lg p-6">
+            <label className="block text-sm font-medium text-gray-300 mb-4">
+              이미지 첨부
+            </label>
+            <ImageUploader
+              images={images}
+              onImagesChange={setImages}
+              maxImages={5}
+              maxSizeKB={5120}
             />
           </div>
 
-          {/* 파일 첨부 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              파일 첨부 (사진, 동영상, GPS 데이터 등)
-            </label>
-            <div className="border-2 border-dashed border-dark-500 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-3xl text-gray-500">📁</span>
-                <p className="text-sm text-gray-400">
-                  클릭하거나 파일을 드래그하여 업로드
-                </p>
-                <p className="text-xs text-gray-500">
-                  최대 10MB, JPG/PNG/GIF/MP4/GPX 지원
-                </p>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*,video/*,.gpx"
-                  multiple
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* 옵션 설정 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="allowComments"
-                defaultChecked
-                className="w-4 h-4 rounded text-primary-500 bg-dark-700 border-dark-500 focus:ring-primary-500"
-              />
-              <label htmlFor="allowComments" className="text-sm text-gray-300">
-                댓글 허용
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="shareRecord"
-                defaultChecked
-                className="w-4 h-4 rounded text-primary-500 bg-dark-700 border-dark-500 focus:ring-primary-500"
-              />
-              <label htmlFor="shareRecord" className="text-sm text-gray-300">
-                기록 공개 (랭킹 반영)
-              </label>
-            </div>
-          </div>
-
-          {/* 버튼 영역 */}
-          <div className="flex items-center justify-between pt-4">
+          {/* 제출 버튼 */}
+          <div className="flex items-center justify-between">
             <button
               type="button"
-              onClick={() => navigate(-1)}
-              className="btn-secondary"
+              onClick={handleCancel}
+              className="px-6 py-3 bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500 transition-colors"
+              disabled={loading}
             >
               취소
             </button>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="btn-secondary"
-              >
-                임시저장
-              </button>
-              <button
-                type="submit"
-                className="btn-primary"
-              >
-                게시글 작성
-              </button>
-            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>작성 중...</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  <span>게시글 작성</span>
+                </>
+              )}
+            </button>
           </div>
         </form>
-      </div>
 
-      {/* 작성 가이드 */}
-      <div className="mt-4 card-dark p-4">
-        <h3 className="text-sm font-bold text-white mb-2">📝 게시글 작성 가이드</h3>
-        <ul className="space-y-1 text-xs text-gray-400">
-          <li>• 정확한 기록과 날짜를 입력하면 랭킹에 자동 반영됩니다.</li>
-          <li>• 훈련 일지는 상세할수록 다른 선수들에게 도움이 됩니다.</li>
-          <li>• 대회 후기는 사진과 함께 작성하면 더 생생합니다.</li>
-          <li>• 부정확하거나 허위 기록은 제재 대상이 될 수 있습니다.</li>
-          <li>• 서로 격려하고 응원하는 건전한 커뮤니티 문화를 만들어주세요.</li>
-        </ul>
+        {/* 작성 가이드 */}
+        <div className="mt-8 bg-dark-700 rounded-lg p-6">
+          <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-400" />
+            작성 가이드
+          </h3>
+          <ul className="space-y-2 text-sm text-gray-400">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-400">•</span>
+              <span>이미지는 Cloudinary CDN에 업로드되어 빠르고 안정적으로 제공됩니다.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-400">•</span>
+              <span>작성자명과 비밀번호는 게시글 수정/삭제 시 필요합니다.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-400">•</span>
+              <span>욕설, 비방, 허위사실 유포 등은 제재 대상이 될 수 있습니다.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-400">•</span>
+              <span>서로 격려하고 응원하는 건전한 커뮤니티 문화를 만들어주세요.</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-  )
+  );
 }

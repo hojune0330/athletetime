@@ -4,6 +4,7 @@ import PostListReal from '../components/post/PostListReal'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useCreatePost } from '../hooks/usePosts'
+import { getAnonymousId } from '../utils/anonymousUser'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
@@ -20,11 +21,15 @@ export default function HomePage() {
     
     try {
       await createPostMutation.mutateAsync({
-        title: newPost.title || '무제',
-        content: newPost.content,
-        category: '자유',
-        author: '익명',
-        password: 'anonymous', // 익명 게시글용 기본 비밀번호
+        data: {
+          title: newPost.title || '무제',
+          content: newPost.content,
+          category: '자유',
+          author: '익명',
+          password: 'anonymous',
+          anonymousId: getAnonymousId(),
+        },
+        images: [],
       })
       
       // 성공 시 폼 초기화
