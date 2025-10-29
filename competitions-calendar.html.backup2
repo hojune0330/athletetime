@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 KAAF 대회 일정 | 애슬리트타임</title>
+    
+    <!-- PWA 메타 태그 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#00ffa3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="애슬리트 타임">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="competitions-calendar.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button class="simple-install-btn" id="simpleInstallBtn">
+    <i class="fas fa-download"></i> 앱 설치
+  </button>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="site-title">
+                <a href="index.html">🏃 애슬리트타임</a>
+            </h1>
+            <nav class="nav">
+                <a href="pace-calculator.html">페이스 계산기</a>
+                <a href="chat-real.html">실시간 채팅</a>
+                <a href="competitions-calendar.html" class="active">대회 일정</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="main-container">
+        <!-- 타이틀 섹션 -->
+        <section class="title-section">
+            <h2>2025 KAAF 국내 육상경기 일정</h2>
+            <p class="subtitle">한국육상경기연맹 공식 대회 일정 · 총 <span id="total-competitions">54</span>개 대회</p>
+        </section>
+
+        <!-- 필터 컨트롤 -->
+        <section class="filter-controls">
+            <div class="view-controls">
+                <button class="view-btn active" data-view="calendar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    달력 뷰
+                </button>
+                <button class="view-btn" data-view="list">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    리스트 뷰
+                </button>
+                <button class="view-btn" data-view="timeline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    타임라인 뷰
+                </button>
+            </div>
+
+            <div class="filter-options">
+                <!-- 검색바 -->
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="대회명, 장소 검색...">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </div>
+
+                <!-- 카테고리 필터 -->
+                <div class="category-filters">
+                    <label class="filter-chip active">
+                        <input type="checkbox" value="all" checked>
+                        <span>전체</span>
+                    </label>
+                    <label class="filter-chip">
+                        <input type="checkbox" value="트랙필드">
+                        <span class="track">트랙필드</span>
+                    </label>
+                    <label class="filter-chip">
+                        <input type="checkbox" value="로드레이스">
+                        <span class="road">로드레이스</span>
+                    </label>
+                    <label class="filter-chip">
+                        <input type="checkbox" value="단일경기">
+                        <span class="single">단일경기</span>
+                    </label>
+                </div>
+
+                <!-- 주최기관 필터 -->
+                <div class="organizer-filter">
+                    <select id="organizer-select">
+                        <option value="">전체 주최기관</option>
+                        <option value="대한육상연맹">대한육상연맹</option>
+                        <option value="한국실업육상연맹">한국실업육상연맹</option>
+                        <option value="한국대학육상연맹">한국대학육상연맹</option>
+                        <option value="한국중고육상연맹">한국중고육상연맹</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- 달력 뷰 -->
+        <section id="calendar-view" class="view-section active">
+            <!-- 달력 네비게이션 -->
+            <div class="calendar-navigation">
+                <button class="nav-btn" id="prev-month">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="current-month">
+                    <h3 id="current-month-display">2025년 1월</h3>
+                </div>
+                <button class="nav-btn" id="next-month">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+                <button class="today-btn" id="today-btn">오늘</button>
+            </div>
+
+            <!-- 달력 그리드 -->
+            <div class="calendar-grid">
+                <div class="calendar-header">
+                    <div class="day-label">일</div>
+                    <div class="day-label">월</div>
+                    <div class="day-label">화</div>
+                    <div class="day-label">수</div>
+                    <div class="day-label">목</div>
+                    <div class="day-label">금</div>
+                    <div class="day-label">토</div>
+                </div>
+                <div class="calendar-body" id="calendar-body">
+                    <!-- 달력 날짜들이 JavaScript로 동적 생성됩니다 -->
+                </div>
+            </div>
+
+            <!-- 월간 대회 요약 -->
+            <div class="month-summary">
+                <h4>이번 달 대회</h4>
+                <div id="month-competitions-list" class="month-competitions">
+                    <!-- 월간 대회 목록이 여기에 표시됩니다 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 리스트 뷰 -->
+        <section id="list-view" class="view-section">
+            <div class="list-header">
+                <h3>전체 대회 목록</h3>
+                <div class="sort-options">
+                    <select id="sort-select">
+                        <option value="date">날짜순</option>
+                        <option value="name">이름순</option>
+                        <option value="location">장소순</option>
+                        <option value="category">카테고리순</option>
+                    </select>
+                </div>
+            </div>
+            <div id="competitions-list" class="competitions-list">
+                <!-- 대회 목록이 JavaScript로 동적 생성됩니다 -->
+            </div>
+        </section>
+
+        <!-- 타임라인 뷰 -->
+        <section id="timeline-view" class="view-section">
+            <div class="timeline-header">
+                <h3>2025년 대회 타임라인</h3>
+            </div>
+            <div id="timeline-container" class="timeline-container">
+                <!-- 타임라인이 JavaScript로 동적 생성됩니다 -->
+            </div>
+        </section>
+
+        <!-- 통계 섹션 -->
+        <section class="statistics-section">
+            <h3>2025년 대회 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon track">🏃‍♂️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-track">34</div>
+                        <div class="stat-label">트랙필드</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon road">🏃‍♀️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-road">17</div>
+                        <div class="stat-label">로드레이스</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon single">🎯</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-single">3</div>
+                        <div class="stat-label">단일경기</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon peak">📍</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-peak">6</div>
+                        <div class="stat-label">예천 최다</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 대회 상세 모달 -->
+    <div id="competition-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div id="modal-body">
+                <!-- 대회 상세 정보가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 날짜 대회 목록 팝업 -->
+    <div id="date-competitions-popup" class="popup">
+        <div class="popup-content">
+            <button class="popup-close">&times;</button>
+            <h3 id="popup-date-title"></h3>
+            <div id="popup-competitions-list">
+                <!-- 해당 날짜 대회 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="competitions-calendar.js"></script>
+    
+    <!-- PWA 등록 스크립트 -->
+    <script src="/install-ui-patch.js"></script>
+  <script src="/pwa-register.js"></script>
+</body>
+</html>��짜 대회 목록 팝업 -->
+    <div id="date-competitions-popup" class="popup">
+        <div class="popup-content">
+            <button class="popup-close">&times;</button>
+            <h3 id="popup-date-title"></h3>
+            <div id="popup-competitions-list">
+                <!-- 해당 날짜 대회 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="competitions-calendar.js"></script>
+    
+    <!-- PWA 등록 스크립트 -->
+    <script src="/install-ui-patch.js"></script>
+  <script src="/pwa-register.js"></script>
+</body>
+</html></html>
