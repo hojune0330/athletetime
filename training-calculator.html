@@ -4,11 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>전문 훈련 페이스 계산기 | Athlete Time</title>
+  
+  <!-- PWA 메타 태그 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00ffa3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="애슬리트 타임">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  
   <script src="https://cdn.tailwindcss.com"></script>
-
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   
   <style>
     body {
@@ -109,6 +118,36 @@
       background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
     }
   </style>
+    
+    /* PWA 간단한 설치 버튼 */
+    .simple-install-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #00ffa3, #00d4ff);
+      color: #0f0f0f;
+      padding: 10px 18px;
+      border-radius: 25px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 255, 163, 0.4);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+    
+    .simple-install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 255, 163, 0.6);
+    }
+    
+    .simple-install-btn.show {
+      display: inline-flex;
+    }
 
   <style>
     /* 커스텀 스크롤바 스타일 */
@@ -221,6 +260,9 @@
       }
     }
   </style>
+    
+      display: inline-flex;
+    }
 
 </head>
 <body class="bg-gray-50">
@@ -2433,7 +2475,9 @@
       }
     });
   </script>
-
-
+  
+  <!-- PWA 등록 스크립트 -->
+  <script src="/install-ui-patch.js"></script>
+  <script src="/pwa-register.js"></script>
 </body>
 </html>

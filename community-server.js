@@ -429,7 +429,7 @@ app.post('/api/posts', async (req, res) => {
     // 데이터 저장
     await savePosts();
     
-    res.json({ success: true, post: newPost });
+    res.json({ success: true, data: newPost, post: newPost });
     
     console.log(`📝 새 게시글: ${newPost.title} by ${newPost.author}`);
   } catch (error) {
@@ -457,7 +457,7 @@ app.put('/api/posts/:id', (req, res) => {
   // 업데이트
   posts[postIndex] = { ...post, ...updateData, id: post.id, date: post.date };
   
-  res.json({ success: true, post: posts[postIndex] });
+  res.json({ success: true, data: posts[postIndex], post: posts[postIndex] });
 });
 
 // 게시글 삭제
@@ -513,7 +513,7 @@ app.post('/api/posts/:id/vote', (req, res) => {
     }
   }
   
-  res.json({ success: true, post });
+  res.json({ success: true, data: post, post });
 });
 
 // 댓글 작성
@@ -555,7 +555,7 @@ app.post('/api/posts/:id/comments', (req, res) => {
   post.comments.push(comment);
   stats.totalComments++;
   
-  res.json({ success: true, comment });
+  res.json({ success: true, data: comment, comment });
   
   console.log(`💬 새 댓글: ${comment.author} on "${post.title}"`);
 });
