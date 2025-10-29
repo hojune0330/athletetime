@@ -12,12 +12,32 @@ import axios, { type AxiosError, type AxiosInstance } from 'axios';
 // 프론트엔드: https://athlete-time.netlify.app
 // 백엔드 (프로덕션): https://athlete-time-backend.onrender.com
 // 백엔드 (개발): http://localhost:3005
-// 백엔드 (샌드박스): https://3005-iq027ecuq0v4g69kga779-2e77fc33.sandbox.novita.ai
+// 백엔드 (샌드박스): 자동 감지 (e2b.dev 환경)
 // 
 // ⚠️ 중요: 모든 URL에 하이픈(-) 사용으로 통일되었습니다.
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://athlete-time-backend.onrender.com'
-  : 'http://localhost:3005';
+const getApiBaseUrl = () => {
+  // 프로덕션 환경
+  if (import.meta.env.PROD) {
+    return 'https://athlete-time-backend.onrender.com';
+  }
+  
+  // 개발 환경 - sandbox URL 자동 감지
+  const hostname = window.location.hostname;
+  
+  // e2b.dev sandbox 환경인 경우
+  if (hostname.includes('e2b.dev')) {
+    // 현재 URL: https://5175-sandbox-id.e2b.dev
+    // API URL: https://3005-sandbox-id.e2b.dev
+    const currentUrl = window.location.host;
+    const apiUrl = currentUrl.replace(/^\d+/, '3005');
+    return `https://${apiUrl}`;
+  }
+  
+  // 로컬 환경
+  return 'http://localhost:3005';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Axios 인스턴스 생성

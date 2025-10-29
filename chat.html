@@ -536,6 +536,54 @@
     }
   </style>
     
+    /* 모바일 키보드 대응 */
+    body {
+      position: relative;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+    
+    html {
+      height: -webkit-fill-available;
+    }
+    
+    /* 채팅 컨테이너 높이 조정 */
+    .chat-container {
+      height: 100vh;
+      height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 메시지 영역이 키보드에 가려지지 않도록 */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* 입력창을 하단에 고정하되 키보드 위로 올라가도록 */
+    .message-input-container {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+    
+    /* iOS Safari에서 입력 시 확대 방지 */
+    input, textarea {
+      font-size: 16px !important;
+    }
+    
+    @media (max-width: 768px) {
+      .chat-container {
+        max-height: 100vh;
+        max-height: -webkit-fill-available;
+      }
+    }
+    
     /* PWA 간단한 설치 버튼 */
     .simple-install-btn {
       position: fixed;

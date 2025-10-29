@@ -68,13 +68,13 @@
     const bannerBtn = document.getElementById('bannerInstallBtn');
     if (bannerBtn) {
       bannerBtn.onclick = handleInstall;
+    }
     
     // 간단한 설치 버튼 (다른 페이지용)
     const simpleBtn = document.getElementById("simpleInstallBtn");
     if (simpleBtn) {
       simpleBtn.classList.add("show");
       simpleBtn.onclick = handleInstall;
-    }
     }
   }
   
@@ -101,9 +101,9 @@
     if (closeBtn) {
       closeBtn.onclick = () => {
         banner.classList.remove('show');
-    
-    const simpleBtn = document.getElementById("simpleInstallBtn");
-    if (simpleBtn) simpleBtn.classList.remove("show");
+        
+        const simpleBtn = document.getElementById("simpleInstallBtn");
+        if (simpleBtn) simpleBtn.classList.remove("show");
         localStorage.setItem('pwa-top-banner-dismissed', Date.now().toString());
       };
     }
@@ -273,9 +273,6 @@
     const banner = document.getElementById('topInstallBanner');
     if (banner) banner.classList.remove('show');
     
-    const simpleBtn = document.getElementById("simpleInstallBtn");
-    if (simpleBtn) simpleBtn.classList.remove("show");
-    
     const simpleBtn = document.getElementById('simpleInstallBtn');
     if (simpleBtn) simpleBtn.classList.remove('show');
   }
@@ -332,12 +329,6 @@
       from { transform: translateX(0); opacity: 1; }
       to { transform: translateX(100px); opacity: 0; }
     }
-  `;
-  document.head.appendChild(style);
-  
-  console.log('✅ PWA 설치 UI 준비 완료');
-})();
-   }
   `;
   document.head.appendChild(style);
   
