@@ -10,7 +10,6 @@ export default function PostDetailPage() {
   
   const [commentText, setCommentText] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
-  const [commentPassword, setCommentPassword] = useState('')
   const [deletePassword, setDeletePassword] = useState('')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   
@@ -35,11 +34,19 @@ export default function PostDetailPage() {
   // 투표 핸들러
   const handleVote = async (voteType: 'up' | 'down') => {
     try {
+      // Generate a unique user ID or get from session
+      const userId = localStorage.getItem('anonymousUserId') || 
+        (() => {
+          const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('anonymousUserId', newId);
+          return newId;
+        })();
+      
       await votePostMutation.mutateAsync({
         postId,
         data: {
-          voteType,
-          userId: 'anonymous' // 실제로는 세션에서 가져와야 함
+          userId,
+          type: voteType === 'up' ? 'like' : 'dislike'
         }
       })
     } catch (error) {
@@ -51,24 +58,31 @@ export default function PostDetailPage() {
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!commentText.trim() || !commentAuthor.trim() || !commentPassword.trim()) {
-      alert('모든 필드를 입력해주세요.')
+    if (!commentText.trim() || !commentAuthor.trim()) {
+      alert('닉네임과 댓글 내용을 입력해주세요.')
       return
     }
     
     try {
+      // Generate a unique user ID or get from session
+      const userId = localStorage.getItem('anonymousUserId') || 
+        (() => {
+          const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          localStorage.setItem('anonymousUserId', newId);
+          return newId;
+        })();
+      
       await createCommentMutation.mutateAsync({
         postId,
         data: {
           content: commentText,
           author: commentAuthor,
-          password: commentPassword
+          userId
         }
       })
       
       // 성공 시 입력 필드 초기화
       setCommentText('')
-      setCommentPassword('')
       alert('댓글이 작성되었습니다!')
     } catch (error) {
       console.error('댓글 작성 실패:', error)
@@ -260,21 +274,13 @@ export default function PostDetailPage() {
 
         {/* 댓글 작성 */}
         <form onSubmit={handleCommentSubmit} className="mb-6">
-          <div className="grid grid-cols-2 gap-2 mb-2">
+          <div className="mb-2">
             <input
               type="text"
               value={commentAuthor}
               onChange={(e) => setCommentAuthor(e.target.value)}
               placeholder="닉네임"
-              className="px-3 py-2 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
-              required
-            />
-            <input
-              type="password"
-              value={commentPassword}
-              onChange={(e) => setCommentPassword(e.target.value)}
-              placeholder="비밀번호"
-              className="px-3 py-2 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
+              className="w-full px-3 py-2 rounded-lg bg-dark-700 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
               required
             />
           </div>

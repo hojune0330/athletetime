@@ -80,7 +80,8 @@ export interface DeletePostRequest {
 export interface CreateCommentRequest {
   author: string;
   content: string;
-  password: string;
+  userId: string;
+  instagram?: string;
 }
 
 /**
@@ -88,7 +89,7 @@ export interface CreateCommentRequest {
  */
 export interface VoteRequest {
   userId: string;
-  voteType: 'up' | 'down';
+  type: 'like' | 'dislike';
 }
 
 /**

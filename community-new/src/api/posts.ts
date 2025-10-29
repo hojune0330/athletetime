@@ -27,8 +27,18 @@ export async function getPosts(): Promise<Post[]> {
  * 게시글 상세 조회
  */
 export async function getPost(id: number): Promise<Post | null> {
-  const posts = await getPosts();
-  return posts.find(post => post.id === id) || null;
+  try {
+    const response = await apiClient.get<{ success: boolean; post: Post }>(`/api/posts/${id}`);
+    
+    if (!response.data.success || !response.data.post) {
+      return null;
+    }
+    
+    return response.data.post;
+  } catch (error) {
+    console.error('게시글 조회 실패:', error);
+    return null;
+  }
 }
 
 /**
@@ -73,14 +83,15 @@ export async function deletePost(id: number, password: string): Promise<void> {
 /**
  * 댓글 작성
  */
-export async function createComment(postId: number, data: CreateCommentRequest): Promise<Post> {
-  const response = await apiClient.post<ApiResponse<Post>>(`/api/posts/${postId}/comments`, data);
+export async function createComment(postId: number, data: CreateCommentRequest): Promise<any> {
+  const response = await apiClient.post<{ success: boolean; data: any; comment: any; message?: string }>(`/api/posts/${postId}/comments`, data);
   
-  if (!response.data.success || !response.data.data) {
+  if (!response.data.success) {
     throw new Error(response.data.message || '댓글 작성에 실패했습니다.');
   }
   
-  return response.data.data;
+  // 댓글 작성 후 게시글 전체를 다시 조회
+  return await getPost(postId);
 }
 
 /**
