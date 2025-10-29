@@ -53,7 +53,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Multer (이미지 업로드)
 const upload = multer({
-  storage: multer.memoryBuffer(),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 5 }
 });
 
