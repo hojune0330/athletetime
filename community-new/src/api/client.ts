@@ -2,40 +2,13 @@
  * API Client Configuration
  * 
  * 백엔드 서버와의 HTTP 통신을 담당하는 Axios 클라이언트 설정
+ * 
+ * ⚠️ URL 설정은 src/config/constants.ts에서 관리됩니다.
+ * 이 파일에서 직접 URL을 변경하지 마세요!
  */
 
 import axios, { type AxiosError, type AxiosInstance } from 'axios';
-
-// 환경별 API URL 설정
-// 
-// 프로젝트 이름: athletetime (하이픈 없음 - v3.0.0)
-// 프론트엔드: https://athlete-time.netlify.app (하이픈 있음)
-// 백엔드 (프로덕션): https://athletetime-backend.onrender.com (하이픈 없음)
-// 백엔드 (개발): http://localhost:3005
-// 백엔드 (샌드박스): 자동 감지 (e2b.dev 환경)
-// 
-// ⚠️ 중요: 프론트엔드는 athlete-time, 백엔드는 athletetime (하이픈 차이 주의!)
-const getApiBaseUrl = () => {
-  // 프로덕션 환경
-  if (import.meta.env.PROD) {
-    return 'https://athletetime-backend.onrender.com';
-  }
-  
-  // 개발 환경 - sandbox URL 자동 감지
-  const hostname = window.location.hostname;
-  
-  // e2b.dev sandbox 환경인 경우
-  if (hostname.includes('e2b.dev')) {
-    // 현재 URL: https://5175-sandbox-id.e2b.dev
-    // API URL: https://3005-sandbox-id.e2b.dev
-    const currentUrl = window.location.host;
-    const apiUrl = currentUrl.replace(/^\d+/, '3005');
-    return `https://${apiUrl}`;
-  }
-  
-  // 로컬 환경
-  return 'http://localhost:3005';
-};
+import { getApiBaseUrl, APP_CONFIG } from '../config/constants';
 
 const API_BASE_URL = getApiBaseUrl();
 
@@ -44,7 +17,7 @@ const API_BASE_URL = getApiBaseUrl();
  */
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: APP_CONFIG.API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },

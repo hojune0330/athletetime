@@ -8,7 +8,9 @@
     "dev": "nodemon server.js",
     "db:migrate": "psql $DATABASE_URL < database/schema.sql",
     "db:seed": "node database/seed.js",
-    "db:reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run db:migrate && npm run db:seed"
+    "db:reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run db:migrate && npm run db:seed",
+    "check:urls": "node scripts/check-urls.js",
+    "prebuild": "npm run check:urls"
   },
   "keywords": [
     "athletics",
