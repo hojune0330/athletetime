@@ -51,10 +51,16 @@ export async function getPosts(
   params.append('limit', limit.toString());
   params.append('offset', offset.toString());
   
-  const response = await apiClient.get<PostsResponse>(`/api/posts?${params.toString()}`);
+  const response = await apiClient.get<any>(`/api/posts?${params.toString()}`);
   
-  // v3.0.0: 배열 직접 반환
-  return response.data;
+  // v3.0.0: {success: true, posts: [...]} 형태
+  // posts 배열을 반환해야 함
+  if (response.data && response.data.posts) {
+    return response.data.posts;
+  }
+  
+  // 레거시 형태 또는 에러 시 빈 배열 반환
+  return [];
 }
 
 /**
@@ -199,6 +205,12 @@ export async function incrementViews(postId: number): Promise<void> {
  * 검색 (향후 구현)
  */
 export async function searchPosts(query: string): Promise<Post[]> {
-  const response = await apiClient.get<PostsResponse>(`/api/posts/search?q=${encodeURIComponent(query)}`);
-  return response.data;
+  const response = await apiClient.get<any>(`/api/posts/search?q=${encodeURIComponent(query)}`);
+  
+  // 백엔드 응답 형태에 따라 처리
+  if (response.data && response.data.posts) {
+    return response.data.posts;
+  }
+  
+  return [];
 }
