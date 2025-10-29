@@ -71,7 +71,7 @@ function PostItem({ post }: { post: Post }) {
       <article className="card-dark hover:bg-dark-500 transition-all duration-200 p-4 border-l-4 hover:border-l-primary-400 border-l-transparent">
         <div className="flex gap-4">
           {/* 썸네일 (이미지가 있는 경우) */}
-          {post.images[0]?.cloudinary_url && (
+          {post.images && post.images[0]?.cloudinary_url && (
             <div className="shrink-0">
               <img 
                 src={post.images[0]?.cloudinary_url} 
