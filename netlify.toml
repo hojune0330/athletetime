@@ -10,6 +10,8 @@
   base = ""
 
 # Redirects for SPA routing
+# _redirects file takes precedence over this
+# This is backup only
 [[redirects]]
   from = "/*"
   to = "/index.html"
