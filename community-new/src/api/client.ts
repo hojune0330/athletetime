@@ -8,17 +8,17 @@ import axios, { type AxiosError, type AxiosInstance } from 'axios';
 
 // 환경별 API URL 설정
 // 
-// 프로젝트 이름: athlete-time (하이픈 있음)
-// 프론트엔드: https://athlete-time.netlify.app
-// 백엔드 (프로덕션): https://athlete-time-backend.onrender.com
+// 프로젝트 이름: athletetime (하이픈 없음 - v3.0.0)
+// 프론트엔드: https://athlete-time.netlify.app (하이픈 있음)
+// 백엔드 (프로덕션): https://athletetime-backend.onrender.com (하이픈 없음)
 // 백엔드 (개발): http://localhost:3005
 // 백엔드 (샌드박스): 자동 감지 (e2b.dev 환경)
 // 
-// ⚠️ 중요: 모든 URL에 하이픈(-) 사용으로 통일되었습니다.
+// ⚠️ 중요: 프론트엔드는 athlete-time, 백엔드는 athletetime (하이픈 차이 주의!)
 const getApiBaseUrl = () => {
   // 프로덕션 환경
   if (import.meta.env.PROD) {
-    return 'https://athlete-time-backend.onrender.com';
+    return 'https://athletetime-backend.onrender.com';
   }
   
   // 개발 환경 - sandbox URL 자동 감지
