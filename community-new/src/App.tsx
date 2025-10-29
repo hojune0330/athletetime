@@ -13,8 +13,8 @@ function App() {
     document.documentElement.classList.add('dark')
   }, [])
 
-  // Production에서는 /community basename 사용
-  const basename = import.meta.env.PROD ? '/community' : '/'
+  // Netlify deploys community/ folder as root, so always use '/' as basename
+  const basename = '/'
 
   return (
     <div className="min-h-screen bg-dark-800">
