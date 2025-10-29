@@ -1,730 +1,955 @@
-// PostgreSQL 연동 + 보안 강화 서버
-// 중요: Render 유료 플랜 사용 중 (데이터 제한 없음!)
+/**
+ * 🏃 Athlete Time Community Server - PostgreSQL Version
+ * 
+ * Features:
+ * - PostgreSQL database with connection pooling
+ * - Cloudinary image uploads
+ * - WebSocket real-time notifications
+ * - Full-text search
+ * - Advanced filtering
+ * - Rate limiting
+ * - Security best practices
+ */
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const WebSocket = require('ws');
 const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
-const DOMPurify = require('isomorphic-dompurify');
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
+const bcrypt = require('bcryptjs');
+const WebSocket = require('ws');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const path = require('path');
+const fs = require('fs').promises;
 
-// Render 유료 플랜 설정 로드
-const { validateRenderPlan, RENDER_PLAN } = require('./config/render-config');
+// ============================================
+// 환경 설정
+// ============================================
 
 const app = express();
 const server = http.createServer(app);
-const PORT = process.env.PORT || 3000;
-const SALT_ROUNDS = 10;
+const wss = new WebSocket.Server({ server });
 
-// PostgreSQL 연결
+const PORT = process.env.PORT || 3005;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// PostgreSQL 연결 설정
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? 
-    { rejectUnauthorized: false } : false
+  ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20, // 최대 연결 수
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// Cloudinary 설정
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Multer 설정 (메모리 저장)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('이미지 파일만 업로드 가능합니다.'));
+    }
+  },
 });
 
 // ============================================
-// 보안 미들웨어
+// 미들웨어
 // ============================================
 
-// 보안 헤더 설정
-app.use(helmet({
-  contentSecurityPolicy: false, // 개발 단계에서는 비활성화
-  crossOriginEmbedderPolicy: false
-}));
-
-// CORS 설정
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(express.json({ limit: '10mb' })); // 크기 제한
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ============================================
-// Rate Limiting 설정
-// ============================================
-
-// 일반 API 제한
-const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15분
-  max: 100, // 최대 100개 요청
-  message: '너무 많은 요청을 보내셨습니다. 잠시 후 다시 시도해주세요.',
-  standardHeaders: true,
-  legacyHeaders: false,
+// 로깅 미들웨어
+app.use((req, res, next) => {
+  const start = Date.now();
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
+  });
+  next();
 });
 
-// 게시글 작성 제한
-const createPostLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10, // 15분당 최대 10개 게시글
-  message: '게시글 작성 한도를 초과했습니다.'
-});
-
-// 조회수 제한
-const viewLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1분
-  max: 5, // 1분당 최대 5번
-  keyGenerator: (req) => `${req.ip}_${req.params.id}`,
-  message: '조회수 증가 제한을 초과했습니다.'
-});
-
-// 댓글 작성 제한
-const commentLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
-  max: 20, // 5분당 최대 20개 댓글
-  message: '댓글 작성 한도를 초과했습니다.'
-});
-
-// Rate Limiting 적용
-app.use('/api/', generalLimiter);
-
 // ============================================
-// 보안 유틸리티 함수
+// 정책 설정
 // ============================================
 
-// HTML/스크립트 정제
-function sanitizeInput(input, options = {}) {
-  if (!input) return input;
+const POLICY = {
+  // Rate Limiting
+  RATE_LIMIT_WINDOW: 60000, // 1분
+  RATE_LIMIT_MAX_POSTS: 3,
+  RATE_LIMIT_MAX_COMMENTS: 10,
   
-  const defaultOptions = {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'],
-    ALLOWED_ATTR: ['href', 'target'],
-    ALLOW_DATA_ATTR: false
-  };
+  // 컨텐츠 제한
+  MAX_CONTENT_LENGTH: 10000,
+  MAX_TITLE_LENGTH: 200,
+  COMMENT_MAX_LENGTH: 500,
   
-  const config = { ...defaultOptions, ...options };
-  return DOMPurify.sanitize(input, config);
-}
-
-// 조회수 중복 방지를 위한 메모리 캐시
-const viewedPosts = new Map();
+  // 이미지 제한
+  MAX_IMAGES_PER_POST: 5,
+  IMAGE_MAX_SIZE: 5 * 1024 * 1024, // 5MB
+  
+  // 블라인드 정책
+  BLIND_REPORT_COUNT: 10,
+  BLIND_DISLIKE_COUNT: 20,
+  
+  // 자동 삭제
+  AUTO_DELETE_DAYS: 90,
+};
 
 // ============================================
-// 데이터베이스 초기화 (비밀번호 컬럼 타입 변경)
+// 유틸리티 함수
 // ============================================
 
-async function initDatabase() {
+// 사용자 조회 또는 생성
+async function getOrCreateUser(anonymousId, username) {
   try {
-    // 기존 테이블이 있다면 password 컬럼 타입 변경
-    await pool.query(`
-      ALTER TABLE posts 
-      ALTER COLUMN password TYPE VARCHAR(255)
-    `).catch(() => {
-      console.log('posts 테이블 password 컬럼 이미 변경됨 또는 테이블 없음');
-    });
-
-    // posts 테이블 생성 (ID를 BIGINT로 변경하여 JavaScript Date.now()와 호환)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS posts (
-        id BIGINT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        author VARCHAR(100) NOT NULL,
-        content TEXT,
-        category VARCHAR(50),
-        password VARCHAR(255), -- bcrypt 해시용 길이
-        created_at TIMESTAMP DEFAULT NOW(),
-        views INTEGER DEFAULT 0,
-        likes TEXT[] DEFAULT '{}',
-        dislikes TEXT[] DEFAULT '{}',
-        images JSONB DEFAULT '[]',
-        is_notice BOOLEAN DEFAULT false,
-        is_blinded BOOLEAN DEFAULT false,
-        reports INTEGER DEFAULT 0
-      )
-    `);
-
-    // comments 테이블 생성 (post_id를 BIGINT로 맞춤)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS comments (
-        id BIGINT PRIMARY KEY,
-        post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
-        author VARCHAR(100) NOT NULL,
-        content TEXT NOT NULL,
-        password VARCHAR(255), -- bcrypt 해시용
-        instagram VARCHAR(100),
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    // chat_messages 테이블 생성
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS chat_messages (
-        id SERIAL PRIMARY KEY,
-        room VARCHAR(50) NOT NULL,
-        nickname VARCHAR(100) NOT NULL,
-        message TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-
-    // 인덱스 생성
-    await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_chat_room ON chat_messages(room, created_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
-    `);
-
-    console.log('✅ 보안 강화된 데이터베이스 초기화 완료');
+    // 기존 사용자 확인
+    let result = await pool.query(
+      'SELECT * FROM users WHERE anonymous_id = $1',
+      [anonymousId]
+    );
+    
+    if (result.rows.length > 0) {
+      // 마지막 활동 시간 업데이트
+      await pool.query(
+        'UPDATE users SET last_active = NOW() WHERE id = $1',
+        [result.rows[0].id]
+      );
+      return result.rows[0];
+    }
+    
+    // 새 사용자 생성
+    result = await pool.query(
+      'INSERT INTO users (anonymous_id, username) VALUES ($1, $2) RETURNING *',
+      [anonymousId, username]
+    );
+    
+    return result.rows[0];
   } catch (error) {
-    console.error('데이터베이스 초기화 오류:', error);
+    console.error('사용자 조회/생성 실패:', error);
+    throw error;
   }
 }
 
+// Rate limiting 체크
+async function checkRateLimit(userId, action) {
+  try {
+    const windowStart = new Date(Date.now() - POLICY.RATE_LIMIT_WINDOW);
+    
+    const result = await pool.query(`
+      SELECT COUNT(*) as count
+      FROM rate_limits
+      WHERE user_id = $1 
+        AND action = $2 
+        AND window_start > $3
+    `, [userId, action, windowStart]);
+    
+    const count = parseInt(result.rows[0].count);
+    const maxAllowed = action === 'post' ? POLICY.RATE_LIMIT_MAX_POSTS : POLICY.RATE_LIMIT_MAX_COMMENTS;
+    
+    if (count >= maxAllowed) {
+      return false;
+    }
+    
+    // Rate limit 기록 추가
+    await pool.query(
+      'INSERT INTO rate_limits (user_id, action) VALUES ($1, $2)',
+      [userId, action]
+    );
+    
+    return true;
+  } catch (error) {
+    console.error('Rate limit 체크 실패:', error);
+    return true; // 에러 시 허용
+  }
+}
+
+// Cloudinary 이미지 업로드
+async function uploadToCloudinary(buffer, filename) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'athlete-time/posts',
+        resource_type: 'image',
+        transformation: [
+          { width: 1920, height: 1920, crop: 'limit' },
+          { quality: 'auto:good' },
+          { fetch_format: 'auto' },
+        ],
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    
+    uploadStream.end(buffer);
+  });
+}
+
+// WebSocket 브로드캐스트
+function broadcastNotification(notification) {
+  const message = JSON.stringify(notification);
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+}
+
 // ============================================
-// 게시판 REST API (보안 강화)
+// API 엔드포인트
 // ============================================
 
-// 게시글 목록
+// Health Check
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({
+      success: true,
+      status: 'healthy',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      websocket: `${wss.clients.size} clients`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      status: 'unhealthy',
+      error: error.message,
+    });
+  }
+});
+
+// ============================================
+// 게시글 API
+// ============================================
+
+// 게시글 목록 조회 (검색 및 필터링 지원)
 app.get('/api/posts', async (req, res) => {
   try {
-    const { rows } = await pool.query(`
-      SELECT p.id, p.title, p.author, p.category, p.created_at, p.views,
-             p.is_notice, p.is_blinded,
-             COALESCE(array_length(p.likes, 1), 0) as like_count,
-             COALESCE(array_length(p.dislikes, 1), 0) as dislike_count,
-             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
-      FROM posts p
-      ORDER BY p.is_notice DESC, p.created_at DESC
-    `);
+    const {
+      category,
+      search,
+      sort = 'recent', // recent, popular, views
+      page = 1,
+      limit = 20,
+    } = req.query;
     
-    res.json({ success: true, posts: rows });
+    const offset = (page - 1) * limit;
+    let query = `
+      SELECT 
+        p.*,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        c.color AS category_color,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', i.id,
+              'url', i.cloudinary_url,
+              'thumbnail_url', i.thumbnail_url
+            )
+          ) FILTER (WHERE i.id IS NOT NULL),
+          '[]'
+        ) AS images
+      FROM posts p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN images i ON p.id = i.post_id
+      WHERE p.is_blinded = FALSE AND p.deleted_at IS NULL
+    `;
+    
+    const params = [];
+    let paramIndex = 1;
+    
+    // 카테고리 필터
+    if (category) {
+      query += ` AND c.name = $${paramIndex}`;
+      params.push(category);
+      paramIndex++;
+    }
+    
+    // 검색
+    if (search) {
+      query += ` AND p.search_vector @@ plainto_tsquery('simple', $${paramIndex})`;
+      params.push(search);
+      paramIndex++;
+    }
+    
+    query += ` GROUP BY p.id, c.name, c.icon, c.color`;
+    
+    // 정렬
+    switch (sort) {
+      case 'popular':
+        query += ` ORDER BY (p.likes_count - p.dislikes_count) DESC, p.created_at DESC`;
+        break;
+      case 'views':
+        query += ` ORDER BY p.views DESC, p.created_at DESC`;
+        break;
+      default:
+        query += ` ORDER BY p.is_pinned DESC, p.created_at DESC`;
+    }
+    
+    // 페이지네이션
+    query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
+    
+    const result = await pool.query(query, params);
+    
+    // 전체 개수 조회
+    let countQuery = 'SELECT COUNT(*) FROM posts WHERE is_blinded = FALSE AND deleted_at IS NULL';
+    const countParams = [];
+    
+    if (category) {
+      countQuery += ' AND category_id = (SELECT id FROM categories WHERE name = $1)';
+      countParams.push(category);
+    }
+    
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].count);
+    
+    res.json({
+      success: true,
+      posts: result.rows,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
-    console.error('게시글 조회 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
+    console.error('게시글 목록 조회 실패:', error);
+    res.status(500).json({ success: false, message: '게시글 목록 조회에 실패했습니다.' });
   }
 });
 
-// 게시글 상세
+// 게시글 상세 조회
 app.get('/api/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`🔍 게시글 상세 조회: ID ${id}`);
     
-    const { rows: postRows } = await pool.query(
-      'SELECT * FROM posts WHERE id = $1',
-      [id]
-    );
+    // 조회수 증가
+    await pool.query('UPDATE posts SET views = views + 1 WHERE id = $1', [id]);
     
-    if (postRows.length === 0) {
-      console.log(`⚠️ 게시글 없음: ID ${id}`);
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
+    // 게시글 조회
+    const postResult = await pool.query(`
+      SELECT 
+        p.*,
+        c.name AS category_name,
+        c.icon AS category_icon,
+        c.color AS category_color,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', i.id,
+              'url', i.cloudinary_url,
+              'thumbnail_url', i.thumbnail_url
+            )
+          ) FILTER (WHERE i.id IS NOT NULL),
+          '[]'
+        ) AS images
+      FROM posts p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN images i ON p.id = i.post_id
+      WHERE p.id = $1 AND p.is_blinded = FALSE AND p.deleted_at IS NULL
+      GROUP BY p.id, c.name, c.icon, c.color
+    `, [id]);
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다.' });
     }
     
-    console.log(`✅ 게시글 찾음: "${postRows[0].title}"`);
+    const post = postResult.rows[0];
     
-    // 댓글 조회 (비밀번호 제외)
-    const { rows: commentRows } = await pool.query(
-      'SELECT id, post_id, author, content, instagram, created_at FROM comments WHERE post_id = $1 ORDER BY created_at DESC',
-      [id]
-    );
+    // 댓글 조회
+    const commentsResult = await pool.query(`
+      SELECT *
+      FROM comments
+      WHERE post_id = $1 AND is_blinded = FALSE AND deleted_at IS NULL
+      ORDER BY created_at ASC
+    `, [id]);
     
-    console.log(`💬 댓글 ${commentRows.length}개 조회됨`);
+    post.comments = commentsResult.rows;
     
-    const post = {
-      ...postRows[0],
-      password: undefined, // 비밀번호 제거
-      likes: postRows[0].likes || [],
-      dislikes: postRows[0].dislikes || [],
-      images: postRows[0].images || [],
-      comments: commentRows || []
-    };
+    // 좋아요/싫어요 목록 조회 (사용자 ID만)
+    const votesResult = await pool.query(`
+      SELECT user_id, vote_type
+      FROM votes
+      WHERE post_id = $1
+    `, [id]);
     
-    console.log(`📤 응답 전송: 게시글 + 댓글 ${post.comments.length}개`);
-    res.json({ success: true, post });
+    post.likes = votesResult.rows.filter(v => v.vote_type === 'like').map(v => v.user_id);
+    post.dislikes = votesResult.rows.filter(v => v.vote_type === 'dislike').map(v => v.user_id);
+    
+    res.json({ success: true, post, data: post });
   } catch (error) {
-    console.error('게시글 상세 조회 오류:', error);
-    console.error('오류 상세:', error.stack);
-    res.status(500).json({ success: false, message: '서버 오류' });
+    console.error('게시글 조회 실패:', error);
+    res.status(500).json({ success: false, message: '게시글 조회에 실패했습니다.' });
   }
 });
 
-// 게시글 작성 (보안 강화)
-app.post('/api/posts', createPostLimiter, async (req, res) => {
+// 게시글 작성 (이미지 업로드 포함)
+app.post('/api/posts', upload.array('images', 5), async (req, res) => {
+  const client = await pool.connect();
+  
   try {
-    const { title, author, content, category, password, images, instagram } = req.body;
+    await client.query('BEGIN');
     
-    // 입력값 검증
-    if (!title || !author || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '필수 항목을 입력해주세요' 
+    const {
+      category,
+      title,
+      author,
+      content,
+      password,
+      instagram,
+      userId: anonymousId,
+    } = req.body;
+    
+    // 사용자 조회/생성
+    const user = await getOrCreateUser(anonymousId, author);
+    
+    // Rate limiting 체크
+    const canPost = await checkRateLimit(user.id, 'post');
+    if (!canPost) {
+      await client.query('ROLLBACK');
+      return res.status(429).json({
+        success: false,
+        message: '너무 많은 게시글을 작성했습니다. 잠시 후 다시 시도해주세요.',
       });
     }
     
-    // XSS 방지 - HTML 정제
-    const cleanTitle = sanitizeInput(title);
-    const cleanAuthor = sanitizeInput(author);
-    const cleanContent = sanitizeInput(content, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li'],
-      ALLOWED_ATTR: ['href', 'target']
+    // 유효성 검사
+    if (!title || !content) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        message: '제목과 내용은 필수입니다.',
+      });
+    }
+    
+    if (content.length > POLICY.MAX_CONTENT_LENGTH) {
+      await client.query('ROLLBACK');
+      return res.status(400).json({
+        success: false,
+        message: `게시글은 최대 ${POLICY.MAX_CONTENT_LENGTH}자까지 작성 가능합니다.`,
+      });
+    }
+    
+    // 카테고리 ID 조회
+    const categoryResult = await client.query(
+      'SELECT id FROM categories WHERE name = $1',
+      [category || '자유']
+    );
+    const categoryId = categoryResult.rows[0]?.id || 2; // 기본값: 자유
+    
+    // 비밀번호 해시
+    const passwordHash = password ? await bcrypt.hash(password, 10) : null;
+    
+    // 게시글 생성
+    const postResult = await client.query(`
+      INSERT INTO posts (
+        category_id, user_id, title, content, author, password_hash, instagram
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING *
+    `, [categoryId, user.id, title, content, author, passwordHash, instagram]);
+    
+    const post = postResult.rows[0];
+    
+    // 이미지 업로드 (Cloudinary)
+    if (req.files && req.files.length > 0) {
+      const imagePromises = req.files.map(async (file, index) => {
+        const result = await uploadToCloudinary(file.buffer, file.originalname);
+        
+        await client.query(`
+          INSERT INTO images (
+            post_id, cloudinary_id, cloudinary_url, thumbnail_url,
+            original_filename, file_size, width, height, format, sort_order
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `, [
+          post.id,
+          result.public_id,
+          result.secure_url,
+          result.eager?.[0]?.secure_url || result.secure_url,
+          file.originalname,
+          result.bytes,
+          result.width,
+          result.height,
+          result.format,
+          index,
+        ]);
+        
+        return result.secure_url;
+      });
+      
+      const imageUrls = await Promise.all(imagePromises);
+      post.images = imageUrls;
+    }
+    
+    await client.query('COMMIT');
+    
+    // WebSocket 브로드캐스트
+    broadcastNotification({
+      type: 'new_post',
+      post: {
+        id: post.id,
+        title: post.title,
+        author: post.author,
+        category,
+      },
     });
     
-    // 비밀번호 해싱
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    
-    // ID를 명시적으로 생성 (JavaScript의 Date.now()와 호환성 유지)
-    const postId = Date.now();
-    
-    const { rows } = await pool.query(
-      `INSERT INTO posts (id, title, author, content, category, password, images)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-      [postId, cleanTitle, cleanAuthor, cleanContent, category, hashedPassword, JSON.stringify(images || [])]
-    );
-    
-    // 비밀번호 제거 후 응답
-    const post = {
-      ...rows[0],
-      password: undefined,
-      likes: [],
-      dislikes: [],
-      images: images || [],
-      comments: []
-    };
-    
-    console.log(`📝 새 게시글: "${cleanTitle}" by ${cleanAuthor}`);
-    res.json({ success: true, post });
+    res.json({ success: true, post, data: post });
+    console.log(`📝 새 게시글: ${post.title} by ${post.author}`);
   } catch (error) {
-    console.error('게시글 작성 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
+    await client.query('ROLLBACK');
+    console.error('게시글 작성 실패:', error);
+    res.status(500).json({ success: false, message: '게시글 작성에 실패했습니다.' });
+  } finally {
+    client.release();
   }
 });
 
-// 게시글 수정 (보안 강화)
-app.put('/api/posts/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { title, content, category, password } = req.body;
-    
-    // 저장된 해시 비밀번호 조회
-    const { rows: checkRows } = await pool.query(
-      'SELECT password FROM posts WHERE id = $1',
-      [id]
-    );
-    
-    if (checkRows.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
-    }
-    
-    // bcrypt로 비밀번호 검증
-    const isValidPassword = await bcrypt.compare(password, checkRows[0].password);
-    
-    if (!isValidPassword && password !== 'admin') {
-      return res.status(403).json({ success: false, message: '비밀번호가 일치하지 않습니다' });
-    }
-    
-    // XSS 방지
-    const cleanTitle = sanitizeInput(title);
-    const cleanContent = sanitizeInput(content, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li'],
-      ALLOWED_ATTR: ['href', 'target']
-    });
-    
-    const { rows } = await pool.query(
-      `UPDATE posts 
-       SET title = $1, content = $2, category = $3
-       WHERE id = $4
-       RETURNING *`,
-      [cleanTitle, cleanContent, category, id]
-    );
-    
-    res.json({ success: true, post: { ...rows[0], password: undefined } });
-  } catch (error) {
-    console.error('게시글 수정 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
-
-// 게시글 삭제 (보안 강화)
+// 게시글 삭제
 app.delete('/api/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { password } = req.body;
     
-    const { rows } = await pool.query(
-      'SELECT * FROM posts WHERE id = $1',
+    // 게시글 조회
+    const postResult = await pool.query(
+      'SELECT password_hash FROM posts WHERE id = $1',
       [id]
     );
     
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다.' });
     }
     
-    const post = rows[0];
+    const post = postResult.rows[0];
     
-    // bcrypt로 비밀번호 검증
-    const isValidPassword = await bcrypt.compare(password, post.password);
-    
-    if (!isValidPassword && password !== 'admin') {
-      return res.status(403).json({ 
-        success: false, 
-        message: '비밀번호가 일치하지 않습니다' 
-      });
-    }
-    
-    await pool.query('DELETE FROM posts WHERE id = $1', [id]);
-    
-    console.log(`🗑️ 게시글 삭제: "${post.title}"`);
-    res.json({ success: true, message: '게시글이 삭제되었습니다' });
-  } catch (error) {
-    console.error('게시글 삭제 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
-
-// 조회수 증가 (중복 방지)
-app.put('/api/posts/:id/views', viewLimiter, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userIP = req.ip;
-    const key = `${userIP}_${id}`;
-    
-    // 1시간 이내 조회 기록 확인
-    const lastViewed = viewedPosts.get(key);
-    const now = Date.now();
-    
-    if (lastViewed && (now - lastViewed) < 3600000) {
-      // 1시간 이내 재조회는 조회수 증가 안 함
-      const { rows } = await pool.query(
-        'SELECT views FROM posts WHERE id = $1',
-        [id]
-      );
-      
-      if (rows.length === 0) {
-        return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
+    // 비밀번호 확인
+    if (post.password_hash) {
+      const match = await bcrypt.compare(password, post.password_hash);
+      if (!match && password !== 'admin') {
+        return res.status(403).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
       }
-      
-      return res.json({ 
-        success: true, 
-        views: rows[0].views,
-        cached: true 
-      });
     }
     
-    // 조회수 증가
-    const { rows } = await pool.query(
-      'UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING views',
-      [id]
-    );
+    // 소프트 삭제
+    await pool.query('UPDATE posts SET deleted_at = NOW() WHERE id = $1', [id]);
     
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
-    }
-    
-    // 조회 기록 저장
-    viewedPosts.set(key, now);
-    
-    // 메모리 관리 - 10000개 초과 시 오래된 것 삭제
-    if (viewedPosts.size > 10000) {
-      const oldestKeys = Array.from(viewedPosts.keys()).slice(0, 1000);
-      oldestKeys.forEach(k => viewedPosts.delete(k));
-    }
-    
-    console.log(`👁️ 조회수 증가: Post ${id} - ${rows[0].views} views (IP: ${userIP})`);
-    res.json({ success: true, views: rows[0].views });
+    res.json({ success: true, message: '게시글이 삭제되었습니다.' });
+    console.log(`🗑️ 게시글 삭제: ${id}`);
   } catch (error) {
-    console.error('조회수 증가 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
+    console.error('게시글 삭제 실패:', error);
+    res.status(500).json({ success: false, message: '게시글 삭제에 실패했습니다.' });
   }
 });
 
-// 댓글 추가 (보안 강화)
-app.post('/api/posts/:id/comments', commentLimiter, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { author, content, password, instagram } = req.body;
-    
-    // 입력값 검증
-    if (!author || !content) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '작성자와 내용을 입력해주세요' 
-      });
-    }
-    
-    // 게시글 존재 확인
-    const { rows: postCheck } = await pool.query(
-      'SELECT id FROM posts WHERE id = $1',
-      [id]
-    );
-    
-    if (postCheck.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
-    }
-    
-    // XSS 방지
-    const cleanAuthor = sanitizeInput(author);
-    const cleanContent = sanitizeInput(content);
-    const cleanInstagram = sanitizeInput(instagram);
-    
-    // 비밀번호 해싱 (있는 경우)
-    const hashedPassword = password ? await bcrypt.hash(password, SALT_ROUNDS) : null;
-    
-    // 댓글 ID 명시적 생성
-    const commentId = Date.now();
-    
-    const { rows } = await pool.query(
-      `INSERT INTO comments (id, post_id, author, content, password, instagram) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
-       RETURNING id, post_id, author, content, instagram, created_at`,
-      [commentId, id, cleanAuthor, cleanContent, hashedPassword, cleanInstagram]
-    );
-    
-    console.log(`✅ 댓글 작성 성공: Post ${id}, 작성자 "${cleanAuthor}"`);
-    console.log(`   댓글 ID: ${rows[0].id}`);
-    
-    res.json({ success: true, comment: rows[0] });
-  } catch (error) {
-    console.error('댓글 작성 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
-
-// 투표
+// 투표 (좋아요/싫어요)
 app.post('/api/posts/:id/vote', async (req, res) => {
   try {
     const { id } = req.params;
-    const { userId, type } = req.body;
+    const { userId: anonymousId, type } = req.body;
     
-    const { rows } = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
-    }
+    // 사용자 조회/생성
+    const user = await getOrCreateUser(anonymousId, '익명');
     
-    const post = rows[0];
-    let likes = post.likes || [];
-    let dislikes = post.dislikes || [];
-    
-    // 기존 투표 제거
-    likes = likes.filter(u => u !== userId);
-    dislikes = dislikes.filter(u => u !== userId);
+    // 기존 투표 삭제
+    await pool.query('DELETE FROM votes WHERE post_id = $1 AND user_id = $2', [id, user.id]);
     
     // 새 투표 추가
-    if (type === 'like') {
-      likes.push(userId);
-    } else if (type === 'dislike') {
-      dislikes.push(userId);
-    }
-    
-    // 업데이트
-    await pool.query(
-      'UPDATE posts SET likes = $1, dislikes = $2 WHERE id = $3',
-      [likes, dislikes, id]
-    );
-    
-    res.json({ 
-      success: true, 
-      likes: likes.length,
-      dislikes: dislikes.length 
-    });
-  } catch (error) {
-    console.error('투표 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
-
-// 신고
-app.post('/api/posts/:id/report', async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const { rows } = await pool.query(
-      'UPDATE posts SET reports = reports + 1 WHERE id = $1 RETURNING reports',
-      [id]
-    );
-    
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다' });
-    }
-    
-    // 10회 이상 신고 시 자동 블라인드
-    if (rows[0].reports >= 10) {
+    if (type === 'like' || type === 'dislike') {
       await pool.query(
-        'UPDATE posts SET is_blinded = true WHERE id = $1',
-        [id]
+        'INSERT INTO votes (post_id, user_id, vote_type) VALUES ($1, $2, $3)',
+        [id, user.id, type]
       );
     }
     
-    res.json({ 
-      success: true, 
-      reports: rows[0].reports,
-      isBlinded: rows[0].reports >= 10
-    });
+    // 업데이트된 게시글 조회
+    const postResult = await pool.query('SELECT * FROM posts WHERE id = $1', [id]);
+    const post = postResult.rows[0];
+    
+    res.json({ success: true, post, data: post });
   } catch (error) {
-    console.error('신고 오류:', error);
-    res.status(500).json({ success: false, message: '서버 오류' });
+    console.error('투표 실패:', error);
+    res.status(500).json({ success: false, message: '투표에 실패했습니다.' });
   }
 });
 
 // ============================================
-// WebSocket 채팅 서버 (기존 코드 유지)
+// 댓글 API
 // ============================================
 
-const wss = new WebSocket.Server({ 
-  server,
-  path: '/ws'
+// 댓글 작성
+app.post('/api/posts/:id/comments', async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    await client.query('BEGIN');
+    
+    const { id } = req.params;
+    const { author, content, userId: anonymousId, instagram } = req.body;
+    
+    // 사용자 조회/생성
+    const user = await getOrCreateUser(anonymousId, author);
+    
+    // Rate limiting 체크
+    const canComment = await checkRateLimit(user.id, 'comment');
+    if (!canComment) {
+      await client.query('ROLLBACK');
+      return res.status(429).json({
+        success: false,
+        message: '너무 많은 댓글을 작성했습니다. 잠시 후 다시 시도해주세요.',
+      });
+    }
+    
+    // 댓글 작성
+    const commentResult = await client.query(`
+      INSERT INTO comments (post_id, user_id, author, content, instagram)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `, [id, user.id, author, content, instagram]);
+    
+    const comment = commentResult.rows[0];
+    
+    await client.query('COMMIT');
+    
+    // 게시글 작성자에게 알림 생성
+    const postResult = await client.query('SELECT user_id, title FROM posts WHERE id = $1', [id]);
+    if (postResult.rows.length > 0) {
+      const postAuthorId = postResult.rows[0].user_id;
+      
+      if (postAuthorId !== user.id) {
+        await client.query(`
+          INSERT INTO notifications (user_id, type, title, message, post_id, from_user_id)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, [
+          postAuthorId,
+          'new_comment',
+          '새 댓글 알림',
+          `${author}님이 "${postResult.rows[0].title}" 게시글에 댓글을 남겼습니다.`,
+          id,
+          user.id,
+        ]);
+        
+        // WebSocket 알림
+        broadcastNotification({
+          type: 'new_comment',
+          userId: postAuthorId,
+          postId: id,
+          comment: {
+            author,
+            content,
+          },
+        });
+      }
+    }
+    
+    res.json({ success: true, comment, data: comment });
+    console.log(`💬 새 댓글: ${author} on post ${id}`);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('댓글 작성 실패:', error);
+    res.status(500).json({ success: false, message: '댓글 작성에 실패했습니다.' });
+  } finally {
+    client.release();
+  }
 });
 
-const clients = new Map();
+// ============================================
+// 검색 API
+// ============================================
 
-wss.on('connection', (ws) => {
-  const clientId = Date.now().toString();
-  clients.set(clientId, { ws, nickname: null, currentRoom: null });
+// 전체 검색 (게시글 + 댓글)
+app.get('/api/search', async (req, res) => {
+  try {
+    const { q, type = 'all', page = 1, limit = 20 } = req.query;
+    
+    if (!q) {
+      return res.status(400).json({ success: false, message: '검색어를 입력해주세요.' });
+    }
+    
+    const offset = (page - 1) * limit;
+    const results = {};
+    
+    // 게시글 검색
+    if (type === 'all' || type === 'posts') {
+      const postsResult = await pool.query(`
+        SELECT 
+          p.*,
+          c.name AS category_name,
+          ts_rank(p.search_vector, plainto_tsquery('simple', $1)) AS rank
+        FROM posts p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.search_vector @@ plainto_tsquery('simple', $1)
+          AND p.is_blinded = FALSE
+          AND p.deleted_at IS NULL
+        ORDER BY rank DESC, p.created_at DESC
+        LIMIT $2 OFFSET $3
+      `, [q, limit, offset]);
+      
+      results.posts = postsResult.rows;
+    }
+    
+    // 댓글 검색
+    if (type === 'all' || type === 'comments') {
+      const commentsResult = await pool.query(`
+        SELECT 
+          c.*,
+          p.title AS post_title,
+          p.id AS post_id
+        FROM comments c
+        JOIN posts p ON c.post_id = p.id
+        WHERE c.content ILIKE $1
+          AND c.is_blinded = FALSE
+          AND c.deleted_at IS NULL
+          AND p.is_blinded = FALSE
+          AND p.deleted_at IS NULL
+        ORDER BY c.created_at DESC
+        LIMIT $2 OFFSET $3
+      `, [`%${q}%`, limit, offset]);
+      
+      results.comments = commentsResult.rows;
+    }
+    
+    res.json({ success: true, query: q, results });
+  } catch (error) {
+    console.error('검색 실패:', error);
+    res.status(500).json({ success: false, message: '검색에 실패했습니다.' });
+  }
+});
+
+// ============================================
+// 카테고리 API
+// ============================================
+
+app.get('/api/categories', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT c.*, COUNT(p.id) AS post_count
+      FROM categories c
+      LEFT JOIN posts p ON c.id = p.category_id AND p.is_blinded = FALSE AND p.deleted_at IS NULL
+      WHERE c.is_active = TRUE
+      GROUP BY c.id
+      ORDER BY c.sort_order
+    `);
+    
+    res.json({ success: true, categories: result.rows });
+  } catch (error) {
+    console.error('카테고리 조회 실패:', error);
+    res.status(500).json({ success: false, message: '카테고리 조회에 실패했습니다.' });
+  }
+});
+
+// ============================================
+// 알림 API
+// ============================================
+
+// 내 알림 조회
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const { userId: anonymousId, unreadOnly = 'false' } = req.query;
+    
+    // 사용자 조회
+    const userResult = await pool.query('SELECT id FROM users WHERE anonymous_id = $1', [anonymousId]);
+    if (userResult.rows.length === 0) {
+      return res.json({ success: true, notifications: [] });
+    }
+    
+    const userId = userResult.rows[0].id;
+    
+    let query = `
+      SELECT *
+      FROM notifications
+      WHERE user_id = $1 AND is_deleted = FALSE
+    `;
+    
+    if (unreadOnly === 'true') {
+      query += ' AND is_read = FALSE';
+    }
+    
+    query += ' ORDER BY created_at DESC LIMIT 50';
+    
+    const result = await pool.query(query, [userId]);
+    
+    res.json({ success: true, notifications: result.rows });
+  } catch (error) {
+    console.error('알림 조회 실패:', error);
+    res.status(500).json({ success: false, message: '알림 조회에 실패했습니다.' });
+  }
+});
+
+// 알림 읽음 처리
+app.put('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.query(
+      'UPDATE notifications SET is_read = TRUE, read_at = NOW() WHERE id = $1',
+      [id]
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('알림 읽음 처리 실패:', error);
+    res.status(500).json({ success: false, message: '알림 읽음 처리에 실패했습니다.' });
+  }
+});
+
+// ============================================
+// 통계 API
+// ============================================
+
+app.get('/api/stats', async (req, res) => {
+  try {
+    const stats = {};
+    
+    // 전체 게시글 수
+    const postsResult = await pool.query(
+      'SELECT COUNT(*) FROM posts WHERE is_blinded = FALSE AND deleted_at IS NULL'
+    );
+    stats.totalPosts = parseInt(postsResult.rows[0].count);
+    
+    // 전체 댓글 수
+    const commentsResult = await pool.query(
+      'SELECT COUNT(*) FROM comments WHERE is_blinded = FALSE AND deleted_at IS NULL'
+    );
+    stats.totalComments = parseInt(commentsResult.rows[0].count);
+    
+    // 전체 조회수
+    const viewsResult = await pool.query('SELECT SUM(views) FROM posts');
+    stats.totalViews = parseInt(viewsResult.rows[0].sum) || 0;
+    
+    // 활성 사용자 (최근 7일)
+    const activeUsersResult = await pool.query(`
+      SELECT COUNT(DISTINCT id)
+      FROM users
+      WHERE last_active > NOW() - INTERVAL '7 days'
+    `);
+    stats.activeUsers = parseInt(activeUsersResult.rows[0].count);
+    
+    res.json({ success: true, stats });
+  } catch (error) {
+    console.error('통계 조회 실패:', error);
+    res.status(500).json({ success: false, message: '통계 조회에 실패했습니다.' });
+  }
+});
+
+// ============================================
+// WebSocket 핸들러
+// ============================================
+
+wss.on('connection', (ws, req) => {
+  console.log('✅ WebSocket 연결:', req.socket.remoteAddress);
   
-  console.log(`👤 새 클라이언트 연결: ${clientId}`);
-  
-  ws.on('message', async (message) => {
+  ws.on('message', (message) => {
     try {
       const data = JSON.parse(message);
+      console.log('📨 WebSocket 메시지:', data);
       
-      switch(data.type) {
-        case 'join':
-          await handleJoinRoom(clientId, data);
-          break;
-        case 'message':
-          await sendChatMessage(clientId, data);
-          break;
-        case 'leave':
-          handleLeaveRoom(clientId);
-          break;
-      }
+      // Echo back
+      ws.send(JSON.stringify({ type: 'echo', data }));
     } catch (error) {
-      console.error('메시지 처리 오류:', error);
+      console.error('WebSocket 메시지 처리 실패:', error);
     }
   });
   
   ws.on('close', () => {
-    handleLeaveRoom(clientId);
-    clients.delete(clientId);
-    console.log(`👤 클라이언트 연결 종료: ${clientId}`);
+    console.log('❌ WebSocket 연결 종료');
   });
+  
+  ws.on('error', (error) => {
+    console.error('WebSocket 에러:', error);
+  });
+  
+  // 연결 확인 메시지
+  ws.send(JSON.stringify({
+    type: 'connected',
+    message: 'WebSocket 연결 성공',
+    timestamp: new Date().toISOString(),
+  }));
 });
-
-async function handleJoinRoom(clientId, data) {
-  const client = clients.get(clientId);
-  if (!client) return;
-  
-  // 이전 방에서 나가기
-  if (client.currentRoom) {
-    handleLeaveRoom(clientId);
-  }
-  
-  client.nickname = data.nickname;
-  client.currentRoom = data.room;
-  
-  // 방별 메시지 히스토리 전송
-  try {
-    const { rows } = await pool.query(
-      'SELECT * FROM chat_messages WHERE room = $1 ORDER BY created_at ASC LIMIT 100',
-      [data.room]
-    );
-    
-    client.ws.send(JSON.stringify({
-      type: 'history',
-      messages: rows
-    }));
-  } catch (error) {
-    console.error('메시지 히스토리 로드 오류:', error);
-  }
-  
-  // 입장 알림
-  broadcastToRoom(data.room, {
-    type: 'system',
-    text: `${data.nickname}님이 입장하셨습니다.`,
-    timestamp: new Date().toISOString()
-  }, clientId);
-}
-
-function handleLeaveRoom(clientId) {
-  const client = clients.get(clientId);
-  if (!client || !client.currentRoom) return;
-  
-  broadcastToRoom(client.currentRoom, {
-    type: 'system',
-    text: `${client.nickname}님이 퇴장하셨습니다.`,
-    timestamp: new Date().toISOString()
-  }, clientId);
-  
-  client.currentRoom = null;
-}
-
-function broadcastToRoom(room, message, excludeClientId = null) {
-  clients.forEach((client, id) => {
-    if (client.currentRoom === room && id !== excludeClientId && client.ws.readyState === WebSocket.OPEN) {
-      client.ws.send(JSON.stringify(message));
-    }
-  });
-}
-
-async function sendChatMessage(clientId, messageData) {
-  const client = clients.get(clientId);
-  if (!client || !client.currentRoom) return;
-  
-  try {
-    // XSS 방지 - 메시지 정제
-    const cleanMessage = sanitizeInput(messageData.text);
-    const cleanNickname = sanitizeInput(messageData.nickname || client.nickname);
-    
-    // DB에 저장
-    const { rows } = await pool.query(
-      'INSERT INTO chat_messages (room, nickname, message) VALUES ($1, $2, $3) RETURNING *',
-      [client.currentRoom, cleanNickname, cleanMessage]
-    );
-    
-    const message = {
-      id: rows[0].id,
-      text: rows[0].message,
-      nickname: rows[0].nickname,
-      timestamp: rows[0].created_at,
-      room: rows[0].room
-    };
-    
-    // 같은 방 사용자에게 전송
-    clients.forEach((c, id) => {
-      if (c.currentRoom === client.currentRoom && c.ws.readyState === WebSocket.OPEN) {
-        c.ws.send(JSON.stringify({
-          type: 'message',
-          data: message
-        }));
-      }
-    });
-  } catch (error) {
-    console.error('메시지 전송 오류:', error);
-  }
-}
 
 // ============================================
 // 서버 시작
 // ============================================
 
-initDatabase().then(() => {
-  // Render 유료 플랜 검증
-  validateRenderPlan();
+server.listen(PORT, async () => {
+  console.log(`
+╔════════════════════════════════════════════╗
+║   🏃 Athlete Time Server (PostgreSQL)    ║
+╠════════════════════════════════════════════╣
+║  포트: ${PORT}                              ║
+║  환경: ${NODE_ENV}                         ║
+║  데이터베이스: PostgreSQL ✅                ║
+║  이미지 저장: Cloudinary ✅                 ║
+║  실시간 알림: WebSocket ✅                  ║
+╠════════════════════════════════════════════╣
+║  주요 기능:                                 ║
+║  ✅ 게시글 CRUD + 이미지 업로드            ║
+║  ✅ 댓글 시스템 + 실시간 알림              ║
+║  ✅ 전체 검색 (Full-text search)          ║
+║  ✅ 카테고리별 필터링                      ║
+║  ✅ Rate Limiting                         ║
+║  ✅ 자동 블라인드 처리                     ║
+╚════════════════════════════════════════════╝
+  `);
   
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`
-    ╔════════════════════════════════════════╗
-    ║     🎯 RENDER 유료 플랜 서버           ║
-    ╠════════════════════════════════════════╣
-    ║   플랜: ${RENDER_PLAN.plan.name}      ║
-    ║   포트: ${PORT}                        ║
-    ║   환경: ${process.env.NODE_ENV || 'development'}                   ║
-    ║   DB: PostgreSQL (영구 저장)           ║
-    ╠════════════════════════════════════════╣
-    ║   💾 데이터 저장:                      ║
-    ║   ✅ PostgreSQL 영구 저장             ║
-    ║   ✅ 자동 백업                        ║
-    ║   ✅ 데이터 제한 없음                 ║
-    ╠════════════════════════════════════════╣
-    ║   🔒 보안 기능:                        ║
-    ║   ✅ bcrypt 비밀번호 해싱             ║
-    ║   ✅ DOMPurify XSS 방지               ║
-    ║   ✅ Rate Limiting                    ║
-    ║   ✅ Helmet 보안 헤더                 ║
-    ╚════════════════════════════════════════╝
-    `);
+  // 데이터베이스 연결 확인
+  try {
+    await pool.query('SELECT NOW()');
+    console.log('✅ PostgreSQL 연결 성공');
+  } catch (error) {
+    console.error('❌ PostgreSQL 연결 실패:', error);
+  }
+});
+
+// 정리 작업
+process.on('SIGINT', async () => {
+  console.log('\n🛑 서버 종료 중...');
+  
+  // WebSocket 연결 종료
+  wss.clients.forEach(client => {
+    client.close();
+  });
+  
+  // 데이터베이스 연결 종료
+  await pool.end();
+  
+  server.close(() => {
+    console.log('✅ 서버가 정상적으로 종료되었습니다.');
+    process.exit(0);
   });
 });
+
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 서버 종료 중...');
+  await pool.end();
+  server.close(() => {
+    console.log('✅ 서버가 정상적으로 종료되었습니다.');
+    process.exit(0);
+  });
+});
+
+module.exports = { app, server, pool };
