@@ -47,7 +47,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// CORS 설정 - 모든 도메인 허용
+// CORS 설정 - 명확하고 확실한 설정
 const allowedOrigins = [
   'https://athlete-time.netlify.app',
   'https://athletetime.netlify.app',
@@ -57,25 +57,43 @@ const allowedOrigins = [
   'http://localhost:3005',
 ];
 
-// Middleware
+// Middleware - CORS (가장 먼저 설정)
 app.use(cors({
   origin: function (origin, callback) {
-    // origin이 없는 경우(서버 간 요청, curl 등) 또는 허용 목록에 있는 경우
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // 개발 환경에서는 모든 origin 허용
-      if (NODE_ENV === 'development') {
-        callback(null, true);
-      } else {
-        callback(null, true); // 임시로 모든 origin 허용 (나중에 제한 가능)
-      }
+    console.log('🌐 CORS Request from origin:', origin);
+    
+    // origin이 없는 경우 (서버 간 요청, curl, Postman 등)
+    if (!origin) {
+      console.log('✅ CORS: No origin (server-to-server), allowing');
+      return callback(null, true);
     }
+    
+    // 허용 목록에 있는 경우
+    if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS: Origin in whitelist, allowing:', origin);
+      return callback(null, true);
+    }
+    
+    // 개발 환경에서는 모든 origin 허용
+    if (NODE_ENV === 'development') {
+      console.log('✅ CORS: Development mode, allowing:', origin);
+      return callback(null, true);
+    }
+    
+    // 프로덕션에서는 모든 origin 허용 (임시)
+    console.log('⚠️  CORS: Not in whitelist but allowing (temp):', origin);
+    return callback(null, true);
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400, // 24시간 동안 프리플라이트 캐시
 }));
+
+// OPTIONS 프리플라이트 요청 명시적 처리
+app.options('*', cors());
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
