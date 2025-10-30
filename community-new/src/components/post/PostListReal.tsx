@@ -34,32 +34,13 @@ function formatDate(dateString: string): string {
   });
 }
 
-// 카테고리별 색상 매핑
-const categoryColors: Record<string, string> = {
-  '공지': 'text-red-500',
-  '자유': 'text-blue-500',
-  '훈련': 'text-green-500',
-  '대회': 'text-purple-500',
-  '장비': 'text-yellow-500',
-  '질문': 'text-pink-500',
-};
-
-// 카테고리별 아이콘 매핑
-const categoryIcons: Record<string, string> = {
-  '공지': '📢',
-  '자유': '💬',
-  '훈련': '🏃',
-  '대회': '🏆',
-  '장비': '👟',
-  '질문': '❓',
-};
-
 /**
  * 게시글 아이템 컴포넌트
  */
 function PostItem({ post }: { post: Post }) {
-  const categoryColor = categoryColors[post.category] || 'text-gray-500';
-  const categoryIcon = categoryIcons[post.category] || '📝';
+  // 백엔드에서 제공하는 카테고리 색상/아이콘 사용
+  const categoryColor = post.categoryColor || '#9CA3AF'; // 기본값: gray-400
+  const categoryIcon = post.categoryIcon || '📝';
   const viewsCount = post.views;
   const likesCount = post.likesCount;
   const commentsCount = post.commentsCount;
@@ -74,10 +55,10 @@ function PostItem({ post }: { post: Post }) {
       <article className="card-dark hover:bg-dark-500 transition-all duration-200 p-4 border-l-4 hover:border-l-primary-400 border-l-transparent">
         <div className="flex gap-4">
           {/* 썸네일 (이미지가 있는 경우) */}
-          {post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0]?.cloudinary_url && (
+          {post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0]?.cloudinaryUrl && (
             <div className="shrink-0">
               <img 
-                src={post.images[0].cloudinary_url} 
+                src={post.images[0].cloudinaryUrl} 
                 alt={post.title}
                 className="w-24 h-16 object-cover rounded-lg"
               />
@@ -95,7 +76,10 @@ function PostItem({ post }: { post: Post }) {
                   )}
                   
                   {/* 카테고리 */}
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-dark-700 ${categoryColor}`}>
+                  <span 
+                    className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-dark-700"
+                    style={{ color: categoryColor }}
+                  >
                     <span>{categoryIcon}</span>
                     <span>{post.category}</span>
                   </span>

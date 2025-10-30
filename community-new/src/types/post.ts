@@ -102,19 +102,19 @@ export interface RawPost {
 }
 
 /**
- * 이미지 타입 (Cloudinary)
+ * 이미지 타입 (Cloudinary) - camelCase 프론트엔드 타입
  */
 export interface PostImage {
   id: number;
-  cloudinary_id: string;
-  cloudinary_url: string;
-  thumbnail_url: string;
-  original_filename: string;
-  file_size: number;
+  cloudinaryId: string;
+  cloudinaryUrl: string;
+  thumbnailUrl: string;
+  originalFilename: string;
+  fileSize: number;
   width: number;
   height: number;
   format: string;
-  sort_order: number;
+  sortOrder: number;
 }
 
 /**

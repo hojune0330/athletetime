@@ -13,6 +13,7 @@ import { ArrowLeft, Send, AlertCircle } from 'lucide-react';
 import ImageUploader from '../components/post/ImageUploader';
 import { createPost, getCategories } from '../api/posts';
 import { getAnonymousId, getUsername, setUsername } from '../utils/anonymousUser';
+import { showToast } from '../utils/toast';
 import type { Category } from '../types/post';
 
 export default function WritePage() {
@@ -122,8 +123,8 @@ export default function WritePage() {
         images
       );
 
-      alert('게시글이 작성되었습니다!');
-      navigate(`/post/${post.id}`);
+      showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
+      setTimeout(() => navigate(`/post/${post.id}`), 500);
     } catch (err: any) {
       console.error('게시글 작성 실패:', err);
       setError(err.message || '게시글 작성에 실패했습니다. 다시 시도해주세요.');

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { usePost, useVotePost, useCreateComment, useDeletePost } from '../hooks/usePosts'
 import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline'
 import { getAnonymousId } from "../utils/anonymousUser"
+import { showToast } from '../utils/toast'
 
 export default function PostDetailPage() {
   const { id: postIdParam } = useParams()
@@ -35,13 +36,7 @@ export default function PostDetailPage() {
   // 투표 핸들러
   const handleVote = async (voteType: 'up' | 'down') => {
     try {
-      // Generate a unique user ID or get from session
-      const anonymousId = getAnonymousId()
-        (() => {
-          const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          // using getAnonymousId()
-          // auto-generated;
-        })();
+      const anonymousId = getAnonymousId();
       
       await votePostMutation.mutateAsync({
         postId,
@@ -49,9 +44,12 @@ export default function PostDetailPage() {
           anonymousId,
           type: voteType === 'up' ? 'like' : 'dislike'
         }
-      })
+      });
+      
+      showToast(voteType === 'up' ? '👍 추천했습니다!' : '👎 비추천했습니다!', { type: 'success' });
     } catch (error) {
-      console.error('투표 실패:', error)
+      console.error('투표 실패:', error);
+      showToast('투표에 실패했습니다. 다시 시도해주세요.', { type: 'error' });
     }
   }
   
@@ -60,18 +58,12 @@ export default function PostDetailPage() {
     e.preventDefault()
     
     if (!commentText.trim() || !commentAuthor.trim()) {
-      alert('닉네임과 댓글 내용을 입력해주세요.')
+      showToast('닉네임과 댓글 내용을 입력해주세요.', { type: 'warning' });
       return
     }
     
     try {
-      // Generate a unique user ID or get from session
-      const anonymousId = getAnonymousId()
-        (() => {
-          const newId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          // using getAnonymousId()
-          // auto-generated;
-        })();
+      const anonymousId = getAnonymousId();
       
       await createCommentMutation.mutateAsync({
         postId,
@@ -80,33 +72,34 @@ export default function PostDetailPage() {
           author: commentAuthor,
           anonymousId
         }
-      })
+      });
       
       // 성공 시 입력 필드 초기화
-      setCommentText('')
-      alert('댓글이 작성되었습니다!')
+      setCommentText('');
+      showToast('💬 댓글이 작성되었습니다!', { type: 'success' });
     } catch (error) {
-      console.error('댓글 작성 실패:', error)
-      alert('댓글 작성에 실패했습니다.')
+      console.error('댓글 작성 실패:', error);
+      showToast('댓글 작성에 실패했습니다.', { type: 'error' });
     }
   }
   
   // 게시글 삭제 핸들러
   const handleDelete = async () => {
     if (!deletePassword.trim()) {
-      alert('비밀번호를 입력해주세요.')
+      showToast('비밀번호를 입력해주세요.', { type: 'warning' });
       return
     }
     
     try {
-      await deletePostMutation.mutateAsync({ id: postId, password: deletePassword })
-      alert('게시글이 삭제되었습니다.')
-      navigate('/')
-    } catch (error) {
-      console.error('게시글 삭제 실패:', error)
-      alert('비밀번호가 일치하지 않거나 삭제에 실패했습니다.')
+      await deletePostMutation.mutateAsync({ id: postId, password: deletePassword });
+      showToast('🗑️ 게시글이 삭제되었습니다.', { type: 'success' });
+      setTimeout(() => navigate('/'), 1000);
+    } catch (error: any) {
+      console.error('게시글 삭제 실패:', error);
+      const errorMsg = error?.response?.data?.error || '비밀번호가 일치하지 않거나 삭제에 실패했습니다.';
+      showToast(errorMsg, { type: 'error' });
     }
-    setShowDeleteModal(false)
+    setShowDeleteModal(false);
   }
   
   // 로딩 상태
@@ -138,8 +131,12 @@ export default function PostDetailPage() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-0.5 text-xs font-medium bg-primary-500/20 text-primary-400 rounded">
-                  {post.category}
+                <span 
+                  className="px-2 py-0.5 text-xs font-medium bg-dark-700 rounded flex items-center gap-1"
+                  style={{ color: post.categoryColor || '#60A5FA' }}
+                >
+                  {post.categoryIcon && <span>{post.categoryIcon}</span>}
+                  <span>{post.category}</span>
                 </span>
                 {post.isNotice && (
                   <span className="text-yellow-500 text-sm">📌</span>
@@ -177,10 +174,10 @@ export default function PostDetailPage() {
         {/* 게시글 내용 */}
         <div className="p-6">
           <div className="prose prose-invert max-w-none">
-            {post.images && post.images[0]?.cloudinary_url && (
+            {post.images && post.images[0]?.cloudinaryUrl && (
               <div className="my-6">
                 <img 
-                  src={post.images[0]?.cloudinary_url} 
+                  src={post.images[0]?.cloudinaryUrl} 
                   alt={post.title}
                   className="rounded-lg w-full"
                 />

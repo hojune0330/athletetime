@@ -86,7 +86,7 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
         const likes = post.likesCount || 0
         const dislikes = post.dislikesCount || 0
         const comments = post.commentsCount || 0
-        const hasImages = Boolean(post.images && post.images[0]?.cloudinary_url)
+        const hasImages = Boolean(post.images && post.images[0]?.cloudinaryUrl)
         const isHot = likes >= 20 // 좋아요 20개 이상
 
         return (
@@ -98,8 +98,11 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
             <article className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 {post.category && (
-                  <span className="text-xs px-2 py-0.5 bg-dark-600 text-gray-400 rounded">
-                    {post.category}
+                  <span 
+                    className="text-xs px-2 py-0.5 bg-dark-600 rounded"
+                    style={{ color: post.categoryColor || '#9CA3AF' }}
+                  >
+                    {post.categoryIcon && <span>{post.categoryIcon}</span>} {post.category}
                   </span>
                 )}
                 {post.isNotice && (

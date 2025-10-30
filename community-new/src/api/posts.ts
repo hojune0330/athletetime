@@ -43,20 +43,20 @@ function transformComment(rawComment: RawComment): PostComment {
 }
 
 /**
- * 백엔드 원시 이미지를 프론트엔드 타입으로 변환
+ * 백엔드 원시 이미지를 프론트엔드 타입으로 변환 (snake_case → camelCase)
  */
 function transformImage(rawImage: RawPostImage): PostImage {
   return {
     id: rawImage.id,
-    cloudinary_id: rawImage.cloudinary_id || '',
-    cloudinary_url: rawImage.cloudinary_url,
-    thumbnail_url: rawImage.thumbnail_url,
-    original_filename: rawImage.original_filename || '',
-    file_size: rawImage.file_size || 0,
+    cloudinaryId: rawImage.cloudinary_id || '',
+    cloudinaryUrl: rawImage.cloudinary_url,
+    thumbnailUrl: rawImage.thumbnail_url,
+    originalFilename: rawImage.original_filename || '',
+    fileSize: rawImage.file_size || 0,
     width: rawImage.width,
     height: rawImage.height,
     format: rawImage.format || '',
-    sort_order: rawImage.sort_order || 0,
+    sortOrder: rawImage.sort_order || 0,
   };
 }
 

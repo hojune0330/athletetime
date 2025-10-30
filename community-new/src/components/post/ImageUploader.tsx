@@ -10,6 +10,7 @@
 
 import { useState, useRef, type DragEvent } from 'react';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
+import { showToast } from '../../utils/toast';
 
 interface ImageUploaderProps {
   images: File[];
@@ -53,7 +54,7 @@ export default function ImageUploader({
     const remainingSlots = maxImages - images.length;
 
     if (remainingSlots <= 0) {
-      alert(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`);
+      showToast(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`, { type: 'warning' });
       return;
     }
 
@@ -62,7 +63,7 @@ export default function ImageUploader({
     for (const file of filesArray.slice(0, remainingSlots)) {
       const error = validateFile(file);
       if (error) {
-        alert(error);
+        showToast(error, { type: 'error' });
         continue;
       }
       validFiles.push(file);

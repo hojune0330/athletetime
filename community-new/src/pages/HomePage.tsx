@@ -5,6 +5,7 @@ import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
+import { showToast } from '../utils/toast'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
@@ -37,14 +38,14 @@ export default function HomePage() {
       })
       
       // 성공 시 폼 초기화
-      setNewPost({ title: '', content: '', hasImage: false, hasPoll: false })
-      setShowWriteForm(false)
+      setNewPost({ title: '', content: '', hasImage: false, hasPoll: false });
+      setShowWriteForm(false);
       
-      // 성공 알림 (선택적)
-      alert('게시글이 작성되었습니다!')
-    } catch (error) {
-      console.error('게시글 작성 실패:', error)
-      alert('게시글 작성에 실패했습니다. 다시 시도해주세요.')
+      showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
+    } catch (error: any) {
+      console.error('게시글 작성 실패:', error);
+      const errorMsg = error?.response?.data?.error || '게시글 작성에 실패했습니다. 다시 시도해주세요.';
+      showToast(errorMsg, { type: 'error' });
     }
   }
 
