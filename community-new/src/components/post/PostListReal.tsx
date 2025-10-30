@@ -58,13 +58,13 @@ const categoryIcons: Record<string, string> = {
  * 게시글 아이템 컴포넌트
  */
 function PostItem({ post }: { post: Post }) {
-  const categoryColor = categoryColors[post.category_name] || 'text-gray-500';
-  const categoryIcon = categoryIcons[post.category_name] || '📝';
-  const viewsCount = typeof post.views_count === 'number' ? post.views_count : parseInt(String(post.views_count)) || 0;
-  const likesCount = typeof post.likes_count === 'number' ? post.likes_count : parseInt(String(post.likes_count)) || 0;
-  const commentsCount = typeof post.comments_count === 'number' ? post.comments_count : parseInt(String(post.comments_count)) || 0;
-  const isHot = likesCount >= 20; // GPT 권장: 좋아요 20개 이상
-  const isNew = new Date(post.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000;
+  const categoryColor = categoryColors[post.category] || 'text-gray-500';
+  const categoryIcon = categoryIcons[post.category] || '📝';
+  const viewsCount = post.views;
+  const likesCount = post.likesCount;
+  const commentsCount = post.commentsCount;
+  const isHot = likesCount >= 20; // 좋아요 20개 이상
+  const isNew = new Date(post.date).getTime() > Date.now() - 24 * 60 * 60 * 1000;
   
   return (
     <Link
@@ -90,14 +90,14 @@ function PostItem({ post }: { post: Post }) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   {/* 고정 게시글 */}
-                  {post.is_notice && (
+                  {post.isNotice && (
                     <span className="text-track-yellow text-sm">📌</span>
                   )}
                   
                   {/* 카테고리 */}
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-dark-700 ${categoryColor}`}>
                     <span>{categoryIcon}</span>
-                    <span>{post.category_name}</span>
+                    <span>{post.category}</span>
                   </span>
                   
                   {/* 뱃지 */}
@@ -123,7 +123,7 @@ function PostItem({ post }: { post: Post }) {
             <div className="flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-3">
                 <span className="text-gray-400">{post.author}</span>
-                <span>{formatDate(post.created_at)}</span>
+                <span>{formatDate(post.date)}</span>
               </div>
               
               <div className="flex items-center gap-3">

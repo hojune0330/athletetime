@@ -24,19 +24,21 @@ import type {
 } from '../types';
 
 /**
- * 백엔드 원시 댓글을 프론트엔드 타입으로 변환
+ * 백엔드 원시 댓글을 프론트엔드 타입으로 변환 (snake_case → camelCase)
  */
 function transformComment(rawComment: RawComment): PostComment {
   return {
     id: rawComment.id,
-    post_id: 0, // 댓글 응답에는 post_id가 없으므로 기본값 설정
-    user_id: '', // 댓글 응답에는 user_id가 없으므로 기본값 설정
+    postId: 0, // 댓글 응답에는 post_id가 없으므로 기본값
+    userId: '', // 댓글 응답에는 user_id가 없으므로 기본값
     author: rawComment.author,
     content: rawComment.content,
     instagram: rawComment.instagram,
-    created_at: rawComment.created_at,
-    updated_at: rawComment.created_at, // updated_at이 없으면 created_at 사용
-    deleted_at: undefined,
+    date: rawComment.created_at, // 표시용
+    createdAt: rawComment.created_at,
+    updatedAt: rawComment.created_at, // updated_at이 없으면 created_at 사용
+    deletedAt: undefined,
+    isBlinded: rawComment.is_blinded,
   };
 }
 
@@ -60,51 +62,52 @@ function transformImage(rawImage: RawPostImage): PostImage {
 
 /**
  * 백엔드 원시 게시글을 프론트엔드 타입으로 변환
- * RawPost (snake_case, 원시 타입) → Post (프론트엔드 타입)
+ * RawPost (snake_case) → Post (camelCase)
  */
 function transformPost(rawPost: RawPost): Post {
   return {
     // 기본 정보
     id: rawPost.id,
-    user_id: rawPost.user_id,
+    userId: rawPost.user_id,
     title: rawPost.title,
     content: rawPost.content,
-    author: rawPost.username || rawPost.author, // username 우선, 없으면 author
+    author: rawPost.username || rawPost.author,
     
     // 카테고리 정보
-    category_id: rawPost.category_id,
-    category_name: rawPost.category_name,
-    category_icon: rawPost.category_icon,
-    category_color: rawPost.category_color,
+    categoryId: rawPost.category_id,
+    category: rawPost.category_name, // 표시용
+    categoryIcon: rawPost.category_icon,
+    categoryColor: rawPost.category_color,
     
     // Instagram
     instagram: rawPost.instagram,
     
-    // 이미지 (변환 및 null 처리)
+    // 이미지
     images: rawPost.images ? rawPost.images.map(transformImage) : null,
-    images_count: typeof rawPost.images_count === 'string' 
+    imagesCount: typeof rawPost.images_count === 'string' 
       ? parseInt(rawPost.images_count, 10) 
       : rawPost.images_count,
     
-    // 카운터 (숫자 변환)
-    views_count: rawPost.views_count || rawPost.views || 0,
-    comments_count: rawPost.comments_count || 0,
-    likes_count: rawPost.likes_count || 0,
-    dislikes_count: rawPost.dislikes_count || 0,
+    // 카운터
+    views: rawPost.views_count || rawPost.views || 0, // 표시용
+    likesCount: rawPost.likes_count || 0,
+    dislikesCount: rawPost.dislikes_count || 0,
+    commentsCount: rawPost.comments_count || 0,
     
-    // 댓글 목록 (변환 및 null 처리)
+    // 댓글 목록
     comments: rawPost.comments ? rawPost.comments.map(transformComment) : undefined,
     
     // 상태
-    is_notice: rawPost.is_notice,
-    is_admin: rawPost.is_admin,
-    is_pinned: rawPost.is_pinned,
-    is_blinded: rawPost.is_blinded,
+    isNotice: rawPost.is_notice,
+    isAdmin: rawPost.is_admin,
+    isPinned: rawPost.is_pinned,
+    isBlinded: rawPost.is_blinded,
     
     // 타임스탬프
-    created_at: rawPost.created_at,
-    updated_at: rawPost.updated_at,
-    deleted_at: rawPost.deleted_at || undefined,
+    date: rawPost.created_at, // 표시용
+    createdAt: rawPost.created_at,
+    updatedAt: rawPost.updated_at,
+    deletedAt: rawPost.deleted_at || undefined,
   };
 }
 

@@ -118,63 +118,66 @@ export interface PostImage {
 }
 
 /**
- * 댓글 타입
+ * 댓글 타입 (프론트엔드 - camelCase)
  */
 export interface PostComment {
   id: number;
-  post_id: number;
-  user_id: string;
+  postId: number;
+  userId: string;
   author: string;
   content: string;
   instagram?: string;
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
+  date: string; // 표시용 (created_at)
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+  isBlinded?: boolean;
 }
 
 /**
- * 게시글 타입 (PostgreSQL)
+ * 게시글 타입 (프론트엔드 - camelCase)
  */
 export interface Post {
   // 기본 정보
-  id: string; // PostgreSQL BIGINT가 문자열로 반환됨
-  user_id: string;
+  id: string;
+  userId: string;
   title: string;
   content: string;
-  author: string; // username from users table
+  author: string;
   
-  // 카테고리 정보 (조인된 데이터)
-  category_id: number;
-  category_name: string;
-  category_icon: string;
-  category_color: string;
+  // 카테고리 정보
+  categoryId: number;
+  category: string; // 표시용 (category_name)
+  categoryIcon: string;
+  categoryColor: string;
   
   // Instagram (optional)
   instagram?: string;
   
   // 이미지 (Cloudinary)
   images: PostImage[] | null;
-  images_count: number;
+  imagesCount: number;
   
   // 카운터
-  views_count: number;
-  comments_count: number;
-  likes_count: number;
-  dislikes_count: number;
+  views: number; // 표시용 (views_count)
+  likesCount: number;
+  dislikesCount: number;
+  commentsCount: number;
   
   // 댓글 목록 (상세 조회 시)
   comments?: PostComment[];
   
   // 상태
-  is_notice: boolean;
-  is_admin: boolean;
-  is_pinned: boolean;
-  is_blinded: boolean;
+  isNotice: boolean;
+  isAdmin: boolean;
+  isPinned: boolean;
+  isBlinded: boolean;
   
   // 타임스탬프
-  created_at: string;
-  updated_at: string;
-  deleted_at?: string;
+  date: string; // 표시용 (created_at)
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
 }
 
 /**

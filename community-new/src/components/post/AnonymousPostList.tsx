@@ -83,11 +83,11 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
   return (
     <div className="space-y-3">
       {displayPosts.map((post) => {
-        const likes = post.likes_count || 0
-        const dislikes = post.dislikes_count || 0
-        const comments = post.comments?.length ?? 0
+        const likes = post.likesCount || 0
+        const dislikes = post.dislikesCount || 0
+        const comments = post.commentsCount || 0
         const hasImages = Boolean(post.images && post.images[0]?.cloudinary_url)
-        const isHot = likes >= 20 // GPT 권장: 좋아요 20개 이상
+        const isHot = likes >= 20 // 좋아요 20개 이상
 
         return (
           <Link
@@ -97,12 +97,12 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
           >
             <article className="p-4">
               <div className="flex items-center gap-2 mb-2">
-                {post.category_name && (
+                {post.category && (
                   <span className="text-xs px-2 py-0.5 bg-dark-600 text-gray-400 rounded">
-                    {post.category_name}
+                    {post.category}
                   </span>
                 )}
-                {post.is_notice && (
+                {post.isNotice && (
                   <span className="text-xs px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded">
                     📢 공지
                   </span>
@@ -131,11 +131,11 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
                 <div className="flex items-center gap-2 text-gray-500">
                   <span>{post.author || '익명'}</span>
                   <span>·</span>
-                  <span>{formatRelativeTime(post.created_at)}</span>
+                  <span>{formatRelativeTime(post.date)}</span>
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <EyeIcon className="w-3.5 h-3.5" />
-                    {post.views_count ?? 0}
+                    {post.views}
                   </span>
                 </div>
 
