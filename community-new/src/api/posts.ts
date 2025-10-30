@@ -46,21 +46,32 @@ export async function getPosts(
   limit: number = 50,
   offset: number = 0
 ): Promise<Post[]> {
-  const params = new URLSearchParams();
-  if (category) params.append('category', category);
-  params.append('limit', limit.toString());
-  params.append('offset', offset.toString());
-  
-  const response = await apiClient.get<any>(`/api/posts?${params.toString()}`);
-  
-  // v3.0.0: {success: true, posts: [...]} 형태
-  // posts 배열을 반환해야 함
-  if (response.data && response.data.posts) {
-    return response.data.posts;
+  try {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    params.append('limit', limit.toString());
+    params.append('offset', offset.toString());
+    
+    console.log('[getPosts] 요청 시작:', `/api/posts?${params.toString()}`);
+    
+    const response = await apiClient.get<any>(`/api/posts?${params.toString()}`);
+    
+    console.log('[getPosts] 응답 받음:', response.data);
+    
+    // v3.0.0: {success: true, posts: [...]} 형태
+    // posts 배열을 반환해야 함
+    if (response.data && response.data.posts) {
+      console.log('[getPosts] posts 반환:', response.data.posts.length, '개');
+      return response.data.posts;
+    }
+    
+    console.warn('[getPosts] posts 데이터 없음, 빈 배열 반환');
+    // 레거시 형태 또는 에러 시 빈 배열 반환
+    return [];
+  } catch (error) {
+    console.error('[getPosts] 에러 발생:', error);
+    throw error;
   }
-  
-  // 레거시 형태 또는 에러 시 빈 배열 반환
-  return [];
 }
 
 /**

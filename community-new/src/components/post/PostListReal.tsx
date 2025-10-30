@@ -151,6 +151,14 @@ function PostItem({ post }: { post: Post }) {
 export default function PostListReal() {
   const { data: posts, isLoading, isError, error } = usePosts();
   
+  // 디버깅 로그
+  console.log('[PostListReal] 상태:', { 
+    isLoading, 
+    isError, 
+    postsCount: posts?.length,
+    error: error?.message 
+  });
+  
   // 로딩 상태
   if (isLoading) {
     return (
