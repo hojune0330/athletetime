@@ -47,10 +47,34 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// CORS 설정 - 모든 도메인 허용
+const allowedOrigins = [
+  'https://athlete-time.netlify.app',
+  'https://athletetime.netlify.app',
+  'https://community.athletetime.com',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:3005',
+];
+
 // Middleware
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'],
-  credentials: true
+  origin: function (origin, callback) {
+    // origin이 없는 경우(서버 간 요청, curl 등) 또는 허용 목록에 있는 경우
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      // 개발 환경에서는 모든 origin 허용
+      if (NODE_ENV === 'development') {
+        callback(null, true);
+      } else {
+        callback(null, true); // 임시로 모든 origin 허용 (나중에 제한 가능)
+      }
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
