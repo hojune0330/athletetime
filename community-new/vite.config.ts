@@ -4,8 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // Base path - always '/' since Netlify deploys community/ folder as root
-  base: '/',
+  // Base path - '/community' since app is at /community/ route
+  base: '/community/',
   server: {
     host: '0.0.0.0',
     port: 5173,

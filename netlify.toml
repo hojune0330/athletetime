@@ -1,22 +1,26 @@
 # Netlify Configuration for Athlete Time
 [build]
   # Build command (if needed)
-  command = "echo 'Using pre-built files from community/'"
+  command = "echo 'Using pre-built files'"
   
-  # Publish directory (where the built files are)
-  publish = "community"
+  # Publish directory (루트 디렉토리)
+  publish = "."
   
   # Base directory
   base = ""
 
-# Redirects for SPA routing
-# _redirects file takes precedence over this
-# This is backup only
+# Redirects - 순서가 중요합니다!
+# 1. React 앱 (community/) - SPA 라우팅
 [[redirects]]
-  from = "/*"
+  from = "/community/*"
+  to = "/community/index.html"
+  status = 200
+
+# 2. 메인 index.html은 그대로 서빙
+[[redirects]]
+  from = "/"
   to = "/index.html"
   status = 200
-  force = false
 
 # Headers for security and performance
 [[headers]]

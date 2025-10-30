@@ -17,8 +17,8 @@ function App() {
     document.documentElement.classList.add('dark')
   }, [])
 
-  // Netlify deploys community/ folder as root, so always use '/' as basename
-  const basename = '/'
+  // React app is deployed at /community path
+  const basename = '/community'
 
   return (
     <div className="min-h-screen bg-dark-800">
