@@ -238,6 +238,59 @@ export default function Header() {
             </a>
           </nav>
           
+          {/* 로그인/회원가입 섹션 */}
+          {!isAuthenticated && (
+            <div className="px-3 pb-3 flex gap-2 border-t border-dark-700 pt-3">
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-sm font-medium text-white bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors"
+              >
+                로그인
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-sm font-medium text-primary-600 bg-white hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                회원가입
+              </Link>
+            </div>
+          )}
+          
+          {/* 로그인 상태 */}
+          {isAuthenticated && (
+            <div className="px-3 pb-3 border-t border-dark-700 pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <UserCircleIcon className="w-8 h-8 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-white">{user?.nickname}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 py-2 text-center text-sm text-gray-300 bg-dark-600 hover:bg-dark-500 rounded-lg"
+                >
+                  프로필
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    logout()
+                  }}
+                  className="flex-1 py-2 text-center text-sm text-red-400 bg-dark-600 hover:bg-dark-500 rounded-lg"
+                >
+                  로그아웃
+                </button>
+              </div>
+            </div>
+          )}
+          
           {/* 닫기 버튼 */}
           <button
             onClick={() => setMobileMenuOpen(false)}
