@@ -162,11 +162,11 @@ export default function PostDetailPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <HandThumbUpIcon className="w-3.5 h-3.5" />
-                    {post.likes_count.length}
+                    {post.likes_count}
                   </span>
                   <span className="flex items-center gap-1">
                     <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
-                    {post.comments || [].length}
+                    {post.comments_count || 0}
                   </span>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function PostDetailPage() {
         {/* 게시글 내용 */}
         <div className="p-6">
           <div className="prose prose-invert max-w-none">
-            {post.images[0]?.cloudinary_url && (
+            {post.images && post.images[0]?.cloudinary_url && (
               <div className="my-6">
                 <img 
                   src={post.images[0]?.cloudinary_url} 
@@ -203,7 +203,7 @@ export default function PostDetailPage() {
               >
                 <span>👍</span>
                 <span>추천</span>
-                <span className="font-bold">{post.likes_count.length}</span>
+                <span className="font-bold">{post.likes_count}</span>
               </button>
               <button 
                 onClick={() => handleVote('down')}
@@ -270,7 +270,7 @@ export default function PostDetailPage() {
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <span>💬</span>
           <span>댓글</span>
-          <span className="text-primary-400">{post.comments || [].length}</span>
+          <span className="text-primary-400">{post.comments_count || 0}</span>
         </h2>
 
         {/* 댓글 작성 */}
@@ -306,12 +306,12 @@ export default function PostDetailPage() {
 
         {/* 댓글 목록 */}
         <div className="space-y-4">
-          {post.comments || [].length === 0 ? (
+          {!post.comments || post.comments.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
               <p>첫 번째 댓글을 작성해보세요!</p>
             </div>
           ) : (
-            post.comments || [].map((comment) => (
+            post.comments.map((comment) => (
               <div key={comment.id} className="border-b border-dark-600 last:border-0 pb-4 last:pb-0">
                 <div className="flex gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shrink-0" />
