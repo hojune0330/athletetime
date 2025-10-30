@@ -4,10 +4,16 @@
 
 const { Resend } = require('resend');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend API 키가 없으면 null로 초기화 (서버 시작은 가능하도록)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@athletetime.com';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '애슬리트 타임';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://athlete-time.netlify.app';
+
+// API 키 경고
+if (!resend) {
+  console.warn('⚠️  RESEND_API_KEY가 설정되지 않았습니다. 이메일 기능이 비활성화됩니다.');
+}
 
 /**
  * 인증 코드 이메일 템플릿
@@ -232,6 +238,11 @@ function getResetPasswordEmailHtml(resetUrl, nickname) {
  * 인증 코드 이메일 발송
  */
 async function sendVerificationEmail(email, code, nickname) {
+  if (!resend) {
+    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다. 인증 코드:', code);
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
@@ -252,6 +263,11 @@ async function sendVerificationEmail(email, code, nickname) {
  * 비밀번호 재설정 이메일 발송
  */
 async function sendResetPasswordEmail(email, resetToken, nickname) {
+  if (!resend) {
+    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
   
   try {
@@ -274,6 +290,11 @@ async function sendResetPasswordEmail(email, resetToken, nickname) {
  * 환영 이메일 발송
  */
 async function sendWelcomeEmail(email, nickname) {
+  if (!resend) {
+    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다.');
+    return { success: false, error: 'Email service not configured' };
+  }
+  
   try {
     const result = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
