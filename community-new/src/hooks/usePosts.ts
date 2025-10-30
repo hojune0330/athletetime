@@ -33,10 +33,10 @@ export const postKeys = {
 /**
  * 게시글 목록 조회 훅
  */
-export function usePosts(category?: string, limit?: number, offset?: number) {
+export function usePosts(params?: { category?: string; limit?: number; page?: number }) {
   return useQuery({
-    queryKey: postKeys.list({ category, limit, offset }),
-    queryFn: () => getPosts(category, limit, offset),
+    queryKey: postKeys.list(params),
+    queryFn: () => getPosts(params),
     staleTime: 1000 * 60 * 5, // 5분
   });
 }
@@ -94,14 +94,22 @@ export function useDeletePost() {
   return useMutation({
     mutationFn: ({ id, password }: { id: number; password: string }) =>
       deletePost(id, password),
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
+      // 상세 페이지 캐시 제거
+      queryClient.removeQueries({ queryKey: postKeys.detail(id) });
+      
+      // 목록 캐시 무효화
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('삭제 실패:', error);
+      // TODO: 사용자 알림 추가
     },
   });
 }
 
 /**
- * 댓글 작성 훅
+ * 댓글 작성 훅 (캐시 직접 업데이트)
  */
 export function useCreateComment() {
   const queryClient = useQueryClient();
@@ -109,14 +117,22 @@ export function useCreateComment() {
   return useMutation({
     mutationFn: ({ postId, data }: { postId: number; data: CreateCommentRequest }) =>
       createComment(postId, data),
-    onSuccess: (_, { postId }) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
+    onSuccess: (updatedPost, { postId }) => {
+      // 댓글이 추가된 전체 Post 객체로 캐시 업데이트
+      queryClient.setQueryData(postKeys.detail(postId), updatedPost);
+      
+      // 목록도 갱신 (commentsCount 변경)
+      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('댓글 작성 실패:', error);
+      // TODO: 사용자 알림 추가
     },
   });
 }
 
 /**
- * 투표 훅
+ * 투표 훅 (낙관적 업데이트 + 캐시 갱신)
  */
 export function useVotePost() {
   const queryClient = useQueryClient();
@@ -124,9 +140,16 @@ export function useVotePost() {
   return useMutation({
     mutationFn: ({ postId, data }: { postId: number; data: VoteRequest }) =>
       votePost(postId, data),
-    onSuccess: (_, { postId }) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) });
+    onSuccess: (updatedPost, { postId }) => {
+      // 상세 페이지 캐시 직접 업데이트
+      queryClient.setQueryData(postKeys.detail(postId), updatedPost);
+      
+      // 목록 캐시 무효화 (새로고침)
       queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    },
+    onError: (error) => {
+      console.error('투표 실패:', error);
+      // TODO: 사용자 알림 추가
     },
   });
 }

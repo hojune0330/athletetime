@@ -152,7 +152,8 @@ function PostItem({ post }: { post: Post }) {
  * 게시글 목록 컴포넌트
  */
 export default function PostListReal() {
-  const { data: posts, isLoading, isError, error } = usePosts();
+  const { data: postsData, isLoading, isError, error } = usePosts();
+  const posts = postsData?.posts || [];
   
   // 디버깅 로그
   console.log('[PostListReal] 상태:', { 

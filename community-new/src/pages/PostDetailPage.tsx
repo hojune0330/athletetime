@@ -139,13 +139,13 @@ export default function PostDetailPage() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <span className="px-2 py-0.5 text-xs font-medium bg-primary-500/20 text-primary-400 rounded">
-                  {post.category_name}
+                  {post.category}
                 </span>
-                {post.is_notice && (
+                {post.isNotice && (
                   <span className="text-yellow-500 text-sm">📌</span>
                 )}
                 <span className="text-gray-500 text-xs">·</span>
-                <span className="text-xs text-gray-400">{formatDate(post.created_at)}</span>
+                <span className="text-xs text-gray-400">{formatDate(post.date)}</span>
               </div>
               <h1 className="text-2xl font-bold text-white mb-3">
                 {post.title}
@@ -158,15 +158,15 @@ export default function PostDetailPage() {
                 <div className="flex items-center gap-3 text-xs text-gray-400">
                   <span className="flex items-center gap-1">
                     <EyeIcon className="w-3.5 h-3.5" />
-                    {post.views_count}
+                    {post.views}
                   </span>
                   <span className="flex items-center gap-1">
                     <HandThumbUpIcon className="w-3.5 h-3.5" />
-                    {post.likes_count}
+                    {post.likesCount}
                   </span>
                   <span className="flex items-center gap-1">
                     <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
-                    {post.comments_count || 0}
+                    {post.commentsCount}
                   </span>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function PostDetailPage() {
               >
                 <span>👍</span>
                 <span>추천</span>
-                <span className="font-bold">{post.likes_count}</span>
+                <span className="font-bold">{post.likesCount}</span>
               </button>
               <button 
                 onClick={() => handleVote('down')}
@@ -270,7 +270,7 @@ export default function PostDetailPage() {
         <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
           <span>💬</span>
           <span>댓글</span>
-          <span className="text-primary-400">{post.comments_count || 0}</span>
+          <span className="text-primary-400">{post.commentsCount}</span>
         </h2>
 
         {/* 댓글 작성 */}
@@ -318,7 +318,7 @@ export default function PostDetailPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-white">{comment.author}</span>
-                      <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
+                      <span className="text-xs text-gray-500">{formatDate(comment.date)}</span>
                     </div>
                     <p className="text-gray-300 mb-2 whitespace-pre-wrap">{comment.content}</p>
                   </div>

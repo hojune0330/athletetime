@@ -3,12 +3,16 @@ import { useSearchParams } from 'react-router-dom'
 import PostListReal from '../components/post/PostListReal'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
-import { useCreatePost } from '../hooks/usePosts'
+import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
+  const limit = 20
+  
+  // 게시글 목록 조회 (count 포함)
+  const { data: postsData } = usePosts({ page, limit })
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({ title: '', content: '', hasImage: false, hasPoll: false })
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
@@ -219,9 +223,12 @@ export default function HomePage() {
       {/* 익명 게시글 목록 - 실제 API 연동 */}
       <PostListReal />
 
-      {/* 페이지네이션 */}
+      {/* 페이지네이션 - count 기반 */}
       <div className="mt-6">
-        <Pagination currentPage={page} totalPages={10} />
+        <Pagination 
+          currentPage={page} 
+          totalPages={postsData ? Math.ceil(postsData.count / limit) : 1} 
+        />
       </div>
       
       {/* 모바일 하단 여백 (하단 네비 때문에) */}

@@ -137,40 +137,55 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 /**
- * 게시글 목록 조회
- * 
- * @param category - 카테고리 필터 (optional)
- * @param limit - 페이지 크기 (default: 50)
- * @param offset - 오프셋 (default: 0)
+ * 게시글 목록 파라미터
  */
-export async function getPosts(
-  category?: string,
-  limit: number = 50,
-  offset: number = 0
-): Promise<Post[]> {
+export interface ListPostsParams {
+  category?: string;
+  limit?: number;
+  offset?: number;
+  page?: number; // page 번호 (1부터 시작)
+}
+
+/**
+ * 게시글 목록 응답 (count 포함)
+ */
+export interface ListPostsResponse {
+  posts: Post[];
+  count: number; // 전체 게시글 수
+}
+
+/**
+ * 게시글 목록 조회
+ */
+export async function getPosts(params?: ListPostsParams): Promise<ListPostsResponse> {
   try {
-    const params = new URLSearchParams();
-    if (category) params.append('category', category);
-    params.append('limit', limit.toString());
-    params.append('offset', offset.toString());
+    const limit = params?.limit || 20;
+    const page = params?.page || 1;
+    const offset = (page - 1) * limit;
     
-    console.log('[getPosts] 요청 시작:', `/api/posts?${params.toString()}`);
+    const queryParams = new URLSearchParams();
+    if (params?.category) queryParams.append('category', params.category);
+    queryParams.append('limit', limit.toString());
+    queryParams.append('offset', offset.toString());
     
-    const response = await apiClient.get<{success: boolean; posts: RawPost[]}>(`/api/posts?${params.toString()}`);
+    console.log('[getPosts] 요청 시작:', `/api/posts?${queryParams.toString()}`);
+    
+    const response = await apiClient.get<{success: boolean; posts: RawPost[]; count: number}>(`/api/posts?${queryParams.toString()}`);
     
     console.log('[getPosts] 응답 받음:', response.data);
     
-    // v3.0.0: {success: true, posts: [...]} 형태
     if (response.data && response.data.posts) {
-      console.log('[getPosts] posts 반환:', response.data.posts.length, '개');
+      console.log('[getPosts] posts 반환:', response.data.posts.length, '개, 총:', response.data.count);
       // RawPost[] → Post[] 변환
       const transformedPosts = response.data.posts.map(transformPost);
-      console.log('[getPosts] 변환된 첫 번째 post:', transformedPosts[0]);
-      return transformedPosts;
+      return {
+        posts: transformedPosts,
+        count: response.data.count || transformedPosts.length
+      };
     }
     
-    console.warn('[getPosts] posts 데이터 없음, 빈 배열 반환');
-    return [];
+    console.warn('[getPosts] posts 데이터 없음');
+    return { posts: [], count: 0 };
   } catch (error) {
     console.error('[getPosts] 에러 발생:', error);
     throw error;
