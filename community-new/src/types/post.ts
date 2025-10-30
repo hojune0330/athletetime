@@ -69,8 +69,8 @@ export interface Post {
   instagram?: string;
   
   // 이미지 (Cloudinary)
-  images: PostImage[];
-  images_count: number;
+  images: PostImage[] | null;
+  images_count: number | string;
   
   // 카운터
   views_count: number;

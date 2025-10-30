@@ -19,6 +19,23 @@ import type {
 } from '../types';
 
 /**
+ * 백엔드 응답 데이터를 정규화
+ */
+function normalizePost(rawPost: any): Post {
+  return {
+    ...rawPost,
+    // images가 null인 경우 빈 배열로 변환
+    images: rawPost.images || [],
+    // 문자열로 오는 숫자 필드들을 숫자로 변환
+    images_count: Number(rawPost.images_count) || 0,
+    views_count: Number(rawPost.views_count) || Number(rawPost.views) || 0,
+    likes_count: Number(rawPost.likes_count) || 0,
+    dislikes_count: Number(rawPost.dislikes_count) || 0,
+    comments_count: Number(rawPost.comments_count) || 0,
+  };
+}
+
+/**
  * Health Check
  */
 export async function checkHealth(): Promise<HealthResponse> {
@@ -62,7 +79,10 @@ export async function getPosts(
     // posts 배열을 반환해야 함
     if (response.data && response.data.posts) {
       console.log('[getPosts] posts 반환:', response.data.posts.length, '개');
-      return response.data.posts;
+      // 데이터 정규화 적용
+      const normalizedPosts = response.data.posts.map(normalizePost);
+      console.log('[getPosts] 정규화된 첫 번째 post:', normalizedPosts[0]);
+      return normalizedPosts;
     }
     
     console.warn('[getPosts] posts 데이터 없음, 빈 배열 반환');
@@ -85,7 +105,8 @@ export async function getPost(id: number): Promise<Post | null> {
       return null;
     }
     
-    return response.data.post;
+    // 데이터 정규화 적용
+    return normalizePost(response.data.post);
   } catch (error) {
     console.error('게시글 조회 실패:', error);
     return null;

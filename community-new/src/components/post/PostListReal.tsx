@@ -60,7 +60,10 @@ const categoryIcons: Record<string, string> = {
 function PostItem({ post }: { post: Post }) {
   const categoryColor = categoryColors[post.category_name] || 'text-gray-500';
   const categoryIcon = categoryIcons[post.category_name] || '📝';
-  const isHot = post.likes_count >= 10 || post.views_count >= 100;
+  const viewsCount = typeof post.views_count === 'number' ? post.views_count : parseInt(String(post.views_count)) || 0;
+  const likesCount = typeof post.likes_count === 'number' ? post.likes_count : parseInt(String(post.likes_count)) || 0;
+  const commentsCount = typeof post.comments_count === 'number' ? post.comments_count : parseInt(String(post.comments_count)) || 0;
+  const isHot = likesCount >= 10 || viewsCount >= 100;
   const isNew = new Date(post.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000;
   
   return (
@@ -71,10 +74,10 @@ function PostItem({ post }: { post: Post }) {
       <article className="card-dark hover:bg-dark-500 transition-all duration-200 p-4 border-l-4 hover:border-l-primary-400 border-l-transparent">
         <div className="flex gap-4">
           {/* 썸네일 (이미지가 있는 경우) */}
-          {post.images && post.images[0]?.cloudinary_url && (
+          {post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0]?.cloudinary_url && (
             <div className="shrink-0">
               <img 
-                src={post.images[0]?.cloudinary_url} 
+                src={post.images[0].cloudinary_url} 
                 alt={post.title}
                 className="w-24 h-16 object-cover rounded-lg"
               />
@@ -126,15 +129,15 @@ function PostItem({ post }: { post: Post }) {
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <EyeIcon className="w-3.5 h-3.5" />
-                  {post.views_count}
+                  {viewsCount}
                 </span>
                 <span className="flex items-center gap-1 text-primary-400">
                   <HandThumbUpIcon className="w-3.5 h-3.5" />
-                  {post.likes_count}
+                  {likesCount}
                 </span>
                 <span className="flex items-center gap-1">
                   <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
-                  {post.comments_count}
+                  {commentsCount}
                 </span>
               </div>
             </div>
