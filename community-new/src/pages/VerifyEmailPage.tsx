@@ -86,6 +86,17 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen bg-dark-800 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         <div className="bg-dark-700 rounded-lg p-8 shadow-xl">
+          {/* 뒤로가기 버튼 */}
+          <button
+            onClick={() => navigate('/register')}
+            className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="text-sm">뒤로가기</span>
+          </button>
+
           {/* 헤더 */}
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">📧</div>

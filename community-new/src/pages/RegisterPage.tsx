@@ -3,11 +3,12 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
   const { register } = useAuth();
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -107,6 +108,17 @@ export default function RegisterPage() {
       <div className="min-h-screen bg-dark-800 flex items-center justify-center px-4 py-12">
         <div className="max-w-md w-full">
           <div className="bg-dark-700 rounded-lg p-8 shadow-xl">
+            {/* 뒤로가기 버튼 */}
+            <button
+              onClick={() => setShowVerification(false)}
+              className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm">뒤로가기</span>
+            </button>
+
             <div className="text-center mb-8">
               <div className="text-6xl mb-4">📧</div>
               <h1 className="text-2xl font-bold text-white mb-2">
@@ -168,6 +180,17 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-dark-800 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
         <div className="bg-dark-700 rounded-lg p-8 shadow-xl">
+          {/* 뒤로가기 버튼 */}
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-6 flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="text-sm">뒤로가기</span>
+          </button>
+
           {/* 헤더 */}
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🏃</div>
