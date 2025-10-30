@@ -18,6 +18,10 @@ const bcrypt = require('bcryptjs');
 const WebSocket = require('ws');
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+require('dotenv').config();
+
+// 인증 라우터
+const authRoutes = require('./auth/routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -56,6 +60,11 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 5 }
 });
+
+// ============================================
+// 인증 API 라우터 등록
+// ============================================
+app.use('/api/auth', authRoutes);
 
 // ============================================
 // 헬스체크

@@ -26,10 +26,16 @@ export const apiClient: AxiosInstance = axios.create({
 /**
  * 요청 인터셉터
  * - 요청 전 로깅
- * - 인증 토큰 추가 (향후 구현)
+ * - 인증 토큰 자동 추가
  */
 apiClient.interceptors.request.use(
   (config) => {
+    // JWT 토큰 자동 추가
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     // 개발 환경에서만 로깅
     if (import.meta.env.DEV) {
       console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
