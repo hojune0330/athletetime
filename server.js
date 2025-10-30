@@ -94,6 +94,7 @@ app.get('/api/posts', async (req, res) => {
     let query = `
       SELECT 
         p.*,
+        p.views as views_count,
         c.name as category_name,
         c.icon as category_icon,
         c.color as category_color,
@@ -101,7 +102,7 @@ app.get('/api/posts', async (req, res) => {
         (SELECT COUNT(*) FROM images WHERE post_id = p.id) as images_count,
         (SELECT json_agg(json_build_object(
           'id', i.id,
-          'url', i.cloudinary_url,
+          'cloudinary_url', i.cloudinary_url,
           'thumbnail_url', i.thumbnail_url
         )) FROM images i WHERE i.post_id = p.id) as images
       FROM posts p
@@ -146,13 +147,14 @@ app.get('/api/posts/:id', async (req, res) => {
     const result = await pool.query(`
       SELECT 
         p.*,
+        p.views as views_count,
         c.name as category_name,
         c.icon as category_icon,
         c.color as category_color,
         u.username,
         (SELECT json_agg(json_build_object(
           'id', i.id,
-          'url', i.cloudinary_url,
+          'cloudinary_url', i.cloudinary_url,
           'thumbnail_url', i.thumbnail_url,
           'width', i.width,
           'height', i.height
