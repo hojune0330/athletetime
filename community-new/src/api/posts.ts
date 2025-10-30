@@ -197,16 +197,36 @@ export async function getPosts(params?: ListPostsParams): Promise<ListPostsRespo
  */
 export async function getPost(id: number): Promise<Post | null> {
   try {
+    console.log(`[getPost] 요청 시작: /api/posts/${id}`);
     const response = await apiClient.get<{success: boolean; post: RawPost}>(`/api/posts/${id}`);
     
+    console.log('[getPost] 응답 받음:', {
+      success: response.data.success,
+      hasPost: !!response.data.post,
+      postId: response.data.post?.id
+    });
+    
     if (!response.data.success || !response.data.post) {
+      console.warn('[getPost] 유효하지 않은 응답:', response.data);
       return null;
     }
     
     // RawPost → Post 변환
-    return transformPost(response.data.post);
-  } catch (error) {
-    console.error('게시글 조회 실패:', error);
+    const transformedPost = transformPost(response.data.post);
+    console.log('[getPost] 변환 완료:', {
+      id: transformedPost.id,
+      title: transformedPost.title,
+      hasImages: !!transformedPost.images,
+      hasComments: !!transformedPost.comments
+    });
+    return transformedPost;
+  } catch (error: any) {
+    console.error('[getPost] 에러 발생:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
     return null;
   }
 }

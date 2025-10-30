@@ -16,10 +16,19 @@ export default function PostDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   
   // API 훅
-  const { data: post, isLoading, isError } = usePost(postId)
+  const { data: post, isLoading, isError, error } = usePost(postId)
   const votePostMutation = useVotePost()
   const createCommentMutation = useCreateComment()
   const deletePostMutation = useDeletePost()
+  
+  // 디버깅: 데이터 로딩 상태 확인
+  console.log('[PostDetailPage] 상태:', {
+    postId,
+    isLoading,
+    isError,
+    hasPost: !!post,
+    error: error instanceof Error ? error.message : error
+  })
   
   // 시간 포맷팅
   const formatDate = (dateString: string) => {
@@ -113,11 +122,39 @@ export default function PostDetailPage() {
   
   // 에러 상태
   if (isError || !post) {
+    const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류';
+    const errorDetails = error instanceof Error && 'response' in error 
+      ? JSON.stringify((error as any).response?.data, null, 2)
+      : '';
+    
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12 px-4">
         <div className="text-red-500 text-6xl mb-4">⚠️</div>
         <h3 className="text-xl font-bold text-gray-200 mb-2">게시글을 찾을 수 없습니다</h3>
-        <Link to="/" className="text-primary-400 hover:underline">목록으로 돌아가기</Link>
+        <p className="text-gray-400 mb-4">
+          {isError ? `오류: ${errorMessage}` : '게시글 ID가 유효하지 않거나 삭제되었습니다.'}
+        </p>
+        {errorDetails && (
+          <details className="mb-4 text-left max-w-2xl mx-auto">
+            <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300">
+              🔍 상세 오류 정보 (개발자용)
+            </summary>
+            <pre className="mt-2 p-4 bg-dark-800 rounded text-xs text-gray-400 overflow-auto">
+              {errorDetails}
+            </pre>
+          </details>
+        )}
+        <div className="flex gap-4 justify-center">
+          <Link to="/" className="text-primary-400 hover:underline">
+            목록으로 돌아가기
+          </Link>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="text-gray-400 hover:text-white underline"
+          >
+            새로고침
+          </button>
+        </div>
       </div>
     )
   }
