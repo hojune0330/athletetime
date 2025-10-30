@@ -53,7 +53,7 @@ export interface PostComment {
  */
 export interface Post {
   // 기본 정보
-  id: number;
+  id: string; // PostgreSQL BIGINT가 문자열로 반환됨
   user_id: string;
   title: string;
   content: string;

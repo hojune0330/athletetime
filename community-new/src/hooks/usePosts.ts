@@ -44,12 +44,13 @@ export function usePosts(category?: string, limit?: number, offset?: number) {
 /**
  * 게시글 상세 조회 훅
  */
-export function usePost(id: number) {
+export function usePost(id: number | string) {
   return useQuery({
-    queryKey: postKeys.detail(id),
-    queryFn: () => getPost(id),
+    queryKey: postKeys.detail(Number(id)),
+    queryFn: () => getPost(Number(id)),
     staleTime: 1000 * 60 * 5, // 5분
     retry: 1,
+    enabled: !isNaN(Number(id)), // ID가 유효한 숫자일 때만 요청
   });
 }
 

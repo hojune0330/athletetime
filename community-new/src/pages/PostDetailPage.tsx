@@ -7,7 +7,7 @@ import { getAnonymousId } from "../utils/anonymousUser"
 export default function PostDetailPage() {
   const { id: postIdParam } = useParams()
   const navigate = useNavigate()
-  const postId = Number(postIdParam)
+  const postId = postIdParam ? parseInt(postIdParam, 10) : NaN
   
   const [commentText, setCommentText] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
