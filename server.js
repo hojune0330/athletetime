@@ -141,7 +141,7 @@ app.get('/api/posts', async (req, res) => {
         c.icon as category_icon,
         c.color as category_color,
         u.username,
-        (SELECT COUNT(*) FROM images WHERE post_id = p.id) as images_count,
+        CAST((SELECT COUNT(*) FROM images WHERE post_id = p.id) AS INTEGER) as images_count,
         (SELECT json_agg(json_build_object(
           'id', i.id,
           'cloudinary_url', i.cloudinary_url,
@@ -194,6 +194,7 @@ app.get('/api/posts/:id', async (req, res) => {
         c.icon as category_icon,
         c.color as category_color,
         u.username,
+        CAST((SELECT COUNT(*) FROM images WHERE post_id = p.id) AS INTEGER) as images_count,
         (SELECT json_agg(json_build_object(
           'id', i.id,
           'cloudinary_url', i.cloudinary_url,
@@ -364,22 +365,56 @@ app.post('/api/posts/:id/comments', async (req, res) => {
     
     const userId = userResult.rows[0].id;
     
-    const result = await pool.query(`
+    await pool.query(`
       INSERT INTO comments (post_id, user_id, content, author, instagram)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
     `, [id, userId, content, author, instagram]);
+    
+    // 전체 게시글 정보 조회 (프론트엔드 타입과 일치)
+    const postResult = await pool.query(`
+      SELECT 
+        p.*,
+        p.views as views_count,
+        c.name as category_name,
+        c.icon as category_icon,
+        c.color as category_color,
+        u.username,
+        CAST((SELECT COUNT(*) FROM images WHERE post_id = p.id) AS INTEGER) as images_count,
+        (SELECT json_agg(json_build_object(
+          'id', i.id,
+          'cloudinary_url', i.cloudinary_url,
+          'thumbnail_url', i.thumbnail_url,
+          'width', i.width,
+          'height', i.height
+        ) ORDER BY i.sort_order) FROM images i WHERE i.post_id = p.id) as images,
+        (SELECT json_agg(json_build_object(
+          'id', cm.id,
+          'content', cm.content,
+          'author', cm.author,
+          'instagram', cm.instagram,
+          'created_at', cm.created_at,
+          'is_blinded', cm.is_blinded
+        ) ORDER BY cm.created_at ASC) FROM comments cm WHERE cm.post_id = p.id AND cm.deleted_at IS NULL) as comments
+      FROM posts p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN users u ON p.user_id = u.id
+      WHERE p.id = $1 AND p.deleted_at IS NULL
+    `, [id]);
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: '게시글을 찾을 수 없습니다' });
+    }
     
     // WebSocket 알림
     broadcastToClients({
       type: 'new_comment',
       postId: id,
-      comment: result.rows[0]
+      post: postResult.rows[0]
     });
     
     res.json({
       success: true,
-      comment: result.rows[0]
+      post: postResult.rows[0]
     });
   } catch (error) {
     console.error('댓글 작성 실패:', error);
@@ -430,19 +465,98 @@ app.post('/api/posts/:id/vote', async (req, res) => {
       );
     }
     
-    // 최신 카운트 조회
-    const countResult = await pool.query(
-      'SELECT likes_count, dislikes_count FROM posts WHERE id = $1',
-      [id]
-    );
+    // 전체 게시글 정보 조회 (프론트엔드 타입과 일치)
+    const postResult = await pool.query(`
+      SELECT 
+        p.*,
+        p.views as views_count,
+        c.name as category_name,
+        c.icon as category_icon,
+        c.color as category_color,
+        u.username,
+        CAST((SELECT COUNT(*) FROM images WHERE post_id = p.id) AS INTEGER) as images_count,
+        (SELECT json_agg(json_build_object(
+          'id', i.id,
+          'cloudinary_url', i.cloudinary_url,
+          'thumbnail_url', i.thumbnail_url,
+          'width', i.width,
+          'height', i.height
+        ) ORDER BY i.sort_order) FROM images i WHERE i.post_id = p.id) as images,
+        (SELECT json_agg(json_build_object(
+          'id', cm.id,
+          'content', cm.content,
+          'author', cm.author,
+          'instagram', cm.instagram,
+          'created_at', cm.created_at,
+          'is_blinded', cm.is_blinded
+        ) ORDER BY cm.created_at ASC) FROM comments cm WHERE cm.post_id = p.id AND cm.deleted_at IS NULL) as comments
+      FROM posts p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN users u ON p.user_id = u.id
+      WHERE p.id = $1 AND p.deleted_at IS NULL
+    `, [id]);
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: '게시글을 찾을 수 없습니다' });
+    }
     
     res.json({
       success: true,
-      likes: countResult.rows[0].likes_count,
-      dislikes: countResult.rows[0].dislikes_count
+      post: postResult.rows[0]
     });
   } catch (error) {
     console.error('투표 실패:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ============================================
+// 게시글 삭제 (Soft Delete)
+// ============================================
+app.delete('/api/posts/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    
+    if (!password) {
+      return res.status(400).json({ success: false, error: '비밀번호를 입력해주세요.' });
+    }
+    
+    // 게시글 조회 (비밀번호 확인용)
+    const postResult = await pool.query(
+      'SELECT password_hash FROM posts WHERE id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ success: false, error: '게시글을 찾을 수 없습니다.' });
+    }
+    
+    // 비밀번호 확인
+    const isValidPassword = await bcrypt.compare(password, postResult.rows[0].password_hash);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ success: false, error: '비밀번호가 일치하지 않습니다.' });
+    }
+    
+    // Soft Delete: deleted_at 타임스탬프 설정
+    await pool.query(
+      'UPDATE posts SET deleted_at = NOW() WHERE id = $1',
+      [id]
+    );
+    
+    // WebSocket 알림
+    broadcastToClients({
+      type: 'post_deleted',
+      postId: id
+    });
+    
+    res.json({
+      success: true,
+      message: '게시글이 삭제되었습니다.'
+    });
+  } catch (error) {
+    console.error('게시글 삭제 실패:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

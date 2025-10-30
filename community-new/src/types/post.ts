@@ -18,6 +18,90 @@ export interface Category {
 }
 
 /**
+ * 백엔드에서 반환하는 원시 이미지 타입 (Cloudinary)
+ */
+export interface RawPostImage {
+  id: number;
+  cloudinary_id?: string;
+  cloudinary_url: string;
+  thumbnail_url: string;
+  original_filename?: string;
+  file_size?: number;
+  width: number;
+  height: number;
+  format?: string;
+  sort_order?: number;
+}
+
+/**
+ * 백엔드에서 반환하는 원시 댓글 타입
+ */
+export interface RawComment {
+  id: number;
+  content: string;
+  author: string;
+  instagram?: string;
+  created_at: string;
+  is_blinded?: boolean;
+}
+
+/**
+ * 백엔드에서 반환하는 원시 게시글 타입
+ * (백엔드 API 응답 구조 그대로)
+ */
+export interface RawPost {
+  // 기본 정보
+  id: string; // PostgreSQL BIGINT가 문자열로 반환
+  user_id: string;
+  title: string;
+  content: string;
+  author: string;
+  password_hash?: string; // 응답에 포함될 수 있음
+  
+  // 카테고리 정보 (조인된 데이터)
+  category_id: number;
+  category_name: string;
+  category_icon: string;
+  category_color: string;
+  
+  // Instagram (optional)
+  instagram?: string;
+  
+  // 이미지 (Cloudinary)
+  images: RawPostImage[] | null;
+  images_count: string | number; // 문자열로 올 수 있음
+  
+  // 카운터
+  views: number; // views 필드도 있음
+  views_count: number; // views as views_count
+  comments_count: number;
+  likes_count: number;
+  dislikes_count: number;
+  reports_count?: number;
+  
+  // 댓글 목록 (상세 조회 시)
+  comments?: RawComment[] | null;
+  
+  // 상태
+  is_notice: boolean;
+  is_admin: boolean;
+  is_pinned: boolean;
+  is_blinded: boolean;
+  blind_reason?: string | null;
+  
+  // 타임스탬프
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string | null;
+  
+  // username (조인된 데이터)
+  username?: string;
+  
+  // search_vector (PostgreSQL tsvector)
+  search_vector?: string;
+}
+
+/**
  * 이미지 타입 (Cloudinary)
  */
 export interface PostImage {
@@ -70,7 +154,7 @@ export interface Post {
   
   // 이미지 (Cloudinary)
   images: PostImage[] | null;
-  images_count: number | string;
+  images_count: number;
   
   // 카운터
   views_count: number;

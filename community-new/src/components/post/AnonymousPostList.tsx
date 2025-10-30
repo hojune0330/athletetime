@@ -86,8 +86,8 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
         const likes = post.likes_count || 0
         const dislikes = post.dislikes_count || 0
         const comments = post.comments?.length ?? 0
-        const hasImages = Boolean(post.images[0]?.cloudinary_url)
-        const isHot = likes >= 10 || comments >= 15 || (post.views_count ?? 0) >= 300
+        const hasImages = Boolean(post.images && post.images[0]?.cloudinary_url)
+        const isHot = likes >= 20 // GPT 권장: 좋아요 20개 이상
 
         return (
           <Link

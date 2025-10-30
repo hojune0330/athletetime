@@ -63,7 +63,7 @@ function PostItem({ post }: { post: Post }) {
   const viewsCount = typeof post.views_count === 'number' ? post.views_count : parseInt(String(post.views_count)) || 0;
   const likesCount = typeof post.likes_count === 'number' ? post.likes_count : parseInt(String(post.likes_count)) || 0;
   const commentsCount = typeof post.comments_count === 'number' ? post.comments_count : parseInt(String(post.comments_count)) || 0;
-  const isHot = likesCount >= 10 || viewsCount >= 100;
+  const isHot = likesCount >= 20; // GPT 권장: 좋아요 20개 이상
   const isNew = new Date(post.created_at).getTime() > Date.now() - 24 * 60 * 60 * 1000;
   
   return (

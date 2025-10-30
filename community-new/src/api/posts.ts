@@ -8,6 +8,8 @@ import { apiClient } from './client';
 import type {
   Post,
   PostsResponse,
+  PostComment,
+  PostImage,
   Category,
   CategoriesResponse,
   CreatePostRequest,
@@ -16,23 +18,103 @@ import type {
   VoteRequest,
   PostDetailResponse,
   HealthResponse,
+  RawPost,
+  RawComment,
+  RawPostImage,
 } from '../types';
 
 /**
- * 백엔드 응답 데이터를 정규화
+ * 백엔드 원시 댓글을 프론트엔드 타입으로 변환
+ */
+function transformComment(rawComment: RawComment): PostComment {
+  return {
+    id: rawComment.id,
+    post_id: 0, // 댓글 응답에는 post_id가 없으므로 기본값 설정
+    user_id: '', // 댓글 응답에는 user_id가 없으므로 기본값 설정
+    author: rawComment.author,
+    content: rawComment.content,
+    instagram: rawComment.instagram,
+    created_at: rawComment.created_at,
+    updated_at: rawComment.created_at, // updated_at이 없으면 created_at 사용
+    deleted_at: undefined,
+  };
+}
+
+/**
+ * 백엔드 원시 이미지를 프론트엔드 타입으로 변환
+ */
+function transformImage(rawImage: RawPostImage): PostImage {
+  return {
+    id: rawImage.id,
+    cloudinary_id: rawImage.cloudinary_id || '',
+    cloudinary_url: rawImage.cloudinary_url,
+    thumbnail_url: rawImage.thumbnail_url,
+    original_filename: rawImage.original_filename || '',
+    file_size: rawImage.file_size || 0,
+    width: rawImage.width,
+    height: rawImage.height,
+    format: rawImage.format || '',
+    sort_order: rawImage.sort_order || 0,
+  };
+}
+
+/**
+ * 백엔드 원시 게시글을 프론트엔드 타입으로 변환
+ * RawPost (snake_case, 원시 타입) → Post (프론트엔드 타입)
+ */
+function transformPost(rawPost: RawPost): Post {
+  return {
+    // 기본 정보
+    id: rawPost.id,
+    user_id: rawPost.user_id,
+    title: rawPost.title,
+    content: rawPost.content,
+    author: rawPost.username || rawPost.author, // username 우선, 없으면 author
+    
+    // 카테고리 정보
+    category_id: rawPost.category_id,
+    category_name: rawPost.category_name,
+    category_icon: rawPost.category_icon,
+    category_color: rawPost.category_color,
+    
+    // Instagram
+    instagram: rawPost.instagram,
+    
+    // 이미지 (변환 및 null 처리)
+    images: rawPost.images ? rawPost.images.map(transformImage) : null,
+    images_count: typeof rawPost.images_count === 'string' 
+      ? parseInt(rawPost.images_count, 10) 
+      : rawPost.images_count,
+    
+    // 카운터 (숫자 변환)
+    views_count: rawPost.views_count || rawPost.views || 0,
+    comments_count: rawPost.comments_count || 0,
+    likes_count: rawPost.likes_count || 0,
+    dislikes_count: rawPost.dislikes_count || 0,
+    
+    // 댓글 목록 (변환 및 null 처리)
+    comments: rawPost.comments ? rawPost.comments.map(transformComment) : undefined,
+    
+    // 상태
+    is_notice: rawPost.is_notice,
+    is_admin: rawPost.is_admin,
+    is_pinned: rawPost.is_pinned,
+    is_blinded: rawPost.is_blinded,
+    
+    // 타임스탬프
+    created_at: rawPost.created_at,
+    updated_at: rawPost.updated_at,
+    deleted_at: rawPost.deleted_at || undefined,
+  };
+}
+
+/**
+ * 레거시 지원: 기존 normalizePost 함수 유지 (하위 호환성)
+ * @deprecated transformPost 사용 권장
  */
 function normalizePost(rawPost: any): Post {
-  return {
-    ...rawPost,
-    // images가 null인 경우 빈 배열로 변환
-    images: rawPost.images || [],
-    // 문자열로 오는 숫자 필드들을 숫자로 변환
-    images_count: Number(rawPost.images_count) || 0,
-    views_count: Number(rawPost.views_count) || Number(rawPost.views) || 0,
-    likes_count: Number(rawPost.likes_count) || 0,
-    dislikes_count: Number(rawPost.dislikes_count) || 0,
-    comments_count: Number(rawPost.comments_count) || 0,
-  };
+  // RawPost 타입으로 캐스팅 후 transformPost 사용
+  return transformPost(rawPost as RawPost);
 }
 
 /**
@@ -71,22 +153,20 @@ export async function getPosts(
     
     console.log('[getPosts] 요청 시작:', `/api/posts?${params.toString()}`);
     
-    const response = await apiClient.get<any>(`/api/posts?${params.toString()}`);
+    const response = await apiClient.get<{success: boolean; posts: RawPost[]}>(`/api/posts?${params.toString()}`);
     
     console.log('[getPosts] 응답 받음:', response.data);
     
     // v3.0.0: {success: true, posts: [...]} 형태
-    // posts 배열을 반환해야 함
     if (response.data && response.data.posts) {
       console.log('[getPosts] posts 반환:', response.data.posts.length, '개');
-      // 데이터 정규화 적용
-      const normalizedPosts = response.data.posts.map(normalizePost);
-      console.log('[getPosts] 정규화된 첫 번째 post:', normalizedPosts[0]);
-      return normalizedPosts;
+      // RawPost[] → Post[] 변환
+      const transformedPosts = response.data.posts.map(transformPost);
+      console.log('[getPosts] 변환된 첫 번째 post:', transformedPosts[0]);
+      return transformedPosts;
     }
     
     console.warn('[getPosts] posts 데이터 없음, 빈 배열 반환');
-    // 레거시 형태 또는 에러 시 빈 배열 반환
     return [];
   } catch (error) {
     console.error('[getPosts] 에러 발생:', error);
@@ -99,14 +179,14 @@ export async function getPosts(
  */
 export async function getPost(id: number): Promise<Post | null> {
   try {
-    const response = await apiClient.get<PostDetailResponse>(`/api/posts/${id}`);
+    const response = await apiClient.get<{success: boolean; post: RawPost}>(`/api/posts/${id}`);
     
     if (!response.data.success || !response.data.post) {
       return null;
     }
     
-    // 데이터 정규화 적용
-    return normalizePost(response.data.post);
+    // RawPost → Post 변환
+    return transformPost(response.data.post);
   } catch (error) {
     console.error('게시글 조회 실패:', error);
     return null;
@@ -142,7 +222,7 @@ export async function createPost(
     formData.append('images', image);
   });
   
-  const response = await apiClient.post<PostDetailResponse>('/api/posts', formData, {
+  const response = await apiClient.post<{success: boolean; post: RawPost}>('/api/posts', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -152,7 +232,8 @@ export async function createPost(
     throw new Error('게시글 작성에 실패했습니다.');
   }
   
-  return response.data.post;
+  // RawPost → Post 변환
+  return transformPost(response.data.post);
 }
 
 /**
@@ -162,13 +243,14 @@ export async function updatePost(
   id: number,
   data: UpdatePostRequest
 ): Promise<Post> {
-  const response = await apiClient.put<PostDetailResponse>(`/api/posts/${id}`, data);
+  const response = await apiClient.put<{success: boolean; post: RawPost}>(`/api/posts/${id}`, data);
   
   if (!response.data.success || !response.data.post) {
     throw new Error('게시글 수정에 실패했습니다.');
   }
   
-  return response.data.post;
+  // RawPost → Post 변환
+  return transformPost(response.data.post);
 }
 
 /**
@@ -194,7 +276,7 @@ export async function createComment(
   postId: number,
   data: CreateCommentRequest
 ): Promise<Post> {
-  const response = await apiClient.post<PostDetailResponse>(
+  const response = await apiClient.post<{success: boolean; post: RawPost}>(
     `/api/posts/${postId}/comments`,
     data
   );
@@ -203,15 +285,15 @@ export async function createComment(
     throw new Error('댓글 작성에 실패했습니다.');
   }
   
-  // 댓글이 추가된 전체 게시글 반환
-  return response.data.post;
+  // RawPost → Post 변환
+  return transformPost(response.data.post);
 }
 
 /**
  * 투표 (좋아요/싫어요)
  */
 export async function votePost(postId: number, data: VoteRequest): Promise<Post> {
-  const response = await apiClient.post<PostDetailResponse>(
+  const response = await apiClient.post<{success: boolean; post: RawPost}>(
     `/api/posts/${postId}/vote`,
     data
   );
@@ -220,7 +302,8 @@ export async function votePost(postId: number, data: VoteRequest): Promise<Post>
     throw new Error('투표에 실패했습니다.');
   }
   
-  return response.data.post;
+  // RawPost → Post 변환
+  return transformPost(response.data.post);
 }
 
 /**
@@ -237,11 +320,12 @@ export async function incrementViews(postId: number): Promise<void> {
  * 검색 (향후 구현)
  */
 export async function searchPosts(query: string): Promise<Post[]> {
-  const response = await apiClient.get<any>(`/api/posts/search?q=${encodeURIComponent(query)}`);
+  const response = await apiClient.get<{success: boolean; posts: RawPost[]}>(`/api/posts/search?q=${encodeURIComponent(query)}`);
   
   // 백엔드 응답 형태에 따라 처리
   if (response.data && response.data.posts) {
-    return response.data.posts;
+    // RawPost[] → Post[] 변환
+    return response.data.posts.map(transformPost);
   }
   
   return [];
