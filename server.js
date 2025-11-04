@@ -30,6 +30,7 @@ const commentsRouter = require('./routes/comments');
 const votesRouter = require('./routes/votes');
 const categoriesRouter = require('./routes/categories');
 const authRouter = require('./auth/routes');
+const pollsRouter = require('./routes/polls');
 
 // 미들웨어
 const { upload, handleUploadError } = require('./middleware/upload');
