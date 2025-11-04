@@ -71,23 +71,35 @@ export const getSandboxBackendUrl = (): string | null => {
  * 환경별 자동 URL 선택
  * 
  * 우선순위:
- * 1. 프로덕션 빌드 → BACKEND_URL
- * 2. e2b.dev 샌드박스 → 자동 감지
- * 3. 로컬 개발 → LOCAL_BACKEND_URL
+ * 1. 환경 변수 VITE_API_BASE_URL (최우선)
+ * 2. 프로덕션 빌드 → BACKEND_URL
+ * 3. e2b.dev 샌드박스 → 자동 감지
+ * 4. 로컬 개발 → LOCAL_BACKEND_URL
  */
 export const getApiBaseUrl = (): string => {
-  // 프로덕션 환경
-  if (import.meta.env.PROD) {
+  // 환경 변수가 명시적으로 설정된 경우 최우선
+  const envApiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL;
+  if (envApiUrl) {
+    console.log('[Config] Using env API URL:', envApiUrl);
+    return envApiUrl;
+  }
+  
+  // 프로덕션 환경 (명시적 체크)
+  const isProd = import.meta.env.MODE === 'production' || import.meta.env.PROD === true;
+  if (isProd) {
+    console.log('[Config] Production mode - using:', BACKEND_URL);
     return BACKEND_URL;
   }
   
   // 샌드박스 환경 자동 감지
   const sandboxUrl = getSandboxBackendUrl();
   if (sandboxUrl) {
+    console.log('[Config] Sandbox detected - using:', sandboxUrl);
     return sandboxUrl;
   }
   
   // 로컬 개발 환경
+  console.log('[Config] Local development - using:', LOCAL_BACKEND_URL);
   return LOCAL_BACKEND_URL;
 };
 

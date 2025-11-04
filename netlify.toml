@@ -1,57 +1,53 @@
-# Netlify Configuration for Athlete Time
+# Netlify Configuration for Athlete Time Community
+# 
+# 이 설정은 커뮤니티 앱(community-new)을 Netlify에 배포하기 위한 설정입니다.
+# Landing 페이지는 별도의 Netlify 사이트로 관리됩니다.
+
 [build]
-  # Build command (if needed)
-  command = "echo 'Using pre-built files'"
+  base = "community-new"
+  command = "npm ci && npm run build"
+  publish = "community-new/dist"
   
-  # Publish directory (루트 디렉토리)
-  publish = "."
-  
-  # Base directory
-  base = ""
+[build.environment]
+  NODE_VERSION = "20"
+  VITE_API_BASE_URL = "https://athletetime-backend.onrender.com"
+  VITE_BACKEND_URL = "https://athletetime-backend.onrender.com"
+  VITE_MAIN_URL = "https://athlete-time.netlify.app"
 
-# Redirects - 순서가 중요합니다!
-# 1. React 앱 (community/) - SPA 라우팅
+# SPA 리다이렉트 - 모든 요청을 index.html로
 [[redirects]]
-  from = "/community/*"
-  to = "/community/index.html"
-  status = 200
-
-# 2. 메인 index.html은 그대로 서빙
-[[redirects]]
-  from = "/"
+  from = "/*"
   to = "/index.html"
   status = 200
+  
+# API 프록시 (선택사항 - CORS 문제 해결용)
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://athletetime-backend.onrender.com/api/:splat"
+#   status = 200
+#   force = true
 
-# Headers for security and performance
+# 보안 헤더
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
+    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-
+    
+# 캐싱 헤더
 [[headers]]
-  for = "/*.js"
+  for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
+    
 [[headers]]
-  for = "/*.css"
+  for = "*.js"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
+    
 [[headers]]
-  for = "/*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.svg"
+  for = "*.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
