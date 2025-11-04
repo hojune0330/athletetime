@@ -99,6 +99,9 @@ const wss = new WebSocket.Server({ server });
 // 미들웨어 설정
 // ============================================
 
+// Proxy 신뢰 설정 (Render, Netlify 등 프록시 환경 대응)
+app.set('trust proxy', 1);
+
 // CORS
 app.use(cors({
   origin: function (origin, callback) {

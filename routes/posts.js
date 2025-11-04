@@ -418,7 +418,8 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     const { password } = req.body;
     
-    if (!password) {
+    // 비밀번호 필수 체크
+    if (!password || typeof password !== 'string' || password.trim().length === 0) {
       return res.status(400).json({ 
         success: false, 
         error: '비밀번호를 입력해주세요.' 
@@ -435,6 +436,14 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ 
         success: false, 
         error: '게시글을 찾을 수 없습니다.' 
+      });
+    }
+    
+    // password_hash 존재 여부 확인 (방어 로직)
+    if (!result.rows[0].password_hash) {
+      return res.status(500).json({ 
+        success: false, 
+        error: '게시글 비밀번호 정보가 없습니다.' 
       });
     }
     
