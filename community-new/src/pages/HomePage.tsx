@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import PostListReal from '../components/post/PostListReal'
+import PostList from '../components/post/PostList'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
@@ -222,7 +222,7 @@ export default function HomePage() {
       </div>
 
       {/* 익명 게시글 목록 - 실제 API 연동 */}
-      <PostListReal />
+      <PostList />
 
       {/* 페이지네이션 - count 기반 */}
       <div className="mt-6">

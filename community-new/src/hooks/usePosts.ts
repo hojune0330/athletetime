@@ -1,155 +1,156 @@
 /**
- * 게시글 관련 React Query 훅 (v3.0.0)
+ * React Query 훅 (v4.0.0)
+ * 
+ * 게시글 관련 데이터 페칭 및 뮤테이션
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  getPosts,
-  getPost,
-  createPost as apiCreatePost,
-  updatePost,
-  deletePost,
-  createComment,
-  votePost,
-} from '../api/posts';
-import type {
-  CreatePostRequest,
-  UpdatePostRequest,
-  CreateCommentRequest,
-  VoteRequest,
-} from '../types';
+import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
+import * as api from '../api/posts';
+import type { Post, PostsResponse, CreatePostRequest, CreateCommentRequest, VoteRequest } from '../types';
 
-/**
- * Query Keys
- */
-export const postKeys = {
-  all: ['posts'] as const,
-  lists: () => [...postKeys.all, 'list'] as const,
-  list: (filters?: any) => [...postKeys.lists(), filters] as const,
-  details: () => [...postKeys.all, 'detail'] as const,
-  detail: (id: number) => [...postKeys.details(), id] as const,
+// ============================================
+// Query Keys
+// ============================================
+
+export const queryKeys = {
+  posts: ['posts'] as const,
+  postsList: (params?: api.GetPostsParams) => ['posts', 'list', params] as const,
+  post: (id: string | number) => ['posts', 'detail', id] as const,
+  categories: ['categories'] as const,
 };
 
-/**
- * 게시글 목록 조회 훅
- */
-export function usePosts(params?: { category?: string; limit?: number; page?: number }) {
+// ============================================
+// 게시글 목록
+// ============================================
+
+export function usePosts(params?: api.GetPostsParams): UseQueryResult<PostsResponse, Error> {
   return useQuery({
-    queryKey: postKeys.list(params),
-    queryFn: () => getPosts(params),
-    staleTime: 1000 * 60 * 5, // 5분
+    queryKey: queryKeys.postsList(params),
+    queryFn: () => api.getPosts(params),
+    staleTime: 1000 * 30, // 30초
+    gcTime: 1000 * 60 * 5, // 5분
   });
 }
 
-/**
- * 게시글 상세 조회 훅
- */
-export function usePost(id: number | string) {
+// ============================================
+// 게시글 상세
+// ============================================
+
+export function usePost(id: string | number): UseQueryResult<Post, Error> {
   return useQuery({
-    queryKey: postKeys.detail(Number(id)),
-    queryFn: () => getPost(Number(id)),
-    staleTime: 1000 * 60 * 5, // 5분
-    retry: 1,
-    enabled: !isNaN(Number(id)), // ID가 유효한 숫자일 때만 요청
+    queryKey: queryKeys.post(id),
+    queryFn: () => api.getPost(id),
+    enabled: !!id && !isNaN(Number(id)),
+    staleTime: 0, // 항상 최신 데이터 가져오기 (Priority 1 요구사항)
+    gcTime: 1000 * 60 * 10, // 10분
+    refetchOnMount: 'always', // 마운트 시 항상 새로고침
   });
 }
 
-/**
- * 게시글 작성 훅
- */
-export function useCreatePost() {
+// ============================================
+// 카테고리 목록
+// ============================================
+
+export function useCategories() {
+  return useQuery({
+    queryKey: queryKeys.categories,
+    queryFn: api.getCategories,
+    staleTime: 1000 * 60 * 10, // 10분 (카테고리는 자주 변하지 않음)
+    gcTime: 1000 * 60 * 30, // 30분
+  });
+}
+
+// ============================================
+// 게시글 작성
+// ============================================
+
+interface CreatePostMutationVariables {
+  data: CreatePostRequest;
+  images: File[];
+}
+
+export function useCreatePost(): UseMutationResult<Post, Error, CreatePostMutationVariables> {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: ({ data, images }: { data: CreatePostRequest; images?: File[] }) =>
-      apiCreatePost(data, images),
+    mutationFn: ({ data, images }: CreatePostMutationVariables) => 
+      api.createPost(data, images),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+      // 게시글 목록 무효화 (새로고침)
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
 }
 
-/**
- * 게시글 수정 훅
- */
-export function useUpdatePost() {
-  const queryClient = useQueryClient();
+// ============================================
+// 게시글 삭제
+// ============================================
 
+interface DeletePostMutationVariables {
+  id: string | number;
+  password: string;
+}
+
+export function useDeletePost(): UseMutationResult<void, Error, DeletePostMutationVariables> {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: UpdatePostRequest }) =>
-      updatePost(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: postKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
+    mutationFn: ({ id, password }: DeletePostMutationVariables) => 
+      api.deletePost(id, password),
+    onSuccess: (_, variables) => {
+      // 해당 게시글 캐시 제거
+      queryClient.removeQueries({ queryKey: queryKeys.post(variables.id) });
+      // 게시글 목록 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
 }
 
-/**
- * 게시글 삭제 훅
- */
-export function useDeletePost() {
-  const queryClient = useQueryClient();
+// ============================================
+// 댓글 작성
+// ============================================
 
+interface CreateCommentMutationVariables {
+  postId: string | number;
+  data: CreateCommentRequest;
+}
+
+export function useCreateComment(): UseMutationResult<Post, Error, CreateCommentMutationVariables> {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: ({ id, password }: { id: number; password: string }) =>
-      deletePost(id, password),
-    onSuccess: (_, { id }) => {
-      // 상세 페이지 캐시 제거
-      queryClient.removeQueries({ queryKey: postKeys.detail(id) });
-      
-      // 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-    },
-    onError: (error) => {
-      console.error('삭제 실패:', error);
-      // TODO: 사용자 알림 추가
+    mutationFn: ({ postId, data }: CreateCommentMutationVariables) => 
+      api.createComment(postId, data),
+    onSuccess: (updatedPost, variables) => {
+      // 해당 게시글 캐시 업데이트
+      queryClient.setQueryData(queryKeys.post(variables.postId), updatedPost);
+      // 게시글 목록도 무효화 (댓글 수 업데이트)
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
 }
 
-/**
- * 댓글 작성 훅 (캐시 직접 업데이트)
- */
-export function useCreateComment() {
-  const queryClient = useQueryClient();
+// ============================================
+// 투표
+// ============================================
 
-  return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: CreateCommentRequest }) =>
-      createComment(postId, data),
-    onSuccess: (updatedPost, { postId }) => {
-      // 댓글이 추가된 전체 Post 객체로 캐시 업데이트
-      queryClient.setQueryData(postKeys.detail(postId), updatedPost);
-      
-      // 목록도 갱신 (commentsCount 변경)
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-    },
-    onError: (error) => {
-      console.error('댓글 작성 실패:', error);
-      // TODO: 사용자 알림 추가
-    },
-  });
+interface VotePostMutationVariables {
+  postId: string | number;
+  data: VoteRequest;
 }
 
-/**
- * 투표 훅 (낙관적 업데이트 + 캐시 갱신)
- */
-export function useVotePost() {
+export function useVotePost(): UseMutationResult<Post, Error, VotePostMutationVariables> {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
-    mutationFn: ({ postId, data }: { postId: number; data: VoteRequest }) =>
-      votePost(postId, data),
-    onSuccess: (updatedPost, { postId }) => {
-      // 상세 페이지 캐시 직접 업데이트
-      queryClient.setQueryData(postKeys.detail(postId), updatedPost);
-      
-      // 목록 캐시 무효화 (새로고침)
-      queryClient.invalidateQueries({ queryKey: postKeys.lists() });
-    },
-    onError: (error) => {
-      console.error('투표 실패:', error);
-      // TODO: 사용자 알림 추가
+    mutationFn: ({ postId, data }: VotePostMutationVariables) => 
+      api.votePost(postId, data),
+    onSuccess: (updatedPost, variables) => {
+      // 해당 게시글 캐시 업데이트
+      queryClient.setQueryData(queryKeys.post(variables.postId), updatedPost);
+      // 게시글 목록도 무효화 (좋아요 수 업데이트)
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
 }
