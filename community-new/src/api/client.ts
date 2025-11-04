@@ -1,117 +1,64 @@
 /**
- * API Client Configuration
+ * API 클라이언트 (v4.0.0)
  * 
- * 백엔드 서버와의 HTTP 통신을 담당하는 Axios 클라이언트 설정
- * 
- * ⚠️ URL 설정은 src/config/constants.ts에서 관리됩니다.
- * 이 파일에서 직접 URL을 변경하지 마세요!
+ * Axios 기반 HTTP 클라이언트
  */
 
-import axios, { type AxiosError, type AxiosInstance } from 'axios';
-import { getApiBaseUrl, APP_CONFIG } from '../config/constants';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 
-const API_BASE_URL = getApiBaseUrl();
+// 환경 변수에서 API URL 가져오기
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
+
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 /**
  * Axios 인스턴스 생성
  */
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: APP_CONFIG.API_TIMEOUT,
+  timeout: 30000, // 30초
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // CORS 쿠키 전송
 });
 
 /**
  * 요청 인터셉터
- * - 요청 전 로깅
- * - 인증 토큰 자동 추가
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // JWT 토큰 자동 추가
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
-    }
+    console.log(`📤 [${config.method?.toUpperCase()}] ${config.url}`);
     return config;
   },
   (error) => {
-    console.error('[API Request Error]', error);
+    console.error('❌ 요청 에러:', error);
     return Promise.reject(error);
   }
 );
 
 /**
  * 응답 인터셉터
- * - 응답 전 로깅
- * - 에러 처리
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log(`[API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.data);
-    }
+    console.log(`✅ [${response.status}] ${response.config.url}`);
     return response;
   },
   (error: AxiosError) => {
-    // 에러 로깅
     if (error.response) {
-      // 서버가 응답했지만 에러 상태 코드
-      console.error('[API Error]', {
-        status: error.response.status,
-        data: error.response.data,
-        url: error.config?.url,
-      });
+      // 서버가 응답을 반환한 경우
+      console.error(`❌ [${error.response.status}] ${error.config?.url}:`, error.response.data);
     } else if (error.request) {
-      // 요청은 보냈지만 응답이 없음
-      console.error('[API Error] No response received', error.message);
+      // 요청은 전송되었으나 응답이 없는 경우
+      console.error('❌ 응답 없음:', error.config?.url);
     } else {
-      // 요청 설정 중 에러
-      console.error('[API Error]', error.message);
+      // 요청 설정 중 에러가 발생한 경우
+      console.error('❌ 요청 설정 에러:', error.message);
     }
     
     return Promise.reject(error);
   }
 );
-
-/**
- * API 에러 타입
- */
-export interface ApiError {
-  message: string;
-  status?: number;
-  data?: any;
-}
-
-/**
- * Axios 에러를 ApiError로 변환
- */
-export function handleApiError(error: unknown): ApiError {
-  if (axios.isAxiosError(error)) {
-    return {
-      message: error.response?.data?.message || error.message || '알 수 없는 오류가 발생했습니다.',
-      status: error.response?.status,
-      data: error.response?.data,
-    };
-  }
-  
-  if (error instanceof Error) {
-    return {
-      message: error.message,
-    };
-  }
-  
-  return {
-    message: '알 수 없는 오류가 발생했습니다.',
-  };
-}
 
 export default apiClient;

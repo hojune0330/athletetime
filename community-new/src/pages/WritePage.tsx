@@ -1,20 +1,16 @@
 /**
- * 게시글 작성 페이지 (v3.0.0)
+ * 게시글 작성 페이지 (v4.0.0 - Clean Architecture)
  * 
- * - Cloudinary 이미지 업로드 지원 (최대 5개)
- * - PostgreSQL API 통합
- * - 익명 사용자 ID 자동 관리
- * - 회원 시스템 대비 구조
+ * 완전히 재작성된 깔끔한 코드
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle } from 'lucide-react';
 import ImageUploader from '../components/post/ImageUploader';
-import { createPost, getCategories } from '../api/posts';
+import { useCreatePost, useCategories } from '../hooks/usePosts';
 import { getAnonymousId, getUsername, setUsername } from '../utils/anonymousUser';
 import { showToast } from '../utils/toast';
-import type { Category } from '../types/post';
 
 export default function WritePage() {
   const navigate = useNavigate();
@@ -28,49 +24,22 @@ export default function WritePage() {
   const [instagram, setInstagram] = useState('');
   const [images, setImages] = useState<File[]>([]);
   
-  // 카테고리 목록
-  const [categories, setCategories] = useState<Category[]>([]);
+  // API 훅
+  const { data: categoriesData } = useCategories();
+  const createPostMutation = useCreatePost();
   
-  // 로딩 & 에러 상태
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  // 익명 사용자 ID
+  const categories = categoriesData || [];
   const anonymousId = getAnonymousId();
 
-  /**
-   * 컴포넌트 마운트 시 카테고리 로드 & 사용자명 불러오기
-   */
+  // 컴포넌트 마운트 시 사용자명 불러오기
   useEffect(() => {
-    loadCategories();
-    
-    // 이전에 저장된 사용자명 불러오기
     const savedUsername = getUsername();
     if (savedUsername) {
       setAuthor(savedUsername);
     }
   }, []);
 
-  /**
-   * 카테고리 목록 로드
-   */
-  const loadCategories = async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data.filter(c => c.is_active));
-    } catch (err) {
-      console.error('카테고리 로드 실패:', err);
-      // 기본 카테고리 사용
-      setCategories([
-        { id: 1, name: '공지사항', icon: '📢', color: '#FF4444', description: '', sort_order: 1, is_active: true },
-        { id: 2, name: '자유게시판', icon: '💬', color: '#4CAF50', description: '', sort_order: 2, is_active: true },
-      ]);
-    }
-  };
-
-  /**
-   * 폼 유효성 검사
-   */
+  // 폼 유효성 검사
   const validateForm = (): string | null => {
     if (!title.trim()) return '제목을 입력해주세요.';
     if (title.length > 200) return '제목은 200자 이내로 입력해주세요.';
@@ -89,53 +58,48 @@ export default function WritePage() {
     return null;
   };
 
-  /**
-   * 게시글 작성 제출
-   */
+  // 게시글 작성 제출
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
 
     // 유효성 검사
     const validationError = validateForm();
     if (validationError) {
-      setError(validationError);
+      showToast(validationError, { type: 'warning' });
       return;
     }
 
-    setLoading(true);
-
     try {
-      // 사용자명 저장 (다음에도 사용할 수 있도록)
+      // 사용자명 저장
       setUsername(author);
 
+      // 카테고리명 찾기
+      const selectedCategory = categories.find(c => c.id === categoryId);
+      const categoryName = selectedCategory?.name || '자유';
+
       // 게시글 작성
-      const post = await createPost(
-        {
+      const post = await createPostMutation.mutateAsync({
+        data: {
           title: title.trim(),
           content: content.trim(),
           author: author.trim(),
           password,
-          category: categoryId.toString(),
+          category: categoryName,
           instagram: instagram.trim() || undefined,
           anonymousId,
         },
         images
-      );
+      });
 
       showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
       setTimeout(() => navigate(`/post/${post.id}`), 500);
     } catch (err: any) {
       console.error('게시글 작성 실패:', err);
-      setError(err.message || '게시글 작성에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
+      showToast(err.message || '게시글 작성에 실패했습니다.', { type: 'error' });
     }
   };
 
-  /**
-   * 취소
-   */
+  // 취소
   const handleCancel = () => {
     if (title || content || images.length > 0) {
       if (!confirm('작성 중인 내용이 있습니다. 정말 취소하시겠습니까?')) {
@@ -145,6 +109,8 @@ export default function WritePage() {
     navigate(-1);
   };
 
+  const isSubmitting = createPostMutation.isPending;
+
   return (
     <div className="min-h-screen bg-dark-800 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -153,6 +119,7 @@ export default function WritePage() {
           <button
             onClick={handleCancel}
             className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            disabled={isSubmitting}
           >
             <ArrowLeft className="w-5 h-5" />
             <span>돌아가기</span>
@@ -162,23 +129,15 @@ export default function WritePage() {
             게시글 작성
           </h1>
           
-          <div className="w-24" /> {/* Spacer for centering */}
+          <div className="w-24" /> {/* Spacer */}
         </div>
-
-        {/* 에러 메시지 */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-red-200 text-sm">{error}</p>
-          </div>
-        )}
 
         {/* 작성 폼 */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 카테고리 & 작성자 정보 */}
           <div className="bg-dark-700 rounded-lg p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* 카테고리 선택 */}
+              {/* 카테고리 */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   게시판
@@ -187,7 +146,7 @@ export default function WritePage() {
                   value={categoryId}
                   onChange={(e) => setCategoryId(Number(e.target.value))}
                   className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                  disabled={loading}
+                  disabled={isSubmitting}
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
@@ -209,7 +168,7 @@ export default function WritePage() {
                   placeholder="닉네임"
                   maxLength={50}
                   className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-                  disabled={loading}
+                  disabled={isSubmitting}
                   required
                 />
               </div>
@@ -226,7 +185,7 @@ export default function WritePage() {
                   placeholder="4자 이상"
                   minLength={4}
                   className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-                  disabled={loading}
+                  disabled={isSubmitting}
                   required
                 />
               </div>
@@ -243,7 +202,7 @@ export default function WritePage() {
                 onChange={(e) => setInstagram(e.target.value)}
                 placeholder="@username"
                 className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-                disabled={loading}
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -260,7 +219,7 @@ export default function WritePage() {
               placeholder="제목을 입력하세요 (최대 200자)"
               maxLength={200}
               className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
-              disabled={loading}
+              disabled={isSubmitting}
               required
             />
             <p className="mt-2 text-xs text-gray-500 text-right">
@@ -280,7 +239,7 @@ export default function WritePage() {
               maxLength={10000}
               rows={15}
               className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 resize-none focus:outline-none focus:border-blue-500"
-              disabled={loading}
+              disabled={isSubmitting}
               required
             />
             <p className="mt-2 text-xs text-gray-500 text-right">
@@ -307,17 +266,17 @@ export default function WritePage() {
               type="button"
               onClick={handleCancel}
               className="px-6 py-3 bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500 transition-colors"
-              disabled={loading}
+              disabled={isSubmitting}
             >
               취소
             </button>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>작성 중...</span>
