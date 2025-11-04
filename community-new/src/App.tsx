@@ -17,8 +17,9 @@ function App() {
     document.documentElement.classList.add('dark')
   }, [])
 
-  // React app is deployed at /community path
-  const basename = '/community'
+  // React app is deployed at /community path in production
+  // In development, use root path
+  const basename = import.meta.env.MODE === 'production' ? '/community' : '/'
 
   return (
     <div className="min-h-screen bg-dark-800">

@@ -4,7 +4,8 @@
  * 게시글 관련 데이터 페칭 및 뮤테이션
  */
 
-import { useQuery, useMutation, useQueryClient, UseQueryResult, UseMutationResult } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
 import * as api from '../api/posts';
 import type { Post, PostsResponse, CreatePostRequest, CreateCommentRequest, VoteRequest } from '../types';
 

@@ -4,7 +4,8 @@
  * Axios 기반 HTTP 클라이언트
  */
 
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosError } from 'axios';
 
 // 환경 변수에서 API URL 가져오기
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
@@ -14,7 +15,7 @@ console.log('🌐 API Base URL:', API_BASE_URL);
 /**
  * Axios 인스턴스 생성
  */
-export const apiClient: AxiosInstance = axios.create({
+export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // 30초
   headers: {

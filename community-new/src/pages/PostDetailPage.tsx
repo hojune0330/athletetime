@@ -403,14 +403,14 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
 // ============================================
 
 export default function PostDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
-  const postId = id || '';
+  const id = postId || '';
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   
   // API 훅
-  const { data: post, isLoading, isError, error } = usePost(postId);
+  const { data: post, isLoading, isError, error } = usePost(id);
   const votePostMutation = useVotePost();
   const createCommentMutation = useCreateComment();
   const deletePostMutation = useDeletePost();
@@ -420,7 +420,7 @@ export default function PostDetailPage() {
     try {
       const anonymousId = getAnonymousId();
       await votePostMutation.mutateAsync({
-        postId,
+        postId: id,
         data: { type, anonymousId }
       });
       showToast(type === 'like' ? '👍 추천했습니다!' : '👎 비추천했습니다!', { type: 'success' });
@@ -434,7 +434,7 @@ export default function PostDetailPage() {
     try {
       const anonymousId = getAnonymousId();
       await createCommentMutation.mutateAsync({
-        postId,
+        postId: id,
         data: { author, content, anonymousId }
       });
       showToast('💬 댓글이 작성되었습니다!', { type: 'success' });
@@ -446,7 +446,7 @@ export default function PostDetailPage() {
   // 삭제 핸들러
   const handleDelete = async (password: string) => {
     try {
-      await deletePostMutation.mutateAsync({ id: postId, password });
+      await deletePostMutation.mutateAsync({ id, password });
       showToast('🗑️ 게시글이 삭제되었습니다.', { type: 'success' });
       setTimeout(() => navigate('/'), 1000);
     } catch (err: any) {
