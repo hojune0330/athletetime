@@ -42,8 +42,9 @@ export function usePost(id: string | number): UseQueryResult<Post, Error> {
     queryKey: queryKeys.post(id),
     queryFn: () => api.getPost(id),
     enabled: !!id && !isNaN(Number(id)),
-    staleTime: 1000 * 60, // 1분
+    staleTime: 0, // 항상 최신 데이터 가져오기 (Priority 1 요구사항)
     gcTime: 1000 * 60 * 10, // 10분
+    refetchOnMount: 'always', // 마운트 시 항상 새로고침
   });
 }
 
