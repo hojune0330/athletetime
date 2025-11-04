@@ -186,6 +186,7 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/posts', upload.array('images', 5), handleUploadError, postsRouter);
 app.use('/api/posts/:postId/comments', commentsRouter);
 app.use('/api/posts/:postId/vote', votesRouter);
+app.use('/api/posts/:postId/poll', pollsRouter);
 
 // 404 핸들러
 app.use((req, res) => {
