@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
     const actualPage = parseInt(page);
     const actualOffset = (actualPage - 1) * actualLimit;
     
-    // 기본 쿼리
+    // 기본 쿼리 (password_hash 제외, comments 배열 포함)
     let query = `
       SELECT 
         p.id,
@@ -68,7 +68,23 @@ router.get('/', async (req, res) => {
           FROM images i 
           WHERE i.post_id = p.id),
           '[]'::json
-        ) as images
+        ) as images,
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'id', cm.id,
+              'content', cm.content,
+              'author', cm.author,
+              'instagram', cm.instagram,
+              'created_at', cm.created_at,
+              'is_blinded', cm.is_blinded
+            ) ORDER BY cm.created_at ASC
+          )
+          FROM comments cm 
+          WHERE cm.post_id = p.id 
+            AND cm.deleted_at IS NULL),
+          '[]'::json
+        ) as comments
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
@@ -118,7 +134,8 @@ router.get('/', async (req, res) => {
       success: true,
       posts: postsResult.rows.map(row => ({
         ...row,
-        images: Array.isArray(row.images) ? row.images : []
+        images: Array.isArray(row.images) ? row.images : [],
+        comments: Array.isArray(row.comments) ? row.comments : []
       })),
       count: parseInt(countResult.rows[0].total),
       page: actualPage,
