@@ -11,6 +11,15 @@ function App() {
   useEffect(() => {
     // 다크모드를 기본으로 설정
     document.documentElement.classList.add('dark')
+    
+    // 에러 처리
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error)
+    })
+    
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled rejection:', event.reason)
+    })
   }, [])
 
   return (

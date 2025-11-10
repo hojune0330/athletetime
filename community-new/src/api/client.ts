@@ -19,8 +19,23 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response) {
       console.error('[API ERROR]', error.response.status, error.response.data)
+      
+      // 네트워크 오류 처리
+      if (error.response.status === 0) {
+        console.error('[NETWORK ERROR] Cannot connect to backend server')
+      }
+      // 인증 오류
+      else if (error.response.status === 401) {
+        console.warn('[AUTH ERROR] Unauthorized access')
+      }
+      // 서버 오류
+      else if (error.response.status >= 500) {
+        console.error('[SERVER ERROR] Backend server error')
+      }
+    } else if (error.request) {
+      console.error('[NETWORK ERROR] No response from server:', error.message)
     } else {
-      console.error('[API ERROR]', error.message)
+      console.error('[REQUEST ERROR] Request setup error:', error.message)
     }
     return Promise.reject(error)
   }

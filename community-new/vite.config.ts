@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/', // Netlify 루트 경로 설정
   server: {
     host: '0.0.0.0',
     port: 5173,
@@ -31,5 +32,20 @@ export default defineConfig({
       '.sandbox.novita.ai',
       '.e2b.dev',
     ],
+  },
+  // Netlify 배포 최적화
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@heroicons/react', 'clsx', 'tailwind-merge'],
+          query: ['@tanstack/react-query', 'axios'],
+        },
+      },
+    },
   }
 })

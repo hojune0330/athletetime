@@ -30,14 +30,29 @@ export interface Post {
   images?: string[]
   poll?: PostPoll | null
   date: string
-  views: number
-  likes: string[]
-  dislikes: string[]
-  comments: PostComment[]
+  views?: number // 백엔드에서 optional로 변경됨
+  likes?: string[] // 백엔드에서 optional로 변경됨
+  dislikes?: string[] // 백엔드에서 optional로 변경됨
+  comments?: PostComment[] // 백엔드에서 optional로 변경됨
   reports?: string[]
   isNotice?: boolean
   isAdmin?: boolean
   isBlinded?: boolean
+  // 백엔드에서 추가된 필드들
+  likes_count?: number
+  dislikes_count?: number
+  comments_count?: number
+  is_notice?: boolean
+  is_pinned?: boolean
+  is_blinded?: boolean
+  created_at?: string
+  updated_at?: string
+  category_id?: number
+  category_name?: string
+  category_icon?: string
+  category_color?: string
+  user_id?: string
+  username?: string
 }
 
 export interface PostsResponse {

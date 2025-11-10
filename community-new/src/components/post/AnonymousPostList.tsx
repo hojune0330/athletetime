@@ -39,6 +39,18 @@ function getVoteBadgeClass(likes: number, dislikes: number) {
 }
 
 export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, isError, onRetry }: AnonymousPostListProps) {
+  // 데이터 검증
+  const validPosts = posts?.filter(post => {
+    if (!post || !post.id) return false
+    // 백엔드 필드와 프론트엔드 필드 매핑
+    if (!post.views) post.views = 0
+    if (!post.likes) post.likes = []
+    if (!post.dislikes) post.dislikes = []
+    if (!post.comments) post.comments = []
+    if (post.is_notice !== undefined) post.isNotice = post.is_notice
+    if (post.is_blinded !== undefined) post.isBlinded = post.is_blinded
+    return true
+  }) || []
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -70,7 +82,7 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
     )
   }
 
-  if (!posts.length) {
+  if (!validPosts.length) {
     return (
       <div className="rounded-lg bg-dark-700 border border-dark-600 p-6 text-center text-gray-400">
         아직 게시글이 없어요. 첫 글을 작성해보세요!
@@ -78,7 +90,7 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
     )
   }
 
-  const displayPosts = posts.slice(0, 20)
+  const displayPosts = validPosts.slice(0, 20)
 
   return (
     <div className="space-y-3">
