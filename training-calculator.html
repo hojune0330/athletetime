@@ -20,8 +20,48 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
+    /* Fix text positioning issues - add proper layout structure */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+      position: relative;
+      min-height: 100vh;
+      padding-top: 0; /* Remove any default padding that might push content down */
+    }
+    
+    /* Ensure proper stacking context for all content */
+    .main-content-wrapper {
+      position: relative;
+      z-index: 1;
+      padding-top: 1rem;
+      margin-top: 0; /* Remove any margin that might cause positioning issues */
+    }
+    
+    /* Fix for header positioning */
+    .gradient-bg {
+      position: relative;
+      z-index: 40; /* Consistent header z-index */
+    }
+    
+    /* Ensure floating elements don't interfere with main content */
+    .env-floating-btn {
+      z-index: 30; /* Below header but above content */
+    }
+    
+    /* Ensure proper content flow and prevent text overflow */
+    .content-container {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      margin-top: 0 !important; /* Override any margin that might push content to top */
+      padding-top: 0 !important; /* Override any padding that might affect positioning */
     }
     
     .gradient-bg {
@@ -119,7 +159,7 @@
     }
   </style>
     
-    /* PWA 간단한 설치 버튼 */
+    /* PWA 간단한 설치 버튼 - Fix positioning conflict */
     .simple-install-btn {
       position: fixed;
       top: 20px;
@@ -133,7 +173,7 @@
       font-size: 0.9rem;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0, 255, 163, 0.4);
-      z-index: 9999;
+      z-index: 1000; /* Reduced from 9999 to prevent overlap */
       display: none;
       align-items: center;
       gap: 6px;
@@ -176,7 +216,7 @@
       scrollbar-width: thin;
       scrollbar-color: #667eea rgba(0, 0, 0, 0.1);
     }
-    /* 환경 선택 모달 스타일 */
+    /* 환경 선택 모달 스타일 - Fix z-index conflict */
     .env-modal {
       display: none;
       position: fixed;
@@ -185,7 +225,7 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
+      z-index: 2000; /* Increased to ensure it's above other elements */
       justify-content: center;
       align-items: center;
     }
@@ -230,6 +270,29 @@
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
     }
     
+    /* Fix layout structure to prevent text overflow */
+    .main-content-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 80px); /* Account for header height */
+      padding-top: 1rem;
+    }
+    
+    /* Ensure proper content flow */
+    .content-container {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    /* Fix for gradient header positioning */
+    .gradient-bg.sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    
     /* 플로팅 환경 변경 버튼 (모바일) */
     .env-floating-btn {
       display: none;
@@ -242,7 +305,7 @@
       background: linear-gradient(135deg, #8b5cf6, #7c3aed);
       color: white;
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-      z-index: 100;
+      z-index: 30; /* Reduced from 100 to prevent overlap with header */
       justify-content: center;
       align-items: center;
       cursor: pointer;
@@ -319,9 +382,9 @@
       </div>
     </div>
   </div>
-  <div class="max-w-7xl mx-auto p-6">
+  <div class="max-w-7xl mx-auto p-6 main-content-wrapper">
     <!-- Header -->
-    <div class="gradient-bg text-white p-6 rounded-xl mb-6">
+    <div class="gradient-bg text-white p-6 rounded-xl mb-6 content-container">
       <div class="flex justify-between items-start">
         <div>
           <h1 class="text-3xl font-bold mb-2">전문 훈련 페이스 계산기</h1>

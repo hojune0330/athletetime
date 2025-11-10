@@ -21,9 +21,45 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- dom-to-image 제거, html2canvas만 사용 -->
   <style>
+    /* Fix text positioning issues - add proper layout structure */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    
     body { 
       font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
       -webkit-tap-highlight-color: transparent;
+      position: relative;
+      min-height: 100vh;
+      padding-top: 0; /* Remove any default padding that might push content down */
+    }
+    
+    /* Ensure proper stacking context for all content */
+    .main-content-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 80px);
+      padding-top: 1rem;
+      margin-top: 0; /* Remove any margin that might cause positioning issues */
+    }
+    
+    /* Fix for header positioning */
+    header.sticky {
+      position: sticky;
+      top: 0;
+      z-index: 40; /* Consistent with updated header */
+    }
+    
+    /* Ensure floating elements don't interfere with main content */
+    .env-floating-btn {
+      z-index: 30; /* Below header but above content */
+    }
+    
+    .simple-install-btn {
+      z-index: 30; /* Below header but above content */
     }
     
     .gradient-text {
@@ -74,7 +110,7 @@
         position: sticky;
         left: 0;
         background: white;
-        z-index: 10;
+        z-index: 5; /* Reduced from 10 to prevent overlap with header */
         box-shadow: 2px 0 4px rgba(0,0,0,0.1);
         font-weight: bold;
       }
@@ -157,6 +193,44 @@
       font-weight: bold;
     }
     
+    /* Fix layout structure to prevent text overflow */
+    .main-content-wrapper {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 80px); /* Account for header height */
+      padding-top: 1rem;
+    }
+    
+    /* Ensure proper content flow and prevent text overflow */
+    .content-container {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      margin-top: 0 !important; /* Override any margin that might push content to top */
+      padding-top: 0 !important; /* Override any padding that might affect positioning */
+    }
+    
+    /* Fix for tab content positioning */
+    .tab-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 0; /* Remove any margin that might cause issues */
+    }
+    
+    /* Ensure proper positioning for all text elements */
+    .pace-table {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Fix for sticky header positioning */
+    header.sticky {
+      position: sticky;
+      top: 0;
+      z-index: 50; /* Reduced from 10 to prevent overlap */
+    }
+    
     .lane-track {
       background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
       color: white;
@@ -234,7 +308,7 @@
         position: sticky;
         left: 0;
         background: white;
-        z-index: 10;
+        z-index: 5; /* Reduced from 10 to prevent overlap with header */
         box-shadow: 2px 0 4px rgba(0,0,0,0.1);
         font-weight: bold;
         background-color: #f9fafb;
@@ -467,7 +541,7 @@
       color: #6b7280;
       margin-top: 4px;
     }
-    /* 환경 선택 모달 스타일 */
+    /* 환경 선택 모달 스타일 - Fix z-index conflict */
     .env-modal {
       display: none;
       position: fixed;
@@ -476,7 +550,7 @@
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.8);
-      z-index: 9999;
+      z-index: 2000; /* Increased to ensure it's above other elements */
       justify-content: center;
       align-items: center;
     }
@@ -521,7 +595,7 @@
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
     }
     
-    /* 플로팅 환경 변경 버튼 (모바일) */
+    /* 플로팅 환경 변경 버튼 (모바일) - Fix positioning conflict */
     .env-floating-btn {
       display: none;
       position: fixed;
@@ -533,7 +607,7 @@
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-      z-index: 100;
+      z-index: 30; /* Reduced from 100 to prevent overlap with header */
       justify-content: center;
       align-items: center;
       cursor: pointer;
@@ -586,7 +660,7 @@
     }
   </style>
     
-    /* PWA 간단한 설치 버튼 */
+    /* PWA 간단한 설치 버튼 - Fix positioning conflict */
     .simple-install-btn {
       position: fixed;
       top: 20px;
@@ -600,7 +674,7 @@
       font-size: 0.9rem;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0, 255, 163, 0.4);
-      z-index: 9999;
+      z-index: 50; /* Reduced from 1000 to prevent overlap with main content */
       display: none;
       align-items: center;
       gap: 6px;
@@ -669,7 +743,7 @@
   </div>
   
   <!-- Header -->
-  <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-10 no-print">
+  <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-40 no-print">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3 md:gap-4">
         <button type="button" onclick="goBack()" class="p-1">
@@ -700,10 +774,13 @@
     </div>
   </header>
 
-  <div class="max-w-6xl mx-auto p-4 pb-20">
+  <div class="max-w-6xl mx-auto p-4 pb-20 main-content-wrapper">
+    
+    <!-- Ensure content starts at proper position -->
+    <div style="position: relative; z-index: 1;">
     
     <!-- 모바일 안내 메시지 -->
-    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center">
+    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center content-container">
       <p class="text-sm font-medium">
         <i class="fas fa-hand-point-left mr-2"></i>
         테이블을 좌우로 스크롤하세요
@@ -711,7 +788,7 @@
     </div>
     
     <!-- 탭 메뉴 -->
-    <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container">
+    <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container content-container">
       <button type="button" onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
         <i class="fas fa-table mr-2"></i>페이스 차트
       </button>
@@ -3830,6 +3907,9 @@
     
       display: inline-flex;
     }
+  
+  </div>
+  <!-- End of main content wrapper -->
   
   <!-- PWA 등록 스크립트 -->
   <script src="/install-ui-patch.js"></script>
