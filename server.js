@@ -189,6 +189,9 @@ app.use('/api/posts/:postId/comments', commentsRouter);
 app.use('/api/posts/:postId/vote', votesRouter);
 app.use('/api/posts/:postId/poll', pollsRouter);
 
+// 정적 파일 서빙 (HTML, CSS, JS, 이미지 등)
+app.use(express.static(__dirname));
+
 // 404 핸들러
 app.use((req, res) => {
   res.status(404).json({
