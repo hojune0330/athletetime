@@ -50,7 +50,31 @@ export const InteractiveAppV2 = () => {
 
   // 페이지 이동 처리 with 트랜지션
   const navigateTo = (page: typeof currentPage) => {
-    if (!currentUser && (page === 'community' || page === 'marketplace' || page === 'results')) {
+    // 외부 페이지로 직접 연결
+    if (page === 'community') {
+      // 외부 익명 커뮤니티로 이동
+      window.location.href = 'https://athlete-time.netlify.app/community'
+      return
+    }
+    
+    // 계산기 및 채팅 페이지로 직접 연결
+    if (page === 'pace') {
+      window.location.href = '/pace-calculator.html'
+      return
+    }
+    
+    if (page === 'training') {
+      window.location.href = '/training-calculator.html'
+      return
+    }
+    
+    if (page === 'chat') {
+      window.location.href = '/chat.html'
+      return
+    }
+    
+    // 다른 페이지는 로그인 필요
+    if (!currentUser && (page === 'marketplace' || page === 'results')) {
       setShowLoginModal(true)
       return
     }
@@ -133,7 +157,7 @@ export const InteractiveAppV2 = () => {
 
             {/* 네비게이션 (데스크톱) */}
             <nav className="hidden md:flex items-center space-x-1">
-              {['community', 'marketplace', 'results'].map((page) => (
+              {['community', 'pace', 'training', 'chat', 'marketplace', 'results'].map((page) => (
                 <button
                   key={page}
                   onClick={() => navigateTo(page as typeof currentPage)}
@@ -148,6 +172,9 @@ export const InteractiveAppV2 = () => {
                   }`}
                 >
                   {page === 'community' && '커뮤니티'}
+                  {page === 'pace' && '페이스 계산기'}
+                  {page === 'training' && '훈련 계산기'}
+                  {page === 'chat' && '실시간 채팅'}
                   {page === 'marketplace' && '중고 거래'}
                   {page === 'results' && '경기 결과'}
                 </button>
@@ -258,7 +285,7 @@ export const InteractiveAppV2 = () => {
             </div>
 
             {/* 메인 기능 카드들 - 그리드 레이아웃 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
               {/* 커뮤니티 카드 */}
               <div
                 onMouseEnter={() => setActiveHoverCard('community')}
@@ -278,16 +305,20 @@ export const InteractiveAppV2 = () => {
                   <div className="w-16 h-16 mb-4 relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl animate-pulse"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <i className="fas fa-comments text-white text-2xl"></i>
+                      <i className="fas fa-comments text-white text-2xl animate-bounce"></i>
+                    </div>
+                    {/* 익명 커뮤니티 배지 */}
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                      익명
                     </div>
                   </div>
                   
                   {/* 제목 및 설명 */}
                   <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    커뮤니티
+                    익명 커뮤니티
                   </h3>
                   <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    익명으로 자유롭게 소통하는 육상인들의 공간
+                    로그인 없이 바로 참여하는 익명 육상인 커뮤니티
                   </p>
                   
                   {/* 카테고리 태그들 */}
@@ -449,6 +480,202 @@ export const InteractiveAppV2 = () => {
                     </span>
                     <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                       오늘 3개 경신
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 페이스 계산기 카드 */}
+              <div
+                onMouseEnter={() => setActiveHoverCard('pace')}
+                onMouseLeave={() => setActiveHoverCard(null)}
+                onClick={() => navigateTo('pace')}
+                className={`relative group cursor-pointer transform transition-all duration-300 ${
+                  activeHoverCard === 'pace' ? 'scale-105 -translate-y-2' : ''
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}></div>
+                <div className={`relative p-8 rounded-3xl backdrop-blur-sm ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}>
+                  {/* 아이콘 */}
+                  <div className="w-16 h-16 mb-4 relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl animate-pulse"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <i className="fas fa-calculator text-white text-2xl"></i>
+                    </div>
+                  </div>
+                  
+                  <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    페이스 계산기
+                  </h3>
+                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    정확한 페이스 계산과 기록 예측
+                  </p>
+                  
+                  {/* 계산 기능들 */}
+                  <div className={`space-y-2 mb-4`}>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-orange-50'
+                    }`}>
+                      <i className="fas fa-stopwatch text-orange-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        페이스 변환
+                      </span>
+                    </div>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-orange-50'
+                    }`}>
+                      <i className="fas fa-chart-line text-orange-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        기록 예측
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 사용 통계 */}
+                  <div className={`flex items-center justify-between p-3 rounded-lg ${
+                    isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100'
+                  }`}>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        실시간 사용 중
+                      </span>
+                    </div>
+                    <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      89명
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 훈련 계산기 카드 */}
+              <div
+                onMouseEnter={() => setActiveHoverCard('training')}
+                onMouseLeave={() => setActiveHoverCard(null)}
+                onClick={() => navigateTo('training')}
+                className={`relative group cursor-pointer transform transition-all duration-300 ${
+                  activeHoverCard === 'training' ? 'scale-105 -translate-y-2' : ''
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}></div>
+                <div className={`relative p-8 rounded-3xl backdrop-blur-sm ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}>
+                  {/* 아이콘 */}
+                  <div className="w-16 h-16 mb-4 relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl animate-pulse"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <i className="fas fa-dumbbell text-white text-2xl"></i>
+                    </div>
+                  </div>
+                  
+                  <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    훈련 계산기
+                  </h3>
+                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    과학적인 훈련 계획과 관리
+                  </p>
+                  
+                  {/* 훈련 기능들 */}
+                  <div className={`space-y-2 mb-4`}>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-indigo-50'
+                    }`}>
+                      <i className="fas fa-heartbeat text-indigo-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        심박수 계산
+                      </span>
+                    </div>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-indigo-50'
+                    }`}>
+                      <i className="fas fa-running text-indigo-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        훈련 강도
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 추천 배지 */}
+                  <div className="flex items-center space-x-2">
+                    <span className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-bold rounded-full animate-pulse">
+                      추천
+                    </span>
+                    <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      코치들이 선택
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 실시간 채팅 카드 */}
+              <div
+                onMouseEnter={() => setActiveHoverCard('chat')}
+                onMouseLeave={() => setActiveHoverCard(null)}
+                onClick={() => navigateTo('chat')}
+                className={`relative group cursor-pointer transform transition-all duration-300 ${
+                  activeHoverCard === 'chat' ? 'scale-105 -translate-y-2' : ''
+                }`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r from-teal-500 to-green-500 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}></div>
+                <div className={`relative p-8 rounded-3xl backdrop-blur-sm ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}>
+                  {/* 아이콘 */}
+                  <div className="w-16 h-16 mb-4 relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-green-500 rounded-2xl animate-pulse"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <i className="fas fa-comments text-white text-2xl"></i>
+                    </div>
+                  </div>
+                  
+                  <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    실시간 채팅
+                  </h3>
+                  <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    육상인들과의 실시간 소통
+                  </p>
+                  
+                  {/* 채팅 기능들 */}
+                  <div className={`space-y-2 mb-4`}>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-teal-50'
+                    }`}>
+                      <i className="fas fa-globe text-teal-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        전체 채팅방
+                      </span>
+                    </div>
+                    <div className={`flex items-center space-x-2 p-2 rounded-lg ${
+                      isDarkMode ? 'bg-gray-800/50' : 'bg-teal-50'
+                    }`}>
+                      <i className="fas fa-users text-teal-500"></i>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        부별 채팅방
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* 온라인 상태 */}
+                  <div className={`flex items-center justify-between p-3 rounded-lg ${
+                    isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100'
+                  }`}>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        온라인
+                      </span>
+                    </div>
+                    <span className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      234명
                     </span>
                   </div>
                 </div>
