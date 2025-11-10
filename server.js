@@ -43,7 +43,7 @@ const { isCloudinaryConfigured } = require('./utils/cloudinary');
 // 환경 설정
 // ============================================
 
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://athlete-time.netlify.app';
 
@@ -53,7 +53,7 @@ const allowedOrigins = [
   'https://community.athletetime.com',
   'http://localhost:5173',
   'http://localhost:3000',
-  'http://localhost:3005',
+  'http://localhost:3001',
 ];
 
 // ============================================

@@ -1797,13 +1797,28 @@
   </div>
 
   <script>
-    // 환경 설정 관련 변수
-    let selectedEnvironment = null;
-    
-    // 페이지 로드 시 환경 체크
+    // 페이지 로드 시 초기화
     window.addEventListener('DOMContentLoaded', function() {
-      checkEnvironment();
+      initializePaceCalculator();
     });
+    
+    // 페이스 계산기 초기화
+    function initializePaceCalculator() {
+      // 기본 계산기 설정
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.body.classList.add('force-mobile');
+      }
+      
+      // 초기 표 업데이트
+      setTimeout(() => {
+        if (document.getElementById('kmPaceTable')) {
+          updateKmPaceTable();
+        }
+        // 목표 테이블은 존재하지 않으므로 주석 처리
+        // updateGoalTable();
+      }, 100);
+    }
     
     // 환경 체크 및 모달 표시
     function checkEnvironment() {
@@ -1823,10 +1838,16 @@
         
         // 기본 선택 표시
         if (isMobile) {
-          document.querySelector('.env-button[onclick*="mobile"]').classList.add('selected');
+          const mobileButton = document.querySelector('.env-button[onclick*="mobile"]');
+          if (mobileButton) {
+            mobileButton.classList.add('selected');
+          }
           selectedEnvironment = 'mobile';
         } else {
-          document.querySelector('.env-button[onclick*="desktop"]').classList.add('selected');
+          const desktopButton = document.querySelector('.env-button[onclick*="desktop"]');
+          if (desktopButton) {
+            desktopButton.classList.add('selected');
+          }
           selectedEnvironment = 'desktop';
         }
       }
@@ -1834,7 +1855,13 @@
     
     // 환경 선택 모달 표시
     function showEnvironmentModal(isInitial = false) {
-      document.getElementById('envModal').classList.add('active');
+      const envModal = document.getElementById('envModal');
+      if (!envModal) {
+        console.warn('envModal element not found');
+        return;
+      }
+      
+      envModal.classList.add('active');
       
       // 현재 환경 표시
       const currentEnv = localStorage.getItem('paceCalculatorEnv') || 
@@ -1844,7 +1871,10 @@
         btn.classList.remove('selected');
       });
       
-      document.querySelector(`.env-button[onclick*="${currentEnv}"]`).classList.add('selected');
+      const targetButton = document.querySelector(`.env-button[onclick*="${currentEnv}"]`);
+      if (targetButton) {
+        targetButton.classList.add('selected');
+      }
       selectedEnvironment = currentEnv;
     }
     
@@ -1856,7 +1886,10 @@
       document.querySelectorAll('.env-button').forEach(btn => {
         btn.classList.remove('selected');
       });
-      event.currentTarget.classList.add('selected');
+      
+      if (event && event.currentTarget) {
+        event.currentTarget.classList.add('selected');
+      }
     }
     
     // 환경 확인
@@ -1867,7 +1900,7 @@
       }
       
       // 기억하기 체크 시 로컬 스토리지에 저장
-      if (document.getElementById('rememberChoice').checked) {
+      if (document.getElementById('rememberChoice') && document.getElementById('rememberChoice').checked) {
         const expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 30);
         localStorage.setItem('paceCalculatorEnv', selectedEnvironment);
@@ -1879,21 +1912,18 @@
       updateEnvironmentIcon(selectedEnvironment);
       
       // 모달 닫기
-      document.getElementById('envModal').classList.remove('active');
+      const envModal = document.getElementById('envModal');
+      if (envModal) {
+        envModal.classList.remove('active');
+      }
       
-      // 환경에 따른 스타일 적용 (페이지 리로드 없이)
-      if (selectedEnvironment === 'mobile') {
-        // 모바일 스타일 적용
-        document.body.classList.add('force-mobile');
-        document.body.classList.remove('force-desktop');
-        // 테이블 재렌더링을 위한 트리거
-        window.dispatchEvent(new Event('resize'));
-      } else {
-        // 데스크톱 스타일 적용
+      // 모바일/데스크톱 버전 리다이렉트
+      if (selectedEnvironment === 'mobile' && window.innerWidth > 768) {
+        // 데스크톱에서 모바일 버전 보기
+        window.location.href = 'pace-calculator-mobile.html';
+      } else if (selectedEnvironment === 'desktop' && window.innerWidth <= 768) {
+        // 모바일에서 데스크톱 버전 보기
         document.body.classList.add('force-desktop');
-        document.body.classList.remove('force-mobile');
-        // 테이블 재렌더링을 위한 트리거
-        window.dispatchEvent(new Event('resize'));
       }
     }
     
@@ -1921,6 +1951,9 @@
         if (desktopIcon) desktopIcon.style.display = 'inline';
       }
     }
+    
+    // 환경 선택 변수
+    let selectedEnvironment = null;
     
     // IAAF 표준 레인 거리
     const laneDistances = {
@@ -2082,17 +2115,34 @@
         btn.classList.add('bg-white');
       });
       
-      // 선택한 탭 활성화
-      document.getElementById(`${tabName}-content`).classList.remove('hidden');
-      document.getElementById(`tab-${tabName}`).classList.add('tab-active');
-      document.getElementById(`tab-${tabName}`).classList.remove('bg-white');
+      // 선택한 탭 활성화 (에러 체크 추가)
+      const contentElement = document.getElementById(`${tabName}-content`);
+      const tabElement = document.getElementById(`tab-${tabName}`);
+      
+      if (contentElement) {
+        contentElement.classList.remove('hidden');
+      }
+      
+      if (tabElement) {
+        tabElement.classList.add('tab-active');
+        tabElement.classList.remove('bg-white');
+      }
       
       // 차트가 선택되면 차트 생성
       if (tabName === 'chart') {
-        generatePaceChart1();
-        generateTargetTables();
-        generateLaneChart();
-        generateSteeplechaseChart();
+        // 필요한 요소들이 있는지 확인하고 생성
+        if (document.getElementById('paceChartBody1')) {
+          generatePaceChart1();
+        }
+        if (document.getElementById('target5kmTable')) {
+          generateTargetTables();
+        }
+        if (document.getElementById('laneChartTable')) {
+          generateLaneChart();
+        }
+        if (document.getElementById('steeplechaseInsideTable')) {
+          generateSteeplechaseChart();
+        }
       } else if (tabName === 'lane') {
         // 트랙 레인 계산기 직접 표시
         // 약간의 지연 후 초기 계산 실행
@@ -2477,6 +2527,10 @@
     // 차트 1: KM 페이스별 거리 환산표
     function generatePaceChart1() {
       const tbody = document.getElementById('paceChartBody1');
+      if (!tbody) {
+        console.warn('paceChartBody1 element not found');
+        return;
+      }
       tbody.innerHTML = '';
       
       // km 페이스 목록 (2:30부터 8:00까지 10초 간격)
@@ -2536,6 +2590,10 @@
       ];
       
       const tbody5km = document.getElementById('target5kmTable');
+      if (!tbody5km) {
+        console.warn('target5kmTable element not found');
+        return;
+      }
       tbody5km.innerHTML = '';
       
       targets5km.forEach(target => {
@@ -2735,6 +2793,10 @@
     // 차트 3: 레인별 보정 시간
     function generateLaneChart() {
       const tbody = document.getElementById('laneChartTable');
+      if (!tbody) {
+        console.warn('laneChartTable element not found');
+        return;
+      }
       tbody.innerHTML = '';
       
       // km 페이스 목록 (2:30부터 6:00까지 10초 간격)
@@ -3856,6 +3918,9 @@
     
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
+      // 환경 체크 (먼저 실행)
+      checkEnvironment();
+      
       // 초기 테이블 업데이트
       updateKmPaceTable();
       updateGoalTable();
@@ -4045,10 +4110,106 @@
     .simple-install-btn.show {
       display: inline-flex;
     }
+    
+    /* 환경 선택 모달 스타일 */
+    .env-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .env-modal.active {
+      display: flex;
+    }
+    
+    .env-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .env-button {
+      border: 2px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .env-button:hover {
+      border-color: #8b5cf6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+    
+    .env-button.selected {
+      border-color: #8b5cf6;
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: white;
+    }
   </style>
   
   </div>
   <!-- End of main content wrapper -->
+  
+  <!-- 환경 선택 모달 -->
+  <div id="envModal" class="env-modal">
+    <div class="env-modal-content">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold mb-2">
+          <span style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            환경을 선택해주세요
+          </span>
+        </h2>
+        <p class="text-gray-600">사용 중인 기기에 맞는 환경을 선택하면 최적화된 화면을 제공합니다</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="env-button rounded-lg p-6 text-center" onclick="selectEnvironment('mobile')">
+          <i class="fas fa-mobile-alt text-5xl mb-4" style="color: #8b5cf6;"></i>
+          <h3 class="text-xl font-bold mb-2">모바일</h3>
+          <p class="text-sm text-gray-600">스마트폰, 태블릿</p>
+          <ul class="text-xs text-gray-500 mt-3 text-left">
+            <li>• 터치 최적화 인터페이스</li>
+            <li>• 세로 화면에 최적화</li>
+            <li>• 스크롤 가능한 테이블</li>
+          </ul>
+        </div>
+        
+        <div class="env-button rounded-lg p-6 text-center" onclick="selectEnvironment('desktop')">
+          <i class="fas fa-desktop text-5xl mb-4" style="color: #7c3aed;"></i>
+          <h3 class="text-xl font-bold mb-2">데스크톱</h3>
+          <p class="text-sm text-gray-600">노트북, 데스크톱</p>
+          <ul class="text-xs text-gray-500 mt-3 text-left">
+            <li>• 마우스 최적화 인터페이스</li>
+            <li>• 가로 화면에 최적화</li>
+            <li>• 고정 테이블 레이아웃</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="flex items-center justify-between mb-6">
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox" id="rememberChoice" class="mr-2">
+          <span class="text-sm text-gray-600">선택 기억하기 (30일)</span>
+        </label>
+        
+        <button onclick="confirmEnvironment()" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all font-medium">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
   
   <!-- PWA 등록 스크립트 -->
   <script src="/install-ui-patch.js"></script>
