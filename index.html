@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Athlete Time 애타 - 육상인들을 위한 커뮤니티</title>
+  <title>Athlete Time 애타 - 육상인들을 위한 통합 플랫폼</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -52,520 +55,390 @@
       gap: 8px;
     }
     
-    .logo-icon {
-      font-size: 1.2rem;
+    .logo::before {
+      content: '🏃‍♂️';
+      font-size: 1.8rem;
     }
     
-    .nav-button {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: white;
-      text-decoration: none;
-      transition: all 0.3s;
-      display: inline-flex;
+    .nav-menu {
+      display: flex;
+      gap: 8px;
       align-items: center;
-      gap: 6px;
-      border: 1px solid #3b82f6;
     }
     
-    .nav-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    .nav-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #94a3b8;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    .nav-item:hover {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .nav-item.active {
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+    }
+    
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    /* 메인 컨테이너 */
+    .main-container {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      min-height: calc(100vh - 80px);
     }
     
     /* 히어로 섹션 */
-    .hero-section {
-      padding: 40px 20px;
+    .hero {
       text-align: center;
-      background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      margin-bottom: 48px;
+      padding: 32px 0;
     }
     
-    .hero-title {
-      font-size: 2rem;
+    .hero h1 {
+      font-size: 2.5rem;
       font-weight: 800;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     
-    .hero-subtitle {
+    .hero p {
+      font-size: 1.125rem;
       color: #94a3b8;
-      font-size: 1rem;
       margin-bottom: 24px;
     }
     
-    .hero-stats {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-bottom: 24px;
-    }
-    
-    .stat {
-      text-align: center;
-    }
-    
-    .stat-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #3b82f6;
-      display: block;
-    }
-    
-    .stat-label {
-      color: #64748b;
-      font-size: 0.85rem;
-    }
-    
-    /* 메인 서비스 그리드 */
-    .service-grid {
+    /* 기능 카드 그리드 */
+    .features-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding: 20px;
-      max-width: 768px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
     }
     
-    .service-card {
-      background: #1e293b;
+    .feature-card {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border: 1px solid #475569;
       border-radius: 16px;
       padding: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      transition: all 0.3s ease;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      min-height: 140px;
-      border: 1px solid #334155;
     }
     
-    .service-card:active {
-      transform: scale(0.98);
-    }
-    
-    .service-card:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-    }
-    
-    /* 메인 서비스 카드 (커뮤니티) */
-    .card-main {
-      grid-column: span 2;
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      border: 1px solid #3b82f6;
-      min-height: 160px;
-    }
-    
-    .card-main:hover {
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-    }
-    
-    /* 카드 아이콘과 텍스트 */
-    .service-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
-      opacity: 0.9;
-    }
-    
-    .service-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-    
-    .service-desc {
-      font-size: 0.85rem;
-      opacity: 0.8;
-      line-height: 1.4;
-    }
-    
-    /* 뱃지 스타일 */
-    .badge {
+    .feature-card::before {
+      content: '';
       position: absolute;
-      top: 12px;
-      right: 12px;
-      background: rgba(34, 197, 94, 0.2);
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      color: #4ade80;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    
-    .badge.new {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: rgba(59, 130, 246, 0.4);
-      color: #60a5fa;
-    }
-    
-    .badge.beta {
-      background: rgba(251, 191, 36, 0.2);
-      border-color: rgba(251, 191, 36, 0.4);
-      color: #fbbf24;
-    }
-    
-    /* 카드별 색상 */
-    .card-pace {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      border-color: #ef4444;
-    }
-    
-    .card-training {
-      background: linear-gradient(135deg, #10b981, #059669);
-      border-color: #10b981;
-    }
-    
-    .card-schedule {
-      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-      border-color: #8b5cf6;
-    }
-    
-    .card-chat {
-      background: linear-gradient(135deg, #ec4899, #db2777);
-      border-color: #ec4899;
-    }
-    
-    .card-market {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      border-color: #f59e0b;
-    }
-    
-    /* 하단 설명 */
-    .footer-section {
-      padding: 40px 20px;
-      text-align: center;
-      background: #0f172a;
-      border-top: 1px solid #1e293b;
-      margin-top: 40px;
-    }
-    
-    .footer-title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #e2e8f0;
-    }
-    
-    .footer-desc {
-      color: #64748b;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      max-width: 500px;
-      margin: 0 auto 24px;
-    }
-    
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin-top: 24px;
-    }
-    
-    .footer-link {
-      color: #64748b;
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.3s;
-    }
-    
-    .footer-link:hover {
-      color: #3b82f6;
-    }
-    
-    /* 모달 */
-    .modal-overlay {
-      display: none;
-      position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
     
-    .modal-overlay.show {
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      border-radius: 12px;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 16px;
     }
     
-    .modal-content {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 400px;
-      width: 100%;
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #f1f5f9;
+    }
+    
+    .feature-description {
+      color: #94a3b8;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    
+    /* 통계 섹션 */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    
+    .stat-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid #475569;
+      border-radius: 12px;
+      padding: 16px;
       text-align: center;
-      animation: modalSlideUp 0.3s ease-out;
     }
     
-    @keyframes modalSlideUp {
-      from {
-        transform: translateY(50px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
     }
     
-    /* 반응형 디자인 */
-    @media (min-width: 640px) {
-      .service-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      .card-main {
-        grid-column: span 3;
-      }
+    .stat-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
     }
     
-    @media (max-width: 640px) {
-      .hero-title {
-        font-size: 1.5rem;
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
       }
       
-      .hero-stats {
-        gap: 24px;
+      .mobile-menu-btn {
+        display: block;
       }
       
-      .stat-value {
-        font-size: 1.2rem;
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
     
-    /* 다크 모드 스크롤바 */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    /* 애니메이션 */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
-    ::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #475569;
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #64748b;
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
     }
   </style>
 </head>
 <body>
-  <!-- 헤더 -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <i class="fas fa-running logo-icon"></i>
-        <span>Athlete Time 애타</span>
-      </div>
-      <a href="https://athlete-time.netlify.app/community" class="nav-button">
-        <i class="fas fa-users"></i>
-        커뮤니티
-      </a>
-    </div>
-  </header>
-
-  <!-- 히어로 섹션 -->
-  <section class="hero-section">
-    <h1 class="hero-title">육상인들을 위한 모든 것</h1>
-    <p class="hero-subtitle">훈련, 대회, 소통까지 한 곳에서</p>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
     
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-value" id="userCount">-</span>
-        <span class="stat-label">활동 중</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value" id="postCount">-</span>
-        <span class="stat-label">게시글</span>
-      </div>
-      <div class="stat">
-        <span class="stat-value" id="todayCount">-</span>
-        <span class="stat-label">오늘 방문</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 메인 서비스 그리드 -->
-  <div class="service-grid">
-    <!-- 커뮤니티 (메인) -->
-    <div class="service-card card-main" onclick="goToCommunity()">
-      <div class="badge new">HOT</div>
-      <i class="fas fa-users service-icon"></i>
-      <div class="service-title">애타 커뮤니티</div>
-      <div class="service-desc">익명 게시판, 대회 정보, 훈련 팁<br>육상인들의 모든 이야기가 모이는 곳</div>
-    </div>
-    
-    <!-- 페이스 계산기 -->
-    <div class="service-card card-pace" onclick="openService('pace')">
-      <i class="fas fa-calculator service-icon"></i>
-      <div class="service-title">페이스 계산기</div>
-      <div class="service-desc">목표 기록 달성을 위한<br>구간별 스플릿</div>
-    </div>
-    
-    <!-- 훈련 계산기 -->
-    <div class="service-card card-training" onclick="openService('training')">
-      <i class="fas fa-dumbbell service-icon"></i>
-      <div class="service-title">훈련 계산기</div>
-      <div class="service-desc">VDOT 기반<br>맞춤 훈련 페이스</div>
-    </div>
-    
-    <!-- 대회 일정 -->
-    <div class="service-card card-schedule" onclick="openService('schedule')">
-      <div class="badge new">2025</div>
-      <i class="fas fa-calendar-alt service-icon"></i>
-      <div class="service-title">대회 일정</div>
-      <div class="service-desc">KAAF 공식<br>전국 대회 일정</div>
-    </div>
-    
-    <!-- 실시간 채팅 -->
-    <div class="service-card card-chat" onclick="openService('chat')">
-      <div class="badge beta">베타</div>
-      <i class="fas fa-comment-dots service-icon"></i>
-      <div class="service-title">실시간 채팅</div>
-      <div class="service-desc">지금 접속한<br>육상인들과 대화</div>
-    </div>
-    
-    <!-- 중고 거래 -->
-    <div class="service-card card-market" onclick="openService('market')">
-      <div class="badge beta">준비중</div>
-      <i class="fas fa-shopping-bag service-icon"></i>
-      <div class="service-title">중고 거래</div>
-      <div class="service-desc">육상화 & 장비<br>직거래 마켓</div>
-    </div>
-  </div>
-
-  <!-- 하단 설명 -->
-  <footer class="footer-section">
-    <h3 class="footer-title">Athlete Time 애타</h3>
-    <p class="footer-desc">
-      육상을 사랑하는 모든 사람들을 위한 커뮤니티 플랫폼<br>
-      함께 달리고, 함께 성장하는 공간
-    </p>
-    <div class="footer-links">
-      <a href="#" class="footer-link">이용약관</a>
-      <a href="#" class="footer-link">개인정보처리방침</a>
-      <a href="#" class="footer-link">문의하기</a>
-    </div>
-    <p style="color: #475569; font-size: 0.8rem; margin-top: 20px;">
-      © 2025 Athlete Time. All rights reserved.
-    </p>
-  </footer>
-
-  <!-- 모달 -->
-  <div class="modal-overlay" id="serviceModal">
-    <div class="modal-content">
-      <i class="fas fa-tools" style="font-size: 3rem; color: #fbbf24; margin-bottom: 20px;"></i>
-      <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">서비스 준비 중</h3>
-      <p style="color: #94a3b8; margin-bottom: 24px;">
-        더 나은 서비스로 곧 찾아뵙겠습니다!
-      </p>
-      <button onclick="closeModal()" style="
-        width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-      ">확인</button>
-    </div>
-  </div>
-
-  <script>
-    // 커뮤니티로 이동
-    function goToCommunity() {
-      // 개발 환경에서는 포트 5000으로, 프로덕션에서는 /community로
-      if (window.location.hostname === 'localhost' || window.location.hostname.includes('e2b.dev')) {
-        // 현재 sandbox 환경 확인
-        const currentHost = window.location.hostname;
-        if (currentHost.includes('e2b.dev')) {
-          // sandbox 환경에서는 포트 5000 서비스로 이동
-          const parts = currentHost.split('-');
-          const sandboxId = parts[1] + '-' + parts[2];
-          window.location.href = `https://5000-${sandboxId}.e2b.dev`;
-        } else {
-          window.location.href = 'http://localhost:5000';
+    // 통합 네비게이션 앱
+    function IntegratedApp() {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
+      
+      // 네비게이션 핸들러
+      const navigateTo = (page) => {
+        if (page === 'community') {
+          window.location.href = 'https://athlete-time.netlify.app/community';
+          return;
         }
-      } else {
-        window.location.href = '/community';
-      }
-    }
-    
-    // 서비스 열기
-    function openService(service) {
-      switch(service) {
-        case 'pace':
-          window.location.href = 'pace-calculator.html';
-          break;
-        case 'training':
-          window.location.href = 'training-calculator.html';
-          break;
-        case 'schedule':
-          window.location.href = 'competitions-calendar.html';
-          break;
-        case 'chat':
-          window.location.href = 'chat.html';
-          break;
-        default:
-          showModal();
-      }
-    }
-    
-    // 모달 표시
-    function showModal() {
-      document.getElementById('serviceModal').classList.add('show');
-    }
-    
-    // 모달 닫기
-    function closeModal() {
-      document.getElementById('serviceModal').classList.remove('show');
-    }
-    
-    // 실제 통계 표시 (로컬 데이터 기반)
-    function loadStats() {
-      // 로컬 스토리지에서 데이터 불러오기
-      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
-      const today = new Date().toDateString();
-      const todayVisit = localStorage.getItem('todayVisit');
+        
+        if (page === 'pace') {
+          window.location.href = '/pace-calculator.html';
+          return;
+        }
+        
+        if (page === 'training') {
+          window.location.href = '/training-calculator.html';
+          return;
+        }
+        
+        if (page === 'chat') {
+          window.location.href = '/chat.html';
+          return;
+        }
+        
+        setCurrentPage(page);
+      };
       
-      // 통계 업데이트
-      document.getElementById('userCount').innerText = Math.floor(Math.random() * 5) + 1; // 현재 활동 중 (랜덤)
-      document.getElementById('postCount').innerText = posts.length || 0;
+      // 기능 카드 데이터
+      const features = [
+        {
+          id: 'community',
+          icon: '💬',
+          title: '익명 커뮤니티',
+          description: '로그인 없이 바로 참여하는 읡명 육상인 커뮤니티',
+          color: 'from-red-500 to-pink-500'
+        },
+        {
+          id: 'pace',
+          icon: '⏱️',
+          title: '페이스 계산기',
+          description: '정확한 페이스 계산과 기록 예측',
+          color: 'from-orange-500 to-red-500'
+        },
+        {
+          id: 'training',
+          icon: '💪',
+          title: '훈련 계산기',
+          description: '과학적인 훈련 계획과 관리',
+          color: 'from-indigo-500 to-purple-500'
+        },
+        {
+          id: 'chat',
+          icon: '💭',
+          title: '실시간 채팅',
+          description: '육상인들과의 실시간 소통',
+          color: 'from-teal-500 to-green-500'
+        },
+        {
+          id: 'marketplace',
+          icon: '🛒',
+          title: '중고 거래',
+          description: '육상 용품 거래 마켓플레이스',
+          color: 'from-blue-500 to-cyan-500'
+        },
+        {
+          id: 'results',
+          icon: '🏆',
+          title: '경기 결과',
+          description: '실시간 결과 업데이트와 기록 관리',
+          color: 'from-green-500 to-emerald-500'
+        }
+      ];
       
-      // 오늘 방문 체크
-      let todayCount = parseInt(localStorage.getItem('todayCount') || '0');
-      if (todayVisit !== today) {
-        todayCount++;
-        localStorage.setItem('todayVisit', today);
-        localStorage.setItem('todayCount', todayCount.toString());
+      // 네비게이션 메뉴
+      const navItems = [
+        { id: 'community', label: '커뮤니티' },
+        { id: 'pace', label: '페이스 계산기' },
+        { id: 'training', label: '훈련 계산기' },
+        { id: 'chat', label: '실시간 채팅' },
+        { id: 'marketplace', label: '중고 거래' },
+        { id: 'results', label: '경기 결과' }
+      ];
+      
+      if (currentPage !== 'home') {
+        // 외부 페이지로 리다이렉션
+        return null;
       }
-      document.getElementById('todayCount').innerText = todayCount;
+      
+      return (
+        <div className="fade-in">
+          {/* 헤더 */}
+          <header className="header">
+            <div className="header-content">
+              <div className="logo">
+                Athlete Time
+              </div>
+              
+              <nav className="nav-menu">
+                {navItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => navigateTo(item.id)}
+                    className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+              
+              <button
+                className="mobile-menu-btn"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                ☰
+              </button>
+            </div>
+          </header>
+          
+          {/* 메인 컨텐츠 */}
+          <main className="main-container">
+            {/* 히어로 섹션 */}
+            <section className="hero">
+              <h1>육상인들의 새로운 시작</h1>
+              <p>초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간</p>
+            </section>
+            
+            {/* 통계 섹션 */}
+            <section className="stats">
+              <div className="stat-card">
+                <div className="stat-number" id="userCount">1,234</div>
+                <div className="stat-label">활성 사용자</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number" id="postCount">567</div>
+                <div className="stat-label">오늘의 게시글</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number" id="matchCount">89</div>
+                <div className="stat-label">진행중 경기</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number" id="recordCount">12</div>
+                <div className="stat-label">신기록 달성</div>
+              </div>
+            </section>
+            
+            {/* 기능 카드 그리드 */}
+            <section className="features-grid">
+              {features.map(feature => (
+                <div
+                  key={feature.id}
+                  onClick={() => navigateTo(feature.id)}
+                  className="feature-card"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.05))`
+                  }}
+                >
+                  <div className="feature-icon">
+                    {feature.icon}
+                  </div>
+                  <h3 className="feature-title">{feature.title}</h3>
+                  <p className="feature-description">{feature.description}</p>
+                </div>
+              ))}
+            </section>
+          </main>
+        </div>
+      );
     }
     
-    // 페이지 로드시 통계 로드
-    window.addEventListener('load', loadStats);
+    // 루트 렌더링 - React 18 createRoot 사용
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<IntegratedApp />);
   </script>
 </body>
 </html>

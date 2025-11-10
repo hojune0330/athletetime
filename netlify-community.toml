@@ -1,39 +1,56 @@
-# Netlify 배포 설정 - 커뮤니티 앱
-# Athlete Time 커뮤니티 (React + Vite)
-
 [build]
-  base = "community-new"
-  command = "npm install && npm run build"
+  command = "cd community-new && npm install && npm run build"
   publish = "community-new/dist"
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# 헤더 설정
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
+# SPA 설정
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
-# 정적 자원 캐싱
+# API 프록시
+[[redirects]]
+  from = "/api/*"
+  to = "https://athletetime-backend.onrender.com/api/:splat"
+  status = 200
+
+# 캐싱 설정
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# API 프록시 설정 (백엔드 연결)
-[[redirects]]
-  from = "/api/*"
-  to = "https://athletetime-backend.onrender.com/api/:splat"
-  status = 200
-  force = true
-  headers = {X-From = "Netlify"}
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
 
-# SPA 라우팅 지원
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# 보안 헤더
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://athletetime-backend.onrender.com;"
+
+# 압축
+[dev]
+  command = "cd community-new && npm run dev"
+  port = 5173
+  targetPort = 5173
+  publish = "community-new/dist"
+
+# 분석
+[functions]
+  node_bundler = "esbuild"

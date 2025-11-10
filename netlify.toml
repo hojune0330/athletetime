@@ -1,16 +1,32 @@
 [build]
-  command = "cd community-new && npm install && npm run build"
-  publish = "community-new/dist"
+  command = "echo 'Main site deployment'"
+  publish = "."
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# SPA 설정
+# SPA 설정 - 통합 네비게이션
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+# 계산기 페이지들
+[[redirects]]
+  from = "/pace-calculator"
+  to = "/pace-calculator.html"
+  status = 200
+
+[[redirects]]
+  from = "/training-calculator"
+  to = "/training-calculator.html"
+  status = 200
+
+[[redirects]]
+  from = "/chat"
+  to = "/chat.html"
   status = 200
 
 # API 프록시
@@ -44,13 +60,9 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://athletetime-backend.onrender.com;"
 
-# 압축
+# 개발 서버
 [dev]
-  command = "cd community-new && npm run dev"
-  port = 5173
-  targetPort = 5173
-  publish = "community-new/dist"
-
-# 분석
-[functions]
-  node_bundler = "esbuild"
+  command = "python3 -m http.server 8080"
+  port = 8080
+  targetPort = 8080
+  publish = "."

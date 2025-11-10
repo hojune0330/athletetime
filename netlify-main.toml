@@ -1,37 +1,68 @@
-# Netlify 배포 설정 - 메인 사이트
-# Athlete Time 메인 페이지 (정적 HTML)
-
 [build]
-  # 메인 사이트는 정적 파일이므로 빌드 명령어 불필요
+  command = "echo 'Main site deployment'"
   publish = "."
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_VERSION = "9"
 
-# 헤더 설정
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "SAMEORIGIN"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Cache-Control = "public, max-age=3600"
+# SPA 설정 - 통합 네비게이션
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
-# 이미지 캐싱
-[[headers]]
-  for = "/*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+# 계산기 페이지들
+[[redirects]]
+  from = "/pace-calculator"
+  to = "/pace-calculator.html"
+  status = 200
 
-[[headers]]
-  for = "/*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+[[redirects]]
+  from = "/training-calculator"
+  to = "/training-calculator.html"
+  status = 200
 
-# API 프록시 설정 (백엔드 연결)
+[[redirects]]
+  from = "/chat"
+  to = "/chat.html"
+  status = 200
+
+# API 프록시
 [[redirects]]
   from = "/api/*"
   to = "https://athletetime-backend.onrender.com/api/:splat"
   status = 200
-  force = true
-  headers = {X-From = "Netlify"}
+
+# 캐싱 설정
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# 보안 헤더
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://athletetime-backend.onrender.com;"
+
+# 개발 서버
+[dev]
+  command = "python3 -m http.server 8080"
+  port = 8080
+  targetPort = 8080
+  publish = "."
