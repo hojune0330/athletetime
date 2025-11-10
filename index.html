@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Athlete Time 애타 - 육상인들을 위한 통합 플랫폼</title>
+  
+  <!-- PWA 메타 태그 -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00ffa3">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="애슬리트 타임">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -271,7 +283,7 @@
       // 네비게이션 핸들러
       const navigateTo = (page) => {
         if (page === 'community') {
-          window.location.href = 'https://athlete-time.netlify.app/community';
+          goToCommunity();
           return;
         }
         
@@ -299,7 +311,7 @@
           id: 'community',
           icon: '💬',
           title: '익명 커뮤니티',
-          description: '로그인 없이 바로 참여하는 읡명 육상인 커뮤니티',
+          description: '로그인 없이 바로 참여하는 익명 육상인 커뮤니티',
           color: 'from-red-500 to-pink-500'
         },
         {
@@ -436,9 +448,28 @@
       );
     }
     
+    // 커뮤니티로 이동 (환경 감지)
+    function goToCommunity() {
+      if (window.location.hostname === 'localhost' || window.location.hostname.includes('e2b.dev')) {
+        const currentHost = window.location.hostname;
+        if (currentHost.includes('e2b.dev')) {
+          const parts = currentHost.split('-');
+          const sandboxId = parts[1] + '-' + parts[2];
+          window.location.href = `https://5000-${sandboxId}.e2b.dev`;
+        } else {
+          window.location.href = 'http://localhost:5000';
+        }
+      } else {
+        window.location.href = '/community';
+      }
+    }
+    
     // 루트 렌더링 - React 18 createRoot 사용
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<IntegratedApp />);
   </script>
+  
+  <!-- PWA 등록 스크립트 -->
+  <script src="/pwa-register.js"></script>
 </body>
 </html>

@@ -1,28 +1,30 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { 
   BellIcon,
   Bars3Icon,
   ClockIcon,
-  UserCircleIcon
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline'
 import { useState } from 'react'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { user, logout, isAuthenticated } = useAuth()
   
   const goToMain = () => {
     // 메인 홈페이지로 이동
-    const currentHost = window.location.hostname
-    if (currentHost.includes('e2b.dev')) {
-      // sandbox 환경에서는 포트 8080으로
-      const parts = currentHost.split('-')
-      const sandboxId = parts[1] + '-' + parts[2]
-      window.location.href = `https://8080-${sandboxId}.e2b.dev`
-    } else {
-      // 로컬 환경
-      window.location.href = 'http://localhost:8080'
-    }
+    window.location.href = '/'
+  }
+  
+  // 외부 도구 링크 생성 (프로덕션에서는 루트 기준)
+  const getToolLink = (path: string) => {
+    const isProd = import.meta.env.PROD
+    return isProd ? `/${path}` : `/${path}`
   }
   
   const isActive = (path: string) => {
@@ -64,52 +66,112 @@ export default function Header() {
               >
                 🎭 익명
               </Link>
-              <Link
-                to="/events"
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  location.pathname.includes('/events') ? 'bg-white/20 text-white' : 'text-primary-100 hover:text-white hover:bg-white/10'
-                }`}
+              <a
+                href={getToolLink('pace-calculator.html')}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
               >
-                🏆 대회
-              </Link>
-              <Link
-                to="/track"
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  location.pathname.includes('/track') ? 'bg-white/20 text-white' : 'text-primary-100 hover:text-white hover:bg-white/10'
-                }`}
+                ⏱️ 페이스
+              </a>
+              <a
+                href={getToolLink('training-calculator.html')}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
               >
-                🏃 종목별
-              </Link>
-              <Link
-                to="/market"
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  isActive('/market') ? 'bg-white/20 text-white' : 'text-primary-100 hover:text-white hover:bg-white/10'
-                }`}
+                🏋️ 훈련
+              </a>
+              <a
+                href={getToolLink('competitions-calendar.html')}
+                className="px-3 py-1.5 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
               >
-                🛒 중고거래
-              </Link>
+                📅 대회
+              </a>
               <Link
-                to="/community"
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  isActive('/community') ? 'bg-white/20 text-white' : 'text-primary-100 hover:text-white hover:bg-white/10'
-                }`}
+                to="/write"
+                className="px-3 py-1.5 text-sm font-medium rounded-lg transition-all bg-white/10 text-white hover:bg-white/20 border border-white/20"
               >
-                💬 커뮤니티
+                ✍️ 글쓰기
               </Link>
             </nav>
 
             {/* 우측 메뉴 - 심플하게 */}
             <div className="flex items-center gap-2">
-              {/* 알림 버튼 */}
-              <button className="p-2 text-primary-100 hover:text-white transition-colors relative">
-                <BellIcon className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-              </button>
+              {isAuthenticated ? (
+                <>
+                  {/* 알림 버튼 (로그인 시) */}
+                  <button className="p-2 text-primary-100 hover:text-white transition-colors relative">
+                    <BellIcon className="w-5 h-5" />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                  </button>
 
-              {/* 프로필 버튼 */}
-              <button className="p-2 text-primary-100 hover:text-white transition-colors">
-                <UserCircleIcon className="w-6 h-6" />
-              </button>
+                  {/* 프로필 드롭다운 */}
+                  <div className="relative">
+                    <button 
+                      onClick={() => setUserMenuOpen(!userMenuOpen)}
+                      className="flex items-center gap-2 px-3 py-1.5 text-white hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <UserCircleIcon className="w-6 h-6" />
+                      <span className="hidden md:block text-sm font-medium">{user?.nickname}</span>
+                    </button>
+
+                    {/* 드롭다운 메뉴 */}
+                    {userMenuOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-dark-700 rounded-lg shadow-xl border border-dark-600 py-2 z-50">
+                        <div className="px-4 py-2 border-b border-dark-600">
+                          <p className="text-sm font-medium text-white">{user?.nickname}</p>
+                          <p className="text-xs text-gray-400">{user?.email}</p>
+                        </div>
+                        <Link
+                          to="/profile"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-white"
+                        >
+                          👤 프로필
+                        </Link>
+                        <Link
+                          to="/my-posts"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-300 hover:bg-dark-600 hover:text-white"
+                        >
+                          📝 내 게시글
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false)
+                            logout()
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-600"
+                        >
+                          🚪 로그아웃
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* 로그인/회원가입 버튼 (비로그인 시) */}
+                  <Link
+                    to="/login"
+                    className="hidden md:flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                    로그인
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="hidden md:flex px-3 py-1.5 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                  >
+                    회원가입
+                  </Link>
+                  
+                  {/* 모바일용 로그인 버튼 */}
+                  <Link
+                    to="/login"
+                    className="md:hidden p-2 text-primary-100 hover:text-white transition-colors"
+                  >
+                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                  </Link>
+                </>
+              )}
 
               {/* 모바일 메뉴 버튼 */}
               <button
@@ -125,33 +187,117 @@ export default function Header() {
 
       {/* 모바일 메뉴 - 하단 고정 네비게이션 */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-800 border-t border-dark-600 z-50">
-          <nav className="grid grid-cols-6 gap-1 p-2">
-            <button onClick={goToMain} className="flex flex-col items-center p-2 text-xs">
-              <i className="fas fa-home text-lg mb-1 text-blue-400"></i>
-              <span className="text-blue-400">메인</span>
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-dark-800 border-t border-dark-600 z-50 shadow-xl">
+          <nav className="grid grid-cols-3 gap-2 p-3">
+            {/* 상단 행 */}
+            <button 
+              onClick={goToMain} 
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <i className="fas fa-home text-xl mb-1 text-blue-400"></i>
+              <span className="text-xs text-blue-400 font-medium">메인</span>
             </button>
-            <Link to="/" className="flex flex-col items-center p-2 text-xs">
-              <span className="text-lg mb-1">🎭</span>
-              <span className={isActive('/') ? 'text-primary-400' : 'text-gray-400'}>익명</span>
+            <Link 
+              to="/" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <span className="text-xl mb-1">🎭</span>
+              <span className={`text-xs font-medium ${isActive('/') ? 'text-primary-400' : 'text-gray-400'}`}>익명게시판</span>
             </Link>
-            <Link to="/events" className="flex flex-col items-center p-2 text-xs">
-              <span className="text-lg mb-1">🏆</span>
-              <span className={location.pathname.includes('/events') ? 'text-primary-400' : 'text-gray-400'}>대회</span>
+            <Link 
+              to="/write" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <span className="text-xl mb-1">✍️</span>
+              <span className="text-xs font-medium text-gray-400">글쓰기</span>
             </Link>
-            <Link to="/track" className="flex flex-col items-center p-2 text-xs">
-              <span className="text-lg mb-1">🏃</span>
-              <span className={location.pathname.includes('/track') ? 'text-primary-400' : 'text-gray-400'}>종목</span>
-            </Link>
-            <Link to="/market" className="flex flex-col items-center p-2 text-xs">
-              <span className="text-lg mb-1">🛒</span>
-              <span className={isActive('/market') ? 'text-primary-400' : 'text-gray-400'}>중고</span>
-            </Link>
-            <Link to="/community" className="flex flex-col items-center p-2 text-xs">
-              <span className="text-lg mb-1">💬</span>
-              <span className={isActive('/community') ? 'text-primary-400' : 'text-gray-400'}>더보기</span>
-            </Link>
+            
+            {/* 하단 행 - 도구 링크 */}
+            <a 
+              href={getToolLink('pace-calculator.html')}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <span className="text-xl mb-1">⏱️</span>
+              <span className="text-xs font-medium text-gray-400">페이스</span>
+            </a>
+            <a 
+              href={getToolLink('training-calculator.html')}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <span className="text-xl mb-1">🏋️</span>
+              <span className="text-xs font-medium text-gray-400">훈련</span>
+            </a>
+            <a 
+              href={getToolLink('competitions-calendar.html')}
+              className="flex flex-col items-center p-3 rounded-lg hover:bg-dark-700 transition-colors"
+            >
+              <span className="text-xl mb-1">📅</span>
+              <span className="text-xs font-medium text-gray-400">대회</span>
+            </a>
           </nav>
+          
+          {/* 로그인/회원가입 섹션 */}
+          {!isAuthenticated && (
+            <div className="px-3 pb-3 flex gap-2 border-t border-dark-700 pt-3">
+              <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-sm font-medium text-white bg-dark-600 hover:bg-dark-500 rounded-lg transition-colors"
+              >
+                로그인
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex-1 py-2 text-center text-sm font-medium text-primary-600 bg-white hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                회원가입
+              </Link>
+            </div>
+          )}
+          
+          {/* 로그인 상태 */}
+          {isAuthenticated && (
+            <div className="px-3 pb-3 border-t border-dark-700 pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <UserCircleIcon className="w-8 h-8 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-white">{user?.nickname}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex-1 py-2 text-center text-sm text-gray-300 bg-dark-600 hover:bg-dark-500 rounded-lg"
+                >
+                  프로필
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    logout()
+                  }}
+                  className="flex-1 py-2 text-center text-sm text-red-400 bg-dark-600 hover:bg-dark-500 rounded-lg"
+                >
+                  로그아웃
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {/* 닫기 버튼 */}
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-full py-2 text-xs text-gray-500 hover:text-white transition-colors border-t border-dark-700"
+          >
+            닫기
+          </button>
         </div>
       )}
     </header>

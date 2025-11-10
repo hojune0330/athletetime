@@ -1,9 +1,57 @@
+# Dependencies
 node_modules/
-.env
-.DS_Store
+package-lock.json
+community-new/node_modules/
+community-new/package-lock.json
+
+# Build outputs
+dist/
+community-new/dist/
 *.log
-chat-messages.json
-community-posts.json
-*.backup
-package.json.backend
-package-lock.json.backend
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives
+*.zip
+*.tar.gz
+*.tgz
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Database
+*.sqlite
+*.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# PWA
+sw.js.map
+workbox-*.js
+
+# Misc
+.deploy-trigger
+coverage/
+.nyc_output/

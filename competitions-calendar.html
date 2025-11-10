@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2025 KAAF 대회 일정 | 애슬리트타임</title>
     
+    <!-- PWA 메타 태그 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#00ffa3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="애슬리트 타임">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="competitions-calendar.css">
     
@@ -14,6 +24,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+  <button class="simple-install-btn" id="simpleInstallBtn">
+    <i class="fas fa-download"></i> 앱 설치
+  </button>
     <!-- 헤더 -->
     <header class="header">
         <div class="header-content">
@@ -22,7 +35,7 @@
             </h1>
             <nav class="nav">
                 <a href="pace-calculator.html">페이스 계산기</a>
-                <a href="chat-real.html">실시간 채팅</a>
+                <a href="chat.html">실시간 채팅</a>
                 <a href="competitions-calendar.html" class="active">대회 일정</a>
             </nav>
         </div>
@@ -243,5 +256,27 @@
 
     <!-- JavaScript -->
     <script src="competitions-calendar.js"></script>
+    
+    <!-- PWA 등록 스크립트 -->
+    <script src="/install-ui-patch.js"></script>
+  <script src="/pwa-register.js"></script>
 </body>
-</html>
+</html>��짜 대회 목록 팝업 -->
+    <div id="date-competitions-popup" class="popup">
+        <div class="popup-content">
+            <button class="popup-close">&times;</button>
+            <h3 id="popup-date-title"></h3>
+            <div id="popup-competitions-list">
+                <!-- 해당 날짜 대회 목록이 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="competitions-calendar.js"></script>
+    
+    <!-- PWA 등록 스크립트 -->
+    <script src="/install-ui-patch.js"></script>
+  <script src="/pwa-register.js"></script>
+</body>
+</html></html>

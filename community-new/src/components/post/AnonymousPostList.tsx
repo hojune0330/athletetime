@@ -39,6 +39,7 @@ function getVoteBadgeClass(likes: number, dislikes: number) {
 }
 
 export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, isError, onRetry }: AnonymousPostListProps) {
+<<<<<<< HEAD
   // 데이터 검증
   const validPosts = posts?.filter(post => {
     if (!post || !post.id) return false
@@ -51,6 +52,8 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
     if (post.is_blinded !== undefined) post.isBlinded = post.is_blinded
     return true
   }) || []
+=======
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -82,7 +85,11 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
     )
   }
 
+<<<<<<< HEAD
   if (!validPosts.length) {
+=======
+  if (!posts.length) {
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
     return (
       <div className="rounded-lg bg-dark-700 border border-dark-600 p-6 text-center text-gray-400">
         아직 게시글이 없어요. 첫 글을 작성해보세요!
@@ -90,16 +97,28 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
     )
   }
 
+<<<<<<< HEAD
   const displayPosts = validPosts.slice(0, 20)
+=======
+  const displayPosts = posts.slice(0, 20)
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
 
   return (
     <div className="space-y-3">
       {displayPosts.map((post) => {
+<<<<<<< HEAD
         const likes = post.likes?.length ?? 0
         const dislikes = post.dislikes?.length ?? 0
         const comments = post.comments?.length ?? 0
         const hasImages = Boolean(post.images && post.images.length > 0)
         const isHot = likes >= 10 || comments >= 15 || (post.views ?? 0) >= 300
+=======
+        const likes = post.likesCount || 0
+        const dislikes = post.dislikesCount || 0
+        const comments = post.commentsCount || 0
+        const hasImages = Boolean(post.images && post.images[0]?.cloudinaryUrl)
+        const isHot = likes >= 20 // 좋아요 20개 이상
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
 
         return (
           <Link
@@ -110,8 +129,16 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
             <article className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 {post.category && (
+<<<<<<< HEAD
                   <span className="text-xs px-2 py-0.5 bg-dark-600 text-gray-400 rounded">
                     {post.category}
+=======
+                  <span 
+                    className="text-xs px-2 py-0.5 bg-dark-600 rounded"
+                    style={{ color: post.categoryColor || '#9CA3AF' }}
+                  >
+                    {post.categoryIcon && <span>{post.categoryIcon}</span>} {post.category}
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
                   </span>
                 )}
                 {post.isNotice && (
@@ -147,7 +174,11 @@ export default function AnonymousPostList({ posts, sortBy: _sortBy, isLoading, i
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <EyeIcon className="w-3.5 h-3.5" />
+<<<<<<< HEAD
                     {post.views ?? 0}
+=======
+                    {post.views}
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
                   </span>
                 </div>
 

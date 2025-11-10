@@ -14,7 +14,7 @@
       <!-- API 테스트 -->
       <div class="bg-gray-800 rounded-lg p-6">
         <h2 class="text-xl font-semibold mb-4">📡 API 연결 테스트</h2>
-        <input type="text" id="apiUrl" placeholder="https://athletetime-backend-xxxx.onrender.com" 
+        <input type="text" id="apiUrl" placeholder="https://athlete-time-backend-xxxx.onrender.com" 
           class="w-full p-3 bg-gray-700 rounded mb-4">
         <button onclick="testAPI()" class="bg-blue-500 px-6 py-2 rounded">API 테스트</button>
         <div id="apiResult" class="mt-4 text-sm"></div>
@@ -23,7 +23,7 @@
       <!-- WebSocket 테스트 -->
       <div class="bg-gray-800 rounded-lg p-6">
         <h2 class="text-xl font-semibold mb-4">💬 WebSocket 테스트</h2>
-        <input type="text" id="wsUrl" placeholder="wss://athletetime-backend-xxxx.onrender.com"
+        <input type="text" id="wsUrl" placeholder="wss://athlete-time-backend-xxxx.onrender.com"
           class="w-full p-3 bg-gray-700 rounded mb-4">
         <button onclick="testWebSocket()" class="bg-green-500 px-6 py-2 rounded">WebSocket 테스트</button>
         <div id="wsResult" class="mt-4 text-sm"></div>
@@ -44,7 +44,7 @@
 
   <script>
     async function testAPI() {
-      const url = document.getElementById('apiUrl').value || 'https://athletetime-backend.onrender.com';
+      const url = document.getElementById('apiUrl').value || 'https://athlete-time-backend.onrender.com';
       const result = document.getElementById('apiResult');
       
       result.innerHTML = '⏳ 테스트 중...';
@@ -66,7 +66,7 @@
     }
 
     function testWebSocket() {
-      const url = document.getElementById('wsUrl').value || 'wss://athletetime-backend.onrender.com';
+      const url = document.getElementById('wsUrl').value || 'wss://athlete-time-backend.onrender.com';
       const result = document.getElementById('wsResult');
       
       result.innerHTML = '⏳ 연결 중...';
@@ -98,7 +98,7 @@
     }
 
     async function testDatabase() {
-      const url = document.getElementById('apiUrl').value || 'https://athletetime-backend.onrender.com';
+      const url = document.getElementById('apiUrl').value || 'https://athlete-time-backend.onrender.com';
       const result = document.getElementById('dbResult');
       
       result.innerHTML = '⏳ 테스트 중...';

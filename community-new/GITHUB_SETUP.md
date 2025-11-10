@@ -5,14 +5,14 @@
 
 ### Repository 정보
 - **Owner**: hojune0330
-- **Repository**: athletetime
+- **Repository**: athlete-time
 - **URL**: https://github.com/hojune0330/athletetime
 - **Main Branch**: main
 - **Feature Branch**: feature/community-vite-rebuild
 
 ### Push 권한
 - ✅ **Claude와 GPT 모두 직접 푸시 가능**
-- ✅ **Personal Access Token 설정 완료** (athletetime push token)
+- ✅ **Personal Access Token 설정 완료** (athlete-time push token)
 - ✅ **PR 생성 및 업데이트 가능**
 
 ### Git 워크플로우
@@ -42,6 +42,6 @@ git push origin feature/community-vite-rebuild
 
 ---
 *Last updated: 2025-01-16*
-*Token updated: 2025-01-16 (athletetime push token)*
-*Token: athletetime push token 사용*
+*Token updated: 2025-01-16 (athlete-time push token)*
+*Token: athlete-time push token 사용*
 *이 파일은 Claude와 GPT가 협업시 참고하는 문서입니다.*

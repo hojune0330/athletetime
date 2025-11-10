@@ -29,6 +29,12 @@
   to = "/chat.html"
   status = 200
 
+# 커뮤니티 페이지
+[[redirects]]
+  from = "/community"
+  to = "/community/index.html"
+  status = 200
+
 # API 프록시
 [[redirects]]
   from = "/api/*"

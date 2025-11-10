@@ -4,7 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+<<<<<<< HEAD
   base: '/', // Netlify 루트 경로 설정
+=======
+  // Base path using relative path for safer deployment
+  base: './',
+>>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
   server: {
     host: '0.0.0.0',
     port: 5173,

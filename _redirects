@@ -1,5 +1,8 @@
-# Netlify SPA 설정
+# SPA 라우팅 - 통합 네비게이션
 /* /index.html 200
 
-# API 프록시 (선택사항)
+# 커뮤니티 라우팅
+/community/* /community/index.html 200
+
+# API 프록시
 /api/* https://athletetime-backend.onrender.com/api/:splat 200
