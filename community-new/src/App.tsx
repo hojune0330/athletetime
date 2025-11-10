@@ -17,9 +17,9 @@ function App() {
     document.documentElement.classList.add('dark')
   }, [])
 
-  // React app is deployed at /community path in production
-  // In development, use root path
-  const basename = import.meta.env.MODE === 'production' ? '/community' : '/'
+  // React app is deployed at root path (/)
+  // Netlify handles /community redirect via netlify.toml
+  const basename = '/'
 
   return (
     <div className="min-h-screen bg-dark-800">
