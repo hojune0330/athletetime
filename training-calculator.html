@@ -20,7 +20,30 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <style>
-    /* Fix text positioning issues - add proper layout structure */
+    /* CRITICAL FIX: Prevent text floating at top of screen */
+    /* Reset all positioning to prevent floating text */
+    .floating-element,
+    .top-floating,
+    .absolute-position,
+    .fixed-position {
+      display: none !important;
+      visibility: hidden !important;
+      position: static !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      z-index: -999 !important;
+    }
+    
+    /* Ensure proper content container positioning */
+    .content-container {
+      position: relative !important;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    
+    /* Fix for text positioning issues - add proper layout structure */
     html, body {
       height: 100%;
       margin: 0;
