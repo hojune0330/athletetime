@@ -62,6 +62,36 @@
       z-index: 30; /* Below header but above content */
     }
     
+    /* Hide floating elements that appear outside proper container */
+    .floating-element {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Fix for any elements that might be positioned incorrectly */
+    .content-container {
+      position: relative;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    
+    /* Fix for text elements that appear at the top of the screen */
+    .floating-text, .top-floating-text {
+      display: none !important;
+      visibility: hidden !important;
+      position: absolute !important;
+      top: -9999px !important;
+      left: -9999px !important;
+    }
+    
+    /* Ensure all content stays within proper container boundaries */
+    .pace-calculator-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    
     .gradient-text {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       -webkit-background-clip: text;
@@ -780,7 +810,7 @@
     <div style="position: relative; z-index: 1;">
     
     <!-- 모바일 안내 메시지 -->
-    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center content-container">
+    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center">
       <p class="text-sm font-medium">
         <i class="fas fa-hand-point-left mr-2"></i>
         테이블을 좌우로 스크롤하세요
@@ -788,7 +818,7 @@
     </div>
     
     <!-- 탭 메뉴 -->
-    <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container content-container">
+    <div class="flex gap-2 mb-6 overflow-x-auto no-print">
       <button type="button" onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
         <i class="fas fa-table mr-2"></i>페이스 차트
       </button>
@@ -3188,8 +3218,9 @@
       `;
       downloadContainer.appendChild(footer);
       
-      // DOM에 임시 추가
-      document.body.appendChild(downloadContainer);
+      // Find the proper container instead of body
+      const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+      mainContent.appendChild(downloadContainer);
       
       try {
         // 다운로드 버튼 숨기기
@@ -3261,7 +3292,10 @@
         });
         
         tempContainer.appendChild(clonedElement);
-        document.body.appendChild(tempContainer);
+        
+        // Find the proper container instead of body
+        const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+        mainContent.appendChild(tempContainer);
         
         try {
           // html2canvas로 이미지 생성 (PC 스타일로 렌더링된 요소 사용)
@@ -3509,7 +3543,10 @@
           <div class="chat-badge" id="chatBadge" style="display: none;">0</div>
         `;
         chatFab.onclick = toggleMiniChat;
-        document.body.appendChild(chatFab);
+        
+        // Find the proper container instead of body
+        const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+        mainContent.appendChild(chatFab);
       }
       
       // 미니 채팅창 추가
@@ -3534,7 +3571,10 @@
             <button type="button" onclick="sendMiniMessage()">전송</button>
           </div>
         `;
-        document.body.appendChild(miniChat);
+        
+        // Find the proper container instead of body
+        const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+        mainContent.appendChild(miniChat);
       }
       
       // WebSocket 연결 시도

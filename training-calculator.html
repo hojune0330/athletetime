@@ -54,6 +54,29 @@
       z-index: 30; /* Below header but above content */
     }
     
+    /* Hide floating elements that appear outside proper container */
+    .floating-element {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Fix for any elements that might be positioned incorrectly */
+    .floating-text, .top-floating-text {
+      display: none !important;
+      visibility: hidden !important;
+      position: absolute !important;
+      top: -9999px !important;
+      left: -9999px !important;
+    }
+    
+    /* Ensure all content stays within proper container boundaries */
+    .training-calculator-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    
     /* Ensure proper content flow and prevent text overflow */
     .content-container {
       position: relative;
@@ -2506,7 +2529,9 @@
           </div>
         </div>
       `;
-      document.body.appendChild(helpModal);
+      // Find the proper container instead of body
+      const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+      mainContent.appendChild(helpModal);
     }
 
     // Initialize on page load
@@ -2531,7 +2556,9 @@
           infoBtn.onclick = () => {
             window.location.href = 'system-documentation.html';
           };
-          document.body.appendChild(infoBtn);
+          // Find the proper container instead of body
+          const mainContent = document.querySelector('.main-content-wrapper') || document.body;
+          mainContent.appendChild(infoBtn);
           
           setTimeout(() => infoBtn.remove(), 10000);
         }, 2000);
