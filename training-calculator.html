@@ -491,6 +491,11 @@
         <div>
           <h3 class="font-semibold mb-3 text-gray-700">기본 정보</h3>
           
+          <!-- User Profile Display -->
+          <div id="userProfileDisplay" class="mb-4">
+            <!-- User profile info will be displayed here -->
+          </div>
+          
           <div class="mb-4">
             <label class="block text-sm font-medium mb-2">성별</label>
             <div class="grid grid-cols-2 gap-2">
@@ -790,6 +795,17 @@
             <div class="text-2xl" id="predictedVO2max">--</div>
             <div class="text-sm opacity-90 mt-1">예상 VO₂max (ml/kg/min)</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Training Plan Explanations -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <h3 class="text-xl font-bold mb-4 text-gray-800">
+          <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+          훈련 계획 설명
+        </h3>
+        <div id="trainingExplanations" class="space-y-4">
+          <!-- Training explanations will be inserted here -->
         </div>
       </div>
 
@@ -1203,14 +1219,49 @@
     function selectGender(gender) {
       userProfile.gender = gender;
       
-      // Update UI
-      document.getElementById('btn-male').classList.remove('border-purple-500', 'bg-purple-50');
-      document.getElementById('btn-female').classList.remove('border-purple-500', 'bg-purple-50');
+      // Update UI with better visual feedback
+      const maleBtn = document.getElementById('btn-male');
+      const femaleBtn = document.getElementById('btn-female');
       
+      if (!maleBtn || !femaleBtn) {
+        console.error('Gender buttons not found');
+        return;
+      }
+      
+      // Reset both buttons
+      maleBtn.classList.remove('border-purple-500', 'bg-purple-50', 'ring-2', 'ring-purple-300');
+      femaleBtn.classList.remove('border-purple-500', 'bg-purple-50', 'ring-2', 'ring-purple-300');
+      
+      // Add selected state to chosen button
       if (gender === 'male') {
-        document.getElementById('btn-male').classList.add('border-purple-500', 'bg-purple-50');
+        maleBtn.classList.add('border-purple-500', 'bg-purple-50', 'ring-2', 'ring-purple-300');
+        // Add visual feedback
+        maleBtn.style.transform = 'scale(1.02)';
+        femaleBtn.style.transform = 'scale(1)';
       } else {
-        document.getElementById('btn-female').classList.add('border-purple-500', 'bg-purple-50');
+        femaleBtn.classList.add('border-purple-500', 'bg-purple-50', 'ring-2', 'ring-purple-300');
+        // Add visual feedback
+        femaleBtn.style.transform = 'scale(1.02)';
+        maleBtn.style.transform = 'scale(1)';
+      }
+      
+      // Update user profile display
+      updateUserProfileDisplay();
+      
+      console.log('Gender selected:', gender);
+    }
+
+    function updateUserProfileDisplay() {
+      // 사용자 프로필 정보 표시 업데이트
+      const profileDisplay = document.getElementById('userProfileDisplay');
+      if (profileDisplay && userProfile.gender) {
+        const genderText = userProfile.gender === 'male' ? '남성' : '여성';
+        profileDisplay.innerHTML = `<div class="bg-blue-50 p-3 rounded-lg mb-4">
+          <div class="flex justify-between items-center">
+            <span class="font-medium">성별: ${genderText}</span>
+            <span class="text-sm text-gray-600">VDOT: ${userProfile.vdot || '미계산'}</span>
+          </div>
+        </div>`;
       }
     }
 
@@ -3704,12 +3755,104 @@
         // 실시간 업데이트 시작
         startRealtimeUpdates();
       }
-        // 기존 계산 로직 유지
+
+      // 메인 결과 표시 함수
+      function displayResults(vdot, paces, adjustments, timeBasedPlan) {
+        // VDOT 및 기본 정보 업데이트
+        updateVDOTDisplay(vdot);
         
-        // 9-10일 주기화 업데이트
-        setTimeout(() => {
-          updateNonaryCycle();
-        }, 100);
+        // 페이스 정보 표시
+        displayPaces(paces);
+        
+        // 시간 기반 최적화 결과 표시
+        if (timeBasedPlan) {
+          displayTimeBasedResults(timeBasedPlan);
+        }
+        
+        // 조정치 정보 표시
+        if (adjustments) {
+          displayAdjustmentSummary();
+        }
+        
+        // 훈련 설명 생성
+        generateTrainingExplanations(vdot, paces);
+      }
+
+      function updateVDOTDisplay(vdot) {
+        // 여성의 경우 VDOT 표시만 조정 (페이스 계산은 실제 VDOT 사용)
+        const displayVDOT = userProfile.gender === 'female' ? vdot * 0.88 : vdot;
+        
+        // VDOT 표시 요소 확인 및 업데이트
+        const vdotElement = document.getElementById('vdotScore');
+        if (vdotElement) {
+          vdotElement.textContent = displayVDOT.toFixed(1);
+        }
+        
+        const levelElement = document.getElementById('performanceLevel');
+        if (levelElement) {
+          levelElement.textContent = getPerformanceLevel(displayVDOT);
+        }
+        
+        const vo2Element = document.getElementById('predictedVO2max');
+        if (vo2Element) {
+          vo2Element.textContent = (displayVDOT * 1.05).toFixed(1);
+        }
+        
+        // 성별 조정 정보 표시
+        const adjustmentElement = document.getElementById('vdotAdjustment');
+        if (adjustmentElement) {
+          if (userProfile.gender === 'female') {
+            adjustmentElement.textContent = '여성 보정 적용 (실제 VDOT: ' + vdot.toFixed(1) + ')';
+          } else {
+            adjustmentElement.textContent = '';
+          }
+        }
+      }
+
+      function displayPaces(paces) {
+        // 페이스 표시 로직
+        const pacesToDisplay = ['easy', 'marathon', 'threshold', 'interval', 'repetition'];
+        
+        pacesToDisplay.forEach(paceType => {
+          const element = document.getElementById(paceType + 'Pace');
+          if (element && paces[paceType]) {
+            element.textContent = paces[paceType];
+          }
+        });
+      }
+
+      function generateTrainingExplanations(vdot, paces) {
+        // 훈련 계획 설명 생성
+        const explanationsSection = document.getElementById('trainingExplanations');
+        if (!explanationsSection) return;
+        
+        let explanationsHTML = `<h4 class="font-bold text-lg mb-4 text-gray-800">훈련 계획 설명</h4>
+          <div class="space-y-4">`;
+        
+        // 각 훈련 유형에 대한 설명
+        const trainingTypes = [
+          { type: 'easy', name: ' easy pace', description: '회복 및 기초 체력 향상을 위한 편안한 속도' },
+          { type: 'marathon', name: 'marathon pace', description: '마라톤 경기에서 유지할 수 있는 목표 속도' },
+          { type: 'threshold', name: 'threshold pace', description: '젖산 역치에서 훈련하여 지구력 향상' },
+          { type: 'interval', name: 'interval pace', description: '고강도 인터벌 훈련을 위한 속도' },
+          { type: 'repetition', name: 'repetition pace', description: '최대 산소 섭취량 향상을 위한 최고 강도' }
+        ];
+        
+        trainingTypes.forEach(training => {
+          if (paces[training.type]) {
+            explanationsHTML += `
+              <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div class="flex justify-between items-start mb-2">
+                  <h5 class="font-bold text-gray-800">${training.name}</h5>
+                  <span class="text-blue-600 font-bold">${paces[training.type]}</span>
+                </div>
+                <p class="text-gray-600 text-sm">${training.description}</p>
+              </div>`;
+          }
+        });
+        
+        explanationsHTML += '</div>';
+        explanationsSection.innerHTML = explanationsHTML;
       }
 
       // 실시간 업데이트 함수
