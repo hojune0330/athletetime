@@ -606,6 +606,34 @@
           </div>
         </div>
       </div>
+
+      <!-- 시간 입력 추가 -->
+      <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+        <h3 class="text-lg font-bold mb-4 text-blue-800">
+          <i class="fas fa-clock mr-2"></i>훈련 시간 최적화
+        </h3>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">훈련 시작 시간</label>
+            <input type="time" id="trainingTime" class="w-full p-3 border rounded-lg" value="17:00">
+            <div class="text-xs text-gray-600 mt-1">시작 시간에 따라 최적의 훈련이 제안됩니다</div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">계절 설정</label>
+            <select id="trainingSeason" class="w-full p-3 border rounded-lg">
+              <option value="auto">자동 감지</option>
+              <option value="spring">봄 (3-5월)</option>
+              <option value="summer">여름 (6-8월)</option>
+              <option value="autumn">가을 (9-11월)</option>
+              <option value="winter">겨울 (12-2월)</option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center">
+          <input type="checkbox" id="enableTimeOptimization" class="mr-2" checked>
+          <label for="enableTimeOptimization" class="text-sm font-medium">시간 기반 최적화 활성화</label>
+        </div>
+      </div>
       
       <button type="button" onclick="calculateTraining()" 
         class="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition">
@@ -1625,6 +1653,40 @@
             volumeRatios: [0.9, 0.8, 0.7, 0.2, 0.8, 0.6, 0.3, 0.7, 0.5, 0.4]
           }
         };
+
+        // 시간 기반 최적화 데이터
+        this.timeBasedOptimization = {
+          morning: {
+            6: { optimal: ['technique', 'recovery'], avoid: ['high_intensity'], cortisol: 'high', temp: 'low' },
+            7: { optimal: ['technique', 'base_training'], avoid: ['max_intensity'], cortisol: 'high', temp: 'rising' },
+            8: { optimal: ['high_intensity', 'interval'], avoid: ['long_duration'], cortisol: 'declining', temp: 'optimal' },
+            9: { optimal: ['tempo', 'threshold'], avoid: ['recovery'], cortisol: 'declining', temp: 'optimal' },
+            10: { optimal: ['cross_training', 'drills'], avoid: ['high_intensity'], cortisol: 'normal', temp: 'rising' }
+          },
+          afternoon: {
+            12: { optimal: ['recovery', 'mobility'], avoid: ['high_intensity'], temp: 'peak', digestion: 'active' },
+            13: { optimal: ['technique', 'drills'], avoid: ['long_duration'], temp: 'peak', digestion: 'active' },
+            14: { optimal: ['cross_training', 'strength'], avoid: ['high_intensity'], temp: 'high', digestion: 'settling' },
+            15: { optimal: ['base_training', 'technique'], avoid: ['max_intensity'], temp: 'high', digestion: 'settled' },
+            16: { optimal: ['tempo', 'threshold'], avoid: ['recovery'], temp: 'declining', performance: 'rising' },
+            17: { optimal: ['high_intensity', 'interval'], avoid: ['long_duration'], temp: 'optimal', performance: 'peak' },
+            18: { optimal: ['tempo', 'threshold'], avoid: ['recovery'], temp: 'declining', performance: 'peak' },
+            19: { optimal: ['technique', 'recovery'], avoid: ['high_intensity'], temp: 'declining', recovery: 'preparing' }
+          },
+          evening: {
+            20: { optimal: ['recovery', 'stretching'], avoid: ['high_intensity'], temp: 'declining', melatonin: 'rising' },
+            21: { optimal: ['mobility', 'relaxation'], avoid: ['stimulating'], temp: 'cooling', melatonin: 'high' },
+            22: { optimal: ['meditation', 'breathing'], avoid: ['any_training'], temp: 'cool', melatonin: 'peak' }
+          }
+        };
+
+        // 계절 및 시간대별 최적화
+        this.seasonalOptimization = {
+          spring: { morningStart: 7, afternoonStart: 16, eveningStart: 20 },
+          summer: { morningStart: 6, afternoonStart: 17, eveningStart: 21 },
+          autumn: { morningStart: 8, afternoonStart: 15, eveningStart: 19 },
+          winter: { morningStart: 9, afternoonStart: 14, eveningStart: 18 }
+        };
         
         this.dualSessionTemplates = {
           morning: {
@@ -1964,6 +2026,353 @@
         }
 
         selectAfternoonExercises(dayIndex, morningSession) {
+          const baseExercises = {
+            0: ['쉬운 런닝 30분', '기술드릴', '유연성운동'],
+            1: ['기술정화 25분', '코어운동', '스트레칭'],
+            2: ['폼롤러 마사지', '가벼운 요가', '호흡연습'],
+            3: ['회복조깅 20분', '가동성운동', '이완연습'],
+            4: ['근력운동 40분', '코어강화', '스트레칭'],
+            5: ['드릴연습 30분', '폼체크', '비디오분석'],
+            6: ['크로스트레이닝', '수영 또는 자전거', '활동성회복'],
+            7: ['쉬운 조깅 25분', '스트레칭', '명상'],
+            8: ['주간계획검토', '목표설정', '준비운동']
+          };
+          
+          // 오전 세션의 강도에 따라 오후 운동 조정
+          const morningIntensity = morningSession.targetIntensity;
+          let exercises = baseExercises[dayIndex % 9] || baseExercises[0];
+          
+          if (morningIntensity > 0.7) {
+            // 오전이 고강도였으면 오후는 회복 중심으로
+            exercises = ['회복조깅 20분', '가벼운 스트레칭', '마사지'];
+          }
+          
+          return exercises;
+        }
+
+        // 시간 입력 기반 훈련 계획 생성
+        generateTimeBasedPlan(inputTime, athleteProfile) {
+          const time = new Date(inputTime);
+          const hour = time.getHours();
+          const timeOfDay = this.getTimeOfDay(hour);
+          const season = this.getCurrentSeason();
+          
+          const optimizationData = this.getTimeOptimizationData(timeOfDay, hour, season);
+          const basePlan = this.generateBasePlan(athleteProfile);
+          
+          return this.optimizePlanForTime(basePlan, optimizationData, athleteProfile);
+        }
+
+        getTimeOfDay(hour) {
+          if (hour >= 6 && hour <= 10) return 'morning';
+          if (hour >= 12 && hour <= 19) return 'afternoon';
+          if (hour >= 20 && hour <= 22) return 'evening';
+          return 'night';
+        }
+
+        getCurrentSeason() {
+          const month = new Date().getMonth();
+          if (month >= 2 && month <= 4) return 'spring';
+          if (month >= 5 && month <= 7) return 'summer';
+          if (month >= 8 && month <= 10) return 'autumn';
+          return 'winter';
+        }
+
+        getTimeOptimizationData(timeOfDay, hour, season) {
+          const baseData = this.timeBasedOptimization[timeOfDay];
+          if (!baseData) return null;
+          
+          const seasonData = this.seasonalOptimization[season];
+          if (!seasonData) return baseData[hour] || null;
+          
+          // 계절에 따른 시간대 조정
+          let adjustedHour = hour;
+          if (timeOfDay === 'morning') adjustedHour = Math.max(6, hour - (seasonData.morningStart - 7));
+          if (timeOfDay === 'afternoon') adjustedHour = Math.min(19, hour + (seasonData.afternoonStart - 16));
+          if (timeOfDay === 'evening') adjustedHour = Math.min(22, hour + (seasonData.eveningStart - 20));
+          
+          return baseData[adjustedHour] || baseData[hour] || null;
+        }
+
+        generateBasePlan(athleteProfile) {
+          const vdot = athleteProfile.vdot || 50;
+          const experience = athleteProfile.experience || 'intermediate';
+          
+          return {
+            trainingTypes: this.getBaseTrainingTypes(vdot, experience),
+            intensity: this.getBaseIntensity(vdot, experience),
+            duration: this.getBaseDuration(vdot, experience),
+            frequency: this.getBaseFrequency(vdot, experience)
+          };
+        }
+
+        getBaseTrainingTypes(vdot, experience) {
+          if (vdot >= 65) return ['high_intensity', 'interval', 'tempo', 'recovery'];
+          if (vdot >= 50) return ['threshold', 'interval', 'base_training', 'recovery'];
+          return ['base_training', 'technique', 'recovery', 'easy_run'];
+        }
+
+        getBaseIntensity(vdot, experience) {
+          if (experience === 'elite' || vdot >= 70) return 0.8;
+          if (experience === 'advanced' || vdot >= 55) return 0.7;
+          if (experience === 'intermediate' || vdot >= 40) return 0.6;
+          return 0.5;
+        }
+
+        getBaseDuration(vdot, experience) {
+          if (experience === 'elite') return 90;
+          if (experience === 'advanced') return 75;
+          if (experience === 'intermediate') return 60;
+          return 45;
+        }
+
+        getBaseFrequency(vdot, experience) {
+          if (experience === 'elite') return 7;
+          if (experience === 'advanced') return 6;
+          if (experience === 'intermediate') return 5;
+          return 4;
+        }
+
+        optimizePlanForTime(basePlan, optimizationData, athleteProfile) {
+          if (!optimizationData) {
+            return {
+              ...basePlan,
+              recommendations: ['표준 훈련 계획을 따릅니다.'],
+              warnings: ['입력하신 시간대에 대한 특별한 최적화 정보가 없습니다.']
+            };
+          }
+
+          const optimizedTrainingTypes = this.filterTrainingTypesByTime(basePlan.trainingTypes, optimizationData);
+          const adjustedIntensity = this.adjustIntensityByTime(basePlan.intensity, optimizationData);
+          const optimizedDuration = this.adjustDurationByTime(basePlan.duration, optimizationData);
+          
+          return {
+            originalTime: optimizationData,
+            trainingTypes: optimizedTrainingTypes,
+            intensity: adjustedIntensity,
+            duration: optimizedDuration,
+            recommendations: this.generateTimeRecommendations(optimizationData, athleteProfile),
+            warnings: this.generateTimeWarnings(optimizationData),
+            optimalStartTime: this.calculateOptimalStartTime(optimizationData),
+            physiologicalState: this.describePhysiologicalState(optimizationData)
+          };
+        }
+
+        filterTrainingTypesByTime(trainingTypes, optimizationData) {
+          const { optimal, avoid } = optimizationData;
+          const filteredTypes = trainingTypes.filter(type => !avoid.includes(type));
+          
+          // 우선순위 재정렬
+          const optimalTypes = optimal.filter(type => filteredTypes.includes(type));
+          const remainingTypes = filteredTypes.filter(type => !optimal.includes(type));
+          
+          return [...optimalTypes, ...remainingTypes].slice(0, 4);
+        }
+
+        adjustIntensityByTime(baseIntensity, optimizationData) {
+          const { cortisol, temp } = optimizationData;
+          let adjustedIntensity = baseIntensity;
+          
+          if (cortisol === 'high') adjustedIntensity *= 0.8;
+          if (cortisol === 'declining') adjustedIntensity *= 1.1;
+          if (temp === 'low') adjustedIntensity *= 0.9;
+          if (temp === 'optimal') adjustedIntensity *= 1.05;
+          if (temp === 'peak' || temp === 'high') adjustedIntensity *= 0.85;
+          
+          return Math.max(0.3, Math.min(1.0, adjustedIntensity));
+        }
+
+        adjustDurationByTime(baseDuration, optimizationData) {
+          const { temp, digestion } = optimizationData;
+          let adjustedDuration = baseDuration;
+          
+          if (temp === 'peak' || temp === 'high') adjustedDuration *= 0.8;
+          if (temp === 'low') adjustedDuration *= 1.1;
+          if (digestion === 'active') adjustedDuration *= 0.7;
+          
+          return Math.max(30, Math.min(120, adjustedDuration));
+        }
+
+        generateTimeRecommendations(optimizationData, athleteProfile) {
+          const recommendations = [];
+          const { optimal, cortisol, temp, performance } = optimizationData;
+          
+          if (optimal.includes('technique')) {
+            recommendations.push('기술 훈련에 집중하세요 - 이 시간대는 운동 학습에 최적입니다.');
+          }
+          if (optimal.includes('high_intensity')) {
+            recommendations.push('고강도 인터벌 훈련을 추천합니다 - 근력과爆发力 향상에 좋습니다.');
+          }
+          if (optimal.includes('recovery')) {
+            recommendations.push('회복 중심의 훈련을 하세요 - 스트레칭, 요가, 가벼운 조깅이 좋습니다.');
+          }
+          
+          if (cortisol === 'high') {
+            recommendations.push('코티솔 수치가 높으므로 충분한 워밍업이 필요합니다.');
+          }
+          if (temp === 'low') {
+            recommendations.push('체온이 낮으므로 철저한 워밍업이 필수입니다.');
+          }
+          if (performance === 'peak') {
+            recommendations.push('성능이 최고조에 도달했습니다 - 중요한 훈련을 집중하세요.');
+          }
+          
+          return recommendations;
+        }
+
+        generateTimeWarnings(optimizationData) {
+          const warnings = [];
+          const { avoid, cortisol, temp, melatonin } = optimizationData;
+          
+          if (avoid.includes('high_intensity')) {
+            warnings.push('이 시간대에는 고강도 훈련을 피하는 것이 좋습니다.');
+          }
+          if (avoid.includes('max_intensity')) {
+            warnings.push('최대 강도 훈련은 생리적으로 부적합합니다.');
+          }
+          if (avoid.includes('long_duration')) {
+            warnings.push('장시간 훈련은 피로 누적 위험이 있습니다.');
+          }
+          if (melatonin === 'rising' || melatonin === 'high') {
+            warnings.push('멜라토닌 분비가 증가하고 있으므로 너무 자극적인 훈련은 피하세요.');
+          }
+          
+          return warnings;
+        }
+
+        calculateOptimalStartTime(optimizationData) {
+          const { temp, performance } = optimizationData;
+          if (performance === 'peak') return '지금 바로 시작하세요!';
+          if (temp === 'optimal') return '30분 이내에 시작하는 것이 좋습니다.';
+          if (temp === 'low') return '체온을 높인 후 15분 내에 시작하세요.';
+          return '1시간 내에 시작하는 것이 좋습니다.';
+        }
+
+        describePhysiologicalState(optimizationData) {
+          const { cortisol, temp, melatonin, performance } = optimizationData;
+          let state = '';
+          
+          if (cortisol === 'high') state += '코티솔 수치 상승으로 스트레스 반응이 강합니다. ';
+          if (temp === 'optimal') state += '체온이 최적 상태로 근육 활동이 원활합니다. ';
+          if (performance === 'peak') state += '운동 성능이 최고조에 도달했습니다. ';
+          if (melatonin === 'rising') state += '수면 준비가 시작되었으므로 가벼운 활동이 적합합니다.';
+          
+          return state || '생리 상태가 안정적입니다.';
+        }
+
+        // 실시간 적응형 모니터링
+        generateAdaptiveMonitoring(athleteProfile, currentTime) {
+          return {
+            realTimeMetrics: this.collectRealTimeMetrics(athleteProfile, currentTime),
+            adjustmentRecommendations: this.generateAdjustments(athleteProfile, currentTime),
+            predictiveAnalysis: this.generatePredictions(athleteProfile, currentTime),
+            alertSystem: this.setupAlerts(athleteProfile, currentTime)
+          };
+        }
+
+        collectRealTimeMetrics(athleteProfile, currentTime) {
+          const time = new Date(currentTime);
+          const hour = time.getHours();
+          const dayOfWeek = time.getDay();
+          
+          return {
+            timeOfDay: this.getTimeOfDay(hour),
+            dayOfWeek: dayOfWeek,
+            weeklyLoad: this.calculateWeeklyLoad(athleteProfile),
+            recoveryStatus: this.assessRecoveryStatus(athleteProfile),
+            readinessScore: this.calculateReadinessScore(athleteProfile, hour)
+          };
+        }
+
+        calculateWeeklyLoad(athleteProfile) {
+          const baseLoad = athleteProfile.vdot * 0.8;
+          const frequencyFactor = { '3-4': 0.7, '5-6': 1.0, '7': 1.3, 'double': 1.6 }[athleteProfile.frequency] || 1.0;
+          return Math.round(baseLoad * frequencyFactor);
+        }
+
+        assessRecoveryStatus(athleteProfile) {
+          const vdot = athleteProfile.vdot || 50;
+          const experience = athleteProfile.experience || 'intermediate';
+          
+          if (vdot >= 70 && experience === 'elite') return '우수';
+          if (vdot >= 55 && ['advanced', 'elite'].includes(experience)) return '양호';
+          if (vdot >= 40 && ['intermediate', 'advanced'].includes(experience)) return '보통';
+          return '주의 필요';
+        }
+
+        calculateReadinessScore(athleteProfile, currentHour) {
+          const baseScore = (athleteProfile.vdot || 50) / 100;
+          const timeBonus = this.getTimeOfDay(currentHour) === 'afternoon' ? 0.1 : 0;
+          return Math.min(1.0, baseScore + timeBonus);
+        }
+
+        generateAdjustments(athleteProfile, currentTime) {
+          const metrics = this.collectRealTimeMetrics(athleteProfile, currentTime);
+          const recommendations = [];
+          
+          if (metrics.recoveryStatus === '주의 필요') {
+            recommendations.push('회복을 우선시하세요 - 강도를 20% 낮추세요.');
+          }
+          if (metrics.readinessScore < 0.6) {
+            recommendations.push('준비도가 낮습니다 - 기술 훈련에 집중하세요.');
+          }
+          if (metrics.weeklyLoad > 80) {
+            recommendations.push('주간 부하가 높습니다 - 회복 세션을 추가하세요.');
+          }
+          
+          return recommendations;
+        }
+
+        generatePredictions(athleteProfile, currentTime) {
+          const metrics = this.collectRealTimeMetrics(athleteProfile, currentTime);
+          const predictions = [];
+          
+          if (metrics.recoveryStatus === '우수' && metrics.readinessScore > 0.8) {
+            predictions.push('우수한 상태 지속 중 - 고강도 훈련에 적합합니다.');
+          }
+          if (metrics.weeklyLoad > 90) {
+            predictions.push('피로 누적 가능성 - 다음 주는 감량 주간으로 계획하세요.');
+          }
+          
+          return predictions;
+        }
+
+        setupAlerts(athleteProfile, currentTime) {
+          return {
+            overtrainingRisk: this.assessOvertrainingRisk(athleteProfile),
+            injuryRisk: this.assessInjuryRisk(athleteProfile),
+            performanceDecline: this.assessPerformanceDecline(athleteProfile)
+          };
+        }
+
+        assessOvertrainingRisk(athleteProfile) {
+          const vdot = athleteProfile.vdot || 50;
+          const frequency = athleteProfile.frequency || '5-6';
+          const weeklyLoad = this.calculateWeeklyLoad(athleteProfile);
+          
+          if (weeklyLoad > 100 && frequency === 'double') return '높음';
+          if (weeklyLoad > 80 && ['7', 'double'].includes(frequency)) return '중간';
+          return '낮음';
+        }
+
+        assessInjuryRisk(athleteProfile) {
+          const experience = athleteProfile.experience || 'intermediate';
+          const weeklyLoad = this.calculateWeeklyLoad(athleteProfile);
+          
+          if (experience === 'beginner' && weeklyLoad > 60) return '높음';
+          if (['intermediate', 'advanced'].includes(experience) && weeklyLoad > 90) return '중간';
+          return '낮음';
+        }
+
+        assessPerformanceDecline(athleteProfile) {
+          const recoveryStatus = this.assessRecoveryStatus(athleteProfile);
+          const weeklyLoad = this.calculateWeeklyLoad(athleteProfile);
+          
+          if (recoveryStatus === '주의 필요' && weeklyLoad > 80) return '가능성 있음';
+          if (recoveryStatus === '보통' && weeklyLoad > 90) return '주의 필요';
+          return '안정적';
+        }
+      }
           const baseExercises = {
             0: ['기초유산소 30분', '테크닉 연마', '자세교정'],
             1: ['기술정화 25분', '코어강화', '유연성'],
@@ -3247,8 +3656,31 @@
         // 조정치 계산
         calculateAdjustments();
         
-        // 결과 표시
-        displayResults(vdot, paces);
+        // 시간 기반 최적화 처리
+        let timeBasedPlan = null;
+        if (document.getElementById('enableTimeOptimization').checked) {
+          const trainingTime = document.getElementById('trainingTime').value;
+          const trainingSeason = document.getElementById('trainingSeason').value;
+          
+          // Create athlete profile for time optimization
+          const athleteProfile = {
+            vdot: vdot,
+            experience: userProfile.experience,
+            frequency: userProfile.frequency,
+            eventDistance: distance
+          };
+          
+          // Get current time in proper format
+          const now = new Date();
+          const [timeHours, timeMins] = trainingTime.split(':');
+          now.setHours(parseInt(timeHours), parseInt(timeMins));
+          
+          const periodizationEngine = new NonaryPeriodizationEngine();
+          timeBasedPlan = periodizationEngine.generateTimeBasedPlan(now.toISOString(), athleteProfile);
+        }
+        
+        // 결과 표시 (시간 기반 계획 포함)
+        displayResults(vdot, paces, null, timeBasedPlan);
         
         // 9-10일 주기화 시스템 실행
         updateNonaryCycle();
@@ -4493,6 +4925,34 @@
       // Calculate training paces using actual VDOT
       currentPaces = calculateTrainingPaces(currentVDOT);
       
+      // 시간 기반 최적화 처리
+      let timeBasedPlan = null;
+      if (document.getElementById('enableTimeOptimization') && document.getElementById('enableTimeOptimization').checked) {
+        const trainingTime = document.getElementById('trainingTime').value;
+        const trainingSeason = document.getElementById('trainingSeason').value;
+        
+        // Create athlete profile for time optimization
+        const athleteProfile = {
+          vdot: currentVDOT,
+          experience: userProfile.experience,
+          frequency: userProfile.frequency,
+          eventDistance: distance
+        };
+        
+        // Get current time in proper format
+        const now = new Date();
+        const [timeHours, timeMins] = trainingTime.split(':');
+        now.setHours(parseInt(timeHours), parseInt(timeMins));
+        
+        const periodizationEngine = new NonaryPeriodizationEngine();
+        timeBasedPlan = periodizationEngine.generateTimeBasedPlan(now.toISOString(), athleteProfile);
+        
+        // 시간 기반 계획이 있으면 표시
+        if (timeBasedPlan) {
+          displayTimeBasedResults(timeBasedPlan);
+        }
+      }
+      
       // Display paces with fine-tuning applied
       updatePaceDisplay();
       
@@ -4508,6 +4968,103 @@
       // Show results
       document.getElementById('resultsSection').classList.remove('hidden');
       document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 시간 기반 최적화 결과 표시 함수
+    function displayTimeBasedResults(timeBasedPlan) {
+      if (!timeBasedPlan) return;
+      
+      const resultsDiv = document.getElementById('resultsSection');
+      
+      // 시간 기반 결과 섹션 생성
+      const timeBasedSection = document.createElement('div');
+      timeBasedSection.className = 'bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-6 border border-blue-200';
+      timeBasedSection.innerHTML = `
+        <h3 class="text-xl font-bold mb-4 text-blue-800">
+          <i class="fas fa-clock mr-2"></i>시간 기반 훈련 최적화
+        </h3>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="font-bold text-lg mb-3 text-gray-800">생리학적 상태</h4>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+              <p class="text-gray-700 mb-2">${timeBasedPlan.physiologicalState}</p>
+              
+              <div class="mt-3">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">추천 강도</span>
+                  <span class="font-bold text-blue-600">${Math.round(timeBasedPlan.intensity * 100)}%</span>
+                </div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">추천 시간</span>
+                  <span class="font-bold text-blue-600">${timeBasedPlan.duration}분</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm font-medium">최적 시작 시간</span>
+                  <span class="font-bold text-green-600">${timeBasedPlan.optimalStartTime}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 class="font-bold text-lg mb-3 text-gray-800">추천 훈련</h4>
+            <div class="bg-white p-4 rounded-lg shadow-sm">
+              <div class="mb-3">
+                <span class="text-sm font-medium text-gray-600">적합 운동:</span>
+                <div class="mt-1 flex flex-wrap gap-2">
+                  ${timeBasedPlan.trainingTypes.map(type => `
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                      ${getTrainingTypeName(type)}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div>
+                <span class="text-sm font-medium text-gray-600">권장사항:</span>
+                <ul class="mt-1 text-sm text-gray-700 space-y-1">
+                  ${timeBasedPlan.recommendations.map(rec => `
+                    <li>• ${rec}</li>
+                  `).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        ${timeBasedPlan.warnings.length > 0 ? `
+          <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
+            <h5 class="font-bold text-yellow-800 mb-2">⚠️ 주의사항</h5>
+            <ul class="text-sm text-yellow-700 space-y-1">
+              ${timeBasedPlan.warnings.map(warning => `
+                <li>• ${warning}</li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+      
+      // 결과 섹션의 첫 번째 자식으로 삽입
+      const firstChild = resultsDiv.firstChild;
+      resultsDiv.insertBefore(timeBasedSection, firstChild);
+    }
+    
+    // 훈련 타입 이름 변환 함수
+    function getTrainingTypeName(type) {
+      const typeNames = {
+        'technique': '기술 훈련',
+        'recovery': '회복 훈련',
+        'base_training': '기초 훈련',
+        'high_intensity': '고강도 훈련',
+        'interval': '인터벌',
+        'tempo': '템포',
+        'threshold': '임계 훈련',
+        'easy_run': '쉬운 러닝',
+        'max_intensity': '최대 강도',
+        'long_duration': '장시간 훈련'
+      };
+      return typeNames[type] || type;
     }
 
     // 실시간 업데이트 함수
