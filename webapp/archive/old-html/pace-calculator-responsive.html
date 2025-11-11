@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>페이스 계산기 & 차트 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- dom-to-image 제거, html2canvas만 사용 -->
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .pace-table {
+      font-size: 12px;
+      width: 100%;
+      table-layout: fixed;
+    }
+    
+    .pace-table td, .pace-table th {
+      padding: 6px 4px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+    
+    .pace-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    
+    .pace-table .highlight-row {
+      background: #fef3c7;
+    }
+    
+    .pace-table .sub-highlight {
+      background: #dbeafe;
+    }
+    
+    .pace-table .highlight-cell {
+      background: #fbbf24;
+      font-weight: bold;
+    }
+    
+    .lane-track {
+      background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+      height: 40px;
+    }
+    
+    .tab-active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    @media print {
+      .no-print { display: none; }
+      .pace-table { page-break-inside: avoid; }
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pace-header {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 1;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .pace-table {
+        font-size: 10px;
+      }
+      .pace-table td, .pace-table th {
+        padding: 4px;
+      }
+    }
+
+    .chart-container {
+      position: relative;
+    }
+
+    .chart-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1;
+      width: 50%;
+      max-width: 350px;
+      display: none; /* 일단 숨김 처리 */
+    }
+    
+    /* 워터마크 제거 */
+    .watermark-text {
+      display: none !important;
+    }
+    
+    /* 다운로드시 테이블 간격 유지 */
+    .pace-table {
+      border-spacing: 0;
+      border-collapse: separate;
+    }
+    
+    .pace-table td, .pace-table th {
+      line-height: 1.2;
+      vertical-align: middle;
+    }
+    
+    /* A4 인쇄 최적화 */
+    @media print {
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+      
+      body {
+        font-size: 11pt;
+      }
+      
+      .pace-table {
+        font-size: 9pt !important;
+        page-break-inside: avoid;
+      }
+      
+      .chart-container {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      
+      .no-print, .download-btn, header, .tab-btn {
+        display: none !important;
+      }
+      
+      h3 {
+        font-size: 14pt !important;
+      }
+    }
+
+    .chart-credit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      color: #4b5563;
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 2;
+      font-weight: bold;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .download-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    @media print {
+      .download-btn { display: none; }
+    }
+
+    .chart-header-logo {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #e5e7eb;
+    }
+
+    .chart-header-logo img {
+      height: 45px;
+      margin: 0 auto;
+      opacity: 0.9;
+    }
+
+    .chart-header-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .chart-header-credit {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-10 no-print">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3 md:gap-4">
+        <button onclick="goBack()" class="p-1">
+          <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+        <div class="h-12 md:h-14 bg-white rounded-lg p-1 flex items-center">
+          <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+               alt="Athlete Time Logo" 
+               class="h-full w-auto"
+               style="max-height: 100%;">
+        </div>
+        <div>
+          <h1 class="text-lg md:text-2xl font-bold">페이스 계산기 & 차트</h1>
+          <p class="text-xs md:text-sm opacity-90 -mt-1">ATHLETE TIME</p>
+        </div>
+      </div>
+      <button onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg">
+        <i class="fas fa-print text-xl"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto p-4 pb-20">
+    
+    <!-- 탭 메뉴 -->
+    <div class="flex gap-2 mb-6 overflow-x-auto no-print">
+      <button onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
+        <i class="fas fa-table mr-2"></i>페이스 차트
+      </button>
+      <button onclick="switchTab('lane')" id="tab-lane" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-road mr-2"></i>레인별 계산
+      </button>
+      <button onclick="switchTab('target')" id="tab-target" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-bullseye mr-2"></i>목표 페이스
+      </button>
+      <button onclick="switchTab('split')" id="tab-split" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-chart-line mr-2"></i>스플릿 계산
+      </button>
+    </div>
+
+    <!-- 페이스 차트 탭 -->
+    <div id="chart-content" class="tab-content">
+      <!-- 개발자 정보 -->
+      <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-5 mb-6 shadow-md border border-purple-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+                 alt="Athlete Time" 
+                 class="h-14 md:h-16 w-auto"
+                 style="opacity: 0.9; filter: contrast(1.2);">
+            <div>
+              <h3 class="text-lg md:text-xl font-bold text-purple-900">러닝 페이스 차트</h3>
+              <p class="text-sm text-purple-700">과학적 훈련을 위한 정밀 분석 도구</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-purple-600 uppercase tracking-wider font-medium">Developer</div>
+            <p class="text-lg font-bold text-purple-900">장호준 코치</p>
+            <p class="text-sm text-purple-700 font-semibold">ATHLETE TIME</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 차트 1: KM 페이스별 거리 환산표 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart1">
+        <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
+          <button onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'png')" 
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-image mr-1"></i>PNG
+          </button>
+          <button onclick="downloadChart('chart1', '페이스_거리별_완주시간', 'pdf')" 
+                  class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-file-pdf mr-1"></i>PDF
+          </button>
+          <button onclick="printChart('chart1')" 
+                  class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-print mr-1"></i>인쇄
+          </button>
+        </div>
+        
+        <!-- 제목 -->
+        <h3 class="text-xl font-bold mb-3 text-center">
+          <i class="fas fa-tachometer-alt text-blue-500 mr-2"></i>
+          킬로미터 페이스 → 거리별 완주 시간
+        </h3>
+        
+        <!-- 제작 정보 -->
+        <div class="text-center mb-4 pb-3 border-b-2 border-gray-200">
+          <div class="inline-block">
+            <div style="font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
+          </div>
+        </div>
+        
+        <div class="text-right mb-2">
+          <span class="text-xs text-gray-500">단위: 분:초</span>
+        </div>
+        
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-3 mb-4">
+          <h4 class="font-bold text-blue-900 text-sm mb-1">📖 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-blue-800 leading-relaxed">
+            <strong>"내가 km당 4분 페이스로 뛰면..."</strong> 이라고 생각할 때 사용합니다.<br>
+            • 예: km당 4분 페이스 → 5km는 20분, 10km는 40분, 하프는 1:24:23<br>
+            • 훈련 시 목표 페이스를 정하고 각 거리별 통과 시간을 확인할 때 활용하세요.
+          </p>
+        </div>
+        
+        <div class="table-container" style="position: relative;">
+          
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th class="pace-header">km 페이스</th>
+                <th>100m</th>
+                <th>200m</th>
+                <th>400m</th>
+                <th>800m</th>
+                <th>1km</th>
+                <th>3km</th>
+                <th class="bg-yellow-50">5km</th>
+                <th class="bg-green-50">10km</th>
+                <th>15km</th>
+                <th class="bg-blue-50">하프</th>
+                <th>30km</th>
+                <th class="bg-purple-50">풀코스</th>
+              </tr>
+            </thead>
+            <tbody id="paceChartBody1">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">러닝 전문 트레이닝 프로그램</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- 차트 2: 목표 기록별 페이스 분석표 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart2">
+        <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
+          <button onclick="downloadChart('chart2', '목표_기록별_페이스', 'png')" 
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-image mr-1"></i>PNG
+          </button>
+          <button onclick="downloadChart('chart2', '목표_기록별_페이스', 'pdf')" 
+                  class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-file-pdf mr-1"></i>PDF
+          </button>
+          <button onclick="printChart('chart2')" 
+                  class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-print mr-1"></i>인쇄
+          </button>
+        </div>
+        
+        <!-- 제목 -->
+        <h3 class="text-xl font-bold mb-3 text-center">
+          <i class="fas fa-trophy text-orange-500 mr-2"></i>
+          목표 기록별 필요 페이스 분석
+        </h3>
+        
+        <!-- 제작 정보 -->
+        <div class="text-center mb-4 pb-3 border-b-2 border-gray-200">
+          <div class="inline-block">
+            <div style="font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
+          </div>
+        </div>
+        
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-3 mb-4">
+          <h4 class="font-bold text-orange-900 text-sm mb-1">🎯 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-orange-800 leading-relaxed">
+            <strong>"5km를 20분에 완주하려면..."</strong> 이라고 생각할 때 사용합니다.<br>
+            • 대회 목표 기록을 설정하고 필요한 페이스를 확인할 때<br>
+            • 인기 목표 시간별로 km 페이스, 400m 랩타임, 속도를 한눈에 확인 가능
+          </p>
+        </div>
+
+        <!-- 5km 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 5km 목표 기록</h4>
+        <div class="table-container mb-4" style="position: relative;">
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>100m</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="target5kmTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 10km 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 10km 목표 기록</h4>
+        <div class="table-container mb-4" style="position: relative;">
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>5km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="target10kmTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 하프마라톤 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 하프마라톤 목표 기록</h4>
+        <div class="table-container mb-4" style="position: relative;">
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>5km 통과</th>
+                <th>10km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="targetHalfTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 풀마라톤 목표 기록 -->
+        <h4 class="font-bold text-sm mb-2 text-gray-700">🏃 풀마라톤 목표 기록</h4>
+        <div class="table-container" style="position: relative;">
+          <!-- 워터마크 -->
+          <div class="watermark-text" style="top: 6px; left: 73%; font-size: 9px;">ATHLETE TIME</div>
+          <div class="watermark-text" style="bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 2px;">제작: 장호준 코치</div>
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th>목표 기록</th>
+                <th>km 페이스</th>
+                <th>400m 랩</th>
+                <th>10km 통과</th>
+                <th>하프 통과</th>
+                <th>30km 통과</th>
+                <th>속도(km/h)</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="targetFullTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">목표 달성을 위한 정확한 페이스 가이드</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- 차트 3: 400m 트랙 레인별 보정 시간 -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6 chart-container" id="chart3">
+        <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
+          <button onclick="downloadChart('chart3', '트랙_레인별_보정표', 'png')" 
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-image mr-1"></i>PNG
+          </button>
+          <button onclick="downloadChart('chart3', '트랙_레인별_보정표', 'pdf')" 
+                  class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-file-pdf mr-1"></i>PDF
+          </button>
+          <button onclick="printChart('chart3')" 
+                  class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-print mr-1"></i>인쇄
+          </button>
+        </div>
+        
+        <!-- 제목 -->
+        <h3 class="text-xl font-bold mb-3 text-center">
+          <i class="fas fa-route text-green-500 mr-2"></i>
+          400m 트랙 레인별 거리 & 시간 보정표
+        </h3>
+        
+        <!-- 제작 정보 -->
+        <div class="text-center mb-4 pb-3 border-b-2 border-gray-200">
+          <div class="inline-block">
+            <div style="font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
+          </div>
+        </div>
+        
+        <div class="bg-green-50 border-l-4 border-green-500 p-3 mb-4">
+          <h4 class="font-bold text-green-900 text-sm mb-1">🏟️ 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-green-800 leading-relaxed">
+            <strong>트랙에서 훈련할 때</strong> 각 레인의 실제 거리를 확인합니다.<br>
+            • 1레인은 정확히 400m, 8레인은 453m (13% 더 김)<br>
+            • 인터벌 훈련 시 레인별로 목표 시간을 조정해야 할 때 사용하세요.
+          </p>
+        </div>
+
+        <div class="table-container" style="position: relative;">
+          <!-- 워터마크 -->
+          <div class="watermark-text" style="top: 35px; left: 25%; font-size: 10px;">ATHLETE</div>
+          <div class="watermark-text" style="top: 35px; left: 50%; font-size: 10px;">TIME</div>
+          <div class="watermark-text" style="top: 35px; left: 75%; font-size: 10px;">장호준</div>
+          <div class="watermark-text" style="bottom: 5px; left: 50%; transform: translateX(-50%); font-size: 11px; letter-spacing: 3px;">
+            © ATHLETE TIME · 장호준 코치
+          </div>
+          
+          <table class="pace-table w-full" style="position: relative; z-index: 3;">
+            <thead>
+              <tr>
+                <th rowspan="2">km 페이스</th>
+                <th rowspan="2">400m<br>(1레인)</th>
+                <th colspan="7">외측 레인 보정 시간</th>
+              </tr>
+              <tr>
+                <th class="text-xs">2레인<br>407m</th>
+                <th class="text-xs">3레인<br>415m</th>
+                <th class="text-xs">4레인<br>422m</th>
+                <th class="text-xs">5레인<br>430m</th>
+                <th class="text-xs">6레인<br>438m</th>
+                <th class="text-xs">7레인<br>445m</th>
+                <th class="text-xs">8레인<br>453m</th>
+              </tr>
+            </thead>
+            <tbody id="laneChartTable">
+              <!-- JavaScript로 채워짐 -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">트랙 레인별 정확한 거리 계산</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- 차트 4: 3000m 장애물 페이스 계산표 -->
+      <div class="bg-white rounded-lg shadow-md p-4 chart-container" id="chart4">
+        <div class="download-btn no-print" style="position: absolute; top: 10px; right: 10px; z-index: 5; display: flex; gap: 8px;">
+          <button onclick="downloadChart('chart4', '3000m_장애물_페이스', 'png')" 
+                  class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-lg hover:from-blue-600 hover:to-blue-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-image mr-1"></i>PNG
+          </button>
+          <button onclick="downloadChart('chart4', '3000m_장애물_페이스', 'pdf')" 
+                  class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5 rounded-lg hover:from-red-600 hover:to-red-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-file-pdf mr-1"></i>PDF
+          </button>
+          <button onclick="printChart('chart4')" 
+                  class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-3 py-1.5 rounded-lg hover:from-gray-600 hover:to-gray-700 text-xs font-medium transition-all hover:scale-105">
+            <i class="fas fa-print mr-1"></i>인쇄
+          </button>
+        </div>
+        
+        <!-- 제목 -->
+        <h3 class="text-xl font-bold mb-3 text-center">
+          <i class="fas fa-water text-cyan-500 mr-2"></i>
+          3000m 장애물 경주 페이스 계산표
+        </h3>
+        
+        <!-- 제작 정보 -->
+        <div class="text-center mb-4 pb-3 border-b-2 border-gray-200">
+          <div class="inline-block">
+            <div style="font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #1f2937;">
+              <span style="font-style: italic;">ATHLETE</span> <span>TIME</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
+          </div>
+        </div>
+        
+        <div class="bg-cyan-50 border-l-4 border-cyan-500 p-3 mb-4">
+          <h4 class="font-bold text-cyan-900 text-sm mb-1">💧 이 차트는 언제 사용하나요?</h4>
+          <p class="text-xs text-cyan-800 leading-relaxed">
+            <strong>3000m 장애물 경주</strong>의 정확한 페이스를 계산할 때 사용합니다.<br>
+            • 물 장애물 위치에 따라 랩 거리가 달라집니다 (내측: 396.084m, 외측: 419.407m)<br>
+            • 7랩 + 시작 구간으로 총 28개 장애물과 7개 물 장애물을 통과합니다.<br>
+            • 두 가지 구성을 동시에 비교하여 대회별 차이를 확인할 수 있습니다.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 shadow-xl border-2 border-blue-400">
+            <div class="flex items-center mb-2">
+              <div class="bg-white/25 rounded-full p-2 mr-3">
+                <i class="fas fa-arrow-circle-left text-xl"></i>
+              </div>
+              <h4 class="font-bold text-xl">물 장애물 내측 (INSIDE)</h4>
+            </div>
+            <ul class="text-sm space-y-1.5">
+              <li class="flex items-center">
+                <span class="mr-2">📏</span>
+                <span>랩 거리: <strong class="text-yellow-200">396.084m</strong></span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">⚡</span>
+                <span>400m보다 <strong>3.916m 짧음</strong></span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">🏁</span>
+                <span>시작 구간: 227.412m</span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">🌍</span>
+                <span>World Athletics 표준</span>
+              </li>
+            </ul>
+          </div>
+          <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 shadow-xl border-2 border-purple-400">
+            <div class="flex items-center mb-2">
+              <div class="bg-white/25 rounded-full p-2 mr-3">
+                <i class="fas fa-arrow-circle-right text-xl"></i>
+              </div>
+              <h4 class="font-bold text-xl">물 장애물 외측 (OUTSIDE)</h4>
+            </div>
+            <ul class="text-sm space-y-1.5">
+              <li class="flex items-center">
+                <span class="mr-2">📏</span>
+                <span>랩 거리: <strong class="text-yellow-200">419.407m</strong></span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">⚡</span>
+                <span>400m보다 <strong>19.407m 김</strong></span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">🏁</span>
+                <span>시작 구간: 64.151m</span>
+              </li>
+              <li class="flex items-center">
+                <span class="mr-2">🏟️</span>
+                <span>일부 경기장 구성</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <style>
+          .steeplechase-inside-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-weight: bold;
+          }
+          .steeplechase-outside-header {
+            background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+            color: white;
+            font-weight: bold;
+          }
+          .steeplechase-inside-cell {
+            background-color: #eff6ff;
+            border-left: 2px solid #3b82f6;
+            border-right: 2px solid #3b82f6;
+          }
+          .steeplechase-outside-cell {
+            background-color: #faf5ff;
+            border-left: 2px solid #a855f7;
+            border-right: 2px solid #a855f7;
+          }
+          .steeplechase-inside-cell:first-of-type {
+            border-left: 3px solid #3b82f6;
+          }
+          .steeplechase-inside-cell:last-of-type {
+            border-right: 3px solid #3b82f6;
+          }
+          .steeplechase-outside-cell:first-of-type {
+            border-left: 3px solid #a855f7;
+          }
+          .steeplechase-outside-cell:last-of-type {
+            border-right: 3px solid #a855f7;
+          }
+          .steeplechase-table-divider {
+            width: 20px;
+            background: linear-gradient(to right, #3b82f6, #a855f7);
+            border: none !important;
+          }
+        </style>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 내측 구성 테이블 -->
+          <div class="border-4 border-blue-500 rounded-lg overflow-hidden shadow-xl">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 text-center">
+              <h4 class="font-bold text-lg">🏃 내측 구성 (INSIDE)</h4>
+              <p class="text-sm opacity-90">랩당 396.084m • 시작 227.4m</p>
+            </div>
+            <div class="table-container" style="position: relative;">
+              <table class="pace-table w-full" style="position: relative; z-index: 3;">
+                <thead>
+                  <tr class="bg-blue-100">
+                    <th class="text-xs">목표기록</th>
+                    <th class="text-xs">km페이스</th>
+                    <th class="text-xs">시작구간</th>
+                    <th class="text-xs">1랩</th>
+                    <th class="text-xs">3랩</th>
+                    <th class="text-xs">5랩</th>
+                    <th class="text-xs bg-blue-200 font-bold">완주</th>
+                  </tr>
+                </thead>
+                <tbody id="steeplechaseInsideTable">
+                  <!-- JavaScript로 채워짐 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 외측 구성 테이블 -->
+          <div class="border-4 border-purple-500 rounded-lg overflow-hidden shadow-xl">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-3 text-center">
+              <h4 class="font-bold text-lg">🏃 외측 구성 (OUTSIDE)</h4>
+              <p class="text-sm opacity-90">랩당 419.407m • 시작 64.2m</p>
+            </div>
+            <div class="table-container" style="position: relative;">
+              <table class="pace-table w-full" style="position: relative; z-index: 3;">
+                <thead>
+                  <tr class="bg-purple-100">
+                    <th class="text-xs">목표기록</th>
+                    <th class="text-xs">km페이스</th>
+                    <th class="text-xs">시작구간</th>
+                    <th class="text-xs">1랩</th>
+                    <th class="text-xs">3랩</th>
+                    <th class="text-xs">5랩</th>
+                    <th class="text-xs bg-purple-200 font-bold">완주</th>
+                  </tr>
+                </thead>
+                <tbody id="steeplechaseOutsideTable">
+                  <!-- JavaScript로 채워짐 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+          <p class="text-xs text-gray-600">
+            <strong>참고:</strong> 실제 경기에서는 장애물 통과 시 속도 저하가 발생합니다. 
+            일반적으로 평지 3000m 기록보다 30-60초 정도 늦은 기록이 나옵니다.
+            이 표는 균등 페이스 기준이며, 실제 경기에서는 장애물 구간에서 페이스 변화가 있을 수 있습니다.
+          </p>
+        </div>
+        
+        <!-- 제작 정보 추가 -->
+        <div class="mt-4 pt-3 border-t border-gray-200 text-center">
+          <p class="text-xs text-gray-600">
+            <span class="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
+            <span class="text-gray-500">3000m 장애물 경주 전문 페이스 분석</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 레인 계산기 탭 -->
+    <div id="lane-content" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <h2 class="text-xl font-bold mb-4">
+          <i class="fas fa-road text-orange-500"></i> 400m 트랙 레인별 거리 계산기
+        </h2>
+        
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
+          <p class="text-sm text-orange-800">
+            <strong>IAAF 공식 규격:</strong> 1레인 반경 36.5m 기준, 레인 폭 1.22m
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">레인 선택</label>
+            <select id="laneNumber" onchange="calculateLane()" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="1">1번 레인</option>
+              <option value="2">2번 레인</option>
+              <option value="3">3번 레인</option>
+              <option value="4">4번 레인</option>
+              <option value="5">5번 레인</option>
+              <option value="6">6번 레인</option>
+              <option value="7">7번 레인</option>
+              <option value="8">8번 레인</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">바퀴 수</label>
+            <input type="number" id="laps" value="1" min="0.5" step="0.5" onchange="calculateLane()" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+          </div>
+        </div>
+        
+        <div id="laneResults" class="space-y-3">
+          <!-- 결과가 여기 표시됨 -->
+        </div>
+        
+        <!-- 모든 레인 비교 테이블 -->
+        <div class="mt-6 pt-6 border-t">
+          <h3 class="font-bold mb-3">모든 레인 비교표</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="p-2">레인</th>
+                  <th class="p-2">1바퀴(m)</th>
+                  <th class="p-2">추가거리(m)</th>
+                  <th class="p-2">비율(%)</th>
+                </tr>
+              </thead>
+              <tbody id="allLanesTable">
+                <!-- 동적으로 생성됨 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 목표 페이스 탭 -->
+    <div id="target-content" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <h2 class="text-xl font-bold mb-4">
+          <i class="fas fa-bullseye text-blue-500"></i> 목표 페이스 계산기
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">목표 거리</label>
+            <select id="targetDistance" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="100">100m</option>
+              <option value="200">200m</option>
+              <option value="400">400m</option>
+              <option value="800">800m</option>
+              <option value="1500">1500m</option>
+              <option value="3000">3000m</option>
+              <option value="5000" selected>5000m (5km)</option>
+              <option value="10000">10000m (10km)</option>
+              <option value="21097.5">하프마라톤</option>
+              <option value="42195">풀마라톤</option>
+              <option value="custom">직접 입력</option>
+            </select>
+            <input type="number" id="customDistance" placeholder="거리 입력 (m)" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg mt-2 hidden">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">목표 시간</label>
+            <div class="flex gap-2">
+              <input type="number" id="targetHours" placeholder="시" min="0" max="23" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+              <input type="number" id="targetMinutes" placeholder="분" min="0" max="59" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+              <input type="number" id="targetSeconds" placeholder="초" min="0" max="59" step="0.1" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+          </div>
+        </div>
+        
+        <button onclick="calculateTargetPace()" 
+                class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
+          페이스 계산하기
+        </button>
+        
+        <div id="targetResults" class="mt-6 hidden">
+          <div class="bg-blue-50 rounded-lg p-4">
+            <h3 class="font-bold mb-3">페이스 분석 결과</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="text-gray-600">400m 랩:</span>
+                <span class="font-mono font-bold ml-2" id="lap400">-</span>
+              </div>
+              <div>
+                <span class="text-gray-600">100m 페이스:</span>
+                <span class="font-mono font-bold ml-2" id="pace100m">-</span>
+              </div>
+              <div>
+                <span class="text-gray-600">1km 페이스:</span>
+                <span class="font-mono font-bold ml-2" id="pace1km">-</span>
+              </div>
+              <div>
+                <span class="text-gray-600">평균 속도:</span>
+                <span class="font-mono font-bold ml-2" id="avgSpeed">-</span>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t">
+              <h4 class="font-medium mb-2">랩 스플릿</h4>
+              <div class="space-y-1 text-sm" id="lapSplits">
+                <!-- 동적으로 생성됨 -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 스플릿 계산기 탭 -->
+    <div id="split-content" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+        <h2 class="text-xl font-bold mb-4">
+          <i class="fas fa-chart-line text-green-500"></i> 스플릿 계산기
+        </h2>
+        
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">총 거리 (m)</label>
+              <input type="number" id="splitTotalDistance" value="5000" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">구간 거리 (m)</label>
+              <input type="number" id="splitInterval" value="1000" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">목표 시간</label>
+            <div class="flex gap-2">
+              <input type="number" id="splitHours" placeholder="시" min="0" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+              <input type="number" id="splitMinutes" placeholder="분" min="0" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+              <input type="number" id="splitSeconds" placeholder="초" min="0" step="0.1" 
+                     class="w-1/3 px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">페이스 전략</label>
+            <select id="paceStrategy" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+              <option value="even">균등 페이스 (Even)</option>
+              <option value="negative">네거티브 스플릿 (후반 가속)</option>
+              <option value="positive">포지티브 스플릿 (전반 속도)</option>
+            </select>
+          </div>
+        </div>
+        
+        <button onclick="calculateSplits()" 
+                class="w-full mt-4 bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 rounded-lg font-medium hover:opacity-90 transition">
+          스플릿 계산하기
+        </button>
+        
+        <div id="splitResults" class="mt-6 hidden">
+          <div id="splitTable" class="overflow-x-auto">
+            <!-- 동적으로 생성됨 -->
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    // IAAF 표준 레인 거리
+    const laneDistances = {
+      1: 400.00,
+      2: 407.04,
+      3: 414.70,
+      4: 422.37,
+      5: 430.03,
+      6: 437.70,
+      7: 445.37,
+      8: 453.03
+    };
+
+    // 시간 포맷팅 함수
+    function formatTime(seconds, forceHours = false) {
+      if (isNaN(seconds) || seconds === null) return '-';
+      
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0 || forceHours) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else if (mins > 0) {
+        return `${mins}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else {
+        return secs.toFixed(1);
+      }
+    }
+
+    // 페이스를 분:초 형식으로 포맷
+    function formatPace(secondsPerKm) {
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = Math.floor(secondsPerKm % 60);
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // 탭 전환
+    function switchTab(tabName) {
+      // 모든 탭 내용 숨기기
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      // 모든 탭 버튼 비활성화
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('bg-white');
+      });
+      
+      // 선택한 탭 활성화
+      document.getElementById(`${tabName}-content`).classList.remove('hidden');
+      document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+      document.getElementById(`tab-${tabName}`).classList.remove('bg-white');
+      
+      // 차트가 선택되면 차트 생성
+      if (tabName === 'chart') {
+        generatePaceChart1();
+        generateTargetTables();
+        generateLaneChart();
+        generateSteeplechaseChart();
+      } else if (tabName === 'lane') {
+        calculateLane();
+        generateAllLanesTable();
+      }
+    }
+
+    // 차트 1: KM 페이스별 거리 환산표
+    function generatePaceChart1() {
+      const tbody = document.getElementById('paceChartBody1');
+      tbody.innerHTML = '';
+      
+      // km 페이스 목록 (2:30부터 8:00까지 10초 간격)
+      const paces = [];
+      for (let seconds = 150; seconds <= 480; seconds += 10) {
+        paces.push(seconds);
+      }
+      
+      paces.forEach((pacePerKm, index) => {
+        const row = tbody.insertRow();
+        
+        // 주요 페이스 하이라이트
+        if (pacePerKm === 180 || pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360 || pacePerKm === 420) {
+          row.className = 'highlight-row';
+        } else if (pacePerKm === 210 || pacePerKm === 270 || pacePerKm === 330 || pacePerKm === 390 || pacePerKm === 450) {
+          row.className = 'sub-highlight';
+        }
+        
+        // km 페이스 (첫 번째 열)
+        let cell = row.insertCell();
+        cell.textContent = formatPace(pacePerKm);
+        cell.className = 'pace-header font-bold';
+        
+        // 각 거리별 시간 계산
+        const distances = [100, 200, 400, 800, 1000, 3000, 5000, 10000, 15000, 21097.5, 30000, 42195];
+        distances.forEach((distance, i) => {
+          const time = (pacePerKm / 1000) * distance;
+          cell = row.insertCell();
+          cell.textContent = formatTime(time);
+          
+          // 주요 거리 컬럼 색상
+          if (i === 6) cell.className = 'bg-yellow-50'; // 5km
+          if (i === 7) cell.className = 'bg-green-50';  // 10km
+          if (i === 9) cell.className = 'bg-blue-50';   // 하프
+          if (i === 11) cell.className = 'bg-purple-50'; // 풀
+        });
+      });
+    }
+
+    // 차트 2: 목표 기록별 테이블들
+    function generateTargetTables() {
+      // 5km 목표 기록
+      const targets5km = [
+        { time: 13 * 60, label: '세계 엘리트', highlight: true },
+        { time: 14 * 60, label: '국가대표' },
+        { time: 15 * 60, label: '엘리트', highlight: true },
+        { time: 16 * 60, label: '준엘리트' },
+        { time: 17 * 60, label: '최상급' },
+        { time: 18 * 60, label: '상급' },
+        { time: 19 * 60, label: '중상급' },
+        { time: 20 * 60, label: '서브 20', highlight: true },
+        { time: 22 * 60, label: '중급' },
+        { time: 25 * 60, label: '초중급', highlight: true },
+        { time: 28 * 60, label: '초급' },
+        { time: 30 * 60, label: '입문', highlight: true },
+        { time: 35 * 60, label: '완주 목표' },
+        { time: 40 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const tbody5km = document.getElementById('target5kmTable');
+      tbody5km.innerHTML = '';
+      
+      targets5km.forEach(target => {
+        const row = tbody5km.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 5;
+        const pace400m = pacePerKm * 0.4;
+        const pace100m = pacePerKm * 0.1;
+        const speed = 5000 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(pace100m)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 10km 목표 기록
+      const targets10km = [
+        { time: 27 * 60, label: '세계 엘리트', highlight: true },
+        { time: 29 * 60, label: '국가대표' },
+        { time: 31 * 60, label: '엘리트', highlight: true },
+        { time: 33 * 60, label: '준엘리트' },
+        { time: 35 * 60, label: '상급' },
+        { time: 38 * 60, label: '중상급' },
+        { time: 40 * 60, label: '서브 40', highlight: true },
+        { time: 45 * 60, label: '중급' },
+        { time: 50 * 60, label: '서브 50', highlight: true },
+        { time: 55 * 60, label: '초급' },
+        { time: 60 * 60, label: '서브 1시간', highlight: true },
+        { time: 70 * 60, label: '완주 목표' },
+        { time: 80 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const tbody10km = document.getElementById('target10kmTable');
+      tbody10km.innerHTML = '';
+      
+      targets10km.forEach(target => {
+        const row = tbody10km.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 10;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = target.time / 2;
+        const speed = 10000 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time5km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 하프마라톤 목표 기록
+      const targetsHalf = [
+        { time: 60 * 60, label: '세계 엘리트', highlight: true },
+        { time: 65 * 60, label: '국가대표' },
+        { time: 70 * 60, label: '엘리트', highlight: true },
+        { time: 75 * 60, label: '준엘리트' },
+        { time: 80 * 60, label: '상급' },
+        { time: 85 * 60, label: '중상급' },
+        { time: 90 * 60, label: '서브 1:30', highlight: true },
+        { time: 100 * 60, label: '중급' },
+        { time: 110 * 60, label: '초중급', highlight: true },
+        { time: 120 * 60, label: '서브 2:00', highlight: true },
+        { time: 130 * 60, label: '초급' },
+        { time: 140 * 60, label: '입문' },
+        { time: 150 * 60, label: '서브 2:30', highlight: true },
+        { time: 160 * 60, label: '완주 목표' },
+        { time: 180 * 60, label: '건강 조깅', highlight: true }
+      ];
+      
+      const tbodyHalf = document.getElementById('targetHalfTable');
+      tbodyHalf.innerHTML = '';
+      
+      targetsHalf.forEach(target => {
+        const row = tbodyHalf.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 21.0975;
+        const pace400m = pacePerKm * 0.4;
+        const time5km = pacePerKm * 5;
+        const time10km = pacePerKm * 10;
+        const speed = 21097.5 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time5km)}</td>
+          <td>${formatTime(time10km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+      
+      // 풀마라톤 목표 기록
+      const targetsFull = [
+        { time: 125 * 60, label: '세계 엘리트', highlight: true },
+        { time: 135 * 60, label: '국가대표' },
+        { time: 150 * 60, label: '엘리트', highlight: true },
+        { time: 165 * 60, label: '준엘리트' },
+        { time: 180 * 60, label: '서브 3', highlight: true },
+        { time: 195 * 60, label: '중상급' },
+        { time: 210 * 60, label: '서브 3:30', highlight: true },
+        { time: 225 * 60, label: '중급' },
+        { time: 240 * 60, label: '서브 4', highlight: true },
+        { time: 255 * 60, label: '초중급' },
+        { time: 270 * 60, label: '서브 4:30', highlight: true },
+        { time: 285 * 60, label: '초급' },
+        { time: 300 * 60, label: '서브 5', highlight: true },
+        { time: 330 * 60, label: '서브 5:30' },
+        { time: 360 * 60, label: '서브 6', highlight: true },
+        { time: 390 * 60, label: '완주 목표' },
+        { time: 420 * 60, label: '건강 완주', highlight: true }
+      ];
+      
+      const tbodyFull = document.getElementById('targetFullTable');
+      tbodyFull.innerHTML = '';
+      
+      targetsFull.forEach(target => {
+        const row = tbodyFull.insertRow();
+        if (target.highlight) row.className = 'highlight-row';
+        
+        const pacePerKm = target.time / 42.195;
+        const pace400m = pacePerKm * 0.4;
+        const time10km = pacePerKm * 10;
+        const timeHalf = pacePerKm * 21.0975;
+        const time30km = pacePerKm * 30;
+        const speed = 42195 / target.time * 3.6;
+        
+        row.innerHTML = `
+          <td class="font-bold">${formatTime(target.time, true)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(pace400m)}</td>
+          <td>${formatTime(time10km)}</td>
+          <td>${formatTime(timeHalf)}</td>
+          <td>${formatTime(time30km)}</td>
+          <td>${speed.toFixed(1)}</td>
+          <td class="text-xs">${target.label}</td>
+        `;
+      });
+    }
+
+    // 차트 3: 레인별 보정 시간
+    function generateLaneChart() {
+      const tbody = document.getElementById('laneChartTable');
+      tbody.innerHTML = '';
+      
+      // km 페이스 목록 (2:30부터 6:00까지 10초 간격)
+      const paces = [];
+      for (let seconds = 150; seconds <= 360; seconds += 10) {
+        paces.push(seconds);
+      }
+      
+      paces.forEach((pacePerKm) => {
+        const row = tbody.insertRow();
+        
+        // 주요 페이스 하이라이트
+        if (pacePerKm === 180 || pacePerKm === 240 || pacePerKm === 300 || pacePerKm === 360) {
+          row.className = 'highlight-row';
+        }
+        
+        // km 페이스
+        let cell = row.insertCell();
+        cell.textContent = formatPace(pacePerKm);
+        cell.className = 'font-bold';
+        
+        // 1레인 400m 시간
+        const time400 = pacePerKm * 0.4;
+        cell = row.insertCell();
+        cell.textContent = formatTime(time400);
+        cell.className = 'font-bold bg-yellow-50';
+        
+        // 2-8레인 보정 시간
+        for (let lane = 2; lane <= 8; lane++) {
+          const laneTime = (pacePerKm / 1000) * laneDistances[lane];
+          cell = row.insertCell();
+          cell.textContent = formatTime(laneTime);
+        }
+      });
+    }
+
+    // 차트 4: 3000m 장애물 페이스 계산
+    function generateSteeplechaseChart() {
+      const tbodyInside = document.getElementById('steeplechaseInsideTable');
+      const tbodyOutside = document.getElementById('steeplechaseOutsideTable');
+      
+      if (!tbodyInside || !tbodyOutside) return;
+      
+      tbodyInside.innerHTML = '';
+      tbodyOutside.innerHTML = '';
+      
+      // 3000m 장애물 목표 기록들 (7분부터 13분까지)
+      const targetTimes = [
+        { time: 7 * 60 + 30, label: '세계 엘리트', highlight: true },
+        { time: 8 * 60, label: '국가대표급' },
+        { time: 8 * 60 + 30, label: '엘리트', highlight: true },
+        { time: 9 * 60, label: '준엘리트' },
+        { time: 9 * 60 + 30, label: '상급', highlight: true },
+        { time: 10 * 60, label: '서브 10' },
+        { time: 10 * 60 + 30, label: '중상급', highlight: true },
+        { time: 11 * 60, label: '중급' },
+        { time: 11 * 60 + 30, label: '초중급', highlight: true },
+        { time: 12 * 60, label: '초급' },
+        { time: 12 * 60 + 30, label: '입문' },
+        { time: 13 * 60, label: '완주 목표', highlight: true }
+      ];
+      
+      // 장애물 구성별 거리 정의
+      const insideConfig = {
+        lapDistance: 396.084,  // 내측 물장애물 시 랩 거리
+        startSection: 227.412,  // 시작 구간 거리 (3000 - 7랩)
+        totalLapDistance: 2772.588  // 7랩 총 거리
+      };
+      
+      const outsideConfig = {
+        lapDistance: 419.407,  // 외측 물장애물 시 랩 거리
+        startSection: 64.151,  // 시작 구간 거리 (3000 - 7랩)
+        totalLapDistance: 2935.849  // 7랩 총 거리
+      };
+      
+      targetTimes.forEach(target => {
+        // 기본 페이스 계산
+        const pacePerKm = target.time / 3;
+        
+        // 내측 테이블 행 추가
+        const rowInside = tbodyInside.insertRow();
+        if (target.highlight) rowInside.className = 'bg-blue-50';
+        
+        // 내측 구성 계산
+        const insideStartTime = (target.time / 3000) * insideConfig.startSection;
+        const insideLapTime = (target.time / 3000) * insideConfig.lapDistance;
+        const inside3Laps = insideStartTime + (insideLapTime * 3);
+        const inside5Laps = insideStartTime + (insideLapTime * 5);
+        
+        rowInside.innerHTML = `
+          <td class="font-bold text-blue-700">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(insideStartTime)}</td>
+          <td>${formatTime(insideLapTime)}</td>
+          <td>${formatTime(inside3Laps)}</td>
+          <td>${formatTime(inside5Laps)}</td>
+          <td class="font-bold bg-blue-200">${formatTime(target.time)}</td>
+        `;
+        
+        // 외측 테이블 행 추가
+        const rowOutside = tbodyOutside.insertRow();
+        if (target.highlight) rowOutside.className = 'bg-purple-50';
+        
+        // 외측 구성 계산
+        const outsideStartTime = (target.time / 3000) * outsideConfig.startSection;
+        const outsideLapTime = (target.time / 3000) * outsideConfig.lapDistance;
+        const outside3Laps = outsideStartTime + (outsideLapTime * 3);
+        const outside5Laps = outsideStartTime + (outsideLapTime * 5);
+        
+        rowOutside.innerHTML = `
+          <td class="font-bold text-purple-700">${formatTime(target.time)}</td>
+          <td>${formatPace(pacePerKm)}</td>
+          <td>${formatTime(outsideStartTime)}</td>
+          <td>${formatTime(outsideLapTime)}</td>
+          <td>${formatTime(outside3Laps)}</td>
+          <td>${formatTime(outside5Laps)}</td>
+          <td class="font-bold bg-purple-200">${formatTime(target.time)}</td>
+        `;
+      });
+    }
+
+    // 레인 계산
+    function calculateLane() {
+      const laneNumber = parseInt(document.getElementById('laneNumber').value);
+      const laps = parseFloat(document.getElementById('laps').value);
+      
+      const distance = laneDistances[laneNumber];
+      const totalDistance = distance * laps;
+      const extraDistance = totalDistance - (400 * laps);
+      
+      const results = document.getElementById('laneResults');
+      results.innerHTML = `
+        <div class="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg p-4 lane-track">
+          <div class="text-3xl font-bold mb-2">${totalDistance.toFixed(2)}m</div>
+          <div class="text-sm">
+            ${laneNumber}번 레인 × ${laps}바퀴
+          </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4">
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-gray-600">1바퀴 거리:</span>
+              <span class="font-bold ml-2">${distance.toFixed(2)}m</span>
+            </div>
+            <div>
+              <span class="text-gray-600">추가 거리:</span>
+              <span class="font-bold ml-2 ${extraDistance > 0 ? 'text-red-600' : ''}">${extraDistance > 0 ? '+' : ''}${extraDistance.toFixed(2)}m</span>
+            </div>
+            <div>
+              <span class="text-gray-600">1레인 대비:</span>
+              <span class="font-bold ml-2">${((distance / 400 - 1) * 100).toFixed(1)}% 증가</span>
+            </div>
+            <div>
+              <span class="text-gray-600">레인 반경:</span>
+              <span class="font-bold ml-2">${(36.5 + (laneNumber - 1) * 1.22).toFixed(2)}m</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 모든 레인 비교표 생성
+    function generateAllLanesTable() {
+      const tbody = document.getElementById('allLanesTable');
+      tbody.innerHTML = '';
+      
+      for (let lane = 1; lane <= 8; lane++) {
+        const row = tbody.insertRow();
+        const distance = laneDistances[lane];
+        const extra = distance - 400;
+        const percentage = ((distance / 400 - 1) * 100).toFixed(1);
+        
+        row.innerHTML = `
+          <td class="p-2 font-bold">${lane}번</td>
+          <td class="p-2">${distance.toFixed(2)}</td>
+          <td class="p-2 ${extra > 0 ? 'text-red-600' : ''}">${extra > 0 ? '+' : ''}${extra.toFixed(2)}</td>
+          <td class="p-2">${percentage}%</td>
+        `;
+        
+        if (lane === 1) row.className = 'bg-red-50';
+        if (lane === 8) row.className = 'bg-blue-50';
+      }
+    }
+
+    // 목표 거리 선택 변경
+    document.getElementById('targetDistance').addEventListener('change', function() {
+      const customInput = document.getElementById('customDistance');
+      if (this.value === 'custom') {
+        customInput.classList.remove('hidden');
+      } else {
+        customInput.classList.add('hidden');
+      }
+    });
+
+    // 목표 페이스 계산
+    function calculateTargetPace() {
+      const distanceSelect = document.getElementById('targetDistance');
+      let distance = parseFloat(distanceSelect.value);
+      
+      if (distanceSelect.value === 'custom') {
+        distance = parseFloat(document.getElementById('customDistance').value);
+      }
+      
+      const hours = parseInt(document.getElementById('targetHours').value) || 0;
+      const minutes = parseInt(document.getElementById('targetMinutes').value) || 0;
+      const seconds = parseFloat(document.getElementById('targetSeconds').value) || 0;
+      
+      if (!distance || (hours === 0 && minutes === 0 && seconds === 0)) {
+        alert('거리와 시간을 입력해주세요.');
+        return;
+      }
+      
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      
+      // 페이스 계산
+      const pace400 = (totalSeconds / distance) * 400;
+      const pace100 = (totalSeconds / distance) * 100;
+      const pace1km = (totalSeconds / distance) * 1000;
+      const speedKmh = (distance / totalSeconds) * 3.6;
+      
+      // 결과 표시
+      document.getElementById('lap400').textContent = formatTime(pace400);
+      document.getElementById('pace100m').textContent = formatTime(pace100);
+      document.getElementById('pace1km').textContent = formatTime(pace1km);
+      document.getElementById('avgSpeed').textContent = speedKmh.toFixed(2) + ' km/h';
+      
+      // 랩 스플릿 계산
+      const lapSplits = document.getElementById('lapSplits');
+      lapSplits.innerHTML = '';
+      
+      const laps = [
+        { dist: 400, name: '400m (1바퀴)' },
+        { dist: 800, name: '800m (2바퀴)' },
+        { dist: 1200, name: '1200m (3바퀴)' },
+        { dist: 1600, name: '1600m (4바퀴)' },
+        { dist: 2000, name: '2000m (5바퀴)' },
+        { dist: 3000, name: '3000m (7.5바퀴)' },
+        { dist: 5000, name: '5000m (12.5바퀴)' }
+      ];
+      
+      laps.forEach(lap => {
+        if (lap.dist <= distance) {
+          const lapTime = (totalSeconds / distance) * lap.dist;
+          lapSplits.innerHTML += `
+            <div class="flex justify-between">
+              <span>${lap.name}</span>
+              <span class="font-mono font-bold">${formatTime(lapTime)}</span>
+            </div>
+          `;
+        }
+      });
+      
+      document.getElementById('targetResults').classList.remove('hidden');
+    }
+
+    // 스플릿 계산
+    function calculateSplits() {
+      const totalDistance = parseFloat(document.getElementById('splitTotalDistance').value);
+      const interval = parseFloat(document.getElementById('splitInterval').value);
+      const strategy = document.getElementById('paceStrategy').value;
+      
+      const hours = parseInt(document.getElementById('splitHours').value) || 0;
+      const minutes = parseInt(document.getElementById('splitMinutes').value) || 0;
+      const seconds = parseFloat(document.getElementById('splitSeconds').value) || 0;
+      
+      if (!totalDistance || !interval || (hours === 0 && minutes === 0 && seconds === 0)) return;
+      
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      const numSplits = Math.ceil(totalDistance / interval);
+      
+      const splitTable = document.getElementById('splitTable');
+      splitTable.innerHTML = '';
+      
+      const table = document.createElement('table');
+      table.className = 'w-full text-sm';
+      table.innerHTML = `
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-2 text-left">구간</th>
+            <th class="p-2">거리</th>
+            <th class="p-2">구간 시간</th>
+            <th class="p-2">누적 시간</th>
+            <th class="p-2">페이스 (min/km)</th>
+          </tr>
+        </thead>
+        <tbody id="splitTableBody"></tbody>
+      `;
+      
+      const tbody = table.querySelector('tbody');
+      let cumulativeTime = 0;
+      
+      for (let i = 0; i < numSplits; i++) {
+        const startDist = i * interval;
+        const endDist = Math.min((i + 1) * interval, totalDistance);
+        const segmentDist = endDist - startDist;
+        
+        let segmentTime;
+        
+        switch (strategy) {
+          case 'even':
+            segmentTime = (totalSeconds / totalDistance) * segmentDist;
+            break;
+          case 'negative':
+            // 후반부로 갈수록 빨라짐 (처음 105% -> 마지막 95%)
+            const factor = 1.05 - (0.1 * i / (numSplits - 1));
+            segmentTime = (totalSeconds / totalDistance) * segmentDist * factor;
+            break;
+          case 'positive':
+            // 전반부 빠름 (처음 95% -> 마지막 105%)
+            const posFactor = 0.95 + (0.1 * i / (numSplits - 1));
+            segmentTime = (totalSeconds / totalDistance) * segmentDist * posFactor;
+            break;
+          default:
+            segmentTime = (totalSeconds / totalDistance) * segmentDist;
+        }
+        
+        cumulativeTime += segmentTime;
+        const pacePerKm = (segmentTime / segmentDist) * 1000 / 60;
+        
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td class="p-2 font-medium">${i + 1}구간</td>
+          <td class="p-2">${startDist}-${endDist}m</td>
+          <td class="p-2 font-mono">${formatTime(segmentTime)}</td>
+          <td class="p-2 font-mono font-bold">${formatTime(cumulativeTime)}</td>
+          <td class="p-2">${Math.floor(pacePerKm)}:${String(Math.floor((pacePerKm % 1) * 60)).padStart(2, '0')}</td>
+        `;
+      }
+      
+      splitTable.appendChild(table);
+      document.getElementById('splitResults').classList.remove('hidden');
+    }
+
+    // 뒤로가기
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    // 차트 다운로드 기능 (안정화 버전)
+    async function downloadChart(elementId, filename, format = 'png') {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        console.error('차트 요소를 찾을 수 없습니다:', elementId);
+        alert('차트를 찾을 수 없습니다.');
+        return;
+      }
+      
+      try {
+        const timestamp = new Date().toISOString().slice(0,10).replace(/-/g, '');
+        const credit = 'AthleteTime_장호준코치제작';
+        const fullFilename = `${credit}_${filename}_${timestamp}`;
+        
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        const originalDisplay = [];
+        downloadBtns.forEach((btn, idx) => {
+          originalDisplay[idx] = btn.style.display;
+          btn.style.display = 'none';
+        });
+        
+        // 잠시 대기 (렌더링 완료를 위해)
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (format === 'pdf') {
+          await downloadPDF(element, fullFilename);
+        } else {
+          await downloadPNG(element, fullFilename);
+        }
+        
+        // 버튼 복원
+        downloadBtns.forEach((btn, idx) => {
+          btn.style.display = originalDisplay[idx] || 'flex';
+        });
+        
+      } catch (error) {
+        console.error('차트 다운로드 실패:', error);
+        
+        // 버튼 복원
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => {
+          btn.style.display = 'flex';
+        });
+        
+        const errorMsg = format === 'pdf' 
+          ? 'PDF 다운로드 중 오류가 발생했습니다.\n\nPNG 형식으로 시도해보세요.\n\n오류: ' + error.message
+          : '다운로드 중 오류가 발생했습니다.\n\n다시 시도해주세요.\n\n오류: ' + error.message;
+        alert(errorMsg);
+      }
+    }
+    
+    // PNG 다운로드 함수 (개선된 버전)
+    async function downloadPNG(element, filename) {
+      try {
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'none');
+        
+        // html2canvas 사용 (더 안정적)
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          width: element.scrollWidth,
+          height: element.scrollHeight,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight
+        });
+        
+        // 다운로드 링크 생성
+        const link = document.createElement('a');
+        link.download = filename + '.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // 버튼 다시 표시
+        downloadBtns.forEach(btn => btn.style.display = 'flex');
+        
+      } catch (error) {
+        console.error('PNG 다운로드 오류:', error);
+        // 버튼 다시 표시
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'flex');
+        throw error;
+      }
+    }
+    
+    // PDF 다운로드 함수 (개선된 버전)
+    async function downloadPDF(element, filename) {
+      try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4'); // A4 가로 방향
+        
+        // 다운로드 버튼 숨기기
+        const downloadBtns = element.querySelectorAll('.download-btn');
+        downloadBtns.forEach(btn => btn.style.display = 'none');
+        
+        try {
+          // html2canvas로 이미지 생성
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            useCORS: true,
+            allowTaint: true,
+            width: element.scrollWidth,
+            height: element.scrollHeight
+          });
+          
+          const dataUrl = canvas.toDataURL('image/png', 1.0);
+          
+          // A4 가로 크기: 297mm x 210mm
+          // 여백 고려: 좌우 각 10mm
+          const maxWidth = 277; // 297 - 20 (좌우 여백)
+          const maxHeight = 190; // 210 - 20 (상하 여백)
+          
+          // 이미지 비율 계산
+          const imgRatio = element.offsetHeight / element.offsetWidth;
+          
+          let finalWidth = maxWidth;
+          let finalHeight = maxWidth * imgRatio;
+          
+          // 높이가 초과하면 높이 기준으로 재계산
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = maxHeight / imgRatio;
+          }
+          
+          // 중앙 정렬을 위한 x, y 좌표 계산
+          const x = (297 - finalWidth) / 2;
+          const y = (210 - finalHeight) / 2;
+          
+          // PDF에 이미지 추가 (FAST 모드로 더 빠르게)
+          pdf.addImage(dataUrl, 'PNG', x, y, finalWidth, finalHeight, undefined, 'FAST');
+          
+          // PDF 메타데이터 설정
+          pdf.setProperties({
+            title: filename.replace(/_/g, ' '),
+            subject: 'ATHLETE TIME 러닝 페이스 차트',
+            author: '장호준 코치',
+            keywords: 'running, pace, athlete time, 러닝, 페이스',
+            creator: 'ATHLETE TIME - 애슬리트 타임'
+          });
+          
+          // 하단 저작권 정보 추가
+          try {
+            pdf.setFont('helvetica');
+            pdf.setFontSize(8);
+            pdf.setTextColor(100, 100, 100);
+            
+            // 한글 문제로 인해 영문으로 표시
+            const dateStr = new Date().toLocaleDateString('ko-KR');
+            const footerText = `ATHLETE TIME - Coach Jang Ho Jun - ${dateStr}`;
+            pdf.text(footerText, 148.5, 205, { align: 'center' });
+          } catch (textError) {
+            // 텍스트 추가 오류는 무시 (이미지는 정상 저장)
+            console.warn('PDF footer text error:', textError);
+          }
+          
+          // PDF 저장
+          pdf.save(filename + '.pdf');
+          
+          // 버튼 다시 표시
+          downloadBtns.forEach(btn => btn.style.display = 'flex');
+          
+        } catch (innerError) {
+          // 버튼 다시 표시
+          downloadBtns.forEach(btn => btn.style.display = 'flex');
+          throw innerError;
+        }
+        
+      } catch (error) {
+        console.error('PDF 다운로드 오류:', error);
+        alert('PDF 다운로드 중 오류가 발생했습니다. PNG 다운로드를 시도해주세요.');
+      }
+    }
+    
+    // 차트 인쇄 함수
+    function printChart(elementId) {
+      const element = document.getElementById(elementId);
+      const printWindow = window.open('', 'PRINT', 'width=1200,height=800');
+      
+      const printHTML = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>애슬리트 타임 - 페이스 차트</title>
+            <style>
+              @page {
+                size: A4 landscape;
+                margin: 15mm;
+              }
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+                margin: 0;
+                padding: 20px;
+              }
+              .download-btn { display: none !important; }
+              .watermark-text { color: rgba(0,0,0,0.12) !important; }
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 6px;
+                text-align: center;
+              }
+              th {
+                background-color: #f3f4f6;
+                font-weight: bold;
+              }
+              .highlight-row { background-color: #fef3c7; }
+              .sub-highlight { background-color: #dbeafe; }
+              @media print {
+                body { 
+                  print-color-adjust: exact; 
+                  -webkit-print-color-adjust: exact;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            ${element.innerHTML}
+            <div style="text-align: center; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd;">
+              © ATHLETE TIME · 제작: 장호준 코치 · ${new Date().toLocaleDateString('ko-KR')}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    }
+
+
+    // 페이지 로드 시 차트 탭 활성화 및 차트 생성
+    window.addEventListener('DOMContentLoaded', () => {
+      switchTab('chart');
+    });
+  </script>
+</body>
+</html>

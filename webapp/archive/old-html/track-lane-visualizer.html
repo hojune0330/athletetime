@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>400m 트랙 레인 시각화 | Athlete Time</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', '맑은 고딕', sans-serif;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Track styles */
+    .track-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .track-lane {
+      stroke-dasharray: 5, 5;
+      animation: dash 20s linear infinite;
+    }
+    
+    @keyframes dash {
+      to {
+        stroke-dashoffset: -1000;
+      }
+    }
+    
+    .runner {
+      transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .runner-dot {
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        r: 6;
+        opacity: 1;
+      }
+      50% {
+        r: 8;
+        opacity: 0.8;
+      }
+    }
+    
+    .start-line {
+      stroke-dasharray: 5, 5;
+      animation: blink 2s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    
+    .distance-label {
+      font-size: 12px;
+      font-weight: bold;
+      fill: #4c51bf;
+    }
+    
+    .lane-info-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .lane-info-card.active {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+    
+    .track-svg {
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-7xl mx-auto p-6">
+    <!-- Header -->
+    <div class="gradient-bg text-white p-6 rounded-xl mb-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">400m 트랙 레인 시각화</h1>
+          <p class="opacity-90">레인별 거리와 스타트 위치를 한눈에 확인하세요</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="window.location.href='pace-calculator.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="페이스 계산기">
+            <i class="fas fa-calculator text-xl"></i>
+          </button>
+          <button onclick="window.location.href='index.html'" class="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition" title="홈으로">
+            <i class="fas fa-home text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Lane Selection -->
+        <div>
+          <label class="block text-sm font-medium mb-2">레인 선택</label>
+          <select id="laneSelect" class="w-full p-3 border-2 rounded-lg focus:border-purple-500 focus:outline-none">
+            <option value="1">레인 1 (내측)</option>
+            <option value="2">레인 2</option>
+            <option value="3">레인 3</option>
+            <option value="4">레인 4</option>
+            <option value="5">레인 5</option>
+            <option value="6">레인 6</option>
+            <option value="7">레인 7</option>
+            <option value="8">레인 8 (외측)</option>
+          </select>
+        </div>
+        
+        <!-- Event Type -->
+        <div>
+          <label class="block text-sm font-medium mb-2">종목 선택</label>
+          <select id="eventType" class="w-full p-3 border-2 rounded-lg focus:border-purple-500 focus:outline-none">
+            <option value="400m">400m</option>
+            <option value="400mh">400m 허들</option>
+            <option value="4x100m">4x100m 릴레이</option>
+            <option value="4x400m">4x400m 릴레이</option>
+            <option value="800m">800m</option>
+            <option value="200m">200m</option>
+          </select>
+        </div>
+        
+        <!-- Animation Controls -->
+        <div>
+          <label class="block text-sm font-medium mb-2">애니메이션</label>
+          <div class="flex gap-2">
+            <button onclick="startAnimation()" class="flex-1 bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition">
+              <i class="fas fa-play mr-2"></i>시작
+            </button>
+            <button onclick="resetAnimation()" class="flex-1 bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition">
+              <i class="fas fa-redo mr-2"></i>리셋
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Track Visualization -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">트랙 시각화</h2>
+      
+      <div class="track-container">
+        <svg id="trackSvg" viewBox="0 0 800 500" class="track-svg w-full h-auto">
+          <!-- Track Background -->
+          <rect x="0" y="0" width="800" height="500" fill="#f7fafc"/>
+          
+          <!-- Track Lanes -->
+          <g id="trackLanes">
+            <!-- Outer boundary -->
+            <path d="M 150 100 L 650 100 A 150 150 0 0 1 650 400 L 150 400 A 150 150 0 0 1 150 100" 
+                  fill="none" stroke="#cbd5e0" stroke-width="2"/>
+            
+            <!-- Lane 1 (innermost) -->
+            <path id="lane1" d="M 170 120 L 630 120 A 130 130 0 0 1 630 380 L 170 380 A 130 130 0 0 1 170 120" 
+                  fill="none" stroke="#e53e3e" stroke-width="3" class="track-lane"/>
+            
+            <!-- Lane 2 -->
+            <path id="lane2" d="M 160 110 L 640 110 A 140 140 0 0 1 640 390 L 160 390 A 140 140 0 0 1 160 110" 
+                  fill="none" stroke="#dd6b20" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 3 -->
+            <path id="lane3" d="M 150 100 L 650 100 A 150 150 0 0 1 650 400 L 150 400 A 150 150 0 0 1 150 100" 
+                  fill="none" stroke="#d69e2e" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 4 -->
+            <path id="lane4" d="M 140 90 L 660 90 A 160 160 0 0 1 660 410 L 140 410 A 160 160 0 0 1 140 90" 
+                  fill="none" stroke="#38a169" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 5 -->
+            <path id="lane5" d="M 130 80 L 670 80 A 170 170 0 0 1 670 420 L 130 420 A 170 170 0 0 1 130 80" 
+                  fill="none" stroke="#3182ce" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 6 -->
+            <path id="lane6" d="M 120 70 L 680 70 A 180 180 0 0 1 680 430 L 120 430 A 180 180 0 0 1 120 70" 
+                  fill="none" stroke="#5a67d8" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 7 -->
+            <path id="lane7" d="M 110 60 L 690 60 A 190 190 0 0 1 690 440 L 110 440 A 190 190 0 0 1 110 60" 
+                  fill="none" stroke="#805ad5" stroke-width="2" class="track-lane" opacity="0.5"/>
+            
+            <!-- Lane 8 (outermost) -->
+            <path id="lane8" d="M 100 50 L 700 50 A 200 200 0 0 1 700 450 L 100 450 A 200 200 0 0 1 100 50" 
+                  fill="none" stroke="#b83280" stroke-width="2" class="track-lane" opacity="0.5"/>
+          </g>
+          
+          <!-- Start/Finish Line -->
+          <line x1="400" y1="50" x2="400" y2="450" stroke="#1a202c" stroke-width="3" class="start-line"/>
+          <text x="410" y="70" class="distance-label">Start/Finish</text>
+          
+          <!-- Stagger Lines -->
+          <g id="staggerLines">
+            <!-- These will be dynamically generated -->
+          </g>
+          
+          <!-- Runner Markers -->
+          <g id="runners">
+            <!-- These will be dynamically generated -->
+          </g>
+          
+          <!-- Distance Markers -->
+          <g id="distanceMarkers">
+            <text x="550" y="250" class="distance-label">100m</text>
+            <text x="400" y="440" class="distance-label">200m</text>
+            <text x="250" y="250" class="distance-label">300m</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Lane Information Cards -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="lane-info-card rounded-lg p-4" id="laneCard1">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 1</span>
+          <span class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full">내측</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance1">400.00m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger1">0.00m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius1">36.50m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard2">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 2</span>
+          <span class="text-xs px-2 py-1 bg-orange-100 text-orange-600 rounded-full">+7.04m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance2">407.04m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger2">7.04m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius2">37.72m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard3">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 3</span>
+          <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-600 rounded-full">+14.70m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance3">414.70m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger3">14.70m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius3">38.94m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard4">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 4</span>
+          <span class="text-xs px-2 py-1 bg-green-100 text-green-600 rounded-full">+22.37m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance4">422.37m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger4">22.37m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius4">40.16m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Lane Cards -->
+    <div class="grid md:grid-cols-4 gap-4 mb-6">
+      <div class="lane-info-card rounded-lg p-4" id="laneCard5">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 5</span>
+          <span class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full">+30.03m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance5">430.03m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger5">30.03m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius5">41.38m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard6">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 6</span>
+          <span class="text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full">+37.70m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance6">437.70m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger6">37.70m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius6">42.60m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard7">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 7</span>
+          <span class="text-xs px-2 py-1 bg-purple-100 text-purple-600 rounded-full">+45.36m</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance7">445.36m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger7">45.36m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius7">43.82m</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lane-info-card rounded-lg p-4" id="laneCard8">
+        <div class="flex justify-between items-start mb-2">
+          <span class="text-lg font-bold text-gray-700">레인 8</span>
+          <span class="text-xs px-2 py-1 bg-pink-100 text-pink-600 rounded-full">외측</span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">실제 거리:</span>
+            <span class="font-semibold" id="distance8">453.03m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">스태거:</span>
+            <span class="font-semibold" id="stagger8">53.03m</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">곡선 반경:</span>
+            <span class="font-semibold" id="radius8">45.04m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Information -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">상세 정보</h2>
+      
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold mb-3 text-purple-600">계산 공식</h3>
+          <div class="bg-gray-50 p-4 rounded-lg font-mono text-sm">
+            <p class="mb-2">레인 거리 = 2 × (직선 + π × 반경)</p>
+            <p class="mb-2">반경 = 36.50m + (레인-1) × 1.22m</p>
+            <p>스태거 = 레인거리 - 400m</p>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold mb-3 text-purple-600">선택한 레인 분석</h3>
+          <div id="selectedLaneAnalysis" class="space-y-2 text-sm">
+            <div class="p-3 bg-purple-50 rounded">
+              <p class="font-semibold mb-1">레인을 선택하고 애니메이션을 시작하세요</p>
+              <p class="text-gray-600">각 레인의 실제 거리와 스타트 위치를 시각적으로 확인할 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+        <h3 class="font-semibold mb-2 text-blue-700">💡 Tip</h3>
+        <p class="text-sm text-blue-600">
+          400m 경주에서 모든 선수가 동일한 거리를 달리도록 하기 위해 외측 레인일수록 앞에서 출발합니다. 
+          이를 '스태거(Stagger)'라고 하며, 레인 8은 레인 1보다 약 53m 앞에서 출발합니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- Creator Credit -->
+    <div class="text-center mt-6 text-sm text-gray-600">
+      제작자: 장호준 코치
+    </div>
+  </div>
+
+  <script>
+    let animationRunning = false;
+    let selectedLane = 1;
+    
+    // Lane data
+    const laneData = {
+      1: { distance: 400.00, stagger: 0.00, radius: 36.50, color: '#e53e3e' },
+      2: { distance: 407.04, stagger: 7.04, radius: 37.72, color: '#dd6b20' },
+      3: { distance: 414.70, stagger: 14.70, radius: 38.94, color: '#d69e2e' },
+      4: { distance: 422.37, stagger: 22.37, radius: 40.16, color: '#38a169' },
+      5: { distance: 430.03, stagger: 30.03, radius: 41.38, color: '#3182ce' },
+      6: { distance: 437.70, stagger: 37.70, radius: 42.60, color: '#5a67d8' },
+      7: { distance: 445.36, stagger: 45.36, radius: 43.82, color: '#805ad5' },
+      8: { distance: 453.03, stagger: 53.03, radius: 45.04, color: '#b83280' }
+    };
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('laneSelect').addEventListener('change', updateVisualization);
+      document.getElementById('eventType').addEventListener('change', updateVisualization);
+      updateVisualization();
+    });
+    
+    function updateVisualization() {
+      selectedLane = parseInt(document.getElementById('laneSelect').value);
+      const eventType = document.getElementById('eventType').value;
+      
+      // Update lane highlighting
+      for (let i = 1; i <= 8; i++) {
+        const lanePath = document.getElementById(`lane${i}`);
+        const laneCard = document.getElementById(`laneCard${i}`);
+        
+        if (i === selectedLane) {
+          lanePath.style.opacity = '1';
+          lanePath.style.strokeWidth = '4';
+          laneCard.classList.add('active');
+        } else {
+          lanePath.style.opacity = '0.3';
+          lanePath.style.strokeWidth = '2';
+          laneCard.classList.remove('active');
+        }
+      }
+      
+      // Update stagger lines
+      drawStaggerLines();
+      
+      // Update selected lane analysis
+      updateSelectedLaneAnalysis();
+    }
+    
+    function drawStaggerLines() {
+      const staggerGroup = document.getElementById('staggerLines');
+      staggerGroup.innerHTML = '';
+      
+      // Calculate stagger positions for visualization
+      for (let i = 2; i <= 8; i++) {
+        const stagger = laneData[i].stagger;
+        // Convert stagger to pixels (approximate)
+        const staggerPixels = stagger * 2; // Scale factor for visualization
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', 400 + staggerPixels);
+        line.setAttribute('y1', 50 + (i - 1) * 10);
+        line.setAttribute('x2', 400 + staggerPixels);
+        line.setAttribute('y2', 50 + (i - 1) * 10 + 20);
+        line.setAttribute('stroke', laneData[i].color);
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-dasharray', '3,3');
+        line.style.opacity = i === selectedLane ? '1' : '0.3';
+        
+        staggerGroup.appendChild(line);
+        
+        // Add stagger distance text
+        if (i === selectedLane && i !== 1) {
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', 400 + staggerPixels + 5);
+          text.setAttribute('y', 50 + (i - 1) * 10 + 10);
+          text.setAttribute('class', 'distance-label');
+          text.setAttribute('fill', laneData[i].color);
+          text.textContent = `+${stagger.toFixed(2)}m`;
+          staggerGroup.appendChild(text);
+        }
+      }
+    }
+    
+    function updateSelectedLaneAnalysis() {
+      const lane = laneData[selectedLane];
+      const eventType = document.getElementById('eventType').value;
+      
+      let analysisHTML = `
+        <div class="p-3 bg-purple-50 rounded">
+          <p class="font-semibold mb-2">레인 ${selectedLane} - ${eventType}</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-gray-600">실제 거리:</span>
+              <span class="font-bold">${lane.distance.toFixed(2)}m</span>
+            </div>
+            <div>
+              <span class="text-gray-600">스태거:</span>
+              <span class="font-bold">${lane.stagger.toFixed(2)}m</span>
+            </div>
+            <div>
+              <span class="text-gray-600">곡선 반경:</span>
+              <span class="font-bold">${lane.radius.toFixed(2)}m</span>
+            </div>
+            <div>
+              <span class="text-gray-600">곡선 총 거리:</span>
+              <span class="font-bold">${(Math.PI * lane.radius * 2).toFixed(2)}m</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add event-specific information
+      if (eventType === '400mh') {
+        analysisHTML += `
+          <div class="p-3 bg-yellow-50 rounded mt-2">
+            <p class="font-semibold mb-1">400m 허들 정보</p>
+            <p class="text-sm text-gray-600">허들 간격: 35m</p>
+            <p class="text-sm text-gray-600">첫 허들까지: 45m</p>
+            <p class="text-sm text-gray-600">마지막 허들에서 결승선: 40m</p>
+          </div>
+        `;
+      } else if (eventType === '4x100m') {
+        analysisHTML += `
+          <div class="p-3 bg-green-50 rounded mt-2">
+            <p class="font-semibold mb-1">4x100m 릴레이 구간</p>
+            <p class="text-sm text-gray-600">1구간: ${(lane.distance / 4).toFixed(2)}m (곡선)</p>
+            <p class="text-sm text-gray-600">2구간: ${(lane.distance / 4).toFixed(2)}m (직선)</p>
+            <p class="text-sm text-gray-600">3구간: ${(lane.distance / 4).toFixed(2)}m (곡선)</p>
+            <p class="text-sm text-gray-600">4구간: ${(lane.distance / 4).toFixed(2)}m (직선)</p>
+          </div>
+        `;
+      }
+      
+      document.getElementById('selectedLaneAnalysis').innerHTML = analysisHTML;
+    }
+    
+    function startAnimation() {
+      if (animationRunning) return;
+      animationRunning = true;
+      
+      const svg = document.getElementById('trackSvg');
+      const runnersGroup = document.getElementById('runners');
+      runnersGroup.innerHTML = '';
+      
+      // Create runner for selected lane
+      const runner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      runner.setAttribute('r', '8');
+      runner.setAttribute('fill', laneData[selectedLane].color);
+      runner.setAttribute('class', 'runner-dot');
+      runner.setAttribute('cx', '400');
+      runner.setAttribute('cy', getLaneY(selectedLane));
+      
+      runnersGroup.appendChild(runner);
+      
+      // Animate runner around the track
+      animateRunner(runner, selectedLane);
+      
+      // Show other lanes for comparison
+      if (document.getElementById('eventType').value === '400m') {
+        for (let i = 1; i <= 8; i++) {
+          if (i !== selectedLane) {
+            setTimeout(() => {
+              createComparisonRunner(i);
+            }, 100 * i);
+          }
+        }
+      }
+    }
+    
+    function getLaneY(lane) {
+      // Calculate Y position for each lane
+      return 120 + (lane - 1) * 10;
+    }
+    
+    function animateRunner(runner, lane) {
+      const stagger = laneData[lane].stagger;
+      const startX = 400 + stagger * 2; // Scale for visualization
+      
+      // Create path animation
+      const animateTransform = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+      animateTransform.setAttribute('dur', '8s');
+      animateTransform.setAttribute('repeatCount', '1');
+      animateTransform.setAttribute('path', getRunnerPath(lane));
+      animateTransform.setAttribute('rotate', 'auto');
+      
+      runner.appendChild(animateTransform);
+      
+      // Reset after animation
+      setTimeout(() => {
+        animationRunning = false;
+      }, 8000);
+    }
+    
+    function getRunnerPath(lane) {
+      // Simplified path for animation
+      const y = getLaneY(lane);
+      const radius = 130 + (lane - 1) * 10;
+      const stagger = laneData[lane].stagger * 2;
+      
+      return `M ${400 + stagger} ${y} L 630 ${y} A ${radius} ${radius} 0 0 1 630 ${y + 260} L ${400} ${y + 260} A ${radius} ${radius} 0 0 1 ${400} ${y}`;
+    }
+    
+    function createComparisonRunner(lane) {
+      const runnersGroup = document.getElementById('runners');
+      
+      const runner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      runner.setAttribute('r', '5');
+      runner.setAttribute('fill', laneData[lane].color);
+      runner.setAttribute('opacity', '0.5');
+      runner.setAttribute('cx', '400');
+      runner.setAttribute('cy', getLaneY(lane));
+      
+      runnersGroup.appendChild(runner);
+      
+      // Animate with delay based on stagger
+      const animateTransform = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+      animateTransform.setAttribute('dur', '8s');
+      animateTransform.setAttribute('repeatCount', '1');
+      animateTransform.setAttribute('path', getRunnerPath(lane));
+      
+      runner.appendChild(animateTransform);
+    }
+    
+    function resetAnimation() {
+      animationRunning = false;
+      const runnersGroup = document.getElementById('runners');
+      runnersGroup.innerHTML = '';
+    }
+  </script>
+</body>
+</html>

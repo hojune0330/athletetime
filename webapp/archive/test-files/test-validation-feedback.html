@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation Feedback Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-2xl font-bold mb-6">검증 피드백 구현 테스트</h1>
+    
+    <div class="space-y-4">
+      <div class="border-l-4 border-green-500 pl-4">
+        <h2 class="font-bold text-lg mb-2">✅ 구현 완료 항목</h2>
+        <ul class="space-y-2 text-sm">
+          <li>✓ 페이스 범위 표시 (단일값 → 최소/최대 범위)</li>
+          <li>✓ RPE (운동자각도) 척도 추가 (3-4/10 ~ 10/10)</li>
+          <li>✓ 15개 이상의 표준 운동 템플릿 구현</li>
+          <li>✓ 환경 조건 조정 (보통/추움/더움/고온다습)</li>
+          <li>✓ 탭 인터페이스 (표준 템플릿 / 맞춤 훈련)</li>
+          <li>✓ 용어 수정 (정확성 → 정밀도)</li>
+        </ul>
+      </div>
+      
+      <div class="border-l-4 border-blue-500 pl-4">
+        <h2 class="font-bold text-lg mb-2">📊 페이스 범위 예시</h2>
+        <div class="space-y-1 text-sm font-mono">
+          <div>Easy: 5:30-4:30/km (RPE 3-4/10)</div>
+          <div>Marathon: 4:20-3:50/km (RPE 5-6/10)</div>
+          <div>Threshold: 3:45-3:30/km (RPE 7-8/10)</div>
+          <div>Interval: 3:20-3:10/km (RPE 9/10)</div>
+          <div>Repetition: 3:00-2:50/km (RPE 10/10)</div>
+        </div>
+      </div>
+      
+      <div class="border-l-4 border-purple-500 pl-4">
+        <h2 class="font-bold text-lg mb-2">🏃 표준 운동 템플릿</h2>
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <div>• Recovery Run</div>
+          <div>• Easy Long Run</div>
+          <div>• Marathon Tempo</div>
+          <div>• Progressive Long Run</div>
+          <div>• Classic Tempo</div>
+          <div>• Cruise Intervals</div>
+          <div>• Broken Tempo</div>
+          <div>• 400m Intervals</div>
+          <div>• 800m Intervals</div>
+          <div>• 1000m Intervals</div>
+          <div>• Pyramid Intervals</div>
+          <div>• 200m Reps</div>
+          <div>• 400m Reps</div>
+          <div>• Fartlek</div>
+          <div>• Cutdown Run</div>
+          <div class="text-green-600 font-bold">총 15개+</div>
+        </div>
+      </div>
+      
+      <div class="border-l-4 border-yellow-500 pl-4">
+        <h2 class="font-bold text-lg mb-2">🌡️ 환경 조정</h2>
+        <div class="space-y-1 text-sm">
+          <div>• 보통 (15-20°C): 조정 없음</div>
+          <div>• 추운 날씨 (<10°C): 페이스 +2%</div>
+          <div>• 더운 날씨 (>25°C): 페이스 +4%</div>
+          <div>• 고온다습 (>25°C, 습도 >70%): 페이스 +6%, 강도 -10%</div>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-gray-50 rounded">
+        <p class="text-sm text-gray-600">
+          <strong>테스트 방법:</strong><br>
+          1. <a href="training-calculator.html" class="text-blue-600 underline">훈련 계산기</a> 열기<br>
+          2. 기록 입력 (예: 5km 20:00)<br>
+          3. 페이스 범위 확인<br>
+          4. "운동 세부사항" 섹션에서 템플릿 확인<br>
+          5. 환경 조건 변경하여 실시간 조정 확인
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Quick validation test
+    console.log('Validation Feedback Test Page Loaded');
+    console.log('Features implemented:');
+    console.log('- Pace ranges with RPE');
+    console.log('- 15+ workout templates');
+    console.log('- Environmental adjustments');
+    console.log('- Improved UI/UX');
+  </script>
+</body>
+</html>

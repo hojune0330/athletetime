@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다운로드 기능 테스트 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h1 class="text-2xl font-bold mb-4 text-center">
+        <i class="fas fa-download text-blue-500 mr-2"></i>
+        페이스 계산기 다운로드 기능 개선 사항
+      </h1>
+      
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <h2 class="font-bold text-blue-900 mb-2">✨ 주요 개선 내용</h2>
+        <ul class="space-y-2 text-sm text-blue-800">
+          <li><i class="fas fa-check text-green-600 mr-2"></i><strong>워터마크 가시성 향상:</strong> 다운로드시 opacity 0.5로 증가 (기존 0.25)</li>
+          <li><i class="fas fa-check text-green-600 mr-2"></i><strong>텍스트 간격 문제 해결:</strong> 요소 복제 방식으로 렌더링 문제 방지</li>
+          <li><i class="fas fa-check text-green-600 mr-2"></i><strong>고품질 렌더링:</strong> 2배 스케일로 선명한 이미지 생성</li>
+          <li><i class="fas fa-check text-green-600 mr-2"></i><strong>파일명 개선:</strong> "AthleteTime_장호준코치제작_" 접두사 추가</li>
+          <li><i class="fas fa-check text-green-600 mr-2"></i><strong>3000m 장애물 섹션:</strong> 내측/외측 구성 동시 표시</li>
+        </ul>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+          <h3 class="font-bold text-purple-900 mb-2">🎨 워터마크 스타일링</h3>
+          <ul class="text-sm text-purple-800 space-y-1">
+            <li>• 기본 상태: opacity 0.15 (은은하게)</li>
+            <li>• 다운로드시: opacity 0.5 (선명하게)</li>
+            <li>• 폰트 굵기: 600-800 (bold)</li>
+            <li>• 텍스트 그림자 추가</li>
+          </ul>
+        </div>
+        
+        <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+          <h3 class="font-bold text-green-900 mb-2">📐 레이아웃 개선</h3>
+          <ul class="text-sm text-green-800 space-y-1">
+            <li>• table-layout: fixed 적용</li>
+            <li>• border-spacing 최적화</li>
+            <li>• line-height: 1.2 설정</li>
+            <li>• vertical-align: middle</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+        <h3 class="font-bold text-yellow-900 mb-2">📥 다운로드 프로세스</h3>
+        <ol class="text-sm text-yellow-800 space-y-1 list-decimal list-inside">
+          <li>원본 요소를 복제하여 화면 밖에 배치</li>
+          <li>다운로드 버튼 제거 및 워터마크 강조</li>
+          <li>dom-to-image로 고품질 PNG 생성</li>
+          <li>복제된 요소 제거 및 원본 복원</li>
+        </ol>
+      </div>
+      
+      <div class="flex flex-col gap-4">
+        <a href="/pace-calculator.html" target="_blank" 
+           class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg text-center font-bold hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105">
+          <i class="fas fa-calculator mr-2"></i>
+          개선된 페이스 계산기 열기
+        </a>
+        
+        <a href="/pace-calculator.html#chart4" target="_blank" 
+           class="bg-gradient-to-r from-cyan-500 to-cyan-600 text-white px-6 py-3 rounded-lg text-center font-bold hover:from-cyan-600 hover:to-cyan-700 transition-all transform hover:scale-105">
+          <i class="fas fa-water mr-2"></i>
+          3000m 장애물 섹션으로 이동
+        </a>
+      </div>
+      
+      <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+        <p class="text-xs text-gray-600 text-center">
+          <strong>테스트 방법:</strong> 페이스 계산기를 열고 각 차트의 PNG/PDF 다운로드 버튼을 클릭하여 
+          워터마크 가시성과 텍스트 간격이 올바르게 표시되는지 확인하세요.
+        </p>
+      </div>
+    </div>
+    
+    <div class="text-center text-sm text-gray-500">
+      © 2024 ATHLETE TIME · 제작: 장호준 코치
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>페이스 계산기 & 차트 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Malgun Gothic', '맑은 고딕', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .pace-table {
+      font-size: 12px;
+      width: 100%;
+      table-layout: fixed;
+    }
+    
+    .pace-table td, .pace-table th {
+      padding: 6px 4px;
+      text-align: center;
+      border: 1px solid #e5e7eb;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+    
+    .pace-table th {
+      background: #f3f4f6;
+      font-weight: bold;
+    }
+    
+    .pace-table .highlight-row {
+      background: #fef3c7;
+    }
+    
+    .pace-table .sub-highlight {
+      background: #dbeafe;
+    }
+    
+    .pace-table .highlight-cell {
+      background: #fbbf24;
+      font-weight: bold;
+    }
+    
+    .lane-track {
+      background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+      height: 40px;
+    }
+    
+    .tab-active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    /* 트랙 레인 스타일 추가 */
+    .lane-1 { stroke: #ef4444; fill: none; }
+    .lane-2 { stroke: #f97316; fill: none; }
+    .lane-3 { stroke: #eab308; fill: none; }
+    .lane-4 { stroke: #84cc16; fill: none; }
+    .lane-5 { stroke: #22c55e; fill: none; }
+    .lane-6 { stroke: #06b6d4; fill: none; }
+    .lane-7 { stroke: #3b82f6; fill: none; }
+    .lane-8 { stroke: #8b5cf6; fill: none; }
+    
+    .lane-selected {
+      stroke-width: 3;
+      opacity: 1;
+    }
+    
+    .lane-unselected {
+      stroke-width: 1.5;
+      opacity: 0.4;
+    }
+
+    .section-time {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .section-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.25rem;
+    }
+
+    .track-text {
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .track-time-text {
+      font-size: 11px;
+      font-weight: bold;
+      fill: white;
+    }
+
+    .track-distance-text {
+      font-size: 9px;
+      fill: white;
+      opacity: 0.9;
+    }
+    
+    @media print {
+      .no-print { display: none; }
+      .pace-table { page-break-inside: avoid; }
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pace-header {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 1;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+
+    /* 모바일 반응형 개선 */
+    @media (max-width: 768px) {
+      .pace-table {
+        font-size: 11px;
+      }
+      
+      .pace-table td, .pace-table th {
+        padding: 6px 3px;
+        min-width: 40px;
+      }
+      
+      .pace-table thead th:first-child,
+      .pace-table tbody td:first-child {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 10;
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        font-weight: bold;
+        background-color: #f9fafb;
+      }
+      
+      .download-btn {
+        position: static !important;
+        margin-bottom: 10px;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      
+      .download-btn button {
+        flex: 1;
+        min-width: 80px;
+        padding: 8px 4px;
+        font-size: 11px;
+      }
+      
+      .tab-menu-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .tab-menu-container::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .chart-container {
+        margin-bottom: 20px;
+        padding: 12px !important;
+      }
+      
+      h3 {
+        font-size: 16px !important;
+      }
+      
+      .bg-blue-50, .bg-orange-50, .bg-green-50, .bg-cyan-50 {
+        padding: 10px !important;
+        margin-bottom: 12px !important;
+      }
+      
+      .steeplechase-tables {
+        display: block !important;
+      }
+      
+      .steeplechase-tables > div {
+        margin-bottom: 20px;
+      }
+      
+      header h1 {
+        font-size: 18px !important;
+      }
+      
+      header img {
+        height: 32px !important;
+      }
+      
+      .chart-header-logo {
+        font-size: 18px !important;
+      }
+      
+      .table-container {
+        position: relative;
+      }
+      
+      .table-container.scrollable::after {
+        content: '← 좌우 스크롤 →';
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        pointer-events: none;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-orange-500 to-red-600 text-white p-3 md:p-4 sticky top-0 z-10 no-print">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3 md:gap-4">
+        <button onclick="goBack()" class="p-1">
+          <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+        <div class="h-12 md:h-14 bg-white rounded-lg p-1 flex items-center">
+          <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+               alt="Athlete Time Logo" 
+               class="h-full w-auto"
+               style="max-height: 100%;">
+        </div>
+        <div>
+          <h1 class="text-lg md:text-2xl font-bold">페이스 계산기 & 차트</h1>
+          <p class="text-xs md:text-sm opacity-90 -mt-1">ATHLETE TIME</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="pace-calculator-mobile.html" class="p-2 hover:bg-white/20 rounded-lg" title="모바일 버전">
+          <i class="fas fa-mobile-alt text-xl"></i>
+        </a>
+        <a href="pace-calculator-selector.html?force=true" class="p-2 hover:bg-white/20 rounded-lg" title="버전 선택">
+          <i class="fas fa-exchange-alt text-xl"></i>
+        </a>
+        <button onclick="window.print()" class="p-2 hover:bg-white/20 rounded-lg" title="인쇄">
+          <i class="fas fa-print text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto p-4 pb-20">
+    
+    <!-- 모바일 안내 메시지 -->
+    <div class="md:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-3 mb-4 text-center">
+      <p class="text-sm font-medium">
+        <i class="fas fa-hand-point-left mr-2"></i>
+        테이블을 좌우로 스크롤하세요
+      </p>
+    </div>
+    
+    <!-- 탭 메뉴 -->
+    <div class="flex gap-2 mb-6 overflow-x-auto no-print tab-menu-container">
+      <button onclick="switchTab('chart')" id="tab-chart" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap tab-active">
+        <i class="fas fa-table mr-2"></i>페이스 차트
+      </button>
+      <button onclick="switchTab('lane')" id="tab-lane" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-road mr-2"></i>트랙 레인
+      </button>
+      <button onclick="switchTab('target')" id="tab-target" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-bullseye mr-2"></i>목표 페이스
+      </button>
+      <button onclick="switchTab('split')" id="tab-split" class="tab-btn px-4 py-2 rounded-lg font-medium whitespace-nowrap bg-white">
+        <i class="fas fa-chart-line mr-2"></i>스플릿 계산
+      </button>
+    </div>
+
+    <!-- 페이스 차트 탭 (생략 - 기존 내용 유지) -->
+    <div id="chart-content" class="tab-content">
+      <!-- 기존 페이스 차트 내용 -->
+      <div class="bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-5 mb-6 shadow-md border border-purple-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <img src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+                 alt="Athlete Time" 
+                 class="h-14 md:h-16 w-auto"
+                 style="opacity: 0.9; filter: contrast(1.2);">
+            <div>
+              <h3 class="text-lg md:text-xl font-bold text-purple-900">러닝 페이스 차트</h3>
+              <p class="text-sm text-purple-700">과학적 훈련을 위한 정밀 분석 도구</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-purple-600 uppercase tracking-wider font-medium">Developer</div>
+            <p class="text-lg font-bold text-purple-900">장호준 코치</p>
+            <p class="text-sm text-purple-700 font-semibold">ATHLETE TIME</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 트랙 레인 계산기 탭 (track-lane-simple.html 내용 통합) -->
+    <div id="lane-content" class="tab-content hidden">
+      <!-- 목표 시간 입력 섹션 -->
+      <div class="bg-white rounded-lg shadow p-6 mb-4">
+        <h2 class="text-xl font-bold mb-4">
+          <i class="fas fa-road text-orange-500"></i> 400m 트랙 레인별 구간 시간 계산기
+        </h2>
+        <div class="flex flex-wrap items-center gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">400m 목표 시간 (초)</label>
+            <div class="flex gap-2">
+              <input type="number" id="targetTimeLane" value="72" min="30" max="120" step="0.1"
+                     class="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <button onclick="calculateLaneAll()" 
+                      class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 transition">
+                계산하기
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">선택 레인</label>
+            <select id="laneSelectorTrack" onchange="calculateLaneAll()" 
+                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="1">레인 1 (400.00m)</option>
+              <option value="2">레인 2 (407.67m)</option>
+              <option value="3">레인 3 (415.33m)</option>
+              <option value="4">레인 4 (423.00m)</option>
+              <option value="5">레인 5 (430.66m)</option>
+              <option value="6">레인 6 (438.33m)</option>
+              <option value="7">레인 7 (445.99m)</option>
+              <option value="8">레인 8 (453.66m)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 큰 트랙 시각화 -->
+      <div class="bg-white rounded-lg shadow p-6 mb-4">
+        <h3 class="font-bold text-xl mb-4">트랙 구간별 시간 시각화</h3>
+        
+        <!-- 큰 SVG 트랙 -->
+        <div class="w-full overflow-x-auto">
+          <svg viewBox="0 0 800 500" class="w-full" style="min-width: 700px; min-height: 450px;">
+            <!-- 배경 -->
+            <rect width="800" height="500" fill="#f0f0f0"/>
+            
+            <!-- 트랙 배경 (잔디) -->
+            <rect x="50" y="50" width="700" height="400" rx="200" fill="#90EE90" opacity="0.3"/>
+            
+            <!-- 트랙 레인들 -->
+            <g id="trackLanes">
+              <!-- 동적으로 생성됨 -->
+            </g>
+            
+            <!-- 중앙 잔디 -->
+            <rect x="200" y="200" width="400" height="100" rx="50" fill="#90EE90"/>
+            
+            <!-- Start/Finish 라인 -->
+            <line x1="400" y1="50" x2="400" y2="450" stroke="white" stroke-width="4"/>
+            <rect x="380" y="240" width="40" height="20" fill="black"/>
+            <text x="400" y="255" font-size="12" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
+            
+            <!-- 100m, 200m, 300m 마커 -->
+            <g id="distanceMarkers">
+              <!-- 100m 지점 -->
+              <line x1="200" y1="240" x2="200" y2="260" stroke="yellow" stroke-width="3"/>
+              <text x="200" y="275" font-size="11" fill="black" text-anchor="middle" font-weight="bold">100m</text>
+              
+              <!-- 200m 지점 -->
+              <line x1="400" y1="90" x2="400" y2="110" stroke="yellow" stroke-width="3"/>
+              <text x="400" y="80" font-size="11" fill="black" text-anchor="middle" font-weight="bold">200m</text>
+              
+              <!-- 300m 지점 -->
+              <line x1="600" y1="240" x2="600" y2="260" stroke="yellow" stroke-width="3"/>
+              <text x="600" y="275" font-size="11" fill="black" text-anchor="middle" font-weight="bold">300m</text>
+            </g>
+            
+            <!-- 구간 라벨 -->
+            <g id="sectionLabels">
+              <!-- 홈스트레치 (직선2) -->
+              <rect x="450" y="380" width="100" height="30" rx="5" fill="#3b82f6" opacity="0.8"/>
+              <text x="500" y="398" font-size="14" fill="white" text-anchor="middle" font-weight="bold">직선② 홈</text>
+              
+              <!-- 백스트레치 (직선1) -->
+              <rect x="250" y="90" width="100" height="30" rx="5" fill="#3b82f6" opacity="0.8"/>
+              <text x="300" y="108" font-size="14" fill="white" text-anchor="middle" font-weight="bold">직선① 백</text>
+              
+              <!-- 첫 번째 곡선 -->
+              <rect x="620" y="225" width="80" height="30" rx="5" fill="#ef4444" opacity="0.8"/>
+              <text x="660" y="243" font-size="14" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
+              
+              <!-- 두 번째 곡선 -->
+              <rect x="100" y="225" width="80" height="30" rx="5" fill="#ef4444" opacity="0.8"/>
+              <text x="140" y="243" font-size="14" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
+            </g>
+            
+            <!-- 진행 방향 화살표 -->
+            <defs>
+              <marker id="arrowhead" markerWidth="15" markerHeight="10" refX="15" refY="5" orient="auto">
+                <polygon points="0 0, 15 5, 0 10" fill="#333" />
+              </marker>
+            </defs>
+            
+            <!-- 화살표들 -->
+            <g opacity="0.7">
+              <path d="M 420 410 L 550 410" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+              <path d="M 650 390 Q 680 250 650 110" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+              <path d="M 550 90 L 420 90" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+              <path d="M 150 110 Q 120 250 150 390" stroke="#333" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+            </g>
+            
+            <!-- 레인별 시간 표시 영역 -->
+            <g id="laneTimes">
+              <!-- 동적으로 생성됨 -->
+            </g>
+          </svg>
+        </div>
+        
+        <!-- 범례 -->
+        <div class="flex justify-center gap-6 mt-4">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-3 bg-blue-500"></div>
+            <span class="text-sm">직선 구간</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-3 bg-red-500"></div>
+            <span class="text-sm">곡선 구간</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-3 bg-purple-500"></div>
+            <span class="text-sm font-bold">선택 레인</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4개 구간 시간 표시 -->
+      <div class="bg-white rounded-lg shadow p-6 mb-4">
+        <h2 class="text-xl font-bold mb-4">
+          <span id="selectedLaneDisplay">레인 1</span> - 구간별 시간 상세
+        </h2>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+          <!-- 직선 1 -->
+          <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div class="section-label">직선구간 ①</div>
+            <div class="section-time text-blue-600" id="straight1Time">0.00초</div>
+            <div class="text-xs text-gray-600 mt-1">
+              <span id="straight1Distance">84.39</span>m
+            </div>
+          </div>
+          
+          <!-- 곡선 1 -->
+          <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div class="section-label">곡선구간 ①</div>
+            <div class="section-time text-red-600" id="curve1Time">0.00초</div>
+            <div class="text-xs text-gray-600 mt-1">
+              <span id="curve1Distance">115.61</span>m
+            </div>
+          </div>
+          
+          <!-- 직선 2 -->
+          <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div class="section-label">직선구간 ②</div>
+            <div class="section-time text-blue-600" id="straight2Time">0.00초</div>
+            <div class="text-xs text-gray-600 mt-1">
+              <span id="straight2Distance">84.39</span>m
+            </div>
+          </div>
+          
+          <!-- 곡선 2 -->
+          <div class="bg-red-50 rounded-lg p-4 border border-red-200">
+            <div class="section-label">곡선구간 ②</div>
+            <div class="section-time text-red-600" id="curve2Time">0.00초</div>
+            <div class="text-xs text-gray-600 mt-1">
+              <span id="curve2Distance">115.61</span>m
+            </div>
+          </div>
+        </div>
+
+        <!-- 합계 정보 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- 직선 합계 -->
+          <div class="bg-blue-100 rounded-lg p-4 border-2 border-blue-300">
+            <div class="text-sm font-medium text-blue-700">직선 총 시간</div>
+            <div class="text-2xl font-bold text-blue-700" id="totalStraightTime">0.00초</div>
+            <div class="text-sm text-gray-600 mt-1">
+              총 <span id="totalStraightDistance">168.78</span>m
+            </div>
+          </div>
+          
+          <!-- 곡선 합계 -->
+          <div class="bg-red-100 rounded-lg p-4 border-2 border-red-300">
+            <div class="text-sm font-medium text-red-700">곡선 총 시간</div>
+            <div class="text-2xl font-bold text-red-700" id="totalCurveTime">0.00초</div>
+            <div class="text-sm text-gray-600 mt-1">
+              총 <span id="totalCurveDistance">231.22</span>m
+            </div>
+          </div>
+          
+          <!-- 전체 합계 -->
+          <div class="bg-green-100 rounded-lg p-4 border-2 border-green-300">
+            <div class="text-sm font-medium text-green-700">총 소요 시간</div>
+            <div class="text-2xl font-bold text-green-700" id="totalTime">0.00초</div>
+            <div class="text-sm text-gray-600 mt-1">
+              총 거리: <span id="totalDistance">400.00</span>m
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 전체 레인 비교 테이블 -->
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="font-bold text-lg mb-3">전체 레인 구간별 시간 비교</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th rowspan="2" class="px-3 py-2 text-left border-r">레인</th>
+                <th rowspan="2" class="px-3 py-2 text-center border-r">총 거리</th>
+                <th colspan="2" class="px-3 py-2 text-center bg-blue-50 border-r">직선 구간</th>
+                <th colspan="2" class="px-3 py-2 text-center bg-red-50 border-r">곡선 구간</th>
+                <th rowspan="2" class="px-3 py-2 text-center bg-green-50">총 시간</th>
+              </tr>
+              <tr>
+                <th class="px-2 py-1 text-center bg-blue-50 text-xs">거리(m)</th>
+                <th class="px-2 py-1 text-center bg-blue-50 text-xs border-r">시간(초)</th>
+                <th class="px-2 py-1 text-center bg-red-50 text-xs">거리(m)</th>
+                <th class="px-2 py-1 text-center bg-red-50 text-xs border-r">시간(초)</th>
+              </tr>
+            </thead>
+            <tbody id="laneTableBody">
+              <!-- 동적으로 생성됨 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 목표 페이스 탭 (기존 유지) -->
+    <div id="target-content" class="tab-content hidden">
+      <!-- 목표 페이스 내용 -->
+    </div>
+
+    <!-- 스플릿 계산기 탭 (기존 유지) -->
+    <div id="split-content" class="tab-content hidden">
+      <!-- 스플릿 계산기 내용 -->
+    </div>
+    
+  </div>
+
+  <script>
+    // 레인 데이터 - 1레인이 정확히 400m가 되도록 수정
+    const STRAIGHT_LENGTH = 84.39; // 직선 하나의 길이
+    const LANE_WIDTH = 1.22;
+    const BASE_RADIUS = 36.8; // 1레인이 정확히 400m가 되는 반경
+    
+    const laneData = [
+      { lane: 1, radius: BASE_RADIUS, color: '#ef4444', name: 'Lane 1' },
+      { lane: 2, radius: BASE_RADIUS + LANE_WIDTH * 1, color: '#f97316', name: 'Lane 2' },
+      { lane: 3, radius: BASE_RADIUS + LANE_WIDTH * 2, color: '#eab308', name: 'Lane 3' },
+      { lane: 4, radius: BASE_RADIUS + LANE_WIDTH * 3, color: '#84cc16', name: 'Lane 4' },
+      { lane: 5, radius: BASE_RADIUS + LANE_WIDTH * 4, color: '#22c55e', name: 'Lane 5' },
+      { lane: 6, radius: BASE_RADIUS + LANE_WIDTH * 5, color: '#06b6d4', name: 'Lane 6' },
+      { lane: 7, radius: BASE_RADIUS + LANE_WIDTH * 6, color: '#3b82f6', name: 'Lane 7' },
+      { lane: 8, radius: BASE_RADIUS + LANE_WIDTH * 7, color: '#8b5cf6', name: 'Lane 8' }
+    ];
+
+    // 시간 포맷팅 함수
+    function formatTime(seconds, forceHours = false) {
+      if (isNaN(seconds) || seconds === null) return '-';
+      
+      const hours = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0 || forceHours) {
+        return `${hours}:${String(mins).padStart(2, '0')}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else if (mins > 0) {
+        return `${mins}:${String(Math.floor(secs)).padStart(2, '0')}`;
+      } else {
+        return secs.toFixed(1);
+      }
+    }
+
+    // 탭 전환
+    function switchTab(tabName) {
+      // 모든 탭 내용 숨기기
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      // 모든 탭 버튼 비활성화
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('bg-white');
+      });
+      
+      // 선택한 탭 활성화
+      document.getElementById(`${tabName}-content`).classList.remove('hidden');
+      document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+      document.getElementById(`tab-${tabName}`).classList.remove('bg-white');
+      
+      // 트랙 레인 탭이 선택되면 계산 실행
+      if (tabName === 'lane') {
+        calculateLaneAll();
+      }
+    }
+
+    // 레인 거리 계산
+    function calculateLaneDistance(laneNumber) {
+      const lane = laneData[laneNumber - 1];
+      const oneStraight = STRAIGHT_LENGTH; // 직선 하나
+      const oneCurve = Math.PI * lane.radius; // 곡선 하나 (반원)
+      
+      const totalStraight = oneStraight * 2; // 직선 2개 합계
+      const totalCurve = oneCurve * 2; // 곡선 2개 합계
+      const totalDistance = totalStraight + totalCurve;
+      
+      return {
+        oneStraight: oneStraight,
+        oneCurve: oneCurve,
+        totalStraight: totalStraight,
+        totalCurve: totalCurve,
+        totalDistance: totalDistance,
+        stagger: totalDistance - 400,
+        straightPercentage: (totalStraight / totalDistance * 100),
+        curvePercentage: (totalCurve / totalDistance * 100),
+        radius: lane.radius
+      };
+    }
+
+    // 시간 계산
+    function calculateTimes(laneNumber, targetTime400m) {
+      const distances = calculateLaneDistance(laneNumber);
+      
+      // 레인 1 기준 속도 계산
+      const baseSpeed = 400 / targetTime400m; // m/s
+      
+      // 실제 레인의 조정된 시간 (거리에 비례)
+      const adjustedTotalTime = distances.totalDistance / baseSpeed;
+      
+      // 각 구간별 시간 계산
+      const oneStraightTime = distances.oneStraight / baseSpeed;
+      const oneCurveTime = distances.oneCurve / baseSpeed;
+      const totalStraightTime = distances.totalStraight / baseSpeed;
+      const totalCurveTime = distances.totalCurve / baseSpeed;
+      
+      return {
+        straight1Time: oneStraightTime,
+        straight2Time: oneStraightTime,
+        curve1Time: oneCurveTime,
+        curve2Time: oneCurveTime,
+        totalStraightTime: totalStraightTime,
+        totalCurveTime: totalCurveTime,
+        totalTime: adjustedTotalTime,
+        avgSpeed: baseSpeed,
+        avgKmh: baseSpeed * 3.6,
+        pace100m: 100 / baseSpeed,
+        ...distances
+      };
+    }
+
+    // SVG 트랙 레인 그리기
+    function drawTrackLanes(selectedLane, targetTime) {
+      const svg = document.getElementById('trackLanes');
+      const timesGroup = document.getElementById('laneTimes');
+      svg.innerHTML = '';
+      timesGroup.innerHTML = '';
+      
+      // 레인 8부터 1까지 역순으로 그리기 (바깥쪽부터)
+      for (let i = 8; i >= 1; i--) {
+        const laneOffset = (8 - i) * 15; // 레인 간격
+        const x = 100 + laneOffset;
+        const y = 100 + laneOffset;
+        const width = 600 - (laneOffset * 2);
+        const height = 300 - (laneOffset * 2);
+        const rx = 150 - laneOffset;
+        
+        const isSelected = i === selectedLane;
+        const strokeWidth = isSelected ? 3 : 1.5;
+        const opacity = isSelected ? 1 : 0.4;
+        const color = isSelected ? '#9333ea' : laneData[i-1].color;
+        
+        // 레인 트랙 그리기
+        const lane = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        lane.setAttribute('x', x);
+        lane.setAttribute('y', y);
+        lane.setAttribute('width', width);
+        lane.setAttribute('height', height);
+        lane.setAttribute('rx', rx);
+        lane.setAttribute('fill', 'none');
+        lane.setAttribute('stroke', color);
+        lane.setAttribute('stroke-width', strokeWidth);
+        lane.setAttribute('opacity', opacity);
+        svg.appendChild(lane);
+        
+        // 레인 번호 표시
+        const laneNumBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        laneNumBg.setAttribute('cx', x + width/2);
+        laneNumBg.setAttribute('cy', y + height - 20);
+        laneNumBg.setAttribute('r', '12');
+        laneNumBg.setAttribute('fill', color);
+        laneNumBg.setAttribute('opacity', isSelected ? '1' : '0.7');
+        svg.appendChild(laneNumBg);
+        
+        const laneNum = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        laneNum.setAttribute('x', x + width/2);
+        laneNum.setAttribute('y', y + height - 15);
+        laneNum.setAttribute('text-anchor', 'middle');
+        laneNum.setAttribute('font-size', '14');
+        laneNum.setAttribute('font-weight', 'bold');
+        laneNum.setAttribute('fill', 'white');
+        laneNum.textContent = i;
+        svg.appendChild(laneNum);
+        
+        // 선택된 레인의 구간별 시간 표시
+        if (isSelected) {
+          const result = calculateTimes(i, targetTime);
+          
+          // 홈스트레치 (직선2) 시간
+          const homeStraightBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          homeStraightBg.setAttribute('x', x + width/2 + 30);
+          homeStraightBg.setAttribute('y', y + height - 45);
+          homeStraightBg.setAttribute('width', '80');
+          homeStraightBg.setAttribute('height', '35');
+          homeStraightBg.setAttribute('rx', '5');
+          homeStraightBg.setAttribute('fill', '#3b82f6');
+          timesGroup.appendChild(homeStraightBg);
+          
+          const homeStraightTime = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          homeStraightTime.setAttribute('x', x + width/2 + 70);
+          homeStraightTime.setAttribute('y', y + height - 30);
+          homeStraightTime.setAttribute('text-anchor', 'middle');
+          homeStraightTime.setAttribute('class', 'track-time-text');
+          homeStraightTime.textContent = result.straight2Time.toFixed(2) + '초';
+          timesGroup.appendChild(homeStraightTime);
+          
+          const homeStraightDist = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          homeStraightDist.setAttribute('x', x + width/2 + 70);
+          homeStraightDist.setAttribute('y', y + height - 18);
+          homeStraightDist.setAttribute('text-anchor', 'middle');
+          homeStraightDist.setAttribute('class', 'track-distance-text');
+          homeStraightDist.textContent = result.oneStraight.toFixed(1) + 'm';
+          timesGroup.appendChild(homeStraightDist);
+          
+          // 백스트레치 (직선1) 시간
+          const backStraightBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          backStraightBg.setAttribute('x', x + width/2 - 110);
+          backStraightBg.setAttribute('y', y + 10);
+          backStraightBg.setAttribute('width', '80');
+          backStraightBg.setAttribute('height', '35');
+          backStraightBg.setAttribute('rx', '5');
+          backStraightBg.setAttribute('fill', '#3b82f6');
+          timesGroup.appendChild(backStraightBg);
+          
+          const backStraightTime = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          backStraightTime.setAttribute('x', x + width/2 - 70);
+          backStraightTime.setAttribute('y', y + 25);
+          backStraightTime.setAttribute('text-anchor', 'middle');
+          backStraightTime.setAttribute('class', 'track-time-text');
+          backStraightTime.textContent = result.straight1Time.toFixed(2) + '초';
+          timesGroup.appendChild(backStraightTime);
+          
+          const backStraightDist = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          backStraightDist.setAttribute('x', x + width/2 - 70);
+          backStraightDist.setAttribute('y', y + 37);
+          backStraightDist.setAttribute('text-anchor', 'middle');
+          backStraightDist.setAttribute('class', 'track-distance-text');
+          backStraightDist.textContent = result.oneStraight.toFixed(1) + 'm';
+          timesGroup.appendChild(backStraightDist);
+          
+          // 첫 번째 곡선 시간
+          const curve1Bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          curve1Bg.setAttribute('x', x + width - 90);
+          curve1Bg.setAttribute('y', y + height/2 - 17);
+          curve1Bg.setAttribute('width', '75');
+          curve1Bg.setAttribute('height', '35');
+          curve1Bg.setAttribute('rx', '5');
+          curve1Bg.setAttribute('fill', '#ef4444');
+          timesGroup.appendChild(curve1Bg);
+          
+          const curve1Time = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          curve1Time.setAttribute('x', x + width - 52);
+          curve1Time.setAttribute('y', y + height/2 - 2);
+          curve1Time.setAttribute('text-anchor', 'middle');
+          curve1Time.setAttribute('class', 'track-time-text');
+          curve1Time.textContent = result.curve1Time.toFixed(2) + '초';
+          timesGroup.appendChild(curve1Time);
+          
+          const curve1Dist = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          curve1Dist.setAttribute('x', x + width - 52);
+          curve1Dist.setAttribute('y', y + height/2 + 10);
+          curve1Dist.setAttribute('text-anchor', 'middle');
+          curve1Dist.setAttribute('class', 'track-distance-text');
+          curve1Dist.textContent = result.oneCurve.toFixed(1) + 'm';
+          timesGroup.appendChild(curve1Dist);
+          
+          // 두 번째 곡선 시간
+          const curve2Bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          curve2Bg.setAttribute('x', x + 15);
+          curve2Bg.setAttribute('y', y + height/2 - 17);
+          curve2Bg.setAttribute('width', '75');
+          curve2Bg.setAttribute('height', '35');
+          curve2Bg.setAttribute('rx', '5');
+          curve2Bg.setAttribute('fill', '#ef4444');
+          timesGroup.appendChild(curve2Bg);
+          
+          const curve2Time = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          curve2Time.setAttribute('x', x + 52);
+          curve2Time.setAttribute('y', y + height/2 - 2);
+          curve2Time.setAttribute('text-anchor', 'middle');
+          curve2Time.setAttribute('class', 'track-time-text');
+          curve2Time.textContent = result.curve2Time.toFixed(2) + '초';
+          timesGroup.appendChild(curve2Time);
+          
+          const curve2Dist = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          curve2Dist.setAttribute('x', x + 52);
+          curve2Dist.setAttribute('y', y + height/2 + 10);
+          curve2Dist.setAttribute('text-anchor', 'middle');
+          curve2Dist.setAttribute('class', 'track-distance-text');
+          curve2Dist.textContent = result.oneCurve.toFixed(1) + 'm';
+          timesGroup.appendChild(curve2Dist);
+        }
+      }
+    }
+
+    // 전체 계산 및 업데이트
+    function calculateLaneAll() {
+      const targetTime = parseFloat(document.getElementById('targetTimeLane').value) || 72;
+      const selectedLane = parseInt(document.getElementById('laneSelectorTrack').value);
+      
+      // 선택된 레인 계산
+      const result = calculateTimes(selectedLane, targetTime);
+      
+      // 메인 디스플레이 업데이트
+      document.getElementById('selectedLaneDisplay').textContent = `레인 ${selectedLane}`;
+      
+      // 4개 구간 개별 시간
+      document.getElementById('straight1Time').textContent = result.straight1Time.toFixed(2) + '초';
+      document.getElementById('straight2Time').textContent = result.straight2Time.toFixed(2) + '초';
+      document.getElementById('curve1Time').textContent = result.curve1Time.toFixed(2) + '초';
+      document.getElementById('curve2Time').textContent = result.curve2Time.toFixed(2) + '초';
+      
+      // 4개 구간 개별 거리
+      document.getElementById('straight1Distance').textContent = result.oneStraight.toFixed(2);
+      document.getElementById('straight2Distance').textContent = result.oneStraight.toFixed(2);
+      document.getElementById('curve1Distance').textContent = result.oneCurve.toFixed(2);
+      document.getElementById('curve2Distance').textContent = result.oneCurve.toFixed(2);
+      
+      // 합계 시간
+      document.getElementById('totalStraightTime').textContent = result.totalStraightTime.toFixed(2) + '초';
+      document.getElementById('totalCurveTime').textContent = result.totalCurveTime.toFixed(2) + '초';
+      document.getElementById('totalTime').textContent = result.totalTime.toFixed(2) + '초';
+      
+      // 합계 거리
+      document.getElementById('totalStraightDistance').textContent = result.totalStraight.toFixed(2);
+      document.getElementById('totalCurveDistance').textContent = result.totalCurve.toFixed(2);
+      document.getElementById('totalDistance').textContent = result.totalDistance.toFixed(2);
+      
+      // SVG 트랙 업데이트
+      drawTrackLanes(selectedLane, targetTime);
+      
+      // 테이블 업데이트
+      updateLaneTable(targetTime, selectedLane);
+      
+      // 레인 선택자 옵션 텍스트 업데이트
+      updateLaneSelector();
+    }
+
+    // 레인 선택자 업데이트
+    function updateLaneSelector() {
+      const selector = document.getElementById('laneSelectorTrack');
+      for (let i = 1; i <= 8; i++) {
+        const distances = calculateLaneDistance(i);
+        selector.options[i-1].text = `레인 ${i} (${distances.totalDistance.toFixed(2)}m)`;
+      }
+    }
+
+    // 테이블 업데이트
+    function updateLaneTable(targetTime, selectedLane) {
+      const tbody = document.getElementById('laneTableBody');
+      tbody.innerHTML = '';
+      
+      for (let i = 1; i <= 8; i++) {
+        const result = calculateTimes(i, targetTime);
+        const isSelected = i === selectedLane;
+        
+        const row = `
+          <tr class="${isSelected ? 'bg-purple-50 font-bold' : ''} hover:bg-gray-50 cursor-pointer" onclick="selectLane(${i})">
+            <td class="px-3 py-2 border-r">
+              <span class="inline-block w-3 h-3 rounded-full mr-2" 
+                    style="background-color: ${laneData[i-1].color}"></span>
+              레인 ${i}
+            </td>
+            <td class="px-3 py-2 text-center border-r">${result.totalDistance.toFixed(2)}m</td>
+            <td class="px-2 py-2 text-center bg-blue-50 text-xs">${result.totalStraight.toFixed(2)}</td>
+            <td class="px-2 py-2 text-center bg-blue-50 text-sm font-semibold text-blue-700 border-r">
+              ${result.totalStraightTime.toFixed(2)}
+            </td>
+            <td class="px-2 py-2 text-center bg-red-50 text-xs">${result.totalCurve.toFixed(2)}</td>
+            <td class="px-2 py-2 text-center bg-red-50 text-sm font-semibold text-red-700 border-r">
+              ${result.totalCurveTime.toFixed(2)}
+            </td>
+            <td class="px-3 py-2 text-center bg-green-50 font-semibold text-green-700">
+              ${result.totalTime.toFixed(2)}초
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      }
+    }
+
+    // 테이블에서 레인 선택
+    function selectLane(laneNumber) {
+      document.getElementById('laneSelectorTrack').value = laneNumber;
+      calculateLaneAll();
+    }
+
+    // 뒤로가기
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+
+    // 페이지 로드 시 초기 계산
+    document.addEventListener('DOMContentLoaded', function() {
+      // 초기 탭 설정 등
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>다운로드 기능 테스트 | 애슬리트 타임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+      <h1 class="text-2xl font-bold mb-4 text-center">
+        <i class="fas fa-download text-blue-500 mr-2"></i>
+        다운로드 기능 복구 테스트
+      </h1>
+      
+      <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+        <h2 class="font-bold text-green-900 mb-2">✅ 수정 완료 사항</h2>
+        <ul class="space-y-1 text-sm text-green-800">
+          <li>• dom-to-image 제거, html2canvas로 통일</li>
+          <li>• undefined 오류 수정</li>
+          <li>• 버튼 표시/숨김 로직 수정</li>
+          <li>• 에러 메시지 개선</li>
+        </ul>
+      </div>
+      
+      <!-- 테스트 차트 -->
+      <div id="testChart" class="bg-white border-2 border-gray-300 rounded-lg p-6 mb-6">
+        <h3 class="text-xl font-bold mb-4 text-center">테스트 차트</h3>
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="border p-2">거리</th>
+              <th class="border p-2">4:00/km</th>
+              <th class="border p-2">5:00/km</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border p-2 text-center font-bold">5km</td>
+              <td class="border p-2 text-center">20:00</td>
+              <td class="border p-2 text-center">25:00</td>
+            </tr>
+            <tr class="bg-yellow-50">
+              <td class="border p-2 text-center font-bold">10km</td>
+              <td class="border p-2 text-center">40:00</td>
+              <td class="border p-2 text-center">50:00</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mt-4 pt-3 border-t text-center">
+          <p class="text-xs text-gray-600">
+            © ATHLETE TIME · 제작: 장호준 코치
+          </p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <button onclick="testPNG()" 
+                class="bg-blue-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-600">
+          <i class="fas fa-image mr-2"></i>PNG 테스트
+        </button>
+        <button onclick="testPDF()" 
+                class="bg-red-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-red-600">
+          <i class="fas fa-file-pdf mr-2"></i>PDF 테스트
+        </button>
+      </div>
+      
+      <div id="status" class="text-center p-4 rounded-lg"></div>
+    </div>
+  </div>
+
+  <script>
+    async function testPNG() {
+      const status = document.getElementById('status');
+      status.className = 'text-center p-4 rounded-lg bg-blue-50 text-blue-800';
+      status.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>PNG 생성 중...';
+      
+      try {
+        const element = document.getElementById('testChart');
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        
+        const link = document.createElement('a');
+        link.download = 'test_' + Date.now() + '.png';
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        status.className = 'text-center p-4 rounded-lg bg-green-50 text-green-800';
+        status.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PNG 다운로드 성공!';
+      } catch (error) {
+        status.className = 'text-center p-4 rounded-lg bg-red-50 text-red-800';
+        status.innerHTML = '<i class="fas fa-times-circle mr-2"></i>오류: ' + error.message;
+        console.error('PNG error:', error);
+      }
+    }
+    
+    async function testPDF() {
+      const status = document.getElementById('status');
+      status.className = 'text-center p-4 rounded-lg bg-red-50 text-red-800';
+      status.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>PDF 생성 중...';
+      
+      try {
+        const element = document.getElementById('testChart');
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 277;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        let finalWidth = imgWidth;
+        let finalHeight = imgHeight;
+        
+        if (imgHeight > 190) {
+          finalHeight = 190;
+          finalWidth = (canvas.width * finalHeight) / canvas.height;
+        }
+        
+        const x = (297 - finalWidth) / 2;
+        const y = (210 - finalHeight) / 2;
+        
+        pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+        pdf.save('test_' + Date.now() + '.pdf');
+        
+        status.className = 'text-center p-4 rounded-lg bg-green-50 text-green-800';
+        status.innerHTML = '<i class="fas fa-check-circle mr-2"></i>PDF 다운로드 성공!';
+      } catch (error) {
+        status.className = 'text-center p-4 rounded-lg bg-red-50 text-red-800';
+        status.innerHTML = '<i class="fas fa-times-circle mr-2"></i>오류: ' + error.message;
+        console.error('PDF error:', error);
+      }
+    }
+  </script>
+</body>
+</html>

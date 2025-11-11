@@ -1,0 +1,39 @@
+# Netlify 배포 설정 - 커뮤니티 앱
+# Athlete Time 커뮤니티 (React + Vite)
+
+[build]
+  base = "community-new"
+  command = "npm install && npm run build"
+  publish = "community-new/dist"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+
+# 헤더 설정
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+
+# 정적 자원 캐싱
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# API 프록시 설정 (백엔드 연결)
+[[redirects]]
+  from = "/api/*"
+  to = "https://athlete-time-backend.onrender.com/api/:splat"
+  status = 200
+  force = true
+  headers = {X-From = "Netlify"}
+
+# SPA 라우팅 지원
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: athlete-time-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://athlete-time.netlify.app
+
+databases:
+  - name: athlete-time-db
+    databaseName: athlete-time
+    user: athlete-time

@@ -1,0 +1,47 @@
+{
+  "name": "athlete-time-community",
+  "version": "3.0.0",
+  "description": "Athlete Time - 육상 커뮤니티 (PostgreSQL + Cloudinary + WebSocket + 회원 시스템)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "db:migrate": "psql $DATABASE_URL < database/schema.sql",
+    "db:migrate:auth": "node database/run-migration.js",
+    "db:seed": "node database/seed.js",
+    "db:reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run db:migrate && npm run db:seed",
+    "check:urls": "node scripts/check-urls.js",
+    "prebuild": "npm run check:urls"
+  },
+  "keywords": [
+    "athletics",
+    "track-and-field",
+    "community",
+    "running",
+    "websocket",
+    "chat",
+    "postgresql",
+    "cloudinary"
+  ],
+  "author": "Athlete Time",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.11.3",
+    "resend": "^6.3.0",
+    "sharp": "^0.33.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

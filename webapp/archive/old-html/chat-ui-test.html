@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>채팅 UI 테스트</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      padding: 20px;
+    }
+    
+    .test-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .test-header {
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      text-align: center;
+    }
+    
+    .messages-demo {
+      padding: 20px;
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #1a1a1a;
+    }
+    
+    /* 메시지 스타일 (실제 채팅과 동일) */
+    .message {
+      display: flex;
+      gap: 12px;
+      max-width: 100%;
+    }
+    
+    .message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    
+    .message-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .message-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    
+    .message-username {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #667eea;
+    }
+    
+    .message-time {
+      font-size: 0.75rem;
+      color: #666;
+    }
+    
+    .message-text {
+      color: #e0e0e0;
+      line-height: 1.5;
+      word-wrap: break-word;
+      max-width: 70%;
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 15px;
+      border-radius: 12px;
+    }
+    
+    /* 자신의 메시지 */
+    .message.own {
+      flex-direction: row-reverse;
+    }
+    
+    .message.own .message-content {
+      align-items: flex-end;
+      text-align: right;
+    }
+    
+    .message.own .message-header {
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+    }
+    
+    .message.own .message-username {
+      color: #ec4899;
+    }
+    
+    .message.own .message-text {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(236, 72, 153, 0.1));
+      padding: 10px 15px;
+      border-radius: 12px;
+      display: inline-block;
+      max-width: 70%;
+    }
+    
+    /* 시스템 메시지 */
+    .message.system {
+      justify-content: center;
+      font-size: 0.85rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .test-info {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .test-info h3 {
+      margin-bottom: 10px;
+      color: #667eea;
+    }
+    
+    .test-info p {
+      color: #999;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <div class="test-header">
+      <h1>채팅 UI 레이아웃 테스트</h1>
+      <p style="margin-top: 10px; opacity: 0.9;">메시지 정렬 확인</p>
+    </div>
+    
+    <div class="messages-demo">
+      <!-- 시스템 메시지 -->
+      <div class="message system">
+        <span>채팅방에 입장했습니다.</span>
+      </div>
+      
+      <!-- 다른 사용자 메시지 (왼쪽) -->
+      <div class="message">
+        <div class="message-avatar">김</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">김러너</span>
+            <span class="message-time">14:30</span>
+          </div>
+          <div class="message-text">안녕하세요! 오늘 날씨 좋네요 👋</div>
+        </div>
+      </div>
+      
+      <!-- 내 메시지 (오른쪽) -->
+      <div class="message own">
+        <div class="message-avatar">나</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">나</span>
+            <span class="message-time">14:31</span>
+          </div>
+          <div class="message-text">네, 안녕하세요! 러닝하기 좋은 날씨예요!</div>
+        </div>
+      </div>
+      
+      <!-- 다른 사용자 메시지 (왼쪽) -->
+      <div class="message">
+        <div class="message-avatar">박</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">박러너</span>
+            <span class="message-time">14:32</span>
+          </div>
+          <div class="message-text">오늘 한강에서 10km 뛰고 왔어요!</div>
+        </div>
+      </div>
+      
+      <!-- 내 메시지 (오른쪽) -->
+      <div class="message own">
+        <div class="message-avatar">나</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">나</span>
+            <span class="message-time">14:33</span>
+          </div>
+          <div class="message-text">와, 대단하시네요! 페이스는 어떻게 되셨나요?</div>
+        </div>
+      </div>
+      
+      <!-- 긴 메시지 테스트 -->
+      <div class="message">
+        <div class="message-avatar">이</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">이러너</span>
+            <span class="message-time">14:34</span>
+          </div>
+          <div class="message-text">저는 오늘 처음으로 5km를 완주했어요! 정말 힘들었지만 완주하니까 기분이 너무 좋네요. 다음엔 10km 도전해보려고 합니다. 혹시 초보자를 위한 팁 있으신가요?</div>
+        </div>
+      </div>
+      
+      <!-- 내 긴 메시지 (오른쪽) -->
+      <div class="message own">
+        <div class="message-avatar">나</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">나</span>
+            <span class="message-time">14:35</span>
+          </div>
+          <div class="message-text">축하드려요! 첫 5km 완주는 정말 의미있는 성취예요. 10km로 늘리실 때는 일주일에 10% 이상 거리를 늘리지 마시고, 천천히 적응하면서 늘려가세요!</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="test-info">
+      <h3>✅ 테스트 결과</h3>
+      <p>
+        • 내 메시지: 오른쪽 정렬 (분홍색 닉네임, 그라데이션 배경)<br>
+        • 다른 사용자 메시지: 왼쪽 정렬 (파란색 닉네임, 회색 배경)<br>
+        • 시스템 메시지: 중앙 정렬<br>
+        • 메시지 최대 너비: 70% 제한<br>
+        • 아바타와 메시지가 올바른 위치에 표시됨
+      </p>
+    </div>
+  </div>
+</body>
+</html>

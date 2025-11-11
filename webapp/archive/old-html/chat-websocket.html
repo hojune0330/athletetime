@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>실시간 채팅 - WebSocket</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .chat-container {
+      width: 100%;
+      max-width: 500px;
+      height: 90vh;
+      background: #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    @media (max-width: 640px) {
+      .chat-container {
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+      }
+    }
+    
+    .chat-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      padding: 16px;
+      color: white;
+    }
+    
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: #0f0f0f;
+    }
+    
+    .message {
+      margin-bottom: 12px;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .message-content {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      max-width: 80%;
+    }
+    
+    .own-message .message-content {
+      background: rgba(102, 126, 234, 0.2);
+      margin-left: auto;
+      display: block;
+    }
+    
+    .message-header {
+      font-size: 12px;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .username {
+      font-weight: 600;
+    }
+    
+    .timestamp {
+      color: #666;
+    }
+    
+    .message-text {
+      color: #e0e0e0;
+      word-wrap: break-word;
+    }
+    
+    .system-message {
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+      margin: 8px 0;
+    }
+    
+    .chat-input-container {
+      padding: 16px;
+      background: #1a1a1a;
+      border-top: 1px solid #333;
+    }
+    
+    .chat-input-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .chat-input {
+      flex: 1;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 24px;
+      outline: none;
+    }
+    
+    .chat-input::placeholder {
+      color: #666;
+    }
+    
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    
+    .send-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .send-btn:active {
+      transform: scale(0.9);
+    }
+    
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+    }
+    
+    .status-dot.offline {
+      background: #ef4444;
+    }
+    
+    .status-dot.connecting {
+      background: #fbbf24;
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .typing-indicator {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+      padding: 0 16px 8px;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <!-- 헤더 -->
+    <div class="chat-header">
+      <div class="flex justify-between items-center">
+        <h1 class="text-lg font-bold">실시간 채팅</h1>
+        <div class="connection-status">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">연결 중...</span>
+          <span id="userCount" class="ml-2"></span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 메시지 영역 -->
+    <div class="chat-messages" id="messagesContainer">
+      <div class="system-message">채팅 서버에 연결 중입니다...</div>
+    </div>
+    
+    <!-- 타이핑 표시 -->
+    <div class="typing-indicator" id="typingIndicator" style="display: none;">
+      <span id="typingText"></span>
+    </div>
+    
+    <!-- 입력 영역 -->
+    <div class="chat-input-container">
+      <div class="chat-input-wrapper">
+        <input 
+          type="text" 
+          class="chat-input" 
+          id="messageInput" 
+          placeholder="메시지를 입력하세요..."
+          maxlength="200"
+          disabled
+        >
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // WebSocket 연결 설정
+    let ws = null;
+    let reconnectTimer = null;
+    let currentUser = null;
+    let isTyping = false;
+    let typingTimer = null;
+    let typingUsers = new Set();
+    
+    // 초기화
+    function initChat() {
+      connectWebSocket();
+      setupEventListeners();
+    }
+    
+    // WebSocket 연결
+    function connectWebSocket() {
+      // 현재 페이지의 호스트를 기반으로 WebSocket URL 생성
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.hostname;
+      const port = 3002; // WebSocket 서버 포트
+      const wsUrl = `${protocol}//${host}:${port}`;
+      
+      console.log('WebSocket 연결 시도:', wsUrl);
+      updateConnectionStatus('connecting');
+      
+      try {
+        ws = new WebSocket(wsUrl);
+        
+        ws.onopen = () => {
+          console.log('WebSocket 연결 성공');
+          updateConnectionStatus('connected');
+          clearReconnectTimer();
+        };
+        
+        ws.onmessage = (event) => {
+          handleMessage(JSON.parse(event.data));
+        };
+        
+        ws.onerror = (error) => {
+          console.error('WebSocket 에러:', error);
+          updateConnectionStatus('error');
+        };
+        
+        ws.onclose = () => {
+          console.log('WebSocket 연결 종료');
+          updateConnectionStatus('disconnected');
+          scheduleReconnect();
+        };
+      } catch (error) {
+        console.error('WebSocket 연결 실패:', error);
+        updateConnectionStatus('error');
+        // 대체 방안: 로컬 스토리지 기반 채팅
+        fallbackToLocalChat();
+      }
+    }
+    
+    // 메시지 처리
+    function handleMessage(message) {
+      switch(message.type) {
+        case 'connected':
+          onConnected(message.data);
+          break;
+        case 'message':
+          addMessage(message.data);
+          break;
+        case 'userJoined':
+          onUserJoined(message.data);
+          break;
+        case 'userLeft':
+          onUserLeft(message.data);
+          break;
+        case 'typing':
+          handleTypingIndicator(message.data);
+          break;
+        case 'ping':
+          ws.send(JSON.stringify({ type: 'pong' }));
+          break;
+      }
+    }
+    
+    // 연결 성공 처리
+    function onConnected(data) {
+      currentUser = data.user;
+      updateUserCount(data.userCount);
+      
+      // 입력 활성화
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendBtn').disabled = false;
+      
+      // 시스템 메시지
+      addSystemMessage(`${currentUser.username}으로 입장했습니다.`);
+      
+      // 이전 메시지 표시
+      if (data.recentMessages) {
+        data.recentMessages.forEach(msg => addMessage(msg, false));
+      }
+    }
+    
+    // 메시지 추가
+    function addMessage(data, animate = true) {
+      const container = document.getElementById('messagesContainer');
+      const messageDiv = document.createElement('div');
+      const isOwn = currentUser && data.userId === currentUser.id;
+      
+      messageDiv.className = `message ${isOwn ? 'own-message' : ''}`;
+      if (!animate) messageDiv.style.animation = 'none';
+      
+      const time = new Date(data.timestamp).toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      messageDiv.innerHTML = `
+        <div class="message-content">
+          <div class="message-header">
+            <span class="username" style="color: ${data.color || '#667eea'}">
+              ${data.username}
+            </span>
+            <span class="timestamp">${time}</span>
+          </div>
+          <div class="message-text">${escapeHtml(data.text)}</div>
+        </div>
+      `;
+      
+      container.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    // 시스템 메시지
+    function addSystemMessage(text) {
+      const container = document.getElementById('messagesContainer');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'system-message';
+      messageDiv.textContent = text;
+      container.appendChild(messageDiv);
+      scrollToBottom();
+    }
+    
+    // 메시지 전송
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const text = input.value.trim();
+      
+      if (!text) return;
+      
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'message',
+          data: { text }
+        }));
+        input.value = '';
+      } else {
+        // WebSocket 연결이 없으면 로컬 채팅으로
+        fallbackSendMessage(text);
+        input.value = '';
+      }
+    }
+    
+    // 로컬 채팅 대체 구현
+    function fallbackToLocalChat() {
+      console.log('로컬 채팅 모드로 전환');
+      
+      // 로컬 사용자 생성
+      currentUser = {
+        id: 'local_' + Date.now(),
+        username: generateUsername(),
+        color: getRandomColor()
+      };
+      
+      // UI 활성화
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendBtn').disabled = false;
+      updateConnectionStatus('local');
+      
+      addSystemMessage('로컬 채팅 모드 (서버 연결 없음)');
+      
+      // 로컬 스토리지에서 메시지 로드
+      loadLocalMessages();
+      
+      // 가상 사용자 시뮬레이션
+      simulateUsers();
+    }
+    
+    function fallbackSendMessage(text) {
+      const message = {
+        id: Date.now(),
+        userId: currentUser.id,
+        username: currentUser.username,
+        text: text,
+        timestamp: new Date().toISOString(),
+        color: currentUser.color
+      };
+      
+      // 화면에 표시
+      addMessage(message);
+      
+      // 로컬 스토리지에 저장
+      saveToLocalStorage(message);
+    }
+    
+    function saveToLocalStorage(message) {
+      const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      messages.push(message);
+      if (messages.length > 100) messages.shift();
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+    }
+    
+    function loadLocalMessages() {
+      const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+      messages.forEach(msg => addMessage(msg, false));
+    }
+    
+    // 유틸리티 함수들
+    function generateUsername() {
+      const adjectives = ['빠른', '강한', '민첩한', '파워', '열정'];
+      const nouns = ['러너', '스프린터', '선수', '챔피언', '마라토너'];
+      return adjectives[Math.floor(Math.random() * adjectives.length)] +
+             nouns[Math.floor(Math.random() * nouns.length)] +
+             Math.floor(Math.random() * 999);
+    }
+    
+    function getRandomColor() {
+      const colors = ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444'];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    
+    function scrollToBottom() {
+      const container = document.getElementById('messagesContainer');
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function updateConnectionStatus(status) {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      
+      statusDot.className = 'status-dot';
+      
+      switch(status) {
+        case 'connected':
+          statusText.textContent = '연결됨';
+          break;
+        case 'connecting':
+          statusDot.classList.add('connecting');
+          statusText.textContent = '연결 중...';
+          break;
+        case 'disconnected':
+          statusDot.classList.add('offline');
+          statusText.textContent = '연결 끊김';
+          break;
+        case 'local':
+          statusText.textContent = '로컬 모드';
+          break;
+        case 'error':
+          statusDot.classList.add('offline');
+          statusText.textContent = '연결 오류';
+          break;
+      }
+    }
+    
+    function updateUserCount(count) {
+      document.getElementById('userCount').textContent = `(${count}명)`;
+    }
+    
+    function onUserJoined(data) {
+      addSystemMessage(data.message);
+      updateUserCount(data.userCount);
+    }
+    
+    function onUserLeft(data) {
+      addSystemMessage(data.message);
+      updateUserCount(data.userCount);
+    }
+    
+    // 재연결
+    function scheduleReconnect() {
+      clearReconnectTimer();
+      reconnectTimer = setTimeout(() => {
+        console.log('재연결 시도...');
+        connectWebSocket();
+      }, 3000);
+    }
+    
+    function clearReconnectTimer() {
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+    }
+    
+    // 타이핑 표시
+    function handleTypingIndicator(data) {
+      if (data.isTyping) {
+        typingUsers.add(data.username);
+      } else {
+        typingUsers.delete(data.username);
+      }
+      
+      updateTypingDisplay();
+    }
+    
+    function updateTypingDisplay() {
+      const indicator = document.getElementById('typingIndicator');
+      const text = document.getElementById('typingText');
+      
+      if (typingUsers.size > 0) {
+        const users = Array.from(typingUsers);
+        if (users.length === 1) {
+          text.textContent = `${users[0]}님이 입력 중...`;
+        } else {
+          text.textContent = `${users.length}명이 입력 중...`;
+        }
+        indicator.style.display = 'block';
+      } else {
+        indicator.style.display = 'none';
+      }
+    }
+    
+    // 이벤트 리스너
+    function setupEventListeners() {
+      const input = document.getElementById('messageInput');
+      
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+      
+      input.addEventListener('input', () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          if (!isTyping) {
+            isTyping = true;
+            ws.send(JSON.stringify({
+              type: 'typing',
+              data: { isTyping: true }
+            }));
+          }
+          
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(() => {
+            isTyping = false;
+            ws.send(JSON.stringify({
+              type: 'typing',
+              data: { isTyping: false }
+            }));
+          }, 1000);
+        }
+      });
+    }
+    
+    // 가상 사용자 시뮬레이션 (로컬 모드)
+    function simulateUsers() {
+      const messages = [
+        '오늘 날씨 좋네요!',
+        '같이 뛰실 분 계신가요?',
+        '10km 완주했어요 💪',
+        '페이스 조절이 어려워요',
+        '러닝화 추천해주세요',
+        '내일 아침런 하실 분?',
+        '오늘도 화이팅! 🔥'
+      ];
+      
+      setInterval(() => {
+        if (Math.random() > 0.8) {
+          const message = {
+            id: Date.now(),
+            userId: 'sim_' + Math.random(),
+            username: generateUsername(),
+            text: messages[Math.floor(Math.random() * messages.length)],
+            timestamp: new Date().toISOString(),
+            color: getRandomColor()
+          };
+          addMessage(message);
+        }
+      }, 8000);
+    }
+    
+    // 초기화
+    window.addEventListener('DOMContentLoaded', initChat);
+  </script>
+</body>
+</html>

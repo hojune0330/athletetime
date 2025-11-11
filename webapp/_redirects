@@ -1,0 +1,5 @@
+# Community SPA routing
+/community/* /community/index.html 200
+
+# Root site fallback
+/* /index.html 200

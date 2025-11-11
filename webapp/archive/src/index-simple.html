@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>애슬리트 타임 | 한국 육상인 통합 플랫폼</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    
+    // 메인 앱 컴포넌트
+    function App() {
+      const [currentPage, setCurrentPage] = useState('home');
+      const [isDarkMode, setIsDarkMode] = useState(false);
+      
+      // 페이지 렌더링
+      const renderPage = () => {
+        switch(currentPage) {
+          case 'community':
+            return <CommunityPage onBack={() => setCurrentPage('home')} isDarkMode={isDarkMode} />;
+          case 'marketplace':
+            return <MarketplacePage onBack={() => setCurrentPage('home')} isDarkMode={isDarkMode} />;
+          case 'results':
+            return <ResultsPage onBack={() => setCurrentPage('home')} isDarkMode={isDarkMode} />;
+          default:
+            return <HomePage onNavigate={setCurrentPage} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />;
+        }
+      };
+      
+      return (
+        <div className={`min-h-screen transition-all ${
+          isDarkMode 
+            ? 'bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900' 
+            : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
+        }`}>
+          {renderPage()}
+        </div>
+      );
+    }
+    
+    // 홈페이지 컴포넌트
+    function HomePage({ onNavigate, isDarkMode, setIsDarkMode }) {
+      return (
+        <>
+          {/* 헤더 */}
+          <header className={`sticky top-0 z-50 backdrop-blur-xl ${
+            isDarkMode 
+              ? 'bg-gray-900/70 border-b border-gray-800' 
+              : 'bg-white/70 border-b border-gray-200'
+          }`}>
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">
+                  <span className="bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                    애슬리트 타임
+                  </span>
+                </h1>
+                <button
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className={`p-2 rounded-lg transition-all ${
+                    isDarkMode 
+                      ? 'text-yellow-400 hover:bg-gray-800' 
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} text-lg`}></i>
+                </button>
+              </div>
+            </div>
+          </header>
+          
+          {/* 메인 컨텐츠 */}
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="text-center mb-12">
+              <h1 className={`text-4xl sm:text-5xl font-black mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                육상인들의 새로운 시작
+              </h1>
+              <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간
+              </p>
+            </div>
+            
+            {/* 메인 기능 카드들 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* 커뮤니티 카드 */}
+              <div
+                onClick={() => onNavigate('community')}
+                className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 p-8 rounded-3xl ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}
+              >
+                <div className="w-16 h-16 mb-4 bg-gradient-to-r from-red-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                  <i className="fas fa-comments text-white text-2xl"></i>
+                </div>
+                <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  커뮤니티
+                </h3>
+                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  익명으로 자유롭게 소통하는 육상인들의 공간
+                </p>
+                <button className="w-full py-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg font-bold">
+                  입장하기 →
+                </button>
+              </div>
+              
+              {/* 중고거래 카드 */}
+              <div
+                onClick={() => onNavigate('marketplace')}
+                className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 p-8 rounded-3xl ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}
+              >
+                <div className="w-16 h-16 mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                  <i className="fas fa-shopping-bag text-white text-2xl"></i>
+                </div>
+                <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  중고 거래
+                </h3>
+                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  육상 용품 거래 마켓플레이스
+                </p>
+                <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg font-bold">
+                  둘러보기 →
+                </button>
+              </div>
+              
+              {/* 경기결과 카드 */}
+              <div
+                onClick={() => onNavigate('results')}
+                className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 p-8 rounded-3xl ${
+                  isDarkMode 
+                    ? 'bg-gray-900/80 border border-gray-700' 
+                    : 'bg-white/80 border border-gray-200'
+                }`}
+              >
+                <div className="w-16 h-16 mb-4 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
+                  <i className="fas fa-trophy text-white text-2xl"></i>
+                </div>
+                <h3 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  경기 결과
+                </h3>
+                <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  실시간 결과와 기록 관리
+                </p>
+                <button className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-bold">
+                  확인하기 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+    
+    // 커뮤니티 페이지
+    function CommunityPage({ onBack, isDarkMode }) {
+      const [posts] = useState([
+        { id: 1, category: '고등부', title: '서울고 800m 김형식 선배 여자친구 있나요?', author: '익명', likes: 127, comments: 45, time: '5분 전', isHot: true },
+        { id: 2, category: '대학부', title: '한체대 vs 국민대 육상부 어디가 더 좋나요?', author: '미래의 스프린터', likes: 89, comments: 23, time: '23분 전' },
+        { id: 3, category: '실업부', title: '실업팀 연봉 현실적으로 얼마나 되나요?', author: '꿈나무', likes: 234, comments: 67, time: '1시간 전', isHot: true }
+      ]);
+      
+      return (
+        <div>
+          <header className={`sticky top-0 z-50 backdrop-blur-xl ${isDarkMode ? 'bg-gray-900/70 border-b border-gray-800' : 'bg-white/70 border-b border-gray-200'}`}>
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex items-center space-x-4">
+                <button onClick={onBack} className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  <i className="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>커뮤니티</h1>
+              </div>
+            </div>
+          </header>
+          
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="space-y-4">
+              {posts.map(post => (
+                <div key={post.id} className={`rounded-2xl p-6 ${isDarkMode ? 'bg-gray-900/80 border border-gray-800' : 'bg-white/80 border border-gray-200'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${isDarkMode ? 'bg-purple-500/20 text-purple-300' : 'bg-purple-100 text-purple-600'}`}>
+                        {post.category}
+                      </span>
+                      {post.isHot && <span className="px-2 py-1 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded-full">🔥 HOT</span>}
+                    </div>
+                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{post.time}</span>
+                  </div>
+                  <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{post.title}</h3>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{post.author}</span>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-red-500">❤️ {post.likes}</span>
+                      <span className="text-blue-500">💬 {post.comments}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // 중고거래 페이지
+    function MarketplacePage({ onBack, isDarkMode }) {
+      const [products] = useState([
+        { id: 1, category: '스파이크', title: '나이키 줌 슈퍼플라이 엘리트2', price: '180,000원', location: '서울', isHot: true },
+        { id: 2, category: '유니폼', title: '아식스 대표팀 유니폼 세트', price: '85,000원', location: '수원' },
+        { id: 3, category: '액세서리', title: '가민 포러너 245', price: '220,000원', location: '부산', isHot: true }
+      ]);
+      
+      return (
+        <div>
+          <header className={`sticky top-0 z-50 backdrop-blur-xl ${isDarkMode ? 'bg-gray-900/70 border-b border-gray-800' : 'bg-white/70 border-b border-gray-200'}`}>
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex items-center space-x-4">
+                <button onClick={onBack} className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  <i className="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>중고 거래</h1>
+              </div>
+            </div>
+          </header>
+          
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {products.map(product => (
+                <div key={product.id} className={`rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900/80 border border-gray-800' : 'bg-white/80 border border-gray-200'}`}>
+                  <div className={`h-48 flex items-center justify-center text-6xl ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>👟</div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${isDarkMode ? 'bg-green-500/20 text-green-300' : 'bg-green-100 text-green-600'}`}>
+                        {product.category}
+                      </span>
+                      {product.isHot && <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">🔥 인기</span>}
+                    </div>
+                    <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{product.title}</h3>
+                    <div className="text-2xl font-bold mb-2 bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                      {product.price}
+                    </div>
+                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>📍 {product.location}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // 경기결과 페이지
+    function ResultsPage({ onBack, isDarkMode }) {
+      const [results] = useState([
+        { id: 1, event: '남고 100m', rank: 1, name: '김형식', team: '서울고', record: '10.23', isNewRecord: true },
+        { id: 2, event: '남고 100m', rank: 2, name: '이준호', team: '부산고', record: '10.45' },
+        { id: 3, event: '여중 1500m', rank: 1, name: '최서연', team: '서울여중', record: '4:45.12', isPB: true }
+      ]);
+      
+      return (
+        <div>
+          <header className={`sticky top-0 z-50 backdrop-blur-xl ${isDarkMode ? 'bg-gray-900/70 border-b border-gray-800' : 'bg-white/70 border-b border-gray-200'}`}>
+            <div className="max-w-7xl mx-auto px-4 py-4">
+              <div className="flex items-center space-x-4">
+                <button onClick={onBack} className={`p-2 rounded-lg ${isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  <i className="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>경기 결과</h1>
+              </div>
+            </div>
+          </header>
+          
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <div className={`rounded-2xl overflow-hidden ${isDarkMode ? 'bg-gray-900/80 border border-gray-800' : 'bg-white/80 border border-gray-200'}`}>
+              <table className="w-full">
+                <thead>
+                  <tr className={isDarkMode ? 'border-b border-gray-800' : 'border-b border-gray-200'}>
+                    <th className="px-4 py-3 text-left">순위</th>
+                    <th className="px-4 py-3 text-left">이름</th>
+                    <th className="px-4 py-3 text-left">소속</th>
+                    <th className="px-4 py-3 text-left">기록</th>
+                    <th className="px-4 py-3 text-left">비고</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map(result => (
+                    <tr key={result.id} className={isDarkMode ? 'border-b border-gray-800' : 'border-b border-gray-100'}>
+                      <td className="px-4 py-3">
+                        <div className={`inline-flex items-center justify-center w-8 h-8 rounded-full font-bold ${
+                          result.rank === 1 ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white' : isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-700'
+                        }`}>
+                          {result.rank}
+                        </div>
+                      </td>
+                      <td className={`px-4 py-3 font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{result.name}</td>
+                      <td className={`px-4 py-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{result.team}</td>
+                      <td className={`px-4 py-3 font-mono font-bold text-lg ${result.rank === 1 ? 'text-yellow-500' : isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        {result.record}
+                      </td>
+                      <td className="px-4 py-3">
+                        {result.isNewRecord && <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">대회신</span>}
+                        {result.isPB && <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full ml-1">PB</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    // 앱 렌더링
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
