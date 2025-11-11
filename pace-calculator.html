@@ -698,7 +698,113 @@
         </div>
       </div>
     </section>
-  </main>
+
+    <!-- 9-10일 주기화 섹션 -->
+    <section id="periodizationSection" class="hidden bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h3 class="text-xl font-bold mb-4 flex items-center">
+        <i class="fas fa-calendar-week text-purple-600 mr-2"></i>
+        9-10일 과학적 주기화 추천
+      </h3>
+      
+      <div class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-4">
+        <div class="font-semibold text-purple-700 mb-2">🧬 생리학적 기반</div>
+        <div class="text-sm text-gray-700 grid md:grid-cols-2 gap-3">
+          <div>
+            <strong>근육 단백질 합성:</strong> 48-72시간<br>
+            <strong>미토콘드리아 적응:</strong> 72-96시간<br>
+            <strong>신경계 회복:</strong> 24-48시간
+          </div>
+          <div>
+            <strong>호르몬 최적화:</strong> 48-120시간<br>
+            <strong>초보상 효과:</strong> 72-96시간<br>
+            <strong>부상 예방:</strong> 30% 감소
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid md:grid-cols-9 gap-2 text-xs">
+        <!-- Day 1-9 cycle display -->
+        <div class="col-span-9 grid grid-cols-9 gap-1 mb-4">
+          <!-- Day 1: High Intensity -->
+          <div class="bg-red-100 border border-red-300 rounded p-2 text-center">
+            <div class="font-bold text-red-700">Day 1</div>
+            <div class="text-red-600 text-xs">고강도</div>
+            <div class="text-gray-600 text-xs mt-1">인터벌</div>
+          </div>
+          
+          <!-- Day 2: Recovery -->
+          <div class="bg-green-100 border border-green-300 rounded p-2 text-center">
+            <div class="font-bold text-green-700">Day 2</div>
+            <div class="text-green-600 text-xs">저강도</div>
+            <div class="text-gray-600 text-xs mt-1">회복런</div>
+          </div>
+          
+          <!-- Day 3: Threshold -->
+          <div class="bg-orange-100 border border-orange-300 rounded p-2 text-center">
+            <div class="font-bold text-orange-700">Day 3</div>
+            <div class="text-orange-600 text-xs">중강도</div>
+            <div class="text-gray-600 text-xs mt-1">임계</div>
+          </div>
+          
+          <!-- Day 4: Rest -->
+          <div class="bg-gray-100 border border-gray-300 rounded p-2 text-center">
+            <div class="font-bold text-gray-700">Day 4</div>
+            <div class="text-gray-600 text-xs">휴식</div>
+            <div class="text-gray-600 text-xs mt-1">크로스</div>
+          </div>
+          
+          <!-- Day 5: Speed -->
+          <div class="bg-purple-100 border border-purple-300 rounded p-2 text-center">
+            <div class="font-bold text-purple-700">Day 5</div>
+            <div class="text-purple-600 text-xs">고강도</div>
+            <div class="text-gray-600 text-xs mt-1">스피드</div>
+          </div>
+          
+          <!-- Day 6: Easy -->
+          <div class="bg-green-100 border border-green-300 rounded p-2 text-center">
+            <div class="font-bold text-green-700">Day 6</div>
+            <div class="text-green-600 text-xs">저강도</div>
+            <div class="text-gray-600 text-xs mt-1">쉬운 런</div>
+          </div>
+          
+          <!-- Day 7: Long -->
+          <div class="bg-blue-100 border border-blue-300 rounded p-2 text-center">
+            <div class="font-bold text-blue-700">Day 7</div>
+            <div class="text-blue-600 text-xs">중강도</div>
+            <div class="text-gray-600 text-xs mt-1">장거리</div>
+          </div>
+          
+          <!-- Day 8: Rest -->
+          <div class="bg-gray-100 border border-gray-300 rounded p-2 text-center">
+            <div class="font-bold text-gray-700">Day 8</div>
+            <div class="text-gray-600 text-xs">휴식</div>
+            <div class="text-gray-600 text-xs mt-1">회복</div>
+          </div>
+          
+          <!-- Day 9: Test -->
+          <div class="bg-indigo-100 border border-indigo-300 rounded p-2 text-center">
+            <div class="font-bold text-indigo-700">Day 9</div>
+            <div class="text-indigo-600 text-xs">테스트</div>
+            <div class="text-gray-600 text-xs mt-1">평가</div>
+          </div>
+        </div>
+        
+        <!-- Optional Day 10 -->
+        <div class="col-span-9 grid grid-cols-9 gap-1">
+          <div class="col-span-9 col-start-1 bg-gray-50 border-2 border-dashed border-gray-300 rounded p-2 text-center opacity-75">
+            <div class="font-bold text-gray-600">Day 10 (선택)</div>
+            <div class="text-gray-500 text-xs">추가 회복일</div>
+            <div class="text-gray-500 text-xs mt-1">피로도 기반</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4 text-sm text-gray-600 text-center">
+        💡 <strong>생리학적 초보상:</strong> 고강도 훈련 후 72-96시간의 회복 기간이 성장을 극대화합니다.
+      </div>
+    </section>
+
+    </main>
 
   <!-- 푸터 -->
   <footer class="bg-gray-800 text-white py-8 mt-12">
@@ -874,8 +980,12 @@
       generatePaceTable(distance, pacePerKm);
       generateTargetTables();
       
+      // 9-10일 주기화 섹션 표시
+      generatePeriodizationRecommendations(pacePerKm, distance);
+      
       // 결과 섹션 표시
       document.getElementById('results').classList.remove('hidden');
+      document.getElementById('periodizationSection').classList.remove('hidden');
       
       // 첫 번째 탭 표시
       showTab('paceChart');
