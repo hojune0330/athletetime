@@ -11,7 +11,10 @@
     "db:seed": "node database/seed.js",
     "db:reset": "psql $DATABASE_URL -c 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;' && npm run db:migrate && npm run db:seed",
     "check:urls": "node scripts/check-urls.js",
-    "prebuild": "npm run check:urls"
+    "validate:deployment": "node scripts/validate-deployment.js",
+    "cleanup:html": "node scripts/cleanup-html.js",
+    "cleanup:html:dry": "node scripts/cleanup-html.js --dry-run",
+    "prebuild": "npm run check:urls && npm run validate:deployment"
   },
   "keywords": [
     "athletics",
