@@ -1,0 +1,240 @@
+/* 네비게이션 시스템 CSS */
+
+/* 상단 네비게이션 바 */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 1.125rem;
+}
+
+.navbar-menu {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .navbar-menu {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0 1rem;
+    }
+}
+
+.navbar-item {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: var(--neutral-600);
+    font-weight: 500;
+    border-radius: var(--rounded-lg);
+    transition: all 0.2s;
+}
+
+.navbar-item:hover {
+    background: var(--neutral-100);
+    color: var(--primary);
+}
+
+.navbar-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+/* 모바일 메뉴 버튼 */
+.mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--neutral-600);
+    cursor: pointer;
+    border-radius: var(--rounded-lg);
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
+
+.mobile-menu-btn:hover {
+    background: var(--neutral-100);
+}
+
+/* 모바일 드로어 메뉴 */
+.mobile-drawer {
+    position: fixed;
+    top: 56px;
+    left: -100%;
+    width: 280px;
+    height: calc(100vh - 56px);
+    background: white;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 99;
+    overflow-y: auto;
+}
+
+.mobile-drawer.open {
+    left: 0;
+}
+
+.drawer-menu {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--neutral-700);
+    font-weight: 500;
+    border-radius: var(--rounded-lg);
+    transition: all 0.2s;
+}
+
+.drawer-item:hover {
+    background: var(--neutral-100);
+    color: var(--primary);
+}
+
+.drawer-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.drawer-item i {
+    width: 20px;
+    text-align: center;
+}
+
+/* 오버레이 */
+.drawer-overlay {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 98;
+}
+
+.drawer-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* 페이지 콘텐츠 조정 */
+body.has-navbar {
+    padding-top: 56px;
+}
+
+/* 스크롤 시 네비게이션 숨기기 (옵션) */
+.top-navbar.hidden {
+    transform: translateY(-100%);
+}
+
+/* 브레드크럼 */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--neutral-50);
+    font-size: 0.875rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.breadcrumb-item {
+    color: var(--neutral-600);
+    text-decoration: none;
+}
+
+.breadcrumb-item:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-separator {
+    color: var(--neutral-400);
+}
+
+/* 하단 플로팅 네비게이션 (모바일 전용) */
+.floating-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border-radius: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 90;
+}
+
+@media (min-width: 768px) {
+    .floating-nav {
+        display: none;
+    }
+}
+
+.floating-nav-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--neutral-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.floating-nav-item:hover {
+    background: var(--neutral-100);
+}
+
+.floating-nav-item.active {
+    background: var(--primary);
+    color: white;
+}
