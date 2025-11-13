@@ -439,9 +439,147 @@
         .tab-item span {
             font-size: var(--text-xs);
         }
+
+        /* 테이블 스타일 추가 */
+        .table-responsive {
+            overflow-x: auto;
+            margin: var(--spacing-md) 0;
+            -webkit-overflow-scrolling: touch; /* iOS 스크롤 성능 개선 */
+        }
+
+        @media (max-width: 480px) {
+            .table-responsive {
+                margin: var(--spacing-sm) -var(--spacing-md);
+                padding: 0 var(--spacing-md);
+            }
+        }
+
+        .pace-table,
+        .target-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--rounded-lg);
+            overflow: hidden;
+        }
+
+        .pace-table th,
+        .target-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+            white-space: nowrap;
+        }
+
+        .pace-table td,
+        .target-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--neutral-100);
+            font-size: var(--text-sm);
+            color: var(--neutral-700);
+        }
+
+        .pace-table tr:hover,
+        .target-table tr:hover {
+            background: var(--neutral-50);
+        }
+
+        .pace-table tr.highlight-row,
+        .target-table tr.highlight-row {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: var(--font-semibold);
+        }
+
+        .pace-table tr.highlight-row td,
+        .target-table tr.highlight-row td {
+            color: var(--primary);
+        }
+
+        /* 레벨 배지 스타일 */
+        .level-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: var(--rounded-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+        }
+
+        .level-badge.elite {
+            background: linear-gradient(135deg, #f59e0b, #dc2626);
+            color: white;
+        }
+
+        .level-badge.advanced {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            color: white;
+        }
+
+        .level-badge.intermediate {
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            color: white;
+        }
+
+        .level-badge.beginner {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="메뉴">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="/" class="nav-logo">
+                    <i class="fas fa-running"></i>
+                    <span>Athlete Time</span>
+                </a>
+            </div>
+            <div class="nav-right">
+                <div class="nav-links desktop-only">
+                    <a href="/pace-calculator.html" class="nav-link active">페이스 계산기</a>
+                    <a href="/training-calculator.html" class="nav-link">훈련 계산기</a>
+                    <a href="/competitions-calendar.html" class="nav-link">대회 일정</a>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="테마 변경">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>메뉴</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-menu-content">
+            <a href="/" class="mobile-menu-link">
+                <i class="fas fa-home"></i> 홈
+            </a>
+            <a href="/pace-calculator.html" class="mobile-menu-link active">
+                <i class="fas fa-calculator"></i> 페이스 계산기
+            </a>
+            <a href="/training-calculator.html" class="mobile-menu-link">
+                <i class="fas fa-dumbbell"></i> 훈련 계산기
+            </a>
+            <a href="/competitions-calendar.html" class="mobile-menu-link">
+                <i class="fas fa-calendar"></i> 대회 일정
+            </a>
+        </div>
+    </div>
+    
     <div class="pace-calculator-app">
         <!-- 히어로 섹션 -->
         <div class="hero-section animate-fadeIn">
@@ -480,22 +618,35 @@
 
             <!-- 입력 섹션 -->
             <div class="input-section">
+                <!-- 거리 입력 -->
+                <div class="input-card animate-slideInLeft">
+                    <h3 class="card-title">거리 입력</h3>
+                    <div class="input-group">
+                        <input type="number" class="input-field" id="distance" placeholder="거리 (km)" min="0.1" step="0.1" value="10">
+                        <label for="distance" class="input-label">킬로미터</label>
+                    </div>
+                </div>
+                
                 <!-- 목표 시간 입력 -->
                 <div class="input-card animate-slideInLeft">
                     <h3 class="card-title">목표 시간</h3>
                     <div class="time-input-group">
-                        <input type="number" class="time-input" id="hours" placeholder="시" min="0" max="23">
+                        <label for="hours" class="sr-only">시간</label>
+                        <input type="number" class="time-input" id="hours" placeholder="시" min="0" max="23" aria-label="시간">
                         <span class="time-separator">:</span>
-                        <input type="number" class="time-input" id="minutes" placeholder="분" min="0" max="59">
+                        <label for="minutes" class="sr-only">분</label>
+                        <input type="number" class="time-input" id="minutes" placeholder="분" min="0" max="59" aria-label="분">
                         <span class="time-separator">:</span>
-                        <input type="number" class="time-input" id="seconds" placeholder="초" min="0" max="59">
+                        <label for="seconds" class="sr-only">초</label>
+                        <input type="number" class="time-input" id="seconds" placeholder="초" min="0" max="59" aria-label="초">
                     </div>
                 </div>
 
                 <!-- VDOT 입력 (선택적) -->
                 <div class="input-card animate-slideInRight">
                     <h3 class="card-title">VDOT 값 (선택)</h3>
-                    <input type="number" class="input-field" id="vdot" placeholder="예: 45" min="20" max="85">
+                    <label for="vdot" class="sr-only">VDOT 값</label>
+                    <input type="number" class="input-field" id="vdot" placeholder="예: 45" min="20" max="85" aria-label="VDOT 값">
                     <p class="input-helper">모르시면 비워두세요. 목표 시간으로 자동 계산됩니다.</p>
                 </div>
             </div>
@@ -512,13 +663,84 @@
                 <div class="result-card">
                     <div class="result-header">
                         <h3 class="result-title">📊 페이스 차트</h3>
-                        <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;">
+                        <button class="btn btn-sm" onclick="downloadPaceTable()" style="background: rgba(255,255,255,0.2); color: white;">
                             <i class="fas fa-download"></i>
                         </button>
                     </div>
                     <div class="result-content">
-                        <div class="pace-grid" id="paceGrid">
+                        <div class="pace-grid" id="paceResult">
                             <!-- 동적으로 생성됨 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상세 페이스 테이블 추가 -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">📋 상세 페이스 테이블</h3>
+                    </div>
+                    <div class="result-content">
+                        <div class="table-responsive">
+                            <table class="pace-table">
+                                <thead id="paceTableHead">
+                                    <!-- 동적으로 생성됨 -->
+                                </thead>
+                                <tbody id="paceTableBody">
+                                    <!-- 동적으로 생성됨 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 목표 기록 테이블 (5km) -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">🎯 5km 목표 기록</h3>
+                    </div>
+                    <div class="result-content">
+                        <div class="table-responsive">
+                            <table class="target-table">
+                                <thead>
+                                    <tr>
+                                        <th>목표시간</th>
+                                        <th>페이스</th>
+                                        <th>400m</th>
+                                        <th>100m</th>
+                                        <th>속도</th>
+                                        <th>수준</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="target5kmTable">
+                                    <!-- 동적으로 생성됨 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 목표 기록 테이블 (10km) -->
+                <div class="result-card">
+                    <div class="result-header">
+                        <h3 class="result-title">🎯 10km 목표 기록</h3>
+                    </div>
+                    <div class="result-content">
+                        <div class="table-responsive">
+                            <table class="target-table">
+                                <thead>
+                                    <tr>
+                                        <th>목표시간</th>
+                                        <th>페이스</th>
+                                        <th>400m</th>
+                                        <th>100m</th>
+                                        <th>속도</th>
+                                        <th>수준</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="target10kmTable">
+                                    <!-- 동적으로 생성됨 -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -587,7 +809,14 @@
 
         // 페이스 계산 함수
         function calculatePace() {
-            const distance = document.querySelector('.distance-btn.active').dataset.distance;
+            // 거리 가져오기 (입력 필드 우선, 없으면 버튼 선택값)
+            let distance = parseFloat(document.getElementById('distance')?.value);
+            if (!distance) {
+                const activeBtn = document.querySelector('.distance-btn.active');
+                distance = activeBtn ? parseInt(activeBtn.dataset.distance) / 1000 : 10; // km 단위로 변환
+            }
+            distance = distance * 1000; // 미터로 변환
+            
             const hours = parseInt(document.getElementById('hours').value) || 0;
             const minutes = parseInt(document.getElementById('minutes').value) || 0;
             const seconds = parseInt(document.getElementById('seconds').value) || 0;
@@ -626,6 +855,7 @@
         function generatePaceChart(distance, hours, minutes, seconds) {
             const totalSeconds = hours * 3600 + minutes * 60 + seconds;
             const pacePerKm = totalSeconds / (distance / 1000);
+            const vdot = calculateVDOT(distance, totalSeconds);
             
             const distances = [
                 { label: '1km', distance: 1000 },
@@ -638,8 +868,8 @@
                 { label: '풀', distance: 42195 }
             ];
             
-            const paceGrid = document.getElementById('paceGrid');
-            paceGrid.innerHTML = '';
+            const paceResult = document.getElementById('paceResult');
+            paceResult.innerHTML = '';
             
             distances.forEach(d => {
                 const time = pacePerKm * (d.distance / 1000);
@@ -661,8 +891,181 @@
                     <div class="pace-speed">${speed.toFixed(1)} km/h</div>
                 `;
                 
-                paceGrid.appendChild(paceItem);
+                paceResult.appendChild(paceItem);
             });
+            
+            // 페이스 테이블 생성 추가
+            generatePaceTable(distance, pacePerKm);
+            generateTargetTables();
+            
+            // 결과 반환
+            return {
+                pace: pacePerKm,
+                vdot: vdot,
+                totalTime: totalSeconds,
+                distance: distance
+            };
+        }
+
+        // 페이스 테이블 생성 함수
+        function generatePaceTable(distance, pacePerKm) {
+            const tableHead = document.getElementById('paceTableHead');
+            const tableBody = document.getElementById('paceTableBody');
+            
+            if (!tableHead || !tableBody) return;
+            
+            // 테이블 헤더
+            const headers = ['거리', '목표 시간', '페이스', '400m', '100m', '속도'];
+            tableHead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+            
+            // 데이터 생성
+            const distances = [100, 200, 400, 800, 1000, 1500, 3000, 5000, 10000, 21097.5, 42195];
+            const labels = ['100m', '200m', '400m', '800m', '1km', '1500m', '3km', '5km', '10km', '하프', '마라톤'];
+            
+            tableBody.innerHTML = '';
+            distances.forEach((dist, i) => {
+                const row = tableBody.insertRow();
+                const targetTime = pacePerKm * (dist / 1000);
+                const pace400m = pacePerKm * 0.4;
+                const pace100m = pacePerKm * 0.1;
+                const speed = (dist / 1000) / (targetTime / 3600);
+                
+                // 현재 입력한 거리 하이라이트
+                if (Math.abs(dist - distance) < 100) {
+                    row.className = 'highlight-row';
+                }
+                
+                row.innerHTML = `
+                    <td class="font-bold">${labels[i]}</td>
+                    <td>${formatTime(targetTime)}</td>
+                    <td>${formatPace(pacePerKm)}</td>
+                    <td>${formatTime(pace400m)}</td>
+                    <td>${formatTime(pace100m)}</td>
+                    <td>${speed.toFixed(1)}</td>
+                `;
+            });
+        }
+
+        // 목표 테이블 생성 함수
+        function generateTargetTables() {
+            // 5km 목표 기록
+            const targets5km = [
+                { time: 13 * 60, label: '세계 엘리트', level: 'elite', highlight: true },
+                { time: 15 * 60, label: '엘리트', level: 'elite' },
+                { time: 17 * 60, label: '최상급', level: 'advanced' },
+                { time: 20 * 60, label: '서브 20', level: 'intermediate', highlight: true },
+                { time: 25 * 60, label: '초중급', level: 'beginner', highlight: true },
+                { time: 30 * 60, label: '입문', level: 'beginner', highlight: true }
+            ];
+            
+            const tbody5km = document.getElementById('target5kmTable');
+            if (tbody5km) {
+                tbody5km.innerHTML = '';
+                targets5km.forEach(target => {
+                    const row = tbody5km.insertRow();
+                    if (target.highlight) row.className = 'highlight-row';
+                    
+                    const pacePerKm = target.time / 5;
+                    const pace400m = pacePerKm * 0.4;
+                    const pace100m = pacePerKm * 0.1;
+                    const speed = 5000 / target.time * 3.6;
+                    
+                    row.innerHTML = `
+                        <td class="font-bold">${formatTime(target.time)}</td>
+                        <td>${formatPace(pacePerKm)}</td>
+                        <td>${formatTime(pace400m)}</td>
+                        <td>${formatTime(pace100m)}</td>
+                        <td>${speed.toFixed(1)}</td>
+                        <td><span class="level-badge ${target.level}">${target.label}</span></td>
+                    `;
+                });
+            }
+            
+            // 10km 목표 기록
+            const targets10km = [
+                { time: 28 * 60, label: '세계 엘리트', level: 'elite', highlight: true },
+                { time: 32 * 60, label: '엘리트', level: 'elite' },
+                { time: 38 * 60, label: '최상급', level: 'advanced' },
+                { time: 45 * 60, label: '중상급', level: 'intermediate' },
+                { time: 50 * 60, label: '서브 50', level: 'intermediate', highlight: true },
+                { time: 60 * 60, label: '초중급', level: 'beginner', highlight: true },
+                { time: 70 * 60, label: '입문', level: 'beginner', highlight: true }
+            ];
+            
+            const tbody10km = document.getElementById('target10kmTable');
+            if (tbody10km) {
+                tbody10km.innerHTML = '';
+                targets10km.forEach(target => {
+                    const row = tbody10km.insertRow();
+                    if (target.highlight) row.className = 'highlight-row';
+                    
+                    const pacePerKm = target.time / 10;
+                    const pace400m = pacePerKm * 0.4;
+                    const pace100m = pacePerKm * 0.1;
+                    const speed = 10000 / target.time * 3.6;
+                    
+                    row.innerHTML = `
+                        <td class="font-bold">${formatTime(target.time)}</td>
+                        <td>${formatPace(pacePerKm)}</td>
+                        <td>${formatTime(pace400m)}</td>
+                        <td>${formatTime(pace100m)}</td>
+                        <td>${speed.toFixed(1)}</td>
+                        <td><span class="level-badge ${target.level}">${target.label}</span></td>
+                    `;
+                });
+            }
+        }
+
+        // 시간 포맷 함수
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // 페이스 포맷 함수
+        function formatPace(pacePerKm) {
+            const minutes = Math.floor(pacePerKm / 60);
+            const seconds = Math.floor(pacePerKm % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // 테이블 다운로드 함수
+        function downloadPaceTable() {
+            const tables = document.querySelectorAll('.pace-table, .target-table');
+            let csvContent = 'data:text/csv;charset=utf-8,\uFEFF';
+            
+            tables.forEach((table, index) => {
+                if (index > 0) csvContent += '\n\n';
+                
+                // 헤더
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+                csvContent += headers.join(',') + '\n';
+                
+                // 데이터
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
+                    csvContent += cells.join(',') + '\n';
+                });
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `pace_table_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            
+            if (window.UIUtils) {
+                UIUtils.showToast('페이스 테이블이 다운로드되었습니다', 'success');
+            }
         }
 
         // 훈련 존 생성
@@ -792,7 +1195,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             // 포커스를 분 입력 필드로
             document.getElementById('minutes').focus();
+            
+            // 입력 검증 초기화
+            if (window.ValidationSystem) {
+                ValidationSystem.attachRealtimeValidation(document.getElementById('hours'), 'hours');
+                ValidationSystem.attachRealtimeValidation(document.getElementById('minutes'), 'minutes');
+                ValidationSystem.attachRealtimeValidation(document.getElementById('seconds'), 'seconds');
+            }
+            
+            // 기본값 설정 (사용자 설정에서 가져오기)
+            if (window.DataManager) {
+                const prefs = DataManager.getPreferences();
+                if (prefs.defaultDistance) {
+                    document.querySelector(`[data-distance="${prefs.defaultDistance}"]`)?.click();
+                }
+            }
         });
     </script>
+    
+    <!-- Navigation JavaScript -->
+    <script src="navigation.js"></script>
+    <script src="design-system.js"></script>
+    <script src="validation.js"></script>
+    <script src="data-manager.js"></script>
 </body>
 </html>

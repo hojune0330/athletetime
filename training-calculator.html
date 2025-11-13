@@ -184,32 +184,45 @@
 
         .vdot-slider {
             width: 100%;
-            height: 8px;
+            height: 24px; /* 터치 영역 확대 */
             border-radius: var(--rounded-full);
             background: var(--neutral-200);
             outline: none;
             -webkit-appearance: none;
-            margin: var(--spacing-lg) 0;
+            margin: var(--spacing-xl) 0;
+            cursor: pointer;
         }
 
         .vdot-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 44px; /* 최소 터치 타겟 44px */
+            height: 44px;
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-base);
+        }
+
+        .vdot-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
         }
 
         .vdot-slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
+            width: 44px; /* 최소 터치 타겟 44px */
+            height: 44px;
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-base);
+        }
+
+        .vdot-slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
         }
 
         .vdot-markers {
@@ -513,9 +526,186 @@
             height: 150px;
             border-radius: var(--rounded-xl);
         }
+
+        /* 고급 훈련 카드 */
+        .training-card {
+            background: white;
+            border-radius: var(--rounded-xl);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .training-card h3 {
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .training-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--spacing-md);
+            min-width: 500px; /* 최소 너비 설정 */
+        }
+
+        @media (max-width: 480px) {
+            .training-card {
+                border-radius: 0;
+                margin-left: -var(--spacing-md);
+                margin-right: -var(--spacing-md);
+                padding: var(--spacing-md);
+            }
+
+            .training-table {
+                font-size: var(--text-sm);
+            }
+        }
+
+        .training-table th {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: var(--spacing-sm);
+            text-align: left;
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+        }
+
+        .training-table td {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid var(--neutral-100);
+            font-size: var(--text-sm);
+            color: var(--neutral-700);
+        }
+
+        .training-table tr:hover {
+            background: var(--neutral-50);
+        }
+
+        .protocol-item {
+            padding: var(--spacing-md);
+            background: var(--neutral-50);
+            border-radius: var(--rounded-lg);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .protocol-item h4 {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .protocol-list {
+            list-style: none;
+            padding: 0;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .protocol-list li {
+            padding: var(--spacing-md) 0; /* 패딩 증가 */
+            padding-left: var(--spacing-xl);
+            position: relative;
+            font-size: var(--text-base); /* 글자 크기 증가 */
+            line-height: 1.8; /* 줄 간격 증가 */
+            color: var(--neutral-700);
+        }
+
+        .protocol-list li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .hr-zone {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm);
+            background: var(--neutral-50);
+            border-radius: var(--rounded-lg);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .hr-zone.zone1 { 
+            border-left: 4px solid #10b981;
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.1), white);
+        }
+        .hr-zone.zone2 { 
+            border-left: 4px solid #3b82f6;
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.1), white);
+        }
+        .hr-zone.zone3 { 
+            border-left: 4px solid #f59e0b;
+            background: linear-gradient(to right, rgba(245, 158, 11, 0.1), white);
+        }
+        .hr-zone.zone4 { 
+            border-left: 4px solid #ef4444;
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.1), white);
+        }
+        .hr-zone.zone5 { 
+            border-left: 4px solid #dc2626;
+            background: linear-gradient(to right, rgba(220, 38, 38, 0.1), white);
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="hamburger-menu" id="hamburgerMenu" aria-label="메뉴">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="/" class="nav-logo">
+                    <i class="fas fa-running"></i>
+                    <span>Athlete Time</span>
+                </a>
+            </div>
+            <div class="nav-right">
+                <div class="nav-links desktop-only">
+                    <a href="/pace-calculator.html" class="nav-link">페이스 계산기</a>
+                    <a href="/training-calculator.html" class="nav-link active">훈련 계산기</a>
+                    <a href="/competitions-calendar.html" class="nav-link">대회 일정</a>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="테마 변경">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3>메뉴</h3>
+            <button class="mobile-menu-close" id="mobileMenuClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-menu-content">
+            <a href="/" class="mobile-menu-link">
+                <i class="fas fa-home"></i> 홈
+            </a>
+            <a href="/pace-calculator.html" class="mobile-menu-link">
+                <i class="fas fa-calculator"></i> 페이스 계산기
+            </a>
+            <a href="/training-calculator.html" class="mobile-menu-link active">
+                <i class="fas fa-dumbbell"></i> 훈련 계산기
+            </a>
+            <a href="/competitions-calendar.html" class="mobile-menu-link">
+                <i class="fas fa-calendar"></i> 대회 일정
+            </a>
+        </div>
+    </div>
+    
     <div class="training-calculator-app">
         <!-- AI 헤더 -->
         <div class="ai-header">
@@ -627,6 +817,46 @@
                 </div>
             </div>
 
+            <!-- 고급 훈련 설계 섹션 -->
+            <div class="advanced-training-section results-section" id="advancedTraining">
+                <h2 class="section-title">
+                    <i class="fas fa-brain"></i>
+                    고급 훈련 설계
+                </h2>
+                
+                <!-- 이중 세션 훈련 -->
+                <div class="training-card">
+                    <h3 class="card-title">🏃‍♂️ 이중 세션 훈련</h3>
+                    <div id="doubleSessionPlan">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+
+                <!-- 회복 프로토콜 -->
+                <div class="training-card">
+                    <h3 class="card-title">🛏️ 회복 프로토콜</h3>
+                    <div id="recoveryProtocol">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+
+                <!-- 영양 타이밍 -->
+                <div class="training-card">
+                    <h3 class="card-title">🥗 영양 타이밍</h3>
+                    <div id="nutritionTiming">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+
+                <!-- 심박수 구역 -->
+                <div class="training-card">
+                    <h3 class="card-title">❤️ 심박수 구역</h3>
+                    <div id="heartRateZones">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+            </div>
+
             <!-- 차트 섹션 -->
             <div class="result-grid results-section" id="chartsSection">
                 <div class="chart-container">
@@ -669,6 +899,8 @@
     <!-- JavaScript -->
     <script src="design-system.js"></script>
     <script src="navigation.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="validation.js"></script>
     <script>
         // VDOT 슬라이더 이벤트
         const vdotSlider = document.getElementById('vdotSlider');
@@ -710,6 +942,9 @@
                 
                 // 주간 계획 생성
                 generateWeeklyPlan(frequency, level, goal);
+                
+                // 고급 훈련 설계 생성
+                generateAdvancedTraining(vdot, level, goal, frequency);
                 
                 // 차트 생성 (간단한 시뮬레이션)
                 generateCharts();
@@ -871,6 +1106,219 @@
             UIUtils.showToast('설정 기능은 준비 중입니다', 'info');
         }
 
+        // 고급 훈련 설계 생성
+        function generateAdvancedTraining(vdot, level, goal, frequency) {
+            // 이중 세션 훈련 생성
+            generateDoubleSessionPlan(vdot, level, frequency);
+            
+            // 회복 프로토콜 생성
+            generateRecoveryProtocol(level, frequency);
+            
+            // 영양 타이밍 생성
+            generateNutritionTiming(level, goal);
+            
+            // 심박수 구역 생성
+            generateHeartRateZones(vdot);
+        }
+
+        // 이중 세션 훈련 계획
+        function generateDoubleSessionPlan(vdot, level, frequency) {
+            const container = document.getElementById('doubleSessionPlan');
+            if (!container) return;
+            
+            const sessions = [
+                {
+                    day: '월요일',
+                    morning: { type: '이지 런', duration: '30분', intensity: '60-70% HRmax' },
+                    afternoon: { type: '테크닉 드릴', duration: '20분', intensity: '회복' }
+                },
+                {
+                    day: '수요일',
+                    morning: { type: '인터벌', duration: '40분', intensity: '80-90% HRmax' },
+                    afternoon: { type: '회복 런', duration: '20분', intensity: '50-60% HRmax' }
+                },
+                {
+                    day: '금요일',
+                    morning: { type: '템포 런', duration: '35분', intensity: '75-85% HRmax' },
+                    afternoon: { type: '스트레칭', duration: '15분', intensity: '저강도' }
+                }
+            ];
+            
+            let html = '<table class="training-table">';
+            html += '<thead><tr><th>요일</th><th>오전 세션</th><th>오후 세션</th></tr></thead>';
+            html += '<tbody>';
+            
+            sessions.forEach(session => {
+                html += `<tr>
+                    <td><strong>${session.day}</strong></td>
+                    <td>
+                        <div><strong>${session.morning.type}</strong></div>
+                        <div>시간: ${session.morning.duration}</div>
+                        <div>강도: ${session.morning.intensity}</div>
+                    </td>
+                    <td>
+                        <div><strong>${session.afternoon.type}</strong></div>
+                        <div>시간: ${session.afternoon.duration}</div>
+                        <div>강도: ${session.afternoon.intensity}</div>
+                    </td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // 회복 프로토콜 생성
+        function generateRecoveryProtocol(level, frequency) {
+            const container = document.getElementById('recoveryProtocol');
+            if (!container) return;
+            
+            const protocol = {
+                daily: [
+                    '아침 기상 시 심박수 측정',
+                    '주관적 피로도 평가 (1-10)',
+                    '수면 질 모니터링',
+                    '수분 섭취 확인 (2-3L/일)'
+                ],
+                weekly: [
+                    'HRV(심박변이도) 측정',
+                    '점프 테스트 실시',
+                    '체중 변화 추적',
+                    '주간 훈련 부하 계산'
+                ],
+                tools: [
+                    '폼롤러 마사지',
+                    '아이싱 (10-15분)',
+                    '스트레칭 (15-20분)',
+                    '마사지 볼 사용',
+                    '압박 의류 착용'
+                ]
+            };
+            
+            let html = '';
+            html += '<div class="protocol-item">';
+            html += '<h4>🌅 일일 회복 체크리스트</h4>';
+            html += '<ul class="protocol-list">';
+            protocol.daily.forEach(item => {
+                html += `<li>${item}</li>`;
+            });
+            html += '</ul></div>';
+            
+            html += '<div class="protocol-item">';
+            html += '<h4>📅 주간 평가 항목</h4>';
+            html += '<ul class="protocol-list">';
+            protocol.weekly.forEach(item => {
+                html += `<li>${item}</li>`;
+            });
+            html += '</ul></div>';
+            
+            html += '<div class="protocol-item">';
+            html += '<h4>🔧 회복 도구</h4>';
+            html += '<ul class="protocol-list">';
+            protocol.tools.forEach(item => {
+                html += `<li>${item}</li>`;
+            });
+            html += '</ul></div>';
+            
+            container.innerHTML = html;
+        }
+
+        // 영양 타이밍 생성
+        function generateNutritionTiming(level, goal) {
+            const container = document.getElementById('nutritionTiming');
+            if (!container) return;
+            
+            const nutrition = {
+                preWorkout: {
+                    time: '훈련 30-60분 전',
+                    items: [
+                        '바나나 1개 또는 에너지바',
+                        '물 300-500ml',
+                        '카페인 100-200mg (선택)'
+                    ]
+                },
+                duringWorkout: {
+                    time: '훈련 중 (60분 이상)',
+                    items: [
+                        '전해질 음료 150-250ml/15분',
+                        '탄수화물 30-60g/시간',
+                        '소금 300-600mg/시간'
+                    ]
+                },
+                postWorkout: {
+                    time: '훈련 후 30분 이내',
+                    items: [
+                        '단백질 20-30g',
+                        '탄수화물 40-80g',
+                        '전해질 보충',
+                        '물 500-750ml'
+                    ]
+                },
+                daily: {
+                    time: '일일 섭취량',
+                    items: [
+                        '탄수화물: 5-7g/kg 체중',
+                        '단백질: 1.4-2.0g/kg 체중',
+                        '지방: 0.8-1.2g/kg 체중',
+                        '수분: 35ml/kg 체중'
+                    ]
+                }
+            };
+            
+            let html = '<table class="training-table">';
+            html += '<thead><tr><th>시기</th><th>영양 가이드</th></tr></thead>';
+            html += '<tbody>';
+            
+            Object.values(nutrition).forEach(timing => {
+                html += `<tr>
+                    <td><strong>${timing.time}</strong></td>
+                    <td>
+                        <ul style="margin: 0; padding-left: 20px;">`;
+                timing.items.forEach(item => {
+                    html += `<li>${item}</li>`;
+                });
+                html += `</ul>
+                    </td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // 심박수 구역 생성
+        function generateHeartRateZones(vdot) {
+            const container = document.getElementById('heartRateZones');
+            if (!container) return;
+            
+            // 간단한 추정 (실제로는 연령 및 최대심박수 기반으로 계산)
+            const estimatedMaxHR = 200; // 예시값
+            
+            const zones = [
+                { name: 'Zone 1 - 회복', range: '50-60% HRmax', bpm: `${Math.round(estimatedMaxHR * 0.5)}-${Math.round(estimatedMaxHR * 0.6)}`, purpose: '회복 및 기초 체력', className: 'zone1' },
+                { name: 'Zone 2 - 지구력', range: '60-70% HRmax', bpm: `${Math.round(estimatedMaxHR * 0.6)}-${Math.round(estimatedMaxHR * 0.7)}`, purpose: '유산소 기초 체력', className: 'zone2' },
+                { name: 'Zone 3 - 템포', range: '70-80% HRmax', bpm: `${Math.round(estimatedMaxHR * 0.7)}-${Math.round(estimatedMaxHR * 0.8)}`, purpose: '유산소 효율 향상', className: 'zone3' },
+                { name: 'Zone 4 - 역치', range: '80-90% HRmax', bpm: `${Math.round(estimatedMaxHR * 0.8)}-${Math.round(estimatedMaxHR * 0.9)}`, purpose: '젖산 역치 개선', className: 'zone4' },
+                { name: 'Zone 5 - 최대', range: '90-100% HRmax', bpm: `${Math.round(estimatedMaxHR * 0.9)}-${estimatedMaxHR}`, purpose: 'VO2max 향상', className: 'zone5' }
+            ];
+            
+            let html = '';
+            zones.forEach(zone => {
+                html += `<div class="hr-zone ${zone.className}">
+                    <div>
+                        <strong>${zone.name}</strong><br>
+                        <small>${zone.purpose}</small>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>${zone.bpm} bpm</strong><br>
+                        <small>${zone.range}</small>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
         // 초기화
         document.addEventListener('DOMContentLoaded', () => {
             // 애니메이션 트리거
@@ -887,5 +1335,11 @@
             });
         });
     </script>
+    
+    <!-- Navigation JavaScript -->
+    <script src="navigation.js"></script>
+    <script src="design-system.js"></script>
+    <script src="validation.js"></script>
+    <script src="data-manager.js"></script>
 </body>
 </html>
