@@ -1,9 +1,0 @@
-./chat.html
-./community-new/index.html
-./community/index.html
-./competitions-calendar.html
-./index.html
-./offline.html
-./pace-calculator.html
-./periodization-protocols.html
-./training-calculator.html
