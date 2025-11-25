@@ -1,78 +1,3 @@
-<<<<<<< HEAD
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ClockIcon, TrophyIcon } from '@heroicons/react/24/outline'
-import { useCreatePost } from '../hooks/usePosts'
-
-export default function WritePage() {
-  const navigate = useNavigate()
-  const createPost = useCreatePost()
-
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [category, setCategory] = useState('track-sprint')
-  const [eventType, setEventType] = useState('')
-  const [record, setRecord] = useState('')
-  const [recordDate, setRecordDate] = useState('')
-  const [isOfficial, setIsOfficial] = useState(false)
-  const [author, setAuthor] = useState('')
-  const [password, setPassword] = useState('')
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
-
-  const isSubmitting = createPost.isPending
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitError(null)
-    setSubmitSuccess(null)
-
-    if (!password.trim()) {
-      setSubmitError('삭제용 비밀번호를 입력해주세요.')
-      return
-    }
-
-    try {
-      await createPost.mutateAsync({
-        title: title.trim() || '제목 없음',
-        content: content.trim(),
-        author: author.trim() || '익명',
-        password: password.trim(),
-        category,
-      })
-
-      setSubmitSuccess('게시글이 등록됐어요! 잠시 후 메인으로 이동합니다.')
-      setTitle('')
-      setContent('')
-      setCategory('track-sprint')
-      setEventType('')
-      setRecord('')
-      setRecordDate('')
-      setIsOfficial(false)
-      setAuthor('')
-      setPassword('')
-
-      setTimeout(() => {
-        navigate('/')
-      }, 800)
-    } catch (error) {
-      console.error(error)
-      setSubmitError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
-    }
-  }
-
-  // 종목별 이벤트 목록
-  const eventsByCategory: { [key: string]: string[] } = {
-    'track-sprint': ['100m', '200m', '400m', '4x100m 릴레이'],
-    'track-middle': ['800m', '1500m', '3000m'],
-    'track-distance': ['5000m', '10000m', '3000m 장애물'],
-    'track-hurdles': ['110m 허들', '100m 허들', '400m 허들'],
-    'field-jumps': ['높이뛰기', '멀리뛰기', '세단뛰기', '장대높이뛰기'],
-    'field-throws': ['포환던지기', '원반던지기', '창던지기', '해머던지기'],
-    'running-marathon': ['풀코스', '하프', '10K', '5K'],
-  }
-
-=======
 /**
  * 게시글 작성 페이지 (v4.0.0 - Clean Architecture)
  * 
@@ -84,7 +9,7 @@ export default function WritePage() {
  */
 
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { useCreatePost, useCategories } from '../hooks/usePosts';
 import { getAnonymousId, getUsername, setUsername } from '../utils/anonymousUser';
@@ -225,7 +150,6 @@ export default function WritePage() {
   
   const isSubmitting = createPostMutation.isPending;
   
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
   return (
     <div className="min-h-screen bg-dark-800 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -272,53 +196,26 @@ export default function WritePage() {
                   disabled={isSubmitting}
                   required
                 >
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
-                    </option>
-                  ))}
+                  {categories.length > 0 ? (
+                    categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon} {cat.name}
+                      </option>
+                    ))
+                  ) : (
+                    <>
+                      <option value={1}>📢 공지</option>
+                      <option value={2}>💬 자유</option>
+                      <option value={3}>🏃 훈련</option>
+                      <option value={4}>🏆 대회</option>
+                      <option value={5}>👟 장비</option>
+                      <option value={6}>❓ 질문</option>
+                    </>
+                  )}
                 </select>
               </div>
-<<<<<<< HEAD
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                작성자 닉네임 (선택)
-              </label>
-              <input
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="닉네임을 입력하세요"
-                className="input-dark"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                삭제용 비밀번호 <span className="text-primary-400">*</span>
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="게시글 삭제 시 필요한 비밀번호"
-                className="input-dark"
-                required
-              />
-              <p className="mt-1 text-xs text-gray-500">※ 비밀번호는 잊지 않도록 주의해주세요.</p>
-            </div>
-          </div>
-
-          {/* 기록 입력 (육상/러닝 카테고리일 때만) */}
-          {(category.includes('track') || category.includes('field') || category.includes('running')) && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-=======
               
               {/* 작성자명 */}
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   작성자명 <span className="text-red-400">*</span>
@@ -422,44 +319,9 @@ export default function WritePage() {
               maxSizeKB={5120}
             />
           </div>
-<<<<<<< HEAD
-
-          {/* 옵션 설정 */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="allowComments"
-                defaultChecked
-                className="w-4 h-4 rounded text-primary-500 bg-dark-700 border-dark-500 focus:ring-primary-500"
-              />
-              <label htmlFor="allowComments" className="text-sm text-gray-300">
-                댓글 허용
-              </label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="shareRecord"
-                defaultChecked
-                className="w-4 h-4 rounded text-primary-500 bg-dark-700 border-dark-500 focus:ring-primary-500"
-              />
-              <label htmlFor="shareRecord" className="text-sm text-gray-300">
-                기록 공개 (랭킹 반영)
-              </label>
-            </div>
-          </div>
-
-          {submitError && <p className="text-sm text-red-400">{submitError}</p>}
-          {submitSuccess && <p className="text-sm text-green-400">{submitSuccess}</p>}
-
-          {/* 버튼 영역 */}
-          <div className="flex items-center justify-between pt-4">
-=======
           
           {/* 제출 버튼 */}
           <div className="flex items-center justify-between">
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
             <button
               type="button"
               onClick={handleCancel}
@@ -468,23 +330,6 @@ export default function WritePage() {
             >
               취소
             </button>
-<<<<<<< HEAD
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="btn-secondary"
-              >
-                임시저장
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? '작성 중...' : '게시글 작성'}
-              </button>
-            </div>
-=======
             
             <button
               type="submit"
@@ -503,7 +348,6 @@ export default function WritePage() {
                 </>
               )}
             </button>
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
           </div>
         </form>
         

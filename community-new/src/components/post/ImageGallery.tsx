@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { PostImage } from '../../types/post';
+import type { PostImage } from '../../types';
 
 interface ImageGalleryProps {
   images: PostImage[];

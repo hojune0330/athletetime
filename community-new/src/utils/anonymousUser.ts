@@ -5,7 +5,7 @@
  * 향후 회원 시스템으로 전환 시 기존 게시물/댓글을 연결할 수 있도록 함
  */
 
-import { STORAGE_KEYS } from '../types/post';
+import { STORAGE_KEYS } from '../types';
 
 /**
  * 익명 사용자 ID 생성

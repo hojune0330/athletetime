@@ -1,23 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PostList from '../components/post/PostList'
 import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
-<<<<<<< HEAD
-=======
 import { getAnonymousId } from '../utils/anonymousUser'
-import { showToast } from '../utils/toast'
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
-<<<<<<< HEAD
-
-  const { data: postsData = [], isLoading, isError, refetch } = usePosts()
-  const createPost = useCreatePost()
-
+  const limit = 20
+  
+  // 게시글 목록 조회 (count 포함)
+  const { data: postsData, isLoading, refetch } = usePosts({ page, limit })
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
@@ -31,33 +26,9 @@ export default function HomePage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
 
-  const filteredPosts = useMemo(
-    () => postsData.filter((post) => !post.isBlinded),
-    [postsData]
-  )
-
-  const sortedPosts = useMemo(() => {
-    const posts = [...filteredPosts]
-    if (sortBy === 'hot') {
-      return posts.sort((a, b) => {
-        const likeDiff = (b.likes?.length ?? 0) - (a.likes?.length ?? 0)
-        if (likeDiff !== 0) return likeDiff
-        const commentDiff = (b.comments?.length ?? 0) - (a.comments?.length ?? 0)
-        if (commentDiff !== 0) return commentDiff
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
-      })
-    }
-    if (sortBy === 'comment') {
-      return posts.sort((a, b) => {
-        const commentDiff = (b.comments?.length ?? 0) - (a.comments?.length ?? 0)
-        if (commentDiff !== 0) return commentDiff
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
-      })
-    }
-    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  }, [filteredPosts, sortBy])
-
-  const isSubmitting = createPost.isPending
+  // 게시글 작성 mutation
+  const createPostMutation = useCreatePost()
+  const isSubmitting = createPostMutation.isPending
 
   const handleToggleWriteForm = () => {
     setShowWriteForm((prev) => !prev)
@@ -81,61 +52,30 @@ export default function HomePage() {
     }
 
     try {
-      await createPost.mutateAsync({
-        title: newPost.title.trim() || '제목 없음',
-        content: newPost.content.trim(),
-        author: newPost.author.trim() || '익명',
-        password: newPost.password.trim(),
-        category: '익명',
+      await createPostMutation.mutateAsync({
+        data: {
+          title: newPost.title.trim() || '제목 없음',
+          content: newPost.content.trim(),
+          author: newPost.author.trim() || '익명',
+          password: newPost.password.trim(),
+          category: '자유',
+          anonymousId: getAnonymousId(),
+        },
+        images: [],
       })
 
       setFormSuccess('게시글이 등록됐어요!')
       setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false })
       setShowWriteForm(false)
-      await refetch()
-    } catch (error) {
+      refetch()
+    } catch (error: unknown) {
       console.error(error)
       setFormError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
-=======
-  const limit = 20
-  
-  // 게시글 목록 조회 (count 포함)
-  const { data: postsData } = usePosts({ page, limit })
-  const [showWriteForm, setShowWriteForm] = useState(false)
-  const [newPost, setNewPost] = useState({ title: '', content: '', hasImage: false, hasPoll: false })
-  const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
-
-  // 게시글 작성 mutation
-  const createPostMutation = useCreatePost()
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    try {
-      await createPostMutation.mutateAsync({
-        data: {
-          title: newPost.title || '무제',
-          content: newPost.content,
-          category: '자유',
-          author: '익명',
-          password: 'anonymous',
-          anonymousId: getAnonymousId(),
-        },
-        images: [],
-      })
-      
-      // 성공 시 폼 초기화
-      setNewPost({ title: '', content: '', hasImage: false, hasPoll: false });
-      setShowWriteForm(false);
-      
-      showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
-    } catch (error: any) {
-      console.error('게시글 작성 실패:', error);
-      const errorMsg = error?.response?.data?.error || '게시글 작성에 실패했습니다. 다시 시도해주세요.';
-      showToast(errorMsg, { type: 'error' });
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
     }
   }
+
+  // 총 페이지 수 계산
+  const totalPages = postsData?.count ? Math.ceil(postsData.count / limit) : 1
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4">
@@ -261,12 +201,6 @@ export default function HomePage() {
                 >
                   📊
                 </button>
-                <button
-                  type="button"
-                  className="p-2 rounded-lg bg-dark-600 text-gray-400 hover:text-white transition-colors"
-                >
-                  📷
-                </button>
               </div>
               
               <div className="flex gap-2">
@@ -341,29 +275,18 @@ export default function HomePage() {
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* 익명 게시글 목록 */}
-      <AnonymousPostList
-        sortBy={sortBy}
-        posts={sortedPosts}
-        isLoading={isLoading}
-        isError={isError}
-        onRetry={() => refetch()}
-      />
-=======
-      {/* 익명 게시글 목록 - 실제 API 연동 */}
-      <PostList />
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
+      {/* 게시글 목록 */}
+      <PostList posts={postsData?.posts} isLoading={isLoading} />
 
-      {/* 페이지네이션 - count 기반 */}
+      {/* 페이지네이션 */}
       <div className="mt-6">
         <Pagination 
           currentPage={page} 
-          totalPages={postsData ? Math.ceil(postsData.count / limit) : 1} 
+          totalPages={totalPages} 
         />
       </div>
       
-      {/* 모바일 하단 여백 (하단 네비 때문에) */}
+      {/* 모바일 하단 여백 */}
       <div className="h-20 md:hidden"></div>
     </div>
   )

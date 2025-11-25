@@ -1,101 +1,3 @@
-<<<<<<< HEAD
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  createComment,
-  createPost,
-  deletePost,
-  getPost,
-  getPosts,
-  votePost,
-  type CreateCommentPayload,
-  type CreatePostPayload,
-  type DeletePostPayload,
-  type ListPostsParams,
-  type VotePostPayload,
-} from '../api/posts'
-import type { Post } from '../types/post'
-
-export const postsQueryKeys = {
-  all: ['posts'] as const,
-  list: (params?: ListPostsParams) => ['posts', params ?? {}] as const,
-  detail: (id: number | string) => ['posts', 'detail', String(id)] as const,
-}
-
-export function usePosts(params?: ListPostsParams) {
-  return useQuery({
-    queryKey: postsQueryKeys.list(params),
-    queryFn: () => getPosts(params),
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-  })
-}
-
-export function usePost(id?: number | string) {
-  const queryClient = useQueryClient()
-  const queryKey = id ? postsQueryKeys.detail(id) : ['posts', 'detail', 'unknown'] as const
-
-  return useQuery({
-    queryKey,
-    enabled: Boolean(id),
-    queryFn: () => getPost(id!),
-    initialData: () => {
-      if (!id) return undefined
-      const existingLists = queryClient.getQueriesData<Post[]>({ queryKey: postsQueryKeys.all })
-      for (const [, data] of existingLists) {
-        const match = data?.find((post) => String(post.id) === String(id))
-        if (match) return match
-      }
-      return undefined
-    },
-  })
-}
-
-export function useCreatePost() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: CreatePostPayload) => createPost(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: postsQueryKeys.all })
-    },
-  })
-}
-
-export function useDeletePost() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: DeletePostPayload) => deletePost(payload),
-    onSuccess: (_result, variables) => {
-      queryClient.invalidateQueries({ queryKey: postsQueryKeys.all })
-      queryClient.removeQueries({ queryKey: postsQueryKeys.detail(variables.id) })
-    },
-  })
-}
-
-export function useVotePost() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: VotePostPayload) => votePost(payload),
-    onSuccess: (updatedPost) => {
-      queryClient.invalidateQueries({ queryKey: postsQueryKeys.all })
-      queryClient.setQueryData<Post>(postsQueryKeys.detail(updatedPost.id), updatedPost)
-    },
-  })
-}
-
-export function useCreateComment() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: (payload: CreateCommentPayload) => createComment(payload),
-    onSuccess: (_comment, variables) => {
-      queryClient.invalidateQueries({ queryKey: postsQueryKeys.detail(variables.postId) })
-      queryClient.invalidateQueries({ queryKey: postsQueryKeys.all })
-    },
-  })
-=======
 /**
  * React Query 훅 (v4.0.0)
  * 
@@ -135,12 +37,12 @@ export function usePosts(params?: api.GetPostsParams): UseQueryResult<PostsRespo
 // 게시글 상세
 // ============================================
 
-export function usePost(id: string | number): UseQueryResult<Post, Error> {
+export function usePost(id?: string | number): UseQueryResult<Post, Error> {
   return useQuery({
-    queryKey: queryKeys.post(id),
-    queryFn: () => api.getPost(id),
+    queryKey: queryKeys.post(id || ''),
+    queryFn: () => api.getPost(id!),
     enabled: !!id && !isNaN(Number(id)),
-    staleTime: 0, // 항상 최신 데이터 가져오기 (Priority 1 요구사항)
+    staleTime: 0, // 항상 최신 데이터 가져오기
     gcTime: 1000 * 60 * 10, // 10분
     refetchOnMount: 'always', // 마운트 시 항상 새로고침
   });
@@ -251,5 +153,4 @@ export function useVotePost(): UseMutationResult<Post, Error, VotePostMutationVa
       queryClient.invalidateQueries({ queryKey: queryKeys.posts });
     },
   });
->>>>>>> 81cc99afb4338017e546dcb5ed19ef6be0435e7a
 }
