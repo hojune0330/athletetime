@@ -5,14 +5,17 @@ import Pagination from '../components/common/Pagination'
 import { PlusIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function HomePage() {
   const [searchParams] = useSearchParams()
   const page = Number(searchParams.get('page')) || 1
   const limit = 20
   
+  const queryClient = useQueryClient()
+  
   // 게시글 목록 조회 (count 포함)
-  const { data: postsData, isLoading, refetch } = usePosts({ page, limit })
+  const { data: postsData } = usePosts({ page, limit })
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
@@ -67,7 +70,7 @@ export default function HomePage() {
       setFormSuccess('게시글이 등록됐어요!')
       setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false })
       setShowWriteForm(false)
-      refetch()
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
     } catch (error: unknown) {
       console.error(error)
       setFormError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
@@ -276,7 +279,7 @@ export default function HomePage() {
       </div>
 
       {/* 게시글 목록 */}
-      <PostList posts={postsData?.posts} isLoading={isLoading} />
+      <PostList />
 
       {/* 페이지네이션 */}
       <div className="mt-6">

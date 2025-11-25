@@ -5,7 +5,7 @@
  */
 
 import { useParams, useSearchParams } from 'react-router-dom';
-import PostListReal from '../components/post/PostListReal';
+import PostList from '../components/post/PostList';
 import Pagination from '../components/common/Pagination';
 import { usePosts } from '../hooks/usePosts';
 
@@ -52,7 +52,7 @@ export default function BoardPage() {
 
       {/* Post List */}
       <div className="bg-dark-700 rounded-lg">
-        <PostListReal />
+        <PostList category={category} />
       </div>
       
       {/* Pagination */}
