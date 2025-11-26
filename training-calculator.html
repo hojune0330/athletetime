@@ -2,9 +2,10 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>전문 훈련 페이스 계산기 | Athlete Time</title>
   <!-- Design System v2 -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="design-system-v2.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -70,6 +71,105 @@
     
     .pulse-on-hover:hover {
       animation: pulse 1s infinite;
+    }
+    
+    /* Mobile Responsive Enhancements */
+    @media (max-width: 767px) {
+      .max-w-7xl {
+        padding: 0.75rem !important;
+      }
+      
+      .gradient-bg {
+        padding: 1rem !important;
+      }
+      
+      .gradient-bg h1 {
+        font-size: 1.25rem !important;
+      }
+      
+      .gradient-bg p {
+        font-size: 0.875rem !important;
+      }
+      
+      .bg-white.rounded-xl.shadow-lg {
+        padding: 1rem !important;
+      }
+      
+      .text-2xl {
+        font-size: 1.25rem !important;
+      }
+      
+      .training-zone-easy,
+      .training-zone-marathon,
+      .training-zone-threshold,
+      .training-zone-interval,
+      .training-zone-repetition {
+        padding: 0.75rem !important;
+      }
+      
+      .training-zone-easy .flex,
+      .training-zone-marathon .flex,
+      .training-zone-threshold .flex,
+      .training-zone-interval .flex,
+      .training-zone-repetition .flex {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      
+      .training-zone-easy .text-2xl,
+      .training-zone-marathon .text-2xl,
+      .training-zone-threshold .text-2xl,
+      .training-zone-interval .text-2xl,
+      .training-zone-repetition .text-2xl {
+        font-size: 1.5rem !important;
+        margin-top: 0.5rem;
+      }
+      
+      /* Step numbers */
+      .w-10.h-10 {
+        width: 2rem !important;
+        height: 2rem !important;
+        font-size: 0.875rem !important;
+      }
+      
+      /* Button touch targets */
+      button, select, input {
+        min-height: 44px;
+      }
+      
+      /* Weekly plan grid */
+      #weeklyPlan.grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+      }
+      
+      /* Mesocycle grid */
+      #mesocyclePlan.grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+      }
+      
+      /* Workout details grid */
+      #workoutDetails.grid,
+      #recommendations.grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    
+    /* Touch-friendly improvements */
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5rem;
+      padding-right: 2.5rem;
     }
   </style>
 </head>

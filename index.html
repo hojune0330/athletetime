@@ -92,49 +92,7 @@
       background-clip: text;
     }
     
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--space-4);
-      margin-bottom: var(--space-10);
-    }
-    
-    @media (max-width: 767px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    .stat-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border-default);
-      border-radius: var(--radius-xl);
-      padding: var(--space-5);
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      transition: all var(--transition-slow);
-    }
-    
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--color-primary-200);
-    }
-    
-    .stat-number {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      font-family: var(--font-mono);
-      color: var(--color-primary-500);
-      margin-bottom: var(--space-1);
-    }
-    
-    .stat-label {
-      font-size: var(--text-xs);
-      color: var(--color-text-secondary);
-      font-weight: var(--font-medium);
-    }
+
     
     /* Features Grid */
     .features-grid {
@@ -632,7 +590,12 @@
         <span class="logo-text">ATHLETE TIME</span>
       </div>
       <h1 class="hero-title">육상인들의 새로운 시작</h1>
-      <p class="hero-subtitle">초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간</p>
+<p class="hero-subtitle">초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간</p>
+      
+      <!-- Quick Description -->
+      <p style="color: var(--color-text-tertiary); font-size: var(--text-sm); margin-bottom: var(--space-6); max-width: 500px; margin-left: auto; margin-right: auto;">
+        페이스 계산, 훈련 관리, 커뮤니티까지 - 육상인을 위한 올인원 플랫폼
+      </p>
       
       <!-- CTA Buttons -->
       <div class="cta-container">
@@ -647,25 +610,7 @@
       </div>
     </section>
     
-    <!-- Stats Section -->
-    <section class="stats-grid stagger-animation">
-      <div class="stat-card">
-        <div class="stat-number" id="userCount">1,234</div>
-        <div class="stat-label">활성 사용자</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="postCount">567</div>
-        <div class="stat-label">오늘의 게시글</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="matchCount">89</div>
-        <div class="stat-label">진행중 경기</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="recordCount">12</div>
-        <div class="stat-label">신기록 달성</div>
-      </div>
-    </section>
+
     
     <!-- Features Grid -->
     <section class="features-grid stagger-animation">
@@ -722,7 +667,7 @@
   <!-- Footer -->
   <footer class="main-footer">
     <div class="footer-content">
-      <p class="footer-text">© 2024 Athlete Time. 모든 육상인들을 위한 플랫폼</p>
+      <p class="footer-text">© 2025 Athlete Time. 모든 육상인들을 위한 플랫폼</p>
       <div class="footer-links">
         <a href="#" class="footer-link">이용약관</a>
         <a href="#" class="footer-link">개인정보처리방침</a>
@@ -764,10 +709,10 @@
           window.location.href = '/chat.html';
           break;
         case 'marketplace':
-          alert('중고 거래 기능은 준비 중입니다.');
+          showComingSoon('중고 거래');
           break;
         case 'results':
-          alert('경기 결과 기능은 준비 중입니다.');
+          showComingSoon('경기 결과');
           break;
         default:
           break;
@@ -794,39 +739,55 @@
       }
     }
     
-    // Animate numbers on page load
-    function animateNumber(elementId, endValue, duration = 1000) {
-      const element = document.getElementById(elementId);
-      if (!element) return;
-      
-      const startValue = 0;
-      const startTime = performance.now();
-      
-      function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
-        
-        const currentValue = Math.floor(startValue + (endValue - startValue) * easeProgress);
-        element.textContent = currentValue.toLocaleString();
-        
-        if (progress < 1) {
-          requestAnimationFrame(update);
-        }
-      }
-      
-      requestAnimationFrame(update);
+    // Coming Soon Modal
+    function showComingSoon(featureName) {
+      const modal = document.createElement('div');
+      modal.id = 'comingSoonModal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease;
+      `;
+      modal.innerHTML = `
+        <div style="
+          background: white;
+          border-radius: 16px;
+          padding: 32px;
+          max-width: 400px;
+          width: 90%;
+          text-align: center;
+          box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+          animation: fadeInUp 0.3s ease;
+        ">
+          <div style="font-size: 48px; margin-bottom: 16px;">🚧</div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #1f2937;">${featureName}</h3>
+          <p style="color: #64748b; margin-bottom: 24px;">이 기능은 현재 개발 중입니다.<br>곧 만나보실 수 있습니다!</p>
+          <button onclick="document.getElementById('comingSoonModal').remove()" style="
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+          ">확인</button>
+        </div>
+      `;
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+      };
+      document.body.appendChild(modal);
     }
     
-    // Initialize animations on load
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        animateNumber('userCount', 1234, 1200);
-        animateNumber('postCount', 567, 1000);
-        animateNumber('matchCount', 89, 800);
-        animateNumber('recordCount', 12, 600);
-      }, 500);
-    });
+
   </script>
   
   <!-- PWA Registration -->
