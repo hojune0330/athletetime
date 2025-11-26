@@ -2,192 +2,362 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================
+   Athlete Time Community - Design System v2
+   Light Mode Only - Hybrid Modern Theme
+   ============================================= */
+
 @layer base {
   :root {
-    /* Athlete Time 색상 변수 */
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #111111;
-    --bg-tertiary: #1a1a1a;
-    --bg-card: #242424;
-    --text-primary: #f3f4f6;
-    --text-secondary: #d1d5db;
-    --text-tertiary: #9ca3af;
-    --border-color: #2d2d2d;
-    --primary-blue: #3b82f6;
-    --primary-blue-light: #60a5fa;
-    --track-red: #ef4444;
-    --field-green: #10b981;
+    /* ─────────────────────────────────────────
+       Background Colors
+       ───────────────────────────────────────── */
+    --color-bg-primary: #f8fafc;
+    --color-bg-secondary: #ffffff;
+    --color-bg-card: #ffffff;
+    --color-bg-elevated: #ffffff;
+    --color-bg-overlay: rgba(0, 0, 0, 0.5);
+    
+    /* ─────────────────────────────────────────
+       Text Colors
+       ───────────────────────────────────────── */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
+    --color-text-inverse: #ffffff;
+    
+    /* ─────────────────────────────────────────
+       Border Colors
+       ───────────────────────────────────────── */
+    --color-border-default: #e2e8f0;
+    --color-border-strong: #cbd5e1;
+    --color-border-focus: #6366f1;
+    
+    /* ─────────────────────────────────────────
+       Primary: Indigo
+       ───────────────────────────────────────── */
+    --color-primary-50: #eef2ff;
+    --color-primary-100: #e0e7ff;
+    --color-primary-500: #6366f1;
+    --color-primary-600: #4f46e5;
+    --color-primary-700: #4338ca;
+    
+    /* ─────────────────────────────────────────
+       Accent: Orange
+       ───────────────────────────────────────── */
+    --color-accent-50: #fff7ed;
+    --color-accent-500: #f97316;
+    --color-accent-600: #ea580c;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
-    @apply antialiased bg-dark-800 text-gray-200;
-    font-feature-settings: "tnum" on; /* 숫자 정렬 개선 - 기록 표시에 유용 */
+    @apply antialiased bg-neutral-50 text-neutral-900;
+    font-feature-settings: "tnum" on;
   }
 
-  /* 애니메이션 */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Focus styles for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-500;
   }
 
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  /* 스크롤바 스타일링 */
+  /* 스크롤바 스타일링 (라이트 모드) */
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-dark-700;
+    @apply bg-neutral-100;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-600 rounded;
+    @apply bg-neutral-300 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary-500;
+    @apply bg-neutral-400;
   }
 }
 
 @layer components {
-  /* Athlete Time 버튼 스타일 */
-  .btn-at {
+  /* =============================================
+     Button Styles
+     ============================================= */
+  .btn {
     @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+    min-height: 44px; /* Touch target */
   }
 
   .btn-primary {
-    @apply btn-at bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-lg hover:shadow-glow-blue;
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+    @apply shadow-sm hover:shadow-md;
   }
 
   .btn-secondary {
-    @apply btn-at bg-dark-600 text-gray-300 hover:bg-dark-500 hover:text-white border border-dark-400;
+    @apply btn bg-neutral-100 text-neutral-700 hover:bg-neutral-200 border border-neutral-200;
   }
 
   .btn-ghost {
-    @apply btn-at text-gray-400 hover:text-primary-400 hover:bg-dark-600;
+    @apply btn text-neutral-600 hover:text-primary-600 hover:bg-primary-50;
   }
 
-  .btn-track {
-    @apply btn-at bg-track-red text-white hover:bg-red-600;
+  .btn-accent {
+    @apply btn bg-accent-500 text-white hover:bg-accent-600;
   }
 
-  /* 카드 스타일 */
-  .card-dark {
-    @apply bg-dark-600 border border-dark-500 rounded-lg overflow-hidden;
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600;
   }
 
-  .card-event {
-    @apply card-dark hover:border-primary-500 transition-all duration-200;
+  /* =============================================
+     Card Styles
+     ============================================= */
+  .card {
+    @apply bg-white border border-neutral-200 rounded-xl overflow-hidden;
+    @apply shadow-card transition-all duration-200;
   }
 
-  /* 입력 필드 */
-  .input-dark {
-    @apply w-full px-3 py-2 bg-dark-700 border border-dark-500 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500;
+  .card-hover {
+    @apply card hover:shadow-card-hover hover:border-primary-200;
   }
 
-  /* 배지 스타일 */
+  .card-header {
+    @apply px-5 py-4 border-b border-neutral-100;
+  }
+
+  .card-body {
+    @apply p-5;
+  }
+
+  .card-footer {
+    @apply px-5 py-3 bg-neutral-50 border-t border-neutral-100;
+  }
+
+  /* =============================================
+     Input Styles
+     ============================================= */
+  .input {
+    @apply w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg;
+    @apply text-neutral-900 placeholder-neutral-400;
+    @apply focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100;
+    @apply transition-all duration-200;
+    min-height: 44px;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:border-danger-500 focus:ring-danger-100;
+  }
+
+  .textarea {
+    @apply input resize-none;
+  }
+
+  .select {
+    @apply input appearance-none cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+  }
+
+  /* =============================================
+     Badge Styles
+     ============================================= */
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
   }
 
   .badge-new {
-    @apply badge bg-track-orange text-white;
+    @apply badge bg-info-100 text-info-600;
   }
 
   .badge-hot {
-    @apply badge bg-track-red text-white;
+    @apply badge bg-danger-100 text-danger-600;
   }
 
   .badge-live {
-    @apply badge bg-track-green text-white animate-pulse;
+    @apply badge bg-success-100 text-success-600 animate-pulse;
   }
 
-  .badge-event {
-    @apply badge bg-primary-600 text-white;
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-600;
   }
 
-  .badge-gold {
-    @apply badge bg-track-yellow text-black;
+  .badge-accent {
+    @apply badge bg-accent-100 text-accent-600;
   }
 
-  .badge-silver {
-    @apply badge bg-track-silver text-white;
-  }
-
-  .badge-bronze {
-    @apply badge bg-track-bronze text-white;
-  }
-
-  /* 종목별 배지 */
-  .badge-sprint {
-    @apply badge bg-event-sprint text-white;
-  }
-
-  .badge-distance {
-    @apply badge bg-event-distance text-white;
-  }
-
-  .badge-field {
-    @apply badge bg-event-field text-white;
-  }
-
-  /* 사이드바 메뉴 아이템 */
+  /* =============================================
+     Sidebar Styles
+     ============================================= */
   .sidebar-item {
-    @apply flex items-center justify-between py-2 px-3 text-sm rounded-md transition-colors duration-150;
+    @apply flex items-center gap-3 py-2.5 px-3 text-sm rounded-lg transition-all duration-150;
   }
 
   .sidebar-item-active {
-    @apply bg-primary-900 bg-opacity-20 text-primary-400 border-l-2 border-primary-500;
+    @apply bg-primary-50 text-primary-600 font-medium;
+    @apply border-l-4 border-primary-500 -ml-[1px] pl-[calc(0.75rem-3px)];
   }
 
   .sidebar-item-inactive {
-    @apply text-gray-400 hover:bg-dark-600 hover:text-primary-300;
+    @apply text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900;
   }
 
-  /* 게시글 아이템 */
+  /* =============================================
+     Post Item Styles
+     ============================================= */
   .post-item {
-    @apply flex gap-3 p-3 border-b border-dark-500 hover:bg-dark-700 transition-colors cursor-pointer;
+    @apply flex gap-4 p-4 border-b border-neutral-100;
+    @apply hover:bg-primary-50/50 transition-colors duration-200 cursor-pointer;
   }
 
-  /* 페이지네이션 */
+  .post-item:last-child {
+    @apply border-b-0;
+  }
+
+  .post-item-hover {
+    @apply post-item hover:border-l-4 hover:border-l-primary-500 hover:pl-3;
+  }
+
+  /* =============================================
+     Pagination Styles
+     ============================================= */
   .pagination-btn {
-    @apply px-3 py-1 text-sm rounded transition-colors;
+    @apply px-3 py-2 text-sm rounded-lg transition-colors;
+    min-height: 40px;
   }
 
   .pagination-btn-active {
-    @apply bg-primary-500 text-white;
+    @apply bg-primary-500 text-white font-medium;
   }
 
   .pagination-btn-inactive {
-    @apply text-gray-400 hover:bg-dark-600 hover:text-primary-300;
+    @apply text-neutral-600 hover:bg-neutral-100;
   }
 
-  /* 육상 트랙 스타일 */
-  .track-lane {
-    @apply border-l-4 pl-4;
+  /* =============================================
+     Header Styles
+     ============================================= */
+  .header-gradient {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
   }
 
-  .track-lane-1 { @apply border-l-track-red; }
-  .track-lane-2 { @apply border-l-track-blue; }
-  .track-lane-3 { @apply border-l-track-green; }
-  .track-lane-4 { @apply border-l-track-orange; }
-
-  /* 기록 표시 스타일 */
-  .time-display {
-    @apply font-mono text-lg text-primary-400 font-semibold;
+  /* =============================================
+     Tab Styles
+     ============================================= */
+  .tab-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+    min-height: 40px;
   }
 
-  .rank-display {
-    @apply inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-600 text-white font-bold text-sm;
+  .tab-btn-active {
+    @apply bg-primary-500 text-white shadow-sm;
+  }
+
+  .tab-btn-inactive {
+    @apply bg-neutral-100 text-neutral-600 hover:bg-neutral-200;
+  }
+
+  /* =============================================
+     Sort Button Styles (Pills)
+     ============================================= */
+  .sort-pill {
+    @apply px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200;
+    min-height: 32px;
+  }
+
+  .sort-pill-active {
+    @apply bg-primary-500 text-white;
+  }
+
+  .sort-pill-inactive {
+    @apply bg-neutral-100 text-neutral-600 hover:bg-neutral-200;
+  }
+
+  /* =============================================
+     Mobile Menu Styles
+     ============================================= */
+  .mobile-menu-overlay {
+    @apply fixed inset-0 bg-black/50 z-40;
+    @apply opacity-0 invisible transition-all duration-300;
+  }
+
+  .mobile-menu-overlay.active {
+    @apply opacity-100 visible;
+  }
+
+  .mobile-drawer {
+    @apply fixed top-0 right-0 bottom-0 w-72 bg-white z-50;
+    @apply transform translate-x-full transition-transform duration-300 ease-out;
+    @apply shadow-xl;
+  }
+
+  .mobile-drawer.active {
+    @apply translate-x-0;
+  }
+
+  /* =============================================
+     Animation Utilities
+     ============================================= */
+  .animate-stagger > * {
+    @apply animate-fadeInUp;
+  }
+  
+  .animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+  .animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+  .animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+  .animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+
+  /* =============================================
+     Skeleton Loading
+     ============================================= */
+  .skeleton {
+    @apply bg-neutral-200 rounded animate-pulse;
+  }
+
+  /* =============================================
+     Empty State
+     ============================================= */
+  .empty-state {
+    @apply text-center py-16 px-4;
+  }
+
+  .empty-state-icon {
+    @apply text-6xl mb-4;
+  }
+
+  .empty-state-title {
+    @apply text-xl font-bold text-neutral-800 mb-2;
+  }
+
+  .empty-state-description {
+    @apply text-neutral-500 mb-6;
+  }
+}
+
+/* =============================================
+   Utility Classes
+   ============================================= */
+@layer utilities {
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
   }
 }

@@ -1,11 +1,12 @@
 /**
- * 게시글 작성 페이지 (v4.0.0 - Clean Architecture)
+ * 게시글 작성 페이지 (v4.1.0 - Light Mode Design System v2)
  * 
  * 핵심 개선:
  * - 깔끔한 코드 구조
  * - 컴포넌트 분리
  * - 유효성 검사 강화
  * - UX 향상
+ * - 라이트 모드 디자인
  */
 
 import { useState, useEffect } from 'react';
@@ -151,20 +152,20 @@ export default function WritePage() {
   const isSubmitting = createPostMutation.isPending;
   
   return (
-    <div className="min-h-screen bg-dark-800 py-8 px-4">
+    <div className="min-h-screen bg-neutral-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={handleCancel}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
             disabled={isSubmitting}
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>돌아가기</span>
+            <span className="text-sm font-medium">돌아가기</span>
           </button>
           
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-neutral-900">
             게시글 작성
           </h1>
           
@@ -173,159 +174,167 @@ export default function WritePage() {
         
         {/* 에러 메시지 */}
         {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-red-200 text-sm">{error}</p>
+          <div className="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-xl flex items-start gap-3 animate-fadeIn">
+            <AlertCircle className="w-5 h-5 text-danger-500 flex-shrink-0 mt-0.5" />
+            <p className="text-danger-700 text-sm">{error}</p>
           </div>
         )}
         
         {/* 작성 폼 */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 카테고리 & 작성자 정보 */}
-          <div className="bg-dark-700 rounded-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* 카테고리 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  게시판 <span className="text-red-400">*</span>
-                </label>
-                <select
-                  value={formData.categoryId}
-                  onChange={(e) => handleChange('categoryId', Number(e.target.value))}
-                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white focus:outline-none focus:border-primary-500"
-                  disabled={isSubmitting}
-                  required
-                >
-                  {categories.length > 0 ? (
-                    categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.name}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value={1}>📢 공지</option>
-                      <option value={2}>💬 자유</option>
-                      <option value={3}>🏃 훈련</option>
-                      <option value={4}>🏆 대회</option>
-                      <option value={5}>👟 장비</option>
-                      <option value={6}>❓ 질문</option>
-                    </>
-                  )}
-                </select>
+          <div className="card">
+            <div className="card-body">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 카테고리 */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    게시판 <span className="text-danger-500">*</span>
+                  </label>
+                  <select
+                    value={formData.categoryId}
+                    onChange={(e) => handleChange('categoryId', Number(e.target.value))}
+                    className="select"
+                    disabled={isSubmitting}
+                    required
+                  >
+                    {categories.length > 0 ? (
+                      categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.icon} {cat.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value={1}>📢 공지</option>
+                        <option value={2}>💬 자유</option>
+                        <option value={3}>🏃 훈련</option>
+                        <option value={4}>🏆 대회</option>
+                        <option value={5}>👟 장비</option>
+                        <option value={6}>❓ 질문</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+                
+                {/* 작성자명 */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    작성자명 <span className="text-danger-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.author}
+                    onChange={(e) => handleChange('author', e.target.value)}
+                    placeholder="닉네임"
+                    maxLength={50}
+                    className="input"
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+                
+                {/* 비밀번호 */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    비밀번호 <span className="text-danger-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
+                    placeholder="4자 이상"
+                    minLength={4}
+                    className="input"
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
               </div>
               
-              {/* 작성자명 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  작성자명 <span className="text-red-400">*</span>
+              {/* Instagram (선택) */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Instagram <span className="text-neutral-400">(선택)</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.author}
-                  onChange={(e) => handleChange('author', e.target.value)}
-                  placeholder="닉네임"
-                  maxLength={50}
-                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
+                  value={formData.instagram}
+                  onChange={(e) => handleChange('instagram', e.target.value)}
+                  placeholder="@username"
+                  className="input"
                   disabled={isSubmitting}
-                  required
                 />
               </div>
-              
-              {/* 비밀번호 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  비밀번호 <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleChange('password', e.target.value)}
-                  placeholder="4자 이상"
-                  minLength={4}
-                  className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
-            </div>
-            
-            {/* Instagram (선택) */}
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Instagram (선택)
-              </label>
-              <input
-                type="text"
-                value={formData.instagram}
-                onChange={(e) => handleChange('instagram', e.target.value)}
-                placeholder="@username"
-                className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500"
-                disabled={isSubmitting}
-              />
             </div>
           </div>
           
           {/* 제목 */}
-          <div className="bg-dark-700 rounded-lg p-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              제목 <span className="text-red-400">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange('title', e.target.value)}
-              placeholder="제목을 입력하세요 (최대 200자)"
-              maxLength={200}
-              className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-lg"
-              disabled={isSubmitting}
-              required
-            />
-            <p className="mt-2 text-xs text-gray-500 text-right">
-              {formData.title.length} / 200
-            </p>
+          <div className="card">
+            <div className="card-body">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                제목 <span className="text-danger-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleChange('title', e.target.value)}
+                placeholder="제목을 입력하세요 (최대 200자)"
+                maxLength={200}
+                className="input text-lg"
+                disabled={isSubmitting}
+                required
+              />
+              <p className="mt-2 text-xs text-neutral-400 text-right">
+                {formData.title.length} / 200
+              </p>
+            </div>
           </div>
           
           {/* 내용 */}
-          <div className="bg-dark-700 rounded-lg p-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              내용 <span className="text-red-400">*</span>
-            </label>
-            <textarea
-              value={formData.content}
-              onChange={(e) => handleChange('content', e.target.value)}
-              placeholder="내용을 입력하세요 (최대 10000자)"
-              maxLength={10000}
-              rows={15}
-              className="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-lg text-white placeholder-gray-500 resize-none focus:outline-none focus:border-primary-500"
-              disabled={isSubmitting}
-              required
-            />
-            <p className="mt-2 text-xs text-gray-500 text-right">
-              {formData.content.length} / 10000
-            </p>
+          <div className="card">
+            <div className="card-body">
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                내용 <span className="text-danger-500">*</span>
+              </label>
+              <textarea
+                value={formData.content}
+                onChange={(e) => handleChange('content', e.target.value)}
+                placeholder="내용을 입력하세요 (최대 10000자)"
+                maxLength={10000}
+                rows={15}
+                className="textarea"
+                disabled={isSubmitting}
+                required
+              />
+              <p className="mt-2 text-xs text-neutral-400 text-right">
+                {formData.content.length} / 10000
+              </p>
+            </div>
           </div>
           
           {/* 이미지 업로드 */}
-          <div className="bg-dark-700 rounded-lg p-6">
-            <label className="block text-sm font-medium text-gray-300 mb-4 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5" />
-              <span>이미지 첨부 (최대 5개)</span>
-            </label>
-            <ImageUploader
-              images={images}
-              onImagesChange={setImages}
-              maxImages={5}
-              maxSizeKB={5120}
-            />
+          <div className="card">
+            <div className="card-body">
+              <label className="block text-sm font-medium text-neutral-700 mb-4 flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-primary-500" />
+                <span>이미지 첨부 <span className="text-neutral-400">(최대 5개)</span></span>
+              </label>
+              <ImageUploader
+                images={images}
+                onImagesChange={setImages}
+                maxImages={5}
+                maxSizeKB={5120}
+              />
+            </div>
           </div>
           
           {/* 제출 버튼 */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-3 bg-dark-600 text-gray-300 rounded-lg hover:bg-dark-500 transition-colors font-medium"
+              className="btn-secondary w-full sm:w-auto"
               disabled={isSubmitting}
             >
               취소
@@ -334,7 +343,7 @@ export default function WritePage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center gap-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <>
@@ -352,29 +361,31 @@ export default function WritePage() {
         </form>
         
         {/* 작성 가이드 */}
-        <div className="mt-8 bg-dark-700 rounded-lg p-6">
-          <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-primary-400" />
-            작성 가이드
-          </h3>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li className="flex items-start gap-2">
-              <span className="text-primary-400">•</span>
-              <span>이미지는 Cloudinary CDN에 업로드되어 빠르고 안정적으로 제공됩니다.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary-400">•</span>
-              <span>작성자명과 비밀번호는 게시글 수정/삭제 시 필요합니다.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary-400">•</span>
-              <span>욕설, 비방, 허위사실 유포 등은 제재 대상이 될 수 있습니다.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary-400">•</span>
-              <span>서로 격려하고 응원하는 건전한 커뮤니티 문화를 만들어주세요.</span>
-            </li>
-          </ul>
+        <div className="mt-8 card">
+          <div className="card-body">
+            <h3 className="text-sm font-bold text-neutral-900 mb-3 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-primary-500" />
+              작성 가이드
+            </h3>
+            <ul className="space-y-2 text-sm text-neutral-600">
+              <li className="flex items-start gap-2">
+                <span className="text-primary-500">•</span>
+                <span>이미지는 Cloudinary CDN에 업로드되어 빠르고 안정적으로 제공됩니다.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary-500">•</span>
+                <span>작성자명과 비밀번호는 게시글 수정/삭제 시 필요합니다.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary-500">•</span>
+                <span>욕설, 비방, 허위사실 유포 등은 제재 대상이 될 수 있습니다.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary-500">•</span>
+                <span>서로 격려하고 응원하는 건전한 커뮤니티 문화를 만들어주세요.</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

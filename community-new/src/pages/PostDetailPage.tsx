@@ -1,5 +1,5 @@
 /**
- * 게시글 상세 페이지 (v4.0.0)
+ * 게시글 상세 페이지 (v4.1.0 - Light Mode Design System v2)
  */
 
 import { useState } from 'react';
@@ -61,44 +61,44 @@ function PostHeader({
   commentsCount
 }: PostHeaderProps) {
   return (
-    <div className="p-6 border-b border-dark-600">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="p-6 border-b border-neutral-100">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span 
-          className="px-3 py-1 text-sm font-medium bg-dark-700 rounded-full flex items-center gap-1"
+          className="badge bg-neutral-100"
           style={{ color: categoryColor }}
         >
           <span>{categoryIcon}</span>
-          <span>{categoryName}</span>
+          <span className="ml-1">{categoryName}</span>
         </span>
         {isNotice && (
-          <span className="text-yellow-500 text-sm">📌 공지</span>
+          <span className="badge bg-warning-100 text-warning-600">📌 공지</span>
         )}
-        <span className="text-gray-500 text-xs">·</span>
-        <span className="text-xs text-gray-400">{formatDate(createdAt)}</span>
+        <span className="text-neutral-300">·</span>
+        <span className="text-xs text-neutral-500">{formatDate(createdAt)}</span>
       </div>
       
-      <h1 className="text-2xl font-bold text-white mb-4">{title}</h1>
+      <h1 className="text-2xl font-bold text-neutral-900 mb-4">{title}</h1>
       
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold shadow-sm">
             {author[0]}
           </div>
-          <span className="text-sm font-medium text-white">{author}</span>
+          <span className="text-sm font-medium text-neutral-900">{author}</span>
         </div>
         
-        <div className="flex items-center gap-4 text-xs text-gray-400">
+        <div className="flex items-center gap-4 text-xs text-neutral-500">
           <span className="flex items-center gap-1">
             <EyeIcon className="w-4 h-4" />
-            {views}
+            <span>{views}</span>
           </span>
-          <span className="flex items-center gap-1 text-primary-400">
+          <span className="flex items-center gap-1 text-primary-600">
             <HandThumbUpIcon className="w-4 h-4" />
-            {likesCount}
+            <span>{likesCount}</span>
           </span>
           <span className="flex items-center gap-1">
             <ChatBubbleLeftIcon className="w-4 h-4" />
-            {commentsCount}
+            <span>{commentsCount}</span>
           </span>
         </div>
       </div>
@@ -122,15 +122,15 @@ function PostContent({ content, images }: PostContentProps) {
               key={index}
               src={img.cloudinary_url}
               alt={`이미지 ${index + 1}`}
-              className="w-full rounded-lg"
+              className="w-full rounded-xl shadow-soft"
               loading="lazy"
             />
           ))}
         </div>
       )}
       
-      <div className="prose prose-invert max-w-none">
-        <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+      <div className="prose prose-neutral max-w-none">
+        <p className="text-neutral-700 leading-relaxed whitespace-pre-wrap">
           {content}
         </p>
       </div>
@@ -170,43 +170,43 @@ function PostActions({
   };
   
   return (
-    <div className="p-6 border-t border-dark-600">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="p-6 border-t border-neutral-100 bg-neutral-50">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <button 
             onClick={() => onVote('like')}
             disabled={isVoting}
-            className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-dark-600 text-gray-300 hover:bg-primary-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-secondary hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200"
           >
             <HandThumbUpIcon className="w-5 h-5" />
             <span>추천</span>
-            <span className="font-bold">{likesCount}</span>
+            <span className="font-bold text-primary-600">{likesCount}</span>
           </button>
           
           <button 
             onClick={() => onVote('dislike')}
             disabled={isVoting}
-            className="px-5 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2 bg-dark-600 text-gray-300 hover:bg-red-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-secondary hover:bg-danger-50 hover:text-danger-600 hover:border-danger-200"
           >
             <HandThumbDownIcon className="w-5 h-5" />
             <span>비추천</span>
             {dislikesCount > 0 && (
-              <span className="font-bold">{dislikesCount}</span>
+              <span className="font-bold text-danger-500">{dislikesCount}</span>
             )}
           </button>
           
           <button 
             onClick={handleShare}
-            className="px-4 py-2.5 rounded-lg bg-dark-600 text-gray-300 hover:bg-dark-500 font-medium text-sm transition-colors flex items-center gap-2"
+            className="btn-secondary hover:bg-neutral-100"
           >
             <ShareIcon className="w-5 h-5" />
-            <span>공유</span>
+            <span className="hidden sm:inline">공유</span>
           </button>
         </div>
         
         <button 
           onClick={onDelete}
-          className="px-4 py-2.5 rounded-lg bg-dark-600 text-red-400 hover:bg-dark-500 font-medium text-sm flex items-center gap-2"
+          className="btn-ghost text-danger-500 hover:bg-danger-50"
         >
           <TrashIcon className="w-5 h-5" />
           <span>삭제</span>
@@ -241,66 +241,78 @@ function CommentSection({ comments, commentsCount, onSubmit, isSubmitting }: Com
   };
   
   return (
-    <section className="bg-dark-700 rounded-lg p-6">
-      <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-        <ChatBubbleLeftIcon className="w-5 h-5" />
-        <span>댓글</span>
-        <span className="text-primary-400">{commentsCount}</span>
-      </h2>
+    <section className="card">
+      <div className="card-header">
+        <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+          <ChatBubbleLeftIcon className="w-5 h-5 text-primary-500" />
+          <span>댓글</span>
+          <span className="text-primary-600">{commentsCount}</span>
+        </h2>
+      </div>
       
-      <form onSubmit={handleSubmit} className="mb-6">
-        <div className="mb-2">
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="닉네임 (선택)"
-            className="w-full px-4 py-2 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 text-sm"
+      <div className="card-body">
+        <form onSubmit={handleSubmit} className="mb-6">
+          <div className="mb-3">
+            <input
+              type="text"
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
+              placeholder="닉네임 (선택)"
+              className="input text-sm"
+              disabled={isSubmitting}
+            />
+          </div>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="댓글을 입력하세요..."
+            className="textarea"
+            rows={4}
             disabled={isSubmitting}
           />
-        </div>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="댓글을 입력하세요..."
-          className="w-full p-4 rounded-lg bg-dark-800 border border-dark-600 text-white placeholder-gray-500 resize-none focus:outline-none focus:border-primary-500"
-          rows={4}
-          disabled={isSubmitting}
-        />
-        <div className="flex justify-end mt-2">
-          <button 
-            type="submit"
-            disabled={isSubmitting}
-            className="px-6 py-2 rounded-lg bg-primary-600 text-white font-medium text-sm hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? '작성 중...' : '댓글 작성'}
-          </button>
-        </div>
-      </form>
-      
-      <div className="space-y-4">
-        {comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <p>첫 번째 댓글을 작성해보세요!</p>
+          <div className="flex justify-end mt-3">
+            <button 
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>작성 중...</span>
+                </>
+              ) : (
+                '댓글 작성'
+              )}
+            </button>
           </div>
-        ) : (
-          comments.map((comment) => (
-            <div key={comment.id} className="border-b border-dark-600 last:border-0 pb-4 last:pb-0">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold shrink-0">
-                  {comment.author[0]}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-white text-sm">{comment.author}</span>
-                    <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
+        </form>
+        
+        <div className="space-y-4">
+          {comments.length === 0 ? (
+            <div className="empty-state py-8">
+              <div className="empty-state-icon">💬</div>
+              <p className="text-neutral-500">첫 번째 댓글을 작성해보세요!</p>
+            </div>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment.id} className="border-b border-neutral-100 last:border-0 pb-4 last:pb-0 animate-fadeIn">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-info-500 to-primary-500 flex items-center justify-center text-white font-bold shrink-0 shadow-sm">
+                    {comment.author[0]}
                   </div>
-                  <p className="text-gray-300 text-sm whitespace-pre-wrap">{comment.content}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-medium text-neutral-900 text-sm">{comment.author}</span>
+                      <span className="text-xs text-neutral-400">{formatDate(comment.created_at)}</span>
+                    </div>
+                    <p className="text-neutral-700 text-sm whitespace-pre-wrap break-words">{comment.content}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
     </section>
   );
@@ -327,40 +339,49 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
   };
   
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-700 rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-xl font-bold text-white mb-4">게시글 삭제</h3>
-        <p className="text-gray-400 mb-4">
-          게시글을 삭제하려면 비밀번호를 입력하세요.
-        </p>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="비밀번호"
-            className="w-full px-4 py-2 bg-dark-600 border border-dark-500 rounded-lg text-white mb-4 focus:outline-none focus:border-primary-500"
-            disabled={isDeleting}
-            autoFocus
-          />
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 bg-dark-600 text-white rounded-lg hover:bg-dark-500"
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+      <div className="card max-w-md w-full animate-fadeInUp">
+        <div className="card-body p-6">
+          <h3 className="text-xl font-bold text-neutral-900 mb-2">게시글 삭제</h3>
+          <p className="text-neutral-500 mb-4 text-sm">
+            게시글을 삭제하려면 비밀번호를 입력하세요.
+          </p>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="input mb-4"
               disabled={isDeleting}
-            >
-              취소
-            </button>
-            <button
-              type="submit"
-              disabled={isDeleting || !password.trim()}
-              className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isDeleting ? '삭제 중...' : '삭제'}
-            </button>
-          </div>
-        </form>
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn-secondary flex-1"
+                disabled={isDeleting}
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                disabled={isDeleting || !password.trim()}
+                className="btn-danger flex-1"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>삭제 중...</span>
+                  </>
+                ) : (
+                  '삭제'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -433,15 +454,13 @@ export default function PostDetailPage() {
   // 에러 상태
   if (isError || !post) {
     return (
-      <div className="text-center py-12 px-4">
-        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-bold text-gray-200 mb-2">
-          게시글을 찾을 수 없습니다
-        </h3>
-        <p className="text-gray-400 mb-4">
+      <div className="empty-state py-16">
+        <div className="empty-state-icon">⚠️</div>
+        <h3 className="empty-state-title">게시글을 찾을 수 없습니다</h3>
+        <p className="empty-state-description">
           {error instanceof Error ? error.message : '게시글이 삭제되었거나 존재하지 않습니다.'}
         </p>
-        <Link to="/" className="text-primary-400 hover:underline">
+        <Link to="/" className="btn-primary">
           목록으로 돌아가기
         </Link>
       </div>
@@ -449,18 +468,18 @@ export default function PostDetailPage() {
   }
   
   return (
-    <div className="max-w-4xl mx-auto space-y-4 px-4">
+    <div className="max-w-4xl mx-auto space-y-4 px-4 py-6 animate-fadeIn">
       {/* 뒤로가기 버튼 */}
       <Link 
         to="/"
-        className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
+        className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
       >
         <ArrowLeftIcon className="w-5 h-5" />
-        <span>목록으로</span>
+        <span className="font-medium">목록으로</span>
       </Link>
       
       {/* 게시글 본문 */}
-      <article className="bg-dark-700 rounded-lg overflow-hidden">
+      <article className="card overflow-hidden">
         <PostHeader
           title={post.title}
           author={post.author}

@@ -13,8 +13,8 @@ import { useEffect } from 'react'
 
 function App() {
   useEffect(() => {
-    // 다크모드를 기본으로 설정
-    document.documentElement.classList.add('dark')
+    // 라이트모드 전용 - 다크모드 클래스 제거
+    document.documentElement.classList.remove('dark')
     
     // 에러 처리
     window.addEventListener('error', (event) => {
@@ -31,7 +31,7 @@ function App() {
   const basename = '/'
 
   return (
-    <div className="min-h-screen bg-dark-800">
+    <div className="min-h-screen bg-neutral-50">
       <Router basename={basename}>
         <AuthProvider>
           <Routes>
