@@ -7,157 +7,168 @@
   
   <!-- PWA 메타 태그 -->
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#00ffa3">
+  <meta name="theme-color" content="#6366f1">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="애슬리트 타임">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
   
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Design System v2 -->
+  <link rel="stylesheet" href="design-system-v2.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    /* =============================================
+       Athlete Time - Main Page Styles (Light Mode)
+       Based on Design System v2 & Option D: Hybrid Modern
+       ============================================= */
     
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
-      background: #0f172a;
-      color: #fff;
-      overflow-x: hidden;
-    }
-    
-    /* 헤더 스타일 */
-    .header {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      padding: 16px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      border-bottom: 1px solid #334155;
-      backdrop-filter: blur(10px);
-      background: rgba(15, 23, 42, 0.95);
-    }
-    
-    .header-content {
-      max-width: 768px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .logo::before {
-      content: '🏃‍♂️';
-      font-size: 1.8rem;
-    }
-    
-    .nav-menu {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    
-    .nav-item {
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #94a3b8;
-      text-decoration: none;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-      background: none;
-    }
-    
-    .nav-item:hover {
-      color: #e2e8f0;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .nav-item.active {
-      color: #3b82f6;
-      background: rgba(59, 130, 246, 0.1);
-    }
-    
-    .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: #94a3b8;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    /* 메인 컨테이너 */
-    .main-container {
-      max-width: 768px;
-      margin: 0 auto;
-      padding: 24px 20px;
-      min-height: calc(100vh - 80px);
-    }
-    
-    /* 히어로 섹션 */
+    /* Hero Section */
     .hero {
       text-align: center;
-      margin-bottom: 48px;
-      padding: 32px 0;
+      padding: var(--space-10) 0;
+      position: relative;
+      overflow: hidden;
     }
     
-    .hero h1 {
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at center, var(--color-primary-50) 0%, transparent 60%);
+      z-index: -1;
+      animation: heroGlow 8s ease-in-out infinite;
+    }
+    
+    @keyframes heroGlow {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(10%, 5%) scale(1.1); }
+    }
+    
+    .hero-title {
+      font-size: var(--text-4xl);
+      font-weight: var(--font-extrabold);
+      margin-bottom: var(--space-4);
+      background: linear-gradient(135deg, var(--color-primary-600), var(--color-accent-500));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeInDown 0.6s ease-out;
+    }
+    
+    .hero-subtitle {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-8);
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+    
+    /* Logo Animation */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+    
+    .logo-icon {
       font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #3b82f6, #60a5fa, #93c5fd);
+      animation: bounce 2s ease infinite;
+    }
+    
+    .logo-text {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-extrabold);
+      background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
     
-    .hero p {
-      font-size: 1.125rem;
-      color: #94a3b8;
-      margin-bottom: 24px;
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-10);
     }
     
-    /* 기능 카드 그리드 */
+    @media (max-width: 767px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .stat-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-slow);
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary-200);
+    }
+    
+    .stat-number {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      font-family: var(--font-mono);
+      color: var(--color-primary-500);
+      margin-bottom: var(--space-1);
+    }
+    
+    .stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      font-weight: var(--font-medium);
+    }
+    
+    /* Features Grid */
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-bottom: 48px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+      margin-bottom: var(--space-12);
     }
     
+    @media (max-width: 1023px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 639px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Feature Card */
     .feature-card {
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-      border: 1px solid #475569;
-      border-radius: 16px;
-      padding: 24px;
-      transition: all 0.3s ease;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
       cursor: pointer;
+      transition: all var(--transition-slow);
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
     }
     
     .feature-card::before {
@@ -166,296 +177,615 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
+      height: 4px;
+      background: var(--gradient-color, linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600)));
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity var(--transition-base);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--color-primary-200);
     }
     
     .feature-card:hover::before {
       opacity: 1;
     }
     
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
-      border-color: #3b82f6;
-    }
-    
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, #3b82f6, #60a5fa);
-      border-radius: 12px;
+    .feature-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 16px;
+      font-size: 1.75rem;
+      margin-bottom: var(--space-4);
+      box-shadow: var(--shadow-sm);
     }
     
     .feature-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #f1f5f9;
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-2);
     }
     
     .feature-description {
-      color: #94a3b8;
-      font-size: 0.875rem;
-      line-height: 1.5;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+      flex-grow: 1;
     }
     
-    /* 통계 섹션 */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 16px;
-      margin-bottom: 32px;
+    .feature-arrow {
+      position: absolute;
+      bottom: var(--space-4);
+      right: var(--space-4);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--color-neutral-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all var(--transition-base);
     }
     
-    .stat-card {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid #475569;
-      border-radius: 12px;
-      padding: 16px;
+    .feature-card:hover .feature-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    /* Feature Card Gradient Colors */
+    .feature-card.community { --gradient-color: linear-gradient(135deg, #ef4444, #ec4899); }
+    .feature-card.pace { --gradient-color: linear-gradient(135deg, #f97316, #ef4444); }
+    .feature-card.training { --gradient-color: linear-gradient(135deg, #6366f1, #a855f7); }
+    .feature-card.chat { --gradient-color: linear-gradient(135deg, #14b8a6, #22c55e); }
+    .feature-card.marketplace { --gradient-color: linear-gradient(135deg, #3b82f6, #06b6d4); }
+    .feature-card.results { --gradient-color: linear-gradient(135deg, #22c55e, #10b981); }
+    
+    /* Icon Background Colors */
+    .icon-community { background: linear-gradient(135deg, #fef2f2, #fce7f3); }
+    .icon-pace { background: linear-gradient(135deg, #fff7ed, #fef2f2); }
+    .icon-training { background: linear-gradient(135deg, #eef2ff, #f3e8ff); }
+    .icon-chat { background: linear-gradient(135deg, #f0fdfa, #ecfdf5); }
+    .icon-marketplace { background: linear-gradient(135deg, #eff6ff, #ecfeff); }
+    .icon-results { background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
+    
+    /* Header */
+    .main-header {
+      background: var(--color-bg-card);
+      border-bottom: 1px solid var(--color-border-default);
+      padding: var(--space-3) var(--space-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .header-inner {
+      max-width: var(--container-lg);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    
+    .header-logo-icon {
+      font-size: 1.5rem;
+    }
+    
+    .header-logo-text {
+      font-size: var(--text-xl);
+      font-weight: var(--font-extrabold);
+      background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Navigation */
+    .nav-desktop {
+      display: none;
+    }
+    
+    @media (min-width: 768px) {
+      .nav-desktop {
+        display: flex;
+        gap: var(--space-1);
+      }
+    }
+    
+    .nav-link {
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    
+    .nav-link:hover {
+      color: var(--color-text-primary);
+      background: var(--color-neutral-100);
+    }
+    
+    .nav-link.active {
+      color: var(--color-primary-600);
+      background: var(--color-primary-50);
+    }
+    
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: flex;
+      padding: var(--space-2);
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      font-size: var(--text-xl);
+      cursor: pointer;
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-fast);
+    }
+    
+    .mobile-menu-btn:hover {
+      background: var(--color-neutral-100);
+      color: var(--color-text-primary);
+    }
+    
+    @media (min-width: 768px) {
+      .mobile-menu-btn {
+        display: none;
+      }
+    }
+    
+    /* Mobile Menu Overlay */
+    .mobile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--color-bg-overlay);
+      z-index: var(--z-overlay);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-slow);
+    }
+    
+    .mobile-menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 280px;
+      background: var(--color-bg-card);
+      z-index: var(--z-modal);
+      transform: translateX(100%);
+      transition: transform var(--transition-slow);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+    
+    .mobile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border-default);
+    }
+    
+    .mobile-menu-close {
+      padding: var(--space-2);
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      font-size: var(--text-xl);
+      cursor: pointer;
+      border-radius: var(--radius-lg);
+    }
+    
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
+      color: var(--color-text-primary);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      margin-bottom: var(--space-2);
+    }
+    
+    .mobile-nav-link:hover {
+      background: var(--color-neutral-100);
+    }
+    
+    .mobile-nav-link i {
+      width: 24px;
+      text-align: center;
+      color: var(--color-text-secondary);
+    }
+    
+    /* Main Container */
+    .main-container {
+      max-width: var(--container-lg);
+      margin: 0 auto;
+      padding: var(--space-6) var(--space-4);
+      min-height: calc(100vh - 60px);
+    }
+    
+    /* Footer */
+    .main-footer {
+      background: var(--color-neutral-100);
+      border-top: 1px solid var(--color-border-default);
+      padding: var(--space-8) var(--space-4);
       text-align: center;
     }
     
-    .stat-number {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #3b82f6;
-      margin-bottom: 4px;
+    .footer-content {
+      max-width: var(--container-lg);
+      margin: 0 auto;
     }
     
-    .stat-label {
-      font-size: 0.75rem;
-      color: #94a3b8;
+    .footer-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
     }
     
-    /* 모바일 반응형 */
-    @media (max-width: 768px) {
-      .nav-menu {
-        display: none;
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+    
+    .footer-link {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    
+    .footer-link:hover {
+      color: var(--color-primary-500);
+    }
+    
+    /* Animation Classes */
+    .stagger-animation > * {
+      animation: fadeInUp 0.5s ease-out both;
+    }
+    
+    .stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-animation > *:nth-child(2) { animation-delay: 0.15s; }
+    .stagger-animation > *:nth-child(3) { animation-delay: 0.2s; }
+    .stagger-animation > *:nth-child(4) { animation-delay: 0.25s; }
+    .stagger-animation > *:nth-child(5) { animation-delay: 0.3s; }
+    .stagger-animation > *:nth-child(6) { animation-delay: 0.35s; }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 767px) {
+      .hero-title {
+        font-size: var(--text-3xl);
       }
       
-      .mobile-menu-btn {
-        display: block;
+      .hero-subtitle {
+        font-size: var(--text-base);
       }
       
-      .hero h1 {
-        font-size: 2rem;
+      .feature-card {
+        min-height: 160px;
       }
       
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
+      .main-container {
+        padding: var(--space-4) var(--space-4);
       }
     }
     
-    /* 애니메이션 */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* CTA Button */
+    .cta-container {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      margin-bottom: var(--space-10);
     }
     
-    .fade-in {
-      animation: fadeIn 0.6s ease-out;
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-8);
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      text-decoration: none;
+    }
+    
+    .cta-primary {
+      background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+      color: white;
+      box-shadow: var(--shadow-primary);
+    }
+    
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+    
+    .cta-secondary {
+      background: var(--color-bg-card);
+      color: var(--color-primary-600);
+      border: 2px solid var(--color-primary-200);
+    }
+    
+    .cta-secondary:hover {
+      border-color: var(--color-primary-500);
+      background: var(--color-primary-50);
+    }
+    
+    @media (max-width: 639px) {
+      .cta-container {
+        flex-direction: column;
+      }
+      
+      .cta-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <!-- Header -->
+  <header class="main-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <span class="header-logo-icon">🏃‍♂️</span>
+        <span class="header-logo-text">Athlete Time</span>
+      </div>
+      
+      <nav class="nav-desktop">
+        <button onclick="navigateTo('community')" class="nav-link">커뮤니티</button>
+        <button onclick="navigateTo('pace')" class="nav-link">페이스 계산기</button>
+        <button onclick="navigateTo('training')" class="nav-link">훈련 계산기</button>
+        <button onclick="navigateTo('chat')" class="nav-link">실시간 채팅</button>
+      </nav>
+      
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="메뉴 열기">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
   
-  <script type="text/babel">
-    const { useState, useEffect } = React;
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" id="mobileOverlay" onclick="toggleMobileMenu()"></div>
+  
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <div class="header-logo">
+        <span class="header-logo-icon">🏃‍♂️</span>
+        <span class="header-logo-text">Athlete Time</span>
+      </div>
+      <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
     
-    // 통합 네비게이션 앱
-    function IntegratedApp() {
-      const [currentPage, setCurrentPage] = useState('home');
-      const [isMenuOpen, setIsMenuOpen] = useState(false);
+    <a href="#" onclick="navigateTo('community'); return false;" class="mobile-nav-link">
+      <i class="fas fa-comments"></i> 익명 커뮤니티
+    </a>
+    <a href="#" onclick="navigateTo('pace'); return false;" class="mobile-nav-link">
+      <i class="fas fa-stopwatch"></i> 페이스 계산기
+    </a>
+    <a href="#" onclick="navigateTo('training'); return false;" class="mobile-nav-link">
+      <i class="fas fa-dumbbell"></i> 훈련 계산기
+    </a>
+    <a href="#" onclick="navigateTo('chat'); return false;" class="mobile-nav-link">
+      <i class="fas fa-comment-dots"></i> 실시간 채팅
+    </a>
+    <a href="#" onclick="navigateTo('marketplace'); return false;" class="mobile-nav-link">
+      <i class="fas fa-shopping-cart"></i> 중고 거래
+    </a>
+    <a href="#" onclick="navigateTo('results'); return false;" class="mobile-nav-link">
+      <i class="fas fa-trophy"></i> 경기 결과
+    </a>
+  </div>
+  
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="logo-container animate-fadeIn">
+        <span class="logo-icon">🏃‍♂️</span>
+        <span class="logo-text">ATHLETE TIME</span>
+      </div>
+      <h1 class="hero-title">육상인들의 새로운 시작</h1>
+      <p class="hero-subtitle">초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간</p>
       
-      // 네비게이션 핸들러
-      const navigateTo = (page) => {
-        if (page === 'community') {
-          goToCommunity();
-          return;
-        }
-        
-        if (page === 'pace') {
-          window.location.href = '/pace-calculator.html';
-          return;
-        }
-        
-        if (page === 'training') {
-          window.location.href = '/training-calculator.html';
-          return;
-        }
-        
-        if (page === 'chat') {
-          window.location.href = '/chat.html';
-          return;
-        }
-        
-        setCurrentPage(page);
-      };
+      <!-- CTA Buttons -->
+      <div class="cta-container">
+        <a href="#" onclick="navigateTo('pace'); return false;" class="cta-btn cta-primary">
+          <i class="fas fa-stopwatch"></i>
+          페이스 계산기 시작
+        </a>
+        <a href="#" onclick="navigateTo('community'); return false;" class="cta-btn cta-secondary">
+          <i class="fas fa-users"></i>
+          커뮤니티 참여
+        </a>
+      </div>
+    </section>
+    
+    <!-- Stats Section -->
+    <section class="stats-grid stagger-animation">
+      <div class="stat-card">
+        <div class="stat-number" id="userCount">1,234</div>
+        <div class="stat-label">활성 사용자</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="postCount">567</div>
+        <div class="stat-label">오늘의 게시글</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="matchCount">89</div>
+        <div class="stat-label">진행중 경기</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="recordCount">12</div>
+        <div class="stat-label">신기록 달성</div>
+      </div>
+    </section>
+    
+    <!-- Features Grid -->
+    <section class="features-grid stagger-animation">
+      <!-- Community -->
+      <article class="feature-card community card-hover" onclick="navigateTo('community')">
+        <div class="feature-icon-wrapper icon-community">💬</div>
+        <h3 class="feature-title">익명 커뮤니티</h3>
+        <p class="feature-description">로그인 없이 바로 참여하는 익명 육상인 커뮤니티</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
       
-      // 기능 카드 데이터
-      const features = [
-        {
-          id: 'community',
-          icon: '💬',
-          title: '익명 커뮤니티',
-          description: '로그인 없이 바로 참여하는 익명 육상인 커뮤니티',
-          color: 'from-red-500 to-pink-500'
-        },
-        {
-          id: 'pace',
-          icon: '⏱️',
-          title: '페이스 계산기',
-          description: '정확한 페이스 계산과 기록 예측',
-          color: 'from-orange-500 to-red-500'
-        },
-        {
-          id: 'training',
-          icon: '💪',
-          title: '훈련 계산기',
-          description: '과학적인 훈련 계획과 관리',
-          color: 'from-indigo-500 to-purple-500'
-        },
-        {
-          id: 'chat',
-          icon: '💭',
-          title: '실시간 채팅',
-          description: '육상인들과의 실시간 소통',
-          color: 'from-teal-500 to-green-500'
-        },
-        {
-          id: 'marketplace',
-          icon: '🛒',
-          title: '중고 거래',
-          description: '육상 용품 거래 마켓플레이스',
-          color: 'from-blue-500 to-cyan-500'
-        },
-        {
-          id: 'results',
-          icon: '🏆',
-          title: '경기 결과',
-          description: '실시간 결과 업데이트와 기록 관리',
-          color: 'from-green-500 to-emerald-500'
-        }
-      ];
+      <!-- Pace Calculator -->
+      <article class="feature-card pace card-hover" onclick="navigateTo('pace')">
+        <div class="feature-icon-wrapper icon-pace">⏱️</div>
+        <h3 class="feature-title">페이스 계산기</h3>
+        <p class="feature-description">정확한 페이스 계산과 기록 예측</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
       
-      // 네비게이션 메뉴
-      const navItems = [
-        { id: 'community', label: '커뮤니티' },
-        { id: 'pace', label: '페이스 계산기' },
-        { id: 'training', label: '훈련 계산기' },
-        { id: 'chat', label: '실시간 채팅' },
-        { id: 'marketplace', label: '중고 거래' },
-        { id: 'results', label: '경기 결과' }
-      ];
+      <!-- Training Calculator -->
+      <article class="feature-card training card-hover" onclick="navigateTo('training')">
+        <div class="feature-icon-wrapper icon-training">💪</div>
+        <h3 class="feature-title">훈련 계산기</h3>
+        <p class="feature-description">과학적인 훈련 계획과 관리</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
       
-      if (currentPage !== 'home') {
-        // 외부 페이지로 리다이렉션
-        return null;
-      }
+      <!-- Chat -->
+      <article class="feature-card chat card-hover" onclick="navigateTo('chat')">
+        <div class="feature-icon-wrapper icon-chat">💭</div>
+        <h3 class="feature-title">실시간 채팅</h3>
+        <p class="feature-description">육상인들과의 실시간 소통</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
       
-      return (
-        <div className="fade-in">
-          {/* 헤더 */}
-          <header className="header">
-            <div className="header-content">
-              <div className="logo">
-                Athlete Time
-              </div>
-              
-              <nav className="nav-menu">
-                {navItems.map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => navigateTo(item.id)}
-                    className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
-              
-              <button
-                className="mobile-menu-btn"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                ☰
-              </button>
-            </div>
-          </header>
-          
-          {/* 메인 컨텐츠 */}
-          <main className="main-container">
-            {/* 히어로 섹션 */}
-            <section className="hero">
-              <h1>육상인들의 새로운 시작</h1>
-              <p>초등부부터 마스터즈까지, 모든 한국 육상인들이 함께하는 공간</p>
-            </section>
-            
-            {/* 통계 섹션 */}
-            <section className="stats">
-              <div className="stat-card">
-                <div className="stat-number" id="userCount">1,234</div>
-                <div className="stat-label">활성 사용자</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number" id="postCount">567</div>
-                <div className="stat-label">오늘의 게시글</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number" id="matchCount">89</div>
-                <div className="stat-label">진행중 경기</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number" id="recordCount">12</div>
-                <div className="stat-label">신기록 달성</div>
-              </div>
-            </section>
-            
-            {/* 기능 카드 그리드 */}
-            <section className="features-grid">
-              {features.map(feature => (
-                <div
-                  key={feature.id}
-                  onClick={() => navigateTo(feature.id)}
-                  className="feature-card"
-                  style={{
-                    background: `linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.05))`
-                  }}
-                >
-                  <div className="feature-icon">
-                    {feature.icon}
-                  </div>
-                  <h3 className="feature-title">{feature.title}</h3>
-                  <p className="feature-description">{feature.description}</p>
-                </div>
-              ))}
-            </section>
-          </main>
-        </div>
-      );
+      <!-- Marketplace -->
+      <article class="feature-card marketplace card-hover" onclick="navigateTo('marketplace')">
+        <div class="feature-icon-wrapper icon-marketplace">🛒</div>
+        <h3 class="feature-title">중고 거래</h3>
+        <p class="feature-description">육상 용품 거래 마켓플레이스</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
+      
+      <!-- Results -->
+      <article class="feature-card results card-hover" onclick="navigateTo('results')">
+        <div class="feature-icon-wrapper icon-results">🏆</div>
+        <h3 class="feature-title">경기 결과</h3>
+        <p class="feature-description">실시간 결과 업데이트와 기록 관리</p>
+        <div class="feature-arrow"><i class="fas fa-arrow-right"></i></div>
+      </article>
+    </section>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <p class="footer-text">© 2024 Athlete Time. 모든 육상인들을 위한 플랫폼</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">이용약관</a>
+        <a href="#" class="footer-link">개인정보처리방침</a>
+        <a href="#" class="footer-link">문의하기</a>
+      </div>
+    </div>
+  </footer>
+  
+  <script>
+    // Mobile Menu Toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const overlay = document.getElementById('mobileOverlay');
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
     }
     
-    // 커뮤니티로 이동 (환경 감지)
+    // Navigation Handler
+    function navigateTo(page) {
+      // Close mobile menu if open
+      const menu = document.getElementById('mobileMenu');
+      const overlay = document.getElementById('mobileOverlay');
+      if (menu.classList.contains('active')) {
+        toggleMobileMenu();
+      }
+      
+      switch(page) {
+        case 'community':
+          goToCommunity();
+          break;
+        case 'pace':
+          window.location.href = '/pace-calculator.html';
+          break;
+        case 'training':
+          window.location.href = '/training-calculator.html';
+          break;
+        case 'chat':
+          window.location.href = '/chat.html';
+          break;
+        case 'marketplace':
+          alert('중고 거래 기능은 준비 중입니다.');
+          break;
+        case 'results':
+          alert('경기 결과 기능은 준비 중입니다.');
+          break;
+        default:
+          break;
+      }
+    }
+    
+    // Community Navigation
     function goToCommunity() {
-      if (window.location.hostname === 'localhost' || window.location.hostname.includes('e2b.dev')) {
-        const currentHost = window.location.hostname;
+      const currentHost = window.location.hostname;
+      if (currentHost === 'localhost' || currentHost.includes('e2b.dev') || currentHost.includes('sandbox.novita')) {
         if (currentHost.includes('e2b.dev')) {
           const parts = currentHost.split('-');
-          const sandboxId = parts[1] + '-' + parts[2];
-          window.location.href = `https://5000-${sandboxId}.e2b.dev`;
+          const sandboxId = parts.slice(1).join('-');
+          window.location.href = `https://5000-${sandboxId}`;
+        } else if (currentHost.includes('sandbox.novita')) {
+          // Novita sandbox
+          const sandboxUrl = window.location.origin.replace(/\d{4}-/, '5000-');
+          window.location.href = sandboxUrl;
         } else {
           window.location.href = 'http://localhost:5000';
         }
@@ -464,12 +794,42 @@
       }
     }
     
-    // 루트 렌더링 - React 18 createRoot 사용
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<IntegratedApp />);
+    // Animate numbers on page load
+    function animateNumber(elementId, endValue, duration = 1000) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      const startValue = 0;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+        
+        const currentValue = Math.floor(startValue + (endValue - startValue) * easeProgress);
+        element.textContent = currentValue.toLocaleString();
+        
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+      
+      requestAnimationFrame(update);
+    }
+    
+    // Initialize animations on load
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        animateNumber('userCount', 1234, 1200);
+        animateNumber('postCount', 567, 1000);
+        animateNumber('matchCount', 89, 800);
+        animateNumber('recordCount', 12, 600);
+      }, 500);
+    });
   </script>
   
-  <!-- PWA 등록 스크립트 -->
+  <!-- PWA Registration -->
   <script src="/pwa-register.js"></script>
 </body>
 </html>
