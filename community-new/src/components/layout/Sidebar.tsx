@@ -1,5 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 
+// 외부 링크 클릭 핸들러 (React Router 우회)
+const handleExternalLink = (e: React.MouseEvent, path: string) => {
+  e.preventDefault()
+  window.location.href = `/${path}`
+}
+
 export default function Sidebar() {
   const location = useLocation()
   
@@ -64,6 +70,7 @@ export default function Sidebar() {
             
             <a
               href="/pace-calculator.html"
+              onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
               className="sidebar-item sidebar-item-inactive"
             >
               <span className="text-lg">🧮</span>
@@ -71,6 +78,7 @@ export default function Sidebar() {
             </a>
             <a
               href="/training-calculator.html"
+              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
               className="sidebar-item sidebar-item-inactive"
             >
               <span className="text-lg">📝</span>
@@ -78,6 +86,7 @@ export default function Sidebar() {
             </a>
             <a
               href="/chat.html"
+              onClick={(e) => handleExternalLink(e, 'chat.html')}
               className="sidebar-item sidebar-item-inactive"
             >
               <span className="text-lg">💬</span>

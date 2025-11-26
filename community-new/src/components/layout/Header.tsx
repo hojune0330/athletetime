@@ -20,12 +20,19 @@ export default function Header() {
   const { user, logout, isAuthenticated } = useAuth()
   
   const goToMain = () => {
-    window.location.href = '/'
+    window.location.href = '/index.html'
   }
   
+  // 외부 도구 링크 (community 외부의 HTML 페이지)
   const getToolLink = (path: string) => {
-    const isProd = import.meta.env.PROD
-    return isProd ? `/${path}` : `/${path}`
+    // /community/ base path 밖의 루트 경로로 이동
+    return `/${path}`
+  }
+  
+  // 외부 링크 클릭 핸들러 (React Router 우회)
+  const handleExternalLink = (e: React.MouseEvent, path: string) => {
+    e.preventDefault()
+    window.location.href = getToolLink(path)
   }
   
   const isActive = (path: string) => {
@@ -74,18 +81,21 @@ export default function Header() {
                 </Link>
                 <a
                   href={getToolLink('pace-calculator.html')}
+                  onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
                   ⏱️ 페이스
                 </a>
                 <a
                   href={getToolLink('training-calculator.html')}
+                  onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
                   🏋️ 훈련
                 </a>
                 <a
                   href={getToolLink('chat.html')}
+                  onClick={(e) => handleExternalLink(e, 'chat.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
                   💬 채팅
@@ -278,6 +288,7 @@ export default function Header() {
                 
                 <a 
                   href={getToolLink('pace-calculator.html')}
+                  onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
                 >
                   <span className="text-lg">⏱️</span>
@@ -286,6 +297,7 @@ export default function Header() {
 
                 <a 
                   href={getToolLink('training-calculator.html')}
+                  onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
                 >
                   <span className="text-lg">🏋️</span>
@@ -294,6 +306,7 @@ export default function Header() {
 
                 <a 
                   href={getToolLink('chat.html')}
+                  onClick={(e) => handleExternalLink(e, 'chat.html')}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
                 >
                   <span className="text-lg">💬</span>

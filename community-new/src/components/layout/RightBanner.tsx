@@ -35,6 +35,12 @@ const TRAINING_TIPS = [
   "러닝화는 500km마다 교체를 권장합니다. 쿠셔닝 성능 저하에 주의하세요.",
 ];
 
+// 외부 링크 클릭 핸들러 (React Router 우회)
+const handleExternalLink = (e: React.MouseEvent, path: string) => {
+  e.preventDefault();
+  window.location.href = `/${path}`;
+};
+
 export default function RightBanner() {
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
   const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
@@ -148,12 +154,13 @@ export default function RightBanner() {
             </p>
           </div>
           <div className="mt-3 text-center">
-            <Link 
-              to="/training-calculator.html" 
+            <a 
+              href="/training-calculator.html"
+              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
               className="text-xs text-primary-600 font-medium hover:text-primary-700 transition-colors"
             >
               훈련 페이스 계산기 →
-            </Link>
+            </a>
           </div>
         </div>
       </div>
@@ -165,7 +172,7 @@ export default function RightBanner() {
           <div className="text-white font-bold mb-1">애슬리트 타임</div>
           <div className="text-white/80 text-xs">육상인들의 익명 커뮤니티</div>
           <Link 
-            to="/" 
+            to="/write" 
             className="mt-3 inline-block px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-lg transition-colors"
           >
             글 작성하기
@@ -229,34 +236,38 @@ export default function RightBanner() {
             빠른 링크
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            <Link 
-              to="/pace-calculator.html"
+            <a 
+              href="/pace-calculator.html"
+              onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">⏱️</div>
               <div className="text-xs font-medium text-neutral-700">페이스 계산기</div>
-            </Link>
-            <Link 
-              to="/training-calculator.html"
+            </a>
+            <a 
+              href="/training-calculator.html"
+              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">📊</div>
               <div className="text-xs font-medium text-neutral-700">훈련 계산기</div>
-            </Link>
-            <Link 
-              to="/chat.html"
+            </a>
+            <a 
+              href="/chat.html"
+              onClick={(e) => handleExternalLink(e, 'chat.html')}
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">💬</div>
               <div className="text-xs font-medium text-neutral-700">실시간 채팅</div>
-            </Link>
-            <Link 
-              to="/"
+            </a>
+            <a 
+              href="/index.html"
+              onClick={(e) => handleExternalLink(e, 'index.html')}
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">🏠</div>
               <div className="text-xs font-medium text-neutral-700">메인 페이지</div>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

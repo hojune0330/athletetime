@@ -5,6 +5,12 @@
 import { Link } from 'react-router-dom';
 import { ClockIcon } from '@heroicons/react/24/outline';
 
+// 외부 링크 클릭 핸들러 (React Router 우회)
+const handleExternalLink = (e: React.MouseEvent, path: string) => {
+  e.preventDefault();
+  window.location.href = `/${path}`;
+};
+
 export default function Footer() {
   return (
     <footer className="mt-16 bg-white border-t border-neutral-200">
@@ -97,17 +103,29 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="/training-calculator.html" className="text-sm text-neutral-500 hover:text-primary-600 transition-colors">
+                <a 
+                  href="/training-calculator.html" 
+                  onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
+                  className="text-sm text-neutral-500 hover:text-primary-600 transition-colors"
+                >
                   훈련 계산기
                 </a>
               </li>
               <li>
-                <a href="/pace-calculator.html" className="text-sm text-neutral-500 hover:text-primary-600 transition-colors">
+                <a 
+                  href="/pace-calculator.html" 
+                  onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
+                  className="text-sm text-neutral-500 hover:text-primary-600 transition-colors"
+                >
                   페이스 계산기
                 </a>
               </li>
               <li>
-                <a href="/chat.html" className="text-sm text-neutral-500 hover:text-primary-600 transition-colors">
+                <a 
+                  href="/chat.html" 
+                  onClick={(e) => handleExternalLink(e, 'chat.html')}
+                  className="text-sm text-neutral-500 hover:text-primary-600 transition-colors"
+                >
                   실시간 채팅
                 </a>
               </li>
