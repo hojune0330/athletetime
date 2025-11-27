@@ -1718,11 +1718,15 @@
           
           <div class="input-group">
             <label class="input-label" for="paceStrategy">페이스 전략</label>
-            <select id="paceStrategy" class="input-field select-field">
+            <select id="paceStrategy" class="input-field select-field" onchange="updateStrategyInfo()">
               <option value="even">균등 페이스 (Even)</option>
               <option value="negative">네거티브 스플릿 (후반 가속)</option>
               <option value="positive">포지티브 스플릿 (전반 속도)</option>
             </select>
+            <!-- 전략 설명 -->
+            <div id="strategyInfo" class="mt-2 p-3 rounded-lg text-sm" style="background: var(--color-info-50); border-left: 3px solid var(--color-info-500);">
+              <strong>균등 페이스:</strong> 모든 구간을 동일한 속도로 달립니다. 가장 효율적인 전략입니다.
+            </div>
           </div>
         </div>
         
@@ -1732,6 +1736,9 @@
         </button>
         
         <div id="splitResults" class="mt-6 hidden">
+          <!-- 전략 요약 -->
+          <div id="strategySummary" class="mb-4 p-4 rounded-xl" style="background: linear-gradient(135deg, var(--color-success-50), var(--color-success-100)); border: 1px solid var(--color-success-200);">
+          </div>
           <div id="splitTable" class="table-container">
             <!-- 동적으로 생성됨 -->
           </div>
@@ -2349,6 +2356,35 @@
       });
     }
 
+    // 페이스 전략 설명 업데이트
+    function updateStrategyInfo() {
+      const strategy = document.getElementById('paceStrategy').value;
+      const infoDiv = document.getElementById('strategyInfo');
+      
+      const strategyInfos = {
+        'even': {
+          text: '<strong>균등 페이스:</strong> 모든 구간을 동일한 속도로 달립니다. 에너지 효율이 가장 좋은 전략입니다.',
+          color: 'var(--color-info-50)',
+          border: 'var(--color-info-500)'
+        },
+        'negative': {
+          text: '<strong>네거티브 스플릿:</strong> 전반부를 약간 느리게 (1.5%), 후반부를 약간 빠르게 (1.5%) 달립니다. 마라톤 세계기록 대부분이 이 전략으로 수립되었습니다.',
+          color: 'var(--color-success-50)',
+          border: 'var(--color-success-500)'
+        },
+        'positive': {
+          text: '<strong>포지티브 스플릿:</strong> 전반부를 약간 빠르게 (1.5%), 후반부를 약간 느리게 (1.5%) 달립니다. 공격적인 레이스 전략입니다.',
+          color: 'var(--color-warning-50)',
+          border: 'var(--color-warning-500)'
+        }
+      };
+      
+      const info = strategyInfos[strategy];
+      infoDiv.innerHTML = info.text;
+      infoDiv.style.background = info.color;
+      infoDiv.style.borderLeftColor = info.border;
+    }
+    
     // 스플릿 계산
     function calculateSplits() {
       const totalDistance = parseFloat(document.getElementById('splitTotalDistance').value);
@@ -2363,6 +2399,36 @@
       
       const totalSeconds = hours * 3600 + minutes * 60 + seconds;
       const numSplits = Math.ceil(totalDistance / interval);
+      const avgPace = totalSeconds / (totalDistance / 1000); // 초/km
+      
+      // 전략 요약 표시
+      const strategySummary = document.getElementById('strategySummary');
+      const strategyNames = {
+        'even': '균등 페이스',
+        'negative': '네거티브 스플릿 (±1.5%)',
+        'positive': '포지티브 스플릿 (±1.5%)'
+      };
+      
+      strategySummary.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="text-sm text-gray-600">선택 전략</div>
+            <div class="text-lg font-bold text-green-700">${strategyNames[strategy]}</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600">평균 페이스</div>
+            <div class="text-lg font-bold text-green-700">${formatPace(avgPace)}/km</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600">총 거리</div>
+            <div class="text-lg font-bold text-green-700">${(totalDistance/1000).toFixed(2)}km</div>
+          </div>
+          <div>
+            <div class="text-sm text-gray-600">목표 시간</div>
+            <div class="text-lg font-bold text-green-700">${formatTime(totalSeconds)}</div>
+          </div>
+        </div>
+      `;
       
       const splitTable = document.getElementById('splitTable');
       splitTable.innerHTML = '';
@@ -2377,6 +2443,7 @@
             <th class="p-2">구간 시간</th>
             <th class="p-2">누적 시간</th>
             <th class="p-2">페이스 (min/km)</th>
+            <th class="p-2">편차</th>
           </tr>
         </thead>
         <tbody id="splitTableBody"></tbody>
@@ -2384,6 +2451,7 @@
       
       const tbody = table.querySelector('tbody');
       let cumulativeTime = 0;
+      const basePaceTime = (totalSeconds / totalDistance) * interval; // 기준 구간 시간
       
       for (let i = 0; i < numSplits; i++) {
         const startDist = i * interval;
@@ -2391,20 +2459,24 @@
         const segmentDist = endDist - startDist;
         
         let segmentTime;
+        let factor = 1;
         
         switch (strategy) {
           case 'even':
             segmentTime = (totalSeconds / totalDistance) * segmentDist;
             break;
           case 'negative':
-            // 후반부로 갈수록 빨라짐 (처음 105% -> 마지막 95%)
-            const factor = 1.05 - (0.1 * i / (numSplits - 1));
+            // 네거티브 스플릿: 후반부로 갈수록 약간 빨라짐
+            // 실제 레이스에서 권장되는 1.5% 편차 적용
+            // 처음 101.5% → 마지막 98.5% (총 3% 편차)
+            factor = 1.015 - (0.03 * i / (numSplits - 1));
             segmentTime = (totalSeconds / totalDistance) * segmentDist * factor;
             break;
           case 'positive':
-            // 전반부 빠름 (처음 95% -> 마지막 105%)
-            const posFactor = 0.95 + (0.1 * i / (numSplits - 1));
-            segmentTime = (totalSeconds / totalDistance) * segmentDist * posFactor;
+            // 포지티브 스플릿: 전반부 빠르고 후반 느려짐
+            // 처음 98.5% → 마지막 101.5% (총 3% 편차)
+            factor = 0.985 + (0.03 * i / (numSplits - 1));
+            segmentTime = (totalSeconds / totalDistance) * segmentDist * factor;
             break;
           default:
             segmentTime = (totalSeconds / totalDistance) * segmentDist;
@@ -2412,14 +2484,28 @@
         
         cumulativeTime += segmentTime;
         const pacePerKm = (segmentTime / segmentDist) * 1000 / 60;
+        const deviation = ((factor - 1) * 100).toFixed(1);
+        const deviationColor = factor > 1 ? 'text-red-500' : (factor < 1 ? 'text-green-500' : 'text-gray-500');
+        const deviationSign = factor > 1 ? '+' : '';
+        
+        // 구간 하이라이트 (전반/후반)
+        const isFirstHalf = i < numSplits / 2;
+        let rowClass = '';
+        if (strategy === 'negative') {
+          rowClass = isFirstHalf ? 'bg-red-50' : 'bg-green-50';
+        } else if (strategy === 'positive') {
+          rowClass = isFirstHalf ? 'bg-green-50' : 'bg-red-50';
+        }
         
         const row = tbody.insertRow();
+        row.className = rowClass;
         row.innerHTML = `
           <td class="p-2 font-medium">${i + 1}구간</td>
-          <td class="p-2">${startDist}-${endDist}m</td>
+          <td class="p-2">${(startDist/1000).toFixed(1)}-${(endDist/1000).toFixed(1)}km</td>
           <td class="p-2 font-mono">${formatTime(segmentTime)}</td>
           <td class="p-2 font-mono font-bold">${formatTime(cumulativeTime)}</td>
-          <td class="p-2">${Math.floor(pacePerKm)}:${String(Math.floor((pacePerKm % 1) * 60)).padStart(2, '0')}</td>
+          <td class="p-2 font-mono">${Math.floor(pacePerKm)}:${String(Math.floor((pacePerKm % 1) * 60)).padStart(2, '0')}</td>
+          <td class="p-2 font-mono ${deviationColor}">${strategy === 'even' ? '-' : deviationSign + deviation + '%'}</td>
         `;
       }
       
