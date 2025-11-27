@@ -259,6 +259,357 @@
       font-size: 11px;
       font-weight: var(--font-bold);
     }
+    
+    /* =============================================
+       NEW: 3D 트랙 시각화 스타일
+       ============================================= */
+    
+    .track-visualization-container {
+      background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: var(--radius-xl);
+      border: 2px solid var(--color-primary-200);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .track-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+      color: white;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+    
+    .track-header h3 {
+      color: white;
+      margin: 0;
+    }
+    
+    .track-icon {
+      font-size: 1.5rem;
+    }
+    
+    .track-legend {
+      display: flex;
+      gap: var(--space-4);
+      font-size: var(--text-sm);
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .track-3d-wrapper {
+      position: relative;
+      padding: var(--space-4);
+      background: linear-gradient(180deg, #bae6fd 0%, #7dd3fc 50%, #38bdf8 100%);
+    }
+    
+    .track-3d-svg {
+      width: 100%;
+      height: auto;
+      min-height: 400px;
+      border-radius: var(--radius-lg);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.1);
+    }
+    
+    /* 애니메이션 컨트롤 */
+    .animation-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3);
+      background: rgba(255,255,255,0.95);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-3);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .anim-btn {
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-lg);
+      font-weight: var(--font-semibold);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    
+    .play-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+    }
+    
+    .play-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+    
+    .pause-btn {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    
+    .pause-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+    
+    .reset-btn {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+    }
+    
+    .reset-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .anim-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .progress-bar-container {
+      flex: 1;
+      min-width: 150px;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #84cc16, #eab308, #f97316, #ef4444);
+      width: 0%;
+      transition: width 0.1s linear;
+      border-radius: 4px;
+    }
+    
+    .progress-text {
+      font-weight: var(--font-bold);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      min-width: 40px;
+    }
+    
+    /* 선수 애니메이션 */
+    .runner-glow {
+      animation: runnerPulse 0.5s ease-in-out infinite;
+    }
+    
+    @keyframes runnerPulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+    
+    .runner-icon {
+      animation: runnerBounce 0.3s ease-in-out infinite;
+    }
+    
+    @keyframes runnerBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    
+    /* 레인 비교 바 차트 */
+    .lane-comparison-section {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      border: 1px solid var(--color-border-default);
+    }
+    
+    .lane-bars-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    
+    .lane-bar-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    
+    .lane-bar-label {
+      width: 80px;
+      font-weight: var(--font-semibold);
+      font-size: var(--text-sm);
+      text-align: right;
+    }
+    
+    .lane-bar-wrapper {
+      flex: 1;
+      height: 28px;
+      background: #f3f4f6;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .lane-bar {
+      height: 100%;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: var(--space-2);
+      transition: width 0.5s ease-out;
+      position: relative;
+    }
+    
+    .lane-bar-value {
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .lane-bar.selected {
+      box-shadow: 0 0 0 3px #fbbf24, 0 4px 12px rgba(251, 191, 36, 0.4);
+    }
+    
+    .lane-bar-extra {
+      position: absolute;
+      right: -50px;
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+    
+    /* 테이블 개선 */
+    .lane-table-enhanced {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    
+    .lane-table-enhanced th {
+      background: var(--color-neutral-100);
+      font-size: var(--text-xs);
+    }
+    
+    .lane-table-enhanced .table-header-main th {
+      background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+      color: white;
+    }
+    
+    .lane-table-enhanced tbody tr {
+      transition: all var(--transition-base);
+    }
+    
+    .lane-table-enhanced tbody tr:hover {
+      background: var(--color-primary-50);
+    }
+    
+    .lane-table-enhanced tbody tr.selected-lane {
+      background: linear-gradient(90deg, #fef3c7, #fde68a);
+      font-weight: var(--font-bold);
+    }
+    
+    .lane-table-enhanced tbody tr.selected-lane td {
+      border-color: #f59e0b;
+    }
+    
+    /* 트랙 지식 카드 */
+    .track-knowledge-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-4);
+    }
+    
+    .knowledge-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      border: 1px solid var(--color-border-default);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+    }
+    
+    .knowledge-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    
+    .knowledge-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-2);
+    }
+    
+    .knowledge-card h4 {
+      font-weight: var(--font-bold);
+      margin-bottom: var(--space-2);
+      color: var(--color-text-primary);
+    }
+    
+    .knowledge-card p, .knowledge-card ul {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+    
+    .knowledge-card ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .knowledge-card li {
+      padding: var(--space-1) 0;
+      border-bottom: 1px dashed var(--color-border-default);
+    }
+    
+    .knowledge-card li:last-child {
+      border-bottom: none;
+    }
+    
+    /* 모바일 반응형 */
+    @media (max-width: 767px) {
+      .track-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .track-3d-svg {
+        min-height: 300px;
+      }
+      
+      .animation-controls {
+        flex-direction: column;
+      }
+      
+      .progress-bar-container {
+        width: 100%;
+      }
+      
+      .lane-bar-label {
+        width: 60px;
+        font-size: var(--text-xs);
+      }
+      
+      .lane-bar-extra {
+        display: none;
+      }
+      
+      .track-knowledge-cards {
+        grid-template-columns: 1fr;
+      }
+    }
 
     /* 추가 모바일 개선 */
     @media (max-width: 767px) {
@@ -969,87 +1320,253 @@
       </div>
     </div>
 
-    <!-- 레인 계산기 탭 (통합됨) -->
+    <!-- 레인 계산기 탭 (완전 새로운 3D 시각화) -->
     <div id="lane-content" class="tab-content hidden" role="tabpanel" aria-labelledby="tab-lane">
       <div class="card p-4 md:p-6">
         <h2 class="text-xl font-bold mb-4 text-center" style="color: var(--color-text-primary);">
-          <i class="fas fa-road mr-2" style="color: var(--color-accent-500);"></i>400m 트랙 레인별 구간 시간 계산기
+          <i class="fas fa-running mr-2" style="color: var(--color-accent-500);"></i>400m 트랙 레인별 구간 시간 계산기
         </h2>
         
         <!-- 목표 시간 입력 섹션 -->
-        <div class="p-4 mb-4 rounded-xl" style="background: var(--color-neutral-50);">
+        <div class="p-4 mb-4 rounded-xl" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
           <div class="flex flex-wrap items-end gap-4">
             <div class="input-group flex-1" style="min-width: 200px;">
-              <label class="input-label" for="laneTargetTimeMain">해당 레인 목표 시간 (초)</label>
+              <label class="input-label font-bold text-amber-800" for="laneTargetTimeMain">🏃 목표 시간 (초)</label>
               <div class="flex gap-2">
-                <input type="number" id="laneTargetTimeMain" value="72" min="30" max="120" step="0.1"
-                       class="input-field flex-1" aria-label="레인 목표 시간 입력">
-                <button type="button" onclick="calculateLaneAllMain()" class="btn btn-accent">
-                  <i class="fas fa-calculator"></i>
-                  <span>계산</span>
+                <input type="number" id="laneTargetTimeMain" value="60" min="30" max="180" step="0.1"
+                       class="input-field flex-1 text-lg font-bold" aria-label="레인 목표 시간 입력"
+                       style="background: white; border: 2px solid #f59e0b;">
+                <button type="button" onclick="calculateLaneAllMain(); animateRunner();" class="btn" 
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-weight: bold;">
+                  <i class="fas fa-play"></i>
+                  <span>시작</span>
                 </button>
               </div>
             </div>
             
             <div class="input-group">
-              <label class="input-label" for="laneLaneSelectorMain">선택 레인</label>
-              <select id="laneLaneSelectorMain" onchange="calculateLaneAllMain()" 
-                      class="input-field select-field">
-                <option value="1">레인 1 (400.00m)</option>
-                <option value="2">레인 2 (407.04m)</option>
-                <option value="3">레인 3 (414.70m)</option>
-                <option value="4">레인 4 (422.37m)</option>
-                <option value="5">레인 5 (430.03m)</option>
-                <option value="6">레인 6 (437.70m)</option>
-                <option value="7">레인 7 (445.37m)</option>
-                <option value="8">레인 8 (453.03m)</option>
+              <label class="input-label font-bold text-amber-800" for="laneLaneSelectorMain">🎯 레인 선택</label>
+              <select id="laneLaneSelectorMain" onchange="calculateLaneAllMain(); updateTrackVisualization();" 
+                      class="input-field select-field text-lg font-bold"
+                      style="background: white; border: 2px solid #f59e0b;">
+                <option value="1">1번 레인 (400.00m) - 기준</option>
+                <option value="2">2번 레인 (407.04m)</option>
+                <option value="3">3번 레인 (414.70m)</option>
+                <option value="4" selected>4번 레인 (422.37m) - 추천</option>
+                <option value="5">5번 레인 (430.03m)</option>
+                <option value="6">6번 레인 (437.70m)</option>
+                <option value="7">7번 레인 (445.37m)</option>
+                <option value="8">8번 레인 (453.03m) - 최외곽</option>
               </select>
             </div>
           </div>
         </div>
 
-        <!-- 트랙 시각화 -->
-        <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-          <h3 class="font-bold text-lg mb-4">트랙 구간별 시간 시각화</h3>
-          <div class="w-full overflow-x-auto">
-            <svg viewBox="0 0 800 400" class="w-full" style="min-width: 600px; min-height: 300px;" id="trackSVGMain">
-              <rect width="800" height="400" fill="#f5f5f5"/>
-              <g id="laneTrackLanesMain"></g>
-              <ellipse cx="400" cy="200" rx="210" ry="90" fill="#90EE90"/>
-              <line x1="505" y1="110" x2="505" y2="290" stroke="white" stroke-width="3"/>
-              <rect x="490" y="190" width="30" height="20" fill="black"/>
-              <text x="505" y="204" font-size="11" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
-              <g id="sectionLabelsMain">
-                <rect x="350" y="310" width="100" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
-                <text x="400" y="327" font-size="13" fill="white" text-anchor="middle" font-weight="bold">직선② 홈</text>
-                <rect x="350" y="65" width="100" height="25" rx="5" fill="#3b82f6" opacity="0.8"/>
-                <text x="400" y="82" font-size="13" fill="white" text-anchor="middle" font-weight="bold">직선① 백</text>
-                <rect x="630" y="185" width="70" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
-                <text x="665" y="202" font-size="13" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
-                <rect x="100" y="185" width="70" height="25" rx="5" fill="#ef4444" opacity="0.8"/>
-                <text x="135" y="202" font-size="13" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
+        <!-- 🆕 새로운 3D 트랙 시각화 -->
+        <div class="track-visualization-container mb-6">
+          <div class="track-header">
+            <h3 class="font-bold text-lg flex items-center gap-2">
+              <span class="track-icon">🏟️</span>
+              실제 크기 400m 육상 트랙
+            </h3>
+            <div class="track-legend">
+              <span class="legend-item"><span class="legend-color" style="background: #3b82f6;"></span>직선 84.39m</span>
+              <span class="legend-item"><span class="legend-color" style="background: #ef4444;"></span>곡선 (가변)</span>
+            </div>
+          </div>
+          
+          <!-- 3D 투시도 트랙 -->
+          <div class="track-3d-wrapper">
+            <svg viewBox="0 0 900 500" class="track-3d-svg" id="track3DSVG">
+              <defs>
+                <!-- 트랙 표면 그라데이션 -->
+                <linearGradient id="trackSurface" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#c2410c"/>
+                  <stop offset="50%" style="stop-color:#ea580c"/>
+                  <stop offset="100%" style="stop-color:#c2410c"/>
+                </linearGradient>
+                <!-- 잔디 그라데이션 -->
+                <linearGradient id="grassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#22c55e"/>
+                  <stop offset="100%" style="stop-color:#16a34a"/>
+                </linearGradient>
+                <!-- 레인 색상들 -->
+                <linearGradient id="lane1Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#ef4444"/><stop offset="100%" style="stop-color:#dc2626"/>
+                </linearGradient>
+                <linearGradient id="lane2Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#f97316"/><stop offset="100%" style="stop-color:#ea580c"/>
+                </linearGradient>
+                <linearGradient id="lane3Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#eab308"/><stop offset="100%" style="stop-color:#ca8a04"/>
+                </linearGradient>
+                <linearGradient id="lane4Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#84cc16"/><stop offset="100%" style="stop-color:#65a30d"/>
+                </linearGradient>
+                <linearGradient id="lane5Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#22c55e"/><stop offset="100%" style="stop-color:#16a34a"/>
+                </linearGradient>
+                <linearGradient id="lane6Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#06b6d4"/><stop offset="100%" style="stop-color:#0891b2"/>
+                </linearGradient>
+                <linearGradient id="lane7Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#2563eb"/>
+                </linearGradient>
+                <linearGradient id="lane8Grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#8b5cf6"/><stop offset="100%" style="stop-color:#7c3aed"/>
+                </linearGradient>
+                <!-- 선수 그라데이션 -->
+                <radialGradient id="runnerGlow">
+                  <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.8"/>
+                  <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0"/>
+                </radialGradient>
+                <!-- 그림자 필터 -->
+                <filter id="trackShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="5" dy="10" stdDeviation="8" flood-opacity="0.3"/>
+                </filter>
+              </defs>
+              
+              <!-- 배경 하늘 -->
+              <rect width="900" height="500" fill="#e0f2fe"/>
+              
+              <!-- 관중석 배경 (위쪽) -->
+              <rect x="0" y="0" width="900" height="80" fill="#9ca3af"/>
+              <g id="audienceTop">
+                <!-- 관중 점들 -->
+              </g>
+              
+              <!-- 잔디 필드 (중앙) -->
+              <ellipse cx="450" cy="280" rx="220" ry="100" fill="url(#grassGradient)" filter="url(#trackShadow)"/>
+              
+              <!-- 트랙 레인들 - 동적으로 생성됨 -->
+              <g id="trackLanes"></g>
+              
+              <!-- 레인 번호 표시 -->
+              <g id="laneNumbers"></g>
+              
+              <!-- 스태거(출발선) 표시 -->
+              <g id="staggerLines"></g>
+              
+              <!-- 구간 레이블 -->
+              <g id="sectionLabels">
+                <!-- 직선 구간 (백스트레이트) -->
+                <rect x="350" y="140" width="200" height="30" rx="15" fill="#3b82f6" opacity="0.9"/>
+                <text x="450" y="160" font-size="14" fill="white" text-anchor="middle" font-weight="bold">
+                  ◀ 직선① (백스트레이트) 84.39m ▶
+                </text>
+                
+                <!-- 직선 구간 (홈스트레이트) -->
+                <rect x="350" y="405" width="200" height="30" rx="15" fill="#3b82f6" opacity="0.9"/>
+                <text x="450" y="425" font-size="14" fill="white" text-anchor="middle" font-weight="bold">
+                  ◀ 직선② (홈스트레이트) 84.39m ▶
+                </text>
+                
+                <!-- 곡선 구간 (1턴) -->
+                <rect x="700" y="270" width="90" height="55" rx="10" fill="#ef4444" opacity="0.9"/>
+                <text x="745" y="290" font-size="12" fill="white" text-anchor="middle" font-weight="bold">곡선①</text>
+                <text x="745" y="308" font-size="11" fill="white" text-anchor="middle" id="curve1Distance">(1턴)</text>
+                
+                <!-- 곡선 구간 (2턴) -->
+                <rect x="110" y="270" width="90" height="55" rx="10" fill="#ef4444" opacity="0.9"/>
+                <text x="155" y="290" font-size="12" fill="white" text-anchor="middle" font-weight="bold">곡선②</text>
+                <text x="155" y="308" font-size="11" fill="white" text-anchor="middle" id="curve2Distance">(2턴)</text>
+              </g>
+              
+              <!-- 출발/결승선 -->
+              <g id="finishLine">
+                <rect x="575" y="175" width="8" height="210" fill="white"/>
+                <rect x="575" y="175" width="8" height="15" fill="black"/>
+                <rect x="575" y="205" width="8" height="15" fill="black"/>
+                <rect x="575" y="235" width="8" height="15" fill="black"/>
+                <rect x="575" y="265" width="8" height="15" fill="black"/>
+                <rect x="575" y="295" width="8" height="15" fill="black"/>
+                <rect x="575" y="325" width="8" height="15" fill="black"/>
+                <rect x="575" y="355" width="8" height="15" fill="black"/>
+                <!-- S/F 라벨 -->
+                <rect x="555" y="390" width="50" height="22" rx="5" fill="#1f2937"/>
+                <text x="580" y="405" font-size="12" fill="white" text-anchor="middle" font-weight="bold">S/F</text>
+              </g>
+              
+              <!-- 달리는 선수 아이콘 -->
+              <g id="runnerGroup" transform="translate(580, 280)">
+                <circle r="25" fill="url(#runnerGlow)" class="runner-glow"/>
+                <circle r="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="2" class="runner-body"/>
+                <text y="5" font-size="16" text-anchor="middle" class="runner-icon">🏃</text>
+              </g>
+              
+              <!-- 시간 정보 표시 박스 -->
+              <g id="timeInfoBox" transform="translate(450, 50)">
+                <rect x="-120" y="-25" width="240" height="50" rx="10" fill="white" stroke="#e5e7eb" stroke-width="2" filter="url(#trackShadow)"/>
+                <text x="0" y="-5" font-size="12" fill="#6b7280" text-anchor="middle">선택 레인 완주 시간</text>
+                <text x="0" y="18" font-size="20" fill="#1f2937" text-anchor="middle" font-weight="bold" id="totalTimeDisplay">60.00초</text>
+              </g>
+              
+              <!-- 구간별 시간 표시 -->
+              <g id="sectionTimes">
+                <!-- 직선① 시간 -->
+                <rect x="390" y="185" width="120" height="28" rx="5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                <text x="450" y="204" font-size="13" fill="#3b82f6" text-anchor="middle" font-weight="bold" id="straight1Time">12.50초</text>
+                
+                <!-- 직선② 시간 -->
+                <rect x="390" y="365" width="120" height="28" rx="5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                <text x="450" y="384" font-size="13" fill="#3b82f6" text-anchor="middle" font-weight="bold" id="straight2Time">12.50초</text>
+                
+                <!-- 곡선① 시간 -->
+                <rect x="720" y="320" width="80" height="28" rx="5" fill="white" stroke="#ef4444" stroke-width="2"/>
+                <text x="760" y="339" font-size="13" fill="#ef4444" text-anchor="middle" font-weight="bold" id="curve1Time">17.50초</text>
+                
+                <!-- 곡선② 시간 -->
+                <rect x="100" y="320" width="80" height="28" rx="5" fill="white" stroke="#ef4444" stroke-width="2"/>
+                <text x="140" y="339" font-size="13" fill="#ef4444" text-anchor="middle" font-weight="bold" id="curve2Time">17.50초</text>
               </g>
             </svg>
+            
+            <!-- 애니메이션 컨트롤 -->
+            <div class="animation-controls">
+              <button type="button" onclick="animateRunner()" class="anim-btn play-btn" id="playBtn">
+                <i class="fas fa-play"></i> 달리기 시작
+              </button>
+              <button type="button" onclick="pauseRunner()" class="anim-btn pause-btn" id="pauseBtn" disabled>
+                <i class="fas fa-pause"></i> 일시정지
+              </button>
+              <button type="button" onclick="resetRunner()" class="anim-btn reset-btn">
+                <i class="fas fa-redo"></i> 처음으로
+              </button>
+              <div class="progress-bar-container">
+                <div class="progress-bar" id="runnerProgress"></div>
+              </div>
+              <span class="progress-text" id="progressText">0%</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 🆕 레인 비교 카드 (시각적 비교) -->
+        <div class="lane-comparison-section mb-6">
+          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <span>📊</span> 레인별 거리 비교 (한 눈에 보기)
+          </h3>
+          <div class="lane-bars-container" id="laneBarsContainer">
+            <!-- JavaScript로 생성 -->
           </div>
         </div>
 
-        <!-- 레인별 시간 테이블 -->
-        <div class="table-container">
-          <table class="pace-table w-full">
+        <!-- 레인별 시간 테이블 (개선) -->
+        <div class="table-container mb-6">
+          <table class="pace-table w-full lane-table-enhanced">
             <thead>
-              <tr>
-                <th rowspan="2">레인</th>
-                <th rowspan="2">총 거리</th>
-                <th rowspan="2">스태거</th>
-                <th rowspan="2">총 시간</th>
-                <th rowspan="2">시차</th>
-                <th colspan="4" class="bg-gray-50">구간별 시간 (초)</th>
+              <tr class="table-header-main">
+                <th rowspan="2" class="lane-col">레인</th>
+                <th rowspan="2" class="distance-col">총 거리</th>
+                <th rowspan="2" class="stagger-col">스태거<br><span class="text-xs font-normal">(출발선 차이)</span></th>
+                <th rowspan="2" class="time-col">완주 시간</th>
+                <th rowspan="2" class="diff-col">시간 차이</th>
+                <th colspan="4" class="bg-gray-50 section-header">구간별 소요 시간 (초)</th>
               </tr>
               <tr>
-                <th class="bg-blue-50">직선①</th>
-                <th class="bg-red-50">곡선①</th>
-                <th class="bg-blue-50">직선②</th>
-                <th class="bg-red-50">곡선②</th>
+                <th class="bg-blue-50 section-col"><i class="fas fa-arrows-alt-h text-blue-500"></i> 직선①</th>
+                <th class="bg-red-50 section-col"><i class="fas fa-undo text-red-500"></i> 곡선①</th>
+                <th class="bg-blue-50 section-col"><i class="fas fa-arrows-alt-h text-blue-500"></i> 직선②</th>
+                <th class="bg-red-50 section-col"><i class="fas fa-redo text-red-500"></i> 곡선②</th>
               </tr>
             </thead>
             <tbody id="laneTimeTableMain"></tbody>
@@ -1059,15 +1576,27 @@
         <!-- 정보 영역 -->
         <div id="laneAdditionalInfoMain" class="mt-4"></div>
         
-        <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 class="font-bold text-lg mb-2">💡 사용 방법</h4>
-          <ul class="space-y-1 text-sm text-gray-700">
-            <li>• <strong>목표 시간</strong>은 <strong>선택한 레인에서의 실제 시간</strong>입니다</li>
-            <li>• 예: 4레인에서 90초 = 4레인(422.37m)을 90초에 완주</li>
-            <li>• 동일한 속도로 1레인을 달리면 약 85.17초가 됩니다</li>
-            <li>• <strong>직선 구간</strong>: 모든 레인 동일 (84.39m × 2)</li>
-            <li>• <strong>곡선 구간</strong>: 바깥 레인일수록 더 김</li>
-          </ul>
+        <!-- 🆕 트랙 지식 카드 -->
+        <div class="track-knowledge-cards">
+          <div class="knowledge-card">
+            <div class="knowledge-icon">📐</div>
+            <h4>World Athletics 공식 규격</h4>
+            <ul>
+              <li>직선 구간: <strong>84.39m</strong> (모든 레인 동일)</li>
+              <li>레인 폭: <strong>1.22m</strong></li>
+              <li>측정선: 안쪽 연석에서 30cm (1레인) / 20cm (2~8레인)</li>
+            </ul>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-icon">🎯</div>
+            <h4>스태거(Stagger)란?</h4>
+            <p>바깥 레인이 안쪽보다 더 길기 때문에 공정한 경주를 위해 출발선을 앞으로 배치하는 것입니다. 8레인은 1레인보다 <strong>53.03m</strong> 앞에서 출발합니다.</p>
+          </div>
+          <div class="knowledge-card">
+            <div class="knowledge-icon">💡</div>
+            <h4>레인 선택 팁</h4>
+            <p><strong>4~6레인</strong>이 경기에서 유리합니다. 상대 선수를 볼 수 있고, 곡선에서 원심력 부담이 적당합니다. 1레인은 가장 짧지만 곡선이 급합니다.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1390,9 +1919,11 @@
         generateLaneChart();
         generateSteeplechaseChart();
       } else if (tabName === 'lane') {
-        // 트랙 레인 계산기 초기화
+        // 트랙 레인 계산기 초기화 (새로운 3D 시각화 포함)
         setTimeout(() => {
           calculateLaneAllMain();
+          updateTrackVisualization();
+          resetRunner(); // 애니메이션 초기화
         }, 100);
       }
     }
@@ -2387,10 +2918,12 @@
       switchTab('chart');
       checkMobileAndScroll();
       
-      // 트랙 레인 계산기 초기화 (메인 버전 사용)
+      // 트랙 레인 계산기 초기화 (새로운 3D 시각화 포함)
       setTimeout(() => {
         if (document.getElementById('laneTargetTimeMain') && document.getElementById('laneLaneSelectorMain')) {
           calculateLaneAllMain();
+          // 3D 트랙 시각화 초기화
+          updateTrackVisualization();
         }
       }, 100);
       
@@ -2666,6 +3199,369 @@
       });
     }
     
+    // =============================================
+    // NEW: 3D 트랙 시각화 & 애니메이션 시스템
+    // =============================================
+    
+    // 전역 상태
+    let runnerAnimationId = null;
+    let runnerProgress = 0;
+    let isRunning = false;
+    let currentLaneData = null;
+    
+    // 레인별 색상
+    const laneColors = [
+      '#ef4444', '#f97316', '#eab308', '#84cc16', 
+      '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6'
+    ];
+    
+    // 트랙 시각화 업데이트
+    function updateTrackVisualization() {
+      const selectedLane = parseInt(document.getElementById('laneLaneSelectorMain').value);
+      const targetTime = parseFloat(document.getElementById('laneTargetTimeMain').value);
+      
+      drawTrackLanes3D(selectedLane);
+      drawLaneBars(selectedLane);
+      updateSectionTimes(selectedLane, targetTime);
+    }
+    
+    // 3D 트랙 레인 그리기
+    function drawTrackLanes3D(selectedLane) {
+      const trackLanesGroup = document.getElementById('trackLanes');
+      const laneNumbersGroup = document.getElementById('laneNumbers');
+      const staggerLinesGroup = document.getElementById('staggerLines');
+      
+      if (!trackLanesGroup) return;
+      
+      trackLanesGroup.innerHTML = '';
+      laneNumbersGroup.innerHTML = '';
+      staggerLinesGroup.innerHTML = '';
+      
+      // 트랙 중심 및 크기
+      const centerX = 450;
+      const centerY = 280;
+      const straightLength = 220;
+      const baseRadius = 85;
+      const laneWidth = 12;
+      
+      // 8레인부터 1레인까지 (뒤에서 앞으로)
+      for (let lane = 8; lane >= 1; lane--) {
+        const radius = baseRadius + (lane - 1) * laneWidth;
+        const opacity = lane === selectedLane ? 1 : 0.5;
+        const strokeWidth = lane === selectedLane ? 4 : 2;
+        
+        // 트랙 레인 경로 (타원형)
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const leftCenterX = centerX - straightLength / 2;
+        const rightCenterX = centerX + straightLength / 2;
+        
+        const d = `
+          M ${leftCenterX} ${centerY - radius}
+          L ${rightCenterX} ${centerY - radius}
+          A ${radius} ${radius * 0.9} 0 0 1 ${rightCenterX} ${centerY + radius}
+          L ${leftCenterX} ${centerY + radius}
+          A ${radius} ${radius * 0.9} 0 0 1 ${leftCenterX} ${centerY - radius}
+          Z
+        `;
+        
+        path.setAttribute('d', d);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', laneColors[lane - 1]);
+        path.setAttribute('stroke-width', strokeWidth);
+        path.setAttribute('opacity', opacity);
+        path.setAttribute('class', `lane-path lane-${lane}`);
+        
+        // 선택된 레인에 글로우 효과
+        if (lane === selectedLane) {
+          path.setAttribute('filter', 'drop-shadow(0 0 8px ' + laneColors[lane - 1] + ')');
+        }
+        
+        trackLanesGroup.appendChild(path);
+        
+        // 레인 번호 표시 (왼쪽 곡선 바깥)
+        const laneNum = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        laneNum.setAttribute('x', leftCenterX - radius - 15);
+        laneNum.setAttribute('y', centerY + 5);
+        laneNum.setAttribute('font-size', lane === selectedLane ? '14' : '11');
+        laneNum.setAttribute('font-weight', lane === selectedLane ? 'bold' : 'normal');
+        laneNum.setAttribute('fill', laneColors[lane - 1]);
+        laneNum.setAttribute('text-anchor', 'middle');
+        laneNum.setAttribute('opacity', opacity);
+        laneNum.textContent = lane;
+        laneNumbersGroup.appendChild(laneNum);
+        
+        // 스태거 표시 (출발선 위치)
+        if (lane > 1) {
+          const staggerAngle = getStaggerAngle(lane);
+          const staggerX = rightCenterX + Math.cos(staggerAngle) * (radius * 0.9);
+          const staggerY = centerY + Math.sin(staggerAngle) * (radius * 0.9);
+          
+          const staggerLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          staggerLine.setAttribute('x1', staggerX - 5);
+          staggerLine.setAttribute('y1', staggerY - 10);
+          staggerLine.setAttribute('x2', staggerX + 5);
+          staggerLine.setAttribute('y2', staggerY + 10);
+          staggerLine.setAttribute('stroke', 'white');
+          staggerLine.setAttribute('stroke-width', '2');
+          staggerLine.setAttribute('opacity', '0.8');
+          staggerLinesGroup.appendChild(staggerLine);
+        }
+      }
+      
+      // 선택된 레인 하이라이트 텍스트
+      const highlightText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      highlightText.setAttribute('x', centerX);
+      highlightText.setAttribute('y', centerY + 10);
+      highlightText.setAttribute('font-size', '24');
+      highlightText.setAttribute('font-weight', 'bold');
+      highlightText.setAttribute('fill', laneColors[selectedLane - 1]);
+      highlightText.setAttribute('text-anchor', 'middle');
+      highlightText.textContent = `${selectedLane}번 레인`;
+      trackLanesGroup.appendChild(highlightText);
+      
+      // 선택된 레인 거리 표시
+      const distanceText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      distanceText.setAttribute('x', centerX);
+      distanceText.setAttribute('y', centerY + 35);
+      distanceText.setAttribute('font-size', '14');
+      distanceText.setAttribute('fill', '#4b5563');
+      distanceText.setAttribute('text-anchor', 'middle');
+      distanceText.textContent = `총 ${laneDistances[selectedLane].toFixed(2)}m`;
+      trackLanesGroup.appendChild(distanceText);
+    }
+    
+    // 스태거 각도 계산
+    function getStaggerAngle(lane) {
+      const stagger = laneDistances[lane] - 400;
+      const angleOffset = (stagger / laneDistances[lane]) * Math.PI * 2;
+      return -Math.PI / 2 - angleOffset;
+    }
+    
+    // 레인 비교 바 차트
+    function drawLaneBars(selectedLane) {
+      const container = document.getElementById('laneBarsContainer');
+      if (!container) return;
+      
+      const minDistance = 400;
+      const maxDistance = 453.03;
+      const range = maxDistance - minDistance;
+      
+      let html = '';
+      for (let lane = 1; lane <= 8; lane++) {
+        const distance = laneDistances[lane];
+        const percentage = ((distance - minDistance) / range) * 40 + 60; // 60% ~ 100%
+        const extraDistance = (distance - 400).toFixed(2);
+        const isSelected = lane === selectedLane;
+        
+        html += `
+          <div class="lane-bar-row">
+            <div class="lane-bar-label" style="color: ${laneColors[lane - 1]}">
+              ${lane}번 레인
+            </div>
+            <div class="lane-bar-wrapper">
+              <div class="lane-bar ${isSelected ? 'selected' : ''}" 
+                   style="width: ${percentage}%; background: linear-gradient(90deg, ${laneColors[lane - 1]}, ${laneColors[lane - 1]}dd);">
+                <span class="lane-bar-value">${distance.toFixed(1)}m</span>
+              </div>
+              ${lane > 1 ? `<span class="lane-bar-extra">+${extraDistance}m</span>` : ''}
+            </div>
+          </div>
+        `;
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    // 구간별 시간 업데이트
+    function updateSectionTimes(selectedLane, targetTime) {
+      const distance = laneDistances[selectedLane];
+      const speed = distance / targetTime;
+      
+      // 직선 구간 (모두 동일)
+      const straightTime = 84.39 / speed;
+      
+      // 곡선 구간 (레인별 상이)
+      const curveDistance = (distance - 84.39 * 2) / 2;
+      const curveTime = curveDistance / speed;
+      
+      // 시간 표시 업데이트
+      document.getElementById('totalTimeDisplay').textContent = `${targetTime.toFixed(2)}초`;
+      document.getElementById('straight1Time').textContent = `${straightTime.toFixed(2)}초`;
+      document.getElementById('straight2Time').textContent = `${straightTime.toFixed(2)}초`;
+      document.getElementById('curve1Time').textContent = `${curveTime.toFixed(2)}초`;
+      document.getElementById('curve2Time').textContent = `${curveTime.toFixed(2)}초`;
+      
+      // 곡선 거리 표시
+      document.getElementById('curve1Distance').textContent = `${curveDistance.toFixed(1)}m`;
+      document.getElementById('curve2Distance').textContent = `${curveDistance.toFixed(1)}m`;
+      
+      // 현재 레인 데이터 저장
+      currentLaneData = {
+        lane: selectedLane,
+        distance: distance,
+        speed: speed,
+        totalTime: targetTime,
+        straightTime: straightTime,
+        curveTime: curveTime,
+        curveDistance: curveDistance
+      };
+    }
+    
+    // 선수 달리기 애니메이션
+    function animateRunner() {
+      if (isRunning) return;
+      
+      isRunning = true;
+      runnerProgress = 0;
+      
+      document.getElementById('playBtn').disabled = true;
+      document.getElementById('pauseBtn').disabled = false;
+      
+      const startTime = performance.now();
+      const targetTime = parseFloat(document.getElementById('laneTargetTimeMain').value) * 1000; // ms
+      const animationDuration = Math.min(targetTime, 10000); // 최대 10초 애니메이션
+      
+      function animate(currentTime) {
+        if (!isRunning) return;
+        
+        const elapsed = currentTime - startTime;
+        runnerProgress = Math.min(elapsed / animationDuration, 1);
+        
+        updateRunnerPosition(runnerProgress);
+        updateProgressBar(runnerProgress);
+        
+        if (runnerProgress < 1) {
+          runnerAnimationId = requestAnimationFrame(animate);
+        } else {
+          finishAnimation();
+        }
+      }
+      
+      runnerAnimationId = requestAnimationFrame(animate);
+    }
+    
+    // 선수 위치 업데이트
+    function updateRunnerPosition(progress) {
+      const runnerGroup = document.getElementById('runnerGroup');
+      if (!runnerGroup) return;
+      
+      const selectedLane = parseInt(document.getElementById('laneLaneSelectorMain').value);
+      
+      // 트랙 경로 파라미터
+      const centerX = 450;
+      const centerY = 280;
+      const straightLength = 220;
+      const radius = 85 + (selectedLane - 1) * 12;
+      
+      const leftCenterX = centerX - straightLength / 2;
+      const rightCenterX = centerX + straightLength / 2;
+      
+      // 트랙 구간별 위치 계산
+      // 출발/결승선은 홈스트레이트 오른쪽 끝
+      // 순서: 홈스트레이트 → 1턴(곡선) → 백스트레이트 → 2턴(곡선)
+      
+      const totalPathLength = straightLength * 2 + Math.PI * radius * 2;
+      const currentPosition = progress * totalPathLength;
+      
+      let x, y, rotation;
+      
+      const segment1 = straightLength; // 홈스트레이트
+      const segment2 = Math.PI * radius; // 1턴
+      const segment3 = straightLength; // 백스트레이트
+      const segment4 = Math.PI * radius; // 2턴
+      
+      if (currentPosition < segment1) {
+        // 홈스트레이트 (왼쪽으로 이동)
+        const t = currentPosition / segment1;
+        x = rightCenterX - t * straightLength;
+        y = centerY + radius;
+        rotation = 180;
+      } else if (currentPosition < segment1 + segment2) {
+        // 1턴 (왼쪽 곡선, 아래에서 위로)
+        const t = (currentPosition - segment1) / segment2;
+        const angle = Math.PI / 2 + t * Math.PI;
+        x = leftCenterX + Math.cos(angle) * radius;
+        y = centerY + Math.sin(angle) * radius * 0.9;
+        rotation = 180 + (t * 180);
+      } else if (currentPosition < segment1 + segment2 + segment3) {
+        // 백스트레이트 (오른쪽으로 이동)
+        const t = (currentPosition - segment1 - segment2) / segment3;
+        x = leftCenterX + t * straightLength;
+        y = centerY - radius;
+        rotation = 0;
+      } else {
+        // 2턴 (오른쪽 곡선, 위에서 아래로)
+        const t = (currentPosition - segment1 - segment2 - segment3) / segment4;
+        const angle = -Math.PI / 2 + t * Math.PI;
+        x = rightCenterX + Math.cos(angle) * radius;
+        y = centerY + Math.sin(angle) * radius * 0.9;
+        rotation = (t * 180);
+      }
+      
+      runnerGroup.setAttribute('transform', `translate(${x}, ${y}) rotate(${rotation})`);
+      
+      // 선수 아이콘 방향 보정
+      const runnerIcon = runnerGroup.querySelector('.runner-icon');
+      if (runnerIcon) {
+        runnerIcon.setAttribute('transform', `rotate(${-rotation})`);
+      }
+    }
+    
+    // 진행 바 업데이트
+    function updateProgressBar(progress) {
+      const progressBar = document.getElementById('runnerProgress');
+      const progressText = document.getElementById('progressText');
+      
+      if (progressBar) progressBar.style.width = `${progress * 100}%`;
+      if (progressText) progressText.textContent = `${Math.round(progress * 100)}%`;
+    }
+    
+    // 애니메이션 일시정지
+    function pauseRunner() {
+      isRunning = false;
+      if (runnerAnimationId) {
+        cancelAnimationFrame(runnerAnimationId);
+      }
+      
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+    }
+    
+    // 애니메이션 리셋
+    function resetRunner() {
+      pauseRunner();
+      runnerProgress = 0;
+      
+      updateRunnerPosition(0);
+      updateProgressBar(0);
+      
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+    }
+    
+    // 애니메이션 완료
+    function finishAnimation() {
+      isRunning = false;
+      
+      document.getElementById('playBtn').disabled = false;
+      document.getElementById('pauseBtn').disabled = true;
+      
+      // 완주 효과
+      const runnerGroup = document.getElementById('runnerGroup');
+      if (runnerGroup) {
+        runnerGroup.innerHTML += `
+          <text y="-25" font-size="20" text-anchor="middle" fill="#22c55e" font-weight="bold" class="finish-text">
+            🎉 완주!
+          </text>
+        `;
+        
+        setTimeout(() => {
+          const finishText = runnerGroup.querySelector('.finish-text');
+          if (finishText) finishText.remove();
+        }, 2000);
+      }
+    }
+    
     // 메인 레인 계산기 함수 (lane 탭용)
     function calculateLaneAllMain() {
       const targetTimeInput = document.getElementById('laneTargetTimeMain');
@@ -2814,50 +3710,84 @@
       lanes.forEach(lane => {
         const row = tbody.insertRow();
         if (lane.isSelected) {
-          row.className = 'bg-orange-100 font-semibold';
+          row.className = 'selected-lane';
         } else if (Math.abs(lane.distance - 400) < 0.1) {
           row.className = 'bg-green-50';
         }
         
         const timeDiff = lane.lane === 1 ? 0 : lane.adjustedTime - lanes[0].adjustedTime;
         const timeDiffStr = timeDiff > 0 ? `+${timeDiff.toFixed(2)}` : timeDiff.toFixed(2);
+        const laneColor = laneColors[lane.lane - 1];
         
         row.innerHTML = `
-          <td class="font-bold ${lane.isSelected ? 'text-orange-700' : ''}">${lane.lane}${lane.isSelected ? ' ✓' : ''}</td>
-          <td>${lane.distance.toFixed(2)}m</td>
-          <td>${lane.stagger > 0 ? '+' + lane.stagger.toFixed(2) : lane.stagger.toFixed(2)}m</td>
-          <td class="font-bold ${lane.isSelected ? 'text-orange-700' : ''}">${lane.adjustedTime.toFixed(2)}초</td>
-          <td class="text-xs">${timeDiff === 0 ? '-' : timeDiffStr}</td>
-          <td class="text-blue-600">${lane.sectionTimes.straight1.toFixed(2)}</td>
-          <td class="text-red-600">${lane.sectionTimes.curve1.toFixed(2)}</td>
-          <td class="text-blue-600">${lane.sectionTimes.straight2.toFixed(2)}</td>
-          <td class="text-red-600">${lane.sectionTimes.curve2.toFixed(2)}</td>
+          <td style="border-left: 4px solid ${laneColor};">
+            <span class="font-bold" style="color: ${laneColor};">${lane.lane}</span>
+            ${lane.isSelected ? ' <span class="text-amber-500">★</span>' : ''}
+          </td>
+          <td><strong>${lane.distance.toFixed(2)}m</strong></td>
+          <td class="${lane.stagger > 0 ? 'text-orange-600' : ''}">${lane.stagger > 0 ? '+' + lane.stagger.toFixed(2) : '0.00'}m</td>
+          <td class="font-bold ${lane.isSelected ? 'text-amber-700 text-lg' : ''}">${lane.adjustedTime.toFixed(2)}초</td>
+          <td class="text-xs ${timeDiff > 0 ? 'text-red-500' : 'text-green-600'}">${timeDiff === 0 ? '-' : timeDiffStr}</td>
+          <td class="text-blue-600 font-mono">${lane.sectionTimes.straight1.toFixed(2)}</td>
+          <td class="text-red-600 font-mono">${lane.sectionTimes.curve1.toFixed(2)}</td>
+          <td class="text-blue-600 font-mono">${lane.sectionTimes.straight2.toFixed(2)}</td>
+          <td class="text-red-600 font-mono">${lane.sectionTimes.curve2.toFixed(2)}</td>
         `;
       });
+      
+      // 3D 트랙 시각화 업데이트
+      updateTrackVisualization();
       
       // 추가 정보 표시
       if (selectedLaneData) {
         const infoDiv = document.getElementById('laneAdditionalInfoMain');
         if (infoDiv) {
+          const laneColor = laneColors[selectedLaneData.lane - 1];
           infoDiv.innerHTML = `
-            <div class="bg-orange-50 p-4 rounded-lg">
-              <h4 class="font-bold text-lg mb-2">📊 선택한 레인 분석</h4>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div class="bg-white p-3 rounded shadow-sm">
-                  <div class="text-xs text-gray-600">평균 속도</div>
-                  <div class="text-xl font-bold text-orange-700">${selectedLaneData.speedKMH.toFixed(2)} km/h</div>
+            <div class="p-5 rounded-xl" style="background: linear-gradient(135deg, ${laneColor}15, ${laneColor}25); border: 2px solid ${laneColor}50;">
+              <h4 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <span style="color: ${laneColor};">●</span>
+                ${selectedLaneData.lane}번 레인 상세 분석
+              </h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div class="text-xs text-gray-500 mb-1">🚀 평균 속도</div>
+                  <div class="text-2xl font-bold" style="color: ${laneColor};">${selectedLaneData.speedKMH.toFixed(2)}</div>
+                  <div class="text-xs text-gray-400">km/h</div>
                 </div>
-                <div class="bg-white p-3 rounded shadow-sm">
-                  <div class="text-xs text-gray-600">km당 페이스</div>
-                  <div class="text-xl font-bold text-orange-700">${formatPace(selectedLaneData.pacePerKm)}</div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div class="text-xs text-gray-500 mb-1">⏱️ km 페이스</div>
+                  <div class="text-2xl font-bold" style="color: ${laneColor};">${formatPace(selectedLaneData.pacePerKm)}</div>
+                  <div class="text-xs text-gray-400">/km</div>
                 </div>
-                <div class="bg-white p-3 rounded shadow-sm">
-                  <div class="text-xs text-gray-600">400m 환산 (1레인)</div>
-                  <div class="text-xl font-bold text-orange-700">${(400 / speedInSelectedLane).toFixed(2)}초</div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div class="text-xs text-gray-500 mb-1">🏃 400m 환산</div>
+                  <div class="text-2xl font-bold" style="color: ${laneColor};">${(400 / speedInSelectedLane).toFixed(2)}</div>
+                  <div class="text-xs text-gray-400">초 (1레인 기준)</div>
                 </div>
-                <div class="bg-white p-3 rounded shadow-sm">
-                  <div class="text-xs text-gray-600">100m 평균</div>
-                  <div class="text-xl font-bold text-orange-700">${(targetTime / (selectedLaneData.distance / 100)).toFixed(2)}초</div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                  <div class="text-xs text-gray-500 mb-1">📏 100m 평균</div>
+                  <div class="text-2xl font-bold" style="color: ${laneColor};">${(targetTime / (selectedLaneData.distance / 100)).toFixed(2)}</div>
+                  <div class="text-xs text-gray-400">초</div>
+                </div>
+              </div>
+              
+              <!-- 구간별 거리 정보 -->
+              <div class="mt-4 p-3 bg-white rounded-lg">
+                <div class="text-sm font-semibold text-gray-700 mb-2">📐 구간별 거리</div>
+                <div class="flex flex-wrap gap-4 text-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                    <span>직선: <strong>84.39m × 2</strong></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span>곡선: <strong>${((selectedLaneData.distance - 168.78) / 2).toFixed(2)}m × 2</strong></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded" style="background: ${laneColor};"></span>
+                    <span>총합: <strong>${selectedLaneData.distance.toFixed(2)}m</strong></span>
+                  </div>
                 </div>
               </div>
             </div>
