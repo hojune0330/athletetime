@@ -942,9 +942,19 @@
       transition: all var(--transition-base);
     }
     
-    .calculate-btn:hover {
+    .calculate-btn:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+    
+    .calculate-btn:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+    
+    .calculate-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
     
     /* 전략 요약 박스 */
@@ -2089,6 +2099,22 @@
           페이스 계산하기
         </button>
         
+        <!-- 계산 전 안내 메시지 -->
+        <div id="targetPlaceholder" class="mt-6">
+          <div class="text-center p-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-dashed border-green-200">
+            <div class="text-5xl mb-4">🎯</div>
+            <h3 class="text-lg font-bold text-gray-700 mb-2">목표 페이스를 확인해보세요!</h3>
+            <p class="text-sm text-gray-600 mb-4">
+              목표 거리와 완주 시간을 입력하고<br>
+              <strong>"페이스 계산하기"</strong> 버튼을 클릭하세요.
+            </p>
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-500">
+              <span>📏</span>
+              <span>거리는 드롭다운에서 선택하거나 직접 입력할 수 있습니다.</span>
+            </div>
+          </div>
+        </div>
+        
         <div id="targetResults" class="mt-6 hidden">
           <div class="bg-blue-50 rounded-lg p-4">
             <h3 class="font-bold mb-3">페이스 분석 결과</h3>
@@ -2254,6 +2280,22 @@
           <i class="fas fa-calculator"></i>
           스플릿 계산하기
         </button>
+        
+        <!-- 계산 전 안내 메시지 -->
+        <div id="splitPlaceholder" class="mt-6">
+          <div class="text-center p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border-2 border-dashed border-blue-200">
+            <div class="text-5xl mb-4">🏃‍♂️</div>
+            <h3 class="text-lg font-bold text-gray-700 mb-2">레이스 전략을 계산해보세요!</h3>
+            <p class="text-sm text-gray-600 mb-4">
+              목표 거리와 시간을 설정하고 페이스 전략을 선택한 뒤<br>
+              <strong>"스플릿 계산하기"</strong> 버튼을 클릭하세요.
+            </p>
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-500">
+              <span>💡 Tip:</span>
+              <span>빠른 거리 선택 버튼과 시간 프리셋을 활용해보세요!</span>
+            </div>
+          </div>
+        </div>
         
         <div id="splitResults" class="mt-6 hidden">
           <!-- 전략 요약 -->
@@ -2828,23 +2870,38 @@
 
     // 목표 페이스 계산
     function calculateTargetPace() {
-      const distanceSelect = document.getElementById('targetDistance');
-      let distance = parseFloat(distanceSelect.value);
-      
-      if (distanceSelect.value === 'custom') {
-        distance = parseFloat(document.getElementById('customDistance').value);
-      }
-      
-      const hours = parseInt(document.getElementById('targetHours').value) || 0;
-      const minutes = parseInt(document.getElementById('targetMinutes').value) || 0;
-      const seconds = parseFloat(document.getElementById('targetSeconds').value) || 0;
-      
-      if (!distance || (hours === 0 && minutes === 0 && seconds === 0)) {
-        alert('거리와 시간을 입력해주세요.');
-        return;
-      }
-      
-      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      try {
+        console.log('목표 페이스 계산 시작');
+        
+        const distanceSelect = document.getElementById('targetDistance');
+        let distance = parseFloat(distanceSelect.value);
+        
+        if (distanceSelect.value === 'custom') {
+          distance = parseFloat(document.getElementById('customDistance').value);
+        }
+        
+        const hours = parseInt(document.getElementById('targetHours').value) || 0;
+        const minutes = parseInt(document.getElementById('targetMinutes').value) || 0;
+        const seconds = parseFloat(document.getElementById('targetSeconds').value) || 0;
+        
+        console.log('입력값:', { distance, hours, minutes, seconds });
+        
+        if (isNaN(distance) || distance <= 0) {
+          alert('올바른 거리를 입력해주세요.');
+          return;
+        }
+        
+        if (hours === 0 && minutes === 0 && seconds === 0) {
+          alert('목표 시간을 입력해주세요.');
+          return;
+        }
+        
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        
+        if (totalSeconds <= 0) {
+          alert('올바른 목표 시간을 입력해주세요.');
+          return;
+        }
       
       // 페이스 계산
       const pace400 = (totalSeconds / distance) * 400;
@@ -2884,7 +2941,21 @@
         }
       });
       
+      // 플레이스홀더 숨기기
+      const placeholder = document.getElementById('targetPlaceholder');
+      if (placeholder) {
+        placeholder.classList.add('hidden');
+      }
+      
+      // 결과 표시
       document.getElementById('targetResults').classList.remove('hidden');
+      
+      // 스크롤 애니메이션
+      setTimeout(() => {
+        document.getElementById('targetResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+      
+      console.log('목표 페이스 계산 완료');
       
       // 채팅에 활동 공유
       const distanceText = distanceSelect.value === 'custom' ? 
@@ -2894,6 +2965,11 @@
         pace: formatTime(pace1km) + '/km',
         time: formatTime(totalSeconds)
       });
+      
+      } catch (error) {
+        console.error('목표 페이스 계산 중 오류:', error);
+        alert('계산 중 오류가 발생했습니다. 입력값을 확인해주세요.\n오류: ' + error.message);
+      }
     }
 
     // 페이스 전략 설명 업데이트
@@ -3027,19 +3103,71 @@
     
     // 스플릿 계산
     function calculateSplits() {
-      const totalDistance = parseFloat(document.getElementById('splitTotalDistance').value);
-      const interval = parseFloat(document.getElementById('splitInterval').value);
-      const strategy = document.getElementById('paceStrategy').value;
-      
-      const hours = parseInt(document.getElementById('splitHours').value) || 0;
-      const minutes = parseInt(document.getElementById('splitMinutes').value) || 0;
-      const seconds = parseFloat(document.getElementById('splitSeconds').value) || 0;
-      
-      if (!totalDistance || !interval || (hours === 0 && minutes === 0 && seconds === 0)) return;
-      
-      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-      const numSplits = Math.ceil(totalDistance / interval);
-      const avgPace = totalSeconds / (totalDistance / 1000); // 초/km
+      try {
+        console.log('계산 시작');
+        
+        // 버튼 로딩 상태
+        const btn = event ? event.target : document.querySelector('.calculate-btn');
+        const originalHTML = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 계산 중...';
+        }
+        
+        const totalDistance = parseFloat(document.getElementById('splitTotalDistance').value);
+        const interval = parseFloat(document.getElementById('splitInterval').value);
+        const strategyInput = document.querySelector('input[name="paceStrategy"]:checked');
+        const strategy = strategyInput ? strategyInput.value : 'even';
+        
+        const hours = parseInt(document.getElementById('splitHours').value) || 0;
+        const minutes = parseInt(document.getElementById('splitMinutes').value) || 0;
+        const seconds = parseFloat(document.getElementById('splitSeconds').value) || 0;
+        
+        console.log('입력값:', { totalDistance, interval, strategy, hours, minutes, seconds });
+        
+        // 유효성 검증
+        if (isNaN(totalDistance) || totalDistance <= 0) {
+          alert('올바른 총 거리를 입력해주세요.');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+          }
+          return;
+        }
+        
+        if (isNaN(interval) || interval <= 0) {
+          alert('올바른 구간 거리를 입력해주세요.');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+          }
+          return;
+        }
+        
+        if (hours === 0 && minutes === 0 && seconds === 0) {
+          alert('목표 시간을 입력해주세요.');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+          }
+          return;
+        }
+        
+        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+        
+        if (totalSeconds <= 0) {
+          alert('올바른 목표 시간을 입력해주세요.');
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+          }
+          return;
+        }
+        
+        const numSplits = Math.ceil(totalDistance / interval);
+        const avgPace = totalSeconds / (totalDistance / 1000); // 초/km
+        
+        console.log('계산 데이터:', { totalSeconds, numSplits, avgPace });
       
       // 전략 요약 표시
       const strategySummary = document.getElementById('strategySummary');
@@ -3164,39 +3292,90 @@
       // 페이스 그래프 생성
       renderPaceGraph(graphData, avgPace);
       
-      document.getElementById('splitResults').classList.remove('hidden');
+      // 플레이스홀더 숨기기
+      const placeholder = document.getElementById('splitPlaceholder');
+      if (placeholder) {
+        placeholder.classList.add('hidden');
+      }
+      
+      // 결과 표시
+      const resultsDiv = document.getElementById('splitResults');
+      resultsDiv.classList.remove('hidden');
+      
+      // 스크롤 애니메이션
+      setTimeout(() => {
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+      
+      console.log('계산 완료');
+      
+      // 버튼 복원
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+      
+      } catch (error) {
+        console.error('계산 중 오류 발생:', error);
+        alert('계산 중 오류가 발생했습니다. 입력값을 확인해주세요.\n오류: ' + error.message);
+        
+        // 버튼 복원
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+        }
+      }
     }
     
     // 페이스 그래프 렌더링
     function renderPaceGraph(data, avgPace) {
-      const chartContainer = document.getElementById('paceBarChart');
-      if (!chartContainer) return;
-      
-      // 최소/최대 페이스 계산 (바 높이 스케일링용)
-      const paces = data.map(d => d.pacePerKm);
-      const minPace = Math.min(...paces);
-      const maxPace = Math.max(...paces);
-      const paceRange = maxPace - minPace || 1; // 0으로 나누기 방지
-      
-      // 그래프 HTML 생성
-      let html = '';
-      data.forEach(item => {
-        // 높이 계산 (100px 기준, 역순으로 - 빠른 페이스가 높음)
-        const normalizedHeight = 30 + ((maxPace - item.pacePerKm) / paceRange) * 70;
-        const barClass = item.factor > 1 ? 'slow' : (item.factor < 1 ? 'fast' : '');
-        const paceStr = `${Math.floor(item.pacePerKm)}:${String(Math.floor((item.pacePerKm % 1) * 60)).padStart(2, '0')}`;
+      try {
+        const chartContainer = document.getElementById('paceBarChart');
+        if (!chartContainer) {
+          console.warn('paceBarChart 요소를 찾을 수 없습니다.');
+          return;
+        }
         
-        html += `
-          <div class="pace-bar-item">
-            <div class="pace-bar ${barClass}" style="height: ${normalizedHeight}px;">
-              <span class="pace-bar-value">${paceStr}</span>
+        if (!data || data.length === 0) {
+          console.warn('그래프 데이터가 없습니다.');
+          chartContainer.innerHTML = '<p class="text-center text-gray-500">데이터가 없습니다.</p>';
+          return;
+        }
+        
+        // 최소/최대 페이스 계산 (바 높이 스케일링용)
+        const paces = data.map(d => d.pacePerKm);
+        const minPace = Math.min(...paces);
+        const maxPace = Math.max(...paces);
+        const paceRange = maxPace - minPace || 1; // 0으로 나누기 방지
+        
+        // 그래프 HTML 생성
+        let html = '';
+        data.forEach(item => {
+          // 높이 계산 (100px 기준, 역순으로 - 빠른 페이스가 높음)
+          const normalizedHeight = 30 + ((maxPace - item.pacePerKm) / paceRange) * 70;
+          const barClass = item.factor > 1 ? 'slow' : (item.factor < 1 ? 'fast' : '');
+          const paceStr = `${Math.floor(item.pacePerKm)}:${String(Math.floor((item.pacePerKm % 1) * 60)).padStart(2, '0')}`;
+          
+          html += `
+            <div class="pace-bar-item">
+              <div class="pace-bar ${barClass}" style="height: ${normalizedHeight}px;">
+                <span class="pace-bar-value">${paceStr}</span>
+              </div>
+              <span class="pace-bar-label">${item.segment}구간</span>
             </div>
-            <span class="pace-bar-label">${item.segment}구간</span>
-          </div>
-        `;
-      });
-      
-      chartContainer.innerHTML = html;
+          `;
+        });
+        
+        chartContainer.innerHTML = html;
+        console.log('그래프 렌더링 완료:', data.length, '개 구간');
+        
+      } catch (error) {
+        console.error('그래프 렌더링 중 오류:', error);
+        const chartContainer = document.getElementById('paceBarChart');
+        if (chartContainer) {
+          chartContainer.innerHTML = '<p class="text-center text-red-500">그래프를 생성할 수 없습니다.</p>';
+        }
+      }
     }
 
     // 제거됨: 훈련 페이스는 별도 페이지로 이동
