@@ -52,14 +52,6 @@ export default function Header() {
             <div className="flex items-center justify-between h-14">
               {/* 로고 영역 */}
               <div className="flex items-center gap-3">
-                <button
-                  onClick={goToMain}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-all"
-                  title="메인 홈페이지로"
-                >
-                  <i className="fas fa-home text-sm"></i>
-                  <span className="text-sm font-medium hidden sm:inline">메인</span>
-                </button>
                 <Link to="/" className="flex items-center gap-2">
                   <ClockIcon className="w-7 h-7 text-white" />
                   <div>
