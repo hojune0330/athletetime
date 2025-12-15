@@ -118,16 +118,17 @@ export default function Header() {
                   <MagnifyingGlassIcon className="w-5 h-5" />
                 </button>
 
+                {/* 회원관련(로그인) */}
                 {isAuthenticated ? (
                   <>
                     {/* 알림 버튼 */}
-                    <button className="p-2 text-primary-100 hover:text-white transition-colors relative rounded-lg hover:bg-white/10">
+                    {/* <button className="p-2 text-primary-100 hover:text-white transition-colors relative rounded-lg hover:bg-white/10">
                       <BellIcon className="w-5 h-5" />
                       <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full animate-pulse"></span>
-                    </button>
+                    </button> */}
 
                     {/* 프로필 드롭다운 */}
-                    <div className="relative">
+                    {/* <div className="relative">
                       <button 
                         onClick={() => setUserMenuOpen(!userMenuOpen)}
                         className="flex items-center gap-2 px-3 py-1.5 text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -167,32 +168,31 @@ export default function Header() {
                           </button>
                         </div>
                       )}
-                    </div>
+                    </div> */}
                   </>
                 ) : (
-                  <>
-                    <Link
-                      to="/login"
-                      className="hidden md:flex items-center gap-1 px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
-                    >
-                      <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                      로그인
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="hidden md:flex px-4 py-2 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                    >
-                      회원가입
-                    </Link>
+                  // <>
+                  //   <Link
+                  //     to="/login"
+                  //     className="hidden md:flex items-center gap-1 px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-colors"
+                  //   >
+                  //     <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                  //     로그인
+                  //   </Link>
+                  //   <Link
+                  //     to="/register"
+                  //     className="hidden md:flex px-4 py-2 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                  //   >
+                  //     회원가입
+                  //   </Link>
                     
-                    {/* 모바일용 로그인 버튼 */}
-                    <Link
-                      to="/login"
-                      className="md:hidden p-2 text-primary-100 hover:text-white transition-colors"
-                    >
-                      <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                    </Link>
-                  </>
+                  //   <Link
+                  //     to="/login"
+                  //     className="md:hidden p-2 text-primary-100 hover:text-white transition-colors"
+                  //   >
+                  //     <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                  //   </Link>
+                  // </>
                 )}
 
                 {/* 모바일 메뉴 버튼 */}
