@@ -141,24 +141,6 @@ const MainPage: React.FC = () => {
             <p className="text-sm md:text-base text-neutral-500 mb-8 max-w-lg mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
               페이스 계산, 훈련 관리, 커뮤니티까지 - 육상인을 위한 올인원 플랫폼
             </p>
-            
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeInUp" style={{ animationDelay: '0.3s' }}>
-              <Link 
-                to="/pace-calculator" 
-                className="w-full sm:w-auto btn-primary px-8 py-4 text-base font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <ClockIcon className="w-5 h-5 mr-2" />
-                페이스 계산기 시작
-              </Link>
-              <Link 
-                to="/community" 
-                className="w-full sm:w-auto btn-secondary px-8 py-4 text-base font-bold rounded-xl hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <ChatBubbleLeftRightIcon className="w-5 h-5 mr-2" />
-                커뮤니티 참여
-              </Link>
-            </div>
           </div>
         </div>
       </section>
