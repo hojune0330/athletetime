@@ -26,9 +26,9 @@ function App() {
     })
   }, [])
 
-  // React app is deployed at root path (/)
-  // Netlify handles /community redirect via netlify.toml
-  const basename = '/'
+  // React app is deployed at /community/ path
+  // Vite base is set to '/community/' in vite.config.ts
+  const basename = '/community/'
 
   return (
     <div className="min-h-screen bg-neutral-50">
