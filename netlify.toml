@@ -7,13 +7,7 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# SPA 설정 - 통합 네비게이션
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# 계산기 페이지들
+# 계산기 페이지들 (우선순위 높음)
 [[redirects]]
   from = "/pace-calculator"
   to = "/pace-calculator.html"
@@ -29,10 +23,16 @@
   to = "/chat.html"
   status = 200
 
-# 커뮤니티 페이지
+# 커뮤니티 SPA 라우팅 (우선순위 높음)
 [[redirects]]
-  from = "/community"
+  from = "/community/*"
   to = "/community/index.html"
+  status = 200
+
+# 메인 페이지 SPA 라우팅 (가장 마지막)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
 
 # API 프록시
