@@ -20,7 +20,7 @@ export default function Header() {
   const { user, logout, isAuthenticated } = useAuth()
   
   const goToMain = () => {
-    window.location.href = '/index.html'
+    navigate('/')
   }
   
   // 외부 도구 링크 (community 외부의 HTML 페이지)

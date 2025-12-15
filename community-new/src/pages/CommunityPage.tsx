@@ -268,7 +268,7 @@ export default function CommunityPage() {
       )}
 
       {/* 실시간 인기 태그 */}
-      <div className="card mb-4">
+      {/* <div className="card mb-4">
         <div className="card-body py-3">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-semibold text-neutral-500">🔥 실시간:</span>
@@ -282,7 +282,7 @@ export default function CommunityPage() {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 게시글 목록 */}
       <PostList />

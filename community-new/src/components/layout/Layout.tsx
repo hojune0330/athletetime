@@ -11,9 +11,9 @@ export default function Layout() {
       <div className="container mx-auto px-4 py-6 flex-1">
         <div className="flex gap-6">
           {/* 좌측 사이드바 */}
-          <aside className="hidden lg:block w-64 shrink-0">
+          {/* <aside className="hidden lg:block w-64 shrink-0">
             <Sidebar />
-          </aside>
+          </aside> */}
           
           {/* 메인 컨텐츠 */}
           <main className="flex-1 min-w-0">
@@ -21,9 +21,9 @@ export default function Layout() {
           </main>
           
           {/* 우측 배너/광고 영역 */}
-          <aside className="hidden xl:block w-72 shrink-0">
+          {/* <aside className="hidden xl:block w-72 shrink-0">
             <RightBanner />
-          </aside>
+          </aside> */}
         </div>
       </div>
       <Footer />
