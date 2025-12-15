@@ -317,7 +317,7 @@ export default function Header() {
           </nav>
 
           {/* 드로어 푸터 - 로그인/회원가입 */}
-          <div className="p-4 border-t border-neutral-100 safe-bottom">
+          {/* <div className="p-4 border-t border-neutral-100 safe-bottom">
             {isAuthenticated ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 px-2">
@@ -364,7 +364,7 @@ export default function Header() {
                 </Link>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </>
