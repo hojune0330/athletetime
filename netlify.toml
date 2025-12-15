@@ -1,5 +1,5 @@
 [build]
-  command = "cd community-new && npm ci && npm run build && cp -r dist/* ../"
+  command = "echo 'Using pre-built files from repository'"
   publish = "."
   functions = "netlify/functions"
 
