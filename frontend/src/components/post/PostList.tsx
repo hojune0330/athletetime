@@ -60,7 +60,7 @@ function PostItem({ post }: PostItemProps) {
   
   return (
     <Link
-      to={`community/post/${post.id}`}
+      to={`/community/post/${post.id}`}
       className="block hover:bg-primary-50/50 transition-all duration-200 group"
     >
       <article className="p-4 border-b border-neutral-100 group-hover:border-l-4 group-hover:border-l-primary-500 group-hover:pl-3 transition-all">
