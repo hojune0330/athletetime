@@ -1,0 +1,89 @@
+/* Chat Page Styles */
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Scrollbar styling */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 3px;
+}
+
+/* Chat container fullscreen */
+.chat-page-container {
+  height: 100vh;
+  height: -webkit-fill-available;
+  overflow: hidden;
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: white;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .chat-page-container {
+    flex-direction: column;
+  }
+}
+
+/* Safe area for iPhone */
+@supports (padding: max(0px)) {
+  .input-safe-area {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* iOS zoom prevention */
+input, textarea {
+  font-size: 16px !important;
+}

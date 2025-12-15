@@ -1,0 +1,125 @@
+/* Training Calculator Styles */
+
+/* Gradient Background */
+.gradient-bg {
+  background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+}
+
+/* Training Zone Colors */
+.training-zone-easy {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.training-zone-marathon {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.training-zone-threshold {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.training-zone-interval {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.training-zone-repetition {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+}
+
+/* Phase Card Hover */
+.phase-card {
+  transition: all 0.3s ease;
+}
+
+.phase-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Intensity Borders */
+.intensity-low {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(to right, rgba(16, 185, 129, 0.05), transparent);
+}
+
+.intensity-medium {
+  border-left: 4px solid #3b82f6;
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.05), transparent);
+}
+
+.intensity-high {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent);
+}
+
+.intensity-rest {
+  border-left: 4px solid #6b7280;
+  background: linear-gradient(to right, rgba(107, 114, 128, 0.05), transparent);
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.pulse-on-hover:hover {
+  animation: pulse 1s infinite;
+}
+
+/* Mobile Responsive */
+@media (max-width: 767px) {
+  .max-w-7xl {
+    padding: 0.75rem !important;
+  }
+
+  .gradient-bg {
+    padding: 1rem !important;
+  }
+
+  .gradient-bg h1 {
+    font-size: 1.25rem !important;
+  }
+
+  .gradient-bg p {
+    font-size: 0.875rem !important;
+  }
+
+  .bg-white.rounded-xl.shadow-lg {
+    padding: 1rem !important;
+  }
+
+  /* Step numbers */
+  .w-10.h-10 {
+    width: 2rem !important;
+    height: 2rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Button touch targets */
+  button,
+  select,
+  input {
+    min-height: 44px;
+  }
+}
+
+/* Select dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5rem;
+  padding-right: 2.5rem;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}

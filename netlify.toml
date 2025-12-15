@@ -1,32 +1,14 @@
 [build]
-  # 이미 빌드된 파일을 사용 - npm 빌드 불필요
-  # Netlify UI에서 설정한 빌드 명령어를 무시하고 이 설정 사용
-  command = "echo 'Using pre-built files from repository' && ls -la"
-  publish = "."
-  functions = "netlify/functions"
-  base = ""
+  # frontend 폴더에서 빌드
+  base = "frontend"
+  command = "npm ci && npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# 계산기 페이지들 (우선순위 높음)
-[[redirects]]
-  from = "/pace-calculator"
-  to = "/pace-calculator.html"
-  status = 200
-
-[[redirects]]
-  from = "/training-calculator"
-  to = "/training-calculator.html"
-  status = 200
-
-[[redirects]]
-  from = "/chat"
-  to = "/chat.html"
-  status = 200
-
-# React SPA 라우팅 (가장 마지막에 위치)
+# React SPA - 모든 라우트는 index.html로
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -37,6 +19,7 @@
   from = "/api/*"
   to = "https://athletetime-backend.onrender.com/api/:splat"
   status = 200
+  force = true
 
 # 캐싱 설정
 [[headers]]
@@ -61,11 +44,12 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://athletetime-backend.onrender.com wss:;"
+    Content-Security-Policy = "default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://page.gensparksite.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://athletetime-backend.onrender.com wss://athlete-time-backend.onrender.com wss:;"
 
-# 개발 서버
+# 개발 서버 설정
 [dev]
-  command = "python3 -m http.server 8080"
-  port = 8080
-  targetPort = 8080
-  publish = "."
+  command = "npm run dev"
+  port = 5173
+  targetPort = 5173
+  publish = "dist"
+  autoLaunch = false
