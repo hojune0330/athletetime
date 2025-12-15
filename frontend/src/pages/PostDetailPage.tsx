@@ -470,13 +470,13 @@ export default function PostDetailPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-4 px-4 py-6 animate-fadeIn">
       {/* 뒤로가기 버튼 */}
-      <Link 
-        to="/"
+      <button 
+        onClick={() => navigate(-1)}
         className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
       >
         <ArrowLeftIcon className="w-5 h-5" />
-        <span className="font-medium">목록으로</span>
-      </Link>
+        <span className="font-medium">뒤로가기</span>
+      </button>
       
       {/* 게시글 본문 */}
       <article className="card overflow-hidden">
