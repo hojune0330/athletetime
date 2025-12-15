@@ -147,14 +147,6 @@ const MainPage: React.FC = () => {
 
       {/* Features Section */}
       <section className="flex-1 container mx-auto px-4 py-12 md:py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2">
-            주요 기능
-          </h2>
-          <p className="text-sm text-neutral-500">
-            육상인을 위한 다양한 서비스를 이용해보세요
-          </p>
-        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
           {features.map((feature, index) => {
