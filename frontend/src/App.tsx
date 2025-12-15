@@ -49,12 +49,18 @@ function App() {
             {/* 메인 페이지 (레이아웃 없음) */}
             <Route path="/" element={<MainPage />} />
 
-            {/* 계산기 페이지 (레이아웃 없음 - 자체 헤더/푸터 포함) */}
-            <Route path="/pace-calculator" element={<PaceCalculatorPage />} />
-            <Route path="/training-calculator" element={<TrainingCalculatorPage />} />
+            {/* 계산기 페이지 (레이아웃 포함) */}
+            <Route path="/pace-calculator" element={<Layout />}>
+              <Route index element={<PaceCalculatorPage />} />
+            </Route>
+            <Route path="/training-calculator" element={<Layout />}>
+              <Route index element={<TrainingCalculatorPage />} />
+            </Route>
 
-            {/* 채팅 페이지 (레이아웃 없음 - 자체 UI 포함) */}
-            <Route path="/chat" element={<ChatPage />} />
+            {/* 채팅 페이지 (레이아웃 포함) */}
+            <Route path="/chat" element={<Layout />}>
+              <Route index element={<ChatPage />} />
+            </Route>
 
             {/* 커뮤니티 페이지 (레이아웃 포함) */}
             <Route path="/community" element={<Layout />}>
@@ -62,7 +68,11 @@ function App() {
               <Route path="best" element={<CommunityPage />} />
               <Route path="board/:boardId" element={<BoardPage />} />
               <Route path="post/:postId" element={<PostDetailPage />} />
-              <Route path="write" element={<WritePage />} />
+            </Route>
+
+            {/* 글쓰기 (레이아웃 포함) */}
+            <Route path="/write" element={<Layout />}>
+              <Route index element={<WritePage />} />
             </Route>
 
             {/* 404 */}
