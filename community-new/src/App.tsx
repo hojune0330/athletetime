@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import Layout from './components/layout/Layout'
-import HomePage from './pages/HomePage'
+import MainPage from './pages/MainPage'
+import CommunityPage from './pages/CommunityPage'
 import PostDetailPage from './pages/PostDetailPage'
 import WritePage from './pages/WritePage'
 import BoardPage from './pages/BoardPage'
@@ -26,9 +27,9 @@ function App() {
     })
   }, [])
 
-  // React app is deployed at /community/ path
-  // Vite base is set to '/community/' in vite.config.ts
-  const basename = '/community/'
+  // React app is deployed at root path
+  // Vite base is set to '/' in vite.config.ts
+  const basename = '/'
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -40,15 +41,20 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-            {/* 메인 페이지 (레이아웃 포함) */}
-            <Route path="/" element={<Layout />}>
-              <Route index element={<HomePage />} />
-              <Route path="best" element={<HomePage />} />
+            {/* 메인 페이지 (레이아웃 없음) */}
+            <Route path="/" element={<MainPage />} />
+
+            {/* 커뮤니티 페이지 (레이아웃 포함) */}
+            <Route path="/community" element={<Layout />}>
+              <Route index element={<CommunityPage />} />
+              <Route path="best" element={<CommunityPage />} />
               <Route path="board/:boardId" element={<BoardPage />} />
               <Route path="post/:postId" element={<PostDetailPage />} />
               <Route path="write" element={<WritePage />} />
-              <Route path="*" element={<NotFoundPage />} />
             </Route>
+
+            {/* 404 */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </AuthProvider>
       </Router>

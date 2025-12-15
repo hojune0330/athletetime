@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/community/', // Netlify /community/ 경로 배포
+  base: '/', // 루트 경로에서 배포
   server: {
     host: '0.0.0.0',
     port: 5173,
