@@ -35,7 +35,7 @@ const PaceCalculatorPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-50">
       {/* Header */}
-      <header className="header no-print sticky top-0 z-50 bg-white shadow-sm">
+      <header className="header no-print bg-white shadow-sm">
         <div className="header-content max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
