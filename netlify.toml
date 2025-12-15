@@ -1,11 +1,16 @@
 [build]
-  command = "echo 'Using pre-built files from repository'"
+  # 이미 빌드된 파일을 사용 (npm 빌드 불필요)
+  command = "echo 'Deploying pre-built files - no build required'"
   publish = "."
   functions = "netlify/functions"
+  # Netlify UI 설정보다 이 파일의 설정을 우선 적용
+  ignore = "exit 1"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  # 빌드 스킵 플래그
+  NETLIFY_SKIP_BUILD = "true"
 
 # 계산기 페이지들 (우선순위 높음)
 [[redirects]]
