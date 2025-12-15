@@ -30,8 +30,8 @@ export async function checkHealth(): Promise<HealthResponse> {
 // ============================================
 
 export async function getCategories(): Promise<Category[]> {
-  const response = await apiClient.get<{ success: boolean; categories: Category[] }>('/api/categories');
-  return response.data.categories || [];
+  const response = await apiClient.get<Category[]>('/api/categories');
+  return response.data;
 }
 
 // ============================================
