@@ -3,6 +3,9 @@ import { AuthProvider } from './context/AuthContext'
 import Layout from './components/layout/Layout'
 import MainPage from './pages/MainPage'
 import CommunityPage from './pages/CommunityPage'
+import PaceCalculatorPage from './pages/PaceCalculatorPage'
+import TrainingCalculatorPage from './pages/TrainingCalculatorPage'
+import ChatPage from './pages/ChatPage'
 import PostDetailPage from './pages/PostDetailPage'
 import WritePage from './pages/WritePage'
 import BoardPage from './pages/BoardPage'
@@ -43,6 +46,19 @@ function App() {
 
             {/* 메인 페이지 (레이아웃 없음) */}
             <Route path="/" element={<MainPage />} />
+
+            {/* 계산기 페이지 (레이아웃 포함) */}
+            <Route path="/pace-calculator" element={<Layout />}>
+              <Route index element={<PaceCalculatorPage />} />
+            </Route>
+            <Route path="/training-calculator" element={<Layout />}>
+              <Route index element={<TrainingCalculatorPage />} />
+            </Route>
+
+            {/* 채팅 페이지 (레이아웃 포함) */}
+            <Route path="/chat" element={<Layout />}>
+              <Route index element={<ChatPage />} />
+            </Route>
 
             {/* 커뮤니티 페이지 (레이아웃 포함) */}
             <Route path="/community" element={<Layout />}>
