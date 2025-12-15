@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import Layout from './components/layout/Layout'
+import ScrollToTop from './components/ScrollToTop'
 import MainPage from './pages/MainPage'
 import CommunityPage from './pages/CommunityPage'
 // 새로 변환한 React 컴포넌트 (폴더 형태)
@@ -39,6 +40,7 @@ function App() {
   return (
     <div className="min-h-screen bg-neutral-50">
       <Router basename={basename}>
+        <ScrollToTop />
         <AuthProvider>
           <Routes>
             {/* 인증 페이지 (레이아웃 없음) */}
