@@ -69,35 +69,29 @@ export default function Header() {
                     isActive('/') ? 'bg-white/20 text-white' : 'text-primary-100 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  🎭 익명
+                  🎭 익명 커뮤니티
                 </Link>
                 <a
                   href={getToolLink('pace-calculator.html')}
                   onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
-                  ⏱️ 페이스
+                  ⏱️ 페이스 계산기
                 </a>
                 <a
                   href={getToolLink('training-calculator.html')}
                   onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
-                  🏋️ 훈련
+                  🏋️ 훈련 계산기
                 </a>
                 <a
                   href={getToolLink('chat.html')}
                   onClick={(e) => handleExternalLink(e, 'chat.html')}
                   className="px-3 py-2 text-sm font-medium rounded-lg transition-all text-primary-100 hover:text-white hover:bg-white/10"
                 >
-                  💬 채팅
+                  💬 실시간 채팅
                 </a>
-                <Link
-                  to="/write"
-                  className="px-3 py-2 text-sm font-medium rounded-lg transition-all bg-white/10 text-white hover:bg-white/20 border border-white/20"
-                >
-                  ✍️ 글쓰기
-                </Link>
               </nav>
 
               {/* 우측 메뉴 */}
