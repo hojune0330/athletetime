@@ -44,7 +44,7 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://page.gensparksite.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://athletetime-backend.onrender.com wss://athlete-time-backend.onrender.com wss:;"
+    Content-Security-Policy = "default-src 'self' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://athletetime-backend.onrender.com wss://athletetime-backend.onrender.com wss: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;"
 
 # 개발 서버 설정
 [dev]
