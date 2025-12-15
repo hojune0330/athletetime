@@ -101,9 +101,10 @@ router.get('/', async (req, res) => {
     }
     
     // 정렬 및 페이지네이션
+    // 고정글(is_pinned) 또는 공지글(is_notice)을 상단에 표시하고, 그 안에서 최신순 정렬
     query += ` 
       ORDER BY 
-        p.is_pinned DESC, 
+        (CASE WHEN p.is_pinned OR p.is_notice THEN 1 ELSE 0 END) DESC,
         p.created_at DESC 
       LIMIT $${params.length + 1} 
       OFFSET $${params.length + 2}
