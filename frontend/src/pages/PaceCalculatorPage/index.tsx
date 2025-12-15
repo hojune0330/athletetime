@@ -8,6 +8,7 @@ import {
   TargetPaceCalculator,
 } from './components';
 import './styles/pace-calculator.css';
+import athleteTimeLogo from '../../assets/athlete-time-logo.jpg';
 
 type TabType = 'chart' | 'lane' | 'target' | 'split';
 
@@ -46,7 +47,7 @@ const PaceCalculatorPage: React.FC = () => {
                 <i className="fas fa-arrow-left text-gray-600"></i>
               </Link>
               <img 
-                src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+                src={athleteTimeLogo} 
                 alt="Athlete Time Logo" 
                 className="h-10 w-auto"
               />
@@ -120,7 +121,7 @@ const PaceCalculatorPage: React.FC = () => {
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
                       <img 
-                        src="https://page.gensparksite.com/v1/base64_upload/947dc3993d7e35d0c99a846566641047" 
+                        src={athleteTimeLogo} 
                         alt="Athlete Time" 
                         className="h-14 md:h-16 w-auto opacity-90"
                       />
