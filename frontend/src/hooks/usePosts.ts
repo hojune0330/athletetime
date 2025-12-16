@@ -147,10 +147,23 @@ export function useVotePost(): UseMutationResult<Post, Error, VotePostMutationVa
     mutationFn: ({ postId, data }: VotePostMutationVariables) => 
       api.votePost(postId, data),
     onSuccess: (updatedPost, variables) => {
-      // 해당 게시글 캐시 업데이트
+      // 해당 게시글 캐시 업데이트 (서버 응답으로 직접 업데이트)
       queryClient.setQueryData(queryKeys.post(variables.postId), updatedPost);
-      // 게시글 목록도 무효화 (좋아요 수 업데이트)
-      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+      // 목록 캐시의 해당 게시글도 업데이트
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.posts },
+        (oldData: PostsResponse | undefined) => {
+          if (!oldData?.posts) return oldData;
+          return {
+            ...oldData,
+            posts: oldData.posts.map(post => 
+              post.id === updatedPost.id 
+                ? { ...post, likes_count: updatedPost.likes_count, dislikes_count: updatedPost.dislikes_count }
+                : post
+            ),
+          };
+        }
+      );
     },
   });
 }
