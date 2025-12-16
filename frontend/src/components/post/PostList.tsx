@@ -91,8 +91,8 @@ function PostItem({ post }: PostItemProps) {
                 className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100"
                 style={{ color: post.category_color || '#6366f1' }}
               >
-                <span>{post.category_icon || '💬'}</span>
-                <span>{post.category_name || '자유'}</span>
+                <span>{post.category_icon}</span>
+                <span>{post.category_name}</span>
               </span>
               
               {/* HOT 뱃지 */}
