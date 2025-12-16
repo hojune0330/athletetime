@@ -142,6 +142,7 @@ function PostContent({ content, images }: PostContentProps) {
 interface PostActionsProps {
   likesCount: number;
   dislikesCount: number;
+  myVote?: 'like' | 'dislike' | null;
   onVote: (type: 'like' | 'dislike') => void;
   onDelete: () => void;
   isVoting: boolean;
@@ -149,7 +150,8 @@ interface PostActionsProps {
 
 function PostActions({ 
   likesCount, 
-  dislikesCount, 
+  dislikesCount,
+  myVote,
   onVote, 
   onDelete,
   isVoting 
@@ -169,6 +171,9 @@ function PostActions({
     }
   };
   
+  const isLiked = myVote === 'like';
+  const isDisliked = myVote === 'dislike';
+  
   return (
     <div className="p-6 border-t border-neutral-100 bg-neutral-50">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -176,20 +181,28 @@ function PostActions({
           <button 
             onClick={() => onVote('like')}
             disabled={isVoting}
-            className="btn-secondary hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200"
+            className={`btn-secondary transition-all ${
+              isLiked 
+                ? 'bg-primary-100 text-primary-600 border-primary-300' 
+                : 'hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200'
+            }`}
           >
-            <HandThumbUpIcon className="w-5 h-5" />
-            <span>추천</span>
+            <HandThumbUpIcon className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+            <span>{isLiked ? '추천 취소' : '추천'}</span>
             <span className="font-bold text-primary-600">{likesCount}</span>
           </button>
           
           <button 
             onClick={() => onVote('dislike')}
             disabled={isVoting}
-            className="btn-secondary hover:bg-danger-50 hover:text-danger-600 hover:border-danger-200"
+            className={`btn-secondary transition-all ${
+              isDisliked 
+                ? 'bg-danger-100 text-danger-600 border-danger-300' 
+                : 'hover:bg-danger-50 hover:text-danger-600 hover:border-danger-200'
+            }`}
           >
-            <HandThumbDownIcon className="w-5 h-5" />
-            <span>비추천</span>
+            <HandThumbDownIcon className={`w-5 h-5 ${isDisliked ? 'fill-current' : ''}`} />
+            <span>{isDisliked ? '비추천 취소' : '비추천'}</span>
             {dislikesCount > 0 && (
               <span className="font-bold text-danger-500">{dislikesCount}</span>
             )}
@@ -405,11 +418,20 @@ export default function PostDetailPage() {
   const handleVote = async (type: 'like' | 'dislike') => {
     try {
       const anonymousId = getAnonymousId();
-      await votePostMutation.mutateAsync({
+      const currentVote = post?.myVote;
+      const result = await votePostMutation.mutateAsync({
         postId: id,
         data: { type, anonymousId }
       });
-      showToast(type === 'like' ? '👍 추천했습니다!' : '👎 비추천했습니다!');
+      
+      // 투표 상태에 따른 메시지
+      if (currentVote === type) {
+        // 같은 타입 클릭 → 취소
+        showToast(type === 'like' ? '👍 추천을 취소했습니다.' : '👎 비추천을 취소했습니다.');
+      } else if (result.myVote) {
+        // 새 투표 또는 변경
+        showToast(type === 'like' ? '👍 추천했습니다!' : '👎 비추천했습니다!');
+      }
     } catch {
       showToast('투표에 실패했습니다.');
     }
@@ -501,6 +523,7 @@ export default function PostDetailPage() {
         <PostActions
           likesCount={post.likes_count}
           dislikesCount={post.dislikes_count}
+          myVote={post.myVote}
           onVote={handleVote}
           onDelete={() => setShowDeleteModal(true)}
           isVoting={votePostMutation.isPending}

@@ -183,6 +183,13 @@ router.post('/', async (req, res) => {
     
     const post = postResult.rows[0];
     
+    // 현재 사용자의 투표 상태 조회
+    const myVoteResult = await req.app.locals.pool.query(
+      'SELECT vote_type FROM votes WHERE post_id = $1 AND user_id = $2',
+      [postId, userId]
+    );
+    const myVote = myVoteResult.rows.length > 0 ? myVoteResult.rows[0].vote_type : null;
+    
     // WebSocket 알림
     broadcastToClients({
       type: 'vote',
@@ -195,7 +202,8 @@ router.post('/', async (req, res) => {
       post: {
         ...post,
         images: Array.isArray(post.images) ? post.images : [],
-        comments: Array.isArray(post.comments) ? post.comments : []
+        comments: Array.isArray(post.comments) ? post.comments : [],
+        myVote, // 현재 사용자의 투표 상태 ('like', 'dislike', null)
       }
     });
     

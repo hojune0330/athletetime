@@ -88,6 +88,9 @@ export interface Post {
   // 사용자 정보
   user_id: string;
   username?: string;
+  
+  // 현재 사용자의 투표 상태
+  myVote?: 'like' | 'dislike' | null;
 }
 
 // ============================================
