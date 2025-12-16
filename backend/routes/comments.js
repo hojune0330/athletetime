@@ -71,12 +71,7 @@ router.post('/', async (req, res) => {
       ) 
       VALUES ($1, $2, $3, $4, $5)
     `, [postId, userId, content, author, instagram || null]);
-    
-    // 게시글 댓글 수 증가
-    await req.app.locals.pool.query(
-      'UPDATE posts SET comments_count = comments_count + 1 WHERE id = $1',
-      [postId]
-    );
+    // DB 트리거(posts_comments_count_trigger)가 자동으로 comments_count 증가 처리
     
     // 전체 게시글 정보 조회 (댓글 포함)
     const postResult = await req.app.locals.pool.query(`
