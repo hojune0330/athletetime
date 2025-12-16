@@ -66,14 +66,7 @@ router.post('/', async (req, res) => {
           'DELETE FROM votes WHERE post_id = $1 AND user_id = $2',
           [postId, userId]
         );
-        
-        // 카운터 감소
-        const field = type === 'like' ? 'likes_count' : 'dislikes_count';
-        await client.query(
-          `UPDATE posts SET ${field} = GREATEST(${field} - 1, 0) WHERE id = $1`,
-          [postId]
-        );
-        
+        // DB 트리거가 자동으로 카운터 감소 처리
         console.log(`✅ 투표 취소: PostID=${postId}, Type=${type}`);
       } else {
         // 다른 타입으로 변경
@@ -81,18 +74,7 @@ router.post('/', async (req, res) => {
           'UPDATE votes SET vote_type = $1 WHERE post_id = $2 AND user_id = $3',
           [type, postId, userId]
         );
-        
-        // 카운터 업데이트 (기존 타입 -1, 새 타입 +1)
-        const oldField = oldType === 'like' ? 'likes_count' : 'dislikes_count';
-        const newField = type === 'like' ? 'likes_count' : 'dislikes_count';
-        await client.query(
-          `UPDATE posts 
-           SET ${oldField} = GREATEST(${oldField} - 1, 0),
-               ${newField} = ${newField} + 1
-           WHERE id = $1`,
-          [postId]
-        );
-        
+        // DB 트리거가 자동으로 카운터 업데이트 처리 (기존 타입 -1, 새 타입 +1)
         console.log(`✅ 투표 변경: PostID=${postId}, ${oldType} → ${type}`);
       }
     } else {
@@ -101,14 +83,7 @@ router.post('/', async (req, res) => {
         'INSERT INTO votes (post_id, user_id, vote_type) VALUES ($1, $2, $3)',
         [postId, userId, type]
       );
-      
-      // 카운터 증가
-      const field = type === 'like' ? 'likes_count' : 'dislikes_count';
-      await client.query(
-        `UPDATE posts SET ${field} = ${field} + 1 WHERE id = $1`,
-        [postId]
-      );
-      
+      // DB 트리거가 자동으로 카운터 증가 처리
       console.log(`✅ 신규 투표: PostID=${postId}, Type=${type}`);
     }
     
