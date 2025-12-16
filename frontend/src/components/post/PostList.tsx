@@ -86,14 +86,16 @@ function PostItem({ post }: PostItemProps) {
                 <span className="text-accent-500 text-sm">📌</span>
               )}
               
-              {/* 카테고리 */}
-              <span 
-                className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100"
-                style={{ color: post.category_color || '#6366f1' }}
-              >
-                <span>{post.category_icon}</span>
-                <span>{post.category_name}</span>
-              </span>
+{/* 카테고리 (자유 제외) */}
+              {post.category_name && post.category_name !== '자유' && (
+                <span 
+                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100"
+                  style={{ color: post.category_color || '#6366f1' }}
+                >
+                  <span>{post.category_icon}</span>
+                  <span>{post.category_name}</span>
+                </span>
+              )}
               
               {/* HOT 뱃지 */}
               {isHot && (
