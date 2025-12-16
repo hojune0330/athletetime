@@ -14,7 +14,7 @@ export default function CommunityPage() {
   
   const queryClient = useQueryClient()
   
-  const { data: postsData } = usePosts({ page, limit })
+  const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
   const [showWriteForm, setShowWriteForm] = useState(false)
   const [newPost, setNewPost] = useState({
     title: '',
@@ -24,9 +24,11 @@ export default function CommunityPage() {
     hasImage: false,
     hasPoll: false,
   })
-  const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
+  
+  // 페이지네이션을 위한 데이터 조회
+  const { data: postsData } = usePosts({ page, limit, sort: sortBy })
 
   const createPostMutation = useCreatePost()
   const isSubmitting = createPostMutation.isPending
@@ -285,7 +287,7 @@ export default function CommunityPage() {
       </div> */}
 
       {/* 게시글 목록 */}
-      <PostList />
+      <PostList sort={sortBy} page={page} limit={limit} />
 
       {/* 페이지네이션 */}
       <div className="mt-6">

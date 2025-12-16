@@ -42,6 +42,7 @@ export interface GetPostsParams {
   category?: string;
   limit?: number;
   page?: number;
+  sort?: 'latest' | 'hot' | 'comment';
 }
 
 export async function getPosts(params?: GetPostsParams): Promise<PostsResponse> {
@@ -55,6 +56,9 @@ export async function getPosts(params?: GetPostsParams): Promise<PostsResponse> 
   }
   if (params?.page) {
     queryParams.append('page', params.page.toString());
+  }
+  if (params?.sort) {
+    queryParams.append('sort', params.sort);
   }
   
   const url = `/api/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;

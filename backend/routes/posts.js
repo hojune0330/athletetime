@@ -25,7 +25,8 @@ router.get('/', async (req, res) => {
       category, 
       limit = 20, 
       offset = 0,
-      page = 1
+      page = 1,
+      sort = 'latest' // 'latest' | 'hot' | 'comment'
     } = req.query;
     
     const actualLimit = parseInt(limit);
@@ -102,11 +103,40 @@ router.get('/', async (req, res) => {
     }
     
     // 정렬 및 페이지네이션
-    // 고정글(is_pinned) 또는 공지글(is_notice)을 상단에 표시하고, 그 안에서 최신순 정렬
-    query += ` 
-      ORDER BY 
-        (CASE WHEN p.is_pinned OR p.is_notice THEN 1 ELSE 0 END) DESC,
-        p.created_at DESC 
+    // 고정글(is_pinned) 또는 공지글(is_notice)을 상단에 표시
+    let orderClause = '';
+    switch (sort) {
+      case 'hot':
+        // 인기순: 좋아요 - 싫어요 점수로 정렬
+        orderClause = `
+          ORDER BY 
+            (CASE WHEN p.is_pinned OR p.is_notice THEN 1 ELSE 0 END) DESC,
+            (p.likes_count - p.dislikes_count) DESC,
+            p.created_at DESC
+        `;
+        break;
+      case 'comment':
+        // 댓글순: 댓글 수로 정렬
+        orderClause = `
+          ORDER BY 
+            (CASE WHEN p.is_pinned OR p.is_notice THEN 1 ELSE 0 END) DESC,
+            p.comments_count DESC,
+            p.created_at DESC
+        `;
+        break;
+      case 'latest':
+      default:
+        // 최신순: 작성일로 정렬
+        orderClause = `
+          ORDER BY 
+            (CASE WHEN p.is_pinned OR p.is_notice THEN 1 ELSE 0 END) DESC,
+            p.created_at DESC
+        `;
+        break;
+    }
+    
+    query += `
+      ${orderClause}
       LIMIT $${params.length + 1} 
       OFFSET $${params.length + 2}
     `;

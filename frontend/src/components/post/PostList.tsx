@@ -236,10 +236,13 @@ function EmptyState() {
 
 interface PostListProps {
   category?: string;
+  sort?: 'latest' | 'hot' | 'comment';
+  page?: number;
+  limit?: number;
 }
 
-export default function PostList({ category }: PostListProps) {
-  const { data, isLoading, isError, error, refetch } = usePosts({ category });
+export default function PostList({ category, sort = 'latest', page = 1, limit = 20 }: PostListProps) {
+  const { data, isLoading, isError, error, refetch } = usePosts({ category, sort, page, limit });
   
   if (isLoading) {
     return <LoadingSkeleton />;
