@@ -1,5 +1,5 @@
 import React from 'react';
-import { Workout } from '../utils/trainingPlans';
+import type { Workout } from '../utils/trainingPlans';
 
 interface WorkoutDetailsViewProps {
   workouts: Workout[];

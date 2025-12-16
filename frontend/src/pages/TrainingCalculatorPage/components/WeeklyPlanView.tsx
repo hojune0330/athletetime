@@ -1,5 +1,5 @@
 import React from 'react';
-import { DayPlan } from '../utils/trainingPlans';
+import type { DayPlan } from '../utils/trainingPlans';
 
 interface WeeklyPlanViewProps {
   plan: DayPlan[];

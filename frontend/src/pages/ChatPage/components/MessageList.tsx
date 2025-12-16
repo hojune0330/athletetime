@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { ChatMessage } from '../types';
+import type { ChatMessage } from '../types';
 
 interface MessageListProps {
   messages: (ChatMessage | { type: 'system'; text: string })[];

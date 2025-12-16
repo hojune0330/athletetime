@@ -1,5 +1,5 @@
 import React from 'react';
-import { RoomId, CHAT_ROOMS } from '../types';
+import type { RoomId, CHAT_ROOMS } from '../types';
 
 interface RoomSidebarProps {
   currentRoom: RoomId;

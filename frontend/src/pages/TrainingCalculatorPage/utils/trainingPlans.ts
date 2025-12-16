@@ -1,6 +1,6 @@
 // 훈련 계획 생성 유틸리티
-import { TrainingFrequency, TrainingPhase, Experience, Gender, UserProfile, Conditions } from './adjustments';
-import { TrainingPaces, formatPace } from './vdotCalculations';
+import type { TrainingFrequency, TrainingPhase, Experience, Gender, UserProfile, Conditions } from './adjustments';
+import type { TrainingPaces, formatPace } from './vdotCalculations';
 
 export type DayIntensity = 'low' | 'medium' | 'high' | 'rest';
 

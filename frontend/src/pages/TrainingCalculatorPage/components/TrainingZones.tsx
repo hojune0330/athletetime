@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrainingPaces, formatPace } from '../utils/vdotCalculations';
+import type { TrainingPaces, formatPace } from '../utils/vdotCalculations';
 
 interface TrainingZonesProps {
   paces: TrainingPaces;

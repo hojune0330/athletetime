@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { ChatMessage, RoomId } from '../types';
+import type { ChatMessage, RoomId } from '../types';
 import { useWebSocket } from './useWebSocket';
 
 export interface UseChatReturn {

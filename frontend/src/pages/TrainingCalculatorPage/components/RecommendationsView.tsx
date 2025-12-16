@@ -1,5 +1,5 @@
 import React from 'react';
-import { Recommendation } from '../utils/trainingPlans';
+import type { Recommendation } from '../utils/trainingPlans';
 
 interface RecommendationsViewProps {
   recommendations: Recommendation[];

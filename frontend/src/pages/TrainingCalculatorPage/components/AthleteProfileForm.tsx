@@ -1,16 +1,18 @@
 import React from 'react';
-import {
+import type {
   Gender,
   AgeGroup,
   Experience,
   WeeklyVolume,
   TrainingFrequency,
-  TrainingPhase,
+  TrainingPhase
+} from '../utils/adjustments';
+import {
   AGE_GROUP_OPTIONS,
   EXPERIENCE_OPTIONS,
   WEEKLY_VOLUME_OPTIONS,
   FREQUENCY_OPTIONS,
-  TRAINING_PHASE_OPTIONS,
+  TRAINING_PHASE_OPTIONS
 } from '../utils/adjustments';
 
 interface AthleteProfileFormProps {

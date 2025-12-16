@@ -1,5 +1,5 @@
 import React from 'react';
-import { WeekPlan } from '../utils/trainingPlans';
+import type { WeekPlan } from '../utils/trainingPlans';
 
 interface MesocycleViewProps {
   plan: WeekPlan[];

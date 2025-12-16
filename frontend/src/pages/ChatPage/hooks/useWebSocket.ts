@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { RoomId, ChatMessage, WebSocketMessage } from '../types';
+import type { RoomId, ChatMessage, WebSocketMessage } from '../types';
 
 const WS_URL = 'wss://athlete-time-backend.onrender.com/ws';
 

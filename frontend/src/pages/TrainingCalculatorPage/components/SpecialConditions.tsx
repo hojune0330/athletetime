@@ -1,5 +1,5 @@
 import React from 'react';
-import { Conditions, CONDITION_OPTIONS } from '../utils/adjustments';
+import type { Conditions, CONDITION_OPTIONS } from '../utils/adjustments';
 
 interface SpecialConditionsProps {
   conditions: Conditions;

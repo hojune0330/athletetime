@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
-import {
+import type {
   calculateVDOT,
   calculateTrainingPaces,
   getPerformanceLevel,
   calculateVO2max,
   TrainingPaces,
 } from '../utils/vdotCalculations';
-import {
+import type {
   UserProfile,
   Conditions,
   Adjustments,
@@ -18,7 +18,7 @@ import {
   TrainingFrequency,
   TrainingPhase,
 } from '../utils/adjustments';
-import {
+import type {
   generateWeeklyPlan,
   generateMesocycle,
   generateWorkoutDetails,

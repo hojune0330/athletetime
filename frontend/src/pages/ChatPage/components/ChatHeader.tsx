@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { RoomId, CHAT_ROOMS } from '../types';
+import type { RoomId, CHAT_ROOMS } from '../types';
 
 interface ChatHeaderProps {
   currentRoom: RoomId;

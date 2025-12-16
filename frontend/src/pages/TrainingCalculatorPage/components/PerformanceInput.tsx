@@ -1,6 +1,6 @@
 import React from 'react';
 import { DISTANCE_OPTIONS } from '../utils/vdotCalculations';
-import { TimeInput } from '../hooks/useTrainingCalculator';
+import type { TimeInput } from '../hooks/useTrainingCalculator';
 
 interface PerformanceInputProps {
   distance: string;
