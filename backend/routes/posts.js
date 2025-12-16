@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
     const actualOffset = (actualPage - 1) * actualLimit;
     
     // 기본 쿼리 (password_hash 제외, comments 배열 포함)
+    // '자유' 카테고리는 null로 반환 (프론트에서 뱃지 표시 안함)
     let query = `
       SELECT 
         p.id,
@@ -50,9 +51,9 @@ router.get('/', async (req, res) => {
         p.created_at,
         p.updated_at,
         c.id as category_id,
-        c.name as category_name,
-        c.icon as category_icon,
-        c.color as category_color,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.name END as category_name,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.icon END as category_icon,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.color END as category_color,
         u.id as user_id,
         u.username,
         COALESCE(
@@ -167,6 +168,7 @@ router.get('/:id', async (req, res) => {
     );
     
     // 게시글 상세 조회 (이미지, 댓글 포함)
+    // '자유' 카테고리는 null로 반환
     const result = await req.app.locals.pool.query(`
       SELECT 
         p.id,
@@ -184,9 +186,9 @@ router.get('/:id', async (req, res) => {
         p.created_at,
         p.updated_at,
         c.id as category_id,
-        c.name as category_name,
-        c.icon as category_icon,
-        c.color as category_color,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.name END as category_name,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.icon END as category_icon,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.color END as category_color,
         u.id as user_id,
         u.username,
         COALESCE(

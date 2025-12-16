@@ -86,8 +86,8 @@ function PostItem({ post }: PostItemProps) {
                 <span className="text-accent-500 text-sm">📌</span>
               )}
               
-{/* 카테고리 (자유 제외) */}
-              {post.category_name && post.category_name !== '자유' && (
+{/* 카테고리 (자유는 백엔드에서 null 반환) */}
+              {post.category_name && (
                 <span 
                   className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100"
                   style={{ color: post.category_color || '#6366f1' }}
