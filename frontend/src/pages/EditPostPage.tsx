@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
-import { usePost, useUpdatePost, useCategories } from '../hooks/usePosts';
+import { usePost, useUpdatePost } from '../hooks/usePosts';
 import { showToast } from '../utils/toast';
 
 // ============================================
@@ -17,7 +17,6 @@ import { showToast } from '../utils/toast';
 interface FormData {
   title: string;
   content: string;
-  categoryId: number;
 }
 
 function validateForm(data: FormData): string | null {
@@ -55,17 +54,13 @@ export default function EditPostPage() {
   const [formData, setFormData] = useState<FormData>({
     title: '',
     content: '',
-    categoryId: 2, // 기본: 자유게시판
   });
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   
   // API 훅
   const { data: post, isLoading: isPostLoading } = usePost(id);
-  const { data: categoriesData } = useCategories();
   const updatePostMutation = useUpdatePost();
-  
-  const categories = categoriesData || [];
   
   // 게시글 데이터로 폼 초기화
   useEffect(() => {
@@ -73,7 +68,6 @@ export default function EditPostPage() {
       setFormData({
         title: post.title || '',
         content: post.content || '',
-        categoryId: post.category_id || 2,
       });
       setIsInitialized(true);
     }
@@ -107,17 +101,13 @@ export default function EditPostPage() {
     }
     
     try {
-      // 카테고리 이름 찾기
-      const category = categories.find(c => c.id === formData.categoryId);
-      const categoryName = category?.name || '자유';
-      
-      // 게시글 수정
+      // 게시글 수정 (카테고리는 기존 값 유지)
       await updatePostMutation.mutateAsync({
         id,
         data: {
           title: formData.title.trim(),
           content: formData.content.trim(),
-          category: categoryName,
+          category: post?.category_name || '자유',
           password,
         },
       });
@@ -137,8 +127,7 @@ export default function EditPostPage() {
   const handleCancel = () => {
     const hasChanges = post && (
       formData.title !== post.title ||
-      formData.content !== post.content ||
-      formData.categoryId !== post.category_id
+      formData.content !== post.content
     );
     
     if (hasChanges) {
@@ -216,59 +205,6 @@ export default function EditPostPage() {
         
         {/* 수정 폼 */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 카테고리 & 작성자 정보 */}
-          <div className="card">
-            <div className="card-body">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* 카테고리 */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    게시판 <span className="text-danger-500">*</span>
-                  </label>
-                  <select
-                    value={formData.categoryId}
-                    onChange={(e) => handleChange('categoryId', Number(e.target.value))}
-                    className="select"
-                    disabled={isSubmitting}
-                    required
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.icon} {cat.name}
-                        </option>
-                      ))
-                    ) : (
-                      <>
-                        <option value={1}>📢 공지</option>
-                        <option value={2}>💬 자유</option>
-                        <option value={3}>🏃 훈련</option>
-                        <option value={4}>🏆 대회</option>
-                        <option value={5}>👟 장비</option>
-                        <option value={6}>❓ 질문</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-                
-                {/* 작성자 (읽기 전용) */}
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    작성자
-                  </label>
-                  <input
-                    type="text"
-                    value={post.author}
-                    className="input bg-neutral-100 cursor-not-allowed"
-                    disabled
-                    readOnly
-                  />
-                  <p className="mt-1 text-xs text-neutral-400">작성자는 수정할 수 없습니다.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
           {/* 제목 */}
           <div className="card">
             <div className="card-body">
