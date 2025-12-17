@@ -1,14 +1,20 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { 
   Bars3Icon,
   XMarkIcon,
-  ClockIcon
+  ClockIcon,
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { useState } from 'react'
 
 export default function Header() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [loginError, setLoginError] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/')
@@ -16,6 +22,40 @@ export default function Header() {
 
   const closeMobileMenu = () => {
     setMobileMenuOpen(false)
+  }
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoginError('')
+    
+    if (!loginForm.email || !loginForm.password) {
+      setLoginError('이메일과 비밀번호를 입력해주세요.')
+      return
+    }
+    
+    setIsLoggingIn(true)
+    
+    try {
+      // TODO: 실제 로그인 API 호출
+      console.log('로그인 시도:', loginForm.email)
+      
+      // 임시로 1초 후 성공 처리
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setShowLoginModal(false)
+      setLoginForm({ email: '', password: '' })
+      // 로그인 성공 후 처리
+    } catch (error: any) {
+      setLoginError(error.message || '로그인에 실패했습니다.')
+    } finally {
+      setIsLoggingIn(false)
+    }
+  }
+
+  const closeLoginModal = () => {
+    setShowLoginModal(false)
+    setLoginForm({ email: '', password: '' })
+    setLoginError('')
   }
 
   // 네비게이션 메뉴 아이템 (메인페이지와 동일)
@@ -58,6 +98,22 @@ export default function Header() {
                   </Link>
                 ))}
               </nav>
+
+              {/* 로그인/회원가입 버튼 (데스크톱) */}
+              <div className="hidden md:flex items-center gap-2">
+                <button
+                  onClick={() => setShowLoginModal(true)}
+                  className="px-3 py-2 text-sm font-medium text-primary-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                >
+                  로그인
+                </button>
+                <Link
+                  to="/register"
+                  className="px-3 py-2 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                >
+                  회원가입
+                </Link>
+              </div>
 
               {/* 모바일 메뉴 버튼 */}
               <button
@@ -118,9 +174,117 @@ export default function Header() {
                 </Link>
               ))}
             </div>
+
+            {/* 모바일 로그인/회원가입 */}
+            <div className="mt-6 pt-6 border-t border-neutral-100 space-y-2">
+              <button
+                onClick={() => {
+                  closeMobileMenu()
+                  setShowLoginModal(true)
+                }}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
+              >
+                <UserIcon className="w-5 h-5" />
+                <span className="font-medium">로그인</span>
+              </button>
+              <Link
+                to="/register"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+              >
+                <UserIcon className="w-5 h-5" />
+                <span className="font-medium">회원가입</span>
+              </Link>
+            </div>
           </nav>
         </div>
       </div>
+
+      {/* 로그인 모달 */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl animate-fadeInUp">
+            <div className="p-6">
+              {/* 모달 헤더 */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-neutral-900">로그인</h2>
+                <button
+                  onClick={closeLoginModal}
+                  className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors"
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* 에러 메시지 */}
+              {loginError && (
+                <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-600 text-sm">
+                  {loginError}
+                </div>
+              )}
+
+              {/* 로그인 폼 */}
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    이메일
+                  </label>
+                  <input
+                    type="email"
+                    value={loginForm.email}
+                    onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="example@email.com"
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    disabled={isLoggingIn}
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="비밀번호를 입력하세요"
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    disabled={isLoggingIn}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  className="w-full py-3 bg-primary-500 text-white font-medium rounded-xl hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>로그인 중...</span>
+                    </>
+                  ) : (
+                    '로그인'
+                  )}
+                </button>
+              </form>
+
+              {/* 하단 링크 */}
+              <div className="mt-6 text-center text-sm text-neutral-500">
+                계정이 없으신가요?{' '}
+                <Link
+                  to="/register"
+                  onClick={closeLoginModal}
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  회원가입
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
