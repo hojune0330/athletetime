@@ -1,29 +1,41 @@
 /**
- * 인증 API 클라이언트
+ * 인증 API (v4.2.0)
+ * 
+ * 회원가입, 로그인, 이메일 인증 관련 API
  */
 
 import { apiClient } from './client';
+
+// ============================================
+// 타입 정의
+// ============================================
 
 export interface RegisterRequest {
   email: string;
   password: string;
   nickname: string;
-  specialty?: string;
-  region?: string;
 }
 
 export interface RegisterResponse {
   success: boolean;
   message: string;
-  user: {
-    id: string;
+  user?: {
+    id: number;
     email: string;
     nickname: string;
-    specialty?: string;
-    region?: string;
-    createdAt: string;
   };
-  requiresVerification: boolean;
+  requiresVerification?: boolean;
+  error?: string;
+}
+
+export interface SendVerificationRequest {
+  email: string;
+}
+
+export interface SendVerificationResponse {
+  success: boolean;
+  message: string;
+  error?: string;
 }
 
 export interface VerifyEmailRequest {
@@ -34,13 +46,21 @@ export interface VerifyEmailRequest {
 export interface VerifyEmailResponse {
   success: boolean;
   message: string;
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: {
+    id: number;
     email: string;
     nickname: string;
   };
+  error?: string;
+}
+
+export interface CheckNicknameResponse {
+  success: boolean;
+  available: boolean;
+  message?: string;
+  error?: string;
 }
 
 export interface LoginRequest {
@@ -51,103 +71,168 @@ export interface LoginRequest {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    id: string;
+  accessToken?: string;
+  refreshToken?: string;
+  user?: {
+    id: number;
     email: string;
     nickname: string;
     username: string;
     emailVerified: boolean;
     isAdmin: boolean;
   };
+  error?: string;
 }
 
-export interface UserResponse {
-  success: boolean;
-  user: {
-    id: string;
-    email: string;
-    nickname: string;
-    username: string;
-    specialty?: string;
-    region?: string;
-    profileImage?: string;
-    instagram?: string;
-    bio?: string;
-    emailVerified: boolean;
-    isAdmin: boolean;
-    isActive: boolean;
-    stats: {
-      totalPosts: number;
-      totalComments: number;
-      totalLikesReceived: number;
+// ============================================
+// 이메일 인증 코드 발송
+// ============================================
+
+export async function sendVerificationCode(email: string): Promise<SendVerificationResponse> {
+  try {
+    // 먼저 이메일 중복 체크
+    const checkResponse = await apiClient.post<{ success: boolean; error?: string }>(
+      '/api/auth/check-email',
+      { email }
+    );
+    
+    if (!checkResponse.data.success) {
+      return {
+        success: false,
+        message: '',
+        error: checkResponse.data.error || '이미 사용 중인 이메일입니다'
+      };
+    }
+  } catch (error: any) {
+    // 이메일 체크 API가 없을 수 있으므로 404는 무시
+    if (error.response?.status !== 404) {
+      // 다른 에러면 그냥 진행
+    }
+  }
+
+  try {
+    const response = await apiClient.post<SendVerificationResponse>(
+      '/api/auth/send-verification',
+      { email }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '인증 코드 발송에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
     };
-    createdAt: string;
-    lastLoginAt?: string;
-  };
+  }
 }
 
-export interface UpdateProfileRequest {
-  nickname?: string;
-  specialty?: string;
-  region?: string;
-  instagram?: string;
-  bio?: string;
+// ============================================
+// 이메일 인증 코드 확인 (회원가입 전)
+// ============================================
+
+export async function verifyEmail(email: string, code: string): Promise<VerifyEmailResponse> {
+  try {
+    const response = await apiClient.post<VerifyEmailResponse>(
+      '/api/auth/verify-code',
+      { email, code }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '인증 코드 확인에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
 }
 
-/**
- * 회원가입
- */
+// ============================================
+// 닉네임 중복 확인
+// ============================================
+
+export async function checkNickname(nickname: string): Promise<CheckNicknameResponse> {
+  try {
+    const response = await apiClient.post<CheckNicknameResponse>(
+      '/api/auth/check-nickname',
+      { nickname }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '닉네임 확인에 실패했습니다';
+    return {
+      success: false,
+      available: false,
+      error: errorMessage
+    };
+  }
+}
+
+// ============================================
+// 회원가입
+// ============================================
+
 export async function register(data: RegisterRequest): Promise<RegisterResponse> {
-  const response = await apiClient.post('/api/auth/register', data);
-  return response.data;
+  try {
+    const response = await apiClient.post<RegisterResponse>(
+      '/api/auth/register',
+      data
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '회원가입에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
 }
 
-/**
- * 이메일 인증
- */
-export async function verifyEmail(data: VerifyEmailRequest): Promise<VerifyEmailResponse> {
-  const response = await apiClient.post('/api/auth/verify-email', data);
-  return response.data;
-}
+// ============================================
+// 로그인
+// ============================================
 
-/**
- * 인증 코드 재발송
- */
-export async function resendCode(email: string): Promise<{ success: boolean; message: string }> {
-  const response = await apiClient.post('/api/auth/resend-code', { email });
-  return response.data;
-}
-
-/**
- * 로그인
- */
 export async function login(data: LoginRequest): Promise<LoginResponse> {
-  const response = await apiClient.post('/api/auth/login', data);
-  return response.data;
+  try {
+    const response = await apiClient.post<LoginResponse>(
+      '/api/auth/login',
+      data
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '로그인에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
 }
 
-/**
- * 로그아웃
- */
-export async function logout(refreshToken?: string): Promise<{ success: boolean; message: string }> {
-  const response = await apiClient.post('/api/auth/logout', { refreshToken });
-  return response.data;
-}
+// ============================================
+// 인증 코드 재발송
+// ============================================
 
-/**
- * 내 정보 조회
- */
-export async function getMe(): Promise<UserResponse> {
-  const response = await apiClient.get('/api/auth/me');
-  return response.data;
-}
-
-/**
- * 프로필 수정
- */
-export async function updateProfile(data: UpdateProfileRequest): Promise<{ success: boolean; message: string; user: any }> {
-  const response = await apiClient.put('/api/auth/profile', data);
-  return response.data;
+export async function resendVerificationCode(email: string): Promise<SendVerificationResponse> {
+  try {
+    const response = await apiClient.post<SendVerificationResponse>(
+      '/api/auth/resend-code',
+      { email }
+    );
+    
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '인증 코드 재발송에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
 }

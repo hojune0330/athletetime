@@ -9,7 +9,8 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon } from '@heroicons/react/24/outline';
+import * as authApi from '../api/auth';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -75,11 +76,14 @@ export default function RegisterPage() {
     setErrors(prev => ({ ...prev, email: '' }));
 
     try {
-      // TODO: 실제 이메일 인증 코드 발송 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await authApi.sendVerificationCode(formData.email);
       
-      setEmailSent(true);
-      alert(`${formData.email}로 인증 코드를 발송했습니다.`);
+      if (response.success) {
+        setEmailSent(true);
+        alert(`${formData.email}로 인증 코드를 발송했습니다.`);
+      } else {
+        setErrors(prev => ({ ...prev, email: response.error || '인증 코드 발송에 실패했습니다' }));
+      }
     } catch (error: any) {
       setErrors(prev => ({ ...prev, email: error.message || '인증 코드 발송에 실패했습니다' }));
     } finally {
@@ -98,12 +102,14 @@ export default function RegisterPage() {
     setErrors(prev => ({ ...prev, verificationCode: '' }));
 
     try {
-      // TODO: 실제 이메일 인증 확인 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authApi.verifyEmail(formData.email, formData.verificationCode);
       
-      // 임시: 모든 코드 허용
-      setEmailVerified(true);
-      alert('이메일 인증이 완료되었습니다.');
+      if (response.success) {
+        setEmailVerified(true);
+        alert('이메일 인증이 완료되었습니다.');
+      } else {
+        setErrors(prev => ({ ...prev, verificationCode: response.error || '인증 코드가 일치하지 않습니다' }));
+      }
     } catch (error: any) {
       setErrors(prev => ({ ...prev, verificationCode: error.message || '인증 코드가 일치하지 않습니다' }));
     } finally {
@@ -127,16 +133,20 @@ export default function RegisterPage() {
     setErrors(prev => ({ ...prev, nickname: '' }));
 
     try {
-      // TODO: 실제 닉네임 중복 확인 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authApi.checkNickname(formData.nickname);
       
-      // 임시: 모든 닉네임 사용 가능
       setNicknameChecked(true);
-      setNicknameAvailable(true);
+      
+      if (response.success && response.available) {
+        setNicknameAvailable(true);
+      } else {
+        setNicknameAvailable(false);
+        setErrors(prev => ({ ...prev, nickname: response.error || '이미 사용 중인 닉네임입니다' }));
+      }
     } catch (error: any) {
       setNicknameChecked(true);
       setNicknameAvailable(false);
-      setErrors(prev => ({ ...prev, nickname: error.message || '이미 사용 중인 닉네임입니다' }));
+      setErrors(prev => ({ ...prev, nickname: error.message || '닉네임 확인에 실패했습니다' }));
     } finally {
       setCheckingNickname(false);
     }
@@ -187,11 +197,18 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // TODO: 실제 회원가입 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const response = await authApi.register({
+        email: formData.email,
+        password: formData.password,
+        nickname: formData.nickname
+      });
       
-      alert('회원가입이 완료되었습니다!');
-      navigate('/');
+      if (response.success) {
+        alert('회원가입이 완료되었습니다!');
+        navigate('/');
+      } else {
+        setErrors({ submit: response.error || '회원가입에 실패했습니다' });
+      }
     } catch (error: any) {
       setErrors({ submit: error.message || '회원가입에 실패했습니다' });
     } finally {
