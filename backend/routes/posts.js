@@ -458,6 +458,244 @@ router.post('/', async (req, res) => {
 });
 
 /**
+ * POST /api/posts/:id/verify-password
+ * 게시글 비밀번호 검증 (수정 전 확인용)
+ * 
+ * Body: { password: string }
+ */
+router.post('/:id/verify-password', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    
+    // 비밀번호 필수 체크
+    if (!password || typeof password !== 'string' || password.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '비밀번호를 입력해주세요.' 
+      });
+    }
+    
+    // 게시글 조회
+    const result = await req.app.locals.pool.query(
+      'SELECT password_hash FROM posts WHERE id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: '게시글을 찾을 수 없습니다.' 
+      });
+    }
+    
+    // password_hash 존재 여부 확인
+    if (!result.rows[0].password_hash) {
+      return res.status(500).json({ 
+        success: false, 
+        error: '게시글 비밀번호 정보가 없습니다.' 
+      });
+    }
+    
+    // 비밀번호 확인
+    const isValid = await bcrypt.compare(password, result.rows[0].password_hash);
+    
+    if (!isValid) {
+      return res.status(403).json({ 
+        success: false, 
+        error: '비밀번호가 일치하지 않습니다.' 
+      });
+    }
+    
+    console.log(`✅ 게시글 비밀번호 검증 성공: ID=${id}`);
+    
+    res.json({
+      success: true,
+      message: '비밀번호가 확인되었습니다.'
+    });
+    
+  } catch (error) {
+    console.error(`❌ [POST /api/posts/${req.params.id}/verify-password] 에러:`, error);
+    res.status(500).json({ 
+      success: false, 
+      error: '비밀번호 검증에 실패했습니다.' 
+    });
+  }
+});
+
+/**
+ * PUT /api/posts/:id
+ * 게시글 수정 (비밀번호 검증)
+ * 
+ * Body: { title, content, category, password }
+ */
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, category, password } = req.body;
+    
+    // 비밀번호 필수 체크
+    if (!password || typeof password !== 'string' || password.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '비밀번호를 입력해주세요.' 
+      });
+    }
+    
+    // 유효성 검사
+    if (!title || !content) {
+      return res.status(400).json({
+        success: false,
+        error: '제목과 내용은 필수입니다.'
+      });
+    }
+    
+    if (title.length > 200) {
+      return res.status(400).json({
+        success: false,
+        error: '제목은 200자 이내로 입력해주세요.'
+      });
+    }
+    
+    if (content.length > 10000) {
+      return res.status(400).json({
+        success: false,
+        error: '내용은 10000자 이내로 입력해주세요.'
+      });
+    }
+    
+    // 게시글 조회
+    const postResult = await req.app.locals.pool.query(
+      'SELECT password_hash, category_id FROM posts WHERE id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        error: '게시글을 찾을 수 없습니다.' 
+      });
+    }
+    
+    // password_hash 존재 여부 확인
+    if (!postResult.rows[0].password_hash) {
+      return res.status(500).json({ 
+        success: false, 
+        error: '게시글 비밀번호 정보가 없습니다.' 
+      });
+    }
+    
+    // 비밀번호 확인
+    const isValid = await bcrypt.compare(password, postResult.rows[0].password_hash);
+    
+    if (!isValid) {
+      return res.status(403).json({ 
+        success: false, 
+        error: '비밀번호가 일치하지 않습니다.' 
+      });
+    }
+    
+    // 카테고리 ID 조회 (변경된 경우)
+    let categoryId = postResult.rows[0].category_id;
+    if (category) {
+      const categoryResult = await req.app.locals.pool.query(
+        'SELECT id FROM categories WHERE name = $1',
+        [category]
+      );
+      
+      if (categoryResult.rows.length > 0) {
+        categoryId = categoryResult.rows[0].id;
+      }
+    }
+    
+    // 게시글 수정
+    const updateResult = await req.app.locals.pool.query(`
+      UPDATE posts 
+      SET title = $1, content = $2, category_id = $3, updated_at = NOW()
+      WHERE id = $4
+      RETURNING *
+    `, [title, content, categoryId, id]);
+    
+    // 수정된 게시글 상세 조회 (이미지, 댓글 포함)
+    const result = await req.app.locals.pool.query(`
+      SELECT 
+        p.id,
+        p.title,
+        p.content,
+        p.author,
+        p.instagram,
+        p.views,
+        p.likes_count,
+        p.dislikes_count,
+        p.comments_count,
+        p.is_notice,
+        p.is_pinned,
+        p.is_blinded,
+        p.created_at,
+        p.updated_at,
+        c.id as category_id,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.name END as category_name,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.icon END as category_icon,
+        CASE WHEN c.name = '자유' THEN NULL ELSE c.color END as category_color,
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'id', i.id,
+              'cloudinary_url', i.cloudinary_url,
+              'thumbnail_url', i.thumbnail_url,
+              'width', i.width,
+              'height', i.height
+            ) ORDER BY i.sort_order
+          )
+          FROM images i 
+          WHERE i.post_id = p.id),
+          '[]'::json
+        ) as images,
+        COALESCE(
+          (SELECT json_agg(
+            json_build_object(
+              'id', cm.id,
+              'content', cm.content,
+              'author', cm.author,
+              'instagram', cm.instagram,
+              'created_at', cm.created_at,
+              'is_blinded', cm.is_blinded
+            ) ORDER BY cm.created_at ASC
+          )
+          FROM comments cm 
+          WHERE cm.post_id = p.id 
+            AND cm.deleted_at IS NULL),
+          '[]'::json
+        ) as comments
+      FROM posts p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.id = $1
+    `, [id]);
+    
+    const post = result.rows[0];
+    
+    console.log(`✅ 게시글 수정 완료: ID=${id}, 제목="${title}"`);
+    
+    res.json({
+      success: true,
+      post: {
+        ...post,
+        images: Array.isArray(post.images) ? post.images : [],
+        comments: Array.isArray(post.comments) ? post.comments : []
+      },
+      message: '게시글이 수정되었습니다.'
+    });
+    
+  } catch (error) {
+    console.error(`❌ [PUT /api/posts/${req.params.id}] 에러:`, error);
+    res.status(500).json({ 
+      success: false, 
+      error: '게시글 수정에 실패했습니다.' 
+    });
+  }
+});
+
+/**
  * DELETE /api/posts/:id
  * 게시글 삭제 (비밀번호 검증)
  * 

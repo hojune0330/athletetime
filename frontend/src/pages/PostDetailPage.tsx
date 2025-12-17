@@ -11,9 +11,10 @@ import {
   ChatBubbleLeftIcon,
   ShareIcon,
   TrashIcon,
+  PencilSquareIcon,
   ArrowLeftIcon
 } from '@heroicons/react/24/outline';
-import { usePost, useVotePost, useCreateComment, useDeletePost } from '../hooks/usePosts';
+import { usePost, useVotePost, useCreateComment, useDeletePost, useVerifyPostPassword } from '../hooks/usePosts';
 import { getAnonymousId } from '../utils/anonymousUser';
 import type { Comment } from '../types';
 
@@ -144,6 +145,7 @@ interface PostActionsProps {
   dislikesCount: number;
   myVote?: 'like' | 'dislike' | null;
   onVote: (type: 'like' | 'dislike') => void;
+  onEdit: () => void;
   onDelete: () => void;
   isVoting: boolean;
 }
@@ -153,6 +155,7 @@ function PostActions({
   dislikesCount,
   myVote,
   onVote, 
+  onEdit,
   onDelete,
   isVoting 
 }: PostActionsProps) {
@@ -217,13 +220,23 @@ function PostActions({
           </button>
         </div>
         
-        <button 
-          onClick={onDelete}
-          className="btn-ghost text-danger-500 hover:bg-danger-50"
-        >
-          <TrashIcon className="w-5 h-5" />
-          <span>삭제</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={onEdit}
+            className="btn-ghost text-primary-500 hover:bg-primary-50"
+          >
+            <PencilSquareIcon className="w-5 h-5" />
+            <span>수정</span>
+          </button>
+          
+          <button 
+            onClick={onDelete}
+            className="btn-ghost text-danger-500 hover:bg-danger-50"
+          >
+            <TrashIcon className="w-5 h-5" />
+            <span>삭제</span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -331,6 +344,86 @@ function CommentSection({ comments, commentsCount, onSubmit, isSubmitting }: Com
   );
 }
 
+// 비밀번호 확인 모달 (수정용)
+interface EditPasswordModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (password: string) => void;
+  isVerifying: boolean;
+  error?: string | null;
+}
+
+function EditPasswordModal({ isOpen, onClose, onConfirm, isVerifying, error }: EditPasswordModalProps) {
+  const [password, setPassword] = useState('');
+  
+  if (!isOpen) return null;
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.trim()) {
+      onConfirm(password);
+    }
+  };
+  
+  const handleClose = () => {
+    setPassword('');
+    onClose();
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+      <div className="card max-w-md w-full animate-fadeInUp">
+        <div className="card-body p-6">
+          <h3 className="text-xl font-bold text-neutral-900 mb-2">게시글 수정</h3>
+          <p className="text-neutral-500 mb-4 text-sm">
+            게시글을 수정하려면 비밀번호를 입력하세요.
+          </p>
+          {error && (
+            <div className="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-600 text-sm">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              className="input mb-4"
+              disabled={isVerifying}
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="btn-secondary flex-1"
+                disabled={isVerifying}
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                disabled={isVerifying || !password.trim()}
+                className="btn-primary flex-1"
+              >
+                {isVerifying ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>확인 중...</span>
+                  </>
+                ) : (
+                  '확인'
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // 삭제 확인 모달
 interface DeleteModalProps {
   isOpen: boolean;
@@ -407,12 +500,15 @@ export default function PostDetailPage() {
   const id = postId || '';
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditPasswordModal, setShowEditPasswordModal] = useState(false);
+  const [editPasswordError, setEditPasswordError] = useState<string | null>(null);
   
   // API 훅
   const { data: post, isLoading, isError, error } = usePost(id);
   const votePostMutation = useVotePost();
   const createCommentMutation = useCreateComment();
   const deletePostMutation = useDeletePost();
+  const verifyPasswordMutation = useVerifyPostPassword();
   
   // 투표 핸들러
   const handleVote = async (type: 'like' | 'dislike') => {
@@ -448,6 +544,20 @@ export default function PostDetailPage() {
       showToast('💬 댓글이 작성되었습니다!');
     } catch {
       showToast('댓글 작성에 실패했습니다.');
+    }
+  };
+  
+  // 수정 비밀번호 확인 핸들러
+  const handleEditPasswordVerify = async (password: string) => {
+    try {
+      setEditPasswordError(null);
+      await verifyPasswordMutation.mutateAsync({ id, password });
+      setShowEditPasswordModal(false);
+      // 비밀번호 확인 성공 시 수정 페이지로 이동 (비밀번호를 state로 전달)
+      navigate(`/edit/${id}`, { state: { password } });
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : '비밀번호가 일치하지 않습니다.';
+      setEditPasswordError(errorMsg);
     }
   };
   
@@ -525,6 +635,7 @@ export default function PostDetailPage() {
           dislikesCount={post.dislikes_count}
           myVote={post.myVote}
           onVote={handleVote}
+          onEdit={() => setShowEditPasswordModal(true)}
           onDelete={() => setShowDeleteModal(true)}
           isVoting={votePostMutation.isPending}
         />
@@ -536,6 +647,18 @@ export default function PostDetailPage() {
         commentsCount={post.comments_count}
         onSubmit={handleCommentSubmit}
         isSubmitting={createCommentMutation.isPending}
+      />
+      
+      {/* 수정 비밀번호 확인 모달 */}
+      <EditPasswordModal
+        isOpen={showEditPasswordModal}
+        onClose={() => {
+          setShowEditPasswordModal(false);
+          setEditPasswordError(null);
+        }}
+        onConfirm={handleEditPasswordVerify}
+        isVerifying={verifyPasswordMutation.isPending}
+        error={editPasswordError}
       />
       
       {/* 삭제 확인 모달 */}

@@ -84,6 +84,46 @@ export function useCreatePost(): UseMutationResult<Post, Error, CreatePostMutati
 }
 
 // ============================================
+// 게시글 비밀번호 검증
+// ============================================
+
+interface VerifyPasswordMutationVariables {
+  id: string | number;
+  password: string;
+}
+
+export function useVerifyPostPassword(): UseMutationResult<boolean, Error, VerifyPasswordMutationVariables> {
+  return useMutation({
+    mutationFn: ({ id, password }: VerifyPasswordMutationVariables) => 
+      api.verifyPostPassword(id, password),
+  });
+}
+
+// ============================================
+// 게시글 수정
+// ============================================
+
+interface UpdatePostMutationVariables {
+  id: string | number;
+  data: api.UpdatePostRequest;
+}
+
+export function useUpdatePost(): UseMutationResult<Post, Error, UpdatePostMutationVariables> {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }: UpdatePostMutationVariables) => 
+      api.updatePost(id, data),
+    onSuccess: (updatedPost, variables) => {
+      // 해당 게시글 캐시 업데이트
+      queryClient.setQueryData(queryKeys.post(variables.id), updatedPost);
+      // 게시글 목록 무효화
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+    },
+  });
+}
+
+// ============================================
 // 게시글 삭제
 // ============================================
 

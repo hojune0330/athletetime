@@ -143,6 +143,50 @@ export async function deletePost(id: string | number, password: string): Promise
 }
 
 // ============================================
+// 게시글 비밀번호 검증
+// ============================================
+
+export async function verifyPostPassword(id: string | number, password: string): Promise<boolean> {
+  const response = await apiClient.post<{ success: boolean; message?: string; error?: string }>(
+    `/api/posts/${id}/verify-password`,
+    { password }
+  );
+  
+  if (!response.data.success) {
+    throw new Error(response.data.error || '비밀번호가 일치하지 않습니다.');
+  }
+  
+  return true;
+}
+
+// ============================================
+// 게시글 수정
+// ============================================
+
+export interface UpdatePostRequest {
+  title: string;
+  content: string;
+  category: string;
+  password: string;
+}
+
+export async function updatePost(
+  id: string | number,
+  data: UpdatePostRequest
+): Promise<Post> {
+  const response = await apiClient.put<{ success: boolean; post: Post; message?: string; error?: string }>(
+    `/api/posts/${id}`,
+    data
+  );
+  
+  if (!response.data.success || !response.data.post) {
+    throw new Error(response.data.error || '게시글 수정에 실패했습니다.');
+  }
+  
+  return response.data.post;
+}
+
+// ============================================
 // 댓글 작성
 // ============================================
 

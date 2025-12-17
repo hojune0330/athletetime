@@ -10,6 +10,7 @@ import TrainingCalculatorPage from './pages/TrainingCalculatorPage'
 import ChatPage from './pages/ChatPage'
 // 기존 페이지
 import PostDetailPage from './pages/PostDetailPage'
+import EditPostPage from './pages/EditPostPage'
 import WritePage from './pages/WritePage'
 import BoardPage from './pages/BoardPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -75,6 +76,11 @@ function App() {
             {/* 글쓰기 (레이아웃 포함) */}
             <Route path="/write" element={<Layout />}>
               <Route index element={<WritePage />} />
+            </Route>
+
+            {/* 게시글 수정 (레이아웃 포함) */}
+            <Route path="/edit/:postId" element={<Layout />}>
+              <Route index element={<EditPostPage />} />
             </Route>
 
             {/* 404 */}
