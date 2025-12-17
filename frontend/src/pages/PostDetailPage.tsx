@@ -456,7 +456,7 @@ export default function PostDetailPage() {
     try {
       await deletePostMutation.mutateAsync({ id, password });
       showToast('🗑️ 게시글이 삭제되었습니다.');
-      setTimeout(() => navigate('/'), 1000);
+      setTimeout(() => navigate('/community'), 1000);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : '삭제에 실패했습니다.';
       showToast(errorMsg);
