@@ -116,6 +116,7 @@ interface PostContentProps {
 function PostContent({ content, images }: PostContentProps) {
   return (
     <div className="p-6">
+      ㅁㄴㅇ
       {images && images.length > 0 && (
         <div className="mb-6 space-y-4">
           {images.map((img, index) => (
