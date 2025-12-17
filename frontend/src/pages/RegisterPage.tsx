@@ -1,13 +1,17 @@
 /**
- * 회원가입 페이지 (v4.1.0 - Light Mode Design System v2)
+ * 회원가입 페이지 (v4.2.0 - Light Mode Design System v2)
+ * 
+ * 기능:
+ * - 이메일 인증
+ * - 닉네임 중복 확인
+ * - 비밀번호 유효성 검사
  */
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 
 export default function RegisterPage() {
-  const { register } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -15,17 +19,25 @@ export default function RegisterPage() {
     password: '',
     passwordConfirm: '',
     nickname: '',
-    specialty: '',
-    region: ''
+    verificationCode: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [showVerification, setShowVerification] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
+  
+  // 이메일 인증 상태
+  const [emailSent, setEmailSent] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  
+  // 닉네임 중복 확인 상태
+  const [nicknameChecked, setNicknameChecked] = useState(false);
+  const [nicknameAvailable, setNicknameAvailable] = useState(false);
+  const [checkingNickname, setCheckingNickname] = useState(false);
 
   // 입력 핸들러
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
@@ -33,17 +45,110 @@ export default function RegisterPage() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    
+    // 닉네임 변경 시 중복 확인 상태 초기화
+    if (name === 'nickname') {
+      setNicknameChecked(false);
+      setNicknameAvailable(false);
+    }
+    
+    // 이메일 변경 시 인증 상태 초기화
+    if (name === 'email') {
+      setEmailSent(false);
+      setEmailVerified(false);
+    }
+  };
+
+  // 이메일 인증 코드 발송
+  const handleSendVerification = async () => {
+    // 이메일 유효성 검사
+    if (!formData.email) {
+      setErrors(prev => ({ ...prev, email: '이메일을 입력해주세요' }));
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setErrors(prev => ({ ...prev, email: '올바른 이메일 형식이 아닙니다' }));
+      return;
+    }
+
+    setSendingEmail(true);
+    setErrors(prev => ({ ...prev, email: '' }));
+
+    try {
+      // TODO: 실제 이메일 인증 코드 발송 API 호출
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setEmailSent(true);
+      alert(`${formData.email}로 인증 코드를 발송했습니다.`);
+    } catch (error: any) {
+      setErrors(prev => ({ ...prev, email: error.message || '인증 코드 발송에 실패했습니다' }));
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  // 이메일 인증 코드 확인
+  const handleVerifyEmail = async () => {
+    if (!formData.verificationCode || formData.verificationCode.length !== 6) {
+      setErrors(prev => ({ ...prev, verificationCode: '6자리 인증 코드를 입력해주세요' }));
+      return;
+    }
+
+    setVerifyingEmail(true);
+    setErrors(prev => ({ ...prev, verificationCode: '' }));
+
+    try {
+      // TODO: 실제 이메일 인증 확인 API 호출
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 임시: 모든 코드 허용
+      setEmailVerified(true);
+      alert('이메일 인증이 완료되었습니다.');
+    } catch (error: any) {
+      setErrors(prev => ({ ...prev, verificationCode: error.message || '인증 코드가 일치하지 않습니다' }));
+    } finally {
+      setVerifyingEmail(false);
+    }
+  };
+
+  // 닉네임 중복 확인
+  const handleCheckNickname = async () => {
+    // 닉네임 유효성 검사
+    if (!formData.nickname) {
+      setErrors(prev => ({ ...prev, nickname: '닉네임을 입력해주세요' }));
+      return;
+    }
+    if (formData.nickname.length < 2 || formData.nickname.length > 10) {
+      setErrors(prev => ({ ...prev, nickname: '닉네임은 2-10자여야 합니다' }));
+      return;
+    }
+
+    setCheckingNickname(true);
+    setErrors(prev => ({ ...prev, nickname: '' }));
+
+    try {
+      // TODO: 실제 닉네임 중복 확인 API 호출
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 임시: 모든 닉네임 사용 가능
+      setNicknameChecked(true);
+      setNicknameAvailable(true);
+    } catch (error: any) {
+      setNicknameChecked(true);
+      setNicknameAvailable(false);
+      setErrors(prev => ({ ...prev, nickname: error.message || '이미 사용 중인 닉네임입니다' }));
+    } finally {
+      setCheckingNickname(false);
+    }
   };
 
   // 유효성 검증
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    // 이메일 검증
-    if (!formData.email) {
-      newErrors.email = '이메일을 입력해주세요';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '올바른 이메일 형식이 아닙니다';
+    // 이메일 인증 확인
+    if (!emailVerified) {
+      newErrors.email = '이메일 인증을 완료해주세요';
     }
 
     // 비밀번호 검증
@@ -62,11 +167,9 @@ export default function RegisterPage() {
       newErrors.passwordConfirm = '비밀번호가 일치하지 않습니다';
     }
 
-    // 닉네임 검증
-    if (!formData.nickname) {
-      newErrors.nickname = '닉네임을 입력해주세요';
-    } else if (formData.nickname.length < 2 || formData.nickname.length > 10) {
-      newErrors.nickname = '닉네임은 2-10자여야 합니다';
+    // 닉네임 중복 확인
+    if (!nicknameChecked || !nicknameAvailable) {
+      newErrors.nickname = '닉네임 중복 확인을 해주세요';
     }
 
     setErrors(newErrors);
@@ -84,101 +187,18 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await register({
-        email: formData.email,
-        password: formData.password,
-        nickname: formData.nickname,
-        specialty: formData.specialty || undefined,
-        region: formData.region || undefined
-      });
-
-      if (response.requiresVerification) {
-        setShowVerification(true);
-      }
+      // TODO: 실제 회원가입 API 호출
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      alert('회원가입이 완료되었습니다!');
+      navigate('/');
     } catch (error: any) {
-      setErrors({ submit: error.message });
+      setErrors({ submit: error.message || '회원가입에 실패했습니다' });
     } finally {
       setLoading(false);
     }
   };
 
-  // 이메일 인증 화면
-  if (showVerification) {
-    return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full animate-fadeIn">
-          <div className="card shadow-card-hover">
-            <div className="card-body p-8">
-              {/* 뒤로가기 버튼 */}
-              <button
-                onClick={() => setShowVerification(false)}
-                className="mb-6 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                <span className="text-sm font-medium">뒤로가기</span>
-              </button>
-
-              <div className="text-center mb-8">
-                <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-info-500 to-info-600 rounded-2xl flex items-center justify-center shadow-md">
-                  <span className="text-4xl">📧</span>
-                </div>
-                <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-                  이메일 인증
-                </h1>
-                <p className="text-neutral-500">
-                  {formData.email}로<br />
-                  인증 코드를 발송했습니다
-                </p>
-              </div>
-
-              <form onSubmit={async (e) => {
-                e.preventDefault();
-                window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`;
-              }}>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      인증 코드 6자리
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={verificationCode}
-                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
-                      className="input text-center text-2xl tracking-widest font-mono"
-                      placeholder="000000"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={verificationCode.length !== 6}
-                    className="btn-primary w-full"
-                  >
-                    인증 확인
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      window.location.href = `/verify-email?email=${encodeURIComponent(formData.email)}`;
-                    }}
-                    className="w-full py-2 text-sm text-neutral-500 hover:text-neutral-900 transition-colors"
-                  >
-                    인증 코드를 받지 못하셨나요? →
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 회원가입 폼
   return (
     <div className="min-h-screen bg-neutral-50 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full animate-fadeIn">
@@ -201,10 +221,10 @@ export default function RegisterPage() {
                 <span className="text-4xl">🏃</span>
               </div>
               <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-                애슬리트 타임 회원가입
+                회원가입
               </h1>
               <p className="text-neutral-500">
-                Every Second Counts ⏱️
+                애슬리트 타임에 오신 것을 환영합니다
               </p>
             </div>
 
@@ -222,18 +242,91 @@ export default function RegisterPage() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   이메일 <span className="text-danger-500">*</span>
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`input ${errors.email ? 'input-error' : ''}`}
-                  placeholder="example@email.com"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`input flex-1 ${errors.email ? 'border-danger-500' : ''} ${emailVerified ? 'border-success-500 bg-success-50' : ''}`}
+                    placeholder="example@email.com"
+                    disabled={emailVerified}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendVerification}
+                    disabled={sendingEmail || emailVerified}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all whitespace-nowrap ${
+                      emailVerified 
+                        ? 'bg-success-100 text-success-600 cursor-not-allowed'
+                        : 'bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-50'
+                    }`}
+                  >
+                    {sendingEmail ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : emailVerified ? (
+                      <CheckCircleIcon className="w-5 h-5" />
+                    ) : emailSent ? (
+                      '재발송'
+                    ) : (
+                      '인증'
+                    )}
+                  </button>
+                </div>
                 {errors.email && (
                   <p className="mt-1 text-sm text-danger-500">{errors.email}</p>
                 )}
+                {emailVerified && (
+                  <p className="mt-1 text-sm text-success-600 flex items-center gap-1">
+                    <CheckCircleIcon className="w-4 h-4" />
+                    이메일 인증 완료
+                  </p>
+                )}
               </div>
+
+              {/* 인증 코드 입력 (이메일 발송 후 표시) */}
+              {emailSent && !emailVerified && (
+                <div className="animate-fadeIn">
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    인증 코드 <span className="text-danger-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      name="verificationCode"
+                      value={formData.verificationCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        setFormData(prev => ({ ...prev, verificationCode: value }));
+                        if (errors.verificationCode) {
+                          setErrors(prev => ({ ...prev, verificationCode: '' }));
+                        }
+                      }}
+                      className={`input flex-1 text-center text-lg tracking-widest font-mono ${errors.verificationCode ? 'border-danger-500' : ''}`}
+                      placeholder="000000"
+                      maxLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyEmail}
+                      disabled={verifyingEmail || formData.verificationCode.length !== 6}
+                      className="px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 transition-all whitespace-nowrap"
+                    >
+                      {verifyingEmail ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        '확인'
+                      )}
+                    </button>
+                  </div>
+                  {errors.verificationCode && (
+                    <p className="mt-1 text-sm text-danger-500">{errors.verificationCode}</p>
+                  )}
+                  <p className="mt-2 text-xs text-neutral-500">
+                    이메일로 발송된 6자리 인증 코드를 입력해주세요
+                  </p>
+                </div>
+              )}
 
               {/* 비밀번호 */}
               <div>
@@ -245,7 +338,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`input ${errors.password ? 'input-error' : ''}`}
+                  className={`input ${errors.password ? 'border-danger-500' : ''}`}
                   placeholder="8자 이상, 영문+숫자"
                 />
                 {errors.password && (
@@ -263,7 +356,7 @@ export default function RegisterPage() {
                   name="passwordConfirm"
                   value={formData.passwordConfirm}
                   onChange={handleChange}
-                  className={`input ${errors.passwordConfirm ? 'input-error' : ''}`}
+                  className={`input ${errors.passwordConfirm ? 'border-danger-500' : ''}`}
                   placeholder="비밀번호 재입력"
                 />
                 {errors.passwordConfirm && (
@@ -276,80 +369,51 @@ export default function RegisterPage() {
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   닉네임 <span className="text-danger-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="nickname"
-                  value={formData.nickname}
-                  onChange={handleChange}
-                  className={`input ${errors.nickname ? 'input-error' : ''}`}
-                  placeholder="육상러너123"
-                  maxLength={10}
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    name="nickname"
+                    value={formData.nickname}
+                    onChange={handleChange}
+                    className={`input flex-1 ${errors.nickname ? 'border-danger-500' : ''} ${nicknameAvailable ? 'border-success-500 bg-success-50' : ''}`}
+                    placeholder="2-10자"
+                    maxLength={10}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCheckNickname}
+                    disabled={checkingNickname || (nicknameChecked && nicknameAvailable)}
+                    className={`px-4 py-2 text-sm font-medium rounded-xl transition-all whitespace-nowrap ${
+                      nicknameAvailable 
+                        ? 'bg-success-100 text-success-600 cursor-not-allowed'
+                        : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 disabled:opacity-50'
+                    }`}
+                  >
+                    {checkingNickname ? (
+                      <div className="w-5 h-5 border-2 border-neutral-500 border-t-transparent rounded-full animate-spin" />
+                    ) : nicknameAvailable ? (
+                      <CheckCircleIcon className="w-5 h-5" />
+                    ) : (
+                      '중복확인'
+                    )}
+                  </button>
+                </div>
                 {errors.nickname && (
                   <p className="mt-1 text-sm text-danger-500">{errors.nickname}</p>
                 )}
-              </div>
-
-              {/* 주종목 (선택) */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  주종목 <span className="text-neutral-400">(선택)</span>
-                </label>
-                <select
-                  name="specialty"
-                  value={formData.specialty}
-                  onChange={handleChange}
-                  className="select"
-                >
-                  <option value="">선택하지 않음</option>
-                  <option value="단거리">단거리 (100m, 200m, 400m)</option>
-                  <option value="중거리">중거리 (800m, 1500m)</option>
-                  <option value="장거리">장거리 (5000m, 10000m, 마라톤)</option>
-                  <option value="허들">허들</option>
-                  <option value="계주">계주</option>
-                  <option value="도약">도약 (높이뛰기, 멀리뛰기 등)</option>
-                  <option value="투척">투척 (포환, 원반, 창 등)</option>
-                  <option value="혼성">혼성 (10종, 7종)</option>
-                </select>
-              </div>
-
-              {/* 지역 (선택) */}
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  지역 <span className="text-neutral-400">(선택)</span>
-                </label>
-                <select
-                  name="region"
-                  value={formData.region}
-                  onChange={handleChange}
-                  className="select"
-                >
-                  <option value="">선택하지 않음</option>
-                  <option value="서울">서울</option>
-                  <option value="경기">경기</option>
-                  <option value="인천">인천</option>
-                  <option value="부산">부산</option>
-                  <option value="대구">대구</option>
-                  <option value="광주">광주</option>
-                  <option value="대전">대전</option>
-                  <option value="울산">울산</option>
-                  <option value="세종">세종</option>
-                  <option value="강원">강원</option>
-                  <option value="충북">충북</option>
-                  <option value="충남">충남</option>
-                  <option value="전북">전북</option>
-                  <option value="전남">전남</option>
-                  <option value="경북">경북</option>
-                  <option value="경남">경남</option>
-                  <option value="제주">제주</option>
-                </select>
+                {nicknameAvailable && (
+                  <p className="mt-1 text-sm text-success-600 flex items-center gap-1">
+                    <CheckCircleIcon className="w-4 h-4" />
+                    사용 가능한 닉네임입니다
+                  </p>
+                )}
               </div>
 
               {/* 제출 버튼 */}
               <button
                 type="submit"
-                disabled={loading}
-                className="btn-primary w-full"
+                disabled={loading || !emailVerified || !nicknameAvailable}
+                className="btn-primary w-full mt-6"
               >
                 {loading ? (
                   <>
@@ -366,7 +430,7 @@ export default function RegisterPage() {
             <div className="mt-6 text-center">
               <p className="text-neutral-600 text-sm">
                 이미 계정이 있으신가요?{' '}
-                <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                <Link to="/" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
                   로그인하기 →
                 </Link>
               </p>
