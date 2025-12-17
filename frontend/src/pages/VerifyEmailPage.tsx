@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { resendCode } from '../api/auth';
+import { resendVerificationCode } from '../api/auth';
 import { showToast } from '../utils/toast';
 
 export default function VerifyEmailPage() {
@@ -73,7 +73,7 @@ export default function VerifyEmailPage() {
     setError('');
 
     try {
-      await resendCode(email);
+      await resendVerificationCode(email);
       setResendCooldown(60); // 60초 쿨다운
       showToast('✉️ 인증 코드가 재발송되었습니다', { type: 'success' });
     } catch (error: any) {
