@@ -216,3 +216,68 @@ export async function resendVerificationCode(email: string): Promise<SendVerific
     };
   }
 }
+
+// ============================================
+// 내 정보 조회
+// ============================================
+
+export interface GetMeResponse {
+  success: boolean;
+  user: {
+    id: number;
+    email: string;
+    nickname: string;
+    username: string;
+    emailVerified: boolean;
+    isAdmin: boolean;
+  };
+  error?: string;
+}
+
+export async function getMe(): Promise<GetMeResponse> {
+  const response = await apiClient.get<GetMeResponse>('/api/auth/me');
+  return response.data;
+}
+
+// ============================================
+// 로그아웃
+// ============================================
+
+export async function logout(refreshToken?: string): Promise<void> {
+  await apiClient.post('/api/auth/logout', { refreshToken });
+}
+
+// ============================================
+// 프로필 수정
+// ============================================
+
+export interface UpdateProfileRequest {
+  nickname?: string;
+  password?: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  user?: {
+    nickname: string;
+  };
+  error?: string;
+}
+
+export async function updateProfile(data: UpdateProfileRequest): Promise<UpdateProfileResponse> {
+  try {
+    const response = await apiClient.put<UpdateProfileResponse>(
+      '/api/auth/profile',
+      data
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '프로필 수정에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
+}

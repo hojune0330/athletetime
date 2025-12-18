@@ -80,6 +80,7 @@ router.post('/send-verification', async (req, res) => {
           email VARCHAR(255) PRIMARY KEY,
           code VARCHAR(6) NOT NULL,
           expires_at TIMESTAMP NOT NULL,
+          verified BOOLEAN DEFAULT FALSE,
           created_at TIMESTAMP DEFAULT NOW()
         )
       `);
@@ -159,11 +160,21 @@ router.post('/verify-code', async (req, res) => {
       });
     }
 
-    // 인증 성공 - verified 표시
-    await db.query(
-      `UPDATE email_verifications SET verified = TRUE WHERE email = $1`,
-      [email]
-    );
+    // 인증 성공 - verified 표시 (컬럼이 없으면 추가)
+    try {
+      await db.query(
+        `UPDATE email_verifications SET verified = TRUE WHERE email = $1`,
+        [email]
+      );
+    } catch (updateError) {
+      // verified 컬럼이 없으면 추가 후 재시도
+      console.log('verified 컬럼 추가 시도...');
+      await db.query(`ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE`);
+      await db.query(
+        `UPDATE email_verifications SET verified = TRUE WHERE email = $1`,
+        [email]
+      );
+    }
 
     res.json({
       success: true,

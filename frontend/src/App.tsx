@@ -17,6 +17,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
+import ProfilePage from './pages/ProfilePage'
 import { useEffect } from 'react'
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
 
             {/* 메인 페이지 (레이아웃 없음) */}
             <Route path="/" element={<MainPage />} />
