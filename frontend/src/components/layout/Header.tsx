@@ -5,7 +5,17 @@ import {
   ClockIcon,
   UserIcon
 } from '@heroicons/react/24/outline'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import * as authApi from '../../api/auth'
+
+interface User {
+  id: number;
+  email: string;
+  nickname: string;
+  username: string;
+  emailVerified: boolean;
+  isAdmin: boolean;
+}
 
 export default function Header() {
   const location = useLocation()
@@ -15,6 +25,36 @@ export default function Header() {
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [loginError, setLoginError] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  
+  // 로그인 상태 관리
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoadingUser, setIsLoadingUser] = useState(true)
+  
+  // 토큰에서 사용자 정보 불러오기
+  useEffect(() => {
+    const loadUser = async () => {
+      const token = localStorage.getItem('accessToken')
+      if (!token) {
+        setIsLoadingUser(false)
+        return
+      }
+      
+      try {
+        const response = await authApi.getMe()
+        if (response.success && response.user) {
+          setUser(response.user)
+        }
+      } catch (error) {
+        console.error('사용자 정보 로드 실패:', error)
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+      } finally {
+        setIsLoadingUser(false)
+      }
+    }
+    
+    loadUser()
+  }, [])
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/')
@@ -36,19 +76,38 @@ export default function Header() {
     setIsLoggingIn(true)
     
     try {
-      // TODO: 실제 로그인 API 호출
-      console.log('로그인 시도:', loginForm.email)
+      const response = await authApi.login({
+        email: loginForm.email,
+        password: loginForm.password
+      })
       
-      // 임시로 1초 후 성공 처리
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setShowLoginModal(false)
-      setLoginForm({ email: '', password: '' })
-      // 로그인 성공 후 처리
+      if (response.success && response.accessToken && response.refreshToken && response.user) {
+        localStorage.setItem('accessToken', response.accessToken)
+        localStorage.setItem('refreshToken', response.refreshToken)
+        setUser(response.user)
+        setShowLoginModal(false)
+        setLoginForm({ email: '', password: '' })
+      } else {
+        setLoginError(response.error || '로그인에 실패했습니다.')
+      }
     } catch (error: any) {
       setLoginError(error.message || '로그인에 실패했습니다.')
     } finally {
       setIsLoggingIn(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken')
+      await authApi.logout(refreshToken || undefined)
+    } catch (error) {
+      console.error('로그아웃 오류:', error)
+    } finally {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      setUser(null)
+      navigate('/')
     }
   }
 
@@ -99,20 +158,42 @@ export default function Header() {
                 ))}
               </nav>
 
-              {/* 로그인/회원가입 버튼 (데스크톱) */}
+              {/* 로그인/회원가입 또는 사용자 정보 (데스크톱) */}
               <div className="hidden md:flex items-center gap-2">
-                <button
-                  onClick={() => setShowLoginModal(true)}
-                  className="px-3 py-2 text-sm font-medium text-primary-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                >
-                  로그인
-                </button>
-                <Link
-                  to="/register"
-                  className="px-3 py-2 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
-                >
-                  회원가입
-                </Link>
+                {isLoadingUser ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : user ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      className="px-3 py-2 text-sm font-medium text-white hover:bg-white/10 rounded-lg transition-all flex items-center gap-2"
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      <span>{user.nickname}</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="px-3 py-2 text-sm font-medium text-primary-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                    >
+                      로그아웃
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setShowLoginModal(true)}
+                      className="px-3 py-2 text-sm font-medium text-primary-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                    >
+                      로그인
+                    </button>
+                    <Link
+                      to="/register"
+                      className="px-3 py-2 text-sm font-medium bg-white text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                    >
+                      회원가입
+                    </Link>
+                  </>
+                )}
               </div>
 
               {/* 모바일 메뉴 버튼 */}
@@ -175,26 +256,50 @@ export default function Header() {
               ))}
             </div>
 
-            {/* 모바일 로그인/회원가입 */}
+            {/* 모바일 로그인/회원가입 또는 사용자 정보 */}
             <div className="mt-6 pt-6 border-t border-neutral-100 space-y-2">
-              <button
-                onClick={() => {
-                  closeMobileMenu()
-                  setShowLoginModal(true)
-                }}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
-              >
-                <UserIcon className="w-5 h-5" />
-                <span className="font-medium">로그인</span>
-              </button>
-              <Link
-                to="/register"
-                onClick={closeMobileMenu}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
-              >
-                <UserIcon className="w-5 h-5" />
-                <span className="font-medium">회원가입</span>
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-primary-50 text-primary-600 transition-colors"
+                  >
+                    <UserIcon className="w-5 h-5" />
+                    <span className="font-medium">{user.nickname}</span>
+                  </Link>
+                  <button
+                    onClick={() => {
+                      closeMobileMenu()
+                      handleLogout()
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
+                  >
+                    <span className="font-medium">로그아웃</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      closeMobileMenu()
+                      setShowLoginModal(true)
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-neutral-700 hover:bg-neutral-100 transition-colors"
+                  >
+                    <UserIcon className="w-5 h-5" />
+                    <span className="font-medium">로그인</span>
+                  </button>
+                  <Link
+                    to="/register"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                  >
+                    <UserIcon className="w-5 h-5" />
+                    <span className="font-medium">회원가입</span>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

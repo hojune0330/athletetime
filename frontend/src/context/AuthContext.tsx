@@ -120,10 +120,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 이메일 인증
   const verifyEmail = async (email: string, code: string) => {
     try {
-      const response = await authApi.verifyEmail({ email, code });
-      setTokens(response.accessToken, response.refreshToken);
-      setUser(response.user);
-      navigate('/');
+      const response = await authApi.verifyEmail(email, code);
+      if (response.accessToken && response.refreshToken && response.user) {
+        setTokens(response.accessToken, response.refreshToken);
+        setUser(response.user as unknown as User);
+        navigate('/');
+      }
     } catch (error: any) {
       throw new Error(error.response?.data?.error || '이메일 인증에 실패했습니다');
     }
