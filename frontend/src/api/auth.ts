@@ -90,27 +90,7 @@ export interface LoginResponse {
 
 export async function sendVerificationCode(email: string): Promise<SendVerificationResponse> {
   try {
-    // 먼저 이메일 중복 체크
-    const checkResponse = await apiClient.post<{ success: boolean; error?: string }>(
-      '/api/auth/check-email',
-      { email }
-    );
-    
-    if (!checkResponse.data.success) {
-      return {
-        success: false,
-        message: '',
-        error: checkResponse.data.error || '이미 사용 중인 이메일입니다'
-      };
-    }
-  } catch (error: any) {
-    // 이메일 체크 API가 없을 수 있으므로 404는 무시
-    if (error.response?.status !== 404) {
-      // 다른 에러면 그냥 진행
-    }
-  }
-
-  try {
+    // send-verification API가 이메일 중복 체크도 함께 수행함
     const response = await apiClient.post<SendVerificationResponse>(
       '/api/auth/send-verification',
       { email }
