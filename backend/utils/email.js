@@ -244,6 +244,8 @@ async function sendVerificationEmail(email, code, nickname) {
   }
   
   try {
+    console.log('📧 이메일 발송 시도:', { to: email, from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
+    
     const result = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: email,
@@ -251,10 +253,12 @@ async function sendVerificationEmail(email, code, nickname) {
       html: getVerificationEmailHtml(code, nickname)
     });
 
-    console.log('✅ 인증 이메일 발송 성공:', result.id);
+    console.log('✅ 인증 이메일 발송 성공:', JSON.stringify(result, null, 2));
     return { success: true, messageId: result.id };
   } catch (error) {
-    console.error('❌ 인증 이메일 발송 실패:', error);
+    console.error('❌ 인증 이메일 발송 실패:', JSON.stringify(error, null, 2));
+    console.error('❌ 에러 메시지:', error.message);
+    console.error('❌ 에러 상세:', error.response?.data || error);
     throw new Error('이메일 발송에 실패했습니다');
   }
 }
