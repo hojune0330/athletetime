@@ -103,6 +103,10 @@ export async function createPost(
     formData.append('instagram', data.instagram);
   }
   
+  if (data.isNotice) {
+    formData.append('isNotice', 'true');
+  }
+  
   // 이미지 파일 추가 (최대 5개)
   images.slice(0, 5).forEach((image) => {
     formData.append('images', image);

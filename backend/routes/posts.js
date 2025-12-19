@@ -14,6 +14,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
 
 /**
  * GET /api/posts
@@ -301,8 +302,9 @@ router.get('/:id', async (req, res) => {
  * - instagram: string (optional)
  * - anonymousId: string
  * - images: File[] (최대 5개)
+ * - isNotice: boolean (관리자만, 공지사항 여부)
  */
-router.post('/', async (req, res) => {
+router.post('/', optionalAuth, async (req, res) => {
   const client = await req.app.locals.pool.connect();
   
   try {
@@ -315,7 +317,8 @@ router.post('/', async (req, res) => {
       password, 
       category = '자유', 
       instagram,
-      anonymousId = `anon_${Date.now()}`
+      anonymousId = `anon_${Date.now()}`,
+      isNotice = false
     } = req.body;
     
     // 유효성 검사
@@ -365,6 +368,15 @@ router.post('/', async (req, res) => {
     
     const categoryId = categoryResult.rows[0].id;
     
+    // 관리자 여부 확인 (공지사항 설정용)
+    let canSetNotice = false;
+    if (req.user && req.user.is_admin) {
+      canSetNotice = true;
+    }
+    
+    // isNotice 값 파싱 (문자열 "true" 처리)
+    const isNoticeValue = canSetNotice && (isNotice === true || isNotice === 'true');
+    
     // 게시글 생성
     const postResult = await client.query(`
       INSERT INTO posts (
@@ -374,11 +386,13 @@ router.post('/', async (req, res) => {
         content, 
         author, 
         password_hash, 
-        instagram
+        instagram,
+        is_notice,
+        is_pinned
       ) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
-    `, [categoryId, userId, title, content, author, passwordHash, instagram || null]);
+    `, [categoryId, userId, title, content, author, passwordHash, instagram || null, isNoticeValue, isNoticeValue]);
     
     const post = postResult.rows[0];
     

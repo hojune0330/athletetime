@@ -1133,4 +1133,60 @@ router.put('/profile', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/auth/set-admin
+ * 관리자 권한 설정 (특정 이메일에 대해)
+ * 내부용 API - 보안을 위해 특정 조건에서만 사용
+ */
+router.post('/set-admin', async (req, res) => {
+  try {
+    const { email, secretKey } = req.body;
+
+    // 비밀 키 검증 (환경변수 또는 하드코딩된 키)
+    const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'athletetime-admin-2024';
+    
+    if (secretKey !== ADMIN_SECRET_KEY) {
+      return res.status(403).json({
+        success: false,
+        error: '권한이 없습니다.'
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: '이메일이 필요합니다.'
+      });
+    }
+
+    // 사용자 찾기 및 관리자 권한 부여
+    const result = await db.query(
+      'UPDATE users SET is_admin = TRUE WHERE email = $1 RETURNING id, email, nickname, is_admin',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: '해당 이메일로 가입된 사용자가 없습니다.'
+      });
+    }
+
+    console.log(`✅ 관리자 권한 부여: ${email}`);
+
+    res.json({
+      success: true,
+      message: '관리자 권한이 부여되었습니다.',
+      user: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('❌ 관리자 설정 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '관리자 설정 중 오류가 발생했습니다.'
+    });
+  }
+});
+
 module.exports = router;
