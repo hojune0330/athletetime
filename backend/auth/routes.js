@@ -391,18 +391,30 @@ router.post('/register', async (req, res) => {
         );
       });
 
+    // JWT 토큰 생성 (회원가입 즉시 로그인)
+    const accessToken = generateAccessToken(user.id, email);
+    const refreshToken = generateRefreshToken(user.id, email);
+
+    // Refresh token 저장
+    await db.query(
+      `INSERT INTO refresh_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, NOW() + INTERVAL '30 days')`,
+      [user.id, refreshToken]
+    );
+
     res.status(201).json({
       success: true,
-      message: '회원가입이 완료되었습니다. 이메일로 발송된 인증 코드를 입력해주세요.',
+      message: '회원가입이 완료되었습니다.',
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
         nickname: user.nickname,
-        specialty: user.specialty,
-        region: user.region,
-        createdAt: user.created_at
-      },
-      requiresVerification: true
+        username: user.nickname,
+        emailVerified: false,
+        isAdmin: false
+      }
     });
 
   } catch (error) {

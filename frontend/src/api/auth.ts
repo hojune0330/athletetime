@@ -19,10 +19,15 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   success: boolean;
   message: string;
+  accessToken?: string;
+  refreshToken?: string;
   user?: {
     id: number;
     email: string;
     nickname: string;
+    username: string;
+    emailVerified: boolean;
+    isAdmin: boolean;
   };
   requiresVerification?: boolean;
   error?: string;
