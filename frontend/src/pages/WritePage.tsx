@@ -57,10 +57,13 @@ function validateForm(data: FormData, images: File[]): string | null {
 export default function WritePage() {
   const navigate = useNavigate();
   const anonymousId = getAnonymousId();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   
   // 관리자 여부 확인
   const isAdmin = user?.isAdmin || false;
+  
+  // 디버깅용 로그
+  console.log('WritePage - Auth state:', { user, loading, isAdmin });
   
   // 폼 상태
   const [formData, setFormData] = useState<FormData>({
