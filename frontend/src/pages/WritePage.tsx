@@ -11,11 +11,12 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Send, AlertCircle, Image as ImageIcon, Megaphone } from 'lucide-react';
 import { useCreatePost, useCategories } from '../hooks/usePosts';
 import { getAnonymousId, getUsername, setUsername } from '../utils/anonymousUser';
 import { showToast } from '../utils/toast';
 import ImageUploader from '../components/post/ImageUploader';
+import { useAuth } from '../context/AuthContext';
 
 // ============================================
 // 폼 유효성 검사
@@ -28,6 +29,7 @@ interface FormData {
   password: string;
   categoryId: number;
   instagram: string;
+  isNotice: boolean;
 }
 
 function validateForm(data: FormData, images: File[]): string | null {
@@ -55,6 +57,13 @@ function validateForm(data: FormData, images: File[]): string | null {
 export default function WritePage() {
   const navigate = useNavigate();
   const anonymousId = getAnonymousId();
+  const { user, loading } = useAuth();
+  
+  // 관리자 여부 확인
+  const isAdmin = user?.isAdmin || false;
+  
+  // 디버깅용 로그
+  console.log('WritePage - Auth state:', { user, loading, isAdmin });
   
   // 폼 상태
   const [formData, setFormData] = useState<FormData>({
@@ -64,6 +73,7 @@ export default function WritePage() {
     password: '',
     categoryId: 2, // 기본: 자유게시판
     instagram: '',
+    isNotice: false,
   });
   const [images, setImages] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +97,7 @@ export default function WritePage() {
   /**
    * 폼 입력 핸들러
    */
-  const handleChange = (field: keyof FormData, value: string | number) => {
+  const handleChange = (field: keyof FormData, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setError(null);
   };
@@ -124,6 +134,7 @@ export default function WritePage() {
           category: categoryName,
           instagram: formData.instagram.trim() || undefined,
           anonymousId,
+          isNotice: isAdmin && formData.isNotice,
         },
         images,
       });
@@ -266,6 +277,28 @@ export default function WritePage() {
                   disabled={isSubmitting}
                 />
               </div>
+              
+              {/* 관리자 전용: 공지사항 체크박스 */}
+              {isAdmin && (
+                <div className="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isNotice}
+                      onChange={(e) => handleChange('isNotice', e.target.checked)}
+                      className="w-5 h-5 rounded border-primary-300 text-primary-600 focus:ring-primary-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Megaphone className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium text-primary-700">공지사항으로 등록</span>
+                    </div>
+                  </label>
+                  <p className="mt-2 text-sm text-primary-600 ml-8">
+                    공지사항은 게시판 목록 상단에 고정됩니다.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           

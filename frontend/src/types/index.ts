@@ -105,6 +105,7 @@ export interface CreatePostRequest {
   category: string;
   instagram?: string;
   anonymousId: string;
+  isNotice?: boolean;
 }
 
 export interface CreateCommentRequest {

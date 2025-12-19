@@ -19,10 +19,15 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   success: boolean;
   message: string;
+  accessToken?: string;
+  refreshToken?: string;
   user?: {
     id: number;
     email: string;
     nickname: string;
+    username: string;
+    emailVerified: boolean;
+    isAdmin: boolean;
   };
   requiresVerification?: boolean;
   error?: string;
@@ -274,6 +279,87 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<UpdateP
     return response.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.error || '프로필 수정에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
+}
+
+// ============================================
+// 비밀번호 찾기 (인증 코드 발송)
+// ============================================
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
+export async function forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+  try {
+    const response = await apiClient.post<ForgotPasswordResponse>(
+      '/api/auth/forgot-password',
+      { email }
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '인증 코드 발송에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
+}
+
+// ============================================
+// 비밀번호 재설정 인증 코드 확인
+// ============================================
+
+export interface VerifyResetCodeResponse {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
+export async function verifyResetCode(email: string, code: string): Promise<VerifyResetCodeResponse> {
+  try {
+    const response = await apiClient.post<VerifyResetCodeResponse>(
+      '/api/auth/verify-reset-code',
+      { email, code }
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '인증 코드 확인에 실패했습니다';
+    return {
+      success: false,
+      message: '',
+      error: errorMessage
+    };
+  }
+}
+
+// ============================================
+// 새 비밀번호 설정
+// ============================================
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+  error?: string;
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<ResetPasswordResponse> {
+  try {
+    const response = await apiClient.post<ResetPasswordResponse>(
+      '/api/auth/reset-password',
+      { email, code, newPassword }
+    );
+    return response.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.error || '비밀번호 재설정에 실패했습니다';
     return {
       success: false,
       message: '',

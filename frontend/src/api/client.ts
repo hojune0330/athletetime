@@ -26,6 +26,12 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
+    // localStorage에서 토큰 가져와서 헤더에 추가
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     // 개발 환경에서만 로그 출력
     if (import.meta.env.DEV) {
       console.log(`📤 [${config.method?.toUpperCase()}] ${config.url}`);

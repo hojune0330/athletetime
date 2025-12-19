@@ -204,8 +204,14 @@ export default function RegisterPage() {
       });
       
       if (response.success) {
+        // 토큰 저장 (자동 로그인)
+        if (response.accessToken && response.refreshToken) {
+          localStorage.setItem('accessToken', response.accessToken);
+          localStorage.setItem('refreshToken', response.refreshToken);
+        }
         alert('회원가입이 완료되었습니다!');
-        navigate('/');
+        // 페이지 새로고침으로 헤더 업데이트
+        window.location.href = '/';
       } else {
         setErrors({ submit: response.error || '회원가입에 실패했습니다' });
       }
