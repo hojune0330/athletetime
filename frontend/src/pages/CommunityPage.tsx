@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PostList from '../components/post/PostList'
 import Pagination from '../components/common/Pagination'
-import { PlusIcon, PhotoIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, PhotoIcon, ChartBarIcon, MegaphoneIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../context/AuthContext'
 
 export default function CommunityPage() {
   const [searchParams] = useSearchParams()
@@ -13,6 +14,10 @@ export default function CommunityPage() {
   const limit = 20
   
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  
+  // 관리자 여부 확인
+  const isAdmin = user?.isAdmin || false
   
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
   const [showWriteForm, setShowWriteForm] = useState(false)
@@ -23,6 +28,7 @@ export default function CommunityPage() {
     password: '',
     hasImage: false,
     hasPoll: false,
+    isNotice: false,
   })
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
@@ -63,12 +69,13 @@ export default function CommunityPage() {
           password: newPost.password.trim(),
           category: '자유',
           anonymousId: getAnonymousId(),
+          isNotice: isAdmin && newPost.isNotice,
         },
         images: [],
       })
 
-      setFormSuccess('게시글이 등록됐어요!')
-      setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false })
+      setFormSuccess(newPost.isNotice ? '공지사항이 등록됐어요!' : '게시글이 등록됐어요!')
+      setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false, isNotice: false })
       setShowWriteForm(false)
       queryClient.invalidateQueries({ queryKey: ['posts'] })
     } catch (error: unknown) {
@@ -174,6 +181,28 @@ export default function CommunityPage() {
                   required
                 />
               </div>
+
+              {/* 관리자 전용: 공지사항 체크박스 */}
+              {isAdmin && (
+                <div className="p-3 bg-primary-50 border border-primary-200 rounded-xl">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newPost.isNotice}
+                      onChange={(e) => setNewPost({...newPost, isNotice: e.target.checked})}
+                      className="w-5 h-5 rounded border-primary-300 text-primary-600 focus:ring-primary-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="flex items-center gap-2">
+                      <MegaphoneIcon className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium text-primary-700">공지사항으로 등록</span>
+                    </div>
+                  </label>
+                  <p className="mt-1 text-xs text-primary-600 ml-8">
+                    공지사항은 게시판 목록 상단에 고정됩니다.
+                  </p>
+                </div>
+              )}
 
               {/* 옵션 버튼들 */}
               <div className="flex items-center justify-between">
