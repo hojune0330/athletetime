@@ -793,7 +793,9 @@ router.get('/me', authenticateToken, async (req, res) => {
  */
 router.put('/profile', authenticateToken, async (req, res) => {
   try {
-    const { nickname, specialty, region, instagram, bio } = req.body;
+    const { nickname, password } = req.body;
+    
+    console.log('📝 프로필 수정 요청:', { userId: req.user.id, nickname, hasPassword: !!password });
 
     // 닉네임 변경 시 중복 체크
     if (nickname && nickname !== req.user.nickname) {
@@ -810,19 +812,40 @@ router.put('/profile', authenticateToken, async (req, res) => {
       }
     }
 
+    // 비밀번호 변경 시 해싱
+    let passwordHash = null;
+    if (password) {
+      if (password.length < 8) {
+        return res.status(400).json({
+          success: false,
+          error: '비밀번호는 8자 이상이어야 합니다'
+        });
+      }
+      passwordHash = await bcrypt.hash(password, 10);
+    }
+
     // 프로필 업데이트
-    const result = await db.query(
-      `UPDATE users 
-       SET nickname = COALESCE($1, nickname),
-           specialty = COALESCE($2, specialty),
-           region = COALESCE($3, region),
-           instagram = COALESCE($4, instagram),
-           bio = COALESCE($5, bio),
-           updated_at = NOW()
-       WHERE id = $6
-       RETURNING nickname, specialty, region, instagram, bio`,
-      [nickname, specialty, region, instagram, bio, req.user.id]
-    );
+    let query, params;
+    if (passwordHash) {
+      query = `UPDATE users 
+               SET nickname = COALESCE($1, nickname),
+                   password_hash = $2,
+                   updated_at = NOW()
+               WHERE id = $3
+               RETURNING nickname`;
+      params = [nickname, passwordHash, req.user.id];
+    } else {
+      query = `UPDATE users 
+               SET nickname = COALESCE($1, nickname),
+                   updated_at = NOW()
+               WHERE id = $2
+               RETURNING nickname`;
+      params = [nickname, req.user.id];
+    }
+
+    const result = await db.query(query, params);
+    
+    console.log('✅ 프로필 수정 완료:', result.rows[0]);
 
     res.json({
       success: true,
