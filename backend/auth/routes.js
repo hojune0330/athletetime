@@ -829,15 +829,13 @@ router.put('/profile', authenticateToken, async (req, res) => {
     if (passwordHash) {
       query = `UPDATE users 
                SET nickname = COALESCE($1, nickname),
-                   password_hash = $2,
-                   updated_at = NOW()
+                   password_hash = $2
                WHERE id = $3
                RETURNING nickname`;
       params = [nickname, passwordHash, req.user.id];
     } else {
       query = `UPDATE users 
-               SET nickname = COALESCE($1, nickname),
-                   updated_at = NOW()
+               SET nickname = COALESCE($1, nickname)
                WHERE id = $2
                RETURNING nickname`;
       params = [nickname, req.user.id];
