@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const db = require('../utils/db');
 const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
-const { sendVerificationEmail, sendWelcomeEmail } = require('../utils/email');
+const { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordCodeEmail } = require('../utils/email');
 const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
@@ -795,6 +795,267 @@ router.get('/me', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       error: '사용자 정보 조회 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/forgot-password
+ * 비밀번호 찾기 - 이메일 인증 코드 발송
+ */
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: '이메일이 필요합니다'
+      });
+    }
+
+    // 이메일 형식 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        error: '올바른 이메일 형식이 아닙니다'
+      });
+    }
+
+    // 사용자 확인
+    const userResult = await db.query(
+      'SELECT id, nickname FROM users WHERE email = $1 AND auth_provider = $2',
+      [email, 'email']
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: '해당 이메일로 가입된 계정이 없습니다'
+      });
+    }
+
+    const user = userResult.rows[0];
+
+    // 인증 코드 생성
+    const verificationCode = generateVerificationCode();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후
+
+    // password_reset_codes 테이블에 저장 (테이블이 없으면 생성)
+    try {
+      await db.query(
+        `INSERT INTO password_reset_codes (email, code, expires_at) 
+         VALUES ($1, $2, $3)
+         ON CONFLICT (email) 
+         DO UPDATE SET code = $2, expires_at = $3, created_at = NOW(), used = FALSE`,
+        [email, verificationCode, expiresAt]
+      );
+    } catch (tableError) {
+      // 테이블이 없으면 생성
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS password_reset_codes (
+          email VARCHAR(255) PRIMARY KEY,
+          code VARCHAR(6) NOT NULL,
+          expires_at TIMESTAMP NOT NULL,
+          used BOOLEAN DEFAULT FALSE,
+          created_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      await db.query(
+        `INSERT INTO password_reset_codes (email, code, expires_at) VALUES ($1, $2, $3)`,
+        [email, verificationCode, expiresAt]
+      );
+    }
+
+    // 인증 이메일 발송
+    try {
+      await sendResetPasswordCodeEmail(email, verificationCode, user.nickname);
+      console.log(`✅ 비밀번호 재설정 인증 코드 발송: ${email} -> ${verificationCode}`);
+    } catch (emailError) {
+      console.error('이메일 발송 실패:', emailError);
+      // 개발 환경에서는 코드 로그로 출력
+      console.log(`📧 [DEV] 비밀번호 재설정 인증 코드: ${verificationCode}`);
+    }
+
+    res.json({
+      success: true,
+      message: '인증 코드가 발송되었습니다'
+    });
+
+  } catch (error) {
+    console.error('❌ 비밀번호 찾기 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '비밀번호 찾기 처리 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/verify-reset-code
+ * 비밀번호 재설정 인증 코드 확인
+ */
+router.post('/verify-reset-code', async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        error: '이메일과 인증 코드가 필요합니다'
+      });
+    }
+
+    // 인증 코드 확인
+    const result = await db.query(
+      'SELECT code, expires_at, used FROM password_reset_codes WHERE email = $1',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드를 먼저 요청해주세요'
+      });
+    }
+
+    const resetCode = result.rows[0];
+
+    // 이미 사용된 코드인지 확인
+    if (resetCode.used) {
+      return res.status(400).json({
+        success: false,
+        error: '이미 사용된 인증 코드입니다. 새로운 코드를 요청해주세요.'
+      });
+    }
+
+    // 만료 확인
+    if (new Date() > new Date(resetCode.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
+      });
+    }
+
+    // 코드 확인
+    if (resetCode.code !== code) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드가 일치하지 않습니다'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: '인증이 완료되었습니다. 새 비밀번호를 설정해주세요.'
+    });
+
+  } catch (error) {
+    console.error('❌ 인증 코드 확인 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '인증 코드 확인 중 오류가 발생했습니다'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/reset-password
+ * 새 비밀번호 설정
+ */
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: '이메일, 인증 코드, 새 비밀번호가 필요합니다'
+      });
+    }
+
+    // 비밀번호 강도 검증 (8자 이상, 영문+숫자)
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: '비밀번호는 8자 이상이어야 합니다'
+      });
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        success: false,
+        error: '비밀번호는 영문과 숫자를 포함해야 합니다'
+      });
+    }
+
+    // 인증 코드 확인
+    const codeResult = await db.query(
+      'SELECT code, expires_at, used FROM password_reset_codes WHERE email = $1',
+      [email]
+    );
+
+    if (codeResult.rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드를 먼저 요청해주세요'
+      });
+    }
+
+    const resetCode = codeResult.rows[0];
+
+    // 이미 사용된 코드인지 확인
+    if (resetCode.used) {
+      return res.status(400).json({
+        success: false,
+        error: '이미 사용된 인증 코드입니다. 새로운 코드를 요청해주세요.'
+      });
+    }
+
+    // 만료 확인
+    if (new Date() > new Date(resetCode.expires_at)) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
+      });
+    }
+
+    // 코드 확인
+    if (resetCode.code !== code) {
+      return res.status(400).json({
+        success: false,
+        error: '인증 코드가 일치하지 않습니다'
+      });
+    }
+
+    // 비밀번호 해싱 및 업데이트
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await db.query(
+      'UPDATE users SET password_hash = $1 WHERE email = $2',
+      [passwordHash, email]
+    );
+
+    // 인증 코드 사용 처리
+    await db.query(
+      'UPDATE password_reset_codes SET used = TRUE WHERE email = $1',
+      [email]
+    );
+
+    console.log(`✅ 비밀번호 재설정 완료: ${email}`);
+
+    res.json({
+      success: true,
+      message: '비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인해주세요.'
+    });
+
+  } catch (error) {
+    console.error('❌ 비밀번호 재설정 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '비밀번호 재설정 중 오류가 발생했습니다'
     });
   }
 });
