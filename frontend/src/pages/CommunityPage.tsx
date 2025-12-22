@@ -43,6 +43,10 @@ export default function CommunityPage() {
   const [imageError, setImageError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
+  // 투표 관련 상태
+  const [pollQuestion, setPollQuestion] = useState('')
+  const [pollOptions, setPollOptions] = useState<string[]>(['', '']) // 최소 2개
+  
   // 페이지네이션을 위한 데이터 조회
   const { data: postsData } = usePosts({ page, limit, sort: sortBy })
 
@@ -90,6 +94,9 @@ export default function CommunityPage() {
       setSelectedImages([])
       setImagePreviews([])
       setImageError(null)
+      // 투표 상태 초기화
+      setPollQuestion('')
+      setPollOptions(['', ''])
       setShowWriteForm(false)
       queryClient.invalidateQueries({ queryKey: ['posts'] })
     } catch (error: unknown) {
@@ -381,25 +388,54 @@ export default function CommunityPage() {
               {/* 투표 만들기 */}
               {newPost.hasPoll && (
                 <div className="space-y-3 p-4 bg-neutral-50 rounded-xl">
-                  <p className="text-sm font-medium text-neutral-700">📊 투표 만들기</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-neutral-700">📊 투표 만들기</p>
+                    <span className="text-xs text-neutral-400">{pollOptions.length}/5개 선택지</span>
+                  </div>
                   <input
                     type="text"
                     placeholder="투표 질문"
+                    value={pollQuestion}
+                    onChange={(e) => setPollQuestion(e.target.value)}
                     className="input"
                   />
-                  <input
-                    type="text"
-                    placeholder="선택지 1"
-                    className="input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="선택지 2"
-                    className="input"
-                  />
-                  <button type="button" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                    + 선택지 추가
-                  </button>
+                  {pollOptions.map((option, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder={`선택지 ${index + 1}`}
+                        value={option}
+                        onChange={(e) => {
+                          const newOptions = [...pollOptions]
+                          newOptions[index] = e.target.value
+                          setPollOptions(newOptions)
+                        }}
+                        className="input flex-1"
+                      />
+                      {/* 최소 2개는 유지, 3개 이상일 때만 삭제 가능 */}
+                      {pollOptions.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPollOptions(prev => prev.filter((_, i) => i !== index))
+                          }}
+                          className="p-2.5 rounded-lg bg-danger-50 text-danger-500 hover:bg-danger-100 transition-colors"
+                        >
+                          <XMarkIcon className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {/* 최대 5개까지 추가 가능 */}
+                  {pollOptions.length < 5 && (
+                    <button
+                      type="button"
+                      onClick={() => setPollOptions(prev => [...prev, ''])}
+                      className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                    >
+                      + 선택지 추가
+                    </button>
+                  )}
                 </div>
               )}
             </form>
