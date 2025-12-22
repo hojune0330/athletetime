@@ -14,6 +14,9 @@ import type {
   VoteRequest,
   Category,
   HealthResponse,
+  PollVoteRequest,
+  PollVoteResponse,
+  Poll,
 } from '../types';
 
 // ============================================
@@ -105,6 +108,11 @@ export async function createPost(
   
   if (data.isNotice) {
     formData.append('isNotice', 'true');
+  }
+  
+  // 투표 데이터 추가
+  if (data.poll && data.poll.question && data.poll.options.length >= 2) {
+    formData.append('poll', JSON.stringify(data.poll));
   }
   
   // 이미지 파일 추가 (최대 5개)
@@ -228,6 +236,26 @@ export async function votePost(
   }
   
   return response.data.post;
+}
+
+// ============================================
+// 설문 투표
+// ============================================
+
+export async function votePoll(
+  postId: string | number,
+  data: PollVoteRequest
+): Promise<Poll> {
+  const response = await apiClient.post<PollVoteResponse>(
+    `/api/posts/${postId}/poll/vote`,
+    data
+  );
+  
+  if (!response.data.success) {
+    throw new Error(response.data.error || '투표에 실패했습니다.');
+  }
+  
+  return response.data.poll;
 }
 
 // ============================================

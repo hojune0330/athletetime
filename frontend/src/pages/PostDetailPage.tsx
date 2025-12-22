@@ -14,9 +14,9 @@ import {
   PencilSquareIcon,
   ArrowLeftIcon
 } from '@heroicons/react/24/outline';
-import { usePost, useVotePost, useCreateComment, useDeletePost, useVerifyPostPassword } from '../hooks/usePosts';
+import { usePost, useVotePost, useCreateComment, useDeletePost, useVerifyPostPassword, usePollVote } from '../hooks/usePosts';
 import { getAnonymousId } from '../utils/anonymousUser';
-import type { Comment } from '../types';
+import type { Comment, Poll } from '../types';
 
 // 날짜 포맷팅
 function formatDate(dateString: string): string {
@@ -134,6 +134,75 @@ function PostContent({ content, images }: PostContentProps) {
         <p className="text-neutral-700 leading-relaxed whitespace-pre-wrap">
           {content}
         </p>
+      </div>
+    </div>
+  );
+}
+
+// 투표 컴포넌트
+interface PollSectionProps {
+  poll: Poll;
+  postId: string;
+  onVote: (optionId: number) => void;
+  isVoting: boolean;
+  hasVoted: boolean;
+}
+
+function PollSection({ poll, postId, onVote, isVoting, hasVoted }: PollSectionProps) {
+  const visitorId = getAnonymousId();
+  const userHasVoted = hasVoted || (poll.voters && poll.voters.includes(visitorId));
+  
+  return (
+    <div className="p-6 border-t border-neutral-100">
+      <div className="bg-neutral-50 rounded-xl p-4">
+        <h3 className="text-lg font-bold text-neutral-900 mb-4 flex items-center gap-2">
+          📊 {poll.question}
+        </h3>
+        
+        <div className="space-y-3">
+          {poll.options.map((option) => {
+            const percentage = poll.total_votes > 0 
+              ? Math.round((option.votes / poll.total_votes) * 100) 
+              : 0;
+            
+            return (
+              <div key={option.id} className="relative">
+                {userHasVoted ? (
+                  // 투표 후: 결과 표시
+                  <div className="relative overflow-hidden rounded-lg border border-neutral-200 bg-white">
+                    <div 
+                      className="absolute inset-y-0 left-0 bg-primary-100 transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                    <div className="relative flex items-center justify-between p-3">
+                      <span className="text-sm font-medium text-neutral-700">{option.text}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-500">{option.votes}표</span>
+                        <span className="text-sm font-bold text-primary-600">{percentage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // 투표 전: 선택 버튼
+                  <button
+                    onClick={() => onVote(option.id)}
+                    disabled={isVoting}
+                    className="w-full p-3 text-left rounded-lg border border-neutral-200 bg-white hover:border-primary-300 hover:bg-primary-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="text-sm font-medium text-neutral-700">{option.text}</span>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        
+        <div className="mt-4 flex items-center justify-between text-xs text-neutral-500">
+          <span>총 {poll.total_votes}명 참여</span>
+          {userHasVoted && (
+            <span className="text-primary-600 font-medium">✓ 투표 완료</span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -509,6 +578,10 @@ export default function PostDetailPage() {
   const createCommentMutation = useCreateComment();
   const deletePostMutation = useDeletePost();
   const verifyPasswordMutation = useVerifyPostPassword();
+  const pollVoteMutation = usePollVote();
+  
+  // 설문 투표 상태
+  const [hasVotedPoll, setHasVotedPoll] = useState(false);
   
   // 투표 핸들러
   const handleVote = async (type: 'like' | 'dislike') => {
@@ -574,6 +647,22 @@ export default function PostDetailPage() {
     setShowDeleteModal(false);
   };
   
+  // 설문 투표 핸들러
+  const handlePollVote = async (optionId: number) => {
+    try {
+      const visitorId = getAnonymousId();
+      await pollVoteMutation.mutateAsync({
+        postId: id,
+        data: { optionId, visitorId }
+      });
+      setHasVotedPoll(true);
+      showToast('📊 투표가 완료되었습니다!');
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : '투표에 실패했습니다.';
+      showToast(errorMsg);
+    }
+  };
+  
   // 로딩 상태
   if (isLoading) {
     return (
@@ -629,6 +718,17 @@ export default function PostDetailPage() {
           content={post.content}
           images={post.images || []}
         />
+        
+        {/* 투표 섹션 */}
+        {post.poll && (
+          <PollSection
+            poll={post.poll}
+            postId={id}
+            onVote={handlePollVote}
+            isVoting={pollVoteMutation.isPending}
+            hasVoted={hasVotedPoll}
+          />
+        )}
         
         <PostActions
           likesCount={post.likes_count}

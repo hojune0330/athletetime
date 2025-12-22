@@ -36,6 +36,24 @@ export interface PostImage {
 }
 
 // ============================================
+// 투표
+// ============================================
+
+export interface PollOption {
+  id: number;
+  text: string;
+  votes: number;
+}
+
+export interface Poll {
+  question: string;
+  options: PollOption[];
+  total_votes: number;
+  allow_multiple: boolean;
+  voters: string[];
+}
+
+// ============================================
 // 댓글
 // ============================================
 
@@ -91,6 +109,9 @@ export interface Post {
   
   // 현재 사용자의 투표 상태
   myVote?: 'like' | 'dislike' | null;
+  
+  // 투표
+  poll?: Poll | null;
 }
 
 // ============================================
@@ -106,6 +127,22 @@ export interface CreatePostRequest {
   instagram?: string;
   anonymousId: string;
   isNotice?: boolean;
+  poll?: {
+    question: string;
+    options: string[];
+  };
+}
+
+export interface PollVoteRequest {
+  optionId: number;
+  visitorId: string;
+}
+
+export interface PollVoteResponse {
+  success: boolean;
+  poll: Poll;
+  message?: string;
+  error?: string;
 }
 
 export interface CreateCommentRequest {

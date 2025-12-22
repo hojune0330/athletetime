@@ -7,7 +7,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
 import * as api from '../api/posts';
-import type { Post, PostsResponse, CreatePostRequest, CreateCommentRequest, VoteRequest } from '../types';
+import type { Post, PostsResponse, CreatePostRequest, CreateCommentRequest, VoteRequest, PollVoteRequest, Poll } from '../types';
 
 // ============================================
 // Query Keys
@@ -201,6 +201,37 @@ export function useVotePost(): UseMutationResult<Post, Error, VotePostMutationVa
                 ? { ...post, likes_count: updatedPost.likes_count, dislikes_count: updatedPost.dislikes_count }
                 : post
             ),
+          };
+        }
+      );
+    },
+  });
+}
+
+// ============================================
+// 설문 투표
+// ============================================
+
+interface PollVoteMutationVariables {
+  postId: string | number;
+  data: PollVoteRequest;
+}
+
+export function usePollVote(): UseMutationResult<Poll, Error, PollVoteMutationVariables> {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ postId, data }: PollVoteMutationVariables) => 
+      api.votePoll(postId, data),
+    onSuccess: (updatedPoll, variables) => {
+      // 해당 게시글 캐시에서 poll 업데이트
+      queryClient.setQueryData(
+        queryKeys.post(variables.postId),
+        (oldData: Post | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            poll: updatedPoll
           };
         }
       );

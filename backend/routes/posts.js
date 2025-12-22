@@ -214,6 +214,7 @@ router.get('/:id', async (req, res) => {
         p.is_notice,
         p.is_pinned,
         p.is_blinded,
+        p.poll,
         p.created_at,
         p.updated_at,
         c.id as category_id,
@@ -318,7 +319,8 @@ router.post('/', optionalAuth, async (req, res) => {
       category = '자유', 
       instagram,
       anonymousId = `anon_${Date.now()}`,
-      isNotice = false
+      isNotice = false,
+      poll = null  // 투표 데이터
     } = req.body;
     
     // 유효성 검사
@@ -379,6 +381,26 @@ router.post('/', optionalAuth, async (req, res) => {
     // isNotice 값 파싱 (문자열 "true" 처리)
     const isNoticeValue = canSetNotice && (isNotice === true || isNotice === 'true');
     
+    // 투표 데이터 처리
+    let pollData = null;
+    if (poll && poll.question && poll.options && poll.options.length >= 2) {
+      // 빈 선택지 필터링
+      const validOptions = poll.options.filter((opt: string) => opt && opt.trim());
+      if (validOptions.length >= 2) {
+        pollData = {
+          question: poll.question.trim(),
+          options: validOptions.map((opt: string, index: number) => ({
+            id: index + 1,
+            text: opt.trim(),
+            votes: 0
+          })),
+          total_votes: 0,
+          allow_multiple: false,
+          voters: []  // 투표한 사용자 ID 목록 (중복 방지용)
+        };
+      }
+    }
+    
     // 게시글 생성
     const postResult = await client.query(`
       INSERT INTO posts (
@@ -390,11 +412,12 @@ router.post('/', optionalAuth, async (req, res) => {
         password_hash, 
         instagram,
         is_notice,
-        is_pinned
+        is_pinned,
+        poll
       ) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *
-    `, [categoryId, userId, title, content, author, passwordHash, instagram || null, isNoticeValue, isNoticeValue]);
+    `, [categoryId, userId, title, content, author, passwordHash, instagram || null, isNoticeValue, isNoticeValue, pollData ? JSON.stringify(pollData) : null]);
     
     const post = postResult.rows[0];
     
@@ -779,6 +802,93 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       error: '게시글 삭제에 실패했습니다.' 
+    });
+  }
+});
+
+/**
+ * POST /api/posts/:id/poll/vote
+ * 투표하기 (중복 투표 방지)
+ * 
+ * Body: { optionId: number, visitorId: string }
+ */
+router.post('/:id/poll/vote', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { optionId, visitorId } = req.body;
+    
+    if (!optionId || !visitorId) {
+      return res.status(400).json({
+        success: false,
+        error: '필수 항목이 누락되었습니다.'
+      });
+    }
+    
+    // 게시글 및 투표 조회
+    const postResult = await req.app.locals.pool.query(
+      'SELECT poll FROM posts WHERE id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+    
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: '게시글을 찾을 수 없습니다.'
+      });
+    }
+    
+    const poll = postResult.rows[0].poll;
+    
+    if (!poll) {
+      return res.status(404).json({
+        success: false,
+        error: '이 게시글에는 투표가 없습니다.'
+      });
+    }
+    
+    // 중복 투표 체크
+    if (poll.voters && poll.voters.includes(visitorId)) {
+      return res.status(409).json({
+        success: false,
+        error: '이미 투표하셨습니다.',
+        poll
+      });
+    }
+    
+    // 유효한 선택지인지 확인
+    const optionIndex = poll.options.findIndex((opt: { id: number }) => opt.id === optionId);
+    if (optionIndex === -1) {
+      return res.status(400).json({
+        success: false,
+        error: '유효하지 않은 선택지입니다.'
+      });
+    }
+    
+    // 투표 처리
+    poll.options[optionIndex].votes += 1;
+    poll.total_votes += 1;
+    poll.voters = poll.voters || [];
+    poll.voters.push(visitorId);
+    
+    // DB 업데이트
+    await req.app.locals.pool.query(
+      'UPDATE posts SET poll = $1 WHERE id = $2',
+      [JSON.stringify(poll), id]
+    );
+    
+    console.log(`✅ 투표 완료: postId=${id}, optionId=${optionId}, visitorId=${visitorId}`);
+    
+    res.json({
+      success: true,
+      poll,
+      message: '투표가 완료되었습니다.'
+    });
+    
+  } catch (error) {
+    console.error(`❌ [POST /api/posts/${req.params.id}/poll/vote] 에러:`, error);
+    res.status(500).json({
+      success: false,
+      error: '투표 처리 중 오류가 발생했습니다.'
     });
   }
 });

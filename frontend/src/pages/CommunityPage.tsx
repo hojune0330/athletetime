@@ -74,6 +74,12 @@ export default function CommunityPage() {
       return
     }
 
+    // 투표 데이터 준비 (hasPoll이 true이고 질문과 최소 2개 선택지가 있을 때만)
+    const validPollOptions = pollOptions.filter(opt => opt.trim())
+    const pollData = newPost.hasPoll && pollQuestion.trim() && validPollOptions.length >= 2
+      ? { question: pollQuestion.trim(), options: validPollOptions }
+      : undefined
+
     try {
       await createPostMutation.mutateAsync({
         data: {
@@ -84,6 +90,7 @@ export default function CommunityPage() {
           category: '자유',
           anonymousId: getAnonymousId(),
           isNotice: isAdmin && newPost.isNotice,
+          poll: pollData,
         },
         images: selectedImages,
       })
