@@ -383,21 +383,34 @@ router.post('/', optionalAuth, async (req, res) => {
     
     // 투표 데이터 처리
     let pollData = null;
-    if (poll && poll.question && poll.options && poll.options.length >= 2) {
+    let parsedPoll = poll;
+    
+    // poll이 문자열인 경우 JSON 파싱
+    if (typeof poll === 'string') {
+      try {
+        parsedPoll = JSON.parse(poll);
+      } catch (e) {
+        console.log('📊 투표 데이터 파싱 실패:', e);
+        parsedPoll = null;
+      }
+    }
+    
+    if (parsedPoll && parsedPoll.question && parsedPoll.options && parsedPoll.options.length >= 2) {
       // 빈 선택지 필터링
-      const validOptions = poll.options.filter((opt: string) => opt && opt.trim());
+      const validOptions = parsedPoll.options.filter((opt) => opt && (typeof opt === 'string' ? opt.trim() : opt));
       if (validOptions.length >= 2) {
         pollData = {
-          question: poll.question.trim(),
-          options: validOptions.map((opt: string, index: number) => ({
+          question: parsedPoll.question.trim(),
+          options: validOptions.map((opt, index) => ({
             id: index + 1,
-            text: opt.trim(),
+            text: typeof opt === 'string' ? opt.trim() : String(opt),
             votes: 0
           })),
           total_votes: 0,
           allow_multiple: false,
           voters: []  // 투표한 사용자 ID 목록 (중복 방지용)
         };
+        console.log('📊 투표 데이터 생성:', pollData);
       }
     }
     
