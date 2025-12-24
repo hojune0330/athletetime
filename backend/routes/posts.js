@@ -873,7 +873,7 @@ router.post('/:id/poll/vote', async (req, res) => {
     }
     
     // 유효한 선택지인지 확인
-    const optionIndex = poll.options.findIndex((opt: { id: number }) => opt.id === optionId);
+    const optionIndex = poll.options.findIndex((opt) => opt.id === optionId);
     if (optionIndex === -1) {
       return res.status(400).json({
         success: false,
