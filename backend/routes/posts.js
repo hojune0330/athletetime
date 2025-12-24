@@ -323,6 +323,10 @@ router.post('/', optionalAuth, async (req, res) => {
       poll = null  // 투표 데이터
     } = req.body;
     
+    // 디버그: req.body 전체 출력
+    console.log('📝 게시글 작성 req.body:', JSON.stringify(req.body, null, 2));
+    console.log('📊 poll 원본 값:', poll, '타입:', typeof poll);
+    
     // 유효성 검사
     if (!title || !content || !author || !password) {
       throw new Error('필수 필드가 누락되었습니다.');
