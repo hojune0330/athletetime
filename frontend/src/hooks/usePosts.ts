@@ -129,15 +129,16 @@ export function useUpdatePost(): UseMutationResult<Post, Error, UpdatePostMutati
 
 interface DeletePostMutationVariables {
   id: string | number;
-  password: string;
+  password?: string;
+  deleteReason?: string;
 }
 
 export function useDeletePost(): UseMutationResult<void, Error, DeletePostMutationVariables> {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, password }: DeletePostMutationVariables) => 
-      api.deletePost(id, password),
+    mutationFn: ({ id, password, deleteReason }: DeletePostMutationVariables) => 
+      api.deletePost(id, { password, deleteReason }),
     onSuccess: (_, variables) => {
       // 해당 게시글 캐시 제거
       queryClient.removeQueries({ queryKey: queryKeys.post(variables.id) });

@@ -141,11 +141,16 @@ export async function createPost(
 // 게시글 삭제
 // ============================================
 
-export async function deletePost(id: string | number, password: string): Promise<void> {
+export interface DeletePostParams {
+  password?: string;
+  deleteReason?: string;
+}
+
+export async function deletePost(id: string | number, params: DeletePostParams): Promise<void> {
   const response = await apiClient.delete<{ success: boolean; message?: string }>(
     `/api/posts/${id}`,
     {
-      data: { password },
+      data: params,
     }
   );
   

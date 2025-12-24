@@ -753,26 +753,20 @@ router.put('/:id', async (req, res) => {
 
 /**
  * DELETE /api/posts/:id
- * 게시글 삭제 (비밀번호 검증)
+ * 게시글 삭제
  * 
- * Body: { password: string }
+ * 일반 사용자: { password: string }
+ * 관리자: { deleteReason: string } (비밀번호 불필요)
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { password } = req.body;
-    
-    // 비밀번호 필수 체크
-    if (!password || typeof password !== 'string' || password.trim().length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        error: '비밀번호를 입력해주세요.' 
-      });
-    }
+    const { password, deleteReason } = req.body;
+    const isAdmin = req.user && req.user.isAdmin;
     
     // 게시글 조회
     const result = await req.app.locals.pool.query(
-      'SELECT password_hash FROM posts WHERE id = $1 AND deleted_at IS NULL',
+      'SELECT password_hash, title, author FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
     
@@ -780,6 +774,41 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ 
         success: false, 
         error: '게시글을 찾을 수 없습니다.' 
+      });
+    }
+    
+    // 관리자인 경우: 비밀번호 없이 삭제 가능
+    if (isAdmin) {
+      // 삭제 사유 필수 체크
+      if (!deleteReason || typeof deleteReason !== 'string' || deleteReason.trim().length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          error: '삭제 사유를 선택해주세요.' 
+        });
+      }
+      
+      // Soft delete + 삭제 사유 기록
+      await req.app.locals.pool.query(
+        'UPDATE posts SET deleted_at = NOW(), blind_reason = $1 WHERE id = $2',
+        [deleteReason.trim(), id]
+      );
+      
+      console.log(`✅ [관리자] 게시글 삭제 완료: ID=${id}, 사유="${deleteReason}", 관리자=${req.user.email}`);
+      
+      return res.json({
+        success: true,
+        message: '게시글이 삭제되었습니다.',
+        deletedBy: 'admin',
+        deleteReason: deleteReason.trim()
+      });
+    }
+    
+    // 일반 사용자인 경우: 비밀번호 검증 필요
+    // 비밀번호 필수 체크
+    if (!password || typeof password !== 'string' || password.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: '비밀번호를 입력해주세요.' 
       });
     }
     
