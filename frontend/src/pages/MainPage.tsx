@@ -81,7 +81,7 @@ const MainPage: React.FC = () => {
       onClick: () => showComingSoon('실시간 채팅'),
       gradient: 'from-teal-500 to-green-500',
       iconBg: 'bg-gradient-to-br from-teal-50 to-green-50',
-      available: true
+      available: false
     },
     {
       id: 'marketplace',
@@ -103,7 +103,7 @@ const MainPage: React.FC = () => {
       link: '/competitions',
       gradient: 'from-emerald-500 to-teal-500',
       iconBg: 'bg-gradient-to-br from-emerald-50 to-teal-50',
-      available: false
+      available: true
     }
   ];
 
