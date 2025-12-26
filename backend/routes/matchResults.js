@@ -10,7 +10,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { optionalAuth, requireAdmin } = require('../middleware/auth');
+const { optionalAuth, requireAdmin, authenticateToken } = require('../middleware/auth');
 
 // ============================================
 // GET /api/match-results/competition/:competitionId
@@ -157,7 +157,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/match-results
 // 경기 결과 등록 (관리자만)
 // ============================================
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { 
       competition_id,
@@ -217,7 +217,7 @@ router.post('/', requireAdmin, async (req, res) => {
 // PUT /api/match-results/:id
 // 경기 결과 수정 (관리자만)
 // ============================================
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { 
@@ -271,7 +271,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
 // DELETE /api/match-results/:id
 // 경기 결과 삭제 (관리자만) - Soft Delete
 // ============================================
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     
