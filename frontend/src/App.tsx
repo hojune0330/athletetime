@@ -18,6 +18,12 @@ import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import ProfilePage from './pages/ProfilePage'
+// 대회/경기결과 페이지
+import CompetitionsPage from './pages/CompetitionsPage'
+import CompetitionFormPage from './pages/CompetitionFormPage'
+import MatchResultListPage from './pages/MatchResultListPage'
+import MatchResultDetailPage from './pages/MatchResultDetailPage'
+import MatchResultFormPage from './pages/MatchResultFormPage'
 import { useEffect } from 'react'
 
 function App() {
@@ -83,6 +89,21 @@ function App() {
             {/* 게시글 수정 (레이아웃 포함) */}
             <Route path="/edit/:postId" element={<Layout />}>
               <Route index element={<EditPostPage />} />
+            </Route>
+
+            {/* 대회 목록 (레이아웃 포함) */}
+            <Route path="/competitions" element={<Layout />}>
+              <Route index element={<CompetitionsPage />} />
+              <Route path="new" element={<CompetitionFormPage />} />
+              <Route path=":id/edit" element={<CompetitionFormPage />} />
+            </Route>
+
+            {/* 경기 결과 (레이아웃 포함) */}
+            <Route path="/matchResult/:competitionId" element={<Layout />}>
+              <Route index element={<MatchResultListPage />} />
+              <Route path="new" element={<MatchResultFormPage />} />
+              <Route path=":resultId" element={<MatchResultDetailPage />} />
+              <Route path=":resultId/edit" element={<MatchResultFormPage />} />
             </Route>
 
             {/* 404 */}

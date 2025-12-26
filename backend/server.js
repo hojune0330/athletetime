@@ -31,6 +31,8 @@ const votesRouter = require('./routes/votes');
 const categoriesRouter = require('./routes/categories');
 const authRouter = require('./auth/routes');
 const pollsRouter = require('./routes/polls');
+const competitionsRouter = require('./routes/competitions');
+const matchResultsRouter = require('./routes/matchResults');
 
 // 미들웨어
 const { upload, handleUploadError } = require('./middleware/upload');
@@ -188,6 +190,8 @@ app.use('/api/posts', upload.array('images', 5), handleUploadError, postsRouter)
 app.use('/api/posts/:postId/comments', commentsRouter);
 app.use('/api/posts/:postId/vote', votesRouter);
 app.use('/api/posts/:postId/poll', pollsRouter);
+app.use('/api/competitions', competitionsRouter);
+app.use('/api/match-results', matchResultsRouter);
 
 // 정적 파일 서빙 (HTML, CSS, JS, 이미지 등)
 app.use(express.static(__dirname));
