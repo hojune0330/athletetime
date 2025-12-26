@@ -50,12 +50,6 @@ const TrainingCalculatorPage: React.FC = () => {
               <h1 className="text-3xl font-bold mb-2">전문 훈련 페이스 계산기</h1>
               <p className="opacity-90">과학적 데이터 기반 개인 맞춤형 훈련 계획</p>
             </div>
-            <Link
-              to="/"
-              className="bg-white/20 hover:bg-white/30 p-3 rounded-lg transition"
-            >
-              <i className="fas fa-home text-xl" />
-            </Link>
           </div>
         </div>
 
