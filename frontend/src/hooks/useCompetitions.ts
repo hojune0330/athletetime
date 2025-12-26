@@ -10,7 +10,7 @@ import * as api from '../api/competitions';
 import type { Competition, MatchResult, MatchResultItem, CompetitionsResponse, MatchResultsResponse } from '../api/competitions';
 
 // ⚠️ Mock 모드 플래그 - DB 준비되면 false로 변경
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // ============================================
 // Mock 데이터
