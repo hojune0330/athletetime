@@ -370,9 +370,11 @@ router.post('/', optionalAuth, async (req, res) => {
     
     // 관리자 여부 확인 (공지사항 설정용)
     let canSetNotice = false;
-    if (req.user && req.user.is_admin) {
+    if (req.user && req.user.isAdmin) {
       canSetNotice = true;
     }
+    
+    console.log('📝 게시글 작성 - 관리자 체크:', { user: req.user, isNotice, canSetNotice });
     
     // isNotice 값 파싱 (문자열 "true" 처리)
     const isNoticeValue = canSetNotice && (isNotice === true || isNotice === 'true');

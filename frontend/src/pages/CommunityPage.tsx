@@ -1,11 +1,16 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PostList from '../components/post/PostList'
 import Pagination from '../components/common/Pagination'
-import { PlusIcon, PhotoIcon, ChartBarIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, PhotoIcon, ChartBarIcon, MegaphoneIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../context/AuthContext'
+
+// 허용된 이미지 타입
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
 export default function CommunityPage() {
   const [searchParams] = useSearchParams()
@@ -13,6 +18,10 @@ export default function CommunityPage() {
   const limit = 20
   
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  
+  // 관리자 여부 확인
+  const isAdmin = user?.isAdmin || false
   
   const [sortBy, setSortBy] = useState<'latest' | 'hot' | 'comment'>('latest')
   const [showWriteForm, setShowWriteForm] = useState(false)
@@ -23,9 +32,16 @@ export default function CommunityPage() {
     password: '',
     hasImage: false,
     hasPoll: false,
+    isNotice: false,
   })
   const [formError, setFormError] = useState<string | null>(null)
   const [formSuccess, setFormSuccess] = useState<string | null>(null)
+  
+  // 이미지 업로드 관련 상태
+  const [selectedImages, setSelectedImages] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [imageError, setImageError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   // 페이지네이션을 위한 데이터 조회
   const { data: postsData } = usePosts({ page, limit, sort: sortBy })
@@ -63,12 +79,17 @@ export default function CommunityPage() {
           password: newPost.password.trim(),
           category: '자유',
           anonymousId: getAnonymousId(),
+          isNotice: isAdmin && newPost.isNotice,
         },
-        images: [],
+        images: selectedImages,
       })
 
-      setFormSuccess('게시글이 등록됐어요!')
-      setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false })
+      setFormSuccess(newPost.isNotice ? '공지사항이 등록됐어요!' : '게시글이 등록됐어요!')
+      setNewPost({ title: '', content: '', author: '', password: '', hasImage: false, hasPoll: false, isNotice: false })
+      // 이미지 상태 초기화
+      setSelectedImages([])
+      setImagePreviews([])
+      setImageError(null)
       setShowWriteForm(false)
       queryClient.invalidateQueries({ queryKey: ['posts'] })
     } catch (error: unknown) {
@@ -175,6 +196,28 @@ export default function CommunityPage() {
                 />
               </div>
 
+              {/* 관리자 전용: 공지사항 체크박스 */}
+              {isAdmin && (
+                <div className="p-3 bg-primary-50 border border-primary-200 rounded-xl">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newPost.isNotice}
+                      onChange={(e) => setNewPost({...newPost, isNotice: e.target.checked})}
+                      className="w-5 h-5 rounded border-primary-300 text-primary-600 focus:ring-primary-500"
+                      disabled={isSubmitting}
+                    />
+                    <div className="flex items-center gap-2">
+                      <MegaphoneIcon className="w-5 h-5 text-primary-600" />
+                      <span className="font-medium text-primary-700">공지사항으로 등록</span>
+                    </div>
+                  </label>
+                  <p className="mt-1 text-xs text-primary-600 ml-8">
+                    공지사항은 게시판 목록 상단에 고정됩니다.
+                  </p>
+                </div>
+              )}
+
               {/* 옵션 버튼들 */}
               <div className="flex items-center justify-between">
                 <div className="flex gap-2">
@@ -233,10 +276,105 @@ export default function CommunityPage() {
               
               {/* 이미지 업로드 영역 */}
               {newPost.hasImage && (
-                <div className="border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center hover:border-primary-300 transition-colors cursor-pointer">
-                  <PhotoIcon className="w-10 h-10 mx-auto text-neutral-400 mb-2" />
-                  <p className="text-sm text-neutral-500">클릭하여 이미지 업로드</p>
-                  <p className="text-xs text-neutral-400 mt-1">최대 5MB, JPG/PNG/GIF</p>
+                <div className="space-y-3">
+                  {/* 이미지 에러 메시지 */}
+                  {imageError && (
+                    <div className="flex items-center gap-2 text-sm text-danger-600 bg-danger-50 px-3 py-2 rounded-lg">
+                      <span>⚠️</span>
+                      {imageError}
+                    </div>
+                  )}
+                  
+                  {/* 숨겨진 파일 입력 */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.gif"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || [])
+                      setImageError(null)
+                      
+                      // 파일 개수 제한 (최대 5개)
+                      if (selectedImages.length + files.length > 5) {
+                        setImageError('이미지는 최대 5개까지 업로드할 수 있습니다.')
+                        return
+                      }
+                      
+                      // 파일 유효성 검사
+                      for (const file of files) {
+                        // 파일 타입 검사
+                        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                          setImageError('JPG, PNG, GIF 파일만 업로드할 수 있습니다.')
+                          return
+                        }
+                        // 파일 크기 검사 (5MB)
+                        if (file.size > MAX_FILE_SIZE) {
+                          setImageError(`파일 크기는 5MB를 초과할 수 없습니다. (${file.name})`)
+                          return
+                        }
+                      }
+                      
+                      // 파일 추가 및 미리보기 생성
+                      const newPreviews: string[] = []
+                      files.forEach((file) => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                          newPreviews.push(reader.result as string)
+                          if (newPreviews.length === files.length) {
+                            setImagePreviews(prev => [...prev, ...newPreviews])
+                          }
+                        }
+                        reader.readAsDataURL(file)
+                      })
+                      setSelectedImages(prev => [...prev, ...files])
+                      
+                      // 입력 초기화 (같은 파일 다시 선택 가능하도록)
+                      e.target.value = ''
+                    }}
+                    className="hidden"
+                  />
+                  
+                  {/* 업로드 버튼 영역 */}
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-neutral-200 rounded-xl p-6 text-center hover:border-primary-300 transition-colors cursor-pointer"
+                  >
+                    <PhotoIcon className="w-10 h-10 mx-auto text-neutral-400 mb-2" />
+                    <p className="text-sm text-neutral-500">클릭하여 이미지 업로드</p>
+                    <p className="text-xs text-neutral-400 mt-1">최대 5MB, JPG/PNG/GIF (최대 5개)</p>
+                    {selectedImages.length > 0 && (
+                      <p className="text-xs text-primary-600 mt-1 font-medium">
+                        {selectedImages.length}/5개 선택됨
+                      </p>
+                    )}
+                  </div>
+                  
+                  {/* 이미지 미리보기 */}
+                  {imagePreviews.length > 0 && (
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative group aspect-square">
+                          <img
+                            src={preview}
+                            alt={`미리보기 ${index + 1}`}
+                            className="w-full h-full object-cover rounded-lg border border-neutral-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedImages(prev => prev.filter((_, i) => i !== index))
+                              setImagePreviews(prev => prev.filter((_, i) => i !== index))
+                              setImageError(null)
+                            }}
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-danger-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-danger-600"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
               
