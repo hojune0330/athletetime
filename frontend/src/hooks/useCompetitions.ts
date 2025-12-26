@@ -372,7 +372,8 @@ export function useCompetitions(params?: { type?: string; year?: number; categor
   return useQuery({
     queryKey: competitionKeys.list(params),
     queryFn: () => USE_MOCK ? getMockCompetitions(params) : api.getCompetitions(params),
-    staleTime: 1000 * 60 * 5, // 5분
+    staleTime: 0, // 항상 최신 데이터 가져오기
+    refetchOnMount: 'always', // 마운트 시 항상 새로고침
   });
 }
 
@@ -451,6 +452,8 @@ export function useMatchResults(competitionId: number, params?: { event?: string
     queryKey: matchResultKeys.byCompetition(competitionId, params),
     queryFn: () => USE_MOCK ? getMockMatchResults(competitionId, params) : api.getMatchResults(competitionId, params),
     enabled: !!competitionId,
+    staleTime: 0, // 항상 최신 데이터 가져오기
+    refetchOnMount: 'always', // 마운트 시 항상 새로고침
   });
 }
 
@@ -486,7 +489,12 @@ export function useCreateMatchResult() {
       return api.createMatchResult(data);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matchResultKeys.byCompetition(variables.competition_id) });
+      // 해당 대회의 모든 경기 결과 목록 쿼리 무효화
+      queryClient.invalidateQueries({ 
+        queryKey: ['matchResults', 'competition', variables.competition_id],
+      });
+      // 전체 경기 결과도 무효화
+      queryClient.invalidateQueries({ queryKey: matchResultKeys.all });
     },
   });
 }
