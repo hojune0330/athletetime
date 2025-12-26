@@ -1,28 +1,16 @@
 import { useState, useCallback } from 'react';
+import  { calculateAdjustments } from '../utils/adjustments';
+import { calculateVDOT, calculateTrainingPaces, getPerformanceLevel, calculateVO2max } from '../utils/vdotCalculations';
+import { generateWeeklyPlan, generateMesocycle, generateWorkoutDetails, generateRecommendations } from '../utils/trainingPlans';
 import type {
-  calculateVDOT,
-  calculateTrainingPaces,
-  getPerformanceLevel,
-  calculateVO2max,
-  TrainingPaces,
+  TrainingPaces
 } from '../utils/vdotCalculations';
 import type {
   UserProfile,
   Conditions,
-  Adjustments,
-  calculateAdjustments,
   Gender,
-  AgeGroup,
-  Experience,
-  WeeklyVolume,
-  TrainingFrequency,
-  TrainingPhase,
 } from '../utils/adjustments';
 import type {
-  generateWeeklyPlan,
-  generateMesocycle,
-  generateWorkoutDetails,
-  generateRecommendations,
   DayPlan,
   WeekPlan,
   Workout,
