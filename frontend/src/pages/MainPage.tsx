@@ -78,7 +78,7 @@ const MainPage: React.FC = () => {
       emoji: '💭',
       title: '실시간 채팅',
       description: '육상인들과의 실시간 소통',
-      link: '/chat',
+      onClick: () => showComingSoon('실시간 채팅'),
       gradient: 'from-teal-500 to-green-500',
       iconBg: 'bg-gradient-to-br from-teal-50 to-green-50',
       available: true
