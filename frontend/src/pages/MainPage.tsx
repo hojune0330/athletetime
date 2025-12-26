@@ -100,7 +100,7 @@ const MainPage: React.FC = () => {
       emoji: '🏆',
       title: '경기 결과',
       description: '실시간 결과 업데이트와 기록 관리',
-      onClick: () => showComingSoon('경기 결과'),
+      link: '/competitions',
       gradient: 'from-emerald-500 to-teal-500',
       iconBg: 'bg-gradient-to-br from-emerald-50 to-teal-50',
       available: false
