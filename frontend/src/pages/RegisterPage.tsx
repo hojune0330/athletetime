@@ -455,8 +455,10 @@ export default function RegisterPage() {
                 이미 계정이 있으신가요?{' '}
                 <button
                   onClick={() => {
-                    // 홈으로 이동하면서 로그인 모달 열기
-                    navigate('/?showLogin=true');
+                    // sessionStorage에 로그인 모달 트리거 플래그 설정
+                    sessionStorage.setItem('showLoginModal', 'true');
+                    // 히스토리 백
+                    navigate(-1);
                   }}
                   className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
                 >

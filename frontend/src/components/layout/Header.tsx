@@ -29,13 +29,18 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
 
-  // URL 쿼리 파라미터로 로그인 모달 트리거
+  // URL 쿼리 파라미터 또는 sessionStorage로 로그인 모달 트리거
   useEffect(() => {
+    // URL 쿼리 파라미터 확인
     if (searchParams.get('showLogin') === 'true') {
       setShowLoginModal(true)
-      // 쿼리 파라미터 제거 (URL 정리)
       searchParams.delete('showLogin')
       setSearchParams(searchParams, { replace: true })
+    }
+    // sessionStorage 확인 (RegisterPage에서 뒤로가기 시)
+    if (sessionStorage.getItem('showLoginModal') === 'true') {
+      setShowLoginModal(true)
+      sessionStorage.removeItem('showLoginModal')
     }
   }, [searchParams, setSearchParams])
   const [modalMode, setModalMode] = useState<ModalMode>('login')
