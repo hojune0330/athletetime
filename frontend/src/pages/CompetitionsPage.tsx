@@ -194,12 +194,12 @@ function CategorySection({ category, competitions, isAdmin, onEdit, onDelete }: 
           <tbody>
             {competitions.map((comp) => (
               <tr key={comp.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
-                <td className="px-4 py-3 text-sm text-neutral-700">{formatMonth(comp.month)}</td>
+                <td className="px-4 py-3 text-sm text-neutral-700 text-center">{formatMonth(comp.month)}</td>
                 <td className="px-4 py-3 text-sm text-neutral-900 font-medium">{comp.name}</td>
-                <td className="px-4 py-3 text-sm text-neutral-600">
+                <td className="px-4 py-3 text-sm text-neutral-600 text-center">
                   {formatDateRange(comp.start_date, comp.end_date)}
                 </td>
-                <td className="px-4 py-3 text-sm text-neutral-600">{comp.location}</td>
+                <td className="px-4 py-3 text-sm text-neutral-600 text-center">{comp.location}</td>
                 <td className="px-4 py-3 text-center">
                   <Link
                     to={`/matchResult/${comp.id}`}
