@@ -116,7 +116,7 @@ export default function CommunityPage() {
   const totalPages = postsData?.count ? Math.ceil(postsData.count / limit) : 1
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       {/* 익명게시판 헤더 */}
       <PageHeader
         title="익명게시판"

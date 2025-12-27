@@ -35,7 +35,7 @@ const PaceCalculatorPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="no-print">
           <PageHeader
@@ -149,7 +149,7 @@ const PaceCalculatorPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-6 mt-8 no-print">
-        <div className="max-w-7xl mx-auto px-4 text-center">
+        <div className="max-w-5xl mx-auto px-4 text-center">
           <p className="text-sm text-gray-600">
             <span className="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치
           </p>

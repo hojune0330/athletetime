@@ -834,7 +834,7 @@ export default function PostDetailPage() {
   }
   
   return (
-    <div className="max-w-4xl mx-auto space-y-4 px-4 py-6 animate-fadeIn">
+    <div className="max-w-5xl mx-auto space-y-4 px-4 py-6">
       {/* 목록으로 버튼 */}
       <button 
         onClick={() => navigate('/community')}

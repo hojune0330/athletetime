@@ -164,7 +164,7 @@ export default function WritePage() {
   
   return (
     <div className="min-h-screen bg-neutral-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* 헤더 */}
         <div className="mb-6 flex items-center justify-between">
           <button
