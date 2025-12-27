@@ -48,8 +48,6 @@ const TrainingCalculatorPage: React.FC = () => {
           title="전문 훈련 페이스 계산기"
           icon="🏋️"
           description="과학적 데이터 기반 개인 맞춤형 훈련 계획"
-          backTo="/"
-          backText="홈으로"
         />
 
         {/* Error Message */}

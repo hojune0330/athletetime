@@ -42,8 +42,6 @@ const PaceCalculatorPage: React.FC = () => {
             title="페이스 계산기 & 차트"
             icon="⏱️"
             description="러닝 페이스 분석 및 훈련 계획 도구"
-            backTo="/"
-            backText="홈으로"
             actions={
               <button 
                 type="button"
