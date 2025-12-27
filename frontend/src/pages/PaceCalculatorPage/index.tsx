@@ -29,10 +29,6 @@ const TABS: TabConfig[] = [
 const PaceCalculatorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('chart');
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div>
       <div>
@@ -42,17 +38,6 @@ const PaceCalculatorPage: React.FC = () => {
             title="페이스 계산기 & 차트"
             icon="⏱️"
             description="러닝 페이스 분석 및 훈련 계획 도구"
-            actions={
-              <button 
-                type="button"
-                onClick={handlePrint}
-                className="btn-secondary"
-                title="인쇄"
-              >
-                <i className="fas fa-print"></i>
-                <span className="ml-1">인쇄</span>
-              </button>
-            }
           />
         </div>
         {/* 모바일 안내 메시지 */}
