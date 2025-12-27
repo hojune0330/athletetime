@@ -7,6 +7,7 @@ import {
   SplitCalculator,
   TargetPaceCalculator,
 } from './components';
+import PageHeader from '../../components/common/PageHeader';
 import './styles/pace-calculator.css';
 import athleteTimeLogo from '../../assets/athlete-time-logo.jpg';
 
@@ -34,50 +35,28 @@ const PaceCalculatorPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <header className="header no-print bg-white shadow-sm">
-        <div className="header-content max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link 
-                to="/" 
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="뒤로가기"
-              >
-                <i className="fas fa-arrow-left text-gray-600"></i>
-              </Link>
-              <img 
-                src={athleteTimeLogo} 
-                alt="Athlete Time Logo" 
-                className="h-10 w-auto"
-              />
-              <div>
-                <h1 className="text-lg font-bold text-gray-800">페이스 계산기 & 차트</h1>
-                <p className="text-xs text-gray-500">ATHLETE TIME</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link 
-                to="/" 
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="홈으로"
-              >
-                <i className="fas fa-home text-gray-600"></i>
-              </Link>
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="no-print">
+          <PageHeader
+            title="페이스 계산기 & 차트"
+            icon="⏱️"
+            description="러닝 페이스 분석 및 훈련 계획 도구"
+            backTo="/"
+            backText="홈으로"
+            actions={
               <button 
                 type="button"
                 onClick={handlePrint}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="btn-secondary"
                 title="인쇄"
               >
-                <i className="fas fa-print text-gray-600"></i>
+                <i className="fas fa-print"></i>
+                <span className="ml-1">인쇄</span>
               </button>
-            </div>
-          </div>
+            }
+          />
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-6">
         {/* 모바일 안내 메시지 */}
         <div className="sm:hidden mb-4 no-print">
           <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white">
