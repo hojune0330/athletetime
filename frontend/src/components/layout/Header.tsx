@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   Bars3Icon,
   XMarkIcon,
@@ -25,8 +25,19 @@ type ModalMode = 'login' | 'forgotPassword' | 'verifyCode' | 'resetPassword';
 export default function Header() {
   const location = useLocation()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showLoginModal, setShowLoginModal] = useState(false)
+
+  // URL 쿼리 파라미터로 로그인 모달 트리거
+  useEffect(() => {
+    if (searchParams.get('showLogin') === 'true') {
+      setShowLoginModal(true)
+      // 쿼리 파라미터 제거 (URL 정리)
+      searchParams.delete('showLogin')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }, [searchParams, setSearchParams])
   const [modalMode, setModalMode] = useState<ModalMode>('login')
   const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   const [loginError, setLoginError] = useState('')
