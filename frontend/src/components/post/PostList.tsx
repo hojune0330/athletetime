@@ -259,7 +259,7 @@ export default function PostList({ category, sort = 'latest', page = 1, limit = 
   }
   
   return (
-    <div className="card overflow-hidden animate-stagger">
+    <div className="card overflow-hidden">
       {posts.map((post) => (
         <PostItem key={post.id} post={post} />
       ))}
