@@ -181,10 +181,10 @@ function CategorySection({ category, competitions, isAdmin, onEdit, onDelete }: 
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-neutral-100 border-b border-neutral-200">
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-20">월</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600">대회명</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-48">기간</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-24">장소</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-20">월</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600">대회명</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-48">기간</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-24">장소</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-28">결과상세</th>
               {isAdmin && (
                 <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-24">관리</th>
