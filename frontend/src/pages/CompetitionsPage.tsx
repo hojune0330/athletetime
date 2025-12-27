@@ -114,8 +114,70 @@ function CategorySection({ category, competitions, isAdmin, onEdit, onDelete }: 
         {category}
       </div>
       
-      {/* 테이블 */}
-      <div className="overflow-x-auto">
+      {/* 모바일: 카드 레이아웃 */}
+      <div className="md:hidden">
+        {competitions.map((comp) => (
+          <div 
+            key={comp.id} 
+            className="bg-white border-b border-neutral-100 p-4 last:border-b-0"
+          >
+            {/* 상단: 월 뱃지 + 대회명 */}
+            <div className="flex items-start gap-3 mb-3">
+              <span className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 bg-primary-50 text-primary-600 font-bold text-sm rounded-lg">
+                {formatMonth(comp.month)}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-neutral-900 text-base leading-snug mb-1">
+                  {comp.name}
+                </h3>
+                <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <CalendarIcon className="w-3.5 h-3.5" />
+                  <span>{formatDateRange(comp.start_date, comp.end_date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-neutral-500 mt-0.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>{comp.location}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 하단: 액션 버튼들 */}
+            <div className="flex items-center gap-2">
+              <Link
+                to={`/matchResult/${comp.id}`}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
+              >
+                <EyeIcon className="w-4 h-4" />
+                결과 보기
+              </Link>
+              {isAdmin && (
+                <>
+                  <button
+                    onClick={() => onEdit(comp.id)}
+                    className="p-2.5 text-neutral-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg border border-neutral-200 transition-colors"
+                    title="수정"
+                  >
+                    <PencilSquareIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(comp)}
+                    className="p-2.5 text-neutral-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg border border-neutral-200 transition-colors"
+                    title="삭제"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* 데스크톱: 테이블 레이아웃 */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-neutral-100 border-b border-neutral-200">
