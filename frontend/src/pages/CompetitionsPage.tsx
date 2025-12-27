@@ -27,13 +27,13 @@ const CATEGORY_ORDER = ['대한육상연맹사업', '트랙 및 필드', '로드
 const currentYear = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i).reverse();
 
-// 날짜 포맷팅
+// 날짜 포맷팅 (연도 제외 - 상단 연도 필터와 중복 방지)
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
   
   const formatDate = (d: Date) => 
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   
   return `${formatDate(start)} ~ ${formatDate(end)}`;
 }
