@@ -154,7 +154,7 @@ export default function CommunityPage() {
 
       {/* 성공 메시지 */}
       {formSuccess && (
-        <div className="bg-success-50 border border-success-200 text-success-700 rounded-xl px-4 py-3 mb-4 flex items-center gap-2 animate-fadeIn">
+        <div className="bg-success-50 border border-success-200 text-success-700 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
           <span className="text-lg">✅</span>
           {formSuccess}
         </div>
@@ -162,7 +162,7 @@ export default function CommunityPage() {
 
       {/* 빠른 글쓰기 폼 */}
       {showWriteForm && (
-        <div className="card mb-4 animate-fadeInUp">
+        <div className="card mb-4">
           <div className="card-body">
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
