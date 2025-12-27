@@ -227,7 +227,7 @@ export default function CompetitionsPage() {
   };
   
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* 헤더 */}
       <PageHeader
         title="대회 목록"

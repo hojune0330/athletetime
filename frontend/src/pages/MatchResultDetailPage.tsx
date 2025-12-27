@@ -129,7 +129,7 @@ export default function MatchResultDetailPage() {
   // 에러
   if (isError || !matchResult) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      <div className="py-16">
         <div className="empty-state">
           <div className="empty-state-icon">⚠️</div>
           <h3 className="empty-state-title">경기 결과를 찾을 수 없습니다</h3>
@@ -145,7 +145,7 @@ export default function MatchResultDetailPage() {
   const results = Array.isArray(matchResult.results) ? matchResult.results : [];
   
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* 헤더 */}
       <PageHeader
         title={`${matchResult.event} ${matchResult.division} ${matchResult.round}`}

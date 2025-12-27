@@ -130,7 +130,7 @@ export default function MatchResultListPage() {
   const hasFilters = selectedEvent || selectedDivision || selectedRound;
   
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* 로딩 */}
       {isLoading && (
         <div className="flex justify-center items-center py-20">

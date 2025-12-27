@@ -78,7 +78,7 @@ export default function CompetitionFormPage() {
   // 관리자가 아니면 접근 차단
   if (!isAdmin) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      <div className="py-16">
         <div className="empty-state">
           <div className="empty-state-icon">🔒</div>
           <h3 className="empty-state-title">접근 권한이 없습니다</h3>
@@ -161,7 +161,7 @@ export default function CompetitionFormPage() {
   }
   
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* 헤더 */}
       <PageHeader
         title={isEditMode ? '대회 수정' : '대회 등록'}

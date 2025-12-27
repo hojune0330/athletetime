@@ -41,8 +41,8 @@ const TrainingCalculatorPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto p-6">
+    <div>
+      <div>
         {/* Header */}
         <PageHeader
           title="전문 훈련 페이스 계산기"
@@ -117,11 +117,6 @@ const TrainingCalculatorPage: React.FC = () => {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="text-center mt-8 text-gray-600">
-          <p className="text-sm">제작자: 장호준 코치</p>
-          <p className="text-xs mt-1">© 2024 Athlete Time - 과학적 훈련의 시작</p>
-        </div>
       </div>
     </div>
   );
