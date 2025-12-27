@@ -5,12 +5,10 @@
 
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeftIcon,
   PencilSquareIcon,
-  TrashIcon,
-  CalendarIcon,
-  TrophyIcon
+  TrashIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useMatchResult, useDeleteMatchResult } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 import { useState } from 'react';
@@ -148,55 +146,34 @@ export default function MatchResultDetailPage() {
   
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 animate-fadeIn">
-      {/* 뒤로가기 */}
-      <button
-        onClick={() => navigate(`/matchResult/${competitionId}`)}
-        className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors mb-6"
-      >
-        <ArrowLeftIcon className="w-5 h-5" />
-        <span className="font-medium">경기 결과 목록으로</span>
-      </button>
-      
-      {/* 헤더 카드 */}
-      <div className="card mb-6">
-        <div className="card-body">
-          <div className="flex items-start justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-neutral-900 mb-2 flex items-center gap-2">
-                <TrophyIcon className="w-7 h-7 text-yellow-500" />
-                {matchResult.event} {matchResult.division} {matchResult.round}
-              </h1>
-              
-              <div className="text-neutral-600">
-                <p className="font-medium">{matchResult.competition_name}</p>
-                {matchResult.competition_location && (
-                  <p className="text-sm mt-1">📍 {matchResult.competition_location}</p>
-                )}
-              </div>
-            </div>
-            
-            {/* 관리자 액션 */}
-            {isAdmin && (
-              <div className="flex items-center gap-2">
-                <Link
-                  to={`/matchResult/${competitionId}/${resultId}/edit`}
-                  className="btn-secondary"
-                >
-                  <PencilSquareIcon className="w-4 h-4" />
-                  수정
-                </Link>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="btn-ghost text-danger-500 hover:bg-danger-50"
-                >
-                  <TrashIcon className="w-4 h-4" />
-                  삭제
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* 헤더 */}
+      <PageHeader
+        title={`${matchResult.event} ${matchResult.division} ${matchResult.round}`}
+        icon="🏅"
+        description={`${matchResult.competition_name}${matchResult.competition_location ? ` · ${matchResult.competition_location}` : ''}`}
+        backTo={`/matchResult/${competitionId}`}
+        backText="경기 결과 목록으로"
+        actions={
+          isAdmin ? (
+            <>
+              <Link
+                to={`/matchResult/${competitionId}/${resultId}/edit`}
+                className="btn-secondary"
+              >
+                <PencilSquareIcon className="w-4 h-4" />
+                수정
+              </Link>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="btn-ghost text-danger-500 hover:bg-danger-50"
+              >
+                <TrashIcon className="w-4 h-4" />
+                삭제
+              </button>
+            </>
+          ) : undefined
+        }
+      />
       
       {/* 결과 테이블 */}
       {results.length === 0 ? (

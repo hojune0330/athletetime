@@ -10,9 +10,9 @@ import {
   PencilSquareIcon, 
   TrashIcon,
   EyeIcon,
-  CalendarIcon,
-  MapPinIcon
+  CalendarIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useCompetitions, useDeleteCompetition } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 import type { Competition } from '../api/competitions';
@@ -229,19 +229,19 @@ export default function CompetitionsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 animate-fadeIn">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">🏆 대회 목록</h1>
-        
-        {isAdmin && (
-          <Link
-            to="/competitions/new"
-            className="btn-primary"
-          >
-            <PlusIcon className="w-5 h-5" />
-            대회 등록
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title="대회 목록"
+        icon="🏆"
+        description="국내외 육상 대회 일정 및 결과를 확인하세요"
+        actions={
+          isAdmin ? (
+            <Link to="/competitions/new" className="btn-primary">
+              <PlusIcon className="w-5 h-5" />
+              대회 등록
+            </Link>
+          ) : undefined
+        }
+      />
       
       {/* 탭 + 연도 필터 */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">

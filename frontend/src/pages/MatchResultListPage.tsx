@@ -6,7 +6,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeftIcon,
   PlusIcon,
   PencilSquareIcon,
   TrashIcon,
@@ -15,6 +14,7 @@ import {
   MapPinIcon,
   FunnelIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useMatchResults, useDeleteMatchResult } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 import type { MatchResult } from '../api/competitions';
@@ -131,15 +131,6 @@ export default function MatchResultListPage() {
   
   return (
     <div className="max-w-6xl mx-auto px-4 py-6 animate-fadeIn">
-      {/* 뒤로가기 */}
-      <button
-        onClick={() => navigate('/competitions')}
-        className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors mb-6"
-      >
-        <ArrowLeftIcon className="w-5 h-5" />
-        <span className="font-medium">대회 목록으로</span>
-      </button>
-      
       {/* 로딩 */}
       {isLoading && (
         <div className="flex justify-center items-center py-20">
@@ -160,33 +151,40 @@ export default function MatchResultListPage() {
       {!isLoading && !isError && data && (
         <>
           {/* 대회 정보 헤더 */}
-          <div className="card mb-6">
-            <div className="card-body">
-              <h1 className="text-2xl font-bold text-neutral-900 mb-3">
-                🏆 {data.competition.name}
-              </h1>
-              <div className="flex flex-wrap gap-4 text-sm text-neutral-600">
-                <span className="flex items-center gap-1">
-                  <CalendarIcon className="w-4 h-4" />
-                  {formatDateRange(data.competition.start_date, data.competition.end_date)}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MapPinIcon className="w-4 h-4" />
-                  {data.competition.location}
-                </span>
-                <span className="badge bg-primary-100 text-primary-600">
-                  {data.competition.type}
-                </span>
-                <span className="badge bg-neutral-100 text-neutral-600">
-                  {data.competition.category}
-                </span>
-              </div>
+          <PageHeader
+            title={data.competition.name}
+            icon="🏆"
+            backTo="/competitions"
+            backText="대회 목록으로"
+            actions={
+              isAdmin ? (
+                <Link to={`/matchResult/${competitionId}/new`} className="btn-primary">
+                  <PlusIcon className="w-5 h-5" />
+                  경기 결과 등록
+                </Link>
+              ) : undefined
+            }
+          >
+            <div className="flex flex-wrap gap-4 text-sm text-neutral-600">
+              <span className="flex items-center gap-1">
+                <CalendarIcon className="w-4 h-4" />
+                {formatDateRange(data.competition.start_date, data.competition.end_date)}
+              </span>
+              <span className="flex items-center gap-1">
+                <MapPinIcon className="w-4 h-4" />
+                {data.competition.location}
+              </span>
+              <span className="badge bg-primary-100 text-primary-600">
+                {data.competition.type}
+              </span>
+              <span className="badge bg-neutral-100 text-neutral-600">
+                {data.competition.category}
+              </span>
             </div>
-          </div>
+          </PageHeader>
           
-          {/* 필터 + 등록 버튼 */}
+          {/* 필터 */}
           <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-            {/* 필터 */}
             <div className="flex items-center gap-3 flex-wrap">
               <FunnelIcon className="w-5 h-5 text-neutral-400" />
               
@@ -232,17 +230,6 @@ export default function MatchResultListPage() {
                 </button>
               )}
             </div>
-            
-            {/* 등록 버튼 (관리자만) */}
-            {isAdmin && (
-              <Link
-                to={`/matchResult/${competitionId}/new`}
-                className="btn-primary"
-              >
-                <PlusIcon className="w-5 h-5" />
-                경기 결과 등록
-              </Link>
-            )}
           </div>
           
           {/* 결과 테이블 */}
