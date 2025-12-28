@@ -14,6 +14,14 @@ const rooms = {
   injury: new Set(),
 };
 
+// 채팅방별 고유 닉네임 관리 (중복 접속자 처리용)
+const roomNicknames = {
+  main: new Map(), // nickname -> Set of ws connections
+  training: new Map(),
+  race: new Map(),
+  injury: new Map(),
+};
+
 // 채팅 히스토리 (메모리 - 서버 재시작 시 초기화)
 const chatHistory = {
   main: [],
@@ -23,6 +31,14 @@ const chatHistory = {
 };
 
 const MAX_HISTORY = 50; // 방당 최대 메시지 수
+
+/**
+ * 방의 고유 유저 수 반환 (닉네임 기준)
+ */
+function getUniqueUserCount(room) {
+  if (!roomNicknames[room]) return 0;
+  return roomNicknames[room].size;
+}
 
 /**
  * WebSocket 서버 설정
@@ -53,11 +69,28 @@ function setupWebSocket(websocketServer) {
       // 방에서 제거
       if (ws.currentRoom && rooms[ws.currentRoom]) {
         rooms[ws.currentRoom].delete(ws);
+        
+        // 닉네임 연결 제거
+        let isLastConnection = false;
+        if (ws.nickname && roomNicknames[ws.currentRoom]) {
+          const connections = roomNicknames[ws.currentRoom].get(ws.nickname);
+          if (connections) {
+            connections.delete(ws);
+            if (connections.size === 0) {
+              roomNicknames[ws.currentRoom].delete(ws.nickname);
+              isLastConnection = true;
+            }
+          }
+        }
+        
+        // 유저 수 업데이트 (고유 닉네임 기준)
         broadcastToRoom(ws.currentRoom, {
           type: 'userCount',
-          count: rooms[ws.currentRoom].size,
+          count: getUniqueUserCount(ws.currentRoom),
         });
-        if (ws.nickname) {
+        
+        // 마지막 연결이 끊어졌을 때만 퇴장 알림
+        if (isLastConnection && ws.nickname) {
           broadcastToRoom(ws.currentRoom, {
             type: 'system',
             text: `${ws.nickname}님이 퇴장했습니다.`,
@@ -85,9 +118,22 @@ function handleChatMessage(ws, message) {
       // 이전 방에서 나가기
       if (ws.currentRoom && rooms[ws.currentRoom]) {
         rooms[ws.currentRoom].delete(ws);
+        
+        // 닉네임 연결 제거
+        if (ws.nickname && roomNicknames[ws.currentRoom]) {
+          const connections = roomNicknames[ws.currentRoom].get(ws.nickname);
+          if (connections) {
+            connections.delete(ws);
+            if (connections.size === 0) {
+              roomNicknames[ws.currentRoom].delete(ws.nickname);
+              // 마지막 연결이 끊어졌을 때만 퇴장 알림 (이전 방에서)
+            }
+          }
+        }
+        
         broadcastToRoom(ws.currentRoom, {
           type: 'userCount',
-          count: rooms[ws.currentRoom].size,
+          count: getUniqueUserCount(ws.currentRoom),
         });
       }
       
@@ -99,18 +145,31 @@ function handleChatMessage(ws, message) {
       if (!rooms[ws.currentRoom]) {
         rooms[ws.currentRoom] = new Set();
       }
+      if (!roomNicknames[ws.currentRoom]) {
+        roomNicknames[ws.currentRoom] = new Map();
+      }
+      
       rooms[ws.currentRoom].add(ws);
       
-      // 입장 알림
-      broadcastToRoom(ws.currentRoom, {
-        type: 'system',
-        text: `${nickname}님이 입장했습니다.`,
-      });
+      // 닉네임별 연결 관리
+      const isNewUser = !roomNicknames[ws.currentRoom].has(nickname);
+      if (!roomNicknames[ws.currentRoom].has(nickname)) {
+        roomNicknames[ws.currentRoom].set(nickname, new Set());
+      }
+      roomNicknames[ws.currentRoom].get(nickname).add(ws);
       
-      // 유저 수 업데이트
+      // 새로운 유저일 때만 입장 알림
+      if (isNewUser) {
+        broadcastToRoom(ws.currentRoom, {
+          type: 'system',
+          text: `${nickname}님이 입장했습니다.`,
+        });
+      }
+      
+      // 유저 수 업데이트 (고유 닉네임 기준)
       broadcastToRoom(ws.currentRoom, {
         type: 'userCount',
-        count: rooms[ws.currentRoom].size,
+        count: getUniqueUserCount(ws.currentRoom),
       });
       
       // 채팅 히스토리 전송
