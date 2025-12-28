@@ -7,7 +7,6 @@ import {
   ChatBubbleOvalLeftEllipsisIcon,
   ShoppingBagIcon,
   TrophyIcon,
-  ArrowRightIcon,
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
@@ -99,7 +98,7 @@ const MainPage: React.FC = () => {
   };
 
   const showComingSoon = (featureName: string) => {
-    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곷 만나보실 수 있습니다!`);
+    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곧 만나보실 수 있습니다!`);
   };
 
   const features: Feature[] = [
