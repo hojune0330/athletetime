@@ -10,6 +10,7 @@ export interface UseChatReturn {
   userCount: number;
   currentRoom: RoomId;
   isConnected: boolean;
+  connectionStatus: 'disconnected' | 'connecting' | 'connected';
   
   // Actions
   setNickname: (value: string) => void;
@@ -43,6 +44,7 @@ export function useChat(): UseChatReturn {
 
   const {
     isConnected,
+    connectionStatus,
     currentRoom,
     joinRoom,
     sendMessage: wsSendMessage,
@@ -88,6 +90,7 @@ export function useChat(): UseChatReturn {
     userCount,
     currentRoom,
     isConnected,
+    connectionStatus,
     setNickname,
     joinChat,
     sendMessage: wsSendMessage,

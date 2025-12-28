@@ -18,6 +18,7 @@ const ChatPage: React.FC = () => {
     userCount,
     currentRoom,
     isConnected,
+    connectionStatus,
     setNickname,
     joinChat,
     sendMessage,
@@ -81,6 +82,7 @@ const ChatPage: React.FC = () => {
               currentRoom={currentRoom}
               userCount={userCount}
               isConnected={isConnected}
+              connectionStatus={connectionStatus}
             />
 
             {/* Messages */}

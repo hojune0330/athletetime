@@ -13,8 +13,11 @@ interface UseWebSocketOptions {
   onUserCountChange?: (count: number) => void;
 }
 
+type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
+
 interface UseWebSocketReturn {
   isConnected: boolean;
+  connectionStatus: ConnectionStatus;
   currentRoom: RoomId;
   joinRoom: (room: RoomId) => void;
   sendMessage: (text: string) => void;
@@ -30,20 +33,31 @@ export function useWebSocket({
   onHistory,
   onUserCountChange,
 }: UseWebSocketOptions): UseWebSocketReturn {
-  const [isConnected, setIsConnected] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [currentRoom, setCurrentRoom] = useState<RoomId>('main');
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectAttempts = useRef(0);
+  const maxReconnectAttempts = 5;
 
   const connect = useCallback(() => {
     if (!nickname) return;
+    
+    // 이미 연결 중이거나 연결된 상태면 무시
+    if (wsRef.current && wsRef.current.readyState === WebSocket.CONNECTING) {
+      return;
+    }
+
+    setConnectionStatus('connecting');
+    console.log('🔄 WebSocket 연결 시도 중...', WS_URL);
 
     try {
       wsRef.current = new WebSocket(WS_URL);
 
       wsRef.current.onopen = () => {
         console.log('✅ WebSocket 연결됨');
-        setIsConnected(true);
+        setConnectionStatus('connected');
+        reconnectAttempts.current = 0;
         
         // 연결 후 현재 방에 입장
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
@@ -67,23 +81,32 @@ export function useWebSocket({
 
       wsRef.current.onerror = (error) => {
         console.error('❌ WebSocket 오류:', error);
+        setConnectionStatus('disconnected');
       };
 
-      wsRef.current.onclose = () => {
-        console.log('🔌 WebSocket 연결 종료');
-        setIsConnected(false);
+      wsRef.current.onclose = (event) => {
+        console.log('🔌 WebSocket 연결 종료', event.code, event.reason);
+        setConnectionStatus('disconnected');
         
-        // 자동 재연결
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (nickname) {
+        // 자동 재연결 (최대 시도 횟수 제한)
+        if (reconnectAttempts.current < maxReconnectAttempts && nickname) {
+          reconnectAttempts.current++;
+          const delay = Math.min(3000 * reconnectAttempts.current, 15000); // 최대 15초
+          console.log(`🔄 ${delay/1000}초 후 재연결 시도... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
+          
+          reconnectTimeoutRef.current = setTimeout(() => {
             connect();
-          }
-        }, 3000);
+          }, delay);
+        } else if (reconnectAttempts.current >= maxReconnectAttempts) {
+          console.log('❌ 최대 재연결 시도 횟수 초과');
+          onSystemMessage?.('서버 연결에 실패했습니다. 페이지를 새로고침 해주세요.');
+        }
       };
     } catch (error) {
       console.error('WebSocket 연결 오류:', error);
+      setConnectionStatus('disconnected');
     }
-  }, [nickname, userId, currentRoom]);
+  }, [nickname, userId, currentRoom, onSystemMessage]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -160,7 +183,8 @@ export function useWebSocket({
   }, [disconnect]);
 
   return {
-    isConnected,
+    isConnected: connectionStatus === 'connected',
+    connectionStatus,
     currentRoom,
     joinRoom,
     sendMessage,
