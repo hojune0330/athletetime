@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   ChatBubbleLeftRightIcon,
   ClockIcon,
@@ -34,8 +34,72 @@ interface Feature {
 }
 
 const MainPage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  // URL 쿼리 파라미터 또는 sessionStorage로 로그인 모달 트리거
+  useEffect(() => {
+    // URL 쿼리 파라미터 확인
+    if (searchParams.get('showLogin') === 'true') {
+      setShowLoginModal(true);
+      searchParams.delete('showLogin');
+      setSearchParams(searchParams, { replace: true });
+    }
+    // sessionStorage 확인 (RegisterPage에서 뒤로가기 시)
+    if (sessionStorage.getItem('showLoginModal') === 'true') {
+      setShowLoginModal(true);
+      sessionStorage.removeItem('showLoginModal');
+    }
+  }, [searchParams, setSearchParams]);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    
+    if (!loginForm.email || !loginForm.password) {
+      setLoginError('이메일과 비밀번호를 입력해주세요.');
+      return;
+    }
+    
+    setIsLoggingIn(true);
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginForm)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.accessToken && data.refreshToken) {
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        setShowLoginModal(false);
+        setLoginForm({ email: '', password: '' });
+        window.location.reload(); // 새로고침으로 상태 업데이트
+      } else {
+        setLoginError(data.error || '로그인에 실패했습니다.');
+      }
+    } catch (error: any) {
+      setLoginError(error.message || '로그인에 실패했습니다.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const closeLoginModal = () => {
+    setShowLoginModal(false);
+    setLoginForm({ email: '', password: '' });
+    setLoginError('');
+  };
+
   const showComingSoon = (featureName: string) => {
-    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곧 만나보실 수 있습니다!`);
+    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곷 만나보실 수 있습니다!`);
   };
 
   const features: Feature[] = [
@@ -260,6 +324,94 @@ const MainPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* 로그인 모달 */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
+            <div className="p-6">
+              {/* 모달 헤더 */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-neutral-900">로그인</h2>
+                <button
+                  onClick={closeLoginModal}
+                  className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* 에러 메시지 */}
+              {loginError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                  {loginError}
+                </div>
+              )}
+
+              {/* 로그인 폼 */}
+              <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    이메일
+                  </label>
+                  <input
+                    type="email"
+                    value={loginForm.email}
+                    onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="example@email.com"
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    disabled={isLoggingIn}
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                    placeholder="비밀번호를 입력하세요"
+                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    disabled={isLoggingIn}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoggingIn}
+                  className="w-full py-3 bg-primary-500 text-white font-medium rounded-xl hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                >
+                  {isLoggingIn ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>로그인 중...</span>
+                    </>
+                  ) : (
+                    '로그인'
+                  )}
+                </button>
+              </form>
+
+              {/* 하단 링크 */}
+              <div className="mt-4 text-center text-sm text-neutral-500">
+                계정이 없으신가요?{' '}
+                <Link
+                  to="/register"
+                  onClick={closeLoginModal}
+                  className="text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  회원가입
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

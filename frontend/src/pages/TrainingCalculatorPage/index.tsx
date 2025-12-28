@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   AthleteProfileForm,
   PerformanceInput,
@@ -12,6 +11,7 @@ import {
   RecommendationsView,
 } from './components';
 import { useTrainingCalculator } from './hooks/useTrainingCalculator';
+import PageHeader from '../../components/common/PageHeader';
 import './styles/training-calculator.css';
 
 const TrainingCalculatorPage: React.FC = () => {
@@ -41,17 +41,14 @@ const TrainingCalculatorPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+    <div>
+      <div>
         {/* Header */}
-        <div className="gradient-bg text-white p-6 rounded-xl mb-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">전문 훈련 페이스 계산기</h1>
-              <p className="opacity-90">과학적 데이터 기반 개인 맞춤형 훈련 계획</p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          title="전문 훈련 페이스 계산기"
+          icon="🏋️"
+          description="과학적 데이터 기반 개인 맞춤형 훈련 계획"
+        />
 
         {/* Error Message */}
         {error && (
@@ -120,11 +117,6 @@ const TrainingCalculatorPage: React.FC = () => {
           </div>
         )}
 
-        {/* Footer */}
-        <div className="text-center mt-8 text-gray-600">
-          <p className="text-sm">제작자: 장호준 코치</p>
-          <p className="text-xs mt-1">© 2024 Athlete Time - 과학적 훈련의 시작</p>
-        </div>
       </div>
     </div>
   );

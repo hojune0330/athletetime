@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useCompetition, useCreateCompetition, useUpdateCompetition } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 
@@ -78,7 +78,7 @@ export default function CompetitionFormPage() {
   // 관리자가 아니면 접근 차단
   if (!isAdmin) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="py-16">
         <div className="empty-state">
           <div className="empty-state-icon">🔒</div>
           <h3 className="empty-state-title">접근 권한이 없습니다</h3>
@@ -161,24 +161,18 @@ export default function CompetitionFormPage() {
   }
   
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 animate-fadeIn">
-      {/* 뒤로가기 */}
-      <button
-        onClick={() => navigate('/competitions')}
-        className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors mb-6"
-      >
-        <ArrowLeftIcon className="w-5 h-5" />
-        <span className="font-medium">목록으로</span>
-      </button>
+    <div>
+      {/* 헤더 */}
+      <PageHeader
+        title={isEditMode ? '대회 수정' : '대회 등록'}
+        icon={isEditMode ? '✏️' : '➕'}
+        description={isEditMode ? '대회 정보를 수정합니다' : '새로운 대회를 등록합니다'}
+        backTo="/competitions"
+        backText="목록으로"
+      />
       
       {/* 폼 카드 */}
       <div className="card">
-        <div className="card-header">
-          <h1 className="text-xl font-bold text-neutral-900">
-            {isEditMode ? '대회 수정' : '대회 등록'}
-          </h1>
-        </div>
-        
         <form onSubmit={handleSubmit} className="card-body space-y-6">
           {/* 대회명 */}
           <div>

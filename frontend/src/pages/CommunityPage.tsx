@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import PostList from '../components/post/PostList'
 import Pagination from '../components/common/Pagination'
+import PageHeader from '../components/common/PageHeader'
 import { PlusIcon, PhotoIcon, ChartBarIcon, MegaphoneIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useCreatePost, usePosts } from '../hooks/usePosts'
 import { getAnonymousId } from '../utils/anonymousUser'
@@ -115,57 +116,45 @@ export default function CommunityPage() {
   const totalPages = postsData?.count ? Math.ceil(postsData.count / limit) : 1
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       {/* 익명게시판 헤더 */}
-      <div className="card mb-4">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
-                🎭 익명게시판
-              </h1>
-              <p className="text-sm text-neutral-500 mt-1">
-                자유롭게 이야기를 나누는 공간
-              </p>
-            </div>
-            
-            {/* 글쓰기 버튼 */}
-            <button
-              onClick={handleToggleWriteForm}
-              className="btn-primary"
-            >
-              <PlusIcon className="w-5 h-5" />
-              <span className="hidden sm:inline ml-1">글쓰기</span>
-            </button>
-          </div>
-
-          {/* 정렬 옵션 (Pills) */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSortBy('latest')}
-              className={`sort-pill ${sortBy === 'latest' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
-            >
-              최신순
-            </button>
-            <button
-              onClick={() => setSortBy('hot')}
-              className={`sort-pill ${sortBy === 'hot' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
-            >
-              🔥 인기순
-            </button>
-            <button
-              onClick={() => setSortBy('comment')}
-              className={`sort-pill ${sortBy === 'comment' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
-            >
-              💬 댓글순
-            </button>
-          </div>
+      <PageHeader
+        title="익명게시판"
+        icon="🎭"
+        description="자유롭게 이야기를 나누는 공간"
+        actions={
+          <button onClick={handleToggleWriteForm} className="btn-primary">
+            <PlusIcon className="w-5 h-5" />
+            <span className="hidden sm:inline ml-1">글쓰기</span>
+          </button>
+        }
+      >
+        {/* 정렬 옵션 (Pills) */}
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => setSortBy('latest')}
+            className={`sort-pill ${sortBy === 'latest' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
+          >
+            최신순
+          </button>
+          <button
+            onClick={() => setSortBy('hot')}
+            className={`sort-pill ${sortBy === 'hot' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
+          >
+            🔥 인기순
+          </button>
+          <button
+            onClick={() => setSortBy('comment')}
+            className={`sort-pill ${sortBy === 'comment' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
+          >
+            💬 댓글순
+          </button>
         </div>
-      </div>
+      </PageHeader>
 
       {/* 성공 메시지 */}
       {formSuccess && (
-        <div className="bg-success-50 border border-success-200 text-success-700 rounded-xl px-4 py-3 mb-4 flex items-center gap-2 animate-fadeIn">
+        <div className="bg-success-50 border border-success-200 text-success-700 rounded-xl px-4 py-3 mb-4 flex items-center gap-2">
           <span className="text-lg">✅</span>
           {formSuccess}
         </div>
@@ -173,7 +162,7 @@ export default function CommunityPage() {
 
       {/* 빠른 글쓰기 폼 */}
       {showWriteForm && (
-        <div className="card mb-4 animate-fadeInUp">
+        <div className="card mb-4">
           <div className="card-body">
             <form onSubmit={handleSubmit} className="space-y-4">
               <input

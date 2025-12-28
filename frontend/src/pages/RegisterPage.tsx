@@ -453,9 +453,17 @@ export default function RegisterPage() {
             <div className="mt-6 text-center">
               <p className="text-neutral-600 text-sm">
                 이미 계정이 있으신가요?{' '}
-                <Link to="/" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                <button
+                  onClick={() => {
+                    // sessionStorage에 로그인 모달 트리거 플래그 설정
+                    sessionStorage.setItem('showLoginModal', 'true');
+                    // 히스토리 백
+                    navigate(-1);
+                  }}
+                  className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                >
                   로그인하기 →
-                </Link>
+                </button>
               </p>
             </div>
           </div>

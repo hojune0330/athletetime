@@ -10,9 +10,9 @@ import {
   PencilSquareIcon, 
   TrashIcon,
   EyeIcon,
-  CalendarIcon,
-  MapPinIcon
+  CalendarIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useCompetitions, useDeleteCompetition } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 import type { Competition } from '../api/competitions';
@@ -27,13 +27,13 @@ const CATEGORY_ORDER = ['대한육상연맹사업', '트랙 및 필드', '로드
 const currentYear = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i).reverse();
 
-// 날짜 포맷팅
+// 날짜 포맷팅 (연도 제외 - 상단 연도 필터와 중복 방지)
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
   
   const formatDate = (d: Date) => 
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
   
   return `${formatDate(start)} ~ ${formatDate(end)}`;
 }
@@ -114,15 +114,77 @@ function CategorySection({ category, competitions, isAdmin, onEdit, onDelete }: 
         {category}
       </div>
       
-      {/* 테이블 */}
-      <div className="overflow-x-auto">
+      {/* 모바일: 카드 레이아웃 */}
+      <div className="md:hidden">
+        {competitions.map((comp) => (
+          <div 
+            key={comp.id} 
+            className="bg-white border-b border-neutral-100 p-4 last:border-b-0"
+          >
+            {/* 상단: 월 뱃지 + 대회명 */}
+            <div className="flex items-start gap-3 mb-3">
+              <span className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 bg-primary-50 text-primary-600 font-bold text-sm rounded-lg">
+                {formatMonth(comp.month)}
+              </span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-neutral-900 text-base leading-snug mb-1">
+                  {comp.name}
+                </h3>
+                <div className="flex items-center gap-2 text-xs text-neutral-500">
+                  <CalendarIcon className="w-3.5 h-3.5" />
+                  <span>{formatDateRange(comp.start_date, comp.end_date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-neutral-500 mt-0.5">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>{comp.location}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 하단: 액션 버튼들 */}
+            <div className="flex items-center gap-2">
+              <Link
+                to={`/matchResult/${comp.id}`}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary-500 text-white text-sm font-medium rounded-lg hover:bg-primary-600 transition-colors"
+              >
+                <EyeIcon className="w-4 h-4" />
+                결과 보기
+              </Link>
+              {isAdmin && (
+                <>
+                  <button
+                    onClick={() => onEdit(comp.id)}
+                    className="p-2.5 text-neutral-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg border border-neutral-200 transition-colors"
+                    title="수정"
+                  >
+                    <PencilSquareIcon className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(comp)}
+                    className="p-2.5 text-neutral-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg border border-neutral-200 transition-colors"
+                    title="삭제"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* 데스크톱: 테이블 레이아웃 */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-neutral-100 border-b border-neutral-200">
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-20">월</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600">대회명</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-48">기간</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-neutral-600 w-24">장소</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-20">월</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600">대회명</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-48">기간</th>
+              <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-24">장소</th>
               <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-28">결과상세</th>
               {isAdmin && (
                 <th className="px-4 py-3 text-center text-sm font-medium text-neutral-600 w-24">관리</th>
@@ -132,12 +194,12 @@ function CategorySection({ category, competitions, isAdmin, onEdit, onDelete }: 
           <tbody>
             {competitions.map((comp) => (
               <tr key={comp.id} className="border-b border-neutral-100 hover:bg-neutral-50 transition-colors">
-                <td className="px-4 py-3 text-sm text-neutral-700">{formatMonth(comp.month)}</td>
+                <td className="px-4 py-3 text-sm text-neutral-700 text-center">{formatMonth(comp.month)}</td>
                 <td className="px-4 py-3 text-sm text-neutral-900 font-medium">{comp.name}</td>
-                <td className="px-4 py-3 text-sm text-neutral-600">
+                <td className="px-4 py-3 text-sm text-neutral-600 text-center">
                   {formatDateRange(comp.start_date, comp.end_date)}
                 </td>
-                <td className="px-4 py-3 text-sm text-neutral-600">{comp.location}</td>
+                <td className="px-4 py-3 text-sm text-neutral-600 text-center">{comp.location}</td>
                 <td className="px-4 py-3 text-center">
                   <Link
                     to={`/matchResult/${comp.id}`}
@@ -227,21 +289,21 @@ export default function CompetitionsPage() {
   };
   
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 animate-fadeIn">
+    <div>
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">🏆 대회 목록</h1>
-        
-        {isAdmin && (
-          <Link
-            to="/competitions/new"
-            className="btn-primary"
-          >
-            <PlusIcon className="w-5 h-5" />
-            대회 등록
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title="대회 목록"
+        icon="🏆"
+        description="국내외 육상 대회 일정 및 결과를 확인하세요"
+        actions={
+          isAdmin ? (
+            <Link to="/competitions/new" className="btn-primary">
+              <PlusIcon className="w-5 h-5" />
+              대회 등록
+            </Link>
+          ) : undefined
+        }
+      />
       
       {/* 탭 + 연도 필터 */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">

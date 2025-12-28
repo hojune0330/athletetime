@@ -148,8 +148,8 @@ export default function EditPostPage() {
   // 게시글 로딩 중
   if (isPostLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto flex justify-center items-center min-h-[400px]">
+      <div>
+        <div className="flex justify-center items-center min-h-[400px]">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
         </div>
       </div>
@@ -159,8 +159,8 @@ export default function EditPostPage() {
   // 게시글을 찾을 수 없는 경우
   if (!post) {
     return (
-      <div className="min-h-screen bg-neutral-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto empty-state py-16">
+      <div>
+        <div className="empty-state py-16">
           <div className="empty-state-icon">⚠️</div>
           <h3 className="empty-state-title">게시글을 찾을 수 없습니다</h3>
           <p className="empty-state-description">
@@ -175,8 +175,8 @@ export default function EditPostPage() {
   }
   
   return (
-    <div className="min-h-screen bg-neutral-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div>
+      <div>
         {/* 헤더 */}
         <div className="mb-6 flex items-center justify-between">
           <button

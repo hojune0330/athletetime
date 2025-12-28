@@ -7,6 +7,7 @@ import {
   SplitCalculator,
   TargetPaceCalculator,
 } from './components';
+import PageHeader from '../../components/common/PageHeader';
 import './styles/pace-calculator.css';
 import athleteTimeLogo from '../../assets/athlete-time-logo.jpg';
 
@@ -28,56 +29,17 @@ const TABS: TabConfig[] = [
 const PaceCalculatorPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('chart');
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <header className="header no-print bg-white shadow-sm">
-        <div className="header-content max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link 
-                to="/" 
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="뒤로가기"
-              >
-                <i className="fas fa-arrow-left text-gray-600"></i>
-              </Link>
-              <img 
-                src={athleteTimeLogo} 
-                alt="Athlete Time Logo" 
-                className="h-10 w-auto"
-              />
-              <div>
-                <h1 className="text-lg font-bold text-gray-800">페이스 계산기 & 차트</h1>
-                <p className="text-xs text-gray-500">ATHLETE TIME</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Link 
-                to="/" 
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="홈으로"
-              >
-                <i className="fas fa-home text-gray-600"></i>
-              </Link>
-              <button 
-                type="button"
-                onClick={handlePrint}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="인쇄"
-              >
-                <i className="fas fa-print text-gray-600"></i>
-              </button>
-            </div>
-          </div>
+    <div>
+      <div>
+        {/* Header */}
+        <div className="no-print">
+          <PageHeader
+            title="페이스 계산기 & 차트"
+            icon="⏱️"
+            description="러닝 페이스 분석 및 훈련 계획 도구"
+          />
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-6">
         {/* 모바일 안내 메시지 */}
         <div className="sm:hidden mb-4 no-print">
           <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -168,19 +130,7 @@ const PaceCalculatorPage: React.FC = () => {
             </div>
           )}
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-6 mt-8 no-print">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm text-gray-600">
-            <span className="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            러닝 전문 트레이닝 프로그램
-          </p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 };

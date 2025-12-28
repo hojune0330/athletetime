@@ -163,8 +163,8 @@ export default function WritePage() {
   const isSubmitting = createPostMutation.isPending;
   
   return (
-    <div className="min-h-screen bg-neutral-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div>
+      <div>
         {/* 헤더 */}
         <div className="mb-6 flex items-center justify-between">
           <button

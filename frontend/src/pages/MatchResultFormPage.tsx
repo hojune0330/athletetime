@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeftIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import PageHeader from '../components/common/PageHeader';
 import { useCompetition, useMatchResult, useCreateMatchResult, useUpdateMatchResult } from '../hooks/useCompetitions';
 import { useAuth } from '../context/AuthContext';
 import type { MatchResultItem } from '../api/competitions';
@@ -101,7 +102,7 @@ export default function MatchResultFormPage() {
   // 관리자가 아니면 접근 차단
   if (!isAdmin) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16">
+      <div className="py-16">
         <div className="empty-state">
           <div className="empty-state-icon">🔒</div>
           <h3 className="empty-state-title">접근 권한이 없습니다</h3>
@@ -194,37 +195,18 @@ export default function MatchResultFormPage() {
   }
   
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 animate-fadeIn">
-      {/* 뒤로가기 */}
-      <button
-        onClick={() => navigate(`/matchResult/${competitionId}`)}
-        className="inline-flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors mb-6"
-      >
-        <ArrowLeftIcon className="w-5 h-5" />
-        <span className="font-medium">경기 결과 목록으로</span>
-      </button>
-      
-      {/* 대회 정보 */}
-      {competition && (
-        <div className="card mb-6">
-          <div className="card-body py-3">
-            <p className="text-sm text-neutral-600">
-              <span className="font-medium text-neutral-900">{competition.name}</span>
-              <span className="mx-2">·</span>
-              {competition.location}
-            </p>
-          </div>
-        </div>
-      )}
+    <div>
+      {/* 헤더 */}
+      <PageHeader
+        title={isEditMode ? '경기 결과 수정' : '경기 결과 등록'}
+        icon={isEditMode ? '✏️' : '🏅'}
+        description={competition ? `${competition.name} · ${competition.location}` : undefined}
+        backTo={`/matchResult/${competitionId}`}
+        backText="경기 결과 목록으로"
+      />
       
       {/* 폼 카드 */}
       <div className="card">
-        <div className="card-header">
-          <h1 className="text-xl font-bold text-neutral-900">
-            {isEditMode ? '경기 결과 수정' : '경기 결과 등록'}
-          </h1>
-        </div>
-        
         <form onSubmit={handleSubmit} className="card-body space-y-6">
           {/* 경기 정보 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
