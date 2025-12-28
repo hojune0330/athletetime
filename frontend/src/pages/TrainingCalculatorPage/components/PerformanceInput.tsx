@@ -7,6 +7,8 @@ interface PerformanceInputProps {
   time: TimeInput;
   onDistanceChange: (value: string) => void;
   onTimeChange: <K extends keyof TimeInput>(key: K, value: number) => void;
+  distanceSelectRef?: React.RefObject<HTMLSelectElement>;
+  timeInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const PerformanceInput: React.FC<PerformanceInputProps> = ({
@@ -14,6 +16,8 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
   time,
   onDistanceChange,
   onTimeChange,
+  distanceSelectRef,
+  timeInputRef,
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -28,6 +32,7 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
         <div>
           <label className="block text-sm font-medium mb-2">종목 선택</label>
           <select
+            ref={distanceSelectRef}
             value={distance}
             onChange={(e) => onDistanceChange(e.target.value)}
             className="w-full p-3 border rounded-lg bg-white"
@@ -43,6 +48,7 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
           <label className="block text-sm font-medium mb-2">기록 입력</label>
           <div className="grid grid-cols-3 gap-2">
             <input
+              ref={timeInputRef}
               type="number"
               placeholder="시"
               min={0}

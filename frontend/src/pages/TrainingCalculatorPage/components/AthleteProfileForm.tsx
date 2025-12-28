@@ -28,6 +28,7 @@ interface AthleteProfileFormProps {
   onWeeklyVolumeChange: (value: WeeklyVolume) => void;
   onFrequencyChange: (value: TrainingFrequency) => void;
   onTrainingPhaseChange: (value: TrainingPhase) => void;
+  genderSectionRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const AthleteProfileForm: React.FC<AthleteProfileFormProps> = ({
@@ -43,6 +44,7 @@ export const AthleteProfileForm: React.FC<AthleteProfileFormProps> = ({
   onWeeklyVolumeChange,
   onFrequencyChange,
   onTrainingPhaseChange,
+  genderSectionRef,
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -59,7 +61,7 @@ export const AthleteProfileForm: React.FC<AthleteProfileFormProps> = ({
           <h3 className="font-semibold mb-3 text-gray-700">기본 정보</h3>
           
           {/* 성별 선택 */}
-          <div className="mb-4">
+          <div className="mb-4" ref={genderSectionRef}>
             <label className="block text-sm font-medium mb-2">성별</label>
             <div className="grid grid-cols-2 gap-2">
               <button

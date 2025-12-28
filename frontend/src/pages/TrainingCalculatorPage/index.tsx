@@ -16,6 +16,10 @@ import './styles/training-calculator.css';
 
 const TrainingCalculatorPage: React.FC = () => {
   const resultsRef = useRef<HTMLDivElement>(null);
+  const genderSectionRef = useRef<HTMLDivElement>(null);
+  const distanceSelectRef = useRef<HTMLSelectElement>(null);
+  const timeInputRef = useRef<HTMLInputElement>(null);
+  
   const {
     profile,
     conditions,
@@ -32,8 +36,27 @@ const TrainingCalculatorPage: React.FC = () => {
   } = useTrainingCalculator();
 
   const handleCalculate = () => {
-    const success = calculate();
-    if (success && resultsRef.current) {
+    const result = calculate();
+    
+    if (!result.success) {
+      // 에러 타입에 따라 alert 표시 및 포커싱
+      if (result.errorType === 'gender') {
+        alert('성별을 선택해주세요.');
+        genderSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (result.errorType === 'distance') {
+        alert('종목을 선택해주세요.');
+        distanceSelectRef.current?.focus();
+        distanceSelectRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (result.errorType === 'time') {
+        alert('기록을 입력해주세요.');
+        timeInputRef.current?.focus();
+        timeInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
+    // 성공 시 결과로 스크롤
+    if (resultsRef.current) {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
@@ -72,6 +95,7 @@ const TrainingCalculatorPage: React.FC = () => {
           onWeeklyVolumeChange={(v) => updateProfile('weeklyVolume', v)}
           onFrequencyChange={(v) => updateProfile('frequency', v)}
           onTrainingPhaseChange={(v) => updateProfile('trainingPhase', v)}
+          genderSectionRef={genderSectionRef}
         />
 
         {/* Step 2: Performance Input */}
@@ -80,6 +104,8 @@ const TrainingCalculatorPage: React.FC = () => {
           time={time}
           onDistanceChange={setDistance}
           onTimeChange={updateTime}
+          distanceSelectRef={distanceSelectRef}
+          timeInputRef={timeInputRef}
         />
 
         {/* Step 3: Special Conditions */}

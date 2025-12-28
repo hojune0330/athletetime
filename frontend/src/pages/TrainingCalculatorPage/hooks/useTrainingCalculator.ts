@@ -78,24 +78,24 @@ export function useTrainingCalculator() {
     setTime(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  const calculate = useCallback(() => {
+  const calculate = useCallback((): { success: boolean; errorType?: 'gender' | 'distance' | 'time' } => {
     setError('');
     
     // 유효성 검사
+    if (!profile.gender) {
+      setError('성별을 선택해주세요.');
+      return { success: false, errorType: 'gender' };
+    }
+    
     if (!distance) {
       setError('종목을 선택해주세요.');
-      return false;
+      return { success: false, errorType: 'distance' };
     }
     
     const totalSeconds = time.hours * 3600 + time.minutes * 60 + time.seconds;
     if (totalSeconds === 0) {
       setError('기록을 입력해주세요.');
-      return false;
-    }
-    
-    if (!profile.gender) {
-      setError('성별을 선택해주세요.');
-      return false;
+      return { success: false, errorType: 'time' };
     }
 
     // 조정 계수 계산
@@ -130,7 +130,7 @@ export function useTrainingCalculator() {
       adjustmentNote: profile.gender === 'female' ? '여성 보정 적용됨' : '',
     });
 
-    return true;
+    return { success: true };
   }, [profile, conditions, distance, time]);
 
   const reset = useCallback(() => {
