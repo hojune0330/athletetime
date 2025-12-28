@@ -7,7 +7,6 @@ interface PerformanceInputProps {
   time: TimeInput;
   onDistanceChange: (value: string) => void;
   onTimeChange: <K extends keyof TimeInput>(key: K, value: number) => void;
-  onCalculate: () => void;
 }
 
 export const PerformanceInput: React.FC<PerformanceInputProps> = ({
@@ -15,7 +14,6 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
   time,
   onDistanceChange,
   onTimeChange,
-  onCalculate,
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
@@ -75,15 +73,6 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
           </div>
         </div>
       </div>
-      
-      <button
-        type="button"
-        onClick={onCalculate}
-        className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition hover:scale-[1.02]"
-      >
-        <i className="fas fa-calculator mr-2" />
-        훈련 계획 생성
-      </button>
     </div>
   );
 };
