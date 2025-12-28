@@ -93,7 +93,7 @@ const TrainingCalculatorPage: React.FC = () => {
           <button
             type="button"
             onClick={handleCalculate}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition hover:scale-[1.01] text-lg"
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition hover:scale-[1.01] text-lg shadow-md"
           >
             <i className="fas fa-calculator mr-2" />
             훈련 계획 생성
