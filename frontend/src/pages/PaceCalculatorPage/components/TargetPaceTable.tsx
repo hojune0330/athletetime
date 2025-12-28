@@ -80,11 +80,9 @@ const TargetTable: React.FC<TargetTableProps> = ({ title, distance, targets, sho
 
 export const TargetPaceTable: React.FC<{ id?: string }> = ({ id = 'chart2' }) => {
   return (
-    <div className="card chart-container p-4 md:p-6 mb-6 relative" id={id}>
+    <div className="card chart-container p-4 md:p-6 mb-6" id={id}>
       {/* 다운로드 버튼 */}
-      <div className="absolute top-2.5 right-2.5 z-10">
-        <ChartDownloadButtons chartId={id} filename="목표_기록별_페이스" />
-      </div>
+      <ChartDownloadButtons chartId={id} filename="목표_기록별_페이스" />
       
       {/* 제목 */}
       <h3 className="text-xl font-bold mb-3 text-center">
