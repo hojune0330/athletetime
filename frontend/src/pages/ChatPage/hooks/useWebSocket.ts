@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { RoomId, ChatMessage, WebSocketMessage } from '../types';
 
 // WebSocket URL - /ws 경로 없이 기본 연결
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://athlete-time-backend.onrender.com';
+const WS_URL = import.meta.env.VITE_WS_URL || 'wss://athletetime-backend.onrender.com';
 
 interface UseWebSocketOptions {
   nickname: string;
