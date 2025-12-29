@@ -43,8 +43,10 @@ const ChatPage: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  // 채팅 페이지 높이 계산: 뷰포트 높이 - 헤더(약 64px) - Layout 패딩(py-6 = 48px) - 여유공간
+  // calc(100vh - 헤더 - 상단패딩 - 하단패딩)
   return (
-    <div className="h-screen h-[100dvh] bg-gray-100 overflow-hidden">
+    <div className="bg-gray-100 overflow-hidden -mx-4 -mt-6 -mb-6" style={{ height: 'calc(100vh - 64px)' }}>
       {/* Nickname Modal */}
       <NicknameModal
         isOpen={!isJoined}
