@@ -128,9 +128,11 @@ export default function CommunityPage() {
             <span className="hidden sm:inline ml-1">글쓰기</span>
           </button>
         }
-      >
-        {/* 정렬 옵션 (Pills) */}
-        <div className="flex gap-2 mt-3">
+      />
+
+      {/* 정렬 옵션 (글 목록 우측 상단) */}
+      <div className="flex justify-end mb-4">
+        <div className="flex gap-2">
           <button
             onClick={() => setSortBy('latest')}
             className={`sort-pill ${sortBy === 'latest' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
@@ -150,7 +152,7 @@ export default function CommunityPage() {
             💬 댓글순
           </button>
         </div>
-      </PageHeader>
+      </div>
 
       {/* 성공 메시지 */}
       {formSuccess && (
