@@ -5,7 +5,6 @@ import {
   ChatHeader,
   MessageList,
   MessageInput,
-  MobileMenuButton,
 } from './components';
 import { useChat } from './hooks/useChat';
 import './styles/chat.css';
@@ -86,6 +85,8 @@ const ChatPage: React.FC = () => {
                 userCount={userCount}
                 isConnected={isConnected}
                 connectionStatus={connectionStatus}
+                onMenuToggle={toggleMobileMenu}
+                isMenuOpen={isMobileMenuOpen}
               />
             </div>
 
@@ -106,12 +107,6 @@ const ChatPage: React.FC = () => {
               />
             </div>
           </div>
-
-          {/* Mobile Menu Button */}
-          <MobileMenuButton
-            onClick={toggleMobileMenu}
-            isMenuOpen={isMobileMenuOpen}
-          />
         </div>
       )}
     </div>

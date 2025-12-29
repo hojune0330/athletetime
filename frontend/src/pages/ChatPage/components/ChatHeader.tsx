@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { type RoomId, CHAT_ROOMS } from '../types';
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
@@ -9,6 +8,8 @@ interface ChatHeaderProps {
   userCount: number;
   isConnected: boolean;
   connectionStatus?: ConnectionStatus;
+  onMenuToggle?: () => void;
+  isMenuOpen?: boolean;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -16,6 +17,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   userCount,
   isConnected,
   connectionStatus = isConnected ? 'connected' : 'disconnected',
+  onMenuToggle,
+  isMenuOpen = false,
 }) => {
   const roomName = CHAT_ROOMS.find(r => r.id === currentRoom)?.name || '채팅방';
 
@@ -48,13 +51,16 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </span>
       </div>
       
-      <Link
-        to="/"
-        className="py-2 px-4 bg-gray-100 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+      {/* 모바일 채팅방 전환 버튼 */}
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        className="md:hidden py-2 px-4 bg-[#00ffa3] text-black rounded-lg text-sm font-medium hover:bg-[#00e694] transition-colors flex items-center gap-2"
+        aria-label={isMenuOpen ? '메뉴 닫기' : '채팅방 목록'}
       >
-        <i className="fas fa-home mr-1" />
-        홈으로
-      </Link>
+        <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-list'}`} />
+        채팅방
+      </button>
     </div>
   );
 };
