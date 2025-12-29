@@ -276,6 +276,7 @@ export default function Header() {
     { path: '/pace-calculator', label: '⏱️ 페이스 계산기', mobileLabel: '페이스 계산기', emoji: '⏱️' },
     { path: '/training-calculator', label: '💪 훈련 계산기', mobileLabel: '훈련 계산기', emoji: '💪' },
     { path: '/competitions', label: '🏆 경기 결과', mobileLabel: '경기 결과', emoji: '🏆' },
+    { path: '/chat', label: '💭 실시간 채팅', mobileLabel: '실시간 채팅', emoji: '💭' },
   ]
 
   return (
