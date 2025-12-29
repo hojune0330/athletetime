@@ -266,8 +266,41 @@ function getClientsCount() {
   return wss ? wss.clients.size : 0;
 }
 
+/**
+ * 닉네임 사용 가능 여부 확인
+ * @param {string} nickname - 확인할 닉네임
+ * @returns {boolean} - 사용 가능하면 true
+ */
+function isNicknameAvailable(nickname) {
+  if (!nickname) return false;
+  
+  // 모든 방에서 닉네임 사용 여부 확인
+  for (const room of Object.keys(roomNicknames)) {
+    if (roomNicknames[room].has(nickname)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+ * 현재 사용 중인 모든 닉네임 목록 반환
+ * @returns {string[]} - 사용 중인 닉네임 목록
+ */
+function getActiveNicknames() {
+  const nicknames = new Set();
+  for (const room of Object.keys(roomNicknames)) {
+    for (const nickname of roomNicknames[room].keys()) {
+      nicknames.add(nickname);
+    }
+  }
+  return Array.from(nicknames);
+}
+
 module.exports = {
   setupWebSocket,
   broadcastToClients,
-  getClientsCount
+  getClientsCount,
+  isNicknameAvailable,
+  getActiveNicknames
 };

@@ -18,6 +18,8 @@ const ChatPage: React.FC = () => {
     currentRoom,
     isConnected,
     connectionStatus,
+    isCheckingNickname,
+    nicknameError,
     setNickname,
     joinChat,
     sendMessage,
@@ -52,6 +54,8 @@ const ChatPage: React.FC = () => {
         nickname={nickname}
         onNicknameChange={setNickname}
         onJoin={handleJoin}
+        isCheckingNickname={isCheckingNickname}
+        nicknameError={nicknameError}
       />
 
       {/* Main Chat Container */}

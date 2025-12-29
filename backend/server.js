@@ -38,7 +38,7 @@ const matchResultsRouter = require('./routes/matchResults');
 const { upload, handleUploadError } = require('./middleware/upload');
 
 // 유틸리티
-const { setupWebSocket, getClientsCount } = require('./utils/websocket');
+const { setupWebSocket, getClientsCount, isNicknameAvailable } = require('./utils/websocket');
 const { isCloudinaryConfigured } = require('./utils/cloudinary');
 
 // ============================================
@@ -181,6 +181,34 @@ app.get('/health', async (req, res) => {
       error: error.message 
     });
   }
+});
+
+// 채팅 닉네임 중복 체크 API
+app.get('/api/chat/check-nickname', (req, res) => {
+  const { nickname } = req.query;
+  
+  if (!nickname) {
+    return res.status(400).json({
+      success: false,
+      error: '닉네임을 입력해주세요.'
+    });
+  }
+  
+  if (nickname.length < 2 || nickname.length > 10) {
+    return res.status(400).json({
+      success: false,
+      available: false,
+      error: '닉네임은 2~10자 사이여야 합니다.'
+    });
+  }
+  
+  const available = isNicknameAvailable(nickname);
+  
+  res.json({
+    success: true,
+    available,
+    message: available ? '사용 가능한 닉네임입니다.' : '이미 사용 중인 닉네임입니다.'
+  });
 });
 
 // API 라우터

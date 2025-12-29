@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { ChatMessage, RoomId } from '../types';
 import { useWebSocket } from './useWebSocket';
+import { apiClient } from '../../../api/client';
 
 // sessionStorage 키
 const STORAGE_KEYS = {
@@ -31,12 +32,15 @@ export interface UseChatReturn {
   currentRoom: RoomId;
   isConnected: boolean;
   connectionStatus: 'disconnected' | 'connecting' | 'connected';
+  isCheckingNickname: boolean;
+  nicknameError: string | null;
   
   // Actions
   setNickname: (value: string) => void;
-  joinChat: () => boolean;
+  joinChat: () => Promise<boolean>;
   sendMessage: (text: string) => void;
   changeRoom: (room: RoomId) => void;
+  checkNickname: (nickname: string) => Promise<{ available: boolean; message: string }>;
 }
 
 export function useChat(): UseChatReturn {
@@ -46,10 +50,29 @@ export function useChat(): UseChatReturn {
   const [messages, setMessages] = useState<(ChatMessage | { type: 'system'; text: string })[]>([]);
   const [userCount, setUserCount] = useState(0);
   const [userId] = useState(getSavedUserId);
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false);
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
   
-  // 닉네임 설정 시 sessionStorage에도 저장
+  // 닉네임 설정 시 에러 초기화
   const setNickname = useCallback((value: string) => {
     setNicknameState(value);
+    setNicknameError(null);
+  }, []);
+  
+  // 닉네임 중복 체크 API
+  const checkNickname = useCallback(async (nicknameToCheck: string): Promise<{ available: boolean; message: string }> => {
+    try {
+      const response = await apiClient.get('/api/chat/check-nickname', {
+        params: { nickname: nicknameToCheck }
+      });
+      return {
+        available: response.data.available,
+        message: response.data.message
+      };
+    } catch (error: any) {
+      const message = error.response?.data?.error || '닉네임 확인 중 오류가 발생했습니다.';
+      return { available: false, message };
+    }
   }, []);
 
   const handleMessage = useCallback((message: ChatMessage) => {
@@ -84,18 +107,37 @@ export function useChat(): UseChatReturn {
     onUserCountChange: handleUserCountChange,
   });
 
-  const joinChat = useCallback(() => {
+  const joinChat = useCallback(async (): Promise<boolean> => {
     const trimmedNickname = nickname.trim();
     
     if (trimmedNickname.length < 2 || trimmedNickname.length > 10) {
+      setNicknameError('닉네임은 2~10자 사이여야 합니다.');
       return false;
     }
     
-    // sessionStorage에 닉네임 저장
-    sessionStorage.setItem(STORAGE_KEYS.NICKNAME, trimmedNickname);
-    setIsJoined(true);
-    return true;
-  }, [nickname]);
+    // 닉네임 중복 체크
+    setIsCheckingNickname(true);
+    setNicknameError(null);
+    
+    try {
+      const result = await checkNickname(trimmedNickname);
+      
+      if (!result.available) {
+        setNicknameError(result.message);
+        return false;
+      }
+      
+      // sessionStorage에 닉네임 저장
+      sessionStorage.setItem(STORAGE_KEYS.NICKNAME, trimmedNickname);
+      setIsJoined(true);
+      return true;
+    } catch {
+      setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setIsCheckingNickname(false);
+    }
+  }, [nickname, checkNickname]);
 
   // 입장 후 WebSocket 연결
   useEffect(() => {
@@ -119,9 +161,12 @@ export function useChat(): UseChatReturn {
     currentRoom,
     isConnected,
     connectionStatus,
+    isCheckingNickname,
+    nicknameError,
     setNickname,
     joinChat,
     sendMessage: wsSendMessage,
     changeRoom,
+    checkNickname,
   };
 }

@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface NicknameModalProps {
   isOpen: boolean;
   nickname: string;
   onNicknameChange: (value: string) => void;
-  onJoin: () => boolean;
+  onJoin: () => Promise<boolean>;
+  isCheckingNickname?: boolean;
+  nicknameError?: string | null;
 }
 
 export const NicknameModal: React.FC<NicknameModalProps> = ({
@@ -13,22 +15,33 @@ export const NicknameModal: React.FC<NicknameModalProps> = ({
   nickname,
   onNicknameChange,
   onJoin,
+  isCheckingNickname = false,
+  nicknameError = null,
 }) => {
   const navigate = useNavigate();
+  const [isJoining, setIsJoining] = useState(false);
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
     if (nickname.trim().length < 2 || nickname.trim().length > 10) {
-      alert('닉네임은 2자 이상 10자 이하로 입력해주세요.');
       return;
     }
-    onJoin();
+    
+    setIsJoining(true);
+    try {
+      await onJoin();
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isJoining && !isCheckingNickname) {
       handleJoin();
     }
   };
+
+  const isLoading = isJoining || isCheckingNickname;
+  const isValidLength = nickname.trim().length >= 2 && nickname.trim().length <= 10;
 
   if (!isOpen) return null;
 
@@ -62,9 +75,24 @@ export const NicknameModal: React.FC<NicknameModalProps> = ({
               placeholder="닉네임을 입력하세요 (2-10자)"
               minLength={2}
               maxLength={10}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00ffa3] transition-colors"
+              className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none transition-colors ${
+                nicknameError 
+                  ? 'border-red-400 focus:border-red-500' 
+                  : 'border-gray-200 focus:border-[#00ffa3]'
+              }`}
               autoFocus
+              disabled={isLoading}
             />
+            {/* 에러 메시지 */}
+            {nicknameError && (
+              <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                <span>⚠️</span> {nicknameError}
+              </p>
+            )}
+            {/* 글자 수 표시 */}
+            <p className={`mt-1 text-xs ${nickname.length > 0 && !isValidLength ? 'text-red-500' : 'text-gray-400'}`}>
+              {nickname.length}/10자 (최소 2자)
+            </p>
           </div>
 
           <div className="bg-gray-50 p-4 rounded-lg mt-4">
@@ -83,15 +111,24 @@ export const NicknameModal: React.FC<NicknameModalProps> = ({
             type="button"
             onClick={() => navigate('/')}
             className="flex-1 py-3 px-5 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
+            disabled={isLoading}
           >
             취소
           </button>
           <button
             type="button"
             onClick={handleJoin}
-            className="flex-1 py-3 px-5 bg-[#00ffa3] text-black rounded-lg text-sm font-semibold hover:bg-[#00e694] transition-colors"
+            disabled={isLoading || !isValidLength}
+            className="flex-1 py-3 px-5 bg-[#00ffa3] text-black rounded-lg text-sm font-semibold hover:bg-[#00e694] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            입장하기
+            {isLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                확인 중...
+              </>
+            ) : (
+              '입장하기'
+            )}
           </button>
         </div>
       </div>
