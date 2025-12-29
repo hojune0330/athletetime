@@ -41,7 +41,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   return (
     <div
       ref={containerRef}
-      className="message-list flex-1 overflow-y-auto p-5 bg-gray-50 flex flex-col gap-2 scrollbar-thin scrollbar-thumb-gray-300"
+      className="flex-1 overflow-y-auto p-5 bg-gray-50 flex flex-col gap-2 scrollbar-thin scrollbar-thumb-gray-300"
     >
       {messages.map((msg, index) => {
         if (isSystemMessage(msg)) {

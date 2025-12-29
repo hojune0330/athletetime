@@ -27,7 +27,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
-    <div className="message-input bg-white border-t border-gray-200 p-4 pb-[max(16px,env(safe-area-inset-bottom))]">
+    <div className="bg-white border-t border-gray-200 p-4 pb-[max(16px,env(safe-area-inset-bottom))]">
       <div className="flex gap-2.5 items-center bg-gray-100 rounded-3xl px-4 py-2">
         <input
           type="text"

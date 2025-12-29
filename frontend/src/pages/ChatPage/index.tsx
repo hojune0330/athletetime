@@ -76,7 +76,7 @@ const ChatPage: React.FC = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="chat-area flex-1 flex flex-col bg-white">
+          <div className="flex-1 flex flex-col bg-white">
             {/* Header */}
             <ChatHeader
               currentRoom={currentRoom}
