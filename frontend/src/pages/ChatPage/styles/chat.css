@@ -58,22 +58,15 @@
   border-radius: 3px;
 }
 
-/* Chat container fullscreen */
+/* Chat container fullscreen - using 100dvh for mobile compatibility */
 .chat-page-container {
   height: 100vh;
-  height: -webkit-fill-available;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   max-width: 1400px;
   margin: 0 auto;
   background: white;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .chat-page-container {
-    flex-direction: column;
-  }
 }
 
 /* Safe area for iPhone */

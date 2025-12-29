@@ -24,9 +24,9 @@ export const RoomSidebar: React.FC<RoomSidebarProps> = ({
   return (
     <div
       className={`
-        w-[260px] bg-[#1e1e1e] flex flex-col border-r border-[#2a2a2a]
-        md:relative md:bottom-auto md:translate-y-0
-        fixed bottom-0 left-0 right-0 z-[100] rounded-t-[20px] max-h-[70vh]
+        bg-[#1e1e1e] flex flex-col border-r border-[#2a2a2a]
+        md:relative md:bottom-auto md:translate-y-0 md:w-full md:h-full md:rounded-none md:max-h-none
+        fixed bottom-0 left-0 right-0 z-[100] rounded-t-[20px] max-h-[70vh] w-full
         transition-all duration-300
         ${isVisible ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
       `}
