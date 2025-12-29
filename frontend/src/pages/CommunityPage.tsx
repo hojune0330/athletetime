@@ -143,13 +143,13 @@ export default function CommunityPage() {
             onClick={() => setSortBy('hot')}
             className={`sort-pill ${sortBy === 'hot' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
           >
-            🔥 인기순
+            인기순
           </button>
           <button
             onClick={() => setSortBy('comment')}
             className={`sort-pill ${sortBy === 'comment' ? 'sort-pill-active' : 'sort-pill-inactive'}`}
           >
-            💬 댓글순
+            댓글순
           </button>
         </div>
       </div>
