@@ -68,10 +68,8 @@ function App() {
               <Route index element={<TrainingCalculatorPage />} />
             </Route>
 
-            {/* 채팅 페이지 (레이아웃 포함) */}
-            <Route path="/chat" element={<Layout />}>
-              <Route index element={<ChatPage />} />
-            </Route>
+            {/* 채팅 페이지 (독립 레이아웃 - 전체 화면) */}
+            <Route path="/chat" element={<ChatPage />} />
 
             {/* 커뮤니티 페이지 (레이아웃 포함) */}
             <Route path="/community" element={<Layout />}>
