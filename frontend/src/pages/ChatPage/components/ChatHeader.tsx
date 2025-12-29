@@ -33,7 +33,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const status = getStatusInfo();
 
   return (
-    <div className="h-[60px] bg-white border-b border-gray-200 px-5 flex items-center justify-between">
+    <div className="chat-header h-[60px] bg-white border-b border-gray-200 px-5 flex items-center justify-between">
       <div className="text-base font-semibold text-[#1e1e1e] flex items-center gap-2">
         {/* Connection Status Indicator */}
         <span className="relative flex h-3 w-3">
