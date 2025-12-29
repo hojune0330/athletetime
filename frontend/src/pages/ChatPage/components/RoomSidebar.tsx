@@ -21,16 +21,32 @@ export const RoomSidebar: React.FC<RoomSidebarProps> = ({
     }
   };
 
+  const handleOverlayClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <div
-      className={`
-        bg-[#1e1e1e] flex flex-col border-r border-[#2a2a2a]
-        md:relative md:bottom-auto md:translate-y-0 md:w-full md:h-full md:rounded-none md:max-h-none md:z-0
-        fixed bottom-0 left-0 right-0 z-[40] rounded-t-[20px] max-h-[70vh] w-full
-        transition-all duration-300
-        ${isVisible ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
-      `}
-    >
+    <>
+      {/* 모바일 오버레이 - 목록 영역 외 터치 시 닫기 */}
+      {isVisible && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/50 z-[39] transition-opacity duration-300"
+          onClick={handleOverlayClick}
+          aria-hidden="true"
+        />
+      )}
+      
+      <div
+        className={`
+          bg-[#1e1e1e] flex flex-col border-r border-[#2a2a2a]
+          md:relative md:bottom-auto md:translate-y-0 md:w-full md:h-full md:rounded-none md:max-h-none md:z-0
+          fixed bottom-0 left-0 right-0 z-[40] rounded-t-[20px] max-h-[70vh] w-full
+          transition-all duration-300
+          ${isVisible ? 'translate-y-0' : 'translate-y-full md:translate-y-0'}
+        `}
+      >
       {/* Header */}
       <div className="p-5 bg-[#161616] border-b border-[#2a2a2a]">
         <h2 className="text-white text-lg font-semibold">채팅방 목록</h2>
@@ -58,5 +74,6 @@ export const RoomSidebar: React.FC<RoomSidebarProps> = ({
         ))}
       </div>
     </div>
+    </>
   );
 };
