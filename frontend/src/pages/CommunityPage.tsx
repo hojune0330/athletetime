@@ -81,12 +81,17 @@ export default function CommunityPage() {
       ? { question: pollQuestion.trim(), options: validPollOptions }
       : undefined
 
+    // 관리자는 설정된 닉네임 사용, 일반 사용자는 입력값 또는 '익명'
+    const authorName = isAdmin 
+      ? (user?.nickname || '관리자') 
+      : (newPost.author.trim() || '익명');
+
     try {
       await createPostMutation.mutateAsync({
         data: {
           title: newPost.title.trim() || '제목 없음',
           content: newPost.content.trim(),
-          author: newPost.author.trim() || '익명',
+          author: authorName,
           password: newPost.password.trim(),
           category: '자유',
           anonymousId: getAnonymousId(),
@@ -184,13 +189,21 @@ export default function CommunityPage() {
               />
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input
-                  type="text"
-                  placeholder="닉네임 (선택)"
-                  value={newPost.author}
-                  onChange={(e) => setNewPost({ ...newPost, author: e.target.value })}
-                  className="input"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="닉네임 (선택)"
+                    value={isAdmin ? (user?.nickname || '관리자') : newPost.author}
+                    onChange={(e) => !isAdmin && setNewPost({ ...newPost, author: e.target.value })}
+                    className={`input ${isAdmin ? 'bg-neutral-100 cursor-not-allowed' : ''}`}
+                    readOnly={isAdmin}
+                  />
+                  {isAdmin && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-primary-600 font-medium">
+                      🛡️ 관리자
+                    </span>
+                  )}
+                </div>
                 <input
                   type="password"
                   placeholder="삭제용 비밀번호 (필수)"
