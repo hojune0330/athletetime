@@ -79,7 +79,7 @@ git push origin main
 │   └── package.json      # 프론트엔드 의존성
 │
 ├── docs/                  # 📚 문서
-│   ├── REACT_INTEGRATION_2025-12-15.md  # ⭐ React 통합 작업 문서
+│   ├── REACT_INTEGRATION_v4.0_2025-12.md  # ⭐ React 통합 작업 문서 (v4.0)
 │   ├── DEPLOYMENT_COMPLETE_SUMMARY.md
 │   ├── NEXT_STEPS.md
 │   └── ...
@@ -231,7 +231,7 @@ npm run db:seed     # 초기 데이터
 
 ## 📖 문서
 
-- **⭐ React 통합 작업 (2025-12-15)**: [`docs/REACT_INTEGRATION_2025-12-15.md`](./docs/REACT_INTEGRATION_2025-12-15.md)
+- **⭐ React 통합 작업 v4.0 (2025-12)**: [`docs/REACT_INTEGRATION_v4.0_2025-12.md`](./docs/REACT_INTEGRATION_v4.0_2025-12.md)
 - **프로젝트 구조**: [`PROJECT_STRUCTURE.md`](./PROJECT_STRUCTURE.md)
 - **배포 가이드**: [`docs/NEXT_STEPS.md`](./docs/NEXT_STEPS.md)
 - **전체 시스템**: [`docs/DEPLOYMENT_COMPLETE_SUMMARY.md`](./docs/DEPLOYMENT_COMPLETE_SUMMARY.md)
