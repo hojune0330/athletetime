@@ -40,7 +40,7 @@ export default function MarketplaceFormPage() {
   // 상태
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-  const [imageInput, setImageInput] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   // API 호출
   const { data: itemData, isLoading } = useMarketplaceItem(parseInt(id || '0'));
@@ -89,32 +89,68 @@ export default function MarketplaceFormPage() {
     }
   };
 
-  // 이미지 URL 추가
-  const handleAddImage = () => {
-    const url = imageInput.trim();
-    if (!url) {
-      alert('이미지 URL을 입력해주세요.');
-      return;
-    }
+  // 이미지 파일 업로드
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
-    // URL 유효성 검사 (간단)
-    try {
-      new URL(url);
-    } catch {
-      alert('올바른 URL 형식이 아닙니다.');
-      return;
-    }
-
-    if (formData.images.length >= 10) {
+    if (formData.images.length + files.length > 10) {
       alert('이미지는 최대 10개까지 등록할 수 있습니다.');
       return;
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, url],
-    }));
-    setImageInput('');
+    setIsUploading(true);
+
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        // 파일 크기 체크 (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error(`${file.name}은(는) 5MB를 초과합니다.`);
+        }
+
+        // 파일 타입 체크
+        if (!file.type.startsWith('image/')) {
+          throw new Error(`${file.name}은(는) 이미지 파일이 아닙니다.`);
+        }
+
+        // FormData 생성
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // Cloudinary 업로드
+        const response = await fetch('https://api.cloudinary.com/v1_1/dxvxtfrjp/image/upload', {
+          method: 'POST',
+          body: (() => {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('upload_preset', 'ml_default'); // Cloudinary에서 설정한 upload preset
+            return fd;
+          })(),
+        });
+
+        if (!response.ok) {
+          throw new Error('이미지 업로드에 실패했습니다.');
+        }
+
+        const data = await response.json();
+        return data.secure_url;
+      });
+
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls],
+      }));
+
+      // input 초기화
+      e.target.value = '';
+    } catch (error: any) {
+      console.error('이미지 업로드 오류:', error);
+      alert(error.message || '이미지 업로드에 실패했습니다.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // 이미지 삭제
@@ -291,31 +327,38 @@ export default function MarketplaceFormPage() {
             {/* 이미지 */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                상품 이미지 (최대 10개)
+                상품 이미지 (최대 10개, 각 5MB 이하)
               </label>
 
-              {/* 이미지 URL 입력 */}
-              <div className="flex gap-2 mb-4">
+              {/* 이미지 파일 업로드 */}
+              <div className="mb-4">
                 <input
-                  type="url"
-                  value={imageInput}
-                  onChange={(e) => setImageInput(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddImage();
-                    }
-                  }}
-                  className="input flex-1"
-                  placeholder="이미지 URL을 입력하세요"
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  disabled={isUploading || formData.images.length >= 10}
+                  className="hidden"
                 />
-                <button
-                  type="button"
-                  onClick={handleAddImage}
-                  className="btn-secondary"
+                <label
+                  htmlFor="image-upload"
+                  className={`btn-secondary w-full flex items-center justify-center gap-2 cursor-pointer ${
+                    isUploading || formData.images.length >= 10
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
+                  }`}
                 >
-                  추가
-                </button>
+                  <PhotoIcon className="w-5 h-5" />
+                  {isUploading
+                    ? '업로드 중...'
+                    : formData.images.length >= 10
+                    ? '최대 10개까지 업로드 가능'
+                    : '이미지 선택'}
+                </label>
+                <p className="mt-2 text-xs text-neutral-500">
+                  * JPG, PNG, GIF 형식 지원 / 각 파일 최대 5MB
+                </p>
               </div>
 
               {/* 이미지 목록 */}
@@ -372,13 +415,13 @@ export default function MarketplaceFormPage() {
                 <div className="border-2 border-dashed border-neutral-200 rounded-lg p-12 text-center">
                   <PhotoIcon className="w-12 h-12 text-neutral-400 mx-auto mb-3" />
                   <p className="text-neutral-500 text-sm">
-                    이미지 URL을 추가해주세요
+                    '이미지 선택' 버튼을 눌러 이미지를 추가해주세요
                   </p>
                 </div>
               )}
 
               <p className="mt-2 text-sm text-neutral-500">
-                * 이미지 URL을 입력하여 추가하세요. 첫 번째 이미지가 자동으로 대표 이미지로 설정됩니다.
+                * 첫 번째 이미지가 자동으로 대표 이미지로 설정됩니다.
               </p>
             </div>
 
