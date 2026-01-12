@@ -5,7 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { optionalAuth, authenticateToken } = require('../auth/middleware');
+const { optionalAuth, authenticateToken } = require('../middleware/auth');
 
 // ============================================
 // GET /api/marketplace
