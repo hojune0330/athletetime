@@ -14,13 +14,8 @@ export const uploadImage = async (file: File): Promise<{ url: string; public_id:
   formData.append('image', file);
 
   const response = await apiClient.post<{ url: string; public_id: string }>(
-    '/upload/image',
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
+    '/api/upload/image',
+    formData
   );
 
   return response.data;
@@ -40,13 +35,8 @@ export const uploadImages = async (
   });
 
   const response = await apiClient.post<{ images: Array<{ url: string; public_id: string }> }>(
-    '/upload/images',
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
+    '/api/upload/images',
+    formData
   );
 
   return response.data;
