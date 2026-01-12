@@ -34,6 +34,7 @@ const pollsRouter = require('./routes/polls');
 const competitionsRouter = require('./routes/competitions');
 const matchResultsRouter = require('./routes/matchResults');
 const marketplaceRouter = require('./routes/marketplace');
+const uploadRouter = require('./routes/upload');
 
 // 미들웨어
 const { upload, handleUploadError } = require('./middleware/upload');
@@ -250,6 +251,7 @@ app.use('/api/posts/:postId/poll', pollsRouter);
 app.use('/api/competitions', competitionsRouter);
 app.use('/api/match-results', matchResultsRouter);
 app.use('/api/marketplace', marketplaceRouter);
+app.use('/api/upload', uploadRouter);
 
 // 정적 파일 서빙 (HTML, CSS, JS, 이미지 등)
 app.use(express.static(__dirname));

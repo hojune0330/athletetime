@@ -14,6 +14,7 @@ import {
 } from '../hooks/useMarketplace';
 import { useAuth } from '../context/AuthContext';
 import PageHeader from '../components/common/PageHeader';
+import { uploadImages } from '../api/upload';
 
 interface FormData {
   title: string;
@@ -102,7 +103,9 @@ export default function MarketplaceFormPage() {
     setIsUploading(true);
 
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
+      // 파일 유효성 검사
+      const fileArray = Array.from(files);
+      for (const file of fileArray) {
         // 파일 크기 체크 (5MB)
         if (file.size > 5 * 1024 * 1024) {
           throw new Error(`${file.name}은(는) 5MB를 초과합니다.`);
@@ -112,31 +115,11 @@ export default function MarketplaceFormPage() {
         if (!file.type.startsWith('image/')) {
           throw new Error(`${file.name}은(는) 이미지 파일이 아닙니다.`);
         }
+      }
 
-        // FormData 생성
-        const formData = new FormData();
-        formData.append('image', file);
-
-        // Cloudinary 업로드
-        const response = await fetch('https://api.cloudinary.com/v1_1/dxvxtfrjp/image/upload', {
-          method: 'POST',
-          body: (() => {
-            const fd = new FormData();
-            fd.append('file', file);
-            fd.append('upload_preset', 'ml_default'); // Cloudinary에서 설정한 upload preset
-            return fd;
-          })(),
-        });
-
-        if (!response.ok) {
-          throw new Error('이미지 업로드에 실패했습니다.');
-        }
-
-        const data = await response.json();
-        return data.secure_url;
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
+      // 백엔드 API를 통해 업로드
+      const response = await uploadImages(fileArray);
+      const uploadedUrls = response.images.map((img) => img.url);
 
       setFormData((prev) => ({
         ...prev,
