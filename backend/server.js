@@ -79,6 +79,34 @@ pool.on('error', (err) => {
   console.error('❌ PostgreSQL 연결 오류:', err);
 });
 
+// 자동 마이그레이션 실행
+const fs = require('fs');
+const path = require('path');
+
+async function runMigrations() {
+  try {
+    const migrationFiles = [
+      'migration-003-marketplace.sql'
+    ];
+
+    for (const file of migrationFiles) {
+      const filePath = path.join(__dirname, 'database', file);
+      
+      if (fs.existsSync(filePath)) {
+        console.log(`🔄 실행 중: ${file}`);
+        const sql = fs.readFileSync(filePath, 'utf8');
+        await pool.query(sql);
+        console.log(`✅ 완료: ${file}`);
+      }
+    }
+  } catch (error) {
+    console.error('❌ 마이그레이션 오류:', error.message);
+  }
+}
+
+// 서버 시작 시 마이그레이션 실행
+runMigrations();
+
 // ============================================
 // Cloudinary 설정
 // ============================================
