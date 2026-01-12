@@ -24,6 +24,10 @@ import CompetitionFormPage from './pages/CompetitionFormPage'
 import MatchResultListPage from './pages/MatchResultListPage'
 import MatchResultDetailPage from './pages/MatchResultDetailPage'
 import MatchResultFormPage from './pages/MatchResultFormPage'
+// 중고거래 페이지
+import MarketplacePage from './pages/MarketplacePage'
+import MarketplaceDetailPage from './pages/MarketplaceDetailPage'
+import MarketplaceFormPage from './pages/MarketplaceFormPage'
 import { useEffect } from 'react'
 
 function App() {
@@ -104,6 +108,14 @@ function App() {
               <Route path="new" element={<MatchResultFormPage />} />
               <Route path=":resultId" element={<MatchResultDetailPage />} />
               <Route path=":resultId/edit" element={<MatchResultFormPage />} />
+            </Route>
+
+            {/* 중고거래 (레이아웃 포함) */}
+            <Route path="/marketplace" element={<Layout />}>
+              <Route index element={<MarketplacePage />} />
+              <Route path="new" element={<MarketplaceFormPage />} />
+              <Route path=":id" element={<MarketplaceDetailPage />} />
+              <Route path=":id/edit" element={<MarketplaceFormPage />} />
             </Route>
 
             {/* 404 */}
