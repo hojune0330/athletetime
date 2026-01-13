@@ -117,8 +117,13 @@ export default function MarketplaceFormPage() {
         }
       }
 
+      console.log('📤 이미지 업로드 시작:', fileArray.length, '개 파일');
+      
       // 백엔드 API를 통해 업로드
       const response = await uploadImages(fileArray);
+      
+      console.log('✅ 이미지 업로드 성공:', response);
+      
       const uploadedUrls = response.images.map((img) => img.url);
 
       setFormData((prev) => ({
@@ -128,9 +133,24 @@ export default function MarketplaceFormPage() {
 
       // input 초기화
       e.target.value = '';
+      
+      alert(`${uploadedUrls.length}개 이미지가 업로드되었습니다.`);
     } catch (error: any) {
-      console.error('이미지 업로드 오류:', error);
-      alert(error.message || '이미지 업로드에 실패했습니다.');
+      console.error('❌ 이미지 업로드 오류:', error);
+      console.error('❌ 에러 상세:', error.response?.data);
+      
+      // 더 자세한 에러 메시지
+      let errorMessage = '이미지 업로드에 실패했습니다.';
+      
+      if (error.response?.status === 401) {
+        errorMessage = '로그인이 필요합니다. 로그인 후 다시 시도해주세요.';
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.error || '잘못된 요청입니다.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
     }

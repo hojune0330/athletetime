@@ -19,7 +19,7 @@ const { authenticateToken } = require('../middleware/auth');
  * - url: Cloudinary 이미지 URL
  * - public_id: Cloudinary public_id
  */
-router.post('/image', authenticateToken, upload.single('image'), async (req, res) => {
+router.post('/image', upload.single('image'), authenticateToken, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: '이미지 파일이 필요합니다.' });
@@ -52,7 +52,7 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
  * Response:
  * - images: [{ url, public_id }]
  */
-router.post('/images', authenticateToken, upload.array('images', 10), async (req, res) => {
+router.post('/images', upload.array('images', 10), authenticateToken, async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ error: '이미지 파일이 필요합니다.' });
