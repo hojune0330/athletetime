@@ -253,6 +253,8 @@ app.use('/api/match-results', matchResultsRouter);
 app.use('/api/marketplace', marketplaceRouter);
 app.use('/api/upload', uploadRouter);
 
+console.log('✅ 모든 API 라우터 등록 완료 (/api/upload 포함)');
+
 // 정적 파일 서빙 (HTML, CSS, JS, 이미지 등)
 app.use(express.static(__dirname));
 
