@@ -365,7 +365,7 @@ export default function MarketplaceFormPage() {
               </div>
 
               {/* 이미지 목록 */}
-              {formData.images.length > 0 ? (
+              {formData.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {formData.images.map((image, index) => (
                     <div
@@ -413,13 +413,6 @@ export default function MarketplaceFormPage() {
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-neutral-200 rounded-lg p-12 text-center">
-                  <PhotoIcon className="w-12 h-12 text-neutral-400 mx-auto mb-3" />
-                  <p className="text-neutral-500 text-sm">
-                    '이미지 선택' 버튼을 눌러 이미지를 추가해주세요
-                  </p>
                 </div>
               )}
 
