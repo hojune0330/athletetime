@@ -146,7 +146,25 @@ export default function MarketplaceDetailPage() {
   }
 
   const isOwner = user?.id === item.seller_id;
-  const images = item.images && item.images.length > 0 ? item.images : ['/placeholder-image.png'];
+  
+  // 이미지 배열 정렬: 대표 이미지를 맨 앞으로
+  const images = (() => {
+    if (!item.images || item.images.length === 0) {
+      return ['/placeholder-image.png'];
+    }
+    
+    const thumbnailIndex = item.thumbnail_index || 0;
+    const sortedImages = [...item.images];
+    
+    // 대표 이미지를 맨 앞으로 이동
+    if (thumbnailIndex > 0 && thumbnailIndex < sortedImages.length) {
+      const thumbnailImage = sortedImages[thumbnailIndex];
+      sortedImages.splice(thumbnailIndex, 1);
+      sortedImages.unshift(thumbnailImage);
+    }
+    
+    return sortedImages;
+  })();
 
   const statusColor = {
     '판매중': 'bg-success-500',
