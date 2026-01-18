@@ -18,6 +18,7 @@ import {
   useCreateMarketplaceComment,
   useDeleteMarketplaceComment,
   useDeleteMarketplaceItem,
+  useUpdateMarketplaceItemStatus,
 } from '../hooks/useMarketplace';
 import { useAuth } from '../context/AuthContext';
 
@@ -54,9 +55,22 @@ export default function MarketplaceDetailPage() {
   const createCommentMutation = useCreateMarketplaceComment();
   const deleteCommentMutation = useDeleteMarketplaceComment();
   const deleteItemMutation = useDeleteMarketplaceItem();
+  const updateStatusMutation = useUpdateMarketplaceItemStatus();
 
   const item = itemData?.item;
   const comments = commentsData?.comments || [];
+
+  // 상태 변경 핸들러
+  const handleStatusChange = async (newStatus: string) => {
+    if (!confirm(`상태를 '${newStatus}'(으)로 변경하시겠습니까?`)) return;
+
+    try {
+      await updateStatusMutation.mutateAsync({ id: itemId, status: newStatus });
+      alert('상태가 변경되었습니다.');
+    } catch (error) {
+      alert('상태 변경에 실패했습니다.');
+    }
+  };
 
   // 댓글 작성
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -231,11 +245,26 @@ export default function MarketplaceDetailPage() {
 
             {/* 오른쪽: 상품 정보 */}
             <div>
-              {/* 상태 배지 */}
+              {/* 상태 배지 / 드롭다운 */}
               <div className="mb-4">
-                <span className={`${statusColor} text-white text-sm font-medium px-3 py-1 rounded`}>
-                  {item.status}
-                </span>
+                {isOwner ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-neutral-700">상태:</span>
+                    <select
+                      value={item.status}
+                      onChange={(e) => handleStatusChange(e.target.value)}
+                      className={`${statusColor} text-white text-sm font-medium px-3 py-1 rounded cursor-pointer border-0 focus:ring-2 focus:ring-primary-500`}
+                    >
+                      <option value="판매중">판매중</option>
+                      <option value="예약중">예약중</option>
+                      <option value="판매완료">판매완료</option>
+                    </select>
+                  </div>
+                ) : (
+                  <span className={`${statusColor} text-white text-sm font-medium px-3 py-1 rounded`}>
+                    {item.status}
+                  </span>
+                )}
               </div>
 
               {/* 제목 */}

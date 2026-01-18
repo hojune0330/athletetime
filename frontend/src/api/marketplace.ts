@@ -133,6 +133,17 @@ export const deleteMarketplaceItem = async (id: number): Promise<void> => {
 };
 
 /**
+ * 상품 상태 변경
+ */
+export const updateMarketplaceItemStatus = async (
+  id: number,
+  status: string
+): Promise<MarketplaceItemResponse> => {
+  const response = await apiClient.patch(`/api/marketplace/${id}/status`, { status });
+  return response.data;
+};
+
+/**
  * 댓글 목록 조회
  */
 export const getMarketplaceComments = async (

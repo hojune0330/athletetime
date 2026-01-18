@@ -108,6 +108,22 @@ export const useDeleteMarketplaceItem = () => {
 };
 
 /**
+ * 상품 상태 변경
+ */
+export const useUpdateMarketplaceItemStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: number; status: string }) =>
+      api.updateMarketplaceItemStatus(id, status),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: marketplaceKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: marketplaceKeys.detail(variables.id) });
+    },
+  });
+};
+
+/**
  * 댓글 작성
  */
 export const useCreateMarketplaceComment = () => {
