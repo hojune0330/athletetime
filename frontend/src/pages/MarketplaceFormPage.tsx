@@ -131,6 +131,11 @@ export default function MarketplaceFormPage() {
         images: [...prev.images, ...uploadedUrls],
       }));
 
+      // 이미지 에러 클리어
+      if (errors.images) {
+        setErrors((prev) => ({ ...prev, images: undefined }));
+      }
+
       // input 초기화
       e.target.value = '';
       
@@ -200,6 +205,11 @@ export default function MarketplaceFormPage() {
       } else if (priceNum < 0) {
         newErrors.price = '가격은 0원 이상이어야 합니다.';
       }
+    }
+
+    // 이미지 필수 검사
+    if (formData.images.length === 0) {
+      newErrors.images = '최소 1개 이상의 이미지를 등록해주세요.';
     }
 
     setErrors(newErrors);
@@ -330,7 +340,8 @@ export default function MarketplaceFormPage() {
             {/* 이미지 */}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                상품 이미지 (최대 10개, 각 5MB 이하)
+                상품 이미지 <span className="text-danger-500">*</span>
+                <span className="text-neutral-500 font-normal"> (최대 10개, 각 5MB 이하)</span>
               </label>
 
               {/* 이미지 파일 업로드 */}
@@ -350,6 +361,8 @@ export default function MarketplaceFormPage() {
                     isUploading || formData.images.length >= 10
                       ? 'opacity-50 cursor-not-allowed'
                       : ''
+                  } ${
+                    errors.images ? 'border-2 border-danger-500' : ''
                   }`}
                 >
                   <PhotoIcon className="w-5 h-5" />
@@ -359,6 +372,9 @@ export default function MarketplaceFormPage() {
                     ? '최대 10개까지 업로드 가능'
                     : '이미지 선택'}
                 </label>
+                {errors.images && (
+                  <p className="mt-1 text-sm text-danger-600">{errors.images}</p>
+                )}
                 <p className="mt-2 text-xs text-neutral-500">
                   * JPG, PNG, GIF 형식 지원 / 각 파일 최대 5MB
                 </p>
