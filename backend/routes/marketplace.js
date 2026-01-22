@@ -117,6 +117,65 @@ router.get('/', optionalAuth, async (req, res) => {
 });
 
 // ============================================
+// PATCH /api/marketplace/:id/status
+// 상품 상태 변경 (본인만 가능)
+// ============================================
+router.patch('/:id/status', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // 상태값 유효성 검사
+    if (!status || !['판매중', '예약중', '판매완료'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: '올바른 상태값이 아닙니다. (판매중, 예약중, 판매완료)'
+      });
+    }
+
+    // 상품 소유자 확인
+    const checkResult = await req.app.locals.pool.query(
+      'SELECT seller_id FROM marketplace_items WHERE id = $1 AND deleted_at IS NULL',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: '상품을 찾을 수 없습니다.'
+      });
+    }
+
+    if (checkResult.rows[0].seller_id !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: '본인의 상품만 상태를 변경할 수 있습니다.'
+      });
+    }
+
+    // 상태 업데이트
+    const result = await req.app.locals.pool.query(
+      'UPDATE marketplace_items SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+
+    console.log(`✅ 상품 상태 변경: ${id} → ${status}`);
+
+    res.json({
+      success: true,
+      message: '상태가 변경되었습니다.',
+      item: result.rows[0]
+    });
+  } catch (error) {
+    console.error('❌ 상품 상태 변경 오류:', error);
+    res.status(500).json({
+      success: false,
+      error: '상태 변경에 실패했습니다.'
+    });
+  }
+});
+
+// ============================================
 // GET /api/marketplace/:id
 // 상품 상세 조회 (조회수 증가)
 // ============================================
@@ -397,76 +456,6 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     console.log(`✅ 상품 삭제: ${id}`);
 
     res.json({
-      success: true,
-      message: '상품이 삭제되었습니다.'
-    });
-  } catch (error) {
-    console.error('❌ 상품 삭제 오류:', error);
-    res.status(500).json({
-      success: false,
-      error: '상품 삭제에 실패했습니다.'
-    });
-  }
-});
-
-// ============================================
-// PATCH /api/marketplace/:id/status
-// 상품 상태 변경 (본인만 가능)
-// ============================================
-router.patch('/:id/status', authenticateToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    // 상태값 유효성 검사
-    if (!status || !['판매중', '예약중', '판매완료'].includes(status)) {
-      return res.status(400).json({
-        success: false,
-        error: '올바른 상태값이 아닙니다. (판매중, 예약중, 판매완료)'
-      });
-    }
-
-    // 상품 소유자 확인
-    const checkResult = await req.app.locals.pool.query(
-      'SELECT seller_id FROM marketplace_items WHERE id = $1 AND deleted_at IS NULL',
-      [id]
-    );
-
-    if (checkResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: '상품을 찾을 수 없습니다.'
-      });
-    }
-
-    if (checkResult.rows[0].seller_id !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        error: '본인의 상품만 상태를 변경할 수 있습니다.'
-      });
-    }
-
-    // 상태 업데이트
-    const result = await req.app.locals.pool.query(
-      'UPDATE marketplace_items SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
-      [status, id]
-    );
-
-    console.log(`✅ 상품 상태 변경: ${id} → ${status}`);
-
-    res.json({
-      success: true,
-      message: '상태가 변경되었습니다.',
-      item: result.rows[0]
-    });
-  } catch (error) {
-    console.error('❌ 상품 상태 변경 오류:', error);
-    res.status(500).json({
-      success: false,
-      error: '상태 변경에 실패했습니다.'
-    });
-  }
-});
       success: true,
       message: '상품이 삭제되었습니다.'
     });
