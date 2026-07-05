@@ -8,18 +8,18 @@
   NODE_VERSION = "20"
   NPM_VERSION = "10"
 
-# React SPA - 모든 라우트는 index.html로
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
 # API 프록시
 [[redirects]]
   from = "/api/*"
   to = "https://athletetime-backend.onrender.com/api/:splat"
   status = 200
   force = true
+
+# React SPA - 모든 라우트는 index.html로
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 # 캐싱 설정
 [[headers]]

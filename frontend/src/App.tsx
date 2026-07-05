@@ -3,31 +3,19 @@ import { AuthProvider } from './context/AuthContext'
 import Layout from './components/layout/Layout'
 import ScrollToTop from './components/ScrollToTop'
 import MainPage from './pages/MainPage'
-import CommunityPage from './pages/CommunityPage'
-// 새로 변환한 React 컴포넌트 (폴더 형태)
+import { ComingSoonPage } from './pages/ComingSoonPage'
 import PaceCalculatorPage from './pages/PaceCalculatorPage'
 import TrainingCalculatorPage from './pages/TrainingCalculatorPage'
-import ChatPage from './pages/ChatPage'
-// 기존 페이지
-import PostDetailPage from './pages/PostDetailPage'
-import EditPostPage from './pages/EditPostPage'
-import WritePage from './pages/WritePage'
-import BoardPage from './pages/BoardPage'
 import NotFoundPage from './pages/NotFoundPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import ProfilePage from './pages/ProfilePage'
-// 대회/경기결과 페이지
 import CompetitionsPage from './pages/CompetitionsPage'
 import CompetitionFormPage from './pages/CompetitionFormPage'
 import MatchResultListPage from './pages/MatchResultListPage'
 import MatchResultDetailPage from './pages/MatchResultDetailPage'
 import MatchResultFormPage from './pages/MatchResultFormPage'
-// 중고거래 페이지
-import MarketplacePage from './pages/MarketplacePage'
-import MarketplaceDetailPage from './pages/MarketplaceDetailPage'
-import MarketplaceFormPage from './pages/MarketplaceFormPage'
 import { useEffect } from 'react'
 
 function App() {
@@ -72,27 +60,21 @@ function App() {
               <Route index element={<TrainingCalculatorPage />} />
             </Route>
 
-            {/* 채팅 페이지 (레이아웃 포함) */}
             <Route path="/chat" element={<Layout />}>
-              <Route index element={<ChatPage />} />
+              <Route index element={<ComingSoonPage feature="chat" />} />
             </Route>
 
-            {/* 커뮤니티 페이지 (레이아웃 포함) */}
             <Route path="/community" element={<Layout />}>
-              <Route index element={<CommunityPage />} />
-              <Route path="best" element={<CommunityPage />} />
-              <Route path="board/:boardId" element={<BoardPage />} />
-              <Route path="post/:postId" element={<PostDetailPage />} />
+              <Route index element={<ComingSoonPage feature="community" />} />
+              <Route path="*" element={<ComingSoonPage feature="community" />} />
             </Route>
 
-            {/* 글쓰기 (레이아웃 포함) */}
             <Route path="/write" element={<Layout />}>
-              <Route index element={<WritePage />} />
+              <Route index element={<ComingSoonPage feature="community" />} />
             </Route>
 
-            {/* 게시글 수정 (레이아웃 포함) */}
             <Route path="/edit/:postId" element={<Layout />}>
-              <Route index element={<EditPostPage />} />
+              <Route index element={<ComingSoonPage feature="community" />} />
             </Route>
 
             {/* 대회 목록 (레이아웃 포함) */}
@@ -110,12 +92,17 @@ function App() {
               <Route path=":resultId/edit" element={<MatchResultFormPage />} />
             </Route>
 
-            {/* 중고거래 (레이아웃 포함) */}
             <Route path="/marketplace" element={<Layout />}>
-              <Route index element={<MarketplacePage />} />
-              <Route path="new" element={<MarketplaceFormPage />} />
-              <Route path=":id" element={<MarketplaceDetailPage />} />
-              <Route path=":id/edit" element={<MarketplaceFormPage />} />
+              <Route index element={<ComingSoonPage feature="marketplace" />} />
+              <Route path="*" element={<ComingSoonPage feature="marketplace" />} />
+            </Route>
+
+            <Route path="/records" element={<Layout />}>
+              <Route index element={<ComingSoonPage feature="recordsBasic" />} />
+            </Route>
+
+            <Route path="/profile-card" element={<Layout />}>
+              <Route index element={<ComingSoonPage feature="profileCard" />} />
             </Route>
 
             {/* 404 */}

@@ -1,458 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { 
-  ChatBubbleLeftRightIcon,
-  ClockIcon,
-  AcademicCapIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  ShoppingBagIcon,
-  TrophyIcon,
-  ChevronRightIcon,
-  PlayIcon
-} from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 
-/**
- * MainPage 컴포넌트
- * 
- * 전체 애플리케이션의 메인 랜딩 페이지
- * - Hero 섹션 (전체 화면 배경)
- * - 주요 기능 카드
- * - 갤러리 섹션
- * - CTA 버튼
- */
+const readyFeatures = [
+  {
+    title: '경기 결과',
+    description: '대회 일정과 결과를 먼저 안정적으로 확인해요.',
+    path: '/competitions',
+    accent: 'bg-emerald-500',
+  },
+  {
+    title: '페이스 계산기',
+    description: '거리와 기록을 넣고 목표 페이스를 빠르게 계산해요.',
+    path: '/pace-calculator',
+    accent: 'bg-orange-500',
+  },
+  {
+    title: '훈련 계산기',
+    description: '훈련 강도와 반복 구간을 실전적으로 정리해요.',
+    path: '/training-calculator',
+    accent: 'bg-sky-500',
+  },
+] as const;
 
-interface Feature {
-  id: string;
-  icon: React.ReactNode;
-  emoji: string;
-  title: string;
-  description: string;
-  link?: string;
-  onClick?: () => void;
-  gradient: string;
-  iconBg: string;
-  available: boolean;
-}
+const upcomingFeatures = ['커뮤니티', '실시간 채팅', '중고거래', '흥미로운 기록 조회'] as const;
 
-const MainPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  // URL 쿼리 파라미터 또는 sessionStorage로 로그인 모달 트리거
-  useEffect(() => {
-    // URL 쿼리 파라미터 확인
-    if (searchParams.get('showLogin') === 'true') {
-      setShowLoginModal(true);
-      searchParams.delete('showLogin');
-      setSearchParams(searchParams, { replace: true });
-    }
-    // sessionStorage 확인 (RegisterPage에서 뒤로가기 시)
-    if (sessionStorage.getItem('showLoginModal') === 'true') {
-      setShowLoginModal(true);
-      sessionStorage.removeItem('showLoginModal');
-    }
-  }, [searchParams, setSearchParams]);
-
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    
-    if (!loginForm.email || !loginForm.password) {
-      setLoginError('이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-    
-    setIsLoggingIn(true);
-    
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm)
-      });
-      
-      const data = await response.json();
-      
-      if (data.success && data.accessToken && data.refreshToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        setShowLoginModal(false);
-        setLoginForm({ email: '', password: '' });
-        window.location.reload(); // 새로고침으로 상태 업데이트
-      } else {
-        setLoginError(data.error || '로그인에 실패했습니다.');
-      }
-    } catch (error: any) {
-      setLoginError(error.message || '로그인에 실패했습니다.');
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  const closeLoginModal = () => {
-    setShowLoginModal(false);
-    setLoginForm({ email: '', password: '' });
-    setLoginError('');
-  };
-
-  const showComingSoon = (featureName: string) => {
-    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곧 만나보실 수 있습니다!`);
-  };
-
-  const features: Feature[] = [
-    {
-      id: 'community',
-      icon: <ChatBubbleLeftRightIcon className="w-7 h-7" />,
-      emoji: '💬',
-      title: '익명 커뮤니티',
-      description: '로그인 없이 바로 참여하는 익명 육상인 커뮤니티',
-      link: '/community',
-      gradient: 'from-rose-500 to-pink-500',
-      iconBg: 'bg-gradient-to-br from-rose-50 to-pink-50',
-      available: true
-    },
-    {
-      id: 'pace',
-      icon: <ClockIcon className="w-7 h-7" />,
-      emoji: '⏱️',
-      title: '페이스 계산기',
-      description: '정확한 페이스 계산과 기록 예측',
-      link: '/pace-calculator',
-      gradient: 'from-orange-500 to-red-500',
-      iconBg: 'bg-gradient-to-br from-orange-50 to-red-50',
-      available: true
-    },
-    {
-      id: 'training',
-      icon: <AcademicCapIcon className="w-7 h-7" />,
-      emoji: '💪',
-      title: '훈련 계획',
-      description: '과학적인 훈련 계획과 관리',
-      link: '/training-calculator',
-      gradient: 'from-indigo-500 to-purple-500',
-      iconBg: 'bg-gradient-to-br from-indigo-50 to-purple-50',
-      available: true
-    },
-    {
-      id: 'chat',
-      icon: <ChatBubbleOvalLeftEllipsisIcon className="w-7 h-7" />,
-      emoji: '💭',
-      title: '실시간 채팅',
-      description: '육상인들과의 실시간 소통',
-      link: '/chat',
-      gradient: 'from-teal-500 to-green-500',
-      iconBg: 'bg-gradient-to-br from-teal-50 to-green-50',
-      available: true
-    },
-    {
-      id: 'marketplace',
-      icon: <ShoppingBagIcon className="w-7 h-7" />,
-      emoji: '🛒',
-      title: '중고 거래',
-      description: '육상 용품 거래 마켓플레이스',
-      onClick: () => showComingSoon('중고 거래'),
-      gradient: 'from-blue-500 to-cyan-500',
-      iconBg: 'bg-gradient-to-br from-blue-50 to-cyan-50',
-      available: false
-    },
-    {
-      id: 'results',
-      icon: <TrophyIcon className="w-7 h-7" />,
-      emoji: '🏆',
-      title: '경기 결과',
-      description: '실시간 결과 업데이트와 기록 관리',
-      link: '/competitions',
-      gradient: 'from-emerald-500 to-teal-500',
-      iconBg: 'bg-gradient-to-br from-emerald-50 to-teal-50',
-      available: true
-    }
-  ];
-
+export default function MainPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Full Screen Background */}
-      <section className="relative h-[600px] md:h-[700px] overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          {/* Unsplash 육상 이미지 */}
-          <img 
-            src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2070&auto=format&fit=crop" 
-            alt="Running Track" 
-            className="w-full h-full object-cover"
-          />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70"></div>
-        </div>
+    <main className="min-h-screen bg-neutral-950 text-white">
+      <section className="relative overflow-hidden px-5 py-8 md:px-10 md:py-12">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.28),transparent_32%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.22),transparent_26%)]" />
+        <div className="relative mx-auto max-w-6xl">
+          <header className="mb-20 flex items-center justify-between">
+            <Link to="/" className="text-lg font-black tracking-tight">
+              Athlete Time
+            </Link>
+            <div className="flex items-center gap-3 text-sm">
+              <Link to="/login" className="text-white/70 transition-colors hover:text-white">
+                로그인
+              </Link>
+              <Link
+                to="/register"
+                className="rounded-full border border-white/20 px-4 py-2 font-bold transition-colors hover:bg-white hover:text-neutral-950"
+              >
+                회원가입
+              </Link>
+            </div>
+          </header>
 
-        {/* Hero Content */}
-        <div className="relative h-full flex items-center justify-center px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Small Title */}
-            <div className="mb-6 animate-fadeIn">
-              <p className="text-white/90 text-lg md:text-xl font-medium tracking-wider uppercase mb-2">
-                Train With Us &
+          <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+            <div>
+              <p className="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white/80">
+                서비스 오픈 준비 중
               </p>
-            </div>
-            
-            {/* Main Title */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 leading-tight animate-fadeInUp">
-              FEEL THE
-              <br />
-              <span className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-                ADRENALIN
-              </span>
-            </h1>
-            
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-white/90 mb-12 font-light animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              한국 육상인들을 위한 통합 플랫폼
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              <Link
-                to="/community"
-                className="px-8 py-4 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl min-w-[200px]"
-              >
-                커뮤니티 시작하기
-              </Link>
-              <Link
-                to="/pace-calculator"
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-white/20 border-2 border-white/30 transform hover:scale-105 transition-all duration-300 min-w-[200px]"
-              >
-                페이스 계산기
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white/50 rounded-full"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-neutral-50">
-        <div className="container mx-auto px-4">
-          {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <p className="text-primary-600 text-sm font-bold tracking-wider uppercase mb-4">
-              Our Services
-            </p>
-            <h2 className="text-3xl md:text-5xl font-black text-neutral-900 mb-6">
-              육상인을 위한
-              <br />
-              <span className="text-primary-600">All-in-One Platform</span>
-            </h2>
-            <p className="text-lg text-neutral-600">
-              페이스 계산부터 훈련 관리, 커뮤니티까지 - 당신에게 필요한 모든 것
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {features.map((feature, index) => {
-              const CardContent = (
-                <>
-                  {/* Icon */}
-                  <div className={`w-16 h-16 ${feature.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <span className="text-3xl">{feature.emoji}</span>
-                  </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-neutral-900 mb-3 flex items-center gap-2">
-                    {feature.title}
-                    {!feature.available && (
-                      <span className="text-xs font-medium px-2 py-1 bg-neutral-200 text-neutral-600 rounded-full">
-                        준비중
-                      </span>
-                    )}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-neutral-600 mb-6 leading-relaxed">
-                    {feature.description}
-                  </p>
-
-                  {/* CTA */}
-                  <div className={`inline-flex items-center gap-2 text-sm font-bold bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent group-hover:gap-3 transition-all duration-300`}>
-                    자세히 보기
-                    <ChevronRightIcon className="w-4 h-4 text-primary-600" />
-                  </div>
-                </>
-              );
-
-              if (feature.link) {
-                return (
-                  <Link
-                    key={feature.id}
-                    to={feature.link}
-                    className="group bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-neutral-100 animate-fadeInUp"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    {CardContent}
-                  </Link>
-                );
-              } else {
-                return (
-                  <button
-                    key={feature.id}
-                    onClick={feature.onClick}
-                    className="group bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-neutral-100 text-left animate-fadeInUp"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    {CardContent}
-                  </button>
-                );
-              }
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-neutral-900 border-t border-neutral-800 text-neutral-400">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-6xl mx-auto">
-            {/* Top */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              {/* Brand */}
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">🏃‍♂️</span>
-                  <span className="text-xl font-bold text-white">ATHLETE TIME</span>
-                </div>
-                <p className="text-sm text-neutral-500 mb-4">
-                  한국 육상인들을 위한 올인원 플랫폼
-                </p>
-              </div>
-
-              {/* Links */}
-              <div>
-                <h4 className="font-bold text-white mb-3">서비스</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><Link to="/community" className="hover:text-primary-400 transition-colors">커뮤니티</Link></li>
-                  <li><Link to="/pace-calculator" className="hover:text-primary-400 transition-colors">페이스 계산기</Link></li>
-                  <li><Link to="/training-calculator" className="hover:text-primary-400 transition-colors">훈련 계획</Link></li>
-                  <li><Link to="/chat" className="hover:text-primary-400 transition-colors">실시간 채팅</Link></li>
-                </ul>
-              </div>
-
-              {/* Info */}
-              <div>
-                <h4 className="font-bold text-white mb-3">정보</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><button className="hover:text-primary-400 transition-colors">이용약관</button></li>
-                  <li><button className="hover:text-primary-400 transition-colors">개인정보처리방침</button></li>
-                  <li><button className="hover:text-primary-400 transition-colors">문의하기</button></li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Bottom */}
-            <div className="pt-8 border-t border-neutral-800 text-center text-sm">
-              <p>© 2025 Athlete Time. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* 로그인 모달 */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
-            <div className="p-6">
-              {/* 모달 헤더 */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-900">로그인</h2>
-                <button
-                  onClick={closeLoginModal}
-                  className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* 에러 메시지 */}
-              {loginError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-                  {loginError}
-                </div>
-              )}
-
-              {/* 로그인 폼 */}
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    이메일
-                  </label>
-                  <input
-                    type="email"
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="example@email.com"
-                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    disabled={isLoggingIn}
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    비밀번호
-                  </label>
-                  <input
-                    type="password"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="비밀번호를 입력하세요"
-                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    disabled={isLoggingIn}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="w-full py-3 bg-primary-500 text-white font-medium rounded-xl hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                >
-                  {isLoggingIn ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>로그인 중...</span>
-                    </>
-                  ) : (
-                    '로그인'
-                  )}
-                </button>
-              </form>
-
-              {/* 하단 링크 */}
-              <div className="mt-4 text-center text-sm text-neutral-500">
-                계정이 없으신가요?{' '}
+              <h1 className="max-w-3xl text-5xl font-black leading-tight tracking-tight md:text-7xl">
+                육상 기록과 대회 정보를 먼저 안정적으로.
+              </h1>
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
+                Athlete Time은 지금 바로 쓸 수 있는 기능부터 열어둡니다. 커뮤니티와 채팅처럼
+                운영 기준이 필요한 기능은 안전 장치를 갖춘 뒤 순서대로 공개할게요.
+              </p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  to="/register"
-                  onClick={closeLoginModal}
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  to="/competitions"
+                  className="rounded-2xl bg-white px-6 py-4 text-center font-black text-neutral-950 transition-transform hover:-translate-y-0.5"
                 >
-                  회원가입
+                  경기 결과 보기
+                </Link>
+                <Link
+                  to="/pace-calculator"
+                  className="rounded-2xl border border-white/20 px-6 py-4 text-center font-black text-white transition-colors hover:bg-white/10"
+                >
+                  페이스 계산하기
                 </Link>
               </div>
             </div>
+
+            <aside className="rounded-[2rem] border border-white/10 bg-white/[0.07] p-6 backdrop-blur">
+              <p className="mb-4 text-sm font-bold text-white/55">이번 런칭에서 열어두는 것</p>
+              <div className="space-y-3">
+                {readyFeatures.map((feature) => (
+                  <Link
+                    key={feature.path}
+                    to={feature.path}
+                    className="group flex items-center gap-4 rounded-2xl bg-white p-4 text-neutral-950 transition-transform hover:-translate-y-0.5"
+                  >
+                    <span className={`h-10 w-2 rounded-full ${feature.accent}`} />
+                    <span className="flex-1">
+                      <span className="block font-black">{feature.title}</span>
+                      <span className="mt-1 block text-sm leading-5 text-neutral-500">
+                        {feature.description}
+                      </span>
+                    </span>
+                    <span className="text-neutral-400 transition-transform group-hover:translate-x-1">→</span>
+                  </Link>
+                ))}
+              </div>
+            </aside>
           </div>
         </div>
-      )}
-    </div>
-  );
-};
+      </section>
 
-export default MainPage;
+      <section className="bg-white px-5 py-16 text-neutral-950 md:px-10">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p className="mb-3 text-sm font-black text-neutral-400">COMING NEXT</p>
+            <h2 className="text-3xl font-black tracking-tight md:text-5xl">준비 안 된 건 숨깁니다.</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {upcomingFeatures.map((feature) => (
+              <div key={feature} className="rounded-3xl border border-neutral-200 p-5">
+                <p className="text-lg font-black">{feature}</p>
+                <p className="mt-2 text-sm leading-6 text-neutral-500">
+                  실제 사용자에게 보여도 될 만큼 안정화한 뒤 공개합니다.
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}

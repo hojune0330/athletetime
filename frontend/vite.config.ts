@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+const apiProxyTarget = process.env.VITE_DEV_API_PROXY_TARGET || 'http://localhost:3001'
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -19,6 +21,13 @@ export default defineConfig({
     // HMR 설정
     hmr: {
       overlay: false
+    },
+    proxy: {
+      '/api': {
+        target: apiProxyTarget,
+        changeOrigin: true,
+        secure: false,
+      },
     }
   },
   // 프리뷰 서버 설정
@@ -32,6 +41,13 @@ export default defineConfig({
       '.sandbox.novita.ai',
       '.e2b.dev',
     ],
+    proxy: {
+      '/api': {
+        target: apiProxyTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   // Netlify 배포 최적화
   build: {

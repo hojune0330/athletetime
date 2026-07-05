@@ -42,6 +42,12 @@ const { upload, handleUploadError } = require('./middleware/upload');
 // 유틸리티
 const { setupWebSocket, getClientsCount, isNicknameAvailable } = require('./utils/websocket');
 const { isCloudinaryConfigured } = require('./utils/cloudinary');
+const {
+  featureComingSoonPayload,
+  isFeatureEnabled,
+  requireFeature,
+  sendFeatureComingSoon,
+} = require('./utils/features');
 
 // ============================================
 // 환경 설정
@@ -51,14 +57,29 @@ const PORT = process.env.PORT || 3001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://athlete-time.netlify.app';
 
-const allowedOrigins = [
+const configuredOrigins = (process.env.CORS_ALLOWLIST || process.env.ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const productionOrigins = [
+  FRONTEND_URL,
   'https://athlete-time.netlify.app',
   'https://athletetime.netlify.app',
   'https://community.athletetime.com',
+];
+
+const developmentOrigins = [
+  ...productionOrigins,
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:3001',
 ];
+
+const allowedOrigins = new Set([
+  ...(NODE_ENV === 'production' ? productionOrigins : developmentOrigins),
+  ...configuredOrigins,
+]);
 
 // ============================================
 // 데이터베이스 연결
@@ -86,9 +107,7 @@ const path = require('path');
 
 async function runMigrations() {
   try {
-    const migrationFiles = [
-      'migration-003-marketplace.sql'
-    ];
+    const migrationFiles = isFeatureEnabled('marketplace') ? ['migration-003-marketplace.sql'] : [];
 
     for (const file of migrationFiles) {
       const filePath = path.join(__dirname, 'database', file);
@@ -135,36 +154,35 @@ const wss = new WebSocket.Server({ server });
 // Proxy 신뢰 설정 (Render, Netlify 등 프록시 환경 대응)
 app.set('trust proxy', 1);
 
-// CORS
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    // origin이 없는 경우 (서버 간 요청)
     if (!origin) {
       return callback(null, true);
     }
-    
-    // 허용 목록 확인
-    if (allowedOrigins.includes(origin)) {
+
+    if (allowedOrigins.has(origin)) {
       return callback(null, true);
     }
-    
-    // 개발 환경에서는 모든 origin 허용
-    if (NODE_ENV === 'development') {
+
+    if (NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return callback(null, true);
     }
-    
-    // 프로덕션에서도 허용 (임시)
-    return callback(null, true);
+
+    const corsError = new Error(`CORS origin not allowed: ${origin}`);
+    corsError.status = 403;
+    return callback(corsError, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   maxAge: 86400, // 24시간
-}));
+};
+
+app.use(cors(corsOptions));
 
 // OPTIONS 프리플라이트
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // Body 파싱
 app.use(express.json({ limit: '10mb' }));
@@ -187,7 +205,14 @@ app.locals.pool = pool;
 // WebSocket 설정
 // ============================================
 
-setupWebSocket(wss);
+if (isFeatureEnabled('chat')) {
+  setupWebSocket(wss);
+} else {
+  wss.on('connection', (ws) => {
+    ws.send(JSON.stringify(featureComingSoonPayload('chat')));
+    ws.close(1008, 'FEATURE_COMING_SOON');
+  });
+}
 
 // ============================================
 // 라우터 등록
@@ -215,6 +240,10 @@ app.get('/health', async (req, res) => {
 
 // 채팅 닉네임 중복 체크 API
 app.get('/api/chat/check-nickname', (req, res) => {
+  if (!isFeatureEnabled('chat')) {
+    return sendFeatureComingSoon(res, 'chat');
+  }
+
   const { nickname } = req.query;
   
   if (!nickname) {
@@ -243,15 +272,15 @@ app.get('/api/chat/check-nickname', (req, res) => {
 
 // API 라우터
 app.use('/api/auth', authRouter);
-app.use('/api/categories', categoriesRouter);
-app.use('/api/posts', upload.array('images', 5), handleUploadError, postsRouter);
-app.use('/api/posts/:postId/comments', commentsRouter);
-app.use('/api/posts/:postId/vote', votesRouter);
-app.use('/api/posts/:postId/poll', pollsRouter);
+app.use('/api/categories', requireFeature('community'), categoriesRouter);
+app.use('/api/posts', requireFeature('community'), upload.array('images', 5), handleUploadError, postsRouter);
+app.use('/api/posts/:postId/comments', requireFeature('community'), commentsRouter);
+app.use('/api/posts/:postId/vote', requireFeature('community'), votesRouter);
+app.use('/api/posts/:postId/poll', requireFeature('community'), pollsRouter);
 app.use('/api/competitions', competitionsRouter);
 app.use('/api/match-results', matchResultsRouter);
-app.use('/api/marketplace', marketplaceRouter);
-app.use('/api/upload', uploadRouter);
+app.use('/api/marketplace', requireFeature('marketplace'), marketplaceRouter);
+app.use('/api/upload', requireFeature('community'), uploadRouter);
 
 console.log('✅ 모든 API 라우터 등록 완료 (/api/upload 포함)');
 
@@ -270,6 +299,13 @@ app.use((req, res) => {
 // 전역 에러 핸들러
 app.use((err, req, res, next) => {
   console.error('❌ 서버 에러:', err);
+
+  if (err.status === 403 && err.message?.startsWith('CORS origin not allowed')) {
+    return res.status(403).json({
+      success: false,
+      error: '허용되지 않은 요청 출처입니다.',
+    });
+  }
   
   res.status(err.status || 500).json({
     success: false,
@@ -294,17 +330,15 @@ server.listen(PORT, () => {
   console.log(`🌍 환경: ${NODE_ENV}`);
   console.log(`📦 데이터베이스: PostgreSQL`);
   console.log(`🖼️  이미지 CDN: Cloudinary`);
-  console.log(`🔌 WebSocket: 활성화`);
+  console.log(`🔌 WebSocket: ${isFeatureEnabled('chat') ? '활성화' : '오픈 전 점검'}`);
   console.log('');
   console.log('📡 엔드포인트:');
   console.log(`   GET  /health                      - 헬스체크`);
-  console.log(`   GET  /api/categories              - 카테고리 목록`);
-  console.log(`   GET  /api/posts                   - 게시글 목록`);
-  console.log(`   GET  /api/posts/:id               - 게시글 상세`);
-  console.log(`   POST /api/posts                   - 게시글 작성`);
-  console.log(`   DEL  /api/posts/:id               - 게시글 삭제`);
-  console.log(`   POST /api/posts/:id/comments      - 댓글 작성`);
-  console.log(`   POST /api/posts/:id/vote          - 투표`);
+  console.log(`   GET  /api/competitions            - 대회 목록`);
+  console.log(`   GET  /api/match-results           - 경기 결과`);
+  console.log(`   /api/posts, /api/categories       - ${isFeatureEnabled('community') ? '활성화' : '오픈 전 점검'}`);
+  console.log(`   /api/marketplace                  - ${isFeatureEnabled('marketplace') ? '활성화' : '오픈 전 점검'}`);
+  console.log(`   /api/chat/*                       - ${isFeatureEnabled('chat') ? '활성화' : '오픈 전 점검'}`);
   console.log('');
   console.log('✅ 서버 준비 완료!');
   console.log('');
