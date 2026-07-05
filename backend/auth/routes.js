@@ -19,6 +19,24 @@ function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function maskEmail(email) {
+  const [localPart, domainPart] = String(email).split('@');
+  if (!localPart || !domainPart) {
+    return 'unknown-email';
+  }
+
+  return `${localPart.slice(0, 2)}***@${domainPart}`;
+}
+
+function logVerificationDispatch(label, email, code) {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`✅ ${label} 발송: ${maskEmail(email)}`);
+    return;
+  }
+
+  console.log(`✅ ${label} 발송: ${email} -> ${code}`);
+}
+
 /**
  * POST /api/auth/send-verification
  * 이메일 인증 코드 발송 (회원가입 전)
@@ -93,11 +111,12 @@ router.post('/send-verification', async (req, res) => {
     // 인증 이메일 발송
     try {
       await sendVerificationEmail(email, verificationCode, '회원');
-      console.log(`✅ 인증 코드 발송: ${email} -> ${verificationCode}`);
+      logVerificationDispatch('인증 코드', email, verificationCode);
     } catch (emailError) {
       console.error('이메일 발송 실패:', emailError);
-      // 개발 환경에서는 코드 로그로 출력
-      console.log(`📧 [DEV] 인증 코드: ${verificationCode}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`📧 [DEV] 인증 코드: ${verificationCode}`);
+      }
     }
 
     res.json({
@@ -871,11 +890,12 @@ router.post('/forgot-password', async (req, res) => {
     // 인증 이메일 발송
     try {
       await sendResetPasswordCodeEmail(email, verificationCode, user.nickname);
-      console.log(`✅ 비밀번호 재설정 인증 코드 발송: ${email} -> ${verificationCode}`);
+      logVerificationDispatch('비밀번호 재설정 인증 코드', email, verificationCode);
     } catch (emailError) {
       console.error('이메일 발송 실패:', emailError);
-      // 개발 환경에서는 코드 로그로 출력
-      console.log(`📧 [DEV] 비밀번호 재설정 인증 코드: ${verificationCode}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`📧 [DEV] 비밀번호 재설정 인증 코드: ${verificationCode}`);
+      }
     }
 
     res.json({

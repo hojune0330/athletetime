@@ -4,9 +4,14 @@
 
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const INSECURE_DEFAULT_SECRET = 'your-super-secret-jwt-key-change-this-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : INSECURE_DEFAULT_SECRET);
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+
+if (!JWT_SECRET || (process.env.NODE_ENV === 'production' && JWT_SECRET === INSECURE_DEFAULT_SECRET)) {
+  throw new Error('JWT_SECRET must be set to a strong secret in production');
+}
 
 /**
  * Access Token 생성

@@ -10,6 +10,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { useState, useEffect } from 'react'
 import * as authApi from '../../api/auth'
+import { launchNavigationItems } from '../../config/launchSurface'
 
 interface User {
   id: number;
@@ -270,15 +271,7 @@ export default function Header() {
     }
   }
 
-  // 네비게이션 메뉴 아이템 (메인페이지와 동일)
-  const navItems = [
-    { path: '/community', label: '익명 커뮤니티', mobileLabel: '익명 커뮤니티' },
-    { path: '/pace-calculator', label: '페이스 계산기', mobileLabel: '페이스 계산기' },
-    { path: '/training-calculator', label: '훈련 계산기', mobileLabel: '훈련 계산기' },
-    { path: '/competitions', label: '경기 결과', mobileLabel: '경기 결과' },
-    { path: '/marketplace', label: '중고거래', mobileLabel: '중고거래' },
-    { path: '/chat', label: '실시간 채팅', mobileLabel: '실시간 채팅' },
-  ]
+  const navItems = launchNavigationItems
 
   return (
     <>

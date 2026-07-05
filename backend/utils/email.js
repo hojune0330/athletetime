@@ -9,10 +9,25 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@athletetime.com';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '애슬리트 타임';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://athlete-time.netlify.app';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // API 키 경고
 if (!resend) {
   console.warn('⚠️  RESEND_API_KEY가 설정되지 않았습니다. 이메일 기능이 비활성화됩니다.');
+}
+
+function emailServiceNotConfigured(label, code) {
+  const message = `⚠️  Resend API가 설정되지 않아 ${label} 이메일을 발송하지 않습니다.`;
+
+  if (IS_PRODUCTION) {
+    console.error(message);
+  } else if (code) {
+    console.warn(`${message} 인증 코드:`, code);
+  } else {
+    console.warn(message);
+  }
+
+  return { success: false, error: 'Email service not configured' };
 }
 
 /**
@@ -357,8 +372,7 @@ function getResetPasswordCodeEmailHtml(code, nickname) {
  */
 async function sendVerificationEmail(email, code, nickname) {
   if (!resend) {
-    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다. 인증 코드:', code);
-    return { success: false, error: 'Email service not configured' };
+    return emailServiceNotConfigured('인증 코드', code);
   }
   
   try {
@@ -386,8 +400,7 @@ async function sendVerificationEmail(email, code, nickname) {
  */
 async function sendResetPasswordEmail(email, resetToken, nickname) {
   if (!resend) {
-    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다.');
-    return { success: false, error: 'Email service not configured' };
+    return emailServiceNotConfigured('비밀번호 재설정');
   }
   
   const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
@@ -413,8 +426,7 @@ async function sendResetPasswordEmail(email, resetToken, nickname) {
  */
 async function sendResetPasswordCodeEmail(email, code, nickname) {
   if (!resend) {
-    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다. 인증 코드:', code);
-    return { success: false, error: 'Email service not configured' };
+    return emailServiceNotConfigured('비밀번호 재설정 인증 코드', code);
   }
   
   try {

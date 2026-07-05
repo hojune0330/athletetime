@@ -7,8 +7,8 @@
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 
-// 환경 변수에서 API URL 가져오기 (프로덕션 기본값)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://athletetime-backend.onrender.com';
+const SAME_ORIGIN_API_BASE_URL = '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || SAME_ORIGIN_API_BASE_URL;
 
 /**
  * Axios 인스턴스 생성
