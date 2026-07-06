@@ -1,0 +1,865 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { FormEvent, ReactNode } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import {
+  getAnalyticsFilters,
+  getAthleteAnalytics,
+  getSeasonRecordTable,
+  searchRecordAthletes,
+  type AnalyticsFilters,
+  type AthleteAnalyticsProfile,
+  type AthleteSearchCard,
+  type PublicRecord,
+  type SeasonRecordTable,
+} from '../api/recordAnalytics';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { resolveRecordDisplay } from '../lib/recordStatus';
+import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
+import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
+import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
+import { AthleteHighlightBadges } from '../components/record-insights/AthleteHighlightBadges';
+import { CompareTray } from '../components/record-insights/CompareTray';
+import { CompareView } from '../components/record-insights/CompareView';
+import { ShareCard } from '../components/record-insights/ShareCard';
+import { useCompareTray } from '../components/record-insights/useCompareTray';
+import { RecordSearchResults } from '../components/records/RecordSearchResults';
+import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
+
+type Mode = 'athlete' | 'season';
+type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+
+// 카피·신뢰 문구는 중앙 정책(dataPolicy)에서 관리 — 패치 한 곳.
+const DATA_NOTICE = TRUST_NOTICE.collectedPublic;
+const TRUST_POINTS = POLICY_TRUST_POINTS;
+
+export default function RecordsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [mode, setMode] = useState<Mode>('athlete');
+  const [query, setQuery] = useState('');
+  const [submittedQuery, setSubmittedQuery] = useState('');
+  const [searchState, setSearchState] = useState<LoadState>('idle');
+  const [athletes, setAthletes] = useState<AthleteSearchCard[]>([]);
+  const [selectedAthleteKey, setSelectedAthleteKey] = useState('');
+  const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
+  const [profileState, setProfileState] = useState<LoadState>('idle');
+  const [filters, setFilters] = useState<AnalyticsFilters | null>(null);
+  const [season, setSeason] = useState<number | undefined>();
+  const [eventKey, setEventKey] = useState('');
+  const [divisionKey, setDivisionKey] = useState('');
+  const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
+  const [seasonState, setSeasonState] = useState<LoadState>('idle');
+  const [compareNotice, setCompareNotice] = useState('');
+  const compareTray = useCompareTray();
+  const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
+
+  useEffect(() => {
+    let active = true;
+    getAnalyticsFilters()
+      .then((nextFilters) => {
+        if (!active) return;
+        setFilters(nextFilters);
+        setSeason(nextFilters.seasons[0]);
+        setEventKey(nextFilters.events[0]?.key || '');
+        setDivisionKey(nextFilters.divisions[0]?.key || '');
+      })
+      .catch(() => {
+        if (active) setFilters({ seasons: [], events: [], divisions: [] });
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const nextQuery = (searchParams.get('q') || '').trim();
+    setQuery(nextQuery);
+    setSubmittedQuery(nextQuery);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!selectedAthleteParam) {
+      if (selectedAthleteKey) {
+        setSelectedAthleteKey('');
+        setProfile(null);
+        setProfileState('idle');
+      }
+      return;
+    }
+
+    if (selectedAthleteParam === selectedAthleteKey) return;
+    void handleSelectAthlete(selectedAthleteParam, { syncUrl: false });
+  }, [selectedAthleteParam, selectedAthleteKey]);
+
+  useEffect(() => {
+    const trimmed = submittedQuery.trim();
+    if (trimmed.length < 2) {
+      setAthletes([]);
+      setSearchState('idle');
+      if (!selectedAthleteParam) {
+        setProfile(null);
+        setSelectedAthleteKey('');
+      }
+      return;
+    }
+
+    let active = true;
+    setSearchState('loading');
+    if (!selectedAthleteParam) {
+      setProfile(null);
+      setSelectedAthleteKey('');
+    }
+
+    searchRecordAthletes(trimmed)
+      .then((results) => {
+        if (!active) return;
+        setAthletes(results);
+        setSearchState('ready');
+      })
+      .catch(() => {
+        if (active) setSearchState('error');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [submittedQuery, selectedAthleteParam]);
+
+  useEffect(() => {
+    if (!season || !eventKey || !divisionKey) return;
+    let active = true;
+    setSeasonState('loading');
+    getSeasonRecordTable({
+      season,
+      eventKey,
+      divisionKey,
+      athleteKey: selectedAthleteKey || undefined,
+      limit: 100,
+    })
+      .then((table) => {
+        if (!active) return;
+        setSeasonTable(table);
+        setSeasonState('ready');
+      })
+      .catch(() => {
+        if (active) setSeasonState('error');
+      });
+    return () => {
+      active = false;
+    };
+  }, [season, eventKey, divisionKey, selectedAthleteKey]);
+
+  const compareKeys = useMemo(() => {
+    const raw = (searchParams.get('compare') || '').trim();
+    if (!raw) return [] as string[];
+    return Array.from(new Set(raw.split(',').map((s) => s.trim()).filter(Boolean))).slice(0, 4);
+  }, [searchParams]);
+
+  const closeCompare = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const highlightedRow = useMemo(
+    () => seasonTable?.rows.find((row) => row.highlighted) || null,
+    [seasonTable],
+  );
+  const shouldShowAthletePanel = mode === 'athlete' && (profile || profileState !== 'idle');
+  const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean(selectedAthleteParam);
+  const isSharedLinkFallback = Boolean(selectedAthleteParam) && profileState === 'error';
+
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    if (trimmed.length < 2) return;
+    setSubmittedQuery(trimmed);
+    const next = new URLSearchParams(searchParams);
+    next.set('q', trimmed);
+    next.delete('athlete');
+    setSearchParams(next);
+  };
+
+  const handleSelectAthlete = async (athleteKey: string, options: { syncUrl?: boolean } = {}) => {
+    const { syncUrl = true } = options;
+    if (syncUrl) {
+      const next = new URLSearchParams(searchParams);
+      next.set('athlete', athleteKey);
+      setSearchParams(next);
+    }
+    setSelectedAthleteKey(athleteKey);
+    setProfileState('loading');
+    try {
+      const nextProfile = await getAthleteAnalytics(athleteKey);
+      setProfile(nextProfile);
+      setProfileState('ready');
+
+      const mainRecord = nextProfile.summary.latest || nextProfile.summary.indexedBest || nextProfile.records[0];
+      if (mainRecord) {
+        setSeason(mainRecord.season);
+        setEventKey(mainRecord.eventKey);
+        setDivisionKey(mainRecord.divisionKey);
+      }
+    } catch {
+      setProfileState('error');
+    }
+  };
+
+  const showSearchCandidates = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('athlete');
+    setSearchParams(next);
+    setSelectedAthleteKey('');
+    setProfile(null);
+    setProfileState('idle');
+  };
+
+  return (
+    <div className="space-y-6">
+      <section className="border border-line bg-surface p-6 sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              내 기록, 이름만 알면 찾아요.
+            </h1>
+            <p className="mt-4 text-sm leading-6 text-ink-3">
+              이름이나 소속(학교·팀)으로 검색하면 모아 둔 대회 기록을 보여드려요.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
+            <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
+              기록 한눈에
+            </ModeButton>
+            <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
+              시즌 기록표
+            </ModeButton>
+          </div>
+        </div>
+
+        <form onSubmit={handleSearch} className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
+          <label htmlFor="records-search" className="sr-only">
+            공개 기록 검색
+          </label>
+          <Input
+            id="records-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="이름 또는 소속(예: 홍길동, 서울고)"
+            aria-describedby="records-search-help"
+            className="h-12 border-line bg-white text-base"
+          />
+          <Button type="submit" size="lg" disabled={query.trim().length < 2 || searchState === 'loading'}>
+            {searchState === 'loading' ? '검색 중' : '검색'}
+          </Button>
+        </form>
+        <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
+          두 글자 이상 입력하면 검색할 수 있어요.
+        </p>
+
+        <p className="mt-4 text-xs leading-5 text-ink-4">
+          {DATA_NOTICE}{' '}
+          <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
+            데이터 안내 보기
+          </Link>
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {TRUST_POINTS.map((point) => (
+            <span key={point} className="border border-line bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-3">
+              {point}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {compareKeys.length >= 2 && (
+        <CompareView
+          athleteKeys={compareKeys}
+          onSelectAthlete={(key) => {
+            closeCompare();
+            handleSelectAthlete(key);
+          }}
+          onClose={closeCompare}
+        />
+      )}
+
+      {searchState === 'error' && (
+        <NoticeCard
+          role="alert"
+          title="검색을 불러오지 못했습니다"
+          description="잠시 후 다시 시도해 주세요."
+        />
+      )}
+
+      {searchState === 'ready' && submittedQuery.trim().length >= 2 && athletes.length === 0 && (
+        <NoticeCard
+          role="status"
+          title="찾는 기록이 아직 없어요"
+          description="이름이나 소속을 바꿔보세요. 시즌 기록표에서 종목·부문으로도 둘러볼 수 있어요."
+          action={
+            <Button type="button" variant="outline" onClick={() => setMode('season')}>
+              시즌 기록표 보기
+            </Button>
+          }
+        />
+      )}
+
+      {searchState === 'idle' && athletes.length === 0 && !profile && (
+        <div className="space-y-6">
+          <StartPanel onSeasonMode={() => setMode('season')} />
+          <AnonymousInsightCards
+            onPickEvent={(key) => {
+              setEventKey(key);
+              setMode('season');
+            }}
+          />
+        </div>
+      )}
+
+      {shouldPrioritizeAthletePanel && (
+        <AthletePanel
+          profile={profile}
+          state={profileState}
+          isSharedLinkFallback={isSharedLinkFallback}
+          inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
+          onShowSearchCandidates={showSearchCandidates}
+          onToggleCompare={() => {
+            if (!profile) return;
+            const res = compareTray.toggle({
+              athleteKey: profile.athlete.athleteKey,
+              name: profile.athlete.name,
+              team: profile.athlete.team,
+            });
+            if (!res.ok && res.reason === 'full') {
+              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
+              window.setTimeout(() => setCompareNotice(''), 2400);
+            }
+          }}
+        />
+      )}
+
+      {athletes.length > 0 && (
+        <RecordSearchResults
+          athletes={athletes}
+          query={submittedQuery}
+          selectedAthleteKey={selectedAthleteKey}
+          compareNotice={compareNotice}
+          isInCompareTray={compareTray.isInTray}
+          onSelectAthlete={handleSelectAthlete}
+          onToggleCompare={(athlete) => {
+            const res = compareTray.toggle({
+              athleteKey: athlete.athleteKey,
+              name: athlete.name,
+              team: athlete.team,
+            });
+            if (!res.ok && res.reason === 'full') {
+              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
+              window.setTimeout(() => setCompareNotice(''), 2400);
+            }
+          }}
+        />
+      )}
+
+      {shouldShowAthletePanel && !shouldPrioritizeAthletePanel && (
+        <AthletePanel
+          profile={profile}
+          state={profileState}
+          inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
+          onToggleCompare={() => {
+            if (!profile) return;
+            const res = compareTray.toggle({
+              athleteKey: profile.athlete.athleteKey,
+              name: profile.athlete.name,
+              team: profile.athlete.team,
+            });
+            if (!res.ok && res.reason === 'full') {
+              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
+              window.setTimeout(() => setCompareNotice(''), 2400);
+            }
+          }}
+        />
+      )}
+
+      {shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
+        <EstimatedSameAthleteCard
+          athleteKey={selectedAthleteKey}
+          onSelectAthlete={handleSelectAthlete}
+        />
+      )}
+
+      {mode === 'season' && (
+        <SeasonPanel
+          filters={filters}
+          season={season}
+          eventKey={eventKey}
+          divisionKey={divisionKey}
+          table={seasonTable}
+          state={seasonState}
+          highlightedRow={highlightedRow}
+          onSeasonChange={setSeason}
+          onEventChange={setEventKey}
+          onDivisionChange={setDivisionKey}
+        />
+      )}
+
+      {/* 비교 트레이 분량만큼 하단 여백 (담은 게 있을 때만) */}
+      {compareTray.count > 0 && <div aria-hidden className="h-28 sm:h-24" />}
+      <CompareTray
+        onCompare={(athleteKeys) => {
+          setSearchParams({ compare: athleteKeys.join(',') });
+        }}
+      />
+    </div>
+  );
+}
+
+function StartPanel({ onSeasonMode }: { onSeasonMode: () => void }) {
+  return (
+    <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="border-b border-line bg-ink p-6 text-white">
+            <p className="text-sm font-semibold text-white/70">여기서 시작하세요</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-tight">위 검색창에 이름을 적어보세요.</h2>
+            <p className="mt-2 text-sm leading-6 text-white/65">
+              내 이름이면 충분해요. 같은 이름이 여러 명이면 소속을 보고 고르면 돼요.
+            </p>
+          </div>
+          <div className="grid gap-0 sm:grid-cols-3">
+            <StartFeature
+              step={1}
+              title="이름 입력"
+              description="내 이름을 그대로 적으면 돼요. 예: 홍길동"
+            />
+            <StartFeature
+              step={2}
+              title="나 찾기"
+              description="같은 이름이 여러 명 나오면 학교나 팀 이름을 보고 고르세요."
+            />
+            <StartFeature
+              step={3}
+              title="기록 확인"
+              description="최고 기록부터 최근 기록까지 한눈에 보고 카드로 공유해요."
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">시즌 기록표</CardTitle>
+          <p className="text-sm text-ink-3">검색어가 없어도 시즌·종목·부문을 골라 기록표를 볼 수 있어요.</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs leading-5 text-ink-4">
+            종목과 시즌을 고르면 모은 기록을 빠른 순으로 정렬해 보여줘요.
+          </p>
+          <Button type="button" variant="outline" onClick={onSeasonMode}>
+            시즌 기록표 보기
+          </Button>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function StartFeature({ step, title, description }: { step: number; title: string; description: string }) {
+  return (
+    <div className="border-b border-line p-5 sm:border-b-0 sm:border-r sm:last:border-r-0">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand/10 text-sm font-semibold text-brand">{step}</span>
+      <h3 className="mt-3 text-lg font-semibold text-ink">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-ink-3">{description}</p>
+    </div>
+  );
+}
+
+function AthletePanel({
+  profile,
+  state,
+  isSharedLinkFallback = false,
+  inTray = false,
+  onShowSearchCandidates,
+  onToggleCompare,
+}: {
+  profile: AthleteAnalyticsProfile | null;
+  state: LoadState;
+  isSharedLinkFallback?: boolean;
+  inTray?: boolean;
+  onShowSearchCandidates?: () => void;
+  onToggleCompare?: () => void;
+}) {
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [shareLinkMessage, setShareLinkMessage] = useState('');
+  const shareCopyStartedAtRef = useRef(0);
+
+  if (state === 'loading') {
+    return <NoticeCard role="status" title="기록을 정리하는 중입니다" description="모은 공개 기록을 기준으로 요약하고 있습니다." />;
+  }
+
+  if (state === 'error') {
+    return (
+      <NoticeCard
+        role="alert"
+        title={isSharedLinkFallback ? '링크의 선수를 못 찾았어요' : '선수 기록을 불러오지 못했습니다'}
+        description={
+          isSharedLinkFallback
+            ? '데이터 정리로 주소가 바뀌었을 수 있어요. 검색 결과에서 다시 선택해 주세요.'
+            : '검색 결과에서 다시 선택해 주세요.'
+        }
+        action={
+          isSharedLinkFallback && onShowSearchCandidates ? (
+            <Button type="button" variant="outline" onClick={onShowSearchCandidates}>
+              검색 결과 보기
+            </Button>
+          ) : undefined
+        }
+      />
+    );
+  }
+
+  if (!profile) {
+    return <NoticeCard title="선수 이름으로 공개 기록을 찾아보세요" description="검색 결과에서 이름과 소속을 확인한 뒤 선택해 주세요." />;
+  }
+
+  const { athlete, summary } = profile;
+  const clearShareLinkMessage = () => {
+    window.setTimeout(() => setShareLinkMessage(''), 2400);
+  };
+
+  const handleCopyShareLink = () => {
+    const now = Date.now();
+    if (now - shareCopyStartedAtRef.current < 500) return;
+    shareCopyStartedAtRef.current = now;
+    const shareUrl = window.location.href;
+    setShareLinkMessage('공유 링크를 복사하는 중이에요.');
+    if (!navigator.clipboard?.writeText) {
+      setShareLinkMessage('주소창의 링크를 직접 복사해 주세요.');
+      clearShareLinkMessage();
+      return;
+    }
+
+    window.setTimeout(() => {
+      void navigator.clipboard.writeText(shareUrl)
+        .then(() => setShareLinkMessage('공유 링크를 복사했어요.'))
+        .catch(() => setShareLinkMessage('주소창의 링크를 직접 복사해 주세요.'))
+        .finally(clearShareLinkMessage);
+    }, 0);
+  };
+
+  return (
+    <section className="space-y-4">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-brand">기록 한눈에</p>
+              <CardTitle className="mt-2 text-3xl">{athlete.name}</CardTitle>
+              <p className="mt-2 text-sm text-ink-3">{athlete.team || '소속 미상'} · {formatYearRange(athlete.years)}</p>
+              <p className="mt-3 text-xs leading-5 text-ink-4">
+                같은 이름의 다른 선수일 수 있어요. 소속·연도를 함께 확인하세요.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onToggleCompare}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                  inTray
+                    ? 'border-brand-500 bg-brand-500 text-white'
+                    : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'
+                }`}
+              >
+                {inTray ? '✓ 비교에 담음' : '+ 비교에 담기'}
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                onMouseDown={handleCopyShareLink}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface-2 px-3 py-2 text-sm font-medium text-ink-3 transition hover:border-brand-500/50 hover:text-ink"
+              >
+                기록 링크 공유
+              </button>
+              {SHARE_POLICY.status === 'enabled' ? (
+                <button
+                  type="button"
+                  onClick={() => setShowShareCard((v) => !v)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                    showShareCard
+                      ? 'border-brand-500 bg-brand-500 text-white'
+                      : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'
+                  }`}
+                >
+                  {showShareCard ? '공유 카드 닫기' : SHARE_POLICY.enabledLabel}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  title={SHARE_POLICY.preparingTitle}
+                  className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg border border-dashed border-line px-3 py-2 text-sm font-medium text-ink-4"
+                >
+                  {SHARE_POLICY.enabledLabel} <span className="text-[11px]">{SHARE_POLICY.preparingLabel}</span>
+                </button>
+              )}
+              <Link to={`/data-request?athlete=${encodeURIComponent(athlete.name)}`}>
+                <Button variant="outline">기록 고치거나 숨기기</Button>
+              </Link>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-col gap-1 text-xs leading-5 text-ink-4 sm:items-end">
+            <p>링크는 이 화면을 다시 열기 위한 주소예요. 공식 기록 서비스는 아니에요. {TRUST_NOTICE.partial}</p>
+            {shareLinkMessage && (
+              <div role="status" className="space-y-1 text-right">
+                <p className="font-medium text-brand">{shareLinkMessage}</p>
+                <p>틀렸거나 빼고 싶다면 이 화면에서 정정·비노출을 요청할 수 있어요.</p>
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-4">
+            <MetricCard label="모은 기록 중 최고" record={summary.indexedBest} />
+            <MetricCard label="이번 시즌 최고" record={summary.seasonBest} />
+            <MetricCard label="최근 기록" record={summary.latest} />
+            <div className="border border-line bg-surface-2 p-4">
+              <p className="text-xs text-ink-4">모은 기록 수</p>
+              <p className="mt-2 text-2xl font-semibold text-ink">{summary.indexedResultCount}</p>
+              <p className="mt-1 text-xs text-ink-4">비교 가능 기록 {summary.comparableResultCount}</p>
+            </div>
+          </div>
+          <p className="mt-4 text-xs leading-5 text-ink-4">{summary.disclaimer}</p>
+          <AthleteHighlightBadges profile={profile} />
+        </CardContent>
+      </Card>
+
+      {SHARE_POLICY.status === 'enabled' && showShareCard ? (
+        <ShareCard profile={profile} onClose={() => setShowShareCard(false)} />
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>기록 발자취</CardTitle>
+          <p className="text-sm text-ink-3">공개 기록의 흐름이에요. 평가나 예측은 하지 않아요.</p>
+        </CardHeader>
+        <CardContent>
+          <AthleteEventTrail profile={profile} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>최근 모은 기록</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {profile.records.slice(0, 8).map((record) => (
+            <RecordLine key={record.id} record={record} />
+          ))}
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
+
+function SeasonPanel({
+  filters,
+  season,
+  eventKey,
+  divisionKey,
+  table,
+  state,
+  highlightedRow,
+  onSeasonChange,
+  onEventChange,
+  onDivisionChange,
+}: {
+  filters: AnalyticsFilters | null;
+  season?: number;
+  eventKey: string;
+  divisionKey: string;
+  table: SeasonRecordTable | null;
+  state: LoadState;
+  highlightedRow: SeasonRecordTable['rows'][number] | null;
+  onSeasonChange: (season: number) => void;
+  onEventChange: (eventKey: string) => void;
+  onDivisionChange: (divisionKey: string) => void;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-brand">시즌 기록표</p>
+            <CardTitle className="mt-2">시즌 기록 모음</CardTitle>
+            <p className="mt-2 text-sm text-ink-3">모은 기록 기준 정렬이라 실제와 다를 수 있어요.</p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <SelectBox value={String(season || '')} onChange={(value) => onSeasonChange(Number(value))}>
+              {(filters?.seasons || []).map((item) => (
+                <option key={item} value={item}>{item}</option>
+              ))}
+            </SelectBox>
+            <SelectBox value={eventKey} onChange={onEventChange}>
+              {(filters?.events || []).map((item) => (
+                <option key={item.key} value={item.key}>{item.label}</option>
+              ))}
+            </SelectBox>
+            <SelectBox value={divisionKey} onChange={onDivisionChange}>
+              {(filters?.divisions || []).map((item) => (
+                <option key={item.key} value={item.key}>{item.label}</option>
+              ))}
+            </SelectBox>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {highlightedRow && (
+          <div className="mb-4 border border-brand bg-brand/5 p-4">
+            <p className="text-xs font-semibold text-brand">선택한 선수 표시</p>
+            <p className="mt-1 text-sm text-ink">
+              {highlightedRow.name} · {highlightedRow.rank}번째 기록 · {highlightedRow.record}
+            </p>
+          </div>
+        )}
+
+        {state === 'loading' && <NoticeCard role="status" title="시즌 기록표를 불러오는 중입니다" description="모은 기록을 정렬하고 있습니다." />}
+        {state === 'error' && <NoticeCard role="alert" title="시즌 기록표를 불러오지 못했습니다" description="필터를 바꾸거나 다시 시도해 주세요." />}
+
+        {table && state !== 'loading' && (
+          <>
+            <div className="mb-3 flex flex-col gap-1 text-xs text-ink-4 sm:flex-row sm:items-center sm:justify-between">
+              <span>{table.season} · {table.eventLabel} · {table.divisionLabel}</span>
+              <span>{scopeCount(table.totalIndexedAthletes, '명')}</span>
+            </div>
+            <div className="overflow-x-auto border border-line">
+              <table className="w-full min-w-[720px] border-collapse text-sm">
+                <thead className="bg-surface-2 text-left text-xs text-ink-4">
+                  <tr>
+                    <th className="sticky left-0 z-20 w-14 bg-surface-2 p-3">기록 순서</th>
+                    <th className="sticky left-14 z-20 bg-surface-2 p-3">선수</th>
+                    <th className="p-3">기록</th>
+                    <th className="p-3">대회</th>
+                    <th className="p-3">일자</th>
+                    <th className="p-3">풍속</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row) => {
+                    const rowBg = row.highlighted ? 'bg-brand/5' : 'bg-surface';
+                    return (
+                      <tr key={`${row.rank}-${row.athleteKey}`} className={row.highlighted ? 'bg-brand/5' : 'border-t border-line'}>
+                        <td className={`sticky left-0 z-10 w-14 p-3 font-mono text-ink-3 ${rowBg}`}>{row.rank}</td>
+                        <td className={`sticky left-14 z-10 p-3 ${rowBg}`}>
+                          <p className="font-semibold text-ink">{row.name}</p>
+                          <p className="text-xs text-ink-4">{row.team || '소속 미상'}</p>
+                        </td>
+                        <td className="p-3 text-lg font-semibold text-ink">{row.record}</td>
+                        <td className="p-3 text-ink-3">{row.competitionName}</td>
+                        <td className="p-3 text-ink-3">{row.date}</td>
+                        <td className="p-3 text-ink-3">{row.wind || '-'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs leading-5 text-ink-4">{table.disclaimer}</p>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ModeButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-4 py-2 text-sm font-semibold transition-colors ${
+        active ? 'bg-primary text-primary-foreground' : 'text-ink-3 hover:bg-surface hover:text-ink'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SelectBox({
+  value,
+  onChange,
+  children,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+}) {
+  return (
+    <select
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      className="h-10 border border-line bg-surface px-3 text-sm text-ink"
+    >
+      {children}
+    </select>
+  );
+}
+
+function MetricCard({ label, record }: { label: string; record: PublicRecord | null }) {
+  const display = record ? resolveRecordDisplay(record.record, record.note) : null;
+  return (
+    <div className="border border-line bg-surface-2 p-4">
+      <p className="text-xs text-ink-4">{label}</p>
+      <p className={`mt-2 font-semibold ${display?.hasMark ? 'text-2xl text-ink' : 'text-lg text-ink-3'}`}>
+        {display ? display.text : '-'}
+      </p>
+      <p className="mt-1 truncate text-xs text-ink-4">{record ? `${record.eventLabel} · ${record.season}` : '모은 기록 없음'}</p>
+    </div>
+  );
+}
+
+function RecordLine({ record }: { record: PublicRecord }) {
+  const display = resolveRecordDisplay(record.record, record.note);
+  return (
+    <div className="grid gap-2 border border-line p-3 sm:grid-cols-[110px_1fr_auto] sm:items-center">
+      <div className="font-mono text-xs text-ink-4">{record.date}</div>
+      <div>
+        <p className="font-semibold text-ink">{record.eventLabel} · {record.competitionName}</p>
+        <p className="text-xs text-ink-4">{record.divisionLabel} · {record.venue || '장소 미상'} · 출처 {resolveProviderLabel(record.source.provider)}</p>
+      </div>
+      {display.hasMark ? (
+        <div className="text-lg font-semibold text-ink">{display.text}</div>
+      ) : (
+        <div className="text-sm font-medium text-ink-4">{display.text}</div>
+      )}
+    </div>
+  );
+}
+
+function NoticeCard({
+  title,
+  description,
+  role,
+  action,
+}: {
+  title: string;
+  description: string;
+  role?: 'status' | 'alert';
+  action?: ReactNode;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-6" {...(role ? { role, 'aria-live': role === 'alert' ? 'assertive' : 'polite' } : {})}>
+        <p className="text-lg font-semibold text-ink">{title}</p>
+        <p className="mt-2 text-sm text-ink-3">{description}</p>
+        {action && <div className="mt-4">{action}</div>}
+      </CardContent>
+    </Card>
+  );
+}
+
+function formatYearRange(years: number[]) {
+  if (!years.length) return '연도 미상';
+  if (years.length === 1) return String(years[0]);
+  return `${years[0]}-${years[years.length - 1]}`;
+}

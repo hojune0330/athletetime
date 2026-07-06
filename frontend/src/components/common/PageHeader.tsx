@@ -3,7 +3,7 @@
  * 서브페이지들의 타이틀 디자인 통일을 위한 컴포넌트
  */
 
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 

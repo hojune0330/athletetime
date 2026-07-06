@@ -3,8 +3,7 @@
  */
 
 // API Client
-export { apiClient, handleApiError } from './client';
-export type { ApiError } from './client';
+export { apiClient } from './client';
 
 // Posts API
 export * from './posts';

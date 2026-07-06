@@ -17,11 +17,11 @@ import { useState } from 'react';
 function getRankStyle(rank: number): string {
   switch (rank) {
     case 1:
-      return 'bg-yellow-100 text-yellow-800 font-bold';
+      return 'bg-success-100 text-success-700 font-bold';
     case 2:
       return 'bg-gray-100 text-gray-700 font-semibold';
     case 3:
-      return 'bg-orange-100 text-orange-700 font-semibold';
+      return 'bg-accent-100 text-accent-700 font-semibold';
     default:
       return 'bg-white text-neutral-700';
   }
@@ -29,15 +29,9 @@ function getRankStyle(rank: number): string {
 
 // 순위 뱃지
 function RankBadge({ rank }: { rank: number }) {
-  const medals: Record<number, string> = {
-    1: '🥇',
-    2: '🥈',
-    3: '🥉',
-  };
-  
   return (
-    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${getRankStyle(rank)}`}>
-      {medals[rank] || rank}
+    <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${getRankStyle(rank)}`}>
+      {rank}
     </span>
   );
 }

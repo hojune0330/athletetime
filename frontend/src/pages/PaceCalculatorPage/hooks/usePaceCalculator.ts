@@ -9,8 +9,6 @@ import {
   calculate100mTime,
   calculateAllLanesData,
   calculateSplits,
-  STANDARD_DISTANCES,
-  type LaneData,
   type SplitData,
   type PaceStrategy,
 } from '../utils/paceCalculations';

@@ -4,15 +4,26 @@
 
 const { verifyToken } = require('../utils/jwt');
 const db = require('../utils/db');
+const { ACCESS_COOKIE, getCookie } = require('../utils/authCookies');
+
+function extractAccessToken(req) {
+  const authHeader = req.headers.authorization;
+  if (typeof authHeader === 'string') {
+    const [scheme, token] = authHeader.split(' ');
+    if (scheme === 'Bearer' && token) {
+      return token;
+    }
+  }
+
+  return getCookie(req, ACCESS_COOKIE);
+}
 
 /**
  * JWT 토큰 검증 미들웨어
  */
 async function authenticateToken(req, res, next) {
   try {
-    // Authorization 헤더에서 토큰 추출
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = extractAccessToken(req);
 
     if (!token) {
       return res.status(401).json({
@@ -122,8 +133,7 @@ function requireEmailVerified(req, res, next) {
  */
 async function optionalAuth(req, res, next) {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = extractAccessToken(req);
 
     if (!token) {
       req.user = null;

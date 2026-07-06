@@ -7,8 +7,8 @@ interface PerformanceInputProps {
   time: TimeInput;
   onDistanceChange: (value: string) => void;
   onTimeChange: <K extends keyof TimeInput>(key: K, value: number) => void;
-  distanceSelectRef?: React.RefObject<HTMLSelectElement>;
-  timeInputRef?: React.RefObject<HTMLInputElement>;
+  distanceSelectRef?: React.RefObject<HTMLSelectElement | null>;
+  timeInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export const PerformanceInput: React.FC<PerformanceInputProps> = ({

@@ -35,15 +35,9 @@ const TRAINING_TIPS = [
   "러닝화는 500km마다 교체를 권장합니다. 쿠셔닝 성능 저하에 주의하세요.",
 ];
 
-// 외부 링크 클릭 핸들러 (React Router 우회)
-const handleExternalLink = (e: React.MouseEvent, path: string) => {
-  e.preventDefault();
-  window.location.href = `/${path}`;
-};
-
 export default function RightBanner() {
-  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>([]);
-  const [popularPosts, setPopularPosts] = useState<PopularPost[]>([]);
+  const [upcomingEvents] = useState<UpcomingEvent[]>([]);
+  const [popularPosts] = useState<PopularPost[]>([]);
   const [todayTip, setTodayTip] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,7 +78,7 @@ export default function RightBanner() {
               <span className="text-lg">🏆</span>
               대회 일정
             </span>
-            <Link to="/events" className="text-xs text-primary-500 font-medium hover:text-primary-600 transition-colors">
+            <Link to="/competitions" className="text-xs text-primary-500 font-medium hover:text-primary-600 transition-colors">
               더보기
             </Link>
           </h3>
@@ -101,7 +95,7 @@ export default function RightBanner() {
               {upcomingEvents.map((event) => (
                 <Link 
                   key={event.id}
-                  to={event.link || `/events/${event.id}`}
+                  to={event.link || '/competitions'}
                   className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg text-xs hover:bg-neutral-100 transition-colors"
                 >
                   <div>
@@ -134,8 +128,8 @@ export default function RightBanner() {
             // 빈 상태
             <div className="text-center py-6 text-neutral-400 text-sm">
               <div className="text-2xl mb-2">📅</div>
-              <p>등록된 대회가 없습니다</p>
-              <p className="text-xs mt-1">곧 업데이트됩니다!</p>
+              <p>표시할 대회가 없어요</p>
+              <p className="text-xs mt-1">공개된 일정이 모이면 여기에 보여드려요.</p>
             </div>
           )}
         </div>
@@ -154,13 +148,12 @@ export default function RightBanner() {
             </p>
           </div>
           <div className="mt-3 text-center">
-            <a 
-              href="/training-calculator.html"
-              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
+            <Link
+              to="/training-calculator"
               className="text-xs text-primary-600 font-medium hover:text-primary-700 transition-colors"
             >
               훈련 페이스 계산기 →
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -203,7 +196,7 @@ export default function RightBanner() {
               {popularPosts.slice(0, 5).map((post, index) => (
                 <Link 
                   key={post.id}
-                  to={`/post/${post.id}`}
+                  to={`/community/post/${post.id}`}
                   className="flex items-center gap-3 group"
                 >
                   <span className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ${
@@ -236,38 +229,34 @@ export default function RightBanner() {
             빠른 링크
           </h3>
           <div className="grid grid-cols-2 gap-2">
-            <a 
-              href="/pace-calculator.html"
-              onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
+            <Link
+              to="/pace-calculator"
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">⏱️</div>
               <div className="text-xs font-medium text-neutral-700">페이스 계산기</div>
-            </a>
-            <a 
-              href="/training-calculator.html"
-              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
+            </Link>
+            <Link
+              to="/training-calculator"
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">📊</div>
               <div className="text-xs font-medium text-neutral-700">훈련 계산기</div>
-            </a>
-            <a 
-              href="/chat.html"
-              onClick={(e) => handleExternalLink(e, 'chat.html')}
+            </Link>
+            <Link
+              to="/chat"
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">💬</div>
               <div className="text-xs font-medium text-neutral-700">실시간 채팅</div>
-            </a>
-            <a 
-              href="/index.html"
-              onClick={(e) => handleExternalLink(e, 'index.html')}
+            </Link>
+            <Link
+              to="/"
               className="p-3 bg-neutral-50 rounded-lg text-center hover:bg-primary-50 hover:text-primary-600 transition-colors"
             >
               <div className="text-lg mb-1">🏠</div>
               <div className="text-xs font-medium text-neutral-700">메인 페이지</div>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

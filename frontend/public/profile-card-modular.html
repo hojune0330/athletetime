@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AthleteTime 기록카드 모듈러</title>
+    <style>
+      :root {
+        color: #111827;
+        background: #eef2f7;
+        font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+      }
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        border: 1px solid #d1d5db;
+        border-radius: 26px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 28px;
+      }
+      .grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin-top: 22px;
+      }
+      .module {
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        background: #ffffff;
+        padding: 18px;
+      }
+      .eyebrow {
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 12px 0 8px;
+        font-size: clamp(28px, 5vw, 42px);
+        line-height: 1.08;
+      }
+      p {
+        color: #4b5563;
+        line-height: 1.7;
+      }
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 13px 15px;
+        font-size: 16px;
+      }
+      a {
+        display: inline-block;
+        margin-top: 18px;
+        border-radius: 999px;
+        background: #111827;
+        color: #ffffff;
+        padding: 12px 16px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+      .note {
+        margin-top: 18px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">모듈러 카드</div>
+      <h1><span id="selected-athlete-name">이름을 직접 입력해 주세요</span></h1>
+      <p>기록, 시즌 흐름, 한 줄 코멘트를 따로 고른 뒤 하나의 공유 카드로 묶는 화면입니다.</p>
+      <div class="grid">
+        <section class="module">
+          <strong>1. 이름</strong>
+          <p>카드에 들어갈 이름을 먼저 확인하세요.</p>
+          <input id="athlete-name-input" type="text" autocomplete="off" placeholder="이름을 입력하세요" />
+        </section>
+        <section class="module">
+          <strong>2. 기록</strong>
+          <p>기록마다 출처와 연도를 다시 보고 고르세요.</p>
+          <a id="records-link" href="/records">기록 확인하기</a>
+        </section>
+        <section class="module">
+          <strong>3. 공유</strong>
+          <p class="note">직접 확인한 뒤 공유해 주세요. 같은 이름의 다른 선수일 수 있어요.</p>
+        </section>
+      </div>
+    </main>
+    <script>
+      function sanitizeName(value) {
+        return value.replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, 40);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const selectedName = sanitizeName(params.get('name') || '');
+      const nameTarget = document.getElementById('selected-athlete-name');
+      const input = document.getElementById('athlete-name-input');
+      const recordLink = document.getElementById('records-link');
+
+      if (selectedName) {
+        nameTarget.textContent = selectedName;
+        input.value = selectedName;
+        recordLink.href = `/records?q=${encodeURIComponent(selectedName)}`;
+      }
+
+      input.addEventListener('input', () => {
+        const value = sanitizeName(input.value);
+        nameTarget.textContent = value || '이름을 직접 입력해 주세요';
+        recordLink.href = value ? `/records?q=${encodeURIComponent(value)}` : '/records';
+      });
+    </script>
+  </body>
+</html>

@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { 
   PlusIcon,
   PencilSquareIcon,
@@ -83,7 +83,6 @@ function DeleteModal({ isOpen, resultInfo, onClose, onConfirm, isDeleting }: Del
 
 export default function MatchResultListPage() {
   const { competitionId } = useParams<{ competitionId: string }>();
-  const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = user?.isAdmin || false;
   
@@ -95,9 +94,9 @@ export default function MatchResultListPage() {
   // 삭제 상태
   const [deleteTarget, setDeleteTarget] = useState<MatchResult | null>(null);
   
-  // API 호출
+  // API 호출 - competitionId는 card-studio 형식의 문자열 ID 가능
   const { data, isLoading, isError } = useMatchResults(
-    parseInt(competitionId || '0'),
+    competitionId || '',
     {
       event: selectedEvent || undefined,
       division: selectedDivision || undefined,

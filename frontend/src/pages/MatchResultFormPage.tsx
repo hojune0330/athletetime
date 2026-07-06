@@ -69,7 +69,7 @@ export default function MatchResultFormPage() {
   ]);
   
   // API 훅
-  const { data: competition } = useCompetition(parseInt(competitionId || '0'));
+  const { data: competition } = useCompetition(competitionId || '');
   const { data: matchResult, isLoading: isLoadingResult } = useMatchResult(
     isEditMode ? parseInt(resultId) : 0
   );
@@ -158,7 +158,7 @@ export default function MatchResultFormPage() {
     
     try {
       const data = {
-        competition_id: parseInt(competitionId || '0'),
+        competition_id: competitionId || '',
         event: finalEvent,
         division,
         round,

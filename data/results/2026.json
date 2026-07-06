@@ -1,0 +1,3761 @@
+[
+  {
+    "competitionId": "2026-road-001",
+    "toCd": "E014030185",
+    "competitionName": "2026 대구마라톤대회",
+    "year": "2026",
+    "period": "2026-02-22 ~ 2026-02-22",
+    "venue": "대구",
+    "events": [
+      {
+        "event": "남자 마라톤 결승",
+        "division": "남자부",
+        "date": "2026-02-22",
+        "venue": "대구",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "게브리엘 제럴드 게이",
+            "affiliation": "탄자니아",
+            "record": "2:08:11",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "침데사 데벨레 구데타",
+            "affiliation": "에티오피아",
+            "record": "2:08:12",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "엠마누엘 다우디 딘데이",
+            "affiliation": "탄자니아",
+            "record": "2:08:18",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "삼솜 아마레 하일레미카엘",
+            "affiliation": "에리트레아",
+            "record": "2:08:41",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "게르바 베아타 디바바",
+            "affiliation": "에티오피아",
+            "record": "2:10:06",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "스탠리 키프로티치 베트",
+            "affiliation": "케냐",
+            "record": "2:10:34",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "고사 암벨루 찰라",
+            "affiliation": "에티오피아",
+            "record": "2:10:59",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "데제네 메게르사 모레타",
+            "affiliation": "에티오피아",
+            "record": "2:11:11",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "찰스 키프로티치 로노",
+            "affiliation": "케냐",
+            "record": "2:11:40",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "레오나드 체몽게스",
+            "affiliation": "우간다",
+            "record": "2:14:33",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "오스카 키벳",
+            "affiliation": "우간다",
+            "record": "2:15:13",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "제이콥 키벳 홀리오 켄다고르",
+            "affiliation": "케냐",
+            "record": "2:15:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "베나드 에마누엘 게이",
+            "affiliation": "탄자니아",
+            "record": "2:15:47",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "자콥 케초 캅토로",
+            "affiliation": "케냐",
+            "record": "2:19:38",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "이동진",
+            "affiliation": "대구광역시청",
+            "record": "2:20:43",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "디노 세피르 케말",
+            "affiliation": "에티오피아",
+            "record": "2:21:59",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "곽종원",
+            "affiliation": "원주시청",
+            "record": "2:24:12",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "신현수",
+            "affiliation": "한국전력공사",
+            "record": "2:24:34",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "정하늘",
+            "affiliation": "대구광역시청",
+            "record": "2:24:46",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "김지인",
+            "affiliation": "대구광역시청",
+            "record": "2:26:28",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "김호연",
+            "affiliation": "군산시청",
+            "record": "2:28:07",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "모세 키벳",
+            "affiliation": "우간다",
+            "record": "2:28:32",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "피승희",
+            "affiliation": "강원특별자치도청",
+            "record": "2:28:44",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "김은섭",
+            "affiliation": "포항시청",
+            "record": "2:29:14",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "김윤식",
+            "affiliation": "대구광역시청",
+            "record": "2:29:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "훙위 저우",
+            "affiliation": "타이페이(대만)",
+            "record": "2:29:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "박영렬",
+            "affiliation": "국민체육진흥공단",
+            "record": "2:31:16",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "응아깃 입",
+            "affiliation": "홍콩",
+            "record": "2:31:34",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "유대영",
+            "affiliation": "대구광역시청",
+            "record": "2:33:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "김종현",
+            "affiliation": "군산시청",
+            "record": "2:35:59",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "장준표",
+            "affiliation": "경상북도체육회",
+            "record": "2:36:58",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "김시온",
+            "affiliation": "계명대학교",
+            "record": "2:39:25",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "정선진",
+            "affiliation": "삼척시청",
+            "record": "2:39:31",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "김한별",
+            "affiliation": "군산시청",
+            "record": "2:42:36",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 35,
+            "name": "오드후 갈-에르데네",
+            "affiliation": "몽골",
+            "record": "2:44:29",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 36,
+            "name": "타미르 간둘가",
+            "affiliation": "몽골",
+            "record": "2:52:07",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 37,
+            "name": "전수환",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 38,
+            "name": "한승현",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 39,
+            "name": "안병석",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 40,
+            "name": "유진서",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 41,
+            "name": "강종필",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 42,
+            "name": "김영석",
+            "affiliation": "대구광역시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 43,
+            "name": "김기연",
+            "affiliation": "국민체육진흥공단",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 44,
+            "name": "성지훈",
+            "affiliation": "국민체육진흥공단",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 45,
+            "name": "이상민",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 46,
+            "name": "전재원",
+            "affiliation": "강원특별자치도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 47,
+            "name": "박요한",
+            "affiliation": "포항시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 48,
+            "name": "최유빈",
+            "affiliation": "국민체육진흥공단",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 49,
+            "name": "오성일",
+            "affiliation": "국민체육진흥공단",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 50,
+            "name": "김현진",
+            "affiliation": "국민체육진흥공단",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 51,
+            "name": "남혁준",
+            "affiliation": "강원특별자치도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 52,
+            "name": "이준호",
+            "affiliation": "경상북도체육회",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 53,
+            "name": "이정윤",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 54,
+            "name": "이영욱",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 55,
+            "name": "김세옥",
+            "affiliation": "무소속(전남)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 56,
+            "name": "김민서",
+            "affiliation": "영주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 57,
+            "name": "이용일",
+            "affiliation": "군산시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 58,
+            "name": "김지환",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 59,
+            "name": "박기범",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 60,
+            "name": "김지훈",
+            "affiliation": "포항시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 61,
+            "name": "김현우",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 62,
+            "name": "유우진",
+            "affiliation": "계명대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 63,
+            "name": "강지훈",
+            "affiliation": "계명대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 64,
+            "name": "벨라이 지쿠 아스파우",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 65,
+            "name": "타델레 데미시에 이메르",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 66,
+            "name": "올론바야르 잠스란",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 67,
+            "name": "간툴가 담바다르자",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 68,
+            "name": "에브라힘 알타미미",
+            "affiliation": "바레인",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 69,
+            "name": "바트 에르데네 간수크",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 70,
+            "name": "나착도르지 올크혼",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 71,
+            "name": "길버트 키프로티치 코리르",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 72,
+            "name": "자담바 롄친뱜바",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 73,
+            "name": "군삼부 오윤바트",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 74,
+            "name": "아리운볼드 간바드라흐",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 75,
+            "name": "아엔사 알레무 톨레사",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 76,
+            "name": "피우스 마이오 키로프",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 77,
+            "name": "퍼갈 커틴",
+            "affiliation": "아일랜드",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 78,
+            "name": "아르투스 바리키스",
+            "affiliation": "라트비아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "여자 마라톤 결승",
+        "division": "여자부",
+        "date": "2026-02-22",
+        "venue": "대구",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "릴리안 카사이트 렌제룩",
+            "affiliation": "케냐",
+            "record": "2:19:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 2,
+            "name": "부제 디리바 카젤라",
+            "affiliation": "에티오피아",
+            "record": "2:19:54",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 3,
+            "name": "에발린 치르치르",
+            "affiliation": "케냐",
+            "record": "2:20:51",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 4,
+            "name": "쿠푸 타히르 다디소",
+            "affiliation": "에티오피아",
+            "record": "2:28:23",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "옵세니 게타치 아딜로",
+            "affiliation": "에티오피아",
+            "record": "2:28:27",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "케베네 찰라 우리사",
+            "affiliation": "에티오피아",
+            "record": "2:28:39",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "최정윤",
+            "affiliation": "충남도청",
+            "record": "2:32:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "히시그사이한 갈바드라흐",
+            "affiliation": "몽골",
+            "record": "2:36:41",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "이수민",
+            "affiliation": "삼척시청",
+            "record": "2:39:21",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "김은미",
+            "affiliation": "충남도청",
+            "record": "2:39:31",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "정현지",
+            "affiliation": "삼척시청",
+            "record": "2:40:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "박호선",
+            "affiliation": "경기도청",
+            "record": "2:43:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "신사흰",
+            "affiliation": "삼척시청",
+            "record": "2:46:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "남보하나",
+            "affiliation": "경기도청",
+            "record": "2:52:53",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "김려현",
+            "affiliation": "경기도청",
+            "record": "2:55:51",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "임라 한다야니",
+            "affiliation": "인도네시아",
+            "record": "2:56:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "카얀 하우",
+            "affiliation": "홍콩",
+            "record": "3:03:02",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "강혜림",
+            "affiliation": "충남도청",
+            "record": "3:07:22",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "안희연",
+            "affiliation": "전북체육회",
+            "record": "3:08:32",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "김화영",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "메흐렛 게메다 로브",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "마에레구 하에롬 쉐게",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "뭉크자야 바야르초그트",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "판투 즈에우드 지파르",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "제인 젭켐보이 바레이키스",
+            "affiliation": "미국",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "하오 저우",
+            "affiliation": "중국",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "페이스 쳅코에치",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "루스 다니에스 알베트 제벳",
+            "affiliation": "바레인",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "오윤바야르 오트곤도르지",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "데라 디다 야미",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "메세레 베레테 토라",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "김다빈",
+            "affiliation": "DK153",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "이한별",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "김현진",
+            "affiliation": "옥천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "competitionId": "2026-road-002",
+    "toCd": "E015370116",
+    "competitionName": "2026 대구하프마라톤대회",
+    "year": "2026",
+    "period": "2026-02-22 ~ 2026-02-22",
+    "venue": "대구",
+    "events": [
+      {
+        "event": "남자 하프마라톤 결승",
+        "division": "남자부",
+        "date": "2026-02-22",
+        "venue": "대구",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "박재우",
+            "affiliation": "영천시청",
+            "record": "1:04:24",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "박민호",
+            "affiliation": "국군체육부대",
+            "record": "1:04:48",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "오민석",
+            "affiliation": "청주시청",
+            "record": "1:07:27",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "최재경",
+            "affiliation": "영천시청",
+            "record": "1:08:02",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "최진혁",
+            "affiliation": "괴산군청",
+            "record": "1:08:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "최중민",
+            "affiliation": "군산시청",
+            "record": "1:08:57",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "박무영",
+            "affiliation": "괴산군청",
+            "record": "1:09:28",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "김영규",
+            "affiliation": "건국대학교(A)",
+            "record": "1:10:49",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "김대훈",
+            "affiliation": "괴산군청",
+            "record": "1:11:13",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "유동규",
+            "affiliation": "위덕대학교",
+            "record": "1:11:26",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "강동훈",
+            "affiliation": "강원특별자치도청",
+            "record": "1:13:00",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "정승호",
+            "affiliation": "무소속(경남)",
+            "record": "1:13:06",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "김동희",
+            "affiliation": "동원과학기술대학",
+            "record": "1:13:13",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "오준서",
+            "affiliation": "건국대학교(A)",
+            "record": "1:13:56",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "김도연",
+            "affiliation": "동원과학기술대학",
+            "record": "1:14:22",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "선주혁",
+            "affiliation": "구미대학",
+            "record": "1:14:29",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "한재석",
+            "affiliation": "문경대학교",
+            "record": "1:14:39",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "이승준",
+            "affiliation": "동원과학기술대학",
+            "record": "1:15:12",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "이대진",
+            "affiliation": "청주시청",
+            "record": "1:15:15",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "반관진",
+            "affiliation": "문경대학교",
+            "record": "1:15:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "한예찬",
+            "affiliation": "위덕대학교",
+            "record": "1:18:24",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "이삭 키무타이 키플라갓",
+            "affiliation": "코오롱",
+            "record": "1:06:51",
+            "personal_best": "",
+            "note": "기록경기",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "김은혁",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "김재현",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "심규현",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "이동훈",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "이정국",
+            "affiliation": "코오롱",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "박우진",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "김하랑",
+            "affiliation": "동원과학기술대학",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "김영호",
+            "affiliation": "청주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "정승화",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "이재빈",
+            "affiliation": "계명대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "김에녹",
+            "affiliation": "문경대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "임성용",
+            "affiliation": "강릉시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 35,
+            "name": "배성준",
+            "affiliation": "영천시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 36,
+            "name": "이동화",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 37,
+            "name": "조창현",
+            "affiliation": "청주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 38,
+            "name": "정우진",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 39,
+            "name": "이동욱",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 40,
+            "name": "박재영",
+            "affiliation": "경산시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 41,
+            "name": "김도연",
+            "affiliation": "코오롱",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 42,
+            "name": "김현우",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 43,
+            "name": "오준석",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "여자 하프마라톤 결승",
+        "division": "여자부",
+        "date": "2026-02-22",
+        "venue": "대구",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "김혜미",
+            "affiliation": "청주시청",
+            "record": "1:15:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "한지혜",
+            "affiliation": "경기도청",
+            "record": "1:18:27",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "김지혜",
+            "affiliation": "경산시청",
+            "record": "1:19:52",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "강예진",
+            "affiliation": "경기도청",
+            "record": "1:20:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "김민정",
+            "affiliation": "청주시청",
+            "record": "1:22:24",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "나혜린",
+            "affiliation": "포항시청",
+            "record": "1:23:12",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "홍해인",
+            "affiliation": "경산시청",
+            "record": "1:26:28",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "김스라",
+            "affiliation": "해남군청",
+            "record": "1:28:03",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "김영신",
+            "affiliation": "구미시체육회",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "성산아",
+            "affiliation": "강릉시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "정윤서",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "심예영",
+            "affiliation": "문경시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "양연준",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "김나경",
+            "affiliation": "문경대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "김은선",
+            "affiliation": "포항시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "양덕경",
+            "affiliation": "해남군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "competitionId": "2026-road-003",
+    "toCd": "E010171275",
+    "competitionName": "2026 서울마라톤대회 겸 제96회 동아마라톤대회",
+    "year": "2026",
+    "period": "2026-03-15 ~ 2026-03-15",
+    "venue": "서울",
+    "events": [
+      {
+        "event": "남자 마라톤 결승",
+        "division": "남자부",
+        "date": "2026-03-15",
+        "venue": "서울",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "하프투 테클루 아세파",
+            "affiliation": "에티오피아",
+            "record": "2:04:22",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 2,
+            "name": "게타네 몰라 타미레",
+            "affiliation": "에티오피아",
+            "record": "2:04:23",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 3,
+            "name": "길버트 키벳",
+            "affiliation": "케냐",
+            "record": "2:04:31",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 4,
+            "name": "츠가예 게타츄 타데세",
+            "affiliation": "에티오피아",
+            "record": "2:04:32",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 5,
+            "name": "수파로 월리이 카베토",
+            "affiliation": "에티오피아",
+            "record": "2:04:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": "대회신"
+          },
+          {
+            "rank": 6,
+            "name": "에녹 키냐말 조슈아",
+            "affiliation": "케냐",
+            "record": "2:04:46",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "리틀 닉 키툰두",
+            "affiliation": "케냐",
+            "record": "2:05:55",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "하프타무 아바디 게브레실라세",
+            "affiliation": "에티오피아",
+            "record": "2:05:58",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "더글러스 키멜리 킵루굿",
+            "affiliation": "케냐",
+            "record": "2:06:40",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "제 허",
+            "affiliation": "중국",
+            "record": "2:08:15",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "피우스 카란자 키마니",
+            "affiliation": "케냐",
+            "record": "2:08:44",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "다이스케 우에카도",
+            "affiliation": "일본",
+            "record": "2:09:03",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "에드먼드 킵응게티치",
+            "affiliation": "케냐",
+            "record": "2:09:37",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "콜린스 킵쿠루이 킵코리르",
+            "affiliation": "케냐",
+            "record": "2:09:43",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "겐스케 호리오",
+            "affiliation": "일본",
+            "record": "2:10:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "페이 쑤",
+            "affiliation": "중국",
+            "record": "2:10:06",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "티모시 킵켐보이 킵예고",
+            "affiliation": "케냐",
+            "record": "2:10:41",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "박민호",
+            "affiliation": "국군체육부대",
+            "record": "2:11:05",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "폴 킵케모이 킵코리르",
+            "affiliation": "케냐",
+            "record": "2:11:39",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "새미 키롭 킷와라",
+            "affiliation": "케냐",
+            "record": "2:11:48",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "세즈긴 아타치",
+            "affiliation": "튀르키예",
+            "record": "2:11:53",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "김홍록",
+            "affiliation": "한국전력공사",
+            "record": "2:12:09",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "다이키 스즈키",
+            "affiliation": "일본",
+            "record": "2:12:52",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "간툴가 담바다르자",
+            "affiliation": "몽골",
+            "record": "2:12:57",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "이정국",
+            "affiliation": "코오롱",
+            "record": "2:13:32",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "올롱바야르 잠스란",
+            "affiliation": "몽골",
+            "record": "2:13:34",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "한승현",
+            "affiliation": "충남도청",
+            "record": "2:14:32",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "김건오",
+            "affiliation": "한국전력공사",
+            "record": "2:16:29",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "손세진",
+            "affiliation": "삼성전자(주)",
+            "record": "2:17:57",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "웨레타우 에셰티에 하고스",
+            "affiliation": "에티오피아",
+            "record": "2:18:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "전수환",
+            "affiliation": "충남도청",
+            "record": "2:18:37",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "최찬유",
+            "affiliation": "합천군청",
+            "record": "2:18:41",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "오민석",
+            "affiliation": "청주시청",
+            "record": "2:19:08",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "최진혁",
+            "affiliation": "괴산군청",
+            "record": "2:19:20",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 35,
+            "name": "유진서",
+            "affiliation": "충남도청",
+            "record": "2:19:46",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 36,
+            "name": "심종섭",
+            "affiliation": "한국전력공사",
+            "record": "2:21:20",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 37,
+            "name": "박무영",
+            "affiliation": "괴산군청",
+            "record": "2:22:44",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 38,
+            "name": "이주니",
+            "affiliation": "진도군청",
+            "record": "2:23:56",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 39,
+            "name": "정승호",
+            "affiliation": "무소속(경남)",
+            "record": "2:30:13",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 40,
+            "name": "송종인",
+            "affiliation": "광양시청",
+            "record": "2:30:46",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 41,
+            "name": "허동균",
+            "affiliation": "무소속(서울)",
+            "record": "2:31:18",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 42,
+            "name": "장준표",
+            "affiliation": "경상북도체육회",
+            "record": "2:32:36",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 43,
+            "name": "이승준",
+            "affiliation": "동원과학기술대학",
+            "record": "2:33:26",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 44,
+            "name": "이대진",
+            "affiliation": "청주시청",
+            "record": "2:35:14",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 45,
+            "name": "자담바 륜친비암바",
+            "affiliation": "몽골",
+            "record": "2:35:59",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 46,
+            "name": "김하랑",
+            "affiliation": "동원과학기술대학",
+            "record": "2:36:52",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 47,
+            "name": "이준호",
+            "affiliation": "경상북도체육회",
+            "record": "2:39:03",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 48,
+            "name": "임성용",
+            "affiliation": "강릉시청",
+            "record": "2:44:53",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 49,
+            "name": "바타르볼드 주코프",
+            "affiliation": "몽골",
+            "record": "2:46:12",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 50,
+            "name": "이삭 키무타이 키플라갓",
+            "affiliation": "케냐-코오롱",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 51,
+            "name": "신현수",
+            "affiliation": "한국전력공사",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 52,
+            "name": "김학수",
+            "affiliation": "삼성전자(주)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 53,
+            "name": "강종필",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 54,
+            "name": "홍진표",
+            "affiliation": "삼성전자(주)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 55,
+            "name": "임채우",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 56,
+            "name": "김대훈",
+            "affiliation": "괴산군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 57,
+            "name": "곽종원",
+            "affiliation": "원주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 58,
+            "name": "탁인후",
+            "affiliation": "남양주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 59,
+            "name": "조창현",
+            "affiliation": "청주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 60,
+            "name": "최민용",
+            "affiliation": "광양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 61,
+            "name": "고동욱",
+            "affiliation": "충주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 62,
+            "name": "김재현",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 63,
+            "name": "이영욱",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 64,
+            "name": "백승호",
+            "affiliation": "진도군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 65,
+            "name": "장호준",
+            "affiliation": "진도군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 66,
+            "name": "소유준",
+            "affiliation": "한국전력공사",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 67,
+            "name": "김영호",
+            "affiliation": "청주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 68,
+            "name": "김태훈",
+            "affiliation": "국군체육부대",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 69,
+            "name": "김상태",
+            "affiliation": "삼성전자(주)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 70,
+            "name": "한현수",
+            "affiliation": "무소속(경기)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 71,
+            "name": "황보한빈",
+            "affiliation": "한국체육대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 72,
+            "name": "시사이 렘마 카사예",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 73,
+            "name": "펠릭스 킵코에치",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 74,
+            "name": "바트에르덴 간수흐",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 75,
+            "name": "나차그도르지 오르콘",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 76,
+            "name": "타미르 간툴가",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 77,
+            "name": "마이클 무고 기타에",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 78,
+            "name": "실라스 무투리 기초비",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 79,
+            "name": "엘리자 티가 음바이레",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 80,
+            "name": "스티븐 킴보멧 레탄토",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 81,
+            "name": "사무엘 테우리 음와니키",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 82,
+            "name": "케네스 킵로노 라갓",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 83,
+            "name": "앤드루 킵루토 코스게이",
+            "affiliation": "케냐",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 84,
+            "name": "루크 마스",
+            "affiliation": "네덜란드",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 85,
+            "name": "중루이 궈",
+            "affiliation": "중국",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "여자 마라톤 결승",
+        "division": "여자부",
+        "date": "2026-03-15",
+        "venue": "서울",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "하벤 하일루 데세",
+            "affiliation": "에티오피아",
+            "record": "2:19:09",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "베켈레치 구데타 보레차",
+            "affiliation": "에티오피아",
+            "record": "2:19:39",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "보세나 물라티에 모게시에",
+            "affiliation": "에티오피아",
+            "record": "2:19:47",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "조이스 체프케모이 텔레",
+            "affiliation": "케냐",
+            "record": "2:19:50",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "티루예 메스핀 아만",
+            "affiliation": "에티오피아",
+            "record": "2:20:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "아이나다이스 테쇼메 비를레",
+            "affiliation": "에티오피아",
+            "record": "2:20:51",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "베텔레헴 아페니구스 예메르",
+            "affiliation": "에티오피아",
+            "record": "2:23:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "안찰렘 하이마노테 위비네흐",
+            "affiliation": "에티오피아",
+            "record": "2:24:09",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "마오르 티요우리",
+            "affiliation": "이스라엘",
+            "record": "2:29:30",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "빙 우",
+            "affiliation": "중국",
+            "record": "2:32:25",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "정다은",
+            "affiliation": "삼성전자(주)",
+            "record": "2:32:45",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "모니카 체벳 체프코니",
+            "affiliation": "케냐",
+            "record": "2:34:21",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "미유 후카다",
+            "affiliation": "일본",
+            "record": "2:35:00",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "김혜미",
+            "affiliation": "청주시청",
+            "record": "2:35:16",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "한지혜",
+            "affiliation": "경기도청",
+            "record": "2:38:48",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "강예진",
+            "affiliation": "경기도청",
+            "record": "2:41:19",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "김민정",
+            "affiliation": "청주시청",
+            "record": "2:42:24",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "성산아",
+            "affiliation": "강릉시청",
+            "record": "2:44:54",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "지희원",
+            "affiliation": "삼성전자(주)",
+            "record": "2:45:55",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "임예진",
+            "affiliation": "충주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "최정윤",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "김영신",
+            "affiliation": "구미시체육회",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "김은미",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "이현정",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "강혜림",
+            "affiliation": "충남도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "김스라",
+            "affiliation": "해남군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "양연준",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "양덕경",
+            "affiliation": "해남군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "메디나 데메 아르미노",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "문크자야 바얄르초그트",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "케베부시 이스마 제월데마리암",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "메세렛 게브레 데케보",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "지나시 게라도 센베타",
+            "affiliation": "에티오피아",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "이예원",
+            "affiliation": "진도군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 35,
+            "name": "박서연",
+            "affiliation": "합천군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 36,
+            "name": "황지향",
+            "affiliation": "진도군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 37,
+            "name": "김연아",
+            "affiliation": "안양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 38,
+            "name": "간체체그 간수흐",
+            "affiliation": "몽골",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "competitionId": "2026-road-004",
+    "toCd": "E015360126",
+    "competitionName": "2026 동아일보 서울하프마라톤대회",
+    "year": "2026",
+    "period": "2026-03-15 ~ 2026-03-15",
+    "venue": "서울",
+    "events": [
+      {
+        "event": "남자 하프마라톤 결승",
+        "division": "남자부",
+        "date": "2026-03-15",
+        "venue": "서울",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "이동훈",
+            "affiliation": "건국대학교(A)",
+            "record": "1:06:52",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "조민혁",
+            "affiliation": "진도군청",
+            "record": "1:07:11",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "박진현",
+            "affiliation": "한국체육대학교",
+            "record": "1:07:23",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "오준서",
+            "affiliation": "건국대학교(A)",
+            "record": "1:07:41",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "오준석",
+            "affiliation": "건국대학교(A)",
+            "record": "1:08:10",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "유동규",
+            "affiliation": "위덕대학교",
+            "record": "1:08:15",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "김은혁",
+            "affiliation": "건국대학교(A)",
+            "record": "1:09:24",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "심규현",
+            "affiliation": "건국대학교(A)",
+            "record": "1:09:26",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "김영규",
+            "affiliation": "건국대학교(A)",
+            "record": "1:09:35",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "김예찬",
+            "affiliation": "한국체육대학교",
+            "record": "1:09:46",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "이동화",
+            "affiliation": "건국대학교(A)",
+            "record": "1:10:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "박주환",
+            "affiliation": "진도군청",
+            "record": "1:10:17",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "정우진",
+            "affiliation": "남양주시청",
+            "record": "1:10:54",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "김동희",
+            "affiliation": "동원과학기술대학",
+            "record": "1:10:59",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "선주혁",
+            "affiliation": "구미대학",
+            "record": "1:11:08",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "김도연",
+            "affiliation": "동원과학기술대학",
+            "record": "1:12:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "이우형",
+            "affiliation": "청주시청",
+            "record": "1:12:21",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "정선진",
+            "affiliation": "삼척시청",
+            "record": "1:13:10",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "박준혁",
+            "affiliation": "무소속(경북)",
+            "record": "1:13:58",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "한예찬",
+            "affiliation": "위덕대학교",
+            "record": "1:16:34",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "나현영",
+            "affiliation": "고양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 22,
+            "name": "김보성",
+            "affiliation": "고양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 23,
+            "name": "이승현",
+            "affiliation": "단양군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 24,
+            "name": "이준수",
+            "affiliation": "단양군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 25,
+            "name": "최재경",
+            "affiliation": "영천시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 26,
+            "name": "박재우",
+            "affiliation": "영천시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 27,
+            "name": "이승호",
+            "affiliation": "단양군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 28,
+            "name": "고정현",
+            "affiliation": "고양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 29,
+            "name": "김세종",
+            "affiliation": "고양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 30,
+            "name": "박우진",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 31,
+            "name": "한예훈",
+            "affiliation": "한국체육대학교",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 32,
+            "name": "배성준",
+            "affiliation": "영천시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 33,
+            "name": "심주완",
+            "affiliation": "고양시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 34,
+            "name": "정우진",
+            "affiliation": "건국대학교(A)",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "여자 하프마라톤 결승",
+        "division": "여자부",
+        "date": "2026-03-15",
+        "venue": "서울",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "이수민",
+            "affiliation": "삼척시청",
+            "record": "1:13:11",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "정현지",
+            "affiliation": "삼척시청",
+            "record": "1:17:07",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "신사흰",
+            "affiliation": "삼척시청",
+            "record": "1:17:22",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "이재영",
+            "affiliation": "K-water",
+            "record": "1:17:40",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "김지혜",
+            "affiliation": "경산시청",
+            "record": "1:18:06",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "김려현",
+            "affiliation": "경기도청",
+            "record": "1:21:01",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "이보라",
+            "affiliation": "K-water",
+            "record": "1:22:26",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "김유진",
+            "affiliation": "국민대학교(평생교육원)",
+            "record": "1:26:38",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "임경희",
+            "affiliation": "삼척시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "박호선",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "이유정",
+            "affiliation": "단양군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "남보하나",
+            "affiliation": "경기도청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "이지은",
+            "affiliation": "K-water",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "권하영",
+            "affiliation": "남양주시청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "안슬기",
+            "affiliation": "진도군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "오달님",
+            "affiliation": "단양군청",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "competitionId": "2026-road-005",
+    "toCd": "E013900197",
+    "competitionName": "제42회 코오롱구간마라톤대회(중학교부)",
+    "year": "2026",
+    "period": "2026-03-28 ~ 2026-03-28",
+    "venue": "경주",
+    "events": [
+      {
+        "event": "12 역전경기 1일차",
+        "division": "남자중학교부",
+        "date": "2026-03-28",
+        "venue": "경주",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "박준혁(7회)건대부중  10:39",
+            "affiliation": "오성일(10회)배문중  12:02",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "곽민재11:13  238:44",
+            "affiliation": "오대찬0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "박해성13:10  1642:25",
+            "affiliation": "유태민0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "김윤13:58  1749:29",
+            "affiliation": "박성민0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "최승현11:01  137:35",
+            "affiliation": "마준12:26  350:01",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "이시영11:54  837:53",
+            "affiliation": "박건도12:14  250:07",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "박주한11:26  437:31",
+            "affiliation": "조여준13:23  850:54",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "김태산11:36  538:22",
+            "affiliation": "박건태12:34  450:56",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "구승완11:49  739:00",
+            "affiliation": "김종인12:07  151:07",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "강동훈11:44  638:31",
+            "affiliation": "송우주12:48  551:19",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "최아인11:57  939:31",
+            "affiliation": "이태민13:03  752:34",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "김준서12:41  1239:57",
+            "affiliation": "김진석13:29  953:26",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "조민규13:02  1541:00",
+            "affiliation": "한서우12:50  653:50",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "황서진11:24  340:03",
+            "affiliation": "김성은13:48  1153:51",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 15,
+            "name": "김윤형12:32  1140:35",
+            "affiliation": "장시원13:46  1054:21",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 16,
+            "name": "김승휘12:13  1040:15",
+            "affiliation": "조명석15:07  1455:22",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 17,
+            "name": "이종석12:42  1341:14",
+            "affiliation": "엄석현14:30  1255:44",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 18,
+            "name": "안현호12:59  1445:27",
+            "affiliation": "이준성14:35  131:00:02",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 19,
+            "name": "김대윤15:54  1845:16",
+            "affiliation": "강범서21:32  151:06:48",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 20,
+            "name": "조건준0  0",
+            "affiliation": "이승원0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 21,
+            "name": "유영우0  0",
+            "affiliation": "박준호0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "22 역전경기 1일차",
+        "division": "여자중학교부",
+        "date": "2026-03-28",
+        "venue": "경주",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "김령이(6회)한일여중  11:32",
+            "affiliation": "임윤희(4회)동인천여중  13:24",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "박하연16:39  850:09",
+            "affiliation": "이소연0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "박서윤16:22  752:11",
+            "affiliation": "백서희0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "전은지13:16  543:56",
+            "affiliation": "최여원14:51  258:47",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "안예지12:48  344:53",
+            "affiliation": "손예원14:41  159:34",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "이유미13:33  645:22",
+            "affiliation": "우예진14:58  31:00:20",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "권현숙13:15  444:05",
+            "affiliation": "권정빈16:55  41:01:00",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "구하은12:36  246:11",
+            "affiliation": "이루리16:59  51:03:10",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "이윤아12:34  145:49",
+            "affiliation": "박민영20:47  71:06:36",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "이채현17:10  1049:11",
+            "affiliation": "이시은18:18  61:07:29",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "이정은17:07  952:55",
+            "affiliation": "하채윤22:52  81:15:47",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "이유라0  0",
+            "affiliation": "최아영0  0",
+            "record": "",
+            "personal_best": "",
+            "note": "",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "competitionId": "2026-road-006",
+    "toCd": "E010400417",
+    "competitionName": "제42회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2026",
+    "period": "2026-03-28 ~ 2026-03-28",
+    "venue": "경주",
+    "events": [
+      {
+        "event": "13 역전경기 1일차",
+        "division": "남자고등학교부",
+        "date": "2026-03-28",
+        "venue": "경주",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "강순(24회)배문고  19:58",
+            "affiliation": "김준수(23회)충북체고  22:05",
+            "record": "이동진(17회)배문고  14:44",
+            "personal_best": "",
+            "note": "이두행(15회)목포기계공고  25:40",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "서정휘20:35  11:07:25",
+            "affiliation": "최진호24:34  11:31:59",
+            "record": "최지호15:29  11:47:28",
+            "personal_best": "",
+            "note": "유형원27:49  32:15:17",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "하태훈21:19  21:08:42",
+            "affiliation": "권오을24:48  21:33:30",
+            "record": "안세현15:43  21:49:13",
+            "personal_best": "",
+            "note": "왕현빈26:57  12:16:10",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "박성문21:24  31:09:07",
+            "affiliation": "가보현25:12  31:34:19",
+            "record": "이민규15:47  31:50:06",
+            "personal_best": "",
+            "note": "이정인28:40  42:18:46",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "최대한21:25  41:08:24",
+            "affiliation": "박창환25:38  41:34:02",
+            "record": "임재우16:21  51:50:23",
+            "personal_best": "",
+            "note": "손태욱29:36  62:19:59",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "이태양22:18  61:13:12",
+            "affiliation": "한성민25:41  51:38:53",
+            "record": "김한성16:49  71:55:42",
+            "personal_best": "",
+            "note": "박준호27:47  22:23:29",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "천범로22:22  71:12:15",
+            "affiliation": "김준혁26:37  91:38:52",
+            "record": "김진홍17:34  91:56:26",
+            "personal_best": "",
+            "note": "김민기30:21  92:26:47",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "황제이23:08  91:15:25",
+            "affiliation": "정우혁25:44  61:41:09",
+            "record": "박승원16:29  61:57:38",
+            "personal_best": "",
+            "note": "양승환29:11  52:26:49",
+            "newRecord": ""
+          },
+          {
+            "rank": 9,
+            "name": "박상호22:47  81:12:32",
+            "affiliation": "정현준26:00  71:38:32",
+            "record": "김기웅18:46  111:57:18",
+            "personal_best": "",
+            "note": "최백건29:40  72:26:58",
+            "newRecord": ""
+          },
+          {
+            "rank": 10,
+            "name": "황현승21:56  51:12:53",
+            "affiliation": "김준26:35  81:39:28",
+            "record": "이승윤17:59  101:57:27",
+            "personal_best": "",
+            "note": "김정현30:20  82:27:47",
+            "newRecord": ""
+          },
+          {
+            "rank": 11,
+            "name": "권은찬24:14  101:15:35",
+            "affiliation": "김경균26:41  101:42:16",
+            "record": "이모하17:10  81:59:26",
+            "personal_best": "",
+            "note": "정재민32:03  112:31:29",
+            "newRecord": ""
+          },
+          {
+            "rank": 12,
+            "name": "손사랑24:55  111:16:39",
+            "affiliation": "채홍서28:08  111:44:47",
+            "record": "최수종19:33  122:04:20",
+            "personal_best": "",
+            "note": "박창준30:42  102:35:02",
+            "newRecord": ""
+          },
+          {
+            "rank": 13,
+            "name": "천정권28:21  121:24:58",
+            "affiliation": "이석현28:12  121:53:10",
+            "record": "김상형16:07  42:09:17",
+            "personal_best": "",
+            "note": "김규래32:12  122:41:29",
+            "newRecord": ""
+          },
+          {
+            "rank": 14,
+            "name": "정우현23:38  1:13:55",
+            "affiliation": "홍석현0  0",
+            "record": "김예준0  0",
+            "personal_best": "",
+            "note": "변상일0  0",
+            "newRecord": ""
+          }
+        ]
+      },
+      {
+        "event": "23 역전경기 1일차",
+        "division": "여자고등학교부",
+        "date": "2026-03-28",
+        "venue": "경주",
+        "wind": null,
+        "results": [
+          {
+            "rank": 1,
+            "name": "이연진(19회)경기체고  22:18",
+            "affiliation": "신사흰(24회)경기체고  25:12",
+            "record": "강다은(28회)오류고  17:04",
+            "personal_best": "",
+            "note": "장한나(27회)상지여고  28:37",
+            "newRecord": ""
+          },
+          {
+            "rank": 2,
+            "name": "강세민25:42  11:20:34",
+            "affiliation": "양예리30:13  21:50:47",
+            "record": "김려원20:56  42:11:43",
+            "personal_best": "",
+            "note": "김명지34:25  22:46:08",
+            "newRecord": ""
+          },
+          {
+            "rank": 3,
+            "name": "신유희26:48  31:24:04",
+            "affiliation": "조윤아28:49  11:52:53",
+            "record": "김보미19:19  12:12:12",
+            "personal_best": "",
+            "note": "이지민34:46  32:46:58",
+            "newRecord": ""
+          },
+          {
+            "rank": 4,
+            "name": "김가연27:49  41:24:16",
+            "affiliation": "윤정연30:42  31:54:58",
+            "record": "최민서19:43  22:14:41",
+            "personal_best": "",
+            "note": "김현주35:21  42:50:02",
+            "newRecord": ""
+          },
+          {
+            "rank": 5,
+            "name": "지해영26:37  21:25:49",
+            "affiliation": "김세연31:49  51:56:24",
+            "record": "이선민20:31  32:16:55",
+            "personal_best": "",
+            "note": "김은희34:07  12:51:02",
+            "newRecord": ""
+          },
+          {
+            "rank": 6,
+            "name": "박수진28:50  51:28:50",
+            "affiliation": "선민주30:55  41:58:31",
+            "record": "배서연23:24  52:21:55",
+            "personal_best": "",
+            "note": "최연서38:26  53:00:21",
+            "newRecord": ""
+          },
+          {
+            "rank": 7,
+            "name": "송다원0  0",
+            "affiliation": "김은정0  0",
+            "record": "김예향0  0",
+            "personal_best": "",
+            "note": "이수빈0  0",
+            "newRecord": ""
+          },
+          {
+            "rank": 8,
+            "name": "이채린25:37  1:20:33",
+            "affiliation": "손희진0  0",
+            "record": "남채은0  0",
+            "personal_best": "",
+            "note": "민시윤0  0",
+            "newRecord": ""
+          }
+        ]
+      }
+    ]
+  }
+]

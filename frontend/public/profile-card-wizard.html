@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AthleteTime 기록카드 마법사</title>
+    <style>
+      :root {
+        color: #0f172a;
+        background: #f8fafc;
+        font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        border: 1px solid #dbe3ea;
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+      }
+      .eyebrow {
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      h1 {
+        margin: 12px 0 8px;
+        font-size: clamp(28px, 5vw, 44px);
+        line-height: 1.05;
+      }
+      p {
+        color: #475569;
+        line-height: 1.7;
+      }
+      label {
+        display: block;
+        margin-top: 22px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 16px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      a,
+      button {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font: inherit;
+        font-weight: 800;
+        text-decoration: none;
+      }
+      a {
+        background: #0f172a;
+        color: #ffffff;
+      }
+      button {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+      .note {
+        margin-top: 22px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 16px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="eyebrow">기록카드 만들기</div>
+      <h1><span id="selected-athlete-name">이름을 직접 입력해 주세요</span></h1>
+      <p>선수 이름이 넘어왔다면 먼저 기록을 다시 확인하고, 카드에 넣을 내용만 직접 고르세요.</p>
+      <label for="athlete-name-input">카드에 표시할 이름</label>
+      <input id="athlete-name-input" type="text" autocomplete="off" placeholder="이름을 입력하세요" />
+      <div class="actions">
+        <a id="records-link" href="/records">기록 확인하기</a>
+        <button type="button" id="reset-button">비우기</button>
+      </div>
+      <p class="note">직접 확인한 뒤 공유해 주세요. 같은 이름의 다른 선수일 수 있어요.</p>
+    </main>
+    <script>
+      function sanitizeName(value) {
+        return value.replace(/[\u0000-\u001F\u007F]/g, '').trim().slice(0, 40);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const selectedName = sanitizeName(params.get('name') || '');
+      const nameTarget = document.getElementById('selected-athlete-name');
+      const input = document.getElementById('athlete-name-input');
+      const recordLink = document.getElementById('records-link');
+      const resetButton = document.getElementById('reset-button');
+
+      if (selectedName) {
+        nameTarget.textContent = selectedName;
+        input.value = selectedName;
+        recordLink.href = `/records?q=${encodeURIComponent(selectedName)}`;
+      }
+
+      input.addEventListener('input', () => {
+        const value = sanitizeName(input.value);
+        nameTarget.textContent = value || '이름을 직접 입력해 주세요';
+        recordLink.href = value ? `/records?q=${encodeURIComponent(value)}` : '/records';
+      });
+
+      resetButton.addEventListener('click', () => {
+        input.value = '';
+        nameTarget.textContent = '이름을 직접 입력해 주세요';
+        recordLink.href = '/records';
+      });
+    </script>
+  </body>
+</html>

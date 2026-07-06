@@ -1,0 +1,452 @@
+[
+  {
+    "id": "2022-road-003",
+    "kaafSeq": null,
+    "toCd": "E014030145",
+    "name": "2022 대구국제마라톤대회",
+    "period": {
+      "start": "2022-04-03",
+      "end": "2022-04-03"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E014030145&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 140
+  },
+  {
+    "id": "2022-road-004",
+    "kaafSeq": null,
+    "toCd": "E010171235",
+    "name": "2022 서울마라톤대회 겸 제92회 동아마라톤대회",
+    "period": {
+      "start": "2022-04-17",
+      "end": "2022-04-17"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010171235&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 117
+  },
+  {
+    "id": "2022-track_field-001",
+    "kaafSeq": null,
+    "toCd": "E010010551",
+    "name": "제51회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2022-04-19",
+      "end": "2022-04-23"
+    },
+    "venue": "대구",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010010551&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 230,
+    "athleteCount": 1958
+  },
+  {
+    "id": "2022-junior-001",
+    "kaafSeq": null,
+    "toCd": "E01538049C",
+    "name": "2022 세계U20육상경기선수권대회 선발대회",
+    "period": {
+      "start": "2022-04-19",
+      "end": "2022-04-23"
+    },
+    "venue": "대구",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E01538049C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-junior-002",
+    "kaafSeq": null,
+    "toCd": "E010040492",
+    "name": "제51회 전국소년체육대회(육상경기)",
+    "period": {
+      "start": "2022-05-28",
+      "end": "2022-05-29"
+    },
+    "venue": "구미",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010040492&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 49,
+    "athleteCount": 839
+  },
+  {
+    "id": "2022-track_field-002",
+    "kaafSeq": null,
+    "toCd": "E010050521",
+    "name": "제50회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2022-06-02",
+      "end": "2022-06-06"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010050521&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 117,
+    "athleteCount": 1107
+  },
+  {
+    "id": "2022-track_field-003",
+    "kaafSeq": null,
+    "toCd": "E015110113",
+    "name": "제50회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2022-06-02",
+      "end": "2022-06-06"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E015110113&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 62,
+    "athleteCount": 493
+  },
+  {
+    "id": "2022-road-001",
+    "kaafSeq": null,
+    "toCd": "M00003006X",
+    "name": "제28회 대한체육회장배 전국생활체육육상경기대회 2022 전국생활체육대축전",
+    "period": {
+      "start": "2022-06-04",
+      "end": "2022-06-05"
+    },
+    "venue": "예천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=M00003006X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 93,
+    "athleteCount": 672
+  },
+  {
+    "id": "2022-track_field-004",
+    "kaafSeq": null,
+    "toCd": "E010020763",
+    "name": "제76회 전국육상경기선수권대회",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010020763&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 62,
+    "athleteCount": 575
+  },
+  {
+    "id": "2022-junior-003",
+    "kaafSeq": null,
+    "toCd": "E01242020C",
+    "name": "제22회 한국U20육상경기선수권대회",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E01242020C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 54,
+    "athleteCount": 378
+  },
+  {
+    "id": "2022-junior-004",
+    "kaafSeq": null,
+    "toCd": "E01510011D",
+    "name": "제13회 한국U18육상경기대회",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E01510011D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 56,
+    "athleteCount": 466
+  },
+  {
+    "id": "2022-junior-005",
+    "kaafSeq": null,
+    "toCd": "E010121204",
+    "name": "2022 교보생명컵전국초등학교시.도대항육상경기대회",
+    "period": {
+      "start": "2022-07-10",
+      "end": "2022-07-10"
+    },
+    "venue": "영천",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010121204&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 24,
+    "athleteCount": 399
+  },
+  {
+    "id": "2022-track_field-005",
+    "kaafSeq": null,
+    "toCd": "E010100462",
+    "name": "문화체육관광부장관기 제43회 전국시.도대항육상경기대회",
+    "period": {
+      "start": "2022-07-23",
+      "end": "2022-07-25"
+    },
+    "venue": "울산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010100462&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 121,
+    "athleteCount": 1194
+  },
+  {
+    "id": "2022-road-002",
+    "kaafSeq": null,
+    "toCd": "M00007006X",
+    "name": "문화체육관광부장관배 제30회 전국생활체육시도대항육상경기대회",
+    "period": {
+      "start": "2022-07-23",
+      "end": "2022-07-24"
+    },
+    "venue": "울산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=M00007006X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 83,
+    "athleteCount": 293
+  },
+  {
+    "id": "2022-road-005",
+    "kaafSeq": null,
+    "toCd": "E010380518",
+    "name": "제52회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2022-09-04",
+      "end": "2022-09-04"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010380518&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-006",
+    "kaafSeq": null,
+    "toCd": "E015230107",
+    "name": "제52회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2022-09-04",
+      "end": "2022-09-04"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E015230107&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-007",
+    "kaafSeq": null,
+    "toCd": "E010400377",
+    "name": "제38회 코오롱구간마라톤대회(고등학교부)",
+    "period": {
+      "start": "2022-09-24",
+      "end": "2022-09-24"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010400377&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 15
+  },
+  {
+    "id": "2022-track_field-006",
+    "kaafSeq": null,
+    "toCd": "E010031032",
+    "name": "제103회 전국체육대회 (육상경기)",
+    "period": {
+      "start": "2022-10-09",
+      "end": "2022-10-12"
+    },
+    "venue": "울산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010031032&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 150,
+    "athleteCount": 1972
+  },
+  {
+    "id": "2022-road-008",
+    "kaafSeq": null,
+    "toCd": "E015570056",
+    "name": "2022 동아일보 경주 주니어하프마라톤대회",
+    "period": {
+      "start": "2022-10-16",
+      "end": "2022-10-16"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E015570056&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-009",
+    "kaafSeq": null,
+    "toCd": "E014010145",
+    "name": "동아일보 2022 경주국제마라톤대회",
+    "period": {
+      "start": "2022-10-16",
+      "end": "2022-10-16"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E014010145&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 53
+  },
+  {
+    "id": "2022-road-010",
+    "kaafSeq": null,
+    "toCd": "E015480076",
+    "name": "2022 조선일보 주니어하프마라톤대회",
+    "period": {
+      "start": "2022-10-23",
+      "end": "2022-10-23"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E015480076&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-011",
+    "kaafSeq": null,
+    "toCd": "E010141215",
+    "name": "2022 조선일보마라톤대회 겸 제76회 전국마라톤선수권대회",
+    "period": {
+      "start": "2022-10-23",
+      "end": "2022-10-23"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E010141215&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 37
+  },
+  {
+    "id": "2022-road-012",
+    "kaafSeq": null,
+    "toCd": "E015470076",
+    "name": "2022 JTBC서울 주니어하프마라톤대회",
+    "period": {
+      "start": "2022-11-06",
+      "end": "2022-11-06"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E015470076&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 11
+  },
+  {
+    "id": "2022-road-013",
+    "kaafSeq": null,
+    "toCd": "E012670205",
+    "name": "2022 JTBC서울마라톤대회",
+    "period": {
+      "start": "2022-11-06",
+      "end": "2022-11-06"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=E012670205&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 74
+  },
+  {
+    "id": "2022-road-014",
+    "kaafSeq": null,
+    "toCd": "M00008007P",
+    "name": "평화의섬 2022 국무총리기 전국생활체육구간마라톤대회",
+    "period": {
+      "start": "2022-11-12",
+      "end": "2022-11-12"
+    },
+    "venue": "제주도",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2022&to_cd=M00008007P&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 7
+  }
+]

@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>AthleTime · 애슬리트 타임</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+<style>/* AthleTime — 한글 심플 버전
+ * Pretendard 원툴, 여백 중심, 흰 배경 + 블랙 잉크
+ * 토스/노션 방식: 크기와 굵기로 위계, 컬러는 최소한
+ */
+:root{
+  /* Surface */
+  --bg: #FFFFFF;
+  --bg-soft: #F7F7F8;
+  --bg-tint: #F2F2F4;
+
+  /* Ink */
+  --ink: #111111;
+  --ink-2: #333333;
+  --ink-3: #6E6E73;   /* muted */
+  --ink-4: #A1A1A6;   /* placeholder / hint */
+  --rule: #E5E5EA;
+  --rule-strong: #111111;
+
+  /* Accent — 최소한으로 */
+  --accent: #FF3B30;   /* 육상 트랙 느낌의 선명한 빨강 (애플 Red 근방) */
+  --accent-soft: #FFEBEA;
+  --positive: #00875A; /* 개인 최고 */
+  --positive-soft: #E6F4EE;
+
+  /* Type */
+  --sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --mono: "Pretendard Variable", "Pretendard", ui-monospace, monospace; /* 숫자도 Pretendard tabular */
+
+  /* Scale — 한글 기준으로 살짝 크게 */
+  --fs-hero: clamp(48px, 7vw, 96px);
+  --fs-h1: clamp(36px, 4.5vw, 64px);
+  --fs-h2: clamp(26px, 2.6vw, 36px);
+  --fs-h3: 20px;
+  --fs-body: 16px;
+  --fs-sm: 14px;
+  --fs-xs: 12px;
+
+  /* Spacing */
+  --gutter: clamp(20px, 4vw, 64px);
+
+  /* Radius — 부드럽게 */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  /* Shadow — 은은하게 */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:var(--fs-body);
+  line-height:1.55;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01","ss02";
+  letter-spacing:-0.01em;
+}
+
+/* tabular numerals helper */
+.num{font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+
+/* Link default */
+a{color:inherit;text-decoration:none}
+
+/* 선택 */
+::selection{background:var(--ink);color:#fff}
+
+/* 스크롤바 */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule);border-radius:10px;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-4)}
+
+/* ============ 공통 네비 ============ */
+.at-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--rule);
+}
+.at-nav-inner{
+  display:flex;align-items:center;gap:32px;
+  padding:14px var(--gutter);
+  max-width:1440px;margin:0 auto;
+}
+.at-logo{
+  font-size:19px;font-weight:700;letter-spacing:-0.03em;
+  color:var(--ink);display:flex;align-items:center;gap:6px;
+}
+.at-logo .dot{width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;margin-bottom:2px}
+.at-menu{display:flex;gap:28px;margin-left:8px}
+.at-menu a{
+  font-size:15px;color:var(--ink-3);font-weight:500;
+  padding:6px 0;transition:color .15s;
+}
+.at-menu a:hover{color:var(--ink)}
+.at-menu a.active{color:var(--ink);font-weight:600}
+
+.at-search{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-soft);
+  padding:9px 14px;border-radius:10px;min-width:280px;
+  transition:background .15s;
+}
+.at-search:hover{background:var(--bg-tint)}
+.at-search input{border:0;background:transparent;outline:0;font-size:14px;width:100%;color:var(--ink);font-family:inherit}
+.at-search input::placeholder{color:var(--ink-4)}
+.at-search kbd{font-family:inherit;font-size:11px;color:var(--ink-3);background:#fff;padding:2px 6px;border-radius:4px;border:1px solid var(--rule)}
+.at-search svg{color:var(--ink-3);flex-shrink:0}
+
+/* ============ 버튼 ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 20px;border-radius:10px;
+  font-size:14px;font-weight:600;font-family:inherit;
+  border:0;cursor:pointer;transition:background .15s, transform .05s;
+  background:var(--bg-soft);color:var(--ink);
+}
+.btn:hover{background:var(--bg-tint)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.btn.ghost{background:transparent;border:1px solid var(--rule)}
+.btn.ghost:hover{background:var(--bg-soft)}
+.btn.lg{padding:14px 24px;font-size:15px;border-radius:12px}
+
+/* ============ 배지 (한글 중심) ============ */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;
+  background:var(--bg-soft);color:var(--ink-2);
+}
+.tag.red{background:var(--accent-soft);color:var(--accent)}
+.tag.green{background:var(--positive-soft);color:var(--positive)}
+.tag.dark{background:var(--ink);color:#fff}
+.tag.live{background:var(--accent);color:#fff;display:inline-flex;align-items:center;gap:5px}
+.tag.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,40%{opacity:1}70%,100%{opacity:.3}}
+
+/* ============ 카드 ============ */
+.card{
+  background:var(--bg);
+  border:1px solid var(--rule);
+  border-radius:var(--r-md);
+  transition:border-color .15s, box-shadow .15s, transform .15s;
+}
+.card:hover{border-color:var(--ink-4);box-shadow:var(--shadow-sm)}
+.card.soft{background:var(--bg-soft);border-color:transparent}
+.card.soft:hover{background:var(--bg-tint)}
+
+/* ============ 유틸 ============ */
+.muted{color:var(--ink-3)}
+.faint{color:var(--ink-4)}
+.hairline{height:1px;background:var(--rule);border:0;margin:0}
+</style>
+<style data-screen-label="01 홈 시즌">
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+.wrap-wide{max-width:1440px;margin:0 auto;padding:0 var(--gutter)}
+
+/* ===== 시즌 알림 띠 ===== */
+.season-strip{
+  background:var(--ink);color:#fff;
+  padding:10px var(--gutter);
+  display:flex;align-items:center;gap:14px;
+  font-size:13px;letter-spacing:-0.01em;
+  position:relative;overflow:hidden;
+}
+.season-strip .live-dot{
+  width:7px;height:7px;background:var(--accent);border-radius:50%;
+  animation:pulse 1.2s infinite;flex-shrink:0;
+}
+.season-strip .marquee{
+  display:flex;gap:32px;white-space:nowrap;
+  animation:slide 40s linear infinite;
+}
+.season-strip .marquee span{display:inline-flex;align-items:center;gap:8px}
+.season-strip .marquee b{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.season-strip .switch{
+  margin-left:auto;flex-shrink:0;
+  font-size:12px;color:rgba(255,255,255,.6);
+  cursor:pointer;padding:4px 10px;border:1px solid rgba(255,255,255,.2);border-radius:100px;
+  transition:background .15s;
+}
+.season-strip .switch:hover{background:rgba(255,255,255,.08);color:#fff}
+@keyframes slide{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+
+/* ===== 헤로 — 라이브 대회 ===== */
+.hero-live{
+  padding:48px 0 32px;position:relative;
+}
+.live-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:24px;flex-wrap:wrap;gap:12px;
+}
+.live-meta .now{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 14px;background:var(--accent-soft);border-radius:100px;
+  font-size:13px;font-weight:600;color:var(--accent);
+}
+.live-meta .now .dot{
+  width:6px;height:6px;background:var(--accent);border-radius:50%;
+  animation:pulse 1.2s infinite;
+}
+.live-meta .breadcrumb{
+  font-size:13px;color:var(--ink-3);font-weight:500;
+}
+.live-meta .breadcrumb b{color:var(--ink);font-weight:600}
+
+.hero-live h1{
+  font-size:clamp(48px, 7vw, 96px);
+  font-weight:800;letter-spacing:-0.045em;line-height:0.96;
+  margin:0 0 14px;text-wrap:balance;
+}
+.hero-live .meta-row{
+  display:flex;gap:24px;flex-wrap:wrap;
+  font-size:16px;color:var(--ink-3);font-weight:500;
+  margin-bottom:32px;
+}
+.hero-live .meta-row b{color:var(--ink);font-weight:600}
+.hero-live .meta-row .div{color:var(--ink-4)}
+
+/* 라이브 대시보드 (헤로 안) */
+.live-dash{
+  display:grid;grid-template-columns:1.4fr 1fr;gap:0;
+  border-radius:var(--r-lg);overflow:hidden;
+  background:var(--ink);
+  position:relative;
+}
+.live-dash > div{padding:32px 36px}
+
+/* 왼쪽: 지금 진행 중 */
+.live-now{
+  background:var(--ink);color:#fff;
+  position:relative;
+}
+.live-now::before{
+  content:"";position:absolute;right:-80px;top:-80px;
+  width:280px;height:280px;
+  background:radial-gradient(circle, rgba(255,59,48,.22) 0%, transparent 70%);
+  border-radius:50%;
+}
+.live-now .label{
+  font-size:12px;font-weight:700;letter-spacing:0.08em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:12px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.live-now .label::before{
+  content:"";width:6px;height:6px;background:var(--accent);
+  border-radius:50%;animation:pulse 1.2s infinite;
+}
+.live-now h2{
+  font-size:34px;font-weight:700;letter-spacing:-0.025em;line-height:1.1;
+  margin:0 0 8px;color:#fff;
+}
+.live-now .stage{
+  font-size:14px;color:rgba(255,255,255,.6);margin-bottom:24px;
+}
+.live-now .ranking{
+  display:flex;flex-direction:column;gap:1px;
+  background:rgba(255,255,255,.08);border-radius:12px;overflow:hidden;
+}
+.live-now .rank-row{
+  display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;
+  padding:14px 18px;background:var(--ink);
+  font-size:15px;
+}
+.live-now .rank-row.lead{background:rgba(255,59,48,.12)}
+.live-now .rank-row .pos{
+  font-size:18px;font-weight:700;color:rgba(255,255,255,.4);
+  font-variant-numeric:tabular-nums;text-align:center;
+}
+.live-now .rank-row.lead .pos{color:var(--accent)}
+.live-now .rank-row .athlete{color:#fff;font-weight:600}
+.live-now .rank-row .athlete .team{display:block;font-size:12px;color:rgba(255,255,255,.5);font-weight:400;margin-top:1px}
+.live-now .rank-row .time{
+  font-size:18px;font-weight:700;letter-spacing:-0.02em;
+  font-variant-numeric:tabular-nums;color:#fff;
+}
+.live-now .rank-row.lead .time{color:var(--accent)}
+.live-now .rank-row .gap{
+  font-size:11px;color:rgba(255,255,255,.5);font-weight:500;
+  display:block;text-align:right;margin-top:1px;font-variant-numeric:tabular-nums;
+}
+
+.live-now .next-up{
+  margin-top:18px;padding:14px 16px;
+  background:rgba(255,255,255,.06);border-radius:10px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;
+}
+.live-now .next-up .l{color:rgba(255,255,255,.5)}
+.live-now .next-up .r{color:#fff;font-weight:600}
+
+/* 오른쪽: 다음 종목 / 오늘 일정 */
+.live-side{
+  background:#fff;color:var(--ink);
+}
+.live-side .label{
+  font-size:12px;font-weight:700;letter-spacing:0.08em;
+  color:var(--ink-3);text-transform:uppercase;margin-bottom:14px;
+}
+.live-side .schedule{
+  display:flex;flex-direction:column;gap:2px;
+}
+.live-side .ev{
+  display:grid;grid-template-columns:60px 1fr auto;gap:14px;
+  padding:14px 0;border-bottom:1px solid var(--rule);
+  font-size:14px;align-items:center;
+}
+.live-side .ev:last-child{border-bottom:0}
+.live-side .ev .t{
+  font-size:13px;color:var(--ink-3);font-weight:500;
+  font-variant-numeric:tabular-nums;
+}
+.live-side .ev.now .t{color:var(--accent);font-weight:700}
+.live-side .ev .body{font-weight:600;letter-spacing:-0.01em;color:var(--ink)}
+.live-side .ev .body .stage{font-size:12px;color:var(--ink-3);font-weight:500;margin-top:1px}
+.live-side .ev .status{
+  font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;
+  background:var(--bg-soft);color:var(--ink-3);text-transform:uppercase;letter-spacing:0.04em;
+}
+.live-side .ev.now .status{background:var(--accent);color:#fff}
+.live-side .ev.done .status{background:var(--positive-soft);color:var(--positive)}
+
+.hero-live .cta-row{
+  display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;
+}
+.btn-live{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 22px;background:var(--ink);color:#fff;
+  border-radius:10px;font-size:14px;font-weight:700;
+  transition:background .15s;
+}
+.btn-live:hover{background:#000}
+.btn-live .dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:pulse 1.2s infinite}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:13px 22px;background:transparent;color:var(--ink);
+  border-radius:10px;font-size:14px;font-weight:600;
+  border:1px solid var(--rule);transition:background .15s;
+}
+.btn-ghost:hover{background:var(--bg-soft)}
+
+/* ===== 검색바 (작아진 보조 검색) ===== */
+.mini-search{
+  margin:48px 0 0;padding:24px 28px;
+  background:var(--bg-soft);border-radius:var(--r-lg);
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.mini-search .lbl{
+  font-size:14px;font-weight:600;color:var(--ink-3);
+  flex-shrink:0;
+}
+.mini-search .input-box{
+  flex:1;display:flex;align-items:center;gap:10px;
+  padding:10px 16px;background:#fff;border-radius:10px;
+  min-width:280px;
+}
+.mini-search input{
+  flex:1;border:0;outline:0;background:transparent;
+  font-size:15px;color:var(--ink);font-family:inherit;
+  font-weight:500;letter-spacing:-0.01em;
+}
+.mini-search input::placeholder{color:var(--ink-4);font-weight:400}
+.mini-search kbd{
+  font-family:inherit;font-size:11px;color:var(--ink-3);
+  padding:3px 7px;border-radius:5px;background:var(--bg-soft);
+}
+
+/* ===== 섹션 공통 ===== */
+.section{padding:80px 0}
+.section-head{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:28px;gap:16px;flex-wrap:wrap;
+}
+.section-head h2{
+  font-size:var(--fs-h2);font-weight:700;letter-spacing:-0.03em;
+  margin:0 0 6px;line-height:1.1;
+}
+.section-head .sub{font-size:15px;color:var(--ink-3);font-weight:500;margin:0}
+.section-head .more{
+  font-size:14px;color:var(--ink-3);font-weight:500;
+  display:inline-flex;align-items:center;gap:4px;
+}
+.section-head .more:hover{color:var(--ink)}
+
+/* ===== 종목별 라이브 보드 ===== */
+.events-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ev-board{
+  padding:24px;background:#fff;border:1px solid var(--rule);
+  border-radius:var(--r-md);
+  display:flex;flex-direction:column;gap:14px;
+  transition:border-color .15s;
+}
+.ev-board:hover{border-color:var(--ink-4)}
+.ev-board.live{background:var(--bg-soft);border-color:transparent;position:relative}
+.ev-board.live::before{
+  content:"";position:absolute;left:0;top:0;width:3px;height:24px;
+  background:var(--accent);border-radius:0 3px 3px 0;
+}
+.ev-board.done{opacity:.55}
+.ev-board .head{display:flex;justify-content:space-between;align-items:center}
+.ev-board .name{font-size:18px;font-weight:700;letter-spacing:-0.02em}
+.ev-board .stage{font-size:12px;color:var(--ink-3);font-weight:500;margin-top:2px}
+.ev-board .status{
+  font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;
+  background:var(--bg-soft);color:var(--ink-3);
+}
+.ev-board.live .status{background:var(--accent);color:#fff}
+.ev-board.done .status{background:var(--positive-soft);color:var(--positive)}
+.ev-board.up-next .status{background:var(--ink);color:#fff}
+
+.ev-board .top-time{
+  font-size:36px;font-weight:700;letter-spacing:-0.035em;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+  display:flex;align-items:baseline;gap:8px;
+}
+.ev-board .top-time .who{font-size:14px;font-weight:500;color:var(--ink-3);letter-spacing:0;}
+.ev-board.live .top-time{color:var(--accent)}
+.ev-board .placeholder-time{
+  font-size:36px;font-weight:700;letter-spacing:-0.035em;line-height:1;
+  color:var(--ink-4);
+}
+
+.ev-board .progress{
+  height:4px;background:var(--bg-tint);border-radius:2px;overflow:hidden;
+  position:relative;
+}
+.ev-board .progress .bar{
+  height:100%;background:var(--accent);border-radius:2px;
+  position:relative;
+}
+.ev-board.live .progress .bar::after{
+  content:"";position:absolute;right:-2px;top:-2px;
+  width:8px;height:8px;background:var(--accent);border-radius:50%;
+  box-shadow:0 0 0 4px rgba(255,59,48,.2);animation:pulse 1.2s infinite;
+}
+.ev-board .meta-line{
+  display:flex;justify-content:space-between;
+  font-size:12px;color:var(--ink-3);font-weight:500;
+}
+
+/* ===== 오늘의 기록 (시즌엔 보조) ===== */
+.today-flow{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:0;
+}
+.flow-col{display:flex;flex-direction:column}
+.flow-col + .flow-col{border-left:1px solid var(--rule);margin-left:-1px}
+.flow-row{
+  display:grid;grid-template-columns:60px 1fr auto;gap:14px;align-items:center;
+  padding:18px 22px;border-bottom:1px solid var(--rule);
+  transition:background .15s;
+}
+.flow-row:hover{background:var(--bg-soft)}
+.flow-row .time{font-size:12px;color:var(--ink-4);font-weight:500;font-variant-numeric:tabular-nums}
+.flow-row .body .name{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+.flow-row .body .event{font-size:12px;color:var(--ink-3);margin-top:1px}
+.flow-row .val{font-size:18px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;text-align:right}
+.flow-row .val .pb{display:inline-block;font-size:9px;font-weight:700;color:#fff;background:var(--positive);padding:1px 5px;border-radius:3px;margin-left:4px;letter-spacing:0.04em;vertical-align:middle}
+
+/* ===== 커뮤니티 — 시즌 컨텍스트 ===== */
+.com-section{
+  background:var(--bg-soft);margin-top:40px;
+  padding:80px 0;
+}
+.com-head{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:28px;gap:16px;flex-wrap:wrap;
+}
+.com-head h2{
+  font-size:var(--fs-h2);font-weight:700;letter-spacing:-0.03em;
+  margin:0 0 6px;line-height:1.1;
+}
+.com-head .sub{font-size:15px;color:var(--ink-3);font-weight:500;margin:0}
+.com-head .sub b{color:var(--accent)}
+
+/* 트렌딩 태그 (시즌엔 대회 관련 태그가 위로) */
+.trending{
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:24px;
+  padding:14px 20px;background:#fff;border-radius:var(--r-md);
+}
+.trending .lbl{
+  font-size:12px;font-weight:700;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:0.06em;margin-right:6px;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.trending .lbl::before{content:"#";color:var(--accent);font-size:14px}
+.trending .tag-tr{
+  font-size:13px;font-weight:600;color:var(--ink);
+  padding:5px 12px;background:var(--bg-soft);border-radius:100px;
+  transition:background .15s;
+}
+.trending .tag-tr:hover{background:var(--bg-tint)}
+.trending .tag-tr.hot{background:var(--accent-soft);color:var(--accent)}
+.trending .tag-tr .n{
+  display:inline-block;margin-left:4px;font-size:11px;color:var(--ink-3);font-weight:500;
+}
+.trending .tag-tr.hot .n{color:var(--accent);opacity:.7}
+
+/* 커뮤니티 포스트 — 시즌 정렬 */
+.com-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px}
+.com-main{display:flex;flex-direction:column;gap:2px}
+.com-post{
+  display:block;padding:24px;background:#fff;border-radius:var(--r-md);
+  transition:transform .12s;
+}
+.com-post:hover{transform:translateY(-1px)}
+.com-post .meta-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.com-post .meta-top .ctx{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:12px;color:var(--accent);font-weight:600;
+}
+.com-post .meta-top .ctx::before{content:"●";font-size:8px}
+.com-post h4{font-size:18px;font-weight:600;letter-spacing:-0.02em;margin:0 0 8px;line-height:1.35;text-wrap:pretty}
+.com-post .excerpt{font-size:14px;color:var(--ink-3);line-height:1.55;margin:0 0 14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.com-post .meta-bot{font-size:12.5px;color:var(--ink-4);display:flex;gap:14px;align-items:center}
+.com-post .meta-bot b{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* 사이드: 빠른 투표 */
+.com-aside{display:flex;flex-direction:column;gap:12px}
+.poll{
+  padding:20px 22px;background:#fff;border-radius:var(--r-md);
+}
+.poll .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.poll .head .label{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em}
+.poll .head .ttl{font-size:11px;color:var(--ink-4);font-weight:500;font-variant-numeric:tabular-nums}
+.poll h5{font-size:15px;font-weight:700;letter-spacing:-0.015em;margin:0 0 14px;line-height:1.4;text-wrap:pretty}
+.poll .opts{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.poll .opt{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:10px 14px;border-radius:8px;background:var(--bg-soft);
+  position:relative;overflow:hidden;cursor:pointer;
+  font-size:13.5px;font-weight:500;
+  transition:background .12s;
+}
+.poll .opt:hover{background:var(--bg-tint)}
+.poll .opt .fill{
+  position:absolute;left:0;top:0;bottom:0;
+  background:var(--accent-soft);border-radius:8px;
+  z-index:0;
+}
+.poll .opt span,.poll .opt .pct{position:relative;z-index:1}
+.poll .opt .pct{font-size:12px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+.poll .opt.lead{font-weight:700;color:var(--accent)}
+.poll .opt.lead .pct{color:var(--accent)}
+.poll .total{font-size:12px;color:var(--ink-4);font-weight:500}
+
+/* 도구 */
+.tools-section{padding:64px 0}
+.tools-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tool-card{
+  display:flex;align-items:center;gap:18px;
+  padding:20px 22px;background:var(--bg-soft);border-radius:var(--r-md);
+  transition:background .15s;
+}
+.tool-card:hover{background:var(--bg-tint)}
+.tool-card .icon{width:42px;height:42px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:var(--ink);font-weight:700}
+.tool-card h4{font-size:15.5px;font-weight:700;letter-spacing:-0.02em;margin:0 0 2px}
+.tool-card p{font-size:12.5px;color:var(--ink-3);margin:0}
+.tool-card .arr{margin-left:auto;color:var(--ink-3);font-size:16px;transition:transform .15s, color .15s}
+.tool-card:hover .arr{color:var(--ink);transform:translateX(3px)}
+
+/* 푸터 */
+footer.site{
+  padding:48px var(--gutter);
+  display:flex;justify-content:space-between;
+  font-size:13px;color:var(--ink-4);
+  border-top:1px solid var(--rule);flex-wrap:wrap;gap:16px;
+}
+
+/* 반응형 */
+@media(max-width:1024px){
+  .live-dash{grid-template-columns:1fr}
+  .events-board,.tools-grid{grid-template-columns:1fr 1fr}
+  .com-grid{grid-template-columns:1fr}
+  .today-flow{grid-template-columns:1fr}
+  .flow-col + .flow-col{border-left:0;margin-left:0;border-top:1px solid var(--rule)}
+}
+@media(max-width:640px){
+  .hero-live h1{font-size:42px}
+  .live-dash > div{padding:24px}
+  .events-board,.tools-grid{grid-template-columns:1fr}
+  .section{padding:48px 0}
+  .season-strip{flex-wrap:wrap}
+  .season-strip .switch{margin-left:0}
+}
+</style>
+</head>
+<body data-screen-label="01 홈 시즌">
+
+<!-- 시즌 알림 띠 -->
+<div class="season-strip">
+  <span class="live-dot"></span>
+  <div class="marquee">
+    <span><b>전국체전 2일차</b> 진행 중 · 남자 400m 결선 — <b>김민성 45.82 (PB)</b></span>
+    <span>여자 100m 예선 — <b>박서연 11.42</b></span>
+    <span>남자 높이뛰기 — <b>정우진 2.28m (PB)</b></span>
+    <span>여자 800m 결선 — <b>이하늘 2:04.18</b></span>
+    <span><b>전국체전 2일차</b> 진행 중 · 남자 400m 결선 — <b>김민성 45.82 (PB)</b></span>
+    <span>여자 100m 예선 — <b>박서연 11.42</b></span>
+    <span>남자 높이뛰기 — <b>정우진 2.28m (PB)</b></span>
+    <span>여자 800m 결선 — <b>이하늘 2:04.18</b></span>
+  </div>
+  <a href="01_landing_offseason.html" class="switch">비시즌 모드 보기</a>
+</div>
+
+<!-- 네비 -->
+<nav class="at-nav">
+  <div class="at-nav-inner">
+    <a href="../index.html" class="at-logo">
+      <span style="font-weight:800;letter-spacing:-0.03em">AthleTime</span>
+      <span style="font-size:13px;color:var(--ink-3);font-weight:500;margin-left:6px">애슬리트 타임</span>
+      <span style="color:var(--accent)">.</span>
+    </a>
+    <div class="at-menu">
+      <a href="01_landing.html" class="active">홈</a>
+      <a href="07_competitions.html">대회</a>
+      <a href="02_search.html">기록·선수</a>
+      <a href="04_community.html">커뮤니티</a>
+      <a href="05_profile_card.html">도구</a>
+    </div>
+    <div class="at-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="선수 이름, 대회, 종목">
+      <kbd>⌘K</kbd>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- 헤로 — 라이브 대회 -->
+  <section class="hero-live">
+    <div class="live-meta">
+      <span class="now"><span class="dot"></span>지금 진행 중</span>
+      <div class="breadcrumb">
+        <span>대회</span>
+        <span> · </span>
+        <b>제103회 전국체육대회</b>
+      </div>
+    </div>
+
+    <h1>전국체전.<br>2일차 라이브.</h1>
+    <div class="meta-row">
+      <span><b>용인종합운동장</b></span>
+      <span class="div">·</span>
+      <span>4월 20일 — 25일</span>
+      <span class="div">·</span>
+      <span>오늘 종목 <b>14개</b></span>
+      <span class="div">·</span>
+      <span>참가 <b>1,842명</b></span>
+    </div>
+
+    <!-- 라이브 대시보드 -->
+    <div class="live-dash">
+      <div class="live-now">
+        <div class="label">지금 트랙 위에서</div>
+        <h2>남자 400m 결선</h2>
+        <div class="stage">A조 · 8명 출발 · 마지막 곡선구간</div>
+
+        <div class="ranking">
+          <div class="rank-row lead">
+            <div class="pos">1</div>
+            <div class="athlete">김민성<span class="team">고양시청 · 24세</span></div>
+            <div>
+              <div class="time">45.82</div>
+              <div class="gap">PB · –0.14</div>
+            </div>
+          </div>
+          <div class="rank-row">
+            <div class="pos">2</div>
+            <div class="athlete">박재우<span class="team">한국체대 · 22세</span></div>
+            <div>
+              <div class="time">46.14</div>
+              <div class="gap">+0.32</div>
+            </div>
+          </div>
+          <div class="rank-row">
+            <div class="pos">3</div>
+            <div class="athlete">이상민<span class="team">국군체육부대 · 25세</span></div>
+            <div>
+              <div class="time">46.41</div>
+              <div class="gap">+0.59</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="next-up">
+          <span class="l">다음 종목</span>
+          <span class="r">여자 200m 결선 · 8분 뒤</span>
+        </div>
+      </div>
+
+      <div class="live-side">
+        <div class="label">오늘 일정</div>
+        <div class="schedule">
+          <div class="ev done">
+            <div class="t">10:00</div>
+            <div class="body">남자 110m허들<div class="stage">결선</div></div>
+            <div class="status">종료</div>
+          </div>
+          <div class="ev done">
+            <div class="t">11:30</div>
+            <div class="body">여자 800m<div class="stage">결선</div></div>
+            <div class="status">종료</div>
+          </div>
+          <div class="ev now">
+            <div class="t">14:32</div>
+            <div class="body">남자 400m<div class="stage">결선 A조</div></div>
+            <div class="status">진행 중</div>
+          </div>
+          <div class="ev">
+            <div class="t">14:40</div>
+            <div class="body">여자 200m<div class="stage">결선</div></div>
+            <div class="status">대기</div>
+          </div>
+          <div class="ev">
+            <div class="t">15:15</div>
+            <div class="body">남자 1500m<div class="stage">예선</div></div>
+            <div class="status">대기</div>
+          </div>
+          <div class="ev">
+            <div class="t">16:00</div>
+            <div class="body">남자 멀리뛰기<div class="stage">결선</div></div>
+            <div class="status">대기</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a href="08_competition_detail.html" class="btn-live"><span class="dot"></span>전체 라이브 보기</a>
+      <a href="07_competitions.html" class="btn-ghost">대회 목록</a>
+    </div>
+  </section>
+
+  <!-- 검색바 — 시즌엔 보조 -->
+  <div class="mini-search">
+    <span class="lbl">대회 말고 다른 거 찾아요?</span>
+    <div class="input-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-3)"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="선수 이름, 종목, 다른 대회를 검색하세요">
+      <kbd>⌘K</kbd>
+    </div>
+  </div>
+
+  <!-- 종목별 라이브 보드 -->
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>오늘의 결승</h2>
+        <p class="sub">종목별 진행 상황과 1위 기록</p>
+      </div>
+      <a href="08_competition_detail.html" class="more">14개 종목 전체 →</a>
+    </div>
+
+    <div class="events-board">
+      <div class="ev-board done">
+        <div class="head">
+          <div>
+            <div class="name">남자 110m허들</div>
+            <div class="stage">결선 · 8명</div>
+          </div>
+          <span class="status">종료</span>
+        </div>
+        <div class="top-time">13.88<span class="who">최도훈</span></div>
+        <div class="progress"><div class="bar" style="width:100%"></div></div>
+        <div class="meta-line"><span>시작 10:00</span><span>1위 기록</span></div>
+      </div>
+
+      <div class="ev-board done">
+        <div class="head">
+          <div>
+            <div class="name">여자 800m</div>
+            <div class="stage">결선 · 8명</div>
+          </div>
+          <span class="status">종료</span>
+        </div>
+        <div class="top-time">2:04.18<span class="who">이하늘</span></div>
+        <div class="progress"><div class="bar" style="width:100%"></div></div>
+        <div class="meta-line"><span>시작 11:30</span><span>1위 기록</span></div>
+      </div>
+
+      <div class="ev-board live">
+        <div class="head">
+          <div>
+            <div class="name">남자 400m</div>
+            <div class="stage">결선 A조 · 8명 · 마지막 곡선</div>
+          </div>
+          <span class="status">진행 중</span>
+        </div>
+        <div class="top-time">45.82<span class="who">김민성 (선두)</span></div>
+        <div class="progress"><div class="bar" style="width:78%"></div></div>
+        <div class="meta-line"><span>시작 14:32</span><span>예상 종료 14:33</span></div>
+      </div>
+
+      <div class="ev-board up-next">
+        <div class="head">
+          <div>
+            <div class="name">여자 200m</div>
+            <div class="stage">결선 · 8명</div>
+          </div>
+          <span class="status">곧 시작</span>
+        </div>
+        <div class="placeholder-time">— —</div>
+        <div class="progress"><div class="bar" style="width:0"></div></div>
+        <div class="meta-line"><span>시작 14:40 (8분 뒤)</span><span>—</span></div>
+      </div>
+
+      <div class="ev-board">
+        <div class="head">
+          <div>
+            <div class="name">남자 1500m</div>
+            <div class="stage">예선 1조</div>
+          </div>
+          <span class="status">대기</span>
+        </div>
+        <div class="placeholder-time">— —</div>
+        <div class="progress"><div class="bar" style="width:0"></div></div>
+        <div class="meta-line"><span>시작 15:15</span><span>—</span></div>
+      </div>
+
+      <div class="ev-board">
+        <div class="head">
+          <div>
+            <div class="name">남자 멀리뛰기</div>
+            <div class="stage">결선 · 12명 · 6회 시기</div>
+          </div>
+          <span class="status">대기</span>
+        </div>
+        <div class="placeholder-time">— —</div>
+        <div class="progress"><div class="bar" style="width:0"></div></div>
+        <div class="meta-line"><span>시작 16:00</span><span>—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 오늘의 기록 (시즌엔 보조 위치) -->
+  <section class="section" style="padding-top:0">
+    <div class="section-head">
+      <div>
+        <h2>방금 들어온 기록</h2>
+        <p class="sub">2일차 동안 확정된 기록 흐름</p>
+      </div>
+      <a href="#" class="more">전체 흐름 →</a>
+    </div>
+
+    <div class="today-flow card" style="background:#fff">
+      <div class="flow-col">
+        <a href="03_athlete.html" class="flow-row">
+          <div class="time">14:32</div>
+          <div class="body"><div class="name">김민성</div><div class="event">남자 400m 결선 · 1위</div></div>
+          <div class="val">45.82<span class="pb">PB</span></div>
+        </a>
+        <a href="#" class="flow-row">
+          <div class="time">12:15</div>
+          <div class="body"><div class="name">정우진</div><div class="event">남자 높이뛰기 결선 · 1위</div></div>
+          <div class="val">2.28m<span class="pb">PB</span></div>
+        </a>
+        <a href="#" class="flow-row">
+          <div class="time">11:47</div>
+          <div class="body"><div class="name">박서연</div><div class="event">여자 100m 예선 · 1위</div></div>
+          <div class="val">11.42</div>
+        </a>
+        <a href="#" class="flow-row" style="border-bottom:0">
+          <div class="time">11:30</div>
+          <div class="body"><div class="name">이하늘</div><div class="event">여자 800m 결선 · 1위</div></div>
+          <div class="val">2:04.18</div>
+        </a>
+      </div>
+      <div class="flow-col">
+        <a href="#" class="flow-row">
+          <div class="time">10:55</div>
+          <div class="body"><div class="name">최도훈</div><div class="event">남자 110m허들 결선 · 1위</div></div>
+          <div class="val">13.88<span class="pb">PB</span></div>
+        </a>
+        <a href="#" class="flow-row">
+          <div class="time">10:22</div>
+          <div class="body"><div class="name">한지우</div><div class="event">여자 포환던지기 결선 · 2위</div></div>
+          <div class="val">17.62m</div>
+        </a>
+        <a href="#" class="flow-row">
+          <div class="time">09:40</div>
+          <div class="body"><div class="name">송지훈</div><div class="event">남자 5000m 예선 · 1위</div></div>
+          <div class="val">13:48.21</div>
+        </a>
+        <a href="#" class="flow-row" style="border-bottom:0">
+          <div class="time">09:15</div>
+          <div class="body"><div class="name">윤예린</div><div class="event">여자 멀리뛰기 결선 · 1위</div></div>
+          <div class="val">6.42m<span class="pb">PB</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- 커뮤니티 — 시즌 컨텍스트 -->
+<section class="com-section">
+  <div class="wrap">
+    <div class="com-head">
+      <div>
+        <h2>커뮤니티</h2>
+        <p class="sub">지금 사람들이 가장 많이 이야기하는 건 <b>전국체전</b>이에요</p>
+      </div>
+      <a href="04_community.html" class="more">전체 글 →</a>
+    </div>
+
+    <!-- 트렌딩 태그 -->
+    <div class="trending">
+      <span class="lbl">지금 뜨는</span>
+      <a href="#" class="tag-tr hot">전국체전<span class="n">428</span></a>
+      <a href="#" class="tag-tr hot">김민성<span class="n">182</span></a>
+      <a href="#" class="tag-tr">2일차후기<span class="n">94</span></a>
+      <a href="#" class="tag-tr">400m결선<span class="n">76</span></a>
+      <a href="#" class="tag-tr">서울마라톤<span class="n">61</span></a>
+      <a href="#" class="tag-tr">고양시청<span class="n">42</span></a>
+      <a href="#" class="tag-tr">스파이크<span class="n">38</span></a>
+    </div>
+
+    <div class="com-grid">
+      <!-- 메인 포스트 -->
+      <div class="com-main">
+        <a href="04_community.html" class="com-post">
+          <div class="meta-top">
+            <span class="ctx">전국체전 라이브</span>
+            <span class="tag red">실시간 인기</span>
+          </div>
+          <h4>김민성 PB 갱신했네요 진심 소름이었음 (방금 끝난 400m 결선)</h4>
+          <p class="excerpt">마지막 곡선구간 들어갈 때 박재우랑 거의 동시에 들어갔는데 직선에서 차이가 확 벌어졌어요. 0.14초 PB 깬 거 후반부 페이스가 진짜 미쳤다…</p>
+          <div class="meta-bot">
+            <span>댓글 <b>87</b></span>
+            <span>좋아요 <b>312</b></span>
+            <span>3분 전</span>
+            <span style="margin-left:auto;color:var(--accent);font-weight:600">↑ 1위</span>
+          </div>
+        </a>
+
+        <a href="04_community.html" class="com-post">
+          <div class="meta-top">
+            <span class="ctx">전국체전 라이브</span>
+          </div>
+          <h4>정우진 2.28m 진짜 미쳤다 — 한국 시니어 4번째 기록 아닌가요</h4>
+          <p class="excerpt">국군체육부대 저 친구 군대 가서 더 좋아진듯. 도움닫기 폼이 작년이랑 또 달라졌고 발구름 발 위치가 미세하게 바뀐 것 같아요. 영상 분석해보면…</p>
+          <div class="meta-bot">
+            <span>댓글 <b>54</b></span>
+            <span>좋아요 <b>198</b></span>
+            <span>2시간 전</span>
+          </div>
+        </a>
+
+        <a href="04_community.html" class="com-post">
+          <div class="meta-top">
+            <span class="ctx">전국체전 라이브</span>
+            <span class="tag">관전</span>
+          </div>
+          <h4>현장에서 직관 중인데 운동장 분위기 공유합니다 (사진 多)</h4>
+          <p class="excerpt">용인종합운동장 처음 와봤는데 트랙 컨디션 진짜 좋네요. 어제 비 와서 걱정했는데 오늘은 바람도 잠잠하고. 관중석 들어찬 정도는 1단 90%, 2단…</p>
+          <div class="meta-bot">
+            <span>댓글 <b>33</b></span>
+            <span>좋아요 <b>121</b></span>
+            <span>4시간 전</span>
+          </div>
+        </a>
+
+        <a href="04_community.html" class="com-post">
+          <div class="meta-top">
+            <span class="ctx" style="color:var(--ink-3)">서울마라톤</span>
+          </div>
+          <h4>서울마라톤 D-11 — 마지막 테이퍼링 어떻게 가져가시나요</h4>
+          <p class="excerpt">전국체전 보면서 자극받아서 서울마라 페이스 약간 올려볼까 싶은데 11일 남은 시점에 변경하는 거 위험할까요. 현재 30km 롱런 3:30…</p>
+          <div class="meta-bot">
+            <span>댓글 <b>41</b></span>
+            <span>좋아요 <b>76</b></span>
+            <span>6시간 전</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- 사이드: 빠른 투표 -->
+      <aside class="com-aside">
+        <div class="poll">
+          <div class="head">
+            <span class="label">⚡ 라이브 투표</span>
+            <span class="ttl">2시간 남음</span>
+          </div>
+          <h5>오늘 남자 400m 1위 누가 될까?</h5>
+          <div class="opts">
+            <div class="opt lead">
+              <div class="fill" style="width:64%"></div>
+              <span>김민성 (고양시청)</span>
+              <span class="pct">64%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:22%"></div>
+              <span>박재우 (한국체대)</span>
+              <span class="pct">22%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:9%"></div>
+              <span>이상민 (국군체육부대)</span>
+              <span class="pct">9%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:5%"></div>
+              <span>그 외</span>
+              <span class="pct">5%</span>
+            </div>
+          </div>
+          <div class="total">투표 <b style="font-variant-numeric:tabular-nums">847</b>명 참여</div>
+        </div>
+
+        <div class="poll">
+          <div class="head">
+            <span class="label">📊 시즌 투표</span>
+            <span class="ttl">대회 끝날 때까지</span>
+          </div>
+          <h5>이번 전국체전 MVP 누구일 것 같나요?</h5>
+          <div class="opts">
+            <div class="opt">
+              <div class="fill" style="width:38%"></div>
+              <span>정우진 (높이뛰기)</span>
+              <span class="pct">38%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:31%"></div>
+              <span>김민성 (400m)</span>
+              <span class="pct">31%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:18%"></div>
+              <span>박서연 (100m)</span>
+              <span class="pct">18%</span>
+            </div>
+            <div class="opt">
+              <div class="fill" style="width:13%"></div>
+              <span>아직 모름</span>
+              <span class="pct">13%</span>
+            </div>
+          </div>
+          <div class="total">투표 <b style="font-variant-numeric:tabular-nums">2,104</b>명 참여</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- 도구 -->
+<div class="wrap">
+  <section class="tools-section">
+    <div class="section-head">
+      <div>
+        <h2>도구</h2>
+        <p class="sub">대회 준비와 훈련에 쓰는 작은 장치들</p>
+      </div>
+    </div>
+    <div class="tools-grid">
+      <a href="05_profile_card.html" class="tool-card">
+        <div class="icon">◼</div>
+        <div><h4>프로필 카드 만들기</h4><p>오늘 기록으로 카드뉴스 만들기</p></div>
+        <div class="arr">→</div>
+      </a>
+      <a href="06_pace.html" class="tool-card">
+        <div class="icon">▤</div>
+        <div><h4>페이스 차트</h4><p>목표 시간별 km 페이스</p></div>
+        <div class="arr">→</div>
+      </a>
+      <a href="#" class="tool-card">
+        <div class="icon">⟲</div>
+        <div><h4>기록 변환기</h4><p>바람·고도·트랙별 보정</p></div>
+        <div class="arr">→</div>
+      </a>
+    </div>
+  </section>
+</div>
+
+<footer class="site">
+  <span>AthleTime · 애슬리트 타임 · 2026 · 비공식 커뮤니티 프로젝트</span>
+  <span>공개 경기 데이터를 바탕으로 한 2차 창작물입니다</span>
+</footer>
+
+</body>
+</html>

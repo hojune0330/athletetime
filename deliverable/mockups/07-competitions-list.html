@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>대회 · AthleTime</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+<style>/* AthleTime — 한글 심플 버전
+ * Pretendard 원툴, 여백 중심, 흰 배경 + 블랙 잉크
+ * 토스/노션 방식: 크기와 굵기로 위계, 컬러는 최소한
+ */
+:root{
+  /* Surface */
+  --bg: #FFFFFF;
+  --bg-soft: #F7F7F8;
+  --bg-tint: #F2F2F4;
+
+  /* Ink */
+  --ink: #111111;
+  --ink-2: #333333;
+  --ink-3: #6E6E73;   /* muted */
+  --ink-4: #A1A1A6;   /* placeholder / hint */
+  --rule: #E5E5EA;
+  --rule-strong: #111111;
+
+  /* Accent — 최소한으로 */
+  --accent: #FF3B30;   /* 육상 트랙 느낌의 선명한 빨강 (애플 Red 근방) */
+  --accent-soft: #FFEBEA;
+  --positive: #00875A; /* 개인 최고 */
+  --positive-soft: #E6F4EE;
+
+  /* Type */
+  --sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --mono: "Pretendard Variable", "Pretendard", ui-monospace, monospace; /* 숫자도 Pretendard tabular */
+
+  /* Scale — 한글 기준으로 살짝 크게 */
+  --fs-hero: clamp(48px, 7vw, 96px);
+  --fs-h1: clamp(36px, 4.5vw, 64px);
+  --fs-h2: clamp(26px, 2.6vw, 36px);
+  --fs-h3: 20px;
+  --fs-body: 16px;
+  --fs-sm: 14px;
+  --fs-xs: 12px;
+
+  /* Spacing */
+  --gutter: clamp(20px, 4vw, 64px);
+
+  /* Radius — 부드럽게 */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+
+  /* Shadow — 은은하게 */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.08);
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:var(--fs-body);
+  line-height:1.55;-webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01","ss02";
+  letter-spacing:-0.01em;
+}
+
+/* tabular numerals helper */
+.num{font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+
+/* Link default */
+a{color:inherit;text-decoration:none}
+
+/* 선택 */
+::selection{background:var(--ink);color:#fff}
+
+/* 스크롤바 */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--rule);border-radius:10px;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-4)}
+
+/* ============ 공통 네비 ============ */
+.at-nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--rule);
+}
+.at-nav-inner{
+  display:flex;align-items:center;gap:32px;
+  padding:14px var(--gutter);
+  max-width:1440px;margin:0 auto;
+}
+.at-logo{
+  font-size:19px;font-weight:700;letter-spacing:-0.03em;
+  color:var(--ink);display:flex;align-items:center;gap:6px;
+}
+.at-logo .dot{width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;margin-bottom:2px}
+.at-menu{display:flex;gap:28px;margin-left:8px}
+.at-menu a{
+  font-size:15px;color:var(--ink-3);font-weight:500;
+  padding:6px 0;transition:color .15s;
+}
+.at-menu a:hover{color:var(--ink)}
+.at-menu a.active{color:var(--ink);font-weight:600}
+
+.at-search{
+  margin-left:auto;
+  display:flex;align-items:center;gap:8px;
+  background:var(--bg-soft);
+  padding:9px 14px;border-radius:10px;min-width:280px;
+  transition:background .15s;
+}
+.at-search:hover{background:var(--bg-tint)}
+.at-search input{border:0;background:transparent;outline:0;font-size:14px;width:100%;color:var(--ink);font-family:inherit}
+.at-search input::placeholder{color:var(--ink-4)}
+.at-search kbd{font-family:inherit;font-size:11px;color:var(--ink-3);background:#fff;padding:2px 6px;border-radius:4px;border:1px solid var(--rule)}
+.at-search svg{color:var(--ink-3);flex-shrink:0}
+
+/* ============ 버튼 ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 20px;border-radius:10px;
+  font-size:14px;font-weight:600;font-family:inherit;
+  border:0;cursor:pointer;transition:background .15s, transform .05s;
+  background:var(--bg-soft);color:var(--ink);
+}
+.btn:hover{background:var(--bg-tint)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.primary:hover{background:#000}
+.btn.ghost{background:transparent;border:1px solid var(--rule)}
+.btn.ghost:hover{background:var(--bg-soft)}
+.btn.lg{padding:14px 24px;font-size:15px;border-radius:12px}
+
+/* ============ 배지 (한글 중심) ============ */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;
+  background:var(--bg-soft);color:var(--ink-2);
+}
+.tag.red{background:var(--accent-soft);color:var(--accent)}
+.tag.green{background:var(--positive-soft);color:var(--positive)}
+.tag.dark{background:var(--ink);color:#fff}
+.tag.live{background:var(--accent);color:#fff;display:inline-flex;align-items:center;gap:5px}
+.tag.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,40%{opacity:1}70%,100%{opacity:.3}}
+
+/* ============ 카드 ============ */
+.card{
+  background:var(--bg);
+  border:1px solid var(--rule);
+  border-radius:var(--r-md);
+  transition:border-color .15s, box-shadow .15s, transform .15s;
+}
+.card:hover{border-color:var(--ink-4);box-shadow:var(--shadow-sm)}
+.card.soft{background:var(--bg-soft);border-color:transparent}
+.card.soft:hover{background:var(--bg-tint)}
+
+/* ============ 유틸 ============ */
+.muted{color:var(--ink-3)}
+.faint{color:var(--ink-4)}
+.hairline{height:1px;background:var(--rule);border:0;margin:0}
+</style>
+<style data-screen-label="07 대회 목록">
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--gutter)}
+
+/* 페이지 헤드 */
+.page-head{padding:48px 0 24px}
+.page-head .crumb{font-size:13px;color:var(--ink-3);font-weight:500;margin-bottom:14px}
+.page-head .crumb b{color:var(--ink)}
+.page-head h1{
+  font-size:clamp(40px,5.5vw,72px);font-weight:800;
+  letter-spacing:-0.045em;line-height:0.98;margin:0 0 10px;
+}
+.page-head .lede{font-size:17px;color:var(--ink-3);line-height:1.5;max-width:640px;margin:0}
+
+/* 필터 바 */
+.filter-bar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:18px 22px;background:var(--bg-soft);border-radius:14px;
+  margin:24px 0 32px;
+}
+.filter-bar .seg{
+  display:inline-flex;background:#fff;padding:4px;border-radius:10px;gap:2px;
+}
+.filter-bar .seg button{
+  padding:8px 14px;font-size:13px;font-weight:600;
+  background:transparent;border:0;cursor:pointer;color:var(--ink-3);
+  border-radius:7px;font-family:inherit;transition:background .15s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.filter-bar .seg button.on{background:var(--ink);color:#fff}
+.filter-bar .seg button .n{
+  font-size:11px;padding:1px 6px;background:rgba(255,255,255,.2);
+  border-radius:8px;font-variant-numeric:tabular-nums;
+}
+.filter-bar .seg button:not(.on) .n{background:var(--bg-soft);color:var(--ink-4)}
+
+.filter-bar .div{width:1px;height:20px;background:var(--rule)}
+.filter-bar .chips{display:flex;gap:6px;flex-wrap:wrap}
+.filter-bar .chip{
+  font-size:12.5px;font-weight:500;color:var(--ink-3);
+  padding:6px 12px;background:#fff;border-radius:100px;
+  cursor:pointer;transition:all .12s;
+}
+.filter-bar .chip:hover{color:var(--ink)}
+.filter-bar .chip.on{background:var(--ink);color:#fff}
+
+.filter-bar .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.filter-bar .right .sort{font-size:13px;color:var(--ink-3);font-weight:500}
+.filter-bar .right select{
+  border:0;background:transparent;font-family:inherit;font-size:13px;
+  font-weight:600;color:var(--ink);cursor:pointer;
+}
+
+/* ===== 진행 중 (라이브) — 큰 카드 1개 ===== */
+.live-section{margin-bottom:48px}
+.section-label{
+  font-size:12px;font-weight:700;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:14px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.section-label::before{
+  content:"";width:6px;height:6px;background:var(--accent);
+  border-radius:50%;animation:pulse 1.2s infinite;
+}
+.section-label.normal{color:var(--ink-3)}
+.section-label.normal::before{background:var(--ink-4);animation:none}
+
+.live-comp{
+  display:grid;grid-template-columns:1fr 380px;gap:0;
+  background:var(--ink);color:#fff;border-radius:var(--r-lg);overflow:hidden;
+  position:relative;
+}
+.live-comp > div{padding:36px 40px}
+.live-comp::before{
+  content:"";position:absolute;left:0;top:0;width:100%;height:100%;
+  background:radial-gradient(circle at 20% 20%, rgba(255,59,48,.18) 0%, transparent 50%);
+  pointer-events:none;
+}
+.live-comp .left{position:relative;z-index:1}
+.live-comp .lbl{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  border-radius:100px;margin-bottom:18px;
+}
+.live-comp .lbl::before{
+  content:"";width:6px;height:6px;background:#fff;border-radius:50%;
+  animation:pulse 1.2s infinite;
+}
+.live-comp h2{
+  font-size:44px;font-weight:800;letter-spacing:-0.035em;line-height:1.05;
+  margin:0 0 16px;color:#fff;text-wrap:balance;
+}
+.live-comp .info{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  padding:18px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12);
+  margin-bottom:20px;
+}
+.live-comp .info div{font-size:13px;color:rgba(255,255,255,.6);font-weight:500}
+.live-comp .info div b{display:block;color:#fff;font-size:16px;font-weight:600;letter-spacing:-0.01em;margin-top:2px}
+.live-comp .nums{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:24px;
+}
+.live-comp .nums div{font-size:12px;color:rgba(255,255,255,.5);font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+.live-comp .nums div b{display:block;font-size:32px;color:#fff;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;margin-top:4px}
+.live-comp .nums div b .accent{color:var(--accent)}
+.live-comp .cta{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 22px;background:var(--accent);color:#fff;
+  border-radius:10px;font-size:14px;font-weight:700;
+}
+.live-comp .cta::before{
+  content:"";width:7px;height:7px;background:#fff;border-radius:50%;
+  animation:pulse 1.2s infinite;
+}
+
+.live-comp .right{
+  background:rgba(255,255,255,.04);position:relative;z-index:1;
+  border-left:1px solid rgba(255,255,255,.08);
+}
+.live-comp .right h4{
+  font-size:12px;font-weight:700;color:rgba(255,255,255,.5);
+  letter-spacing:0.06em;text-transform:uppercase;margin:0 0 14px;
+}
+.live-comp .right .now-event{
+  padding:14px 16px;background:rgba(255,59,48,.12);border-radius:10px;
+  margin-bottom:16px;
+}
+.live-comp .right .now-event .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.live-comp .right .now-event .top .e{font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.01em}
+.live-comp .right .now-event .top .s{font-size:11px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
+.live-comp .right .now-event .leader{font-size:13px;color:rgba(255,255,255,.7)}
+.live-comp .right .now-event .leader b{color:#fff;font-weight:600}
+.live-comp .right .now-event .leader .t{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;margin-left:4px}
+
+.live-comp .right .upcoming{
+  display:flex;flex-direction:column;gap:1px;
+}
+.live-comp .right .upcoming .item{
+  display:grid;grid-template-columns:50px 1fr;gap:12px;
+  padding:11px 4px;border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:13px;
+}
+.live-comp .right .upcoming .item:last-child{border-bottom:0}
+.live-comp .right .upcoming .item .t{color:rgba(255,255,255,.5);font-weight:500;font-variant-numeric:tabular-nums}
+.live-comp .right .upcoming .item .e{color:#fff;font-weight:500}
+.live-comp .right .upcoming .item .e .stage{color:rgba(255,255,255,.4);font-size:11px;margin-left:6px}
+
+/* ===== 카드 그리드 ===== */
+.comp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.comp{
+  display:block;padding:28px;
+  background:#fff;border:1px solid var(--rule);border-radius:var(--r-md);
+  transition:transform .12s, border-color .15s, box-shadow .15s;
+}
+.comp:hover{transform:translateY(-2px);border-color:var(--ink-4);box-shadow:var(--shadow-sm)}
+
+.comp .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.comp .top .badges{display:flex;gap:6px}
+.comp .d-day{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:-0.015em;font-variant-numeric:tabular-nums}
+.comp .d-day .num{font-size:17px;color:var(--accent)}
+.comp.done .d-day{color:var(--ink-3)}
+.comp.done .d-day .num{color:var(--ink-3)}
+
+.comp h3{
+  font-size:24px;font-weight:700;letter-spacing:-0.025em;line-height:1.2;
+  margin:0 0 10px;text-wrap:balance;
+}
+.comp.done h3{color:var(--ink-2)}
+.comp .meta{
+  display:flex;flex-direction:column;gap:5px;
+  font-size:14px;color:var(--ink-3);font-weight:500;line-height:1.5;
+}
+.comp .meta b{color:var(--ink-2);font-weight:600}
+.comp .meta .row{display:flex;align-items:center;gap:8px}
+.comp .meta svg{flex-shrink:0;color:var(--ink-4);width:14px;height:14px}
+
+.comp .footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:18px;margin-top:18px;border-top:1px solid var(--rule);
+  font-size:13px;
+}
+.comp .footer .stat{color:var(--ink-3);font-weight:500}
+.comp .footer .stat b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.comp .footer .arr{color:var(--ink);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+
+/* 종료된 대회 — 결과 미리보기 */
+.comp.done{background:var(--bg-soft);border-color:transparent}
+.comp .top-results{
+  margin-top:14px;padding:14px;background:var(--bg-soft);
+  border-radius:10px;display:flex;flex-direction:column;gap:6px;
+}
+.comp.done .top-results{background:#fff}
+.comp .top-results .res{
+  display:grid;grid-template-columns:18px 1fr auto;gap:10px;
+  font-size:13px;line-height:1.4;
+}
+.comp .top-results .res .pos{color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums;text-align:center}
+.comp .top-results .res .pos.gold{color:var(--accent);font-weight:700}
+.comp .top-results .res .who{color:var(--ink);font-weight:500}
+.comp .top-results .res .who .ev{color:var(--ink-3);font-weight:400;font-size:12px;margin-left:6px}
+.comp .top-results .res .t{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;font-size:13.5px}
+
+/* 빈 상태 (월별 대회 없을 때) */
+.month-divider{
+  margin:48px 0 16px;padding:0 4px;
+  display:flex;align-items:baseline;gap:14px;
+}
+.month-divider h3{
+  font-size:18px;font-weight:700;letter-spacing:-0.02em;margin:0;color:var(--ink);
+}
+.month-divider .count{font-size:13px;color:var(--ink-3);font-weight:500}
+.month-divider hr{flex:1;border:0;border-top:1px solid var(--rule);margin:0 0 4px 0}
+
+/* 푸터 */
+footer.site{
+  padding:48px var(--gutter);
+  display:flex;justify-content:space-between;
+  font-size:13px;color:var(--ink-4);
+  border-top:1px solid var(--rule);flex-wrap:wrap;gap:16px;
+  margin-top:80px;
+}
+
+@media(max-width:1024px){
+  .live-comp{grid-template-columns:1fr}
+  .live-comp .right{border-left:0;border-top:1px solid rgba(255,255,255,.08)}
+  .comp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body data-screen-label="07 대회 목록">
+
+<nav class="at-nav">
+  <div class="at-nav-inner">
+    <a href="../index.html" class="at-logo">
+      <span style="font-weight:800;letter-spacing:-0.03em">AthleTime</span>
+      <span style="font-size:13px;color:var(--ink-3);font-weight:500;margin-left:6px">애슬리트 타임</span>
+      <span style="color:var(--accent)">.</span>
+    </a>
+    <div class="at-menu">
+      <a href="01_landing.html">홈</a>
+      <a href="07_competitions.html" class="active">대회</a>
+      <a href="02_search.html">기록·선수</a>
+      <a href="04_community.html">커뮤니티</a>
+      <a href="05_profile_card.html">도구</a>
+    </div>
+    <div class="at-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input placeholder="선수 이름, 대회, 종목">
+      <kbd>⌘K</kbd>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="page-head">
+    <div class="crumb">홈 · <b>대회</b></div>
+    <h1>대회.</h1>
+    <p class="lede">
+      국내에서 열리는 모든 육상 경기. 진행 중·예정·종료된 대회를 한눈에.
+    </p>
+  </header>
+
+  <!-- 필터 바 -->
+  <div class="filter-bar">
+    <div class="seg">
+      <button class="on">전체 <span class="n">28</span></button>
+      <button>진행 중 <span class="n">1</span></button>
+      <button>예정 <span class="n">12</span></button>
+      <button>종료 <span class="n">15</span></button>
+    </div>
+
+    <div class="div"></div>
+
+    <div class="chips">
+      <span class="chip on">전체</span>
+      <span class="chip">트랙·필드</span>
+      <span class="chip">마라톤·로드</span>
+      <span class="chip">실내</span>
+      <span class="chip">학생</span>
+      <span class="chip">실업</span>
+    </div>
+
+    <div class="right">
+      <span class="sort">정렬</span>
+      <select>
+        <option>날짜 순</option>
+        <option>인기 순</option>
+        <option>참가자 많은 순</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 진행 중 -->
+  <section class="live-section">
+    <div class="section-label">지금 진행 중</div>
+
+    <a href="08_competition_detail.html" class="live-comp" style="text-decoration:none;color:inherit;display:grid">
+      <div class="left">
+        <div class="lbl">2일차 · 6일 중</div>
+        <h2>제103회 전국체육대회<br>육상경기</h2>
+
+        <div class="info">
+          <div>장소<b>용인종합운동장</b></div>
+          <div>기간<b>4월 20일 — 25일</b></div>
+        </div>
+
+        <div class="nums">
+          <div>참가 선수<b>1,842<span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.5)">명</span></b></div>
+          <div>오늘 종목<b><span class="accent">14</span><span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.5)">개</span></b></div>
+          <div>경신 PB<b><span class="accent">7</span><span style="font-size:14px;font-weight:500;color:rgba(255,255,255,.5)">건</span></b></div>
+        </div>
+
+        <span class="cta">실시간 라이브 보기 →</span>
+      </div>
+
+      <div class="right">
+        <h4>지금 트랙 위에서</h4>
+        <div class="now-event">
+          <div class="top">
+            <div class="e">남자 400m 결선</div>
+            <div class="s">●진행</div>
+          </div>
+          <div class="leader">선두 <b>김민성</b><span class="t">45.82 PB</span></div>
+        </div>
+
+        <h4>다음 5종목</h4>
+        <div class="upcoming">
+          <div class="item">
+            <span class="t">14:40</span>
+            <span class="e">여자 200m<span class="stage">결선</span></span>
+          </div>
+          <div class="item">
+            <span class="t">15:15</span>
+            <span class="e">남자 1500m<span class="stage">예선</span></span>
+          </div>
+          <div class="item">
+            <span class="t">16:00</span>
+            <span class="e">남자 멀리뛰기<span class="stage">결선</span></span>
+          </div>
+          <div class="item">
+            <span class="t">16:30</span>
+            <span class="e">여자 400m허들<span class="stage">결선</span></span>
+          </div>
+          <div class="item">
+            <span class="t">17:00</span>
+            <span class="e">남자 5000m<span class="stage">결선</span></span>
+          </div>
+        </div>
+      </div>
+    </a>
+  </section>
+
+  <!-- 예정 -->
+  <section>
+    <div class="section-label normal">예정된 대회</div>
+
+    <div class="comp-grid">
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">실업</span>
+            <span class="tag">트랙·필드</span>
+          </div>
+          <div class="d-day">D-<span class="num">5</span></div>
+        </div>
+        <h3>제28회 봄철<br>실업육상경기</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>대구스타디움</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>4월 26일 일요일 · 1일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">참가 신청 <b>137</b>명 · 종목 <b>22</b>개</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">마라톤</span>
+            <span class="tag red">엘리트+오픈</span>
+          </div>
+          <div class="d-day">D-<span class="num">11</span></div>
+        </div>
+        <h3>2026 서울<br>국제마라톤</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>광화문 → 잠실</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>5월 2일 토요일 · 1일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">참가 신청 <b>38,421</b>명</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">학생</span>
+            <span class="tag">트랙·필드</span>
+          </div>
+          <div class="d-day">D-<span class="num">19</span></div>
+        </div>
+        <h3>2026 전국<br>학생체육대회 (고등부)</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>춘천공설운동장</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>5월 10일 — 14일 · 5일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">참가 학교 <b>148</b>개교 · 선수 <b>1,204</b>명</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">국제</span>
+            <span class="tag">트랙·필드</span>
+          </div>
+          <div class="d-day">D-<span class="num">26</span></div>
+        </div>
+        <h3>2026 KBS배<br>국제육상경기대회</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>서울월드컵경기장</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>5월 17일 일요일 · 1일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">초청 8개국 · 종목 <b>18</b>개</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="month-divider">
+      <h3>6월</h3>
+      <span class="count">예정 4개</span>
+      <hr>
+    </div>
+
+    <div class="comp-grid">
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">실업</span>
+            <span class="tag">트랙·필드</span>
+          </div>
+          <div class="d-day">D-<span class="num">42</span></div>
+        </div>
+        <h3>제35회 KAAF<br>실업선수권대회</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>인천아시아드주경기장</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>6월 2일 — 4일 · 3일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">참가 등록 <b>284</b>명</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+
+      <a href="#" class="comp">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">마라톤</span>
+          </div>
+          <div class="d-day">D-<span class="num">61</span></div>
+        </div>
+        <h3>2026 춘천<br>국제마라톤</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>춘천 의암호반</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>6월 21일 일요일 · 1일</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="stat">참가 신청 <b>12,847</b>명</span>
+          <span class="arr">자세히 →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 종료된 대회 -->
+  <section style="margin-top:64px">
+    <div class="section-label normal">최근 종료된 대회</div>
+
+    <div class="comp-grid">
+      <a href="#" class="comp done">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">학생</span>
+            <span class="tag">트랙·필드</span>
+          </div>
+          <div class="d-day">12일 전</div>
+        </div>
+        <h3>2026 한국실업육상<br>경기대회 (춘계)</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>서울월드컵경기장</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>4월 8일 — 9일</span>
+          </div>
+        </div>
+
+        <div class="top-results">
+          <div class="res">
+            <span class="pos gold">1</span>
+            <span class="who">박재현<span class="ev">남 100m</span></span>
+            <span class="t">10.31</span>
+          </div>
+          <div class="res">
+            <span class="pos gold">1</span>
+            <span class="who">김수아<span class="ev">여 멀리뛰기</span></span>
+            <span class="t">6.51m</span>
+          </div>
+          <div class="res">
+            <span class="pos gold">1</span>
+            <span class="who">정민혁<span class="ev">남 1500m</span></span>
+            <span class="t">3:42.18</span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span class="stat">참가 <b>312</b>명 · PB <b>11</b>건</span>
+          <span class="arr">결과 전체 →</span>
+        </div>
+      </a>
+
+      <a href="#" class="comp done">
+        <div class="top">
+          <div class="badges">
+            <span class="tag">마라톤</span>
+          </div>
+          <div class="d-day">26일 전</div>
+        </div>
+        <h3>2026 동아<br>국제마라톤</h3>
+        <div class="meta">
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            <span><b>광화문 → 잠실</b></span>
+          </div>
+          <div class="row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>3월 23일 일요일</span>
+          </div>
+        </div>
+
+        <div class="top-results">
+          <div class="res">
+            <span class="pos gold">1</span>
+            <span class="who">Lemma Mosinet<span class="ev">남 마라톤</span></span>
+            <span class="t">2:05:12</span>
+          </div>
+          <div class="res">
+            <span class="pos">국내 1</span>
+            <span class="who">오주한<span class="ev">남 마라톤</span></span>
+            <span class="t">2:09:48</span>
+          </div>
+          <div class="res">
+            <span class="pos">국내 1</span>
+            <span class="who">최경선<span class="ev">여 마라톤</span></span>
+            <span class="t">2:28:14</span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <span class="stat">완주 <b>14,228</b>명</span>
+          <span class="arr">결과 전체 →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site">
+  <span>AthleTime · 애슬리트 타임 · 2026 · 비공식 커뮤니티 프로젝트</span>
+  <span>공개 경기 데이터를 바탕으로 한 2차 창작물입니다</span>
+</footer>
+
+</body>
+</html>

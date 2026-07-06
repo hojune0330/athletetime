@@ -10,59 +10,139 @@
 @layer base {
   :root {
     /* ─────────────────────────────────────────
+       Layout metrics
+       모바일 하단 탭바 높이. 데스크톱(md+)에서는 0으로 덮어써서
+       CompareTray/본문 여백 계산이 자연스럽게 바닥에 붙도록 한다.
+       ───────────────────────────────────────── */
+    --mobile-tabbar-height: 56px;
+
+    /* ─────────────────────────────────────────
        Background Colors
        ───────────────────────────────────────── */
-    --color-bg-primary: #f8fafc;
-    --color-bg-secondary: #ffffff;
-    --color-bg-card: #ffffff;
-    --color-bg-elevated: #ffffff;
-    --color-bg-overlay: rgba(0, 0, 0, 0.5);
+    --color-bg-primary: #FAFAF7;
+    --color-bg-secondary: #FFFFFF;
+    --color-bg-card: #FFFFFF;
+    --color-bg-elevated: #FFFFFF;
+    --color-bg-overlay: rgba(14, 20, 18, 0.5);
+
+    /* TRAINORACLE canonical tokens */
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --surface-2: #F4F3EE;
+    --ink: #0E1412;
+    --ink-2: #2B3330;
+    --ink-3: #5F6965;
+    --ink-4: #8F9894;
+    --line: #D9D6CE;
+    --line-2: #BFBBB0;
+    --hair: #E8E6DF;
+    --brand: #0D5F5A;
+    --brand-ink: #07302E;
+    --ok: #1F7A3A;
+    --warn: #B4530C;
+    --err: #A11F1F;
+    --info: #1D4ED8;
+    --unc: #6B3FB0;
+    --e-base: #4A8FC7;
+    --e-lt: #B8A024;
+    --e-vo2: #C7761C;
+    --e-gly: #B8332E;
+    --e-atp: #7A3FB5;
+    --e-rest: #7A7A70;
     
     /* ─────────────────────────────────────────
        Text Colors
        ───────────────────────────────────────── */
-    --color-text-primary: #0f172a;
-    --color-text-secondary: #475569;
-    --color-text-tertiary: #94a3b8;
-    --color-text-inverse: #ffffff;
+    --color-text-primary: #0E1412;
+    --color-text-secondary: #2B3330;
+    --color-text-tertiary: #5F6965;
+    --color-text-inverse: #FFFFFF;
     
     /* ─────────────────────────────────────────
        Border Colors
        ───────────────────────────────────────── */
-    --color-border-default: #e2e8f0;
-    --color-border-strong: #cbd5e1;
-    --color-border-focus: #6366f1;
+    --color-border-default: #D9D6CE;
+    --color-border-strong: #BFBBB0;
+    --color-border-focus: #0D5F5A;
     
     /* ─────────────────────────────────────────
        Primary: Indigo
        ───────────────────────────────────────── */
-    --color-primary-50: #eef2ff;
-    --color-primary-100: #e0e7ff;
-    --color-primary-500: #6366f1;
-    --color-primary-600: #4f46e5;
-    --color-primary-700: #4338ca;
+    --color-primary-50: #E6F0EF;
+    --color-primary-100: #C2DAD8;
+    --color-primary-500: #0D5F5A;
+    --color-primary-600: #0A4D49;
+    --color-primary-700: #07302E;
     
     /* ─────────────────────────────────────────
        Accent: Orange
        ───────────────────────────────────────── */
-    --color-accent-50: #fff7ed;
-    --color-accent-500: #f97316;
-    --color-accent-600: #ea580c;
+    --color-accent-50: #F7E9D9;
+    --color-accent-500: #C7761C;
+    --color-accent-600: #9E5A14;
+
+    /* ─────────────────────────────────────────
+       shadcn/ui theme variables (HSL, no hsl() wrapper)
+       Mapped onto the TRAINORACLE palette so every
+       shadcn component inherits Scientific Minimalism.
+       ───────────────────────────────────────── */
+    --background: 60 16% 97%;          /* #FAFAF7 warm off-white */
+    --foreground: 160 18% 7%;          /* #0E1412 teal-tinted ink */
+    --card: 0 0% 100%;                 /* #FFFFFF */
+    --card-foreground: 160 18% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 18% 7%;
+    --primary: 176 76% 21%;            /* #0D5F5A Deep Teal brand */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 48 13% 95%;           /* #F4F3EE surface-2 */
+    --secondary-foreground: 160 8% 18%;
+    --muted: 48 13% 95%;
+    --muted-foreground: 158 5% 39%;    /* #5F6965 ink-3 */
+    --accent: 48 13% 95%;
+    --accent-foreground: 176 76% 21%;
+    --destructive: 0 68% 38%;          /* #A11F1F err */
+    --destructive-foreground: 0 0% 100%;
+    --border: 45 12% 83%;              /* #D9D6CE line */
+    --input: 45 12% 83%;
+    --ring: 176 76% 21%;               /* brand focus ring */
+    --radius: 0.25rem;                 /* 4px — square-first */
   }
 
   html {
     scroll-behavior: smooth;
+    font-feature-settings: "ss01", "cv11";
   }
 
   body {
-    @apply antialiased bg-neutral-50 text-neutral-900;
-    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-    font-feature-settings: "tnum" on;
+    @apply antialiased bg-bg text-ink;
+    font-family: "Inter", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-size: 14.5px;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+
+  /* Monospace numerics (pace / HR / TSS / time codes) */
+  .mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Semantic type helpers from the design system */
+  .t-mono-sm {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-3);
+  }
+  .t-mono-xs {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-3);
   }
 
   /* Focus styles for accessibility */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-primary-500;
+    @apply outline-2 outline-offset-2;
+    outline-color: var(--brand);
   }
 
   /* 스크롤바 스타일링 (라이트 모드) */
@@ -244,8 +324,10 @@
   /* =============================================
      Header Styles
      ============================================= */
+  /* Flat surface header (no gradient — Scientific Minimalism) */
   .header-gradient {
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
   }
 
   /* =============================================
@@ -283,8 +365,11 @@
   /* =============================================
      Mobile Menu Styles
      ============================================= */
+  /* 드로어/오버레이는 하단 탭바(z-40)·CompareTray(z-50) 위에 떠야 한다.
+     레이어 계약: 탭바 40 < 트레이 50 < 오버레이 65 < 드로어 70 < 모달 100 */
   .mobile-menu-overlay {
-    @apply fixed inset-0 bg-black/50 z-40;
+    @apply fixed inset-0 bg-black/50;
+    z-index: 65;
     @apply opacity-0 invisible transition-all duration-300;
   }
 
@@ -293,13 +378,36 @@
   }
 
   .mobile-drawer {
-    @apply fixed top-0 right-0 bottom-0 w-72 bg-white z-50;
+    @apply fixed top-0 right-0 bottom-0 w-72 bg-white;
+    z-index: 70;
     @apply transform translate-x-full transition-transform duration-300 ease-out;
     @apply shadow-xl;
   }
 
   .mobile-drawer.active {
     @apply translate-x-0;
+  }
+
+  /* =============================================
+     Mobile Bottom Tab Bar
+     ============================================= */
+  .mobile-tabbar {
+    @apply fixed inset-x-0 bottom-0 border-t border-line bg-surface;
+    z-index: 40;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* 탭바가 콘텐츠/푸터를 가리지 않도록 본문 끝에 두는 여백 */
+  .mobile-tabbar-spacer {
+    height: calc(var(--mobile-tabbar-height) + env(safe-area-inset-bottom));
+  }
+
+  /* 데스크톱(md+)에서는 탭바가 숨겨지므로 높이 변수를 0으로 →
+     CompareTray가 바닥에 붙고, 본문 여백도 사라진다. */
+  @media (min-width: 768px) {
+    :root {
+      --mobile-tabbar-height: 0px;
+    }
   }
 
   /* =============================================
@@ -346,12 +454,13 @@
    Utility Classes
    ============================================= */
 @layer utilities {
+  /* Gradients banned — flatten to solid brand / ink */
   .text-gradient-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent;
+    color: var(--brand);
   }
 
   .text-gradient-accent {
-    @apply bg-gradient-to-r from-accent-500 to-accent-600 bg-clip-text text-transparent;
+    color: var(--ink);
   }
 
   .safe-bottom {
@@ -360,5 +469,22 @@
 
   .safe-top {
     padding-top: env(safe-area-inset-top);
+  }
+
+  /* 숏폼 피드용: 스크롤바 숨김 (터치 UX) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 숏폼 카드 애니메이션 */
+  .snap-x {
+    scroll-snap-type: x mandatory;
+  }
+  .snap-start {
+    scroll-snap-align: start;
   }
 }

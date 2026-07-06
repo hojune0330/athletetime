@@ -1,0 +1,97 @@
+repo=/c/Users/SAMSUNG/Documents/2026 첫프젝/2026-first-item
+branch=codex/athletetime-product-ux-refresh
+## codex/athletetime-product-ux-refresh...origin/codex/athletetime-product-ux-refresh [behind 17]
+ M .gitignore
+ M backend/tests/athlete-user-ux.test.js
+ M card-studio/services/resultsStore.js
+ M frontend/src/api/admin.ts
+ M frontend/src/api/competitions.ts
+ M frontend/src/api/index.ts
+ M frontend/src/components/common/PageHeader.tsx
+ M frontend/src/components/layout/AdminLayout.tsx
+ M frontend/src/components/layout/Footer.tsx
+ M frontend/src/components/layout/Layout.tsx
+ M frontend/src/components/layout/RightBanner.tsx
+ M frontend/src/components/trending/HotRecordsFeed.tsx
+ M frontend/src/config/dataPolicy.ts
+ M frontend/src/context/AuthContext.tsx
+ M frontend/src/hooks/useCompetitions.ts
+ M frontend/src/pages/AboutDataPage.tsx
+ M frontend/src/pages/ChatPage/hooks/useWebSocket.ts
+ M frontend/src/pages/CompetitionFormPage.tsx
+ M frontend/src/pages/CompetitionsPage.tsx
+ M frontend/src/pages/MatchResultListPage.tsx
+ M frontend/src/pages/PaceCalculatorPage/components/TargetPaceTable.tsx
+ M frontend/src/pages/PaceCalculatorPage/components/TrackLaneCalculator.tsx
+ M frontend/src/pages/PaceCalculatorPage/hooks/usePaceCalculator.ts
+ M frontend/src/pages/PaceRisePage.tsx
+ M frontend/src/pages/PostDetailPage.tsx
+ M frontend/src/pages/ProfileCardPage.tsx
+ M frontend/src/pages/RecordsPage.tsx
+ M frontend/src/pages/RegisterPage.tsx
+ M frontend/src/pages/TrainingCalculatorPage/components/AthleteProfileForm.tsx
+ M frontend/src/pages/TrainingCalculatorPage/components/PerformanceInput.tsx
+ M frontend/src/pages/TrainingCalculatorPage/utils/trainingPlans.ts
+ M frontend/src/pages/admin/AdminPipelinePage.tsx
+ M package.json
+?? .omo/drafts/athletetime-claude-codex-sync-plan.md
+?? .omo/drafts/athletetime-data-collection-safety-value-plan.md
+?? .omo/drafts/athletetime-service-readiness-improvement-plan.md
+?? .omo/drafts/auth-wave2-opus-review-request.md
+?? .omo/drafts/final-pr-body.md
+?? .omo/drafts/opus-sync-share-current-pr-comment.md
+?? .omo/drafts/ponytail-agent-rules.md
+?? .omo/drafts/service-readiness-opus-review-request.md
+?? .omo/evidence/
+?? .omo/plans/athletetime-auth-security-readiness-wave2.md
+?? .omo/plans/athletetime-coverage-matrix.md
+?? .omo/plans/athletetime-data-collection-safety-value.md
+?? .omo/plans/athletetime-kaaf-canonicalization-wave.md
+?? .omo/plans/athletetime-next-service-loop.md
+?? .omo/plans/athletetime-opus-sync-share-current-wave.md
+?? .omo/plans/athletetime-service-readiness-improvement.md
+?? .omo/plans/athletetime-source-download-wave.md
+?? .omo/plans/athletetime-staged-launch-readiness-plan.md
+?? .omo/ulw-loop-auth-wave1-brief.md
+?? .omo/ulw-loop-auth-wave2-brief.md
+?? .omo/ulw-loop/
+?? .ultra/
+?? backend/tests/about-data-content.test.js
+?? backend/tests/competition-results-order.test.js
+?? backend/tests/coverage-matrix.test.js
+?? backend/tests/kaaf-result-catalog.test.js
+?? backend/tests/kaaf-result-original-search.test.js
+?? backend/tests/kaaf-schedule-result-harvester.test.js
+?? backend/tests/source-download-cli.test.js
+?? backend/tests/source-download.test.js
+?? backend/tests/source-inventory.test.js
+?? backend/tests/source-ledger.test.js
+?? card-studio/services/coverageMatrixService.js
+?? card-studio/services/kaafResultCatalogService.js
+?? card-studio/services/kaafResultOriginalSearchService.js
+?? card-studio/services/kaafScheduleResultHarvesterService.js
+?? card-studio/services/sourceDownloadService.js
+?? card-studio/services/sourceInventoryService.js
+?? card-studio/services/sourceLedgerService.js
+?? data/sources/
+?? docs/athletetime-coverage-matrix.md
+?? docs/athletetime-final-decision-blueprint.md
+?? frontend/src/pages/AboutDataSections.tsx
+?? frontend/src/pages/aboutDataContent.ts
+?? tools/build-coverage-matrix.js
+?? tools/build-kaaf-result-catalog.js
+?? tools/build-source-inventory.js
+?? tools/download-source.js
+?? tools/harvest-kaaf-schedule-results.js
+?? tools/promote-source-ledger.js
+?? tools/search-kaaf-result-originals.js
+
+origin	https://github.com/hojune0330/2026-first-item.git (fetch)
+origin	https://github.com/hojune0330/2026-first-item.git (push)
+
+ref: refs/heads/genspark_ai_developer	HEAD
+e328c30a1f31aff26390d9a10c30a0bdde62a64a	HEAD
+
+6db3d490231d791152a21df4aac315555faa4061	refs/heads/codex/athletetime-product-ux-refresh
+e328c30a1f31aff26390d9a10c30a0bdde62a64a	refs/heads/genspark_ai_developer
+ef7a38dbb146bedd54ffe501fb9dc5989633c4ac	refs/heads/main

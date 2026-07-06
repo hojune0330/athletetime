@@ -1,0 +1,13 @@
+backend\tests\auth-security-readiness.test.js:217:    secretKey: 'athletetime-admin-2024',
+backend\tests\frontend-auth-cookie-contract.test.js:36:  assert.equal(frontendSource.includes("localStorage.getItem('accessToken')"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:37:  assert.equal(frontendSource.includes('localStorage.getItem("accessToken")'), false);
+backend\tests\frontend-auth-cookie-contract.test.js:38:  assert.equal(frontendSource.includes("localStorage.setItem('accessToken'"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:39:  assert.equal(frontendSource.includes('localStorage.setItem("accessToken"'), false);
+backend\tests\frontend-auth-cookie-contract.test.js:40:  assert.equal(frontendSource.includes("localStorage.removeItem('accessToken'"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:41:  assert.equal(frontendSource.includes('localStorage.removeItem("accessToken"'), false);
+backend\tests\frontend-auth-cookie-contract.test.js:42:  assert.equal(frontendSource.includes("localStorage.getItem('refreshToken')"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:43:  assert.equal(frontendSource.includes('localStorage.getItem("refreshToken")'), false);
+backend\tests\frontend-auth-cookie-contract.test.js:44:  assert.equal(frontendSource.includes("localStorage.setItem('refreshToken'"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:45:  assert.equal(frontendSource.includes('localStorage.setItem("refreshToken"'), false);
+backend\tests\frontend-auth-cookie-contract.test.js:46:  assert.equal(frontendSource.includes("localStorage.removeItem('refreshToken'"), false);
+backend\tests\frontend-auth-cookie-contract.test.js:47:  assert.equal(frontendSource.includes('localStorage.removeItem("refreshToken"'), false);

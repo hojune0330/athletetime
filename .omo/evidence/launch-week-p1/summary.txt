@@ -1,0 +1,35 @@
+AthleteTime launch-week P1 takeover summary
+
+Branch: codex/launch-week-ux-trust
+Base PR: https://github.com/hojune0330/2026-first-item/pull/5
+Reference plan: .omo/plans/athletetime-launch-week-p1-takeover.md
+
+Implemented:
+- Anonymous zero-result /records search aggregation.
+- Competition result freshness label on schedule cards where result availability is shown.
+- Route-level lazy loading and Vite manual chunks to remove the previous large launch chunk warning.
+
+Privacy and trust decisions:
+- Zero-result analytics do not store raw query text, IP, user agent, user id, athlete key, team, headers, or exact timestamps.
+- Repeated zero-result terms are merged by a secret-keyed one-way fingerprint only.
+- Runtime aggregate files are ignored by data/analytics/*.json.
+- Result freshness uses existing collection metadata only. If no collectedAt exists, the UI says "수집일 미상" instead of guessing.
+- No primary nav re-expansion, no sample athlete path, and no official/ranking claim was added.
+
+Verification:
+- node --test backend/tests/launch-week-p1.test.js: 6/6 pass.
+- npm test: 113/113 pass.
+- npm --prefix frontend run type-check: pass.
+- npm --prefix frontend run build: pass.
+- Chunk summary: max JS chunk vendor-jspdf 339.57 kB, app entry chunk 43.34 kB, no >500 kB Vite warning.
+- HTTP zero-result QA: pass, no raw query and no firstSeenAt/lastSeenAt exact timestamp fields.
+- Browser QA on /competitions 2025: pass, freshness label appears as "수집일 미상", console errors 0.
+- Forbidden copy/privacy scan: pass.
+- git diff --check: pass; only CRLF working-copy warnings from Git on Windows.
+
+Reviewer:
+- Independent ultrawork reviewer result: PASS unchanged after privacy hardening.
+- Safe to commit/push to PR #5 with explicit staging.
+
+Deferred:
+- 2010-today result collection and canonical medal/stat querying remain intentionally deferred to the next data expansion plan.

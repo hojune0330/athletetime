@@ -1,0 +1,704 @@
+[
+  {
+    "id": "2025-road-004",
+    "kaafSeq": null,
+    "toCd": "E014030175",
+    "name": "2025 대구마라톤대회",
+    "period": {
+      "start": "2025-02-23",
+      "end": "2025-02-23"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E014030175&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 106
+  },
+  {
+    "id": "2025-road-005",
+    "kaafSeq": null,
+    "toCd": "E015370106",
+    "name": "2025 대구하프마라톤대회",
+    "period": {
+      "start": "2025-02-23",
+      "end": "2025-02-23"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015370106&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 52
+  },
+  {
+    "id": "2025-road-006",
+    "kaafSeq": null,
+    "toCd": "E015360116",
+    "name": "2025 동아일보 서울하프마라톤대회",
+    "period": {
+      "start": "2025-03-16",
+      "end": "2025-03-16"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015360116&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 55
+  },
+  {
+    "id": "2025-road-007",
+    "kaafSeq": null,
+    "toCd": "E010171265",
+    "name": "2025 서울마라톤대회 겸 제95회 동아마라톤대회",
+    "period": {
+      "start": "2025-03-16",
+      "end": "2025-03-16"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010171265&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 105
+  },
+  {
+    "id": "2025-road-008",
+    "kaafSeq": null,
+    "toCd": "E013900187",
+    "name": "제41회 코오롱구간마라톤대회(중학교부)",
+    "period": {
+      "start": "2025-03-29",
+      "end": "2025-03-29"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E013900187&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 26
+  },
+  {
+    "id": "2025-road-009",
+    "kaafSeq": null,
+    "toCd": "E010400407",
+    "name": "제41회 코오롱구간마라톤대회(고등학교부)",
+    "period": {
+      "start": "2025-03-29",
+      "end": "2025-03-29"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010400407&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2025-road-010",
+    "kaafSeq": null,
+    "toCd": "E012390246",
+    "name": "2025 인천국제하프마라톤대회",
+    "period": {
+      "start": "2025-03-30",
+      "end": "2025-03-30"
+    },
+    "venue": "인천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E012390246&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 40
+  },
+  {
+    "id": "2025-junior-001",
+    "kaafSeq": null,
+    "toCd": "E012940371",
+    "name": "제39회 전국체육고등학교체육대회(육상경기)",
+    "period": {
+      "start": "2025-04-05",
+      "end": "2025-04-06"
+    },
+    "venue": "대구",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E012940371&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 14
+  },
+  {
+    "id": "2025-road-011",
+    "kaafSeq": null,
+    "toCd": "E015060125",
+    "name": "2025 군산새만금마라톤대회",
+    "period": {
+      "start": "2025-04-06",
+      "end": "2025-04-06"
+    },
+    "venue": "군산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015060125&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 101
+  },
+  {
+    "id": "2025-road-012",
+    "kaafSeq": null,
+    "toCd": "E015390096",
+    "name": "2025 군산새만금하프마라톤대회",
+    "period": {
+      "start": "2025-04-06",
+      "end": "2025-04-06"
+    },
+    "venue": "군산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015390096&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 28
+  },
+  {
+    "id": "2025-track_field-002",
+    "kaafSeq": null,
+    "toCd": "E015381653",
+    "name": "2025 구미아시아육상경기선수권대회 최종선발대회",
+    "period": {
+      "start": "2025-04-21",
+      "end": "2025-04-23"
+    },
+    "venue": "구미",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015381653&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 63,
+    "athleteCount": 468
+  },
+  {
+    "id": "2025-road-001",
+    "kaafSeq": null,
+    "toCd": "M00010003X",
+    "name": "2025 전국생활체육대축전(육상경기)",
+    "period": {
+      "start": "2025-04-26",
+      "end": "2025-04-27"
+    },
+    "venue": "목포",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=M00010003X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 165,
+    "athleteCount": 1137
+  },
+  {
+    "id": "2025-junior-002",
+    "kaafSeq": null,
+    "toCd": "E010040522",
+    "name": "제54회 전국소년체육대회(육상경기)",
+    "period": {
+      "start": "2025-05-17",
+      "end": "2025-05-18"
+    },
+    "venue": "김해",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010040522&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 50,
+    "athleteCount": 941
+  },
+  {
+    "id": "2025-track_field-003",
+    "kaafSeq": null,
+    "toCd": "E010010581",
+    "name": "제54회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2025-05-19",
+      "end": "2025-05-23"
+    },
+    "venue": "밀양",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010010581&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 211,
+    "athleteCount": 1607
+  },
+  {
+    "id": "2025-track_field-001",
+    "kaafSeq": null,
+    "toCd": "E015110143",
+    "name": "제53회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2025-06-05",
+      "end": "2025-06-10"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015110143&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 30,
+    "athleteCount": 272
+  },
+  {
+    "id": "2025-track_field-004",
+    "kaafSeq": null,
+    "toCd": "E010050551",
+    "name": "제53회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2025-06-05",
+      "end": "2025-06-10"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010050551&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 127,
+    "athleteCount": 1451
+  },
+  {
+    "id": "2025-road-002",
+    "kaafSeq": null,
+    "toCd": "M00003009X",
+    "name": "제31회 대한체육회장배 전국생활체육육상경기대회",
+    "period": {
+      "start": "2025-06-06",
+      "end": "2025-06-06"
+    },
+    "venue": "예천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=M00003009X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 75,
+    "athleteCount": 181
+  },
+  {
+    "id": "2025-track_field-005",
+    "kaafSeq": null,
+    "toCd": "E015680043",
+    "name": "2025 코리아오픈국제육상경기대회",
+    "period": {
+      "start": "2025-06-07",
+      "end": "2025-06-08"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015680043&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 12,
+    "athleteCount": 81
+  },
+  {
+    "id": "2025-track_field-006",
+    "kaafSeq": null,
+    "toCd": "E010020793",
+    "name": "제79회 전국육상경기선수권대회",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010020793&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 62,
+    "athleteCount": 469
+  },
+  {
+    "id": "2025-junior-003",
+    "kaafSeq": null,
+    "toCd": "E01510014D",
+    "name": "제16회 한국U18육상경기대회",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E01510014D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 56,
+    "athleteCount": 388
+  },
+  {
+    "id": "2025-junior-004",
+    "kaafSeq": null,
+    "toCd": "E01242023C",
+    "name": "제25회 한국U20육상경기선수권대회",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E01242023C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 55,
+    "athleteCount": 319
+  },
+  {
+    "id": "2025-track_field-007",
+    "kaafSeq": null,
+    "toCd": "E016200021",
+    "name": "백제왕도 익산 2025 전국육상경기대회",
+    "period": {
+      "start": "2025-07-06",
+      "end": "2025-07-10"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E016200021&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 56,
+    "athleteCount": 541
+  },
+  {
+    "id": "2025-junior-005",
+    "kaafSeq": null,
+    "toCd": "E010121234",
+    "name": "2025 교보생명컵전국초등학교시.도대항육상경기대회",
+    "period": {
+      "start": "2025-07-12",
+      "end": "2025-07-12"
+    },
+    "venue": "서천",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010121234&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 26,
+    "athleteCount": 451
+  },
+  {
+    "id": "2025-road-003",
+    "kaafSeq": null,
+    "toCd": "M00007009X",
+    "name": "문화체육관광부장관배 제33회 전국생활체육육상경기대회",
+    "period": {
+      "start": "2025-07-26",
+      "end": "2025-07-27"
+    },
+    "venue": "부산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=M00007009X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 99,
+    "athleteCount": 514
+  },
+  {
+    "id": "2025-track_field-008",
+    "kaafSeq": null,
+    "toCd": "E010100502",
+    "name": "문화체육관광부장관기 제46회 전국시.도대항육상경기대회",
+    "period": {
+      "start": "2025-07-26",
+      "end": "2025-07-28"
+    },
+    "venue": "부산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010100502&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 124,
+    "athleteCount": 1304
+  },
+  {
+    "id": "2025-single_event-001",
+    "kaafSeq": null,
+    "toCd": "E01590003C",
+    "name": "제21회 목포전국육상투척경기대회(U20)",
+    "period": {
+      "start": "2025-08-21",
+      "end": "2025-08-22"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E01590003C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 48
+  },
+  {
+    "id": "2025-single_event-002",
+    "kaafSeq": null,
+    "toCd": "E01591003D",
+    "name": "제21회 목포전국육상투척경기대회(U18)",
+    "period": {
+      "start": "2025-08-21",
+      "end": "2025-08-22"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E01591003D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 32
+  },
+  {
+    "id": "2025-road-013",
+    "kaafSeq": null,
+    "toCd": "E010380568",
+    "name": "제55회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2025-09-07",
+      "end": "2025-09-07"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010380568&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2025-road-014",
+    "kaafSeq": null,
+    "toCd": "E015230137",
+    "name": "제55회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2025-09-07",
+      "end": "2025-09-07"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015230137&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 5
+  },
+  {
+    "id": "2025-road-015",
+    "kaafSeq": null,
+    "toCd": "E014010175",
+    "name": "동아일보 2025 경주국제마라톤대회",
+    "period": {
+      "start": "2025-10-18",
+      "end": "2025-10-18"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E014010175&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 41
+  },
+  {
+    "id": "2025-road-016",
+    "kaafSeq": null,
+    "toCd": "E015570086",
+    "name": "2025 동아일보 경주하프마라톤대회",
+    "period": {
+      "start": "2025-10-18",
+      "end": "2025-10-18"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015570086&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 13
+  },
+  {
+    "id": "2025-track_field-009",
+    "kaafSeq": null,
+    "toCd": "E010031082",
+    "name": "제106회 전국체육대회 (육상경기)",
+    "period": {
+      "start": "2025-10-19",
+      "end": "2025-10-22"
+    },
+    "venue": "부산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010031082&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 150,
+    "athleteCount": 1853
+  },
+  {
+    "id": "2025-road-017",
+    "kaafSeq": null,
+    "toCd": "E010141245",
+    "name": "2025 조선일보마라톤대회 겸 제79회 전국마라톤선수권대회",
+    "period": {
+      "start": "2025-10-26",
+      "end": "2025-10-26"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E010141245&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 27
+  },
+  {
+    "id": "2025-road-018",
+    "kaafSeq": null,
+    "toCd": "E015480106",
+    "name": "2025 조선일보 하프마라톤대회",
+    "period": {
+      "start": "2025-10-26",
+      "end": "2025-10-26"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015480106&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 16
+  },
+  {
+    "id": "2025-road-019",
+    "kaafSeq": null,
+    "toCd": "E015470106",
+    "name": "2025 JTBC서울하프마라톤대회",
+    "period": {
+      "start": "2025-11-02",
+      "end": "2025-11-02"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015470106&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 44
+  },
+  {
+    "id": "2025-road-020",
+    "kaafSeq": null,
+    "toCd": "E012670235",
+    "name": "2025 JTBC서울마라톤대회",
+    "period": {
+      "start": "2025-11-02",
+      "end": "2025-11-02"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E012670235&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 54
+  },
+  {
+    "id": "2025-road-021",
+    "kaafSeq": null,
+    "toCd": "M00008014P",
+    "name": "평화의섬 2025 국무총리기 전국생활체육구간마라톤대회",
+    "period": {
+      "start": "2025-11-08",
+      "end": "2025-11-08"
+    },
+    "venue": "제주도",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=M00008014P&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 7
+  },
+  {
+    "id": "2025-road-022",
+    "kaafSeq": null,
+    "toCd": "E016300015",
+    "name": "2025 인천마라톤대회",
+    "period": {
+      "start": "2025-11-23",
+      "end": "2025-11-23"
+    },
+    "venue": "인천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E016300015&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 74
+  },
+  {
+    "id": "2025-road-023",
+    "kaafSeq": null,
+    "toCd": "E016310016",
+    "name": "2025 인천하프마라톤대회",
+    "period": {
+      "start": "2025-11-23",
+      "end": "2025-11-23"
+    },
+    "venue": "인천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E016310016&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 13
+  }
+]

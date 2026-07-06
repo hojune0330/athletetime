@@ -207,10 +207,10 @@ export const TargetPaceCalculator: React.FC = () => {
               <div className="text-3xl font-bold text-green-800">{result.pace400m}</div>
               <div className="text-xs text-green-500">초</div>
             </div>
-            <div className="p-4 bg-orange-50 rounded-xl text-center">
-              <div className="text-sm text-orange-600 mb-1">100m 타임</div>
-              <div className="text-3xl font-bold text-orange-800">{result.pace100m}</div>
-              <div className="text-xs text-orange-500">초</div>
+            <div className="p-4 bg-accent-50 rounded-xl text-center">
+              <div className="text-sm text-accent-600 mb-1">100m 타임</div>
+              <div className="text-3xl font-bold text-accent-700">{result.pace100m}</div>
+              <div className="text-xs text-accent-500">초</div>
             </div>
             <div className="p-4 bg-purple-50 rounded-xl text-center">
               <div className="text-sm text-purple-600 mb-1">평균 속도</div>

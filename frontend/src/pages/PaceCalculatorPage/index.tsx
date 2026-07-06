@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   PaceChartTable,
   TargetPaceTable,
@@ -27,7 +26,7 @@ const TABS: TabConfig[] = [
 ];
 
 const PaceCalculatorPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('chart');
+  const [activeTab, setActiveTab] = useState<TabType>('target');
 
   return (
     <div>
@@ -47,6 +46,44 @@ const PaceCalculatorPage: React.FC = () => {
             <span>테이블을 좌우로 스크롤하세요</span>
           </div>
         </div>
+
+        <section className="card mb-6 no-print">
+          <div className="card-body p-4 md:p-6">
+            <p className="text-sm font-semibold text-blue-600">
+              빠른 시작
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-neutral-900">오늘 필요한 계산부터</h2>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">
+              표 전체를 먼저 읽지 않아도 됩니다. 목표 기록, 랩타임, 스플릿 중 지금 필요한 계산을 바로 고르세요.
+            </p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              <button
+                type="button"
+                onClick={() => setActiveTab('target')}
+                className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-left text-sm font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-100"
+              >
+                목표 기록 넣기
+                <span className="mt-1 block text-xs font-normal text-blue-600">완주 기록으로 km·400m 페이스 보기</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('lane')}
+                className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-left text-sm font-semibold text-neutral-800 transition hover:border-neutral-300 hover:bg-neutral-50"
+              >
+                트랙 랩 계산
+                <span className="mt-1 block text-xs font-normal text-neutral-500">레인별 거리와 랩타임 확인</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('split')}
+                className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-left text-sm font-semibold text-neutral-800 transition hover:border-neutral-300 hover:bg-neutral-50"
+              >
+                스플릿 나누기
+                <span className="mt-1 block text-xs font-normal text-neutral-500">구간별 목표 시간을 쪼개기</span>
+              </button>
+            </div>
+          </div>
+        </section>
 
         {/* Tab Navigation */}
         <nav className="tab-container mb-6 no-print" role="tablist" aria-label="페이스 계산기 메뉴">
@@ -78,7 +115,7 @@ const PaceCalculatorPage: React.FC = () => {
           {activeTab === 'chart' && (
             <div id="chart-content" role="tabpanel" aria-labelledby="tab-chart">
               {/* 개발자 정보 카드 */}
-              <div className="card mb-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <div className="card mb-6 bg-gradient-to-r from-primary-50 to-primary-100">
                 <div className="card-body p-4 md:p-6">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
@@ -93,7 +130,7 @@ const PaceCalculatorPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs uppercase tracking-wider font-medium text-blue-500">Developer</div>
+                      <div className="text-xs font-medium text-blue-500">만든 사람</div>
                       <p className="text-lg font-bold text-blue-800">장호준 코치</p>
                       <p className="text-sm font-semibold text-blue-600">ATHLETE TIME</p>
                     </div>

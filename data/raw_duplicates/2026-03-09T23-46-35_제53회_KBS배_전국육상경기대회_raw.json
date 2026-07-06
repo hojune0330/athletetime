@@ -1,0 +1,408 @@
+{
+  "meta": {
+    "competition_name": "제53회 KBS배 전국육상경기대회",
+    "year": "2025",
+    "period": "2025-06-05 ~ 2025-06-10",
+    "venue": "예천",
+    "source_url": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015110143&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "crawled_at": "2026-03-09T23:46:35.226Z"
+  },
+  "events": [
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 100m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": "-0.3",
+      "results": [
+        {
+          "rank": 1,
+          "name": "비웨사다니엘가사마",
+          "affiliation": "안산시청",
+          "record": "10.29",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이창수",
+          "affiliation": "보은군청",
+          "record": "10.46",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김시온",
+          "affiliation": "경산시청",
+          "record": "10.50",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김태효",
+          "affiliation": "광주광역시청",
+          "record": "10.51",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이성진",
+          "affiliation": "서천군청",
+          "record": "10.53",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "이용문",
+          "affiliation": "국군체육부대",
+          "record": "10.56",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "이정태",
+          "affiliation": "국군체육부대",
+          "record": "10.57",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "문해진",
+          "affiliation": "안양시청",
+          "record": "10.62",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 100m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": "-0.4",
+      "results": [
+        {
+          "rank": 1,
+          "name": "이은빈",
+          "affiliation": "해남군청",
+          "record": "11.84",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "신현진",
+          "affiliation": "포항시청",
+          "record": "11.96",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김주하",
+          "affiliation": "시흥시청",
+          "record": "12.01",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김소은",
+          "affiliation": "가평군청",
+          "record": "12.03",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "전하영",
+          "affiliation": "가평군청",
+          "record": "12.13",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "한예솔",
+          "affiliation": "가평군청",
+          "record": "12.21",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "신가영",
+          "affiliation": "구미시청",
+          "record": "12.37",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "김명지",
+          "affiliation": "정선군청",
+          "record": "12.40",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 200m 결승",
+      "date": "2025-06-06",
+      "venue": "예천",
+      "wind": "-1.6",
+      "results": [
+        {
+          "rank": 1,
+          "name": "서민준",
+          "affiliation": "서천군청",
+          "record": "21.01",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "오승우",
+          "affiliation": "국군체육부대",
+          "record": "21.25",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "곽예환",
+          "affiliation": "영남대학교",
+          "record": "21.37",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "최선재",
+          "affiliation": "서천군청",
+          "record": "21.44",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "장민호",
+          "affiliation": "안양시청",
+          "record": "21.48",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "심재원",
+          "affiliation": "서울특별시청",
+          "record": "21.63",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "박민수",
+          "affiliation": "서울특별시청",
+          "record": "21.68",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이재혁",
+          "affiliation": "서울특별시청",
+          "record": "21.75",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 200m 결승",
+      "date": "2025-06-06",
+      "venue": "예천",
+      "wind": "0.1",
+      "results": [
+        {
+          "rank": 1,
+          "name": "김소은",
+          "affiliation": "가평군청",
+          "record": "24.09",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "신현진",
+          "affiliation": "포항시청",
+          "record": "24.39",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "한예솔",
+          "affiliation": "가평군청",
+          "record": "25.21",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "이가은",
+          "affiliation": "정선군청",
+          "record": "25.48",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "유수민",
+          "affiliation": "김포시청",
+          "record": "25.54",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "권민주",
+          "affiliation": "국립경국대학교(A)",
+          "record": "25.92",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "진수인",
+          "affiliation": "가평군청",
+          "record": "25.93",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "김진영",
+          "affiliation": "구미시청",
+          "record": "26.17",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 400m 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "배건율",
+          "affiliation": "안양시청",
+          "record": "47.05",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이정훈",
+          "affiliation": "과천시청",
+          "record": "47.51",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김정현",
+          "affiliation": "포항시청",
+          "record": "47.69",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김현탁",
+          "affiliation": "국군체육부대",
+          "record": "47.98",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "천하림",
+          "affiliation": "서천군청",
+          "record": "48.44",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "전유민",
+          "affiliation": "동아대학교",
+          "record": "49.65",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김현",
+          "affiliation": "국립경국대학교(B)",
+          "record": "51.45",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    }
+  ]
+}

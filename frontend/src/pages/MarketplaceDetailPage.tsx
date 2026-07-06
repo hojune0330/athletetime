@@ -42,7 +42,7 @@ function formatDate(dateString: string): string {
 export default function MarketplaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, promptLogin } = useAuth();
   const itemId = parseInt(id || '0');
 
   // 상태
@@ -67,7 +67,7 @@ export default function MarketplaceDetailPage() {
     try {
       await updateStatusMutation.mutateAsync({ id: itemId, status: newStatus });
       alert('상태가 변경되었습니다.');
-    } catch (error) {
+    } catch {
       alert('상태 변경에 실패했습니다.');
     }
   };
@@ -77,8 +77,8 @@ export default function MarketplaceDetailPage() {
     e.preventDefault();
     
     if (!user) {
-      alert('로그인이 필요합니다.');
-      navigate('/login');
+      // C+A: 페이지 이동 없이 로그인 모달을 띄우고, 로그인 후 이 상품으로 복귀.
+      promptLogin(window.location.pathname + window.location.search);
       return;
     }
 
@@ -93,7 +93,7 @@ export default function MarketplaceDetailPage() {
         content: commentContent,
       });
       setCommentContent('');
-    } catch (error) {
+    } catch {
       alert('댓글 작성에 실패했습니다.');
     }
   };
@@ -104,7 +104,7 @@ export default function MarketplaceDetailPage() {
 
     try {
       await deleteCommentMutation.mutateAsync({ itemId, commentId });
-    } catch (error) {
+    } catch {
       alert('댓글 삭제에 실패했습니다.');
     }
   };
@@ -117,7 +117,7 @@ export default function MarketplaceDetailPage() {
       await deleteItemMutation.mutateAsync(itemId);
       alert('상품이 삭제되었습니다.');
       navigate('/marketplace');
-    } catch (error) {
+    } catch {
       alert('상품 삭제에 실패했습니다.');
     }
   };
@@ -125,8 +125,8 @@ export default function MarketplaceDetailPage() {
   // 구매하기
   const handlePurchase = () => {
     if (!user) {
-      alert('로그인이 필요합니다.');
-      navigate('/login');
+      // C+A: 페이지 이동 없이 로그인 모달을 띄우고, 로그인 후 이 상품으로 복귀.
+      promptLogin(window.location.pathname + window.location.search);
       return;
     }
 
@@ -164,7 +164,7 @@ export default function MarketplaceDetailPage() {
   // 이미지 배열 정렬: 대표 이미지를 맨 앞으로
   const images = (() => {
     if (!item.images || item.images.length === 0) {
-      return ['/placeholder-image.png'];
+      return [];
     }
     
     const thumbnailIndex = item.thumbnail_index || 0;
@@ -206,14 +206,22 @@ export default function MarketplaceDetailPage() {
             <div>
               {/* 메인 이미지 */}
               <div className="aspect-square bg-neutral-100 rounded-lg overflow-hidden mb-4">
-                <img
-                  src={images[selectedImageIndex]}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder-image.png';
-                  }}
-                />
+                {images[selectedImageIndex] ? (
+                  <img
+                    src={images[selectedImageIndex]}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.opacity = '0';
+                    }}
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-neutral-900 text-center text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+                    AthleteTime
+                    <br />
+                    Gear
+                  </div>
+                )}
               </div>
 
               {/* 썸네일 목록 */}
@@ -234,7 +242,7 @@ export default function MarketplaceDetailPage() {
                         alt={`${item.title} ${index + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = '/placeholder-image.png';
+                          e.currentTarget.style.opacity = '0';
                         }}
                       />
                     </button>
@@ -371,9 +379,13 @@ export default function MarketplaceDetailPage() {
             ) : (
               <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-6 text-center mb-6">
                 <p className="text-neutral-600 mb-3">댓글을 작성하려면 로그인이 필요합니다.</p>
-                <Link to="/login" className="btn-primary inline-block">
+                <button
+                  type="button"
+                  onClick={() => promptLogin(window.location.pathname + window.location.search)}
+                  className="btn-primary inline-block"
+                >
                   로그인
-                </Link>
+                </button>
               </div>
             )}
 

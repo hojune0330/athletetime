@@ -1,16 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 
-// 외부 링크 클릭 핸들러 (React Router 우회)
-const handleExternalLink = (e: React.MouseEvent, path: string) => {
-  e.preventDefault()
-  window.location.href = `/${path}`
-}
-
 export default function Sidebar() {
   const location = useLocation()
   
   const isActive = (path: string) => {
-    return location.pathname === path
+    return path === '/'
+      ? location.pathname === '/'
+      : location.pathname === path || location.pathname.startsWith(`${path}/`)
   }
 
   return (
@@ -42,25 +38,32 @@ export default function Sidebar() {
               className={`sidebar-item ${isActive('/') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">🎭</span>
-              <span>익명게시판</span>
+              <span>홈</span>
             </Link>
             <Link
-              to="/events"
-              className={`sidebar-item ${location.pathname.includes('/events') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
+              to="/community"
+              className={`sidebar-item ${isActive('/community') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
+            >
+              <span className="text-lg">💬</span>
+              <span>커뮤니티</span>
+            </Link>
+            <Link
+              to="/competitions"
+              className={`sidebar-item ${isActive('/competitions') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">🏆</span>
               <span>대회 게시판</span>
             </Link>
             <Link
-              to="/track"
-              className={`sidebar-item ${location.pathname.includes('/track') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
+              to="/records"
+              className={`sidebar-item ${isActive('/records') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">🏃</span>
-              <span>종목별 게시판</span>
+              <span>기록</span>
             </Link>
             <Link
-              to="/market"
-              className={`sidebar-item ${isActive('/market') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
+              to="/marketplace"
+              className={`sidebar-item ${isActive('/marketplace') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">🛒</span>
               <span>중고거래</span>
@@ -68,30 +71,27 @@ export default function Sidebar() {
             
             <hr className="border-neutral-100 my-3" />
             
-            <a
-              href="/pace-calculator.html"
-              onClick={(e) => handleExternalLink(e, 'pace-calculator.html')}
-              className="sidebar-item sidebar-item-inactive"
+            <Link
+              to="/pace-calculator"
+              className={`sidebar-item ${isActive('/pace-calculator') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">🧮</span>
               <span>페이스 계산기</span>
-            </a>
-            <a
-              href="/training-calculator.html"
-              onClick={(e) => handleExternalLink(e, 'training-calculator.html')}
-              className="sidebar-item sidebar-item-inactive"
+            </Link>
+            <Link
+              to="/training-calculator"
+              className={`sidebar-item ${isActive('/training-calculator') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">📝</span>
               <span>훈련 계산기</span>
-            </a>
-            <a
-              href="/chat.html"
-              onClick={(e) => handleExternalLink(e, 'chat.html')}
-              className="sidebar-item sidebar-item-inactive"
+            </Link>
+            <Link
+              to="/chat"
+              className={`sidebar-item ${isActive('/chat') ? 'sidebar-item-active' : 'sidebar-item-inactive'}`}
             >
               <span className="text-lg">💬</span>
               <span>실시간 채팅</span>
-            </a>
+            </Link>
           </nav>
         </div>
       </div>

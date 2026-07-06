@@ -1,5 +1,5 @@
 // 훈련 계획 생성 유틸리티
-import type { TrainingFrequency, TrainingPhase, Experience, Gender, UserProfile, Conditions } from './adjustments';
+import type { TrainingFrequency, TrainingPhase, Experience, UserProfile, Conditions } from './adjustments';
 import type { TrainingPaces } from './vdotCalculations';
 import { formatPace } from './vdotCalculations';
 

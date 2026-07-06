@@ -134,6 +134,19 @@ export default function LoginPage() {
             {/* 링크들 */}
             <div className="mt-6 space-y-3">
               <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Header 로그인 모달을 비밀번호 찾기 단계로 열도록 트리거
+                    sessionStorage.setItem('showLoginModal', 'forgotPassword');
+                    navigate('/');
+                  }}
+                  className="text-neutral-500 hover:text-neutral-800 text-sm transition-colors"
+                >
+                  비밀번호를 잊으셨나요?
+                </button>
+              </div>
+              <div className="text-center">
                 <p className="text-neutral-600 text-sm">
                   계정이 없으신가요?{' '}
                   <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">

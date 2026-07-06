@@ -1,0 +1,40 @@
+Final PR rereview summary
+Date: 2026-07-06 KST
+
+GitHub state:
+- PR #3: open, non-draft, mergeable=true.
+- PR #4: open, non-draft, mergeable=true.
+- PR #4 remains the intended token-saving final-decision surface.
+
+Local branch state before rereview patch:
+- branch: codex/final-service-readiness-handoff
+- HEAD matched origin/codex/final-service-readiness-handoff.
+- merge-base with origin/codex/athletetime-product-ux-refresh matched the PR #4 base.
+- ahead count from origin/codex/athletetime-product-ux-refresh was 2 before this rereview patch; final reviewers should recompute after the latest commit.
+- tracked and staged diffs were clean; many local untracked .omo/.ultra artifacts remained and must not be added with git add .
+
+Fix applied during rereview:
+- Removed public home copy that mentioned example/sample athlete selection.
+- Added a regression contract that the home page source must not contain "예시 이름" or "예시 선수" copy.
+
+Verification after fix:
+- Targeted RED was captured before the copy fix.
+- Targeted GREEN passed after the copy fix.
+- npm test passed: 102 tests, 0 failures.
+- npm --prefix frontend run type-check passed.
+- npm --prefix frontend run build passed with warnings only: stale browser data and large chunk warning.
+- git diff --check passed.
+- Auth token response scan found no JSON-field-like accessToken/refreshToken response fields in auth routes or frontend auth response contracts.
+
+Browser smoke:
+- Temporary Vite QA server on 127.0.0.1:4327.
+- /records rendered, console errors 0.
+- /competitions rendered, console errors 0.
+- /about-data rendered, console errors 0.
+- /login rendered, console errors 0.
+- QA browser tab was closed and the Vite server listener was stopped.
+
+Residual launch notes:
+- No GitHub Actions status contexts were observed through this review; use the local evidence commands as the current gate.
+- The frontend build chunk-size warning is a post-launch performance task, not a staged-launch blocker.
+- Production hosting still needs real environment, secret, database, and email verification in the hosting service.

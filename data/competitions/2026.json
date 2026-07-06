@@ -1,0 +1,866 @@
+[
+  {
+    "kaafSeq": 1192,
+    "name": "(취소) 2026 서귀포 KTFL 전국로드레이스대회",
+    "period": {
+      "start": "2026-02-08",
+      "end": "2026-02-08"
+    },
+    "venue": "서귀포시",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1192",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-001"
+  },
+  {
+    "kaafSeq": 1177,
+    "name": "2026 대구마라톤대회",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "대구",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1177",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-001"
+  },
+  {
+    "kaafSeq": 1193,
+    "name": "2026 제주MBC 국제평화마라톤대회(엘리트10km)",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "제주시",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1193",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-002"
+  },
+  {
+    "id": "2026-road-001",
+    "kaafSeq": null,
+    "toCd": "E014030185",
+    "name": "2026 대구마라톤대회",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E014030185&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 112
+  },
+  {
+    "id": "2026-road-002",
+    "kaafSeq": null,
+    "toCd": "E015370116",
+    "name": "2026 대구하프마라톤대회",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E015370116&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 59
+  },
+  {
+    "kaafSeq": 1194,
+    "name": "2026 부천국제10km로드레이스대회",
+    "period": {
+      "start": "2026-03-08",
+      "end": "2026-03-08"
+    },
+    "venue": "부천",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1194",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-003"
+  },
+  {
+    "kaafSeq": 1181,
+    "name": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회",
+    "period": {
+      "start": "2026-03-08",
+      "end": "2026-03-08"
+    },
+    "venue": "예천",
+    "section": "중고연맹 사업",
+    "category": "junior",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1181",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-junior-001"
+  },
+  {
+    "kaafSeq": 1178,
+    "name": "2026 서울마라톤대회 겸 제96회 동아마라톤대회",
+    "period": {
+      "start": "2026-03-15",
+      "end": "2026-03-15"
+    },
+    "venue": "서울",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1178",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-002"
+  },
+  {
+    "id": "2026-road-003",
+    "kaafSeq": null,
+    "toCd": "E010171275",
+    "name": "2026 서울마라톤대회 겸 제96회 동아마라톤대회",
+    "period": {
+      "start": "2026-03-15",
+      "end": "2026-03-15"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E010171275&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 123
+  },
+  {
+    "id": "2026-road-004",
+    "kaafSeq": null,
+    "toCd": "E015360126",
+    "name": "2026 동아일보 서울하프마라톤대회",
+    "period": {
+      "start": "2026-03-15",
+      "end": "2026-03-15"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E015360126&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 50
+  },
+  {
+    "kaafSeq": 1179,
+    "name": "2026 인천국제하프마라톤대회",
+    "period": {
+      "start": "2026-03-22",
+      "end": "2026-03-22"
+    },
+    "venue": "인천",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1179",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-003"
+  },
+  {
+    "kaafSeq": 1195,
+    "name": "2026 KTFL 김해 전국실업육상경기대회",
+    "period": {
+      "start": "2026-03-25",
+      "end": "2026-03-27"
+    },
+    "venue": "김해",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1195",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-004"
+  },
+  {
+    "kaafSeq": 1188,
+    "name": "제2회 한국대학육상연맹회장배 전국대학육상경기대회",
+    "period": {
+      "start": "2026-03-25",
+      "end": "2026-03-27"
+    },
+    "venue": "김해",
+    "section": "대학연맹 사업",
+    "category": "university",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1188",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-university-001"
+  },
+  {
+    "kaafSeq": 1204,
+    "name": "제42회 코오롱구간마라톤대회",
+    "period": {
+      "start": "2026-03-28",
+      "end": "2026-03-28"
+    },
+    "venue": "경주",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1204",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-004"
+  },
+  {
+    "id": "2026-road-005",
+    "kaafSeq": null,
+    "toCd": "E013900197",
+    "name": "제42회 코오롱구간마라톤대회(중학교부)",
+    "period": {
+      "start": "2026-03-28",
+      "end": "2026-03-28"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E013900197&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 33
+  },
+  {
+    "id": "2026-road-006",
+    "kaafSeq": null,
+    "toCd": "E010400417",
+    "name": "제42회 코오롱구간마라톤대회(고등학교부)",
+    "period": {
+      "start": "2026-03-28",
+      "end": "2026-03-28"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2026&to_cd=E010400417&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 22
+  },
+  {
+    "kaafSeq": 1213,
+    "name": "제40회 전국체육고등학교 체육대회(육상경기)",
+    "period": {
+      "start": "2026-04-02",
+      "end": "2026-04-03"
+    },
+    "venue": "보은",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1213",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-001"
+  },
+  {
+    "kaafSeq": 1205,
+    "name": "2026 군산새만금마라톤대회",
+    "period": {
+      "start": "2026-04-05",
+      "end": "2026-04-05"
+    },
+    "venue": "군산",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1205",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-005"
+  },
+  {
+    "kaafSeq": 1214,
+    "name": "익산 보석배 2026 전국육상경기대회(초/중/고/대)",
+    "period": {
+      "start": "2026-04-08",
+      "end": "2026-04-11"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1214",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-002"
+  },
+  {
+    "kaafSeq": 1182,
+    "name": "제55회 춘계전국중·고등학교육상경기대회 겸 제14회 춘계전국초등학교육상경기대회",
+    "period": {
+      "start": "2026-04-19",
+      "end": "2026-04-23"
+    },
+    "venue": "예천",
+    "section": "중고연맹 사업",
+    "category": "junior",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1182",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-junior-002"
+  },
+  {
+    "kaafSeq": 1215,
+    "name": "2026 전국생활체육대축전(육상경기)",
+    "period": {
+      "start": "2026-04-25",
+      "end": "2026-04-26"
+    },
+    "venue": "김해",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1215",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-003"
+  },
+  {
+    "kaafSeq": 1216,
+    "name": "제55회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2026-04-30",
+      "end": "2026-05-04"
+    },
+    "venue": "목포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1216",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-004"
+  },
+  {
+    "kaafSeq": 1201,
+    "name": "2026 아시아투척선수권대회",
+    "period": {
+      "start": "2026-05-02",
+      "end": "2026-05-03"
+    },
+    "venue": "목포",
+    "section": "단일경기",
+    "category": "single_event",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1201",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-single-event-001"
+  },
+  {
+    "kaafSeq": 1217,
+    "name": "제80회 전국육상경기선수권대회",
+    "period": {
+      "start": "2026-05-11",
+      "end": "2026-05-15"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1217",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-005"
+  },
+  {
+    "kaafSeq": 1218,
+    "name": "제26회 한국 U20육상경기선수권대회",
+    "period": {
+      "start": "2026-05-11",
+      "end": "2026-05-15"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1218",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-006"
+  },
+  {
+    "kaafSeq": 1219,
+    "name": "제17회 한국 U18육상경기대회",
+    "period": {
+      "start": "2026-05-11",
+      "end": "2026-05-15"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1219",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-007"
+  },
+  {
+    "kaafSeq": 1220,
+    "name": "제28회 전국꿈나무선수선발육상경기대회",
+    "period": {
+      "start": "2026-05-11",
+      "end": "2026-05-15"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1220",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-008"
+  },
+  {
+    "kaafSeq": 1221,
+    "name": "제55회 전국소년체육대회(육상경기)",
+    "period": {
+      "start": "2026-05-23",
+      "end": "2026-05-24"
+    },
+    "venue": "부산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1221",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-009"
+  },
+  {
+    "kaafSeq": 1196,
+    "name": "제30회 KTFL 전국실업육상경기선수권대회",
+    "period": {
+      "start": "2026-05-26",
+      "end": "2026-05-28"
+    },
+    "venue": "해남",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1196",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-005"
+  },
+  {
+    "kaafSeq": 1189,
+    "name": "제81회 전국대학육상경기선수권대회",
+    "period": {
+      "start": "2026-05-26",
+      "end": "2026-05-28"
+    },
+    "venue": "해남",
+    "section": "대학연맹 사업",
+    "category": "university",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1189",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-university-002"
+  },
+  {
+    "kaafSeq": 1202,
+    "name": "2026 부산국제장대높이뛰기 육상경기대회",
+    "period": {
+      "start": "2026-05-29",
+      "end": "2026-05-30"
+    },
+    "venue": "부산",
+    "section": "단일경기",
+    "category": "single_event",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1202",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-single-event-002"
+  },
+  {
+    "kaafSeq": 1222,
+    "name": "2026 밀양아리랑 전국육상경기대회(중/고/대/일)",
+    "period": {
+      "start": "2026-06-05",
+      "end": "2026-06-09"
+    },
+    "venue": "밀양",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1222",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-010"
+  },
+  {
+    "kaafSeq": 1223,
+    "name": "KAAF배 제54회 그린 전국육상경기대회",
+    "period": {
+      "start": "2026-06-19",
+      "end": "2026-06-23"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1223",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-011"
+  },
+  {
+    "kaafSeq": 1224,
+    "name": "2026 코리아오픈국제육상경기대회",
+    "period": {
+      "start": "2026-06-20",
+      "end": "2026-06-21"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1224",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-012"
+  },
+  {
+    "kaafSeq": 1225,
+    "name": "제32회 대한체육회장배 전국생활체육 육상경기대회",
+    "period": {
+      "start": "2026-06-20",
+      "end": "2026-06-20"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1225",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-013"
+  },
+  {
+    "kaafSeq": 1197,
+    "name": "제2회 KTFL 회장배 전국실업육상경기대회",
+    "period": {
+      "start": "2026-06-29",
+      "end": "2026-07-01"
+    },
+    "venue": "서천",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1197",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-006"
+  },
+  {
+    "kaafSeq": 1190,
+    "name": "제5회 전국대학육상경기대회",
+    "period": {
+      "start": "2026-06-29",
+      "end": "2026-07-01"
+    },
+    "venue": "서천",
+    "section": "대학연맹 사업",
+    "category": "university",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1190",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-university-003"
+  },
+  {
+    "kaafSeq": 1226,
+    "name": "백제왕도 익산 2026 전국육상경기대회",
+    "period": {
+      "start": "2026-07-04",
+      "end": "2026-07-08"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1226",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-014"
+  },
+  {
+    "kaafSeq": 1227,
+    "name": "2026 교보생명컵 전국초등학교시·도대항육상경기대회",
+    "period": {
+      "start": "2026-07-11",
+      "end": "2026-07-11"
+    },
+    "venue": "미정",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1227",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-015"
+  },
+  {
+    "kaafSeq": 1184,
+    "name": "회장배 제24회 전국중·고등학교육상경기선수권대회",
+    "period": {
+      "start": "2026-07-17",
+      "end": "2026-07-20"
+    },
+    "venue": "정선",
+    "section": "중고연맹 사업",
+    "category": "junior",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1184",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-junior-003"
+  },
+  {
+    "kaafSeq": 1228,
+    "name": "2026 정선 하이원 중장거리 챌린지대회",
+    "period": {
+      "start": "2026-07-25",
+      "end": "2026-07-25"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1228",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-016"
+  },
+  {
+    "kaafSeq": 1229,
+    "name": "문화체육관광부장관기 제47회 전국시·도대항육상경기대회",
+    "period": {
+      "start": "2026-07-31",
+      "end": "2026-08-02"
+    },
+    "venue": "서귀포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1229",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-017"
+  },
+  {
+    "kaafSeq": 1230,
+    "name": "문화체육관광부장관배 제34회 전국생활체육 육상경기대회",
+    "period": {
+      "start": "2026-08-01",
+      "end": "2026-08-02"
+    },
+    "venue": "서귀포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1230",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-018"
+  },
+  {
+    "kaafSeq": 1185,
+    "name": "제55회 추계전국중·고등학교육상경기대회 겸 제14회 추계전국초등학교육상경기대회",
+    "period": {
+      "start": "2026-08-06",
+      "end": "2026-08-10"
+    },
+    "venue": "보은",
+    "section": "중고연맹 사업",
+    "category": "junior",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1185",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-junior-004"
+  },
+  {
+    "kaafSeq": 1198,
+    "name": "2026 Happy700평창 대관령전국하프마라톤대회",
+    "period": {
+      "start": "2026-08-16",
+      "end": "2026-08-16"
+    },
+    "venue": "평창",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1198",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-007"
+  },
+  {
+    "kaafSeq": 1231,
+    "name": "2026 대구 세계마스터즈육상경기대회",
+    "period": {
+      "start": "2026-08-22",
+      "end": "2026-09-03"
+    },
+    "venue": "대구",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1231",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-019"
+  },
+  {
+    "kaafSeq": 1232,
+    "name": "제56회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2026-09-06",
+      "end": "2026-09-06"
+    },
+    "venue": "서울-임진각",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1232",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-006"
+  },
+  {
+    "kaafSeq": 1199,
+    "name": "제37회 KTFL 전국실업단대항육상경기대회",
+    "period": {
+      "start": "2026-09-14",
+      "end": "2026-09-16"
+    },
+    "venue": "예천",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1199",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-008"
+  },
+  {
+    "kaafSeq": 1191,
+    "name": "제80회 전국대학대항육상경기대회",
+    "period": {
+      "start": "2026-09-14",
+      "end": "2026-09-16"
+    },
+    "venue": "예천",
+    "section": "대학연맹 사업",
+    "category": "university",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1191",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-university-004"
+  },
+  {
+    "kaafSeq": 1187,
+    "name": "제7회 전국초·중·고등학교 학년별 육상경기대회",
+    "period": {
+      "start": "2026-09-18",
+      "end": "2026-09-22"
+    },
+    "venue": "보은",
+    "section": "중고연맹 사업",
+    "category": "junior",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1187",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-junior-005"
+  },
+  {
+    "kaafSeq": 1233,
+    "name": "2026 단양 달빛 중장거리 챌린지대회",
+    "period": {
+      "start": "2026-10-03",
+      "end": "2026-10-03"
+    },
+    "venue": "단양",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1233",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-020"
+  },
+  {
+    "kaafSeq": 1206,
+    "name": "동아일보 2026 경주국제마라톤대회",
+    "period": {
+      "start": "2026-10-17",
+      "end": "2026-10-17"
+    },
+    "venue": "경주",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1206",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-007"
+  },
+  {
+    "kaafSeq": 1234,
+    "name": "제107회 전국체육대회(육상경기)",
+    "period": {
+      "start": "2026-10-18",
+      "end": "2026-10-21"
+    },
+    "venue": "서귀포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1234",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-track-field-021"
+  },
+  {
+    "kaafSeq": 1207,
+    "name": "제80회 전국마라톤선수권대회 겸 2026 조선일보마라톤대회",
+    "period": {
+      "start": "2026-10-25",
+      "end": "2026-10-25"
+    },
+    "venue": "춘천",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1207",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-008"
+  },
+  {
+    "kaafSeq": 1208,
+    "name": "2026 JTBC 서울마라톤대회",
+    "period": {
+      "start": "2026-11-01",
+      "end": "2026-11-01"
+    },
+    "venue": "서울",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1208",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-009"
+  },
+  {
+    "kaafSeq": 1209,
+    "name": "평화의 섬 2026 국무총리기 국제생활체육구간마라톤대회",
+    "period": {
+      "start": "2026-11-14",
+      "end": "2026-11-14"
+    },
+    "venue": "제주",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1209",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-010"
+  },
+  {
+    "kaafSeq": 1210,
+    "name": "2026 인천마라톤대회",
+    "period": {
+      "start": "2026-11-22",
+      "end": "2026-11-22"
+    },
+    "venue": "인천",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1210",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-011"
+  },
+  {
+    "kaafSeq": 1211,
+    "name": "2026 부산국제마라톤대회",
+    "period": {
+      "start": "2026-12-06",
+      "end": "2026-12-06"
+    },
+    "venue": "부산",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1211",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-012"
+  },
+  {
+    "kaafSeq": 1212,
+    "name": "2026 양양강변 전국고등학교10km대회 겸 중학교 5km대회",
+    "period": {
+      "start": "미정",
+      "end": "미정"
+    },
+    "venue": "양양",
+    "section": "로드레이스",
+    "category": "road",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1212",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-road-013"
+  },
+  {
+    "kaafSeq": 1200,
+    "name": "2026 KTFL 전국실업육상경기 Championship대회",
+    "period": {
+      "start": "미정",
+      "end": "미정"
+    },
+    "venue": "미정",
+    "section": "실업연맹 사업",
+    "category": "corporate",
+    "kaafUrl": "https://www.kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1200",
+    "source": "kaaf_crawl_20260317",
+    "id": "2026-corporate-009"
+  }
+]

@@ -28,7 +28,7 @@ interface AthleteProfileFormProps {
   onWeeklyVolumeChange: (value: WeeklyVolume) => void;
   onFrequencyChange: (value: TrainingFrequency) => void;
   onTrainingPhaseChange: (value: TrainingPhase) => void;
-  genderSectionRef?: React.RefObject<HTMLDivElement>;
+  genderSectionRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const AthleteProfileForm: React.FC<AthleteProfileFormProps> = ({

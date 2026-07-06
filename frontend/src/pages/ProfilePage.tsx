@@ -36,12 +36,6 @@ export default function ProfilePage() {
   // 사용자 정보 불러오기
   useEffect(() => {
     const loadUser = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        navigate('/');
-        return;
-      }
-      
       try {
         const response = await authApi.getMe();
         if (response.success && response.user) {

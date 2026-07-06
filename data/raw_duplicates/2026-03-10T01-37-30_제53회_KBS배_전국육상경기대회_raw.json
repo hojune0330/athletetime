@@ -1,0 +1,2730 @@
+{
+  "meta": {
+    "competition_name": "제53회 KBS배 전국육상경기대회",
+    "year": "2025",
+    "period": "2025-06-05 ~ 2025-06-10",
+    "venue": "예천",
+    "source_url": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2025&to_cd=E015110143&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "crawled_at": "2026-03-10T01:37:30.029Z"
+  },
+  "events": [
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 100m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "비웨사다니엘가사마",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이창수",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김시온",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김태효",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이성진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "이용문",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "이정태",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "문해진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 100m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "이은빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "신현진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김주하",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김소은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "전하영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "한예솔",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "신가영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "김명지",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 200m 결승",
+      "date": "2025-06-06",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "서민준",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "오승우",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "곽예환",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "최선재",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "장민호",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "심재원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "박민수",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이재혁",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 200m 결승",
+      "date": "2025-06-06",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "김소은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "신현진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "한예솔",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "이가은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "유수민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "권민주",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "진수인",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "김진영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 400m 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "배건율",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이정훈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김정현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김현탁",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "천하림",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "전유민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이현용",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 400m 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "김지은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "최윤경",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "임지희",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "민지현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "최지선",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "전하영",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "유수민",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "하제영",
+          "affiliation": "",
+          "record": "불참",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 800m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "한태건",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이현서",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "엄태건",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "배성준",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이우민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김동욱",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "배상운",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "조현욱",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 800m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "박해진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이서빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "이다겸",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "안예원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김가경",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김리경",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "신미란",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이혜지",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 1500m 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "이동욱",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이주니",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김민서",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "김본규",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "조민혁",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 12,
+          "name": "박주환",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "오민석",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 17,
+          "name": "정승화",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 19,
+          "name": "이우민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "임형윤",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "최지호",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 1500m 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "오혜원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이서빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "황예린",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "윤은지",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이유정",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "차지원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "안예원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "김리경",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 9,
+          "name": "심예영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "김가경",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "신미란",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 12,
+          "name": "김지혜",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 13,
+          "name": "고희주",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "방민지",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 15,
+          "name": "정세현",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 16,
+          "name": "김휘경",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 17,
+          "name": "이현정",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 18,
+          "name": "송민선",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 5000m 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 2,
+          "name": "박원빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이주니",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김홍민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "이경호",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 13,
+          "name": "김기연",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "강지훈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 18,
+          "name": "김지훈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 21,
+          "name": "조경현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 25,
+          "name": "유대영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 27,
+          "name": "김현우",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "박재우",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 12,
+          "name": "김중환",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 13,
+          "name": "심종섭",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "김윤식",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 15,
+          "name": "김종윤",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 16,
+          "name": "전수환",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 17,
+          "name": "김상훈",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 18,
+          "name": "성지훈",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 19,
+          "name": "임채우",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 20,
+          "name": "김보성",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 21,
+          "name": "나현영",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 5000m 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "현서용",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "윤은지",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "남보하나",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "심하영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "손유나",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김혜미",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김태린",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "최수아",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 9,
+          "name": "이유정",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "정윤서",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "김연아",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 12,
+          "name": "박서연",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 13,
+          "name": "서수민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "강혜림",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 15,
+          "name": "임지수",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 16,
+          "name": "김가이",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 17,
+          "name": "김지혜",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 18,
+          "name": "김다연",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 19,
+          "name": "홍해인",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 20,
+          "name": "김민정",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 21,
+          "name": "손혜정",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 22,
+          "name": "최경선",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 23,
+          "name": "이혜윤",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 10000m 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "신현수",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "나현영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김홍록",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김건오",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "홍진표",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "이동진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김재민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이대진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 9,
+          "name": "김영석",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "김종윤",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 11,
+          "name": "이경호",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 12,
+          "name": "최유빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 13,
+          "name": "김홍민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 14,
+          "name": "최병수",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 15,
+          "name": "김보성",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 16,
+          "name": "김중환",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 17,
+          "name": "김기연",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 18,
+          "name": "한승현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 19,
+          "name": "박요한",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 20,
+          "name": "임채우",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 21,
+          "name": "김현우",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 22,
+          "name": "유동규",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 23,
+          "name": "정태준",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 24,
+          "name": "이강철",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 25,
+          "name": "성지훈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 26,
+          "name": "박재영",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 27,
+          "name": "소유준",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 28,
+          "name": "김세옥",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 10000m 결승",
+      "date": "2025-06-10",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "최경선",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "현서용",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김은미",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "서수민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김가이",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "심하영",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "김연아",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 3000mSC 결승",
+      "date": "2025-06-10",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "박원빈",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "고동욱",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "박재영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김민서",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "조창현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "이정윤",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "박주환",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "임준영",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 9,
+          "name": "한예찬",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 3000mSC 결승",
+      "date": "2025-06-09",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "남보하나",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "최수아",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "손유나",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "고희주",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "홍해인",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김다연",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "정세현",
+          "affiliation": "",
+          "record": "기권",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 100mH 결승",
+      "date": "2025-06-09",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "류나희",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "정연진",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "조은주",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "임예름",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김솔기",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 110mH 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "김경태",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "황의찬",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "신동민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "최동휘",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "박인우",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김태윤",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 400mH 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "임찬호",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김정현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "이준엽",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "이주현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "한정민",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "이준상",
+          "affiliation": "",
+          "record": "실격",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 400mH 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "조윤서",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김초은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "노지현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "황채원",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김태은",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "안나겸",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "정승연",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "이주현",
+          "affiliation": "",
+          "record": "",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 높이뛰기 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "김주는",
+          "affiliation": "고양시청",
+          "record": "2.10",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김두용",
+          "affiliation": "포항시청",
+          "record": "1.95",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "이준현",
+          "affiliation": "포항시체육회",
+          "record": "1.95",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "김재민",
+          "affiliation": "동아대학교",
+          "record": "",
+          "personal_best": "",
+          "note": "NM",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이정민",
+          "affiliation": "부천시청",
+          "record": "",
+          "personal_best": "",
+          "note": "NM",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 높이뛰기 결승",
+      "date": "2025-06-06",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "이승민",
+          "affiliation": "한국체육대학교",
+          "record": "1.70",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "차현전",
+          "affiliation": "화성시청",
+          "record": "1.65",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김한결",
+          "affiliation": "양구군청",
+          "record": "1.60",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "한다례",
+          "affiliation": "화성시체육회",
+          "record": "",
+          "personal_best": "",
+          "note": "NM",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 장대높이뛰기 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "윤대욱",
+          "affiliation": "예천군청",
+          "record": "4.80",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김채민",
+          "affiliation": "성결대학교",
+          "record": "4.60",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "이종현",
+          "affiliation": "국군체육부대",
+          "record": "4.40",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 장대높이뛰기 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "배한나",
+          "affiliation": "충남도청",
+          "record": "3.90",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "조민지",
+          "affiliation": "충주시청",
+          "record": "3.70",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "신수영",
+          "affiliation": "과천시청",
+          "record": "3.70",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "한은정",
+          "affiliation": "한국체육대학교",
+          "record": "3.30",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "고민지",
+          "affiliation": "화성시청",
+          "record": "3.30",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "윤예린",
+          "affiliation": "부산대학교",
+          "record": "3.10",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 멀리뛰기 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": "0.1",
+      "results": [
+        {
+          "rank": 1,
+          "name": "조홍조",
+          "affiliation": "구미시청",
+          "record": "7.74",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김민성",
+          "affiliation": "한국체육대학교",
+          "record": "7.58",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김영빈",
+          "affiliation": "서천군청",
+          "record": "7.50",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "주은재",
+          "affiliation": "안산시청",
+          "record": "7.46",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "오태근",
+          "affiliation": "포항시청",
+          "record": "7.45",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김민수",
+          "affiliation": "국군체육부대",
+          "record": "7.38",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "이현민",
+          "affiliation": "무소속(경남)",
+          "record": "7.05",
+          "personal_best": "",
+          "note": "",
+          "newRecord": "참고기록"
+        },
+        {
+          "rank": 8,
+          "name": "김성곤",
+          "affiliation": "충주시청",
+          "record": "6.94",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 9,
+          "name": "김은교",
+          "affiliation": "양구군청",
+          "record": "6.72",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 10,
+          "name": "송병찬",
+          "affiliation": "국립경국대학교(A)",
+          "record": "6.13",
+          "personal_best": "",
+          "note": "",
+          "newRecord": "참고기록"
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 멀리뛰기 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": "-0.0",
+      "results": [
+        {
+          "rank": 1,
+          "name": "김아영",
+          "affiliation": "한국체육대학교",
+          "record": "5.62",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이가은",
+          "affiliation": "논산시청",
+          "record": "5.31",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "권소현",
+          "affiliation": "충주시청",
+          "record": "4.92",
+          "personal_best": "",
+          "note": "",
+          "newRecord": "참고기록"
+        },
+        {
+          "rank": 4,
+          "name": "김지원",
+          "affiliation": "국립경국대학교(A)",
+          "record": "4.72",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "최지윤",
+          "affiliation": "음성군청",
+          "record": "",
+          "personal_best": "",
+          "note": "NM",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 세단뛰기 결승",
+      "date": "2025-06-09",
+      "venue": "예천",
+      "wind": "0.2",
+      "results": [
+        {
+          "rank": 1,
+          "name": "조홍조",
+          "affiliation": "구미시청",
+          "record": "16.02",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "김동혁",
+          "affiliation": "한국체육대학교",
+          "record": "15.90",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "박지원",
+          "affiliation": "서천군청",
+          "record": "15.85",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "문성빈",
+          "affiliation": "경주시청",
+          "record": "14.83",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김은교",
+          "affiliation": "양구군청",
+          "record": "14.53",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "조승규",
+          "affiliation": "김천대학교",
+          "record": "14.43",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 7,
+          "name": "박성민",
+          "affiliation": "무소속(경북)",
+          "record": "14.20",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 8,
+          "name": "천영수",
+          "affiliation": "영주시청",
+          "record": "13.94",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 세단뛰기 결승",
+      "date": "2025-06-07",
+      "venue": "예천",
+      "wind": "-0.2",
+      "results": [
+        {
+          "rank": 1,
+          "name": "윤선유",
+          "affiliation": "안동시청",
+          "record": "11.97",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "이가은",
+          "affiliation": "논산시청",
+          "record": "11.81",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "정은아",
+          "affiliation": "남양주시청",
+          "record": "11.71",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "이윤슬",
+          "affiliation": "여수시청",
+          "record": "11.58",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "이현정",
+          "affiliation": "양구군청",
+          "record": "11.47",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "김아영",
+          "affiliation": "한국체육대학교",
+          "record": "",
+          "personal_best": "",
+          "note": "불참",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "남자 포환던지기 결승",
+      "date": "2025-06-08",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "심준",
+          "affiliation": "영월군청",
+          "record": "18.39",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "장종혁",
+          "affiliation": "국군체육부대",
+          "record": "18.01",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "김건주",
+          "affiliation": "성남시청",
+          "record": "17.36",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "이상명",
+          "affiliation": "창원시청",
+          "record": "16.89",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "김현민",
+          "affiliation": "한국체육대학교",
+          "record": "16.71",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "박도현",
+          "affiliation": "한국체육대학교",
+          "record": "16.64",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    },
+    {
+      "competition": "제53회 KBS배 전국육상경기대회",
+      "event": "여자 포환던지기 결승",
+      "date": "2025-06-05",
+      "venue": "예천",
+      "wind": null,
+      "results": [
+        {
+          "rank": 1,
+          "name": "정유선",
+          "affiliation": "영월군청",
+          "record": "15.83",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 2,
+          "name": "정소은",
+          "affiliation": "목포시청",
+          "record": "14.91",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 3,
+          "name": "허지윤",
+          "affiliation": "부천시청",
+          "record": "14.87",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 4,
+          "name": "최가은",
+          "affiliation": "대전광역시청",
+          "record": "14.37",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 5,
+          "name": "류서연",
+          "affiliation": "한국체육대학교",
+          "record": "13.79",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        },
+        {
+          "rank": 6,
+          "name": "정진희",
+          "affiliation": "파주시청",
+          "record": "13.67",
+          "personal_best": "",
+          "note": "",
+          "newRecord": ""
+        }
+      ]
+    }
+  ]
+}

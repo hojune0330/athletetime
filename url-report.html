@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AthleTime - URL 및 리소스 보고서</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --border: #475569;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --pink: #f472b6;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e1b4b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .header .meta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .header .meta span {
+      background: var(--surface2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      padding: 24px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(71,85,105,0.4);
+      background: rgba(30,41,59,0.5);
+    }
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      text-align: center;
+      min-width: 110px;
+    }
+    .stat-chip .num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-chip .label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 40px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--surface2);
+    }
+    .section-header .icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .section-header .count {
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    thead th {
+      background: var(--surface2);
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 10px 14px;
+      border-top: 1px solid rgba(71,85,105,0.3);
+      vertical-align: top;
+    }
+    tbody tr:hover {
+      background: rgba(56,189,248,0.04);
+    }
+    td.num {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 36px;
+      text-align: center;
+    }
+    td.url {
+      word-break: break-all;
+      max-width: 420px;
+    }
+    td.url a {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+    }
+    td.url a:hover {
+      text-decoration: underline;
+    }
+    td.url code {
+      color: var(--green);
+      background: rgba(74,222,128,0.1);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+    td.desc {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    td.desc strong {
+      color: var(--text);
+    }
+    .method {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: monospace;
+      margin-right: 4px;
+    }
+    .method-get { background: rgba(74,222,128,0.15); color: var(--green); }
+    .method-post { background: rgba(56,189,248,0.15); color: var(--accent); }
+    .method-put { background: rgba(251,191,36,0.15); color: var(--amber); }
+    .method-delete { background: rgba(248,113,113,0.15); color: var(--red); }
+    .badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+    .badge-legacy { background: rgba(248,113,113,0.15); color: var(--red); }
+    .badge-prod { background: rgba(74,222,128,0.15); color: var(--green); }
+    .badge-ext { background: rgba(129,140,248,0.15); color: var(--accent2); }
+    .badge-dev { background: rgba(251,191,36,0.15); color: var(--amber); }
+
+    /* Sub-section header */
+    .sub-header {
+      margin: 20px 0 10px;
+      padding: 8px 14px;
+      background: rgba(56,189,248,0.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 { font-size: 1.4rem; }
+      .container { padding: 20px 12px 60px; }
+      table { font-size: 0.78rem; }
+      td.url a, td.url code { font-size: 0.72rem; }
+    }
+
+    /* search */
+    .search-bar {
+      max-width: 480px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 10px 16px 10px 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus {
+      border-color: var(--accent);
+    }
+    .search-bar input::placeholder {
+      color: var(--text-muted);
+    }
+    .search-bar svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AthleTime - URL & Resource Report</h1>
+  <p class="subtitle">프로젝트 내 모든 URL, API 엔드포인트, 외부 리소스 종합 보고서</p>
+  <div class="meta">
+    <span>athletetime-unified v4.0.0</span>
+    <span>genspark_ai_developer</span>
+    <span>2026-04-01</span>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-chip"><div class="num">136</div><div class="label">전체 URL</div></div>
+  <div class="stat-chip"><div class="num">4</div><div class="label">GitHub</div></div>
+  <div class="stat-chip"><div class="num">3</div><div class="label">배포 URL</div></div>
+  <div class="stat-chip"><div class="num">2</div><div class="label">외부 소스</div></div>
+  <div class="stat-chip"><div class="num">96</div><div class="label">API 엔드포인트</div></div>
+  <div class="stat-chip"><div class="num">10</div><div class="label">프론트 라우트</div></div>
+  <div class="stat-chip"><div class="num">21</div><div class="label">기타</div></div>
+</div>
+
+<div class="container">
+
+  <div class="search-bar">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+    <input type="text" id="search" placeholder="URL 또는 설명 검색..." oninput="filterRows(this.value)">
+  </div>
+
+  <!-- 1. GitHub -->
+  <div class="section" id="sec-github">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(129,140,248,0.15);">&#128193;</div>
+      <h2>1. GitHub / 버전 관리</h2>
+      <span class="count">4건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">1</td><td class="url"><a href="https://github.com/hojune0330/2026-first-item" target="_blank">github.com/hojune0330/2026-first-item</a></td><td class="desc"><strong>현재 작업 저장소</strong> (origin). PaceRise 통합, 2차 창작 면책 강화, KAAF 직접 언급 제거 진행.</td></tr>
+          <tr><td class="num">2</td><td class="url"><a href="https://github.com/hojune0330/2026-first-item/pull/1" target="_blank">github.com/…/pull/1</a></td><td class="desc"><strong>PR #1</strong> — PaceRise 통합 + 2차 창작물 면책 + KAAF 제거. <code>genspark_ai_developer</code> &rarr; <code>main</code>.</td></tr>
+          <tr><td class="num">3</td><td class="url"><a href="https://github.com/hojune0330/athletetime" target="_blank">github.com/hojune0330/athletetime</a></td><td class="desc"><strong>원본 저장소</strong>. 육상 커뮤니티 + 카드 스튜디오 통합 플랫폼.</td></tr>
+          <tr><td class="num">4</td><td class="url"><a href="https://github.com/hojune0330/athletetime/issues" target="_blank">github.com/…/issues</a></td><td class="desc">이슈 트래커. 버그 리포트·기능 요청 관리.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2. 프로덕션 배포 -->
+  <div class="section" id="sec-prod">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(74,222,128,0.15);">&#127760;</div>
+      <h2>2. 프로덕션 배포 URL</h2>
+      <span class="count">3건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">5</td><td class="url"><a href="https://athlete-time.netlify.app" target="_blank">athlete-time.netlify.app</a> <span class="badge badge-prod">PROD</span></td><td class="desc"><strong>프론트엔드</strong> (Netlify). React SPA — 메인, 대회, 프로필 카드, 커뮤니티, LIVE, 페이스 계산기.</td></tr>
+          <tr><td class="num">6</td><td class="url"><a href="https://athlete-time.netlify.app/community" target="_blank">…/community</a></td><td class="desc">커뮤니티 게시판. 게시글·댓글·투표 기능.</td></tr>
+          <tr><td class="num">7</td><td class="url"><a href="https://athletetime-backend.onrender.com" target="_blank">athletetime-backend.onrender.com</a> <span class="badge badge-prod">PROD</span></td><td class="desc"><strong>백엔드 API</strong> (Render.com). Express.js — 인증, 카드 스튜디오, PaceRise 프록시 등.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. 외부 데이터 소스 -->
+  <div class="section" id="sec-ext">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(244,114,182,0.15);">&#128279;</div>
+      <h2>3. 외부 데이터 소스</h2>
+      <span class="count">2건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">8</td><td class="url"><a href="https://pace-rise-node.com" target="_blank">pace-rise-node.com</a> <span class="badge badge-ext">EXT</span></td><td class="desc"><strong>PaceRise API</strong>. 실업 대회 목록, 종목, 조(heat), 결과, 선수 데이터 제공. 백엔드가 프록시로 중계.</td></tr>
+          <tr><td class="num">9</td><td class="url"><code>result.kaaf.or.kr/tourInfo/…</code> <span class="badge badge-legacy">LEGACY</span></td><td class="desc"><strong>KAAF 경기결과 사이트</strong>. 백엔드 스크래퍼/파이프라인 CLI에 잔존. 프론트엔드에서는 참조 제거 완료.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. 백엔드 API -->
+  <div class="section" id="sec-api">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(56,189,248,0.15);">&#9889;</div>
+      <h2>4. 백엔드 API 엔드포인트</h2>
+      <span class="count">96건</span>
+    </div>
+
+    <!-- 4-1 PaceRise -->
+    <div class="sub-header">4-1. PaceRise 프록시 API &nbsp;<code>/api/pacerise/*</code> (8개)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>엔드포인트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">10</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/health</code></td><td class="desc">PaceRise 연결 상태 확인.</td></tr>
+          <tr><td class="num">11</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/competitions</code></td><td class="desc">대회 목록 조회.</td></tr>
+          <tr><td class="num">12</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/competitions/:id</code></td><td class="desc">대회 상세 (종목 포함).</td></tr>
+          <tr><td class="num">13</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/competitions/:id/results</code></td><td class="desc">대회 전체 경기 결과.</td></tr>
+          <tr><td class="num">14</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/competitions/:id/schedule</code></td><td class="desc">대회 시간표.</td></tr>
+          <tr><td class="num">15</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/competitions/:id/athletes</code></td><td class="desc">대회 선수 명단.</td></tr>
+          <tr><td class="num">16</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/events/:eventId/results</code></td><td class="desc">특정 종목 결과.</td></tr>
+          <tr><td class="num">17</td><td class="url"><span class="method method-get">GET</span><code>/api/pacerise/live</code></td><td class="desc">LIVE 진행 중 대회 요약.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4-2 Public -->
+    <div class="sub-header">4-2. 공개 API &nbsp;<code>publicRoutes.js</code> (17개)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>엔드포인트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">18</td><td class="url"><span class="method method-get">GET</span><code>/api/search/competitions</code></td><td class="desc">검색 가능 대회 목록.</td></tr>
+          <tr><td class="num">19</td><td class="url"><span class="method method-get">GET</span><code>/api/search</code></td><td class="desc">선수/소속 검색.</td></tr>
+          <tr><td class="num">20</td><td class="url"><span class="method method-get">GET</span><code>/api/profile-card/search</code></td><td class="desc">프로필 카드용 선수 기록 검색.</td></tr>
+          <tr><td class="num">21</td><td class="url"><span class="method method-post">POST</span><code>/api/profile-card/generate</code></td><td class="desc">프로필 카드 이미지 생성.</td></tr>
+          <tr><td class="num">22</td><td class="url"><span class="method method-get">GET</span><code>/api/profile-card/templates</code></td><td class="desc">사용 가능 템플릿 목록.</td></tr>
+          <tr><td class="num">23</td><td class="url"><span class="method method-get">GET</span><code>/api/profile-card/layouts</code></td><td class="desc">카드 레이아웃 옵션.</td></tr>
+          <tr><td class="num">24</td><td class="url"><span class="method method-get">GET</span><code>/api/profile-card/presets</code></td><td class="desc">모듈러 프리셋 목록.</td></tr>
+          <tr><td class="num">25</td><td class="url"><span class="method method-get">GET</span><code>/api/profile-card/presets/:id/options</code></td><td class="desc">프리셋 토글 옵션.</td></tr>
+          <tr><td class="num">26</td><td class="url"><span class="method method-post">POST</span><code>/api/profile-card/generate-modular</code></td><td class="desc">모듈러 카드 생성.</td></tr>
+          <tr><td class="num">27</td><td class="url"><span class="method method-post">POST</span><code>/api/profile-card/preview-html</code></td><td class="desc">모듈러 프리뷰 HTML.</td></tr>
+          <tr><td class="num">28</td><td class="url"><span class="method method-get">GET</span><code>/api/competitions</code></td><td class="desc">연도별 대회 목록.</td></tr>
+          <tr><td class="num">29</td><td class="url"><span class="method method-get">GET</span><code>/api/competitions/current</code></td><td class="desc">현재/직전/다음 대회.</td></tr>
+          <tr><td class="num">30</td><td class="url"><span class="method method-get">GET</span><code>/api/competitions/calendar</code></td><td class="desc">캘린더 뷰 데이터.</td></tr>
+          <tr><td class="num">31</td><td class="url"><span class="method method-get">GET</span><code>/api/competitions/:id</code></td><td class="desc">대회 상세 정보.</td></tr>
+          <tr><td class="num">32</td><td class="url"><span class="method method-get">GET</span><code>/api/results/competitions</code></td><td class="desc">결과 보유 대회 목록.</td></tr>
+          <tr><td class="num">33</td><td class="url"><span class="method method-get">GET</span><code>/api/results/:filename/events</code></td><td class="desc">대회별 전 종목 결과.</td></tr>
+          <tr><td class="num">34</td><td class="url"><span class="method method-get">GET</span><code>/api/data-policy</code></td><td class="desc">데이터 사용 정책 (법적 고지).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4-3 Admin -->
+    <div class="sub-header">4-3. 관리자 API &nbsp;<code>adminRoutes.js</code> (38개)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>엔드포인트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">35</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/status</code></td><td class="desc">전체 시스템 상태.</td></tr>
+          <tr><td class="num">36</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/system/info</code></td><td class="desc">시스템 상세 정보.</td></tr>
+          <tr><td class="num">37</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/gallery</code></td><td class="desc">카드뉴스 이미지 목록.</td></tr>
+          <tr><td class="num">38</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/gallery/:filename</code></td><td class="desc">단일 이미지 정보.</td></tr>
+          <tr><td class="num">39</td><td class="url"><span class="method method-delete">DEL</span><code>/api/admin/gallery/:filename</code></td><td class="desc">이미지 삭제.</td></tr>
+          <tr><td class="num">40</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/pipeline/status</code></td><td class="desc">파이프라인 실행 상태.</td></tr>
+          <tr><td class="num">41</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/pipeline/history</code></td><td class="desc">파이프라인 실행 기록.</td></tr>
+          <tr><td class="num">42</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/pipeline/run</code></td><td class="desc">파이프라인 수동 실행.</td></tr>
+          <tr><td class="num">43</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/watcher/status</code></td><td class="desc">감시 상태.</td></tr>
+          <tr><td class="num">44</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/watcher/logs</code></td><td class="desc">감시 로그.</td></tr>
+          <tr><td class="num">45</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/watcher/start</code></td><td class="desc">감시 시작.</td></tr>
+          <tr><td class="num">46</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/watcher/stop</code></td><td class="desc">감시 중지.</td></tr>
+          <tr><td class="num">47</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/watcher/scan</code></td><td class="desc">수동 스캔 1회.</td></tr>
+          <tr><td class="num">48</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/watcher/reset</code></td><td class="desc">감시 데이터 초기화.</td></tr>
+          <tr><td class="num">49</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/schedule/parse-pdf</code></td><td class="desc">시간표 PDF 파싱.</td></tr>
+          <tr><td class="num">50</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/schedule/parse-and-generate</code></td><td class="desc">시간표 일괄 생성.</td></tr>
+          <tr><td class="num">51</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/schedule/preview</code></td><td class="desc">시간표 미리보기.</td></tr>
+          <tr><td class="num">52</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/schedule/generate</code></td><td class="desc">시간표 생성.</td></tr>
+          <tr><td class="num">53</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/notice/preview</code></td><td class="desc">공지사항 미리보기.</td></tr>
+          <tr><td class="num">54</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/notice/generate</code></td><td class="desc">공지사항 생성.</td></tr>
+          <tr><td class="num">55</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/result/events</code></td><td class="desc">경기결과 종목 목록.</td></tr>
+          <tr><td class="num">56</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/result/event-detail</code></td><td class="desc">종목 상세 결과.</td></tr>
+          <tr><td class="num">57</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/result/preview</code></td><td class="desc">경기결과 미리보기.</td></tr>
+          <tr><td class="num">58</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/result/batch-generate</code></td><td class="desc">경기결과 일괄 생성.</td></tr>
+          <tr><td class="num">59</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/result/generate</code></td><td class="desc">경기결과 생성.</td></tr>
+          <tr><td class="num">60</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/competitions/:id/events</code></td><td class="desc">대회 종목 목록 (관리자).</td></tr>
+          <tr><td class="num">61</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/competitions/import-kaaf</code></td><td class="desc">레거시 KAAF 임포트. <span class="badge badge-legacy">LEGACY</span></td></tr>
+          <tr><td class="num">62</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/pacerise/sync</code></td><td class="desc">PaceRise 동기화 (단일 또는 전체).</td></tr>
+          <tr><td class="num">63</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/pacerise/status</code></td><td class="desc">PaceRise 동기화 상태.</td></tr>
+          <tr><td class="num">64</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/auto-queue/status</code></td><td class="desc">자동 생성 큐 상태.</td></tr>
+          <tr><td class="num">65</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/auto-queue/toggle</code></td><td class="desc">큐 활성/비활성.</td></tr>
+          <tr><td class="num">66</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/auto-queue/log</code></td><td class="desc">큐 로그.</td></tr>
+          <tr><td class="num">67</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/auto-queue/clear</code></td><td class="desc">큐 초기화.</td></tr>
+          <tr><td class="num">68</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/history</code></td><td class="desc">생성 이력 목록.</td></tr>
+          <tr><td class="num">69</td><td class="url"><span class="method method-get">GET</span><code>/api/admin/history/:id/image</code></td><td class="desc">생성 이미지 조회.</td></tr>
+          <tr><td class="num">70</td><td class="url"><span class="method method-delete">DEL</span><code>/api/admin/history/:id</code></td><td class="desc">이력 삭제.</td></tr>
+          <tr><td class="num">71</td><td class="url"><span class="method method-delete">DEL</span><code>/api/admin/history</code></td><td class="desc">전체 이력 삭제.</td></tr>
+          <tr><td class="num">72</td><td class="url"><span class="method method-post">POST</span><code>/api/admin/profile-card/presets/reload</code></td><td class="desc">프리셋 캐시 새로고침.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4-4 Card Studio -->
+    <div class="sub-header">4-4. Card Studio / Match API &nbsp;<code>/api/card-studio/*</code> (12개)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>엔드포인트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">73</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/competitions</code></td><td class="desc">대회 목록 (필터 지원).</td></tr>
+          <tr><td class="num">74</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/competitions/:id</code></td><td class="desc">단일 대회 상세.</td></tr>
+          <tr><td class="num">75</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/competitions/current</code></td><td class="desc">현재/직전/다음 대회.</td></tr>
+          <tr><td class="num">76</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/competitions/calendar</code></td><td class="desc">월별 대회 캘린더.</td></tr>
+          <tr><td class="num">77</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/results/competitions</code></td><td class="desc">결과 보유 대회 목록.</td></tr>
+          <tr><td class="num">78</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/results/:filename/events</code></td><td class="desc">대회별 종목 결과.</td></tr>
+          <tr><td class="num">79</td><td class="url"><span class="method method-get">GET</span><code>/api/card-studio/search</code></td><td class="desc">선수 기록 검색.</td></tr>
+          <tr><td class="num">80</td><td class="url"><span class="method method-get">GET</span><code>/api/match-results/competition/:id</code></td><td class="desc">대회별 매치 결과.</td></tr>
+          <tr><td class="num">81</td><td class="url"><span class="method method-get">GET</span><code>/api/match-results/:id</code></td><td class="desc">매치 결과 상세.</td></tr>
+          <tr><td class="num">82</td><td class="url"><span class="method method-post">POST</span><code>/api/match-results</code></td><td class="desc">매치 결과 생성.</td></tr>
+          <tr><td class="num">83</td><td class="url"><span class="method method-put">PUT</span><code>/api/match-results/:id</code></td><td class="desc">매치 결과 수정.</td></tr>
+          <tr><td class="num">84</td><td class="url"><span class="method method-delete">DEL</span><code>/api/match-results/:id</code></td><td class="desc">매치 결과 삭제.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4-5 Auth/Community -->
+    <div class="sub-header">4-5. 인증 / 커뮤니티 API (21개)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>엔드포인트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">85</td><td class="url"><span class="method method-post">POST</span><code>/api/auth/login</code></td><td class="desc">로그인 (JWT).</td></tr>
+          <tr><td class="num">86</td><td class="url"><span class="method method-post">POST</span><code>/api/auth/register</code></td><td class="desc">회원가입.</td></tr>
+          <tr><td class="num">87</td><td class="url"><span class="method method-post">POST</span><code>/api/auth/logout</code></td><td class="desc">로그아웃.</td></tr>
+          <tr><td class="num">88</td><td class="url"><span class="method method-post">POST</span><code>/api/auth/refresh</code></td><td class="desc">토큰 갱신.</td></tr>
+          <tr><td class="num">89</td><td class="url"><span class="method method-get">GET</span><code>/api/posts</code></td><td class="desc">게시글 목록.</td></tr>
+          <tr><td class="num">90</td><td class="url"><span class="method method-post">POST</span><code>/api/posts</code></td><td class="desc">게시글 작성.</td></tr>
+          <tr><td class="num">91</td><td class="url"><span class="method method-get">GET</span><code>/api/posts/:id</code></td><td class="desc">게시글 상세.</td></tr>
+          <tr><td class="num">92</td><td class="url"><span class="method method-put">PUT</span><code>/api/posts/:id</code></td><td class="desc">게시글 수정.</td></tr>
+          <tr><td class="num">93</td><td class="url"><span class="method method-delete">DEL</span><code>/api/posts/:id</code></td><td class="desc">게시글 삭제.</td></tr>
+          <tr><td class="num">94</td><td class="url"><span class="method method-post">POST</span><code>/api/posts/:id/vote</code></td><td class="desc">게시글 투표.</td></tr>
+          <tr><td class="num">95</td><td class="url"><span class="method method-get">GET</span><code>/api/posts/:postId/comments</code></td><td class="desc">댓글 목록.</td></tr>
+          <tr><td class="num">96</td><td class="url"><span class="method method-post">POST</span><code>/api/posts/:postId/comments</code></td><td class="desc">댓글 작성.</td></tr>
+          <tr><td class="num">97</td><td class="url"><span class="method method-put">PUT</span><code>/api/posts/:postId/comments/:commentId</code></td><td class="desc">댓글 수정.</td></tr>
+          <tr><td class="num">98</td><td class="url"><span class="method method-delete">DEL</span><code>/api/posts/:postId/comments/:commentId</code></td><td class="desc">댓글 삭제.</td></tr>
+          <tr><td class="num">99</td><td class="url"><span class="method method-get">GET</span><code>/api/user/profile</code></td><td class="desc">사용자 프로필.</td></tr>
+          <tr><td class="num">100</td><td class="url"><span class="method method-get">GET</span><code>/api/user/stats</code></td><td class="desc">사용자 통계.</td></tr>
+          <tr><td class="num">101</td><td class="url"><span class="method method-get">GET</span><code>/api/user/posts</code></td><td class="desc">사용자 작성 게시글.</td></tr>
+          <tr><td class="num">102</td><td class="url"><span class="method method-get">GET</span><code>/api/notifications</code></td><td class="desc">알림 목록.</td></tr>
+          <tr><td class="num">103</td><td class="url"><span class="method method-put">PUT</span><code>/api/notifications/:id/read</code></td><td class="desc">알림 읽음.</td></tr>
+          <tr><td class="num">104</td><td class="url"><span class="method method-post">POST</span><code>/api/notifications/read-all</code></td><td class="desc">전체 읽음.</td></tr>
+          <tr><td class="num">105</td><td class="url"><span class="method method-get">GET</span><code>/health</code></td><td class="desc">서버 헬스체크.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. 프론트엔드 라우트 -->
+  <div class="section" id="sec-routes">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(251,191,36,0.15);">&#128196;</div>
+      <h2>5. 프론트엔드 라우트 (React SPA)</h2>
+      <span class="count">10건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>경로</th><th>컴포넌트</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">106</td><td class="url"><code>/</code></td><td>MainPage</td><td class="desc">메인 랜딩 — Hero, 소셜 프루프, 핵심 기능 카드, 로그인 모달.</td></tr>
+          <tr><td class="num">107</td><td class="url"><code>/competitions</code></td><td>CompetitionsPage</td><td class="desc">대회·기록 허브 — 시간표/결과/검색 3탭.</td></tr>
+          <tr><td class="num">108</td><td class="url"><code>/pacerise</code></td><td>PaceRisePage</td><td class="desc">실업 LIVE — PaceRise 실시간 결과, 시간표, 선수 명단.</td></tr>
+          <tr><td class="num">109</td><td class="url"><code>/profile-card</code></td><td>ProfileCardPage</td><td class="desc">프로필 카드 생성 — 위자드/모듈러 모드.</td></tr>
+          <tr><td class="num">110</td><td class="url"><code>/community</code></td><td>CommunityPage</td><td class="desc">육상인 커뮤니티 게시판.</td></tr>
+          <tr><td class="num">111</td><td class="url"><code>/pace-calculator</code></td><td>PaceCalculatorPage</td><td class="desc">페이스 계산기.</td></tr>
+          <tr><td class="num">112</td><td class="url"><code>/login</code></td><td>LoginPage</td><td class="desc">로그인.</td></tr>
+          <tr><td class="num">113</td><td class="url"><code>/register</code></td><td>RegisterPage</td><td class="desc">회원가입.</td></tr>
+          <tr><td class="num">114</td><td class="url"><code>/marketplace</code></td><td>MarketplacePage</td><td class="desc">마켓플레이스 (비활성).</td></tr>
+          <tr><td class="num">115</td><td class="url"><code>/board</code></td><td>BoardPage</td><td class="desc">게시판.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 6. CDN -->
+  <div class="section" id="sec-cdn">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(244,114,182,0.15);">&#127912;</div>
+      <h2>6. 외부 리소스 / CDN</h2>
+      <span class="count">3건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">116</td><td class="url"><a href="https://images.unsplash.com/photo-1461896836934-ffe607ba8211" target="_blank">images.unsplash.com/…</a></td><td class="desc">MainPage Hero 배경 이미지 (Unsplash, 육상 트랙).</td></tr>
+          <tr><td class="num">117</td><td class="url"><code>fonts.googleapis.com/…Inter+Noto+Sans+KR</code></td><td class="desc">Google Fonts — 카드뉴스용 웹폰트.</td></tr>
+          <tr><td class="num">118</td><td class="url"><code>cdn.jsdelivr.net/…tailwindcss@2.2.19</code></td><td class="desc">Tailwind CSS CDN — 차트 다운로드 HTML.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 7. CORS -->
+  <div class="section" id="sec-cors">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(248,113,113,0.15);">&#128274;</div>
+      <h2>7. CORS 허용 도메인</h2>
+      <span class="count">7건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>도메인</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">119</td><td class="url"><code>https://athlete-time.netlify.app</code></td><td class="desc">프론트엔드 메인. <span class="badge badge-prod">PROD</span></td></tr>
+          <tr><td class="num">120</td><td class="url"><code>https://athletetime.netlify.app</code></td><td class="desc">프론트엔드 대체.</td></tr>
+          <tr><td class="num">121</td><td class="url"><code>https://community.athletetime.com</code></td><td class="desc">커뮤니티 커스텀 도메인.</td></tr>
+          <tr><td class="num">122</td><td class="url"><code>http://localhost:5173</code></td><td class="desc">Vite 개발 서버. <span class="badge badge-dev">DEV</span></td></tr>
+          <tr><td class="num">123</td><td class="url"><code>http://localhost:3000</code></td><td class="desc">백엔드 로컬. <span class="badge badge-dev">DEV</span></td></tr>
+          <tr><td class="num">124</td><td class="url"><code>http://localhost:3001</code></td><td class="desc">백엔드 대체 포트. <span class="badge badge-dev">DEV</span></td></tr>
+          <tr><td class="num">125</td><td class="url"><code>http://localhost:3005</code></td><td class="desc">프론트엔드 API 개발. <span class="badge badge-dev">DEV</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 8. 참고자료 -->
+  <div class="section" id="sec-ref">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(74,222,128,0.15);">&#128218;</div>
+      <h2>8. 참고 자료 / 디자인 레퍼런스</h2>
+      <span class="count">9건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">126</td><td class="url"><a href="https://www.chopdawg.com/ui-ux-design-trends-in-mobile-apps-for-2025/" target="_blank">chopdawg.com/…2025</a></td><td class="desc">2025 UI/UX 디자인 트렌드.</td></tr>
+          <tr><td class="num">127</td><td class="url"><a href="https://stormotion.io/blog/fitness-app-ux/" target="_blank">stormotion.io/…fitness-app-ux</a></td><td class="desc">피트니스 앱 UX 원칙.</td></tr>
+          <tr><td class="num">128</td><td class="url"><a href="https://www.w3.org/WAI/WCAG21/quickref/" target="_blank">w3.org/…WCAG21</a></td><td class="desc">WCAG 2.1 접근성 가이드.</td></tr>
+          <tr><td class="num">129</td><td class="url"><a href="https://m3.material.io/" target="_blank">m3.material.io</a></td><td class="desc">Material Design 3.</td></tr>
+          <tr><td class="num">130</td><td class="url"><a href="https://tailwindcss.com/docs" target="_blank">tailwindcss.com/docs</a></td><td class="desc">Tailwind CSS 공식 문서.</td></tr>
+          <tr><td class="num">131</td><td class="url"><a href="https://www.strava.com" target="_blank">strava.com</a></td><td class="desc">Strava — UX 벤치마크.</td></tr>
+          <tr><td class="num">132</td><td class="url"><a href="https://www.nike.com/nrc-app" target="_blank">nike.com/nrc-app</a></td><td class="desc">Nike Run Club.</td></tr>
+          <tr><td class="num">133</td><td class="url"><a href="https://connect.garmin.com" target="_blank">connect.garmin.com</a></td><td class="desc">Garmin Connect.</td></tr>
+          <tr><td class="num">134</td><td class="url"><a href="https://www.mcmillanrunning.com" target="_blank">mcmillanrunning.com</a></td><td class="desc">McMillan Running 페이스 계산.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 9. Badges -->
+  <div class="section" id="sec-badge">
+    <div class="section-header">
+      <div class="icon" style="background:rgba(129,140,248,0.15);">&#127991;</div>
+      <h2>9. 버전 뱃지 URL</h2>
+      <span class="count">2건</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>URL</th><th>내용 요약</th></tr></thead>
+        <tbody class="searchable">
+          <tr><td class="num">135</td><td class="url"><a href="https://img.shields.io/badge/version-3.0.0-blue.svg" target="_blank">img.shields.io/…version-3.0.0</a></td><td class="desc">README 버전 뱃지 (v3.0.0).</td></tr>
+          <tr><td class="num">136</td><td class="url"><a href="https://img.shields.io/badge/status-production-green.svg" target="_blank">img.shields.io/…status-production</a></td><td class="desc">README 상태 뱃지.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function filterRows(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('tbody.searchable tr').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = !q || text.includes(q) ? '' : 'none';
+  });
+}
+</script>
+
+</body>
+</html>

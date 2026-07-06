@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "note": "선수 동일인 식별 매핑. person_no 등 타기관 식별자는 저장하지 않는다(B안). 빈 entries=현행과 동일 동작.",
+  "generatedAt": null,
+  "entries": []
+}

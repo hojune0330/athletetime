@@ -57,7 +57,7 @@ const STRATEGY_INFO: Record<PaceStrategy, { icon: string; name: string; desc: st
     name: '포지티브',
     desc: '전반부 가속 (±1%)',
     badge: '공격적',
-    badgeClass: 'bg-orange-100 text-orange-700',
+    badgeClass: 'bg-accent-100 text-accent-700',
     detail: '전반부를 빠르게 시작하고 후반부에 페이스를 유지합니다. 리스크가 있지만 기록 단축에 도전할 때 사용합니다.',
   },
 };
@@ -334,7 +334,7 @@ export const SplitCalculator: React.FC = () => {
       {splits ? (
         <div className="card p-6">
           {/* 전략 요약 */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl">
             <h3 className="font-bold text-lg mb-2">
               {STRATEGY_INFO[strategy].icon} {STRATEGY_INFO[strategy].name} 전략
             </h3>

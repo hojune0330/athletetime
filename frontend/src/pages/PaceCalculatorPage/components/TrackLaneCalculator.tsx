@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTrackLaneCalculator } from '../hooks/usePaceCalculator';
-import { LANE_COLORS, formatPace, formatTime } from '../utils/paceCalculations';
-import { ChartDownloadButtons } from './ChartDownloadButtons';
+import { LANE_COLORS, formatPace } from '../utils/paceCalculations';
 
 export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calculator' }) => {
   const {
@@ -66,7 +65,7 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
   }, []);
 
   // 트랙 SVG 경로 계산
-  const getTrackPath = (lane: number, radius: number) => {
+  const getTrackPath = (_lane: number, radius: number) => {
     const scaleFactor = 2.5;
     const straightLength = 84.39 * scaleFactor;
     const centerX = 450;
@@ -320,7 +319,7 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
                       {lane.isSelected && <span className="text-amber-500 ml-1">★</span>}
                     </td>
                     <td className="font-bold">{lane.distance.toFixed(2)}m</td>
-                    <td className={lane.stagger > 0 ? 'text-orange-600' : ''}>
+                    <td className={lane.stagger > 0 ? 'text-accent-600' : ''}>
                       {lane.stagger > 0 ? `+${lane.stagger.toFixed(2)}` : '0.00'}m
                     </td>
                     <td className={`font-bold ${lane.isSelected ? 'text-amber-700 text-lg' : ''}`}>
@@ -397,10 +396,10 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
               <li>• 측정선: 안쪽에서 30cm(1레인) / 20cm(2~8레인)</li>
             </ul>
           </div>
-          <div className="p-4 bg-orange-50 rounded-xl border border-orange-200">
+          <div className="p-4 bg-accent-50 rounded-xl border border-accent-200">
             <div className="text-2xl mb-2">🎯</div>
-            <h4 className="font-bold text-orange-900 mb-2">스태거(Stagger)란?</h4>
-            <p className="text-sm text-orange-800">
+            <h4 className="font-bold text-accent-700 mb-2">스태거(Stagger)란?</h4>
+            <p className="text-sm text-accent-700">
               바깥 레인이 안쪽보다 더 길기 때문에 공정한 경주를 위해 출발선을 앞으로 배치하는 것입니다.
               8레인은 1레인보다 <strong>53.03m</strong> 앞에서 출발합니다.
             </p>

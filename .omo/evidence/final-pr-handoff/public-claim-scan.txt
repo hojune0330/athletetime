@@ -1,0 +1,1 @@
+card-studio\services\coverageMatrixService.js:175:      headline: '아직 2010년부터 오늘까지 모든 경기결과가 다 있는 상태가 아닙니다.',

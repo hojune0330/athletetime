@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+ok 1 - login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+  ---
+  duration_ms: 5234.7852
+  type: 'test'
+  ...
+# Subtest: auth session JSON bodies omit access and refresh tokens
+ok 2 - auth session JSON bodies omit access and refresh tokens
+  ---
+  duration_ms: 232.6381
+  type: 'test'
+  ...
+# Subtest: auth route source never serializes session tokens into JSON response bodies
+ok 3 - auth route source never serializes session tokens into JSON response bodies
+  ---
+  duration_ms: 3.4983
+  type: 'test'
+  ...
+# Subtest: csrf hint cookie lasts as long as the refresh session cookie
+ok 4 - csrf hint cookie lasts as long as the refresh session cookie
+  ---
+  duration_ms: 214.679
+  type: 'test'
+  ...
+# Subtest: standalone csrf endpoint issues the long-lived session hint
+ok 5 - standalone csrf endpoint issues the long-lived session hint
+  ---
+  duration_ms: 2.6735
+  type: 'test'
+  ...
+# Subtest: cookie authenticated unsafe auth writes require a valid CSRF token
+ok 6 - cookie authenticated unsafe auth writes require a valid CSRF token
+  ---
+  duration_ms: 255.4908
+  type: 'test'
+  ...
+# Subtest: malformed cookie encoding is rejected without a server error
+ok 7 - malformed cookie encoding is rejected without a server error
+  ---
+  duration_ms: 2.6357
+  type: 'test'
+  ...
+# Subtest: global unsafe cookie-auth routes require CSRF before route authorization
+ok 8 - global unsafe cookie-auth routes require CSRF before route authorization
+  ---
+  duration_ms: 358.5674
+  type: 'test'
+  ...
+# Subtest: refresh rotates session cookies using refresh cookie without request body token
+ok 9 - refresh rotates session cookies using refresh cookie without request body token
+  ---
+  duration_ms: 264.3681
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9691.5346

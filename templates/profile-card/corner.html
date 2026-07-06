@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width={{width}}">
+  <title>프로필 카드 - Corner</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #111111;
+      --white: #FFFFFF;
+      --naver-green: #03C75A;
+    }
+
+    body { margin: 0; padding: 0; background: #000; }
+
+    .profile-card {
+      width: {{width}}px;
+      height: {{height}}px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+    }
+
+    .profile-card__photo {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('{{photoUrl}}');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* 좌하단 코너 블록 (글래스 카드) */
+    .corner__block {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      background: rgba(0,0,0,0.84);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 20px;
+      padding: 36px 40px;
+      color: var(--white);
+      min-width: 380px;
+      max-width: 500px;
+    }
+
+    .corner__event {
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .corner__athlete {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .corner__affiliation {
+      font-size: 17px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 22px;
+    }
+
+    .corner__stats {
+      display: flex;
+      gap: 28px;
+      align-items: flex-end;
+    }
+
+    .corner__stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .corner__stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .corner__stat-value {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+      line-height: 1.05;
+    }
+
+    .corner__stat-value--rank {
+      color: var(--naver-green);
+    }
+
+    .corner__stat-unit {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .corner__meta {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .corner__comp {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .corner__brand {
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      margin-left: 16px;
+    }
+
+    /* 풍속 배지 */
+    .corner__wind {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* 코멘트 */
+    .corner__comment {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 15px;
+      color: rgba(255,255,255,0.6);
+      font-style: italic;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-card">
+  <div class="profile-card__photo"></div>
+  <div class="corner__block">
+    <div class="corner__event">{{event}}</div>
+    <div class="corner__athlete">{{name}}</div>
+    <div class="corner__affiliation">{{affiliation}}</div>
+    <div class="corner__stats">
+      <div class="corner__stat">
+        <div class="corner__stat-label">RANK</div>
+        <div class="corner__stat-value corner__stat-value--rank">{{rank}}</div>
+      </div>
+      <div class="corner__stat">
+        <div class="corner__stat-label">RECORD</div>
+        <div class="corner__stat-value">{{record}}<span class="corner__stat-unit">{{recordUnit}}</span></div>
+        {{#hasWind}}<div class="corner__wind">풍속 {{wind}} m/s</div>{{/hasWind}}
+      </div>
+    </div>
+    {{#hasComment}}<div class="corner__comment">"{{comment}}"</div>{{/hasComment}}
+    <div class="corner__meta">
+      <span class="corner__comp">{{competition}} · {{date}}</span>
+      <span class="corner__brand">AthleTime</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
