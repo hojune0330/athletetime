@@ -933,71 +933,12 @@
         "date": "2023-03-25",
         "venue": "경주",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "박준혁(7회)건대부중  10:39",
-            "affiliation": "오성일(10회)배문중  12:02",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "김현재13:38  441:37",
-            "affiliation": "김주한13:13  154:50",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "조승빈12:57  140:46",
-            "affiliation": "황선호14:45  355:31",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "서민재13:01  242:59",
-            "affiliation": "이현수15:04  458:03",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "장호현14:13  544:39",
-            "affiliation": "김진홍13:26  258:05",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "김주영13:12  343:01",
-            "affiliation": "정태주15:29  558:30",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "박유한14:31  645:57",
-            "affiliation": "이수현16:36  61:02:33",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 7
       },
       {
         "event": "22 역전경기 1일차",
@@ -1005,107 +946,12 @@
         "date": "2023-03-25",
         "venue": "경주",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "김령이(6회)한일여중  11:32",
-            "affiliation": "임윤희(4회)동인천여중  13:24",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "황재희12:23  143:15",
-            "affiliation": "김은정16:25  359:40",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "김가은12:50  244:07",
-            "affiliation": "임지우16:13  21:00:20",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "윤진원15:27  646:06",
-            "affiliation": "이준아15:43  11:01:49",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "최미진14:05  344:20",
-            "affiliation": "민시윤19:01  101:03:21",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "오윤서15:26  546:52",
-            "affiliation": "강다연16:44  51:03:36",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "김명지14:22  447:21",
-            "affiliation": "설예나16:28  41:03:49",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "김재연15:30  748:29",
-            "affiliation": "김주연16:45  61:05:14",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 9,
-            "name": "임지수15:40  850:39",
-            "affiliation": "서한울17:59  81:08:38",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 10,
-            "name": "김주희16:36  953:49",
-            "affiliation": "양유희16:57  71:10:46",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 11,
-            "name": "한재인17:45  1055:18",
-            "affiliation": "이지민18:05  91:13:23",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 11
       }
     ]
   },
@@ -97593,98 +97439,12 @@
         "date": "2023-09-03",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "신용민서울[49]  22:16",
-            "affiliation": "이동규서울[42]  23:35",
-            "record": "김태진서울[42]  29:43",
-            "personal_best": "",
-            "note": "조정구간",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "안도현24:32  21:11:06",
-            "affiliation": "고정현24:21  11:35:27",
-            "record": "김도연31:29  12:06:56",
-            "personal_best": "",
-            "note": "이석인25:44  42:32:40",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "오준서23:52  11:10:35",
-            "affiliation": "박우진25:48  21:36:23",
-            "record": "김은성33:32  32:09:55",
-            "personal_best": "",
-            "note": "김은혁24:01  12:33:56",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "김정민27:46  71:15:32",
-            "affiliation": "공기훈27:14  61:42:46",
-            "record": "임재만33:17  22:16:03",
-            "personal_best": "",
-            "note": "임민철26:09  52:42:12",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "우재영24:41  31:14:08",
-            "affiliation": "양경준26:51  41:40:59",
-            "record": "김한별33:46  42:14:45",
-            "personal_best": "",
-            "note": "박민수27:52  72:42:37",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "김홍남25:56  41:14:56",
-            "affiliation": "김동희26:33  31:41:29",
-            "record": "김주현35:03  52:16:32",
-            "personal_best": "",
-            "note": "박연수26:10  62:42:42",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "김성욱27:03  61:15:09",
-            "affiliation": "염동기27:07  51:42:16",
-            "record": "이우형36:34  82:18:50",
-            "personal_best": "",
-            "note": "정한욱25:29  22:44:19",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "장민기26:50  51:17:56",
-            "affiliation": "김우성29:15  71:47:11",
-            "record": "안성준36:27  62:23:38",
-            "personal_best": "",
-            "note": "이문걸25:39  32:49:17",
-            "newRecord": ""
-          },
-          {
-            "rank": 9,
-            "name": "손태욱31:23  81:22:38",
-            "affiliation": "최선우29:57  81:52:35",
-            "record": "김한36:33  72:29:08",
-            "personal_best": "",
-            "note": "김단우35:19  83:04:27",
-            "newRecord": ""
-          },
-          {
-            "rank": 10,
-            "name": "진준모0  0",
-            "affiliation": "박건0  0",
-            "record": "양지훈0  0",
-            "personal_best": "",
-            "note": "김세현0  0",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 10
       }
     ]
   },
@@ -97702,62 +97462,12 @@
         "date": "2023-09-03",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "이경호[50]한국전력공사  29:56",
-            "affiliation": "조정구간",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "김대훈32:21  22:05:16",
-            "affiliation": "조민혁23:07  12:28:23",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "신현수31:33  12:06:28",
-            "affiliation": "심종섭23:26  22:29:54",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "허태성36:51  32:19:30",
-            "affiliation": "김동환24:56  32:44:26",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "남민우46:51  2:49:30",
-            "affiliation": "안현웅0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "김호연0  0",
-            "affiliation": "이승현0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 6
       }
     ]
   },

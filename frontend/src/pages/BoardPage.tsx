@@ -1,10 +1,11 @@
 /**
- * 게시판 페이지 (v4.0.0 - Clean Architecture)
- * 
+ * 게시판 페이지 (v5.0.0 - 침하하 스타일 라이트 테마)
+ *
  * 카테고리별 게시글 목록을 표시하는 페이지
  */
 
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import PostList from '../components/post/PostList';
 import Pagination from '../components/common/Pagination';
 import { usePosts } from '../hooks/usePosts';
@@ -33,35 +34,42 @@ export default function BoardPage() {
   const [searchParams] = useSearchParams();
   const page = Number(searchParams.get('page')) || 1;
   const limit = 20;
-  
+
   const board = boardInfo[boardId || ''] || { name: '게시판', description: '' };
   const category = boardToCategoryMap[boardId || ''] || undefined;
-  
+
   // 카테고리별 게시글 조회
   const { data: postsData } = usePosts({ category, page, limit });
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto px-4 py-4">
+    <div>
       {/* Board Header */}
-      <div className="bg-dark-700 rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-white mb-2">{board.name}</h1>
+      <div className="mb-4">
+        <Link
+          to="/community"
+          className="mb-3 inline-flex cursor-pointer items-center gap-1.5 text-sm text-neutral-500 transition-colors duration-200 hover:text-neutral-900"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          커뮤니티
+        </Link>
+        <h1 className="text-2xl font-bold text-neutral-900">{board.name}</h1>
         {board.description && (
-          <p className="text-gray-400">{board.description}</p>
+          <p className="mt-1 text-sm text-neutral-500">{board.description}</p>
         )}
       </div>
 
       {/* Post List */}
-      <div className="bg-dark-700 rounded-lg">
-        <PostList category={category} />
-      </div>
-      
+      <PostList category={category} page={page} limit={limit} />
+
       {/* Pagination */}
       <div className="mt-6">
-        <Pagination 
-          currentPage={page} 
-          totalPages={postsData ? Math.ceil(postsData.count / limit) : 1} 
+        <Pagination
+          currentPage={page}
+          totalPages={postsData ? Math.ceil(postsData.count / limit) : 1}
         />
       </div>
+
+      <div className="h-20 md:hidden" />
     </div>
   );
 }

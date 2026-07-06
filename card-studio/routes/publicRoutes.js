@@ -51,6 +51,7 @@ const anonymousInsightsService = require('../services/anonymousInsightsService')
 const identityShadowService = require('../services/identityShadowService');
 const zeroResultSearchService = require('../services/zeroResultSearchService');
 const dataRightsPolicy = require('../dataRightsPolicy');
+const { createResultEventsHandler } = require('./resultEventsRoute');
 
 // 미들웨어
 const { searchLimiter, generateLimiter, competitionLimiter, publicLimiter } = require('../middleware/rateLimiter');
@@ -581,110 +582,12 @@ router.get('/results/competitions', publicLimiter, (req, res) => {
  * 대회별 전 종목 결과
  * GET /results/:filename/events?eventType=track
  */
-router.get('/results/:filename/events', publicLimiter, (req, res) => {
-  try {
-    const fs = require('fs');
-    const resultsStore = require('../services/resultsStore');
-    const rawDir = config.dirs.raw;
-    const filename = req.params.filename;
-    
-    // 보안: 경로 탈출 방지
-    if (filename.includes('..') || filename.includes('/')) {
-      return res.status(400).json({ success: false, error: '잘못된 파일명입니다.' });
-    }
-    
-    // 1순위: resultsStore (data/results 실데이터 어댑터)
-    let data = resultsStore.getRawByFilename(filename);
-    if (data && !resultsStore.isPublicResultFilename(filename)) {
-      return res.status(404).json({ success: false, error: '대회 결과를 찾을 수 없습니다.' });
-    }
-
-    // 2순위(레거시): data/raw 직접 읽기
-    if (!data) {
-      const filePath = path.join(rawDir, filename);
-      if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ success: false, error: '대회 결과를 찾을 수 없습니다.' });
-      }
-      data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    }
-
-    const meta = data.meta || {};
-    const compName = meta.competition_name || '';
-    const provenance = dataRightsPolicy.publicResultProvenance({
-      provider: 'KAAF',
-      sourceId: filename,
-      sourceUrl: meta.source_url || '',
-      capturedAt: meta.crawled_at || '',
-    });
-    const { classifyEvent, needsWind } = require('../eventClassifier');
-    const MASKED_NAME = '비공개 요청 처리 중';
-    const events = (data.events || []).map(ev => ({
-      event: ev.event,
-      division: ev.division || null,
-      date: ev.date || '',
-      wind: ev.wind || null,
-      hasWind: needsWind(ev.event),
-      eventType: classifyEvent(ev.event),
-      results: (ev.results || []).reduce((acc, r) => {
-        // suppression(정정/삭제 요청) 판정:
-        //   remove : 결과표에서 제외 (예외적 삭제)
-        //   mask   : "비공개 요청 처리 중"으로 마스킹 (검토 중)
-        //   hide   : 결과표에는 정상 노출 (검색비노출/de-index 는 이름 검색·추천 화면에만 적용)
-        const sup = dataRequestService.checkSuppression({
-          name: r.name,
-          affiliation: r.affiliation,
-          competition: compName,
-        });
-        if (sup === 'remove') return acc; // 삭제 처리 건은 목록에서 제외
-        const masked = sup === 'mask';
-        acc.push({
-          rank: r.rank,
-          name: masked ? MASKED_NAME : r.name,
-          affiliation: masked ? '' : (r.affiliation || ''),
-          record: masked ? '' : r.record,
-          wind: masked ? null : (r.wind || null),
-          note: masked ? '' : (r.note || ''),
-          newRecord: masked ? '' : (r.newRecord || ''),
-          athleteId: masked ? undefined : stableAthleteId(r.name, r.affiliation),
-          provenance: masked ? undefined : provenance,
-          // 결과표에서 'hide'(검색비노출)는 일반 행과 구분 표시를 두지 않는다(정상 노출).
-          suppressed: masked ? 'mask' : undefined,
-        });
-        return acc;
-      }, []),
-    })).map(ev => ({ ...ev, totalAthletes: ev.results.length }));
-    
-    // 종목 유형 필터 (선택)
-    const eventTypeFilter = req.query.eventType;
-    const filtered = eventTypeFilter 
-      ? events.filter(e => e.eventType === eventTypeFilter)
-      : events;
-    
-    res.json({
-      success: true,
-      data: {
-        meta: {
-          competition: meta.competition_name || '',
-          year: meta.year || '',
-          period: meta.period || '',
-          venue: meta.venue || '',
-          source: 'kaaf',
-          sourceLabel: provenance.sourceLabel,
-          sourceUrl: meta.source_url || '',
-          collectedAt: meta.crawled_at || '',
-          sourceTier: provenance.sourceTier,
-          scopeNotice: provenance.scopeNotice,
-          correctionUrl: provenance.correctionUrl,
-        },
-        events: filtered,
-        totalEvents: filtered.length,
-        totalAthletes: filtered.reduce((sum, e) => sum + e.totalAthletes, 0),
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
+router.get('/results/:filename/events', publicLimiter, createResultEventsHandler({
+  config,
+  dataRequestService,
+  dataRightsPolicy,
+  stableAthleteId,
+}));
 
 // ============================================
 // 법적 고지 (Data Policy)

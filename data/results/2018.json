@@ -1301,179 +1301,12 @@
         "date": "2018-03-24",
         "venue": "경주",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "강순(24회)배문고  19:58",
-            "affiliation": "김준수(23회)충북체고  22:05",
-            "record": "이동진(17회)배문고  14:44",
-            "personal_best": "",
-            "note": "이두행(15회)목포기계공고  25:40",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "오성일22:31  41:09:41",
-            "affiliation": "박주환24:07  11:33:48",
-            "record": "박영민15:10  11:48:58",
-            "personal_best": "",
-            "note": "박지원26:46  22:15:44",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "이윤상22:08  11:10:26",
-            "affiliation": "권현준24:09  21:34:35",
-            "record": "이승준15:16  21:49:51",
-            "personal_best": "",
-            "note": "원천일27:45  42:17:36",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "남대현22:38  51:11:20",
-            "affiliation": "하헌구25:05  51:36:25",
-            "record": "김성문15:56  41:52:21",
-            "personal_best": "",
-            "note": "조경현28:40  62:21:01",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "최세훈22:28  21:11:02",
-            "affiliation": "김진우24:21  31:35:23",
-            "record": "강만세17:58  131:53:21",
-            "personal_best": "",
-            "note": "전도현28:21  52:21:42",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "류의진23:24  91:12:16",
-            "affiliation": "김하늘25:27  71:37:43",
-            "record": "박상욱17:11  111:54:54",
-            "personal_best": "",
-            "note": "김승현27:15  32:22:09",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "박신영24:04  111:14:37",
-            "affiliation": "공상혁25:18  61:39:55",
-            "record": "박찬우16:21  51:56:16",
-            "personal_best": "",
-            "note": "박무영26:44  12:23:00",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "황영준24:18  131:13:28",
-            "affiliation": "박승희24:42  41:38:10",
-            "record": "임신순16:22  61:54:32",
-            "personal_best": "",
-            "note": "심규태28:50  72:23:22",
-            "newRecord": ""
-          },
-          {
-            "rank": 9,
-            "name": "유강철22:42  61:13:09",
-            "affiliation": "안명헌26:04  101:39:13",
-            "record": "이광표16:59  91:56:12",
-            "personal_best": "",
-            "note": "김효근29:23  82:25:35",
-            "newRecord": ""
-          },
-          {
-            "rank": 10,
-            "name": "정규원23:02  81:13:52",
-            "affiliation": "권민재27:14  111:41:06",
-            "record": "김준섭16:41  81:57:47",
-            "personal_best": "",
-            "note": "이수철29:56  102:27:43",
-            "newRecord": ""
-          },
-          {
-            "rank": 11,
-            "name": "남형준23:37  101:15:44",
-            "affiliation": "임동민26:00  91:41:44",
-            "record": "김경민15:45  31:57:29",
-            "personal_best": "",
-            "note": "양명언30:34  112:28:03",
-            "newRecord": ""
-          },
-          {
-            "rank": 12,
-            "name": "남성준22:58  71:13:55",
-            "affiliation": "김윤형25:57  81:39:52",
-            "record": "이명진18:16  141:58:08",
-            "personal_best": "",
-            "note": "김태호31:32  152:29:40",
-            "newRecord": ""
-          },
-          {
-            "rank": 13,
-            "name": "김도엽22:28  21:15:27",
-            "affiliation": "이준호28:44  121:44:11",
-            "record": "김진범17:01  102:01:12",
-            "personal_best": "",
-            "note": "임진모29:54  92:31:06",
-            "newRecord": ""
-          },
-          {
-            "rank": 14,
-            "name": "임형윤24:10  121:15:35",
-            "affiliation": "양준서30:54  141:46:29",
-            "record": "유지민17:41  122:04:10",
-            "personal_best": "",
-            "note": "기성수30:48  132:34:58",
-            "newRecord": ""
-          },
-          {
-            "rank": 15,
-            "name": "양준혁24:43  141:17:17",
-            "affiliation": "함태경28:56  131:46:13",
-            "record": "서준철19:02  152:05:15",
-            "personal_best": "",
-            "note": "김경헌30:45  122:36:00",
-            "newRecord": ""
-          },
-          {
-            "rank": 16,
-            "name": "김유석30:04  151:24:01",
-            "affiliation": "진유범37:46  152:01:47",
-            "record": "허남준16:38  72:18:25",
-            "personal_best": "",
-            "note": "오상철31:04  142:49:29",
-            "newRecord": ""
-          },
-          {
-            "rank": 17,
-            "name": "김동혁0  0",
-            "affiliation": "최진혁0  0",
-            "record": "고지우0  0",
-            "personal_best": "",
-            "note": "윤금성0  0",
-            "newRecord": ""
-          },
-          {
-            "rank": 18,
-            "name": "김인호24:08  1:23:39",
-            "affiliation": "송성재0  0",
-            "record": "노다원0  0",
-            "personal_best": "",
-            "note": "김경태0  0",
-            "newRecord": ""
-          },
-          {
-            "rank": 19,
-            "name": "김동영24:01  1:15:16",
-            "affiliation": "김수홍27:21  1:42:37",
-            "record": "이재환17:40  2:00:17",
-            "personal_best": "",
-            "note": "이진형0  0",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 19
       }
     ]
   },
@@ -1491,116 +1324,12 @@
         "date": "2018-03-24",
         "venue": "경주",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "박준혁(7회)건대부중  10:39",
-            "affiliation": "오성일(10회)배문중  12:02",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "심규현11:07  136:39",
-            "affiliation": "오성윤12:47  149:26",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "손현준11:24  236:58",
-            "affiliation": "김민석12:47  149:45",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "김경현12:16  439:53",
-            "affiliation": "김재민13:07  353:00",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "이성찬12:38  739:33",
-            "affiliation": "기한빈13:54  553:27",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "이동규12:16  439:48",
-            "affiliation": "김규진14:45  654:33",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "이종서12:04  340:36",
-            "affiliation": "김태구15:17  755:53",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "정대한13:38  843:33",
-            "affiliation": "이강희13:48  457:21",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 9,
-            "name": "박정우12:20  642:12",
-            "affiliation": "정혁래16:17  858:29",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 10,
-            "name": "김수우15:12  951:21",
-            "affiliation": "양두훈18:52  91:10:13",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 11,
-            "name": "현근효0  0",
-            "affiliation": "김동준0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 12,
-            "name": "배재성0  0",
-            "affiliation": "김동우0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 12
       },
       {
         "event": "22 역전경기 1일차",
@@ -1608,89 +1337,12 @@
         "date": "2018-03-24",
         "venue": "경주",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "김령이(6회)한일여중  11:32",
-            "affiliation": "임윤희(4회)동인천여중  13:24",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "김다정13:20  243:30",
-            "affiliation": "김소민15:07  358:37",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "박선하12:58  144:25",
-            "affiliation": "조서현16:00  41:00:25",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "나현선14:38  546:27",
-            "affiliation": "김시온14:18  11:00:45",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "오은채13:41  346:01",
-            "affiliation": "송영서16:38  51:02:39",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "최인녕13:44  448:09",
-            "affiliation": "김민승17:35  61:05:44",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "이예솔17:12  655:59",
-            "affiliation": "양민경14:56  21:10:55",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "김나령19:52  759:35",
-            "affiliation": "공명주18:11  71:17:46",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 9,
-            "name": "김예영0  0",
-            "affiliation": "임효진0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 9
       }
     ]
   },
@@ -112430,80 +112082,12 @@
         "date": "2018-09-09",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "정연석경북[40]  22:17",
-            "affiliation": "이동규서울[42]  23:35",
-            "record": "김태진서울[42]  29:43",
-            "personal_best": "",
-            "note": "최병수경북[40]  23:13",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "박주환23:03  11:08:23",
-            "affiliation": "이승호24:05  11:32:28",
-            "record": "전재원31:40  12:04:08",
-            "personal_best": "",
-            "note": "박지원24:49  32:28:57",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "김도엽24:14  21:11:05",
-            "affiliation": "장주안25:59  31:37:04",
-            "record": "고지우33:35  22:10:39",
-            "personal_best": "",
-            "note": "김동혁25:25  52:36:04",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "남대현25:49  61:11:43",
-            "affiliation": "조경현25:28  21:37:11",
-            "record": "홍진표34:35  52:11:46",
-            "personal_best": "",
-            "note": "김성문25:06  42:36:52",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "전찬용25:39  41:14:37",
-            "affiliation": "안명헌27:49  41:42:26",
-            "record": "유강철34:09  42:16:35",
-            "personal_best": "",
-            "note": "김주민24:39  12:41:14",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "김시겸25:48  51:17:33",
-            "affiliation": "주영빈28:05  51:45:38",
-            "record": "장준표33:45  32:19:23",
-            "personal_best": "",
-            "note": "남성준24:48  22:44:11",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "신민우25:22  31:13:54",
-            "affiliation": "우명원31:19  61:45:13",
-            "record": "김민호38:08  62:23:21",
-            "personal_best": "",
-            "note": "홍형선28:08  72:51:29",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "임성준27:10  71:20:43",
-            "affiliation": "김유석32:05  71:52:48",
-            "record": "오상철41:26  72:34:14",
-            "personal_best": "",
-            "note": "박지민26:35  63:00:49",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 8
       }
     ]
   },

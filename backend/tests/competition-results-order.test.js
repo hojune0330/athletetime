@@ -54,16 +54,14 @@ test('result competitions public index excludes life-sport competitions', () => 
 test('life-sport result originals stay stored while public filename index excludes them', () => {
   const { year, competition } = findLifeSportFixture();
   const filename = syntheticFilename(year, competition);
-  const publicRoutes = fs.readFileSync(path.join(ROOT, 'card-studio', 'routes', 'publicRoutes.js'), 'utf8');
-  const excludedResultBlock = publicRoutes.match(
-    /if \(data && !resultsStore\.isPublicResultFilename\(filename\)\) \{\r?\n([\s\S]*?)\r?\n    \}\r?\n\r?\n    \/\/ 2순위/,
-  );
+  const resultEventsRoute = fs.readFileSync(path.join(ROOT, 'card-studio', 'routes', 'resultEventsRoute.js'), 'utf8');
 
   assert.ok(resultsStore.getRawByFilename(filename));
   assert.equal(resultsStore.isPublicResultFilename(filename), false);
   assert.equal(resultsStore.listFilenames().includes(filename), false);
-  assert.ok(excludedResultBlock);
-  assert.match(excludedResultBlock[1], /status\(404\)/);
-  assert.match(excludedResultBlock[1], /error: '대회 결과를 찾을 수 없습니다\.'/);
-  assert.doesNotMatch(excludedResultBlock[1], /[�]|Ã|ë|寃곌낵|李얠쓣|\?놁/);
+  assert.match(resultEventsRoute, /resultsStore\.isPublicResultFilename\(filename\)/);
+  assert.match(resultEventsRoute, /return resultsStore\.isPublicResultFilename\(filename\) \? data : null/);
+  assert.match(resultEventsRoute, /status\(404\)/);
+  assert.match(resultEventsRoute, /error: '대회 결과를 찾을 수 없습니다\.'/);
+  assert.doesNotMatch(resultEventsRoute, /[�]|Ã|ë|寃곌낵|李얠쓣|\?놁/);
 });
