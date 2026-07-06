@@ -144,7 +144,9 @@ app.use(express.static(SPA_DIR));
 // 헬스체크
 // ============================================
 
-app.get('/health', async (req, res) => {
+// /api/health 별칭: Render Blueprint(render.yaml)의 healthCheckPath가
+// /api/health로 지정된 이력이 있어 두 경로 모두 응답한다.
+app.get(['/health', '/api/health'], async (req, res) => {
   const health = {
     status: 'healthy',
     version: '4.0.0',
