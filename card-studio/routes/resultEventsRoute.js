@@ -8,6 +8,7 @@ const {
   HOLD_STATUS,
   isResultEventOnQualityHold,
 } = require('../services/relayResultQualityService');
+const { buildCompetitionHighlights } = require('../services/competitionHighlightsService');
 
 const MASKED_NAME = '비공개 요청 처리 중';
 
@@ -117,6 +118,9 @@ function createResultEventsHandler(dependencies) {
         ? events.filter((event) => event.eventType === eventTypeFilter)
         : events;
 
+      // 대회 볼거리: 마스킹/홀드가 끝난 공개 이벤트에서만 규칙 기반으로 도출
+      const highlights = buildCompetitionHighlights(events);
+
       return res.json({
         success: true,
         data: {
@@ -134,6 +138,7 @@ function createResultEventsHandler(dependencies) {
             correctionUrl: provenance.correctionUrl,
           },
           events: filtered,
+          highlights,
           totalEvents: filtered.length,
           totalAthletes: filtered.reduce((sum, event) => sum + event.totalAthletes, 0),
         },
