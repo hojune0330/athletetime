@@ -15,7 +15,7 @@ test('frontend trust surfaces use public-record indexing copy instead of workaro
     'frontend/src/components/layout/Footer.tsx',
     'frontend/src/config/dataPolicy.ts',
     'frontend/src/pages/CompetitionsPage.tsx',
-    'frontend/src/pages/ProfileCardPage.tsx',
+    'frontend/src/pages/ProfileCardStudio/index.tsx',
   ].map(readSource).join('\n');
 
   assert.match(sources, /공개 경기기록을 모아 정리했어요/);

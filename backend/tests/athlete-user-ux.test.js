@@ -302,15 +302,12 @@ test('competition card links keep intentional discovery policy and accessible la
   assert.doesNotMatch(search, /profile-card\?name=\$\{encodeURIComponent\(result\.name \|\| ''\)\}/);
 });
 
-test('profile card page carries selected athlete name into the builder handoff', () => {
-  const source = readSource('frontend/src/pages/ProfileCardPage.tsx');
+test('profile card studio carries selected athlete name into the editor prefill', () => {
+  const source = readSource('frontend/src/pages/ProfileCardStudio/index.tsx');
 
   assert.match(source, /useSearchParams/);
-  assert.match(source, /const selectedName = \(searchParams\.get\('name'\) \|\| ''\)\.trim\(\)/);
-  assert.match(source, /buildBuilderSrc/);
-  assert.match(source, /new URLSearchParams\(\{ name: selectedName \}\)/);
-  assert.match(source, /<BuilderView mode=\{mode\} selectedName=\{selectedName\}/);
-  assert.match(source, /records\?q=\$\{encodeURIComponent\(selectedName\)\}/);
+  assert.match(source, /const initialName = \(searchParams\.get\('name'\) \|\| ''\)\.trim\(\)/);
+  assert.match(source, /createEmptyCard\(initialName\)/);
 });
 
 test('community page avoids unimplemented optional widgets in the main anonymous journey', () => {

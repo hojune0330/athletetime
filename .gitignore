@@ -58,3 +58,6 @@ data/sources/import/originals/
 
 # 공공데이터 CSV (data.go.kr 다운로드, 대용량·갱신물 — 추적 제외. README/스키마만 추적)
 data/public/krsport/*.csv
+
+# ui-ux-pro-max skill install (local only)
+.claude/
