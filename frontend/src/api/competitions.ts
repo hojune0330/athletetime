@@ -305,6 +305,14 @@ export interface ResultEvent {
   totalAthletes: number;
 }
 
+/** 대회 볼거리 (규칙 기반 하이라이트) */
+export interface CompetitionHighlight {
+  type: 'record' | 'photo_finish' | 'sweep' | 'multi_winner' | 'crowd';
+  title: string;
+  detail: string;
+  eventName: string;
+}
+
 /** 선수 기록 행 */
 export interface ResultAthleteRecord {
   rank: number;
@@ -399,6 +407,7 @@ export async function getResultCompetitions(year?: string): Promise<{
 export async function getResultEvents(filename: string, eventType?: string): Promise<{
   meta: ResultMeta;
   events: ResultEvent[];
+  highlights?: CompetitionHighlight[];
   totalEvents: number;
   totalAthletes: number;
 }> {
@@ -408,6 +417,7 @@ export async function getResultEvents(filename: string, eventType?: string): Pro
     data: {
       meta: ResultMeta;
       events: ResultEvent[];
+      highlights?: CompetitionHighlight[];
       totalEvents: number;
       totalAthletes: number;
     };

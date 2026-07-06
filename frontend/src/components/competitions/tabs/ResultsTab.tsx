@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ResultCompetition, ResultEvent, ResultMeta } from '../../../api/competitions';
+import type { CompetitionHighlight, ResultCompetition, ResultEvent, ResultMeta } from '../../../api/competitions';
 import { getResultCompetitions, getResultEvents } from '../../../api/competitions';
+import { CompetitionHighlights } from '../CompetitionHighlights';
 import { ResultSourceSummary } from '../ResultSourceSummary';
 import { ResultEventAccordion } from './ResultEventAccordion';
 import { EmptyState, EVENT_TYPE_FILTERS, GENDER_FILTERS, LoadingSpinner } from './shared';
@@ -12,7 +13,7 @@ export function ResultsTab({ searchParams, setSearchParams }: { searchParams: UR
   const [selectedComp, setSelectedComp] = useState<string>(searchParams.get('comp') || '');
   const [eventTypeFilter, setEventTypeFilter] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
-  const [resultData, setResultData] = useState<{ meta: ResultMeta; events: ResultEvent[]; totalEvents: number; totalAthletes: number } | null>(null);
+  const [resultData, setResultData] = useState<{ meta: ResultMeta; events: ResultEvent[]; highlights?: CompetitionHighlight[]; totalEvents: number; totalAthletes: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [expandedEvents, setExpandedEvents] = useState<Set<number>>(new Set());
@@ -148,6 +149,11 @@ export function ResultsTab({ searchParams, setSearchParams }: { searchParams: UR
           />
         )}
       </div>
+
+      {/* 대회 볼거리 (규칙 기반 하이라이트) */}
+      {resultData && !loadingEvents && (
+        <CompetitionHighlights highlights={resultData.highlights ?? []} />
+      )}
 
       {/* 대회 미선택 */}
       {!selectedComp && (
