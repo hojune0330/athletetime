@@ -15,10 +15,6 @@ function resolveResultProvider(meta: ResultMeta): string {
   return '대한육상연맹';
 }
 
-function formatCollectedDate(value: string): string {
-  return value ? value.slice(0, 10) : '수집일 미상';
-}
-
 export function ResultSourceSummary({
   meta,
   eventCount,
@@ -53,9 +49,6 @@ export function ResultSourceSummary({
           <div className="flex flex-wrap gap-2">
             <span className="border border-hair bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-2">
               {providerLabel}
-            </span>
-            <span className="border border-hair bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-2">
-              {formatCollectedDate(meta.collectedAt)}
             </span>
             <span className="border border-hair bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-2">
               AthleteTime 정리

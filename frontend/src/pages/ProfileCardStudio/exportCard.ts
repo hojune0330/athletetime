@@ -75,3 +75,47 @@ export async function shareCard(el: HTMLElement, card: CardData): Promise<'share
   download(blob, fileName(card));
   return 'downloaded';
 }
+
+function isMobile(): boolean {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+/**
+ * 인스타그램 직행 공유.
+ *
+ * 웹에서 인스타그램으로 이미지를 보내는 공식 경로는 두 가지:
+ *  1. Web Share 시트 (모바일) — 시트에서 Instagram 선택 시 스토리/피드로 바로 이어짐 (최선)
+ *  2. 이미지 저장 후 instagram://story-camera 딥링크로 앱 스토리 카메라 오픈
+ *     → 방금 저장된 카드를 갤러리에서 바로 집어 올리는 흐름 (차선)
+ * 데스크톱은 저장 후 안내 문구로 폴백.
+ *
+ * @returns 'shared' | 'deeplinked' | 'downloaded'
+ */
+export async function shareToInstagram(
+  el: HTMLElement,
+  card: CardData,
+): Promise<'shared' | 'deeplinked' | 'downloaded'> {
+  const blob = await renderToBlob(el, card);
+  const file = new File([blob], fileName(card), { type: 'image/png' });
+
+  // 1순위: 모바일 공유 시트 (Instagram이 대상 앱으로 노출됨)
+  if (isMobile() && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return 'shared';
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') return 'shared';
+    }
+  }
+
+  // 2순위: 저장 + 스토리 카메라 딥링크 (모바일 전용)
+  download(blob, fileName(card));
+  if (isMobile()) {
+    // 저장이 반영될 시간을 주고 앱 오픈 시도 (미설치 시 조용히 무시됨)
+    setTimeout(() => {
+      window.location.href = 'instagram://story-camera';
+    }, 600);
+    return 'deeplinked';
+  }
+  return 'downloaded';
+}

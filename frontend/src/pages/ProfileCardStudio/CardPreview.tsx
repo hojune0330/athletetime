@@ -6,6 +6,8 @@
  *   → 내보내기 화질 보장 (스케일 업 없음)
  * - 워터마크/'직접 입력한 기록' 배지는 제거 불가 (SHARE_POLICY 연장)
  * - 폰트: 사이트 전역에 이미 로드된 Pretendard 사용 (별도 로드 없음 → CORS/FOUT 없음)
+ * - 사진은 보정이 구워진(baked) dataURL을 그대로 표시 → 미리보기 = 저장본
+ * - 스티커는 % 좌표 자유 배치 — 이모지는 사용자가 고른 "표현 콘텐츠"(UI 아이콘 아님)
  */
 
 import { forwardRef } from 'react';
@@ -17,9 +19,18 @@ interface Props {
   card: CardData;
   /** 미리보기 축소 배율 (내보내기 시 1) */
   scale: number;
+  /** 보정 구워진 사진 (없으면 원본 사용) */
+  displayPhoto?: string | null;
+  /** 편집 중 선택된 스티커 (점선 테두리 표시 — 내보내기 전 해제됨) */
+  selectedStickerId?: string | null;
+  /** 스티커 드래그 시작 핸들러 (없으면 정적 렌더) */
+  onStickerPointerDown?: (id: string, e: React.PointerEvent) => void;
 }
 
-export const CardPreview = forwardRef<HTMLDivElement, Props>(function CardPreview({ card, scale }, ref) {
+export const CardPreview = forwardRef<HTMLDivElement, Props>(function CardPreview(
+  { card, scale, displayPhoto, selectedStickerId, onStickerPointerDown },
+  ref,
+) {
   const theme = getTheme(card.themeId);
   const dim = CARD_DIMENSIONS[card.format];
   const isStory = card.format === 'story';
@@ -113,7 +124,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(function CardPrevie
         >
           {card.photo ? (
             <img
-              src={card.photo}
+              src={displayPhoto ?? card.photo}
               alt=""
               style={{
                 width: '100%',
@@ -226,6 +237,48 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(function CardPrevie
           </p>
         )}
 
+        {/* ── 자유 배치 스티커 레이어 (이모지/텍스트 칩) ── */}
+        {card.stickers.map((s) => (
+          <div
+            key={s.id}
+            onPointerDown={onStickerPointerDown ? (e) => onStickerPointerDown(s.id, e) : undefined}
+            style={{
+              position: 'absolute',
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`,
+              fontSize: s.size,
+              lineHeight: 1,
+              zIndex: 2,
+              cursor: onStickerPointerDown ? 'grab' : 'default',
+              touchAction: 'none',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+              ...(s.type === 'text'
+                ? {
+                    fontWeight: 900,
+                    letterSpacing: '-0.01em',
+                    color: s.color || theme.ink,
+                    ...(s.pill
+                      ? {
+                          background:
+                            s.color === '#FFFFFF' || s.color === '#CCFF00'
+                              ? 'rgba(17, 17, 17, 0.85)'
+                              : 'rgba(255, 255, 255, 0.92)',
+                          padding: '0.28em 0.7em',
+                          borderRadius: 999,
+                        }
+                      : {}),
+                  }
+                : {}),
+              outline: selectedStickerId === s.id ? `${Math.max(3, 4 / scale)}px dashed rgba(79, 70, 229, 0.9)` : 'none',
+              outlineOffset: 6,
+            }}
+          >
+            {s.content}
+          </div>
+        ))}
+
         {/* ── 하단 고정: 신뢰 표기 (제거 불가) ── */}
         <div
           style={{
@@ -235,7 +288,7 @@ export const CardPreview = forwardRef<HTMLDivElement, Props>(function CardPrevie
             justifyContent: 'space-between',
             alignItems: 'flex-end',
             position: 'relative',
-            zIndex: 1,
+            zIndex: 3,
           }}
         >
           <span style={{ fontSize: 28, color: theme.inkSub, fontWeight: 600 }}>{CARD_TRUST.badge}</span>

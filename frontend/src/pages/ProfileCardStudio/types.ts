@@ -23,6 +23,39 @@ export interface RecordEntry {
   value: string;
 }
 
+/** 사진 보정 값 (100 = 원본, warmth는 0 = 원본) */
+export interface PhotoAdjust {
+  brightness: number;
+  contrast: number;
+  saturate: number;
+  /** 따뜻함 0~50 (sepia %) */
+  warmth: number;
+}
+
+export const DEFAULT_ADJUST: PhotoAdjust = { brightness: 100, contrast: 100, saturate: 100, warmth: 0 };
+
+/**
+ * 자유 배치 스티커 — 이모지/텍스트를 카드 위 아무 데나 놓는다.
+ * 위치는 카드 크기 대비 %(0~100) → 포맷(스토리/피드) 바꿔도 배치 유지.
+ */
+export interface StickerItem {
+  id: string;
+  type: 'emoji' | 'text';
+  content: string;
+  /** 가로 위치 % (0~100) */
+  x: number;
+  /** 세로 위치 % (0~100) */
+  y: number;
+  /** 글자 크기 px (실크기 1080px 기준) */
+  size: number;
+  /** 회전 deg (-45~45) */
+  rotation: number;
+  /** 텍스트 색 */
+  color?: string;
+  /** 텍스트: 칩(pill) 배경 — 토스식 라벨 느낌 */
+  pill?: boolean;
+}
+
 export interface CardData {
   name: string;
   /** 소속 (학교/팀) — 선택 */
@@ -40,6 +73,12 @@ export interface CardData {
   photo: string | null;
   /** 사진 세로 초점 (0~100, object-position Y%) */
   photoFocusY: number;
+  /** 사진 보정 (내보내기 시 캔버스에 구워져서 100% 반영) */
+  adjust: PhotoAdjust;
+  /** 선택한 필터 프리셋 id ('custom' = 슬라이더 직접 조절) */
+  filterId: string;
+  /** 자유 배치 스티커 (이모지/텍스트) */
+  stickers: StickerItem[];
   themeId: string;
   format: CardFormat;
 }
@@ -78,6 +117,9 @@ export function createEmptyCard(name = ''): CardData {
     message: '',
     photo: null,
     photoFocusY: 35,
+    adjust: { ...DEFAULT_ADJUST },
+    filterId: 'original',
+    stickers: [],
     themeId: 'track-night',
     format: 'story',
   };
