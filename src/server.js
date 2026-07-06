@@ -231,6 +231,35 @@ const marketplaceRouter = require(path.join(ROOT, 'backend/routes/marketplace'))
 app.use('/api/categories', categoriesRouter);
 app.use('/api/marketplace', marketplaceRouter);
 
+// 채팅 닉네임 중복 체크 API (레거시 계약 유지 — DB 불필요, 메모리 기반)
+const { isNicknameAvailable: chatNicknameAvailable } = require(path.join(ROOT, 'backend/utils/websocket'));
+app.get('/api/chat/check-nickname', (req, res) => {
+  const { nickname } = req.query;
+
+  if (!nickname) {
+    return res.status(400).json({
+      success: false,
+      error: '닉네임을 입력해주세요.',
+    });
+  }
+
+  if (nickname.length < 2 || nickname.length > 10) {
+    return res.status(400).json({
+      success: false,
+      available: false,
+      error: '닉네임은 2~10자 사이여야 합니다.',
+    });
+  }
+
+  const available = chatNicknameAvailable(nickname);
+
+  res.json({
+    success: true,
+    available,
+    message: available ? '사용 가능한 닉네임입니다.' : '이미 사용 중인 닉네임입니다.',
+  });
+});
+
 if (HAS_DATABASE) {
   const postsRouter = require(path.join(ROOT, 'backend/routes/posts'));
   const commentsRouter = require(path.join(ROOT, 'backend/routes/comments'));
@@ -320,14 +349,42 @@ app.use('/api', authenticateToken, jwtRequireAdmin, cardStudioAdmin);
 // WebSocket 설정
 // ============================================
 
-// 카드 스튜디오 WebSocket
+// 카드 스튜디오 WebSocket (경로: /ws — noServer 모드, 자기 경로만 처리)
 try {
   const wsManager = require(path.join(ROOT, 'card-studio/websocket/wsManager'));
   wsManager.attach(server);
-  console.log('  WebSocket (Card Studio): active');
+  console.log('  WebSocket (Card Studio): active (/ws)');
 } catch (e) {
   console.log('  WebSocket (Card Studio): skipped -', e.message);
 }
+
+// 커뮤니티 실시간 채팅 WebSocket (경로: /ws/chat — 레거시 rooms: main/training/race/injury)
+try {
+  const WebSocket = require('ws');
+  const { setupWebSocket } = require(path.join(ROOT, 'backend/utils/websocket'));
+
+  const chatWss = new WebSocket.Server({ noServer: true });
+  server.on('upgrade', (req, socket, head) => {
+    const pathname = (req.url || '').split('?')[0];
+    if (pathname !== '/ws/chat') return; // 다른 WSS(/ws 등)의 몫
+    chatWss.handleUpgrade(req, socket, head, (ws) => {
+      chatWss.emit('connection', ws, req);
+    });
+  });
+  setupWebSocket(chatWss);
+
+  console.log('  WebSocket (Chat): active (/ws/chat)');
+} catch (e) {
+  console.log('  WebSocket (Chat): skipped -', e.message);
+}
+
+// 정의되지 않은 경로의 업그레이드 요청 정리 (소켓 hang 방지)
+server.on('upgrade', (req, socket) => {
+  const pathname = (req.url || '').split('?')[0];
+  if (pathname === '/ws' || pathname === '/ws/chat') return;
+  socket.write('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n');
+  socket.destroy();
+});
 
 // ============================================
 // SPA Fallback (React Router — HTML5 History API)

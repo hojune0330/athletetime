@@ -1,8 +1,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { RoomId, ChatMessage, WebSocketMessage } from '../types';
 
-// WebSocket URL - /ws 경로 없이 기본 연결
-const WS_URL = import.meta.env.VITE_WS_URL || 'wss://athletetime-backend.onrender.com';
+// WebSocket URL 결정 순서:
+// 1) VITE_WS_URL 환경변수 (스테이징/특수 환경 오버라이드)
+// 2) 같은 origin의 /ws/chat (통합 서버 기본 — 프론트와 API가 같은 서버)
+function resolveWsUrl(): string {
+  const override = import.meta.env.VITE_WS_URL;
+  if (override) return override;
+  if (typeof window !== 'undefined' && window.location) {
+    const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${proto}//${window.location.host}/ws/chat`;
+  }
+  return 'wss://athletetime-backend.onrender.com/ws/chat';
+}
+const WS_URL = resolveWsUrl();
 
 interface UseWebSocketOptions {
   nickname: string;

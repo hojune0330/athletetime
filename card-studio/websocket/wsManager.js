@@ -17,10 +17,25 @@ class WSManager {
 
   /**
    * HTTP 서버에 WebSocket 서버를 연결합니다.
+   *
+   * noServer 모드 + 경로 스코프 업그레이드 라우팅:
+   * `{ server, path }` 방식은 같은 HTTP 서버에 WSS를 2개 이상 붙일 때
+   * 서로의 업그레이드 요청을 abortHandshake(400)로 파괴하므로,
+   * 자신의 경로(/ws)가 아닌 업그레이드는 건드리지 않고 통과시킨다.
+   * (채팅 WSS가 /ws/chat 경로를 별도로 사용)
+   *
    * @param {http.Server} server
    */
   attach(server) {
-    this.wss = new WebSocket.Server({ server, path: '/ws' });
+    this.wss = new WebSocket.Server({ noServer: true });
+
+    server.on('upgrade', (req, socket, head) => {
+      const pathname = (req.url || '').split('?')[0];
+      if (pathname !== '/ws') return; // 다른 WSS(예: /ws/chat)의 몫
+      this.wss.handleUpgrade(req, socket, head, (ws) => {
+        this.wss.emit('connection', ws, req);
+      });
+    });
 
     this.wss.on('connection', (ws) => {
       this.clients.add(ws);
