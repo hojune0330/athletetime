@@ -1,3 +1,10 @@
+# 주의: Netlify는 이 _redirects 파일을 netlify.toml의 redirects보다 우선 적용한다.
+# 따라서 API 프록시 규칙이 SPA 폴백보다 먼저 여기에 있어야 한다.
+
+# API 프록시 → Render 통합 서버
+/api/*  https://athletetime-backend.onrender.com/api/:splat  200!
+/health https://athletetime-backend.onrender.com/health      200!
+
 # SPA Routing - Community Section
 /community/* /index.html 200
 
