@@ -8,7 +8,10 @@ const {
   HOLD_STATUS,
   isResultEventOnQualityHold,
 } = require('../services/relayResultQualityService');
-const { buildCompetitionHighlights } = require('../services/competitionHighlightsService');
+const {
+  buildCompetitionHighlights,
+  normalizeSeriesName,
+} = require('../services/competitionHighlightsService');
 
 const MASKED_NAME = '비공개 요청 처리 중';
 
@@ -84,6 +87,44 @@ function mapVisibleEvent(event, context) {
   };
 }
 
+/**
+ * 같은 대회 시리즈의 과거 회차를 찾아 history로 만든다 (최신 먼저, 현재 회차 제외).
+ * 과거 회차 이벤트에도 동일한 노출 정책(마스킹/홀드)을 적용해 비교한다.
+ */
+function buildSeriesHistory(currentFilename, currentMeta, dependencies) {
+  try {
+    const seriesKey = normalizeSeriesName(currentMeta.competition_name || '');
+    if (!seriesKey) return [];
+    const currentYear = Number(currentMeta.year || 0);
+
+    const pastEditions = resultsStore
+      .listCompetitions()
+      .filter((comp) => comp.filename !== currentFilename)
+      .filter((comp) => normalizeSeriesName(comp.competition) === seriesKey)
+      .filter((comp) => !currentYear || Number(comp.year || 0) < currentYear)
+      .sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
+
+    const history = [];
+    for (const past of pastEditions.slice(0, 5)) {
+      const raw = resultsStore.getRawByFilename(past.filename);
+      if (!raw) continue;
+      const context = {
+        competitionName: raw.meta.competition_name || '',
+        dataRequestService: dependencies.dataRequestService,
+        provenance: undefined,
+        stableAthleteId: dependencies.stableAthleteId,
+      };
+      history.push({
+        year: String(past.year || ''),
+        events: (raw.events || []).map((event) => mapVisibleEvent(event, context)),
+      });
+    }
+    return history;
+  } catch (error) {
+    return []; // 맥락 실패는 볼거리 없음으로 강등 — 결과 응답 자체는 유지
+  }
+}
+
 function createResultEventsHandler(dependencies) {
   return (req, res) => {
     try {
@@ -118,8 +159,9 @@ function createResultEventsHandler(dependencies) {
         ? events.filter((event) => event.eventType === eventTypeFilter)
         : events;
 
-      // 대회 볼거리: 마스킹/홀드가 끝난 공개 이벤트에서만 규칙 기반으로 도출
-      const highlights = buildCompetitionHighlights(events);
+      // 대회 볼거리: 마스킹/홀드가 끝난 공개 이벤트 + 같은 시리즈 과거 회차 맥락
+      const history = buildSeriesHistory(filename, meta, dependencies);
+      const highlights = buildCompetitionHighlights(events, { history });
 
       return res.json({
         success: true,

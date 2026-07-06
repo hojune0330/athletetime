@@ -23,6 +23,8 @@ function readSource(relativePath) {
 const {
   buildCompetitionHighlights,
   recordToSeconds,
+  normalizeSeriesName,
+  formatGap,
 } = require(path.join(ROOT, 'card-studio/services/competitionHighlightsService'));
 
 function makeEvent(overrides = {}) {
@@ -107,8 +109,8 @@ test('HIGHLIGHT-RULE-003: sweep and multi-winner detection', () => {
   assert.equal(highlights.some((h) => h.type === 'sweep'), true);
   const multi = highlights.find((h) => h.type === 'multi_winner');
   assert.ok(multi);
-  assert.match(multi.title, /2관왕/);
-  assert.match(multi.detail, /홍길동/);
+  assert.equal(multi.stat, '2관왕');
+  assert.match(multi.title, /홍길동/);
 });
 
 test('HIGHLIGHT-SAFE-001: masked rows, quality-hold events, combined events excluded', () => {
@@ -148,11 +150,138 @@ test('HIGHLIGHT-SAFE-002: recordToSeconds parses times and rejects garbage', () 
   assert.equal(recordToSeconds(null), null);
 });
 
-test('HIGHLIGHT-API-001: result events route returns highlights from visible events', () => {
+test('HIGHLIGHT-API-001: result events route returns highlights with series history context', () => {
   const source = readSource('card-studio/routes/resultEventsRoute.js');
   assert.match(source, /competitionHighlightsService/);
-  assert.match(source, /buildCompetitionHighlights\(events\)/);
+  assert.match(source, /buildSeriesHistory\(filename, meta, dependencies\)/);
+  assert.match(source, /buildCompetitionHighlights\(events, \{ history \}\)/);
   assert.match(source, /highlights,/);
+});
+
+test('HIGHLIGHT-HISTORY-001: series comparison produces series_best / streak / vs_last', () => {
+  const current = [
+    makeEvent({
+      event: '남자 마라톤 결승',
+      eventType: 'marathon',
+      results: [{ rank: 1, name: '홍길동', affiliation: 'A팀', record: '2:05:00', newRecord: '' }],
+    }),
+  ];
+  const history = [
+    {
+      year: '2025',
+      events: [makeEvent({
+        event: '남자 마라톤 결승',
+        eventType: 'marathon',
+        results: [{ rank: 1, name: '홍길동', affiliation: 'A팀', record: '2:06:30', newRecord: '' }],
+      })],
+    },
+    {
+      year: '2024',
+      events: [makeEvent({
+        event: '남자 마라톤 결승',
+        eventType: 'marathon',
+        results: [{ rank: 1, name: '다른사람', affiliation: 'B팀', record: '2:07:00', newRecord: '' }],
+      })],
+    },
+  ];
+
+  const highlights = buildCompetitionHighlights(current, { history });
+
+  // 역대 최고 (2개 이상 과거 회차 필요)
+  const best = highlights.find((h) => h.type === 'series_best');
+  assert.ok(best, 'series_best expected');
+  assert.equal(best.stat, '2:05:00');
+  assert.match(best.detail, /종전 최고 2:06:30 \(2025\)/);
+  assert.match(best.detail, /수집된 3개 회차 기준/);
+
+  // 직전 회차부터 연속 우승 (2025만 같은 사람 → 2회 연속)
+  const streak = highlights.find((h) => h.type === 'streak');
+  assert.ok(streak, 'streak expected');
+  assert.equal(streak.stat, '2회 연속 우승');
+
+  // history 없으면 비교 하이라이트 없음
+  const withoutHistory = buildCompetitionHighlights(current);
+  assert.equal(withoutHistory.some((h) => ['series_best', 'streak', 'vs_last'].includes(h.type)), false);
+});
+
+test('HIGHLIGHT-HISTORY-002: vs_last reports gap against previous edition', () => {
+  const current = [
+    makeEvent({
+      event: '여자 마라톤 결승',
+      eventType: 'marathon',
+      results: [{ rank: 1, name: '가선수', affiliation: 'A', record: '2:29:12', newRecord: '' }],
+    }),
+  ];
+  const history = [
+    {
+      year: '2024',
+      events: [makeEvent({
+        event: '여자 마라톤 결승',
+        eventType: 'marathon',
+        results: [{ rank: 1, name: '나선수', affiliation: 'B', record: '2:31:55', newRecord: '' }],
+      })],
+    },
+  ];
+  const highlights = buildCompetitionHighlights(current, { history });
+  const vsLast = highlights.find((h) => h.type === 'vs_last');
+  assert.ok(vsLast, 'vs_last expected');
+  assert.match(vsLast.stat, /단축/);
+  assert.match(vsLast.detail, /2:29:12/);
+  assert.match(vsLast.detail, /2024 2:31:55/);
+});
+
+test('HIGHLIGHT-HISTORY-003: helpers normalize series names and format gaps', () => {
+  assert.equal(normalizeSeriesName('제42회 코오롱구간마라톤대회(고등학교부)'), normalizeSeriesName('제41회 코오롱구간마라톤대회(고등학교부)'));
+  assert.equal(normalizeSeriesName('2026 대구마라톤대회'), normalizeSeriesName('2025 대구마라톤대회'));
+  assert.equal(formatGap(0.04), '0.04초');
+  assert.equal(formatGap(47), '47초');
+  assert.equal(formatGap(147), '2분 27초');
+});
+
+test('HIGHLIGHT-FORM-001: highlights carry stat field and record dedup groups multiple record rows', () => {
+  const events = [
+    makeEvent({
+      event: '남자 마라톤 결승',
+      eventType: 'marathon',
+      results: [
+        { rank: 1, name: '가', affiliation: 'A', record: '2:04:22', newRecord: '대회신' },
+        { rank: 2, name: '나', affiliation: 'B', record: '2:04:23', newRecord: '대회신' },
+        { rank: 3, name: '다', affiliation: 'C', record: '2:04:31', newRecord: '대회신' },
+      ],
+    }),
+  ];
+  const highlights = buildCompetitionHighlights(events);
+  const records = highlights.filter((h) => h.type === 'record');
+  // 같은 종목 같은 급 신기록은 한 카드로 묶음
+  assert.equal(records.length, 1);
+  assert.match(records[0].title, /3명/);
+  assert.equal(records[0].stat, '2:04:22');
+  assert.match(records[0].detail, /외 2명/);
+});
+
+test('HIGHLIGHT-FORM-002: champion cards appear only for small road meets and skip covered events', () => {
+  const road = [
+    makeEvent({
+      event: '남자 하프마라톤 결승',
+      eventType: 'marathon',
+      results: [{ rank: 1, name: '가', affiliation: 'A', record: '1:04:26', newRecord: '' }],
+    }),
+    makeEvent({
+      event: '여자 하프마라톤 결승',
+      eventType: 'marathon',
+      results: [{ rank: 1, name: '나', affiliation: 'B', record: '1:15:50', newRecord: '' }],
+    }),
+  ];
+  const roadHighlights = buildCompetitionHighlights(road);
+  assert.equal(roadHighlights.filter((h) => h.type === 'champion').length, 2);
+
+  // 종목이 많은 트랙 대회에서는 champion 카드 없음 (스팸 방지)
+  const bigMeet = Array.from({ length: 10 }, (_, i) => makeEvent({
+    event: `남자 종목${i} 결승`,
+    results: [{ rank: 1, name: '가', affiliation: 'A', record: '10.00', newRecord: '' }],
+  }));
+  const bigHighlights = buildCompetitionHighlights(bigMeet);
+  assert.equal(bigHighlights.some((h) => h.type === 'champion'), false);
 });
 
 test('HIGHLIGHT-UI-001: results tab renders highlights card with SVG icons and fact notice', () => {
@@ -162,6 +291,9 @@ test('HIGHLIGHT-UI-001: results tab renders highlights card with SVG icons and f
 
   assert.match(card, /이 대회 볼거리/);
   assert.match(card, /수집된 결과에서 찾은 사실만/);
+  assert.match(card, /highlight\.stat/);
+  assert.match(card, /series_best/);
+  assert.match(card, /vs_last/);
   assert.match(card, /@heroicons\/react/);
   assert.doesNotMatch(card, /[\u{1F300}-\u{1FAFF}]/u, 'no emoji as UI icons');
 
