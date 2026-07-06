@@ -28,6 +28,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const { holdUnsafeRelayEvents } = require('./relayResultQualityService');
 
 const LIFE_SPORT_COMPETITION_PATTERNS = [/생활체육/i, /마스터즈/i, /대축전/i, /recordsport/i];
 
@@ -109,10 +110,11 @@ function _syntheticFilename(year, comp) {
 function _toRawShape(year, comp) {
   const filename = _syntheticFilename(year, comp);
   const period = _normalizePeriod(comp.period);
+  const competitionName = comp.competitionName || comp.name || '(알 수 없는 대회)';
   return {
     filename,
     meta: {
-      competition_name: comp.competitionName || comp.name || '(알 수 없는 대회)',
+      competition_name: competitionName,
       year: String(comp.year || year || ''),
       period,
       venue: comp.venue || '',
@@ -122,7 +124,7 @@ function _toRawShape(year, comp) {
       competition_id: comp.competitionId != null ? String(comp.competitionId) : '',
       to_cd: comp.toCd || '',
     },
-    events: Array.isArray(comp.events) ? comp.events : [],
+    events: holdUnsafeRelayEvents(Array.isArray(comp.events) ? comp.events : [], { competitionName }),
   };
 }
 

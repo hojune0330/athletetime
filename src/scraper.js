@@ -234,6 +234,33 @@ async function fetchEventResult(page, params) {
     const table = document.querySelector('table.table.table-hover.team_table');
     if (!table) return { meta, results: [], hasWindColumn: false, tableType: 'none' };
 
+    const normalizeRelayText = (value) => String(value || '').replace(/\u00A0/g, ' ').trim();
+    const isRelayResultTable = () => {
+      const headerText = Array.from(table.querySelectorAll('thead th'))
+        .map((cell) => normalizeRelayText(cell.textContent))
+        .join(' ');
+      const metaText = `${meta.competitionName || ''} ${meta.eventName || ''} ${headerText}`;
+      return /역전|구간/.test(metaText);
+    };
+    const parseRelayResultTable = () => {
+      const heldResultCount = Array.from(table.querySelectorAll('tbody tr'))
+        .filter((row) => row.querySelectorAll('td').length > 0)
+        .length;
+
+      return {
+        meta,
+        results: [],
+        hasWindColumn: false,
+        tableType: 'relay',
+        resultsStatus: 'source_reverify_needed',
+        qualityHold: true,
+        qualityMessage: '기록 확인 중이에요',
+        heldResultCount,
+      };
+    };
+
+    if (isRelayResultTable()) return parseRelayResultTable();
+
     // 테이블 유형 판별: 2줄 구조(필드) vs 1줄 구조(트랙)
     // twobodr_line만으로는 부족 — 트랙 종목도 twobodr_line 클래스를 가질 수 있음
     // border_dotted(소속 행)가 존재하면 필드 종목의 2줄 구조

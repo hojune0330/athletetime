@@ -28,6 +28,8 @@ export function ResultEventAccordion({
 }: ResultEventAccordionProps) {
   const typeInfo = getEventTypeInfo(resultEvent.eventType);
   const gender = extractGender(resultEvent.event);
+  const isQualityHold = resultEvent.qualityHold || resultEvent.resultsStatus === 'source_reverify_needed';
+  const totalLabel = isQualityHold ? '확인 중' : `${resultEvent.totalAthletes}명`;
 
   return (
     <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden shadow-sm">
@@ -48,11 +50,24 @@ export function ResultEventAccordion({
           <span className="font-bold text-neutral-900 text-sm">{resultEvent.event}</span>
           {resultEvent.wind && <span className="text-xs text-neutral-400">풍속 {resultEvent.wind}m/s</span>}
         </div>
-        <span className="text-xs text-neutral-400 shrink-0 ml-2">{resultEvent.totalAthletes}명</span>
+        <span className="text-xs text-neutral-400 shrink-0 ml-2">{totalLabel}</span>
       </button>
 
       {isExpanded && (
         <div className="border-t border-neutral-100">
+          {isQualityHold ? (
+            <div className="px-4 py-8 text-center">
+              <div className="mx-auto max-w-sm rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-5">
+                <p className="text-sm font-bold text-neutral-900">
+                  {resultEvent.qualityMessage || '기록 확인 중이에요'}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-neutral-500">
+                  원자료를 다시 확인하는 중이에요. 지금은 선수명과 기록을 숨겨두었어요.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
           <div className="hidden sm:block">
             <table className="w-full">
               <thead><tr className="bg-neutral-50">
@@ -150,6 +165,8 @@ export function ResultEventAccordion({
               이 종목 선수로 프로필 카드 만들기 <ChevronRightIcon className="w-3 h-3" />
             </Link>
           </div>
+            </>
+          )}
         </div>
       )}
     </div>

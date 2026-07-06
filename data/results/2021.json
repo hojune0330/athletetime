@@ -73878,71 +73878,12 @@
         "date": "2021-11-21",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "신용민서울[49]  22:16",
-            "affiliation": "이동규서울[42]  23:35",
-            "record": "김태진서울[42]  29:43",
-            "personal_best": "",
-            "note": "이재웅경북[50]  22:42",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "김동환22:32  11:09:28",
-            "affiliation": "김은성25:13  31:34:41",
-            "record": "김홍민31:30  12:06:11",
-            "personal_best": "",
-            "note": "최찬유23:58  12:30:09",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "오민석23:40  31:09:44",
-            "affiliation": "윤형준24:21  11:34:05",
-            "record": "이정윤31:34  22:05:39",
-            "personal_best": "",
-            "note": "강동석24:56  32:30:35",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "임채우23:38  21:10:07",
-            "affiliation": "손현준24:26  21:34:33",
-            "record": "김진만33:05  42:07:38",
-            "personal_best": "",
-            "note": "김민석23:59  22:31:37",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "박노진25:45  41:14:28",
-            "affiliation": "안도현25:34  41:40:02",
-            "record": "노성우33:01  32:13:03",
-            "personal_best": "",
-            "note": "김시현25:16  42:38:19",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "손효상26:58  51:17:08",
-            "affiliation": "정지수28:48  51:45:56",
-            "record": "유동규35:22  52:21:18",
-            "personal_best": "",
-            "note": "김지민26:25  52:47:43",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "이건재0  0",
-            "affiliation": "이동현0  0",
-            "record": "고수완0  0",
-            "personal_best": "",
-            "note": "고재혁0  0",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 7
       }
     ]
   },
@@ -73960,80 +73901,12 @@
         "date": "2021-11-21",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "이경호[50]한국전력공사  29:56",
-            "affiliation": "박종학[50]한국전력공사  22:41",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "박원빈31:00  12:03:13",
-            "affiliation": "장준표23:24  32:26:37",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "김홍록31:14  22:04:18",
-            "affiliation": "조민혁22:43  12:27:01",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "김무연32:30  32:08:14",
-            "affiliation": "도현국23:16  22:31:30",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "김세옥33:26  42:08:03",
-            "affiliation": "양치호24:21  42:32:24",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "이주니0  0",
-            "affiliation": "정하늘0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "이주현0  0",
-            "affiliation": "최성열0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          },
-          {
-            "rank": 8,
-            "name": "김규태0  0",
-            "affiliation": "정선진0  0",
-            "record": "",
-            "personal_best": "",
-            "note": "",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 8
       }
     ]
   },

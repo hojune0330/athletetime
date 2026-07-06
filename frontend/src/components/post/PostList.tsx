@@ -1,12 +1,14 @@
 /**
- * 게시글 목록 컴포넌트 (v5.0.0 - Light Mode Design System v2)
+ * 게시글 목록 컴포넌트 (v6.0.0 - 침하하 스타일 밀도 높은 리스트)
+ *
+ * 한 줄 밀도 높은 행: 카테고리 라벨 · 제목 · 댓글 수 · 썸네일 ·
+ * 좋아요/작성자/조회수/시간 메타 행. 시선 이동을 최소화한다.
  */
 
 import { Link } from 'react-router-dom';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon, FireIcon } from '@heroicons/react/24/outline';
 import { usePosts } from '../../hooks/usePosts';
 import type { Post } from '../../types';
-import QuickReaction from '../trending/QuickReaction';
 
 // ============================================
 // 유틸리티 함수
@@ -16,21 +18,17 @@ function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
-  
+
   const minutes = Math.floor(diff / 1000 / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (minutes < 1) return '방금 전';
   if (minutes < 60) return `${minutes}분 전`;
   if (hours < 24) return `${hours}시간 전`;
   if (days < 7) return `${days}일 전`;
-  
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+
+  return date.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
 }
 
 function isNewPost(dateString: string): boolean {
@@ -46,7 +44,7 @@ function isHotPost(likesCount: number): boolean {
 }
 
 // ============================================
-// 게시글 아이템 컴포넌트
+// 게시글 아이템 컴포넌트 (침하하식 밀도 행)
 // ============================================
 
 interface PostItemProps {
@@ -58,98 +56,79 @@ function PostItem({ post }: PostItemProps) {
   const isHot = isHotPost(post.likes_count);
   const hasImage = post.images && post.images.length > 0;
   const thumbnail = hasImage ? post.images[0].thumbnail_url : null;
-  
+
   return (
     <Link
       to={`/community/post/${post.id}`}
-      className="block hover:bg-primary-50/50 transition-all duration-200 group"
+      className="block cursor-pointer transition-colors duration-150 hover:bg-neutral-50"
     >
-      <article className="p-4 border-b border-neutral-100 group-hover:border-l-4 group-hover:border-l-primary-500 group-hover:pl-3 transition-all">
-        <div className="flex gap-4">
-          {/* 썸네일 */}
-          {thumbnail && (
-            <div className="shrink-0">
-              <img 
-                src={thumbnail}
-                alt={post.title}
-                className="w-20 h-16 object-cover rounded-lg shadow-sm"
-                loading="lazy"
-              />
-            </div>
-          )}
-          
-          {/* 게시글 정보 */}
-          <div className="flex-1 min-w-0">
-            {/* 상단: 카테고리 + 뱃지 */}
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              {/* 공지사항 */}
-              {post.is_notice && (
-                <span className="text-accent-500 text-sm">📌</span>
-              )}
-              
-{/* 카테고리 (자유는 백엔드에서 null 반환) */}
-              {post.category_name && (
-                <span 
-                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-neutral-100"
-                  style={{ color: post.category_color || '#6366f1' }}
-                >
-                  <span>{post.category_icon}</span>
-                  <span>{post.category_name}</span>
-                </span>
-              )}
-              
-              {/* HOT 뱃지 */}
-              {isHot && (
-                <span className="badge-hot flex items-center gap-1">
-                  <FireIcon className="w-3 h-3" />
-                  HOT
-                </span>
-              )}
-              
-              {/* NEW 뱃지 */}
-              {isNew && !isHot && (
-                <span className="badge-new">NEW</span>
-              )}
-            </div>
-            
-            {/* 제목 */}
-            <h3 className="text-base font-semibold text-neutral-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+      <article className="flex items-center gap-3 border-b border-neutral-100 px-4 py-3">
+        {/* 본문 영역 */}
+        <div className="min-w-0 flex-1">
+          {/* 제목 행: 카테고리 라벨 + 제목 + 댓글 수 */}
+          <div className="flex items-baseline gap-2">
+            {post.is_notice ? (
+              <span className="shrink-0 rounded bg-accent-50 px-1.5 py-0.5 text-[11px] font-bold text-accent-600">
+                공지
+              </span>
+            ) : post.category_name ? (
+              <span
+                className="shrink-0 text-xs font-semibold"
+                style={{ color: post.category_color || '#6366f1' }}
+              >
+                {post.category_name}
+              </span>
+            ) : null}
+
+            <h3 className="min-w-0 truncate text-[15px] font-medium text-neutral-900">
               {post.title}
             </h3>
-            
-            {/* 하단: 메타 정보 */}
-            <div className="flex items-center justify-between text-xs text-neutral-500">
-              <div className="flex items-center gap-3">
-                <span className="font-medium text-neutral-600">{post.author}</span>
-                <span>{formatRelativeTime(post.created_at)}</span>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <span className="flex items-center gap-1">
-                  <EyeIcon className="w-3.5 h-3.5" />
-                  {post.views}
-                </span>
-                <span className="flex items-center gap-1 text-primary-500">
-                  <HandThumbUpIcon className="w-3.5 h-3.5" />
-                  {post.likes_count}
-                </span>
-                <span className="flex items-center gap-1">
-                  <ChatBubbleLeftIcon className="w-3.5 h-3.5" />
-                  {post.comments_count}
-                </span>
-              </div>
-            </div>
 
-            {/* 빠른 이모지 리액션 */}
-            <div className="mt-2" onClick={(e) => e.preventDefault()}>
-              <QuickReaction
-                targetId={post.id}
-                targetType="post"
-                compact={true}
-              />
-            </div>
+            {post.comments_count > 0 && (
+              <span className="shrink-0 text-xs font-bold text-primary-600">
+                [{post.comments_count}]
+              </span>
+            )}
+
+            {isHot && (
+              <span className="flex shrink-0 items-center gap-0.5 text-[11px] font-bold text-accent-600">
+                <FireIcon className="h-3 w-3" />
+                HOT
+              </span>
+            )}
+            {isNew && !isHot && (
+              <span className="shrink-0 text-[10px] font-bold text-success-600">N</span>
+            )}
+          </div>
+
+          {/* 메타 행: 좋아요 · 작성자 · 조회수 · 시간 */}
+          <div className="mt-1 flex items-center gap-2.5 text-xs text-neutral-500">
+            <span className="flex items-center gap-0.5 text-primary-600">
+              <HandThumbUpIcon className="h-3.5 w-3.5" />
+              {post.likes_count}
+            </span>
+            <span className="font-medium text-neutral-600">{post.author}</span>
+            <span className="flex items-center gap-0.5">
+              <EyeIcon className="h-3.5 w-3.5" />
+              {post.views}
+            </span>
+            <span className="flex items-center gap-0.5">
+              <ChatBubbleLeftIcon className="h-3.5 w-3.5" />
+              {post.comments_count}
+            </span>
+            <span>{formatRelativeTime(post.created_at)}</span>
           </div>
         </div>
+
+        {/* 썸네일 (우측 정렬, 침하하식) */}
+        {thumbnail && (
+          <img
+            src={thumbnail}
+            alt={post.title}
+            className="h-14 w-[72px] shrink-0 rounded-lg object-cover"
+            loading="lazy"
+          />
+        )}
       </article>
     </Link>
   );
@@ -162,26 +141,16 @@ function PostItem({ post }: PostItemProps) {
 function LoadingSkeleton() {
   return (
     <div className="card overflow-hidden">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="p-4 border-b border-neutral-100 last:border-b-0">
-          <div className="flex gap-4">
-            <div className="skeleton w-20 h-16 rounded-lg shrink-0" />
-            <div className="flex-1 space-y-3">
-              <div className="flex gap-2">
-                <div className="skeleton w-16 h-5 rounded-full" />
-                <div className="skeleton w-12 h-5 rounded-full" />
-              </div>
-              <div className="skeleton w-3/4 h-5 rounded" />
-              <div className="flex justify-between">
-                <div className="skeleton w-32 h-4 rounded" />
-                <div className="flex gap-3">
-                  <div className="skeleton w-10 h-4 rounded" />
-                  <div className="skeleton w-10 h-4 rounded" />
-                  <div className="skeleton w-10 h-4 rounded" />
-                </div>
-              </div>
+      {[...Array(8)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 border-b border-neutral-100 px-4 py-3 last:border-b-0">
+          <div className="flex-1 space-y-2">
+            <div className="flex gap-2">
+              <div className="skeleton h-4 w-10 rounded" />
+              <div className="skeleton h-4 w-2/3 rounded" />
             </div>
+            <div className="skeleton h-3 w-1/2 rounded" />
           </div>
+          <div className="skeleton h-14 w-[72px] shrink-0 rounded-lg" />
         </div>
       ))}
     </div>

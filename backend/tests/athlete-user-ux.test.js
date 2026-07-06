@@ -251,7 +251,7 @@ test('competition search keeps dense result scope compact and repeats same-name 
 });
 
 test('competition results route blocks direct access to public-index-excluded files', () => {
-  const source = readSource('card-studio/routes/publicRoutes.js');
+  const source = readSource('card-studio/routes/publicRoutes.js') + readSource('card-studio/routes/resultEventsRoute.js');
 
   assert.match(source, /resultsStore\.isPublicResultFilename\(filename\)/);
   assert.match(source, /status\(404\)/);

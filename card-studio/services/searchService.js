@@ -17,6 +17,10 @@ const crypto = require('crypto');
 const config = require('../config');
 const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
+const {
+  hasRelayResultTextPollution,
+  isResultEventOnQualityHold,
+} = require('./relayResultQualityService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 // suppression(검토중/삭제) 적용 시 마스킹 표시값
@@ -128,12 +132,17 @@ class SearchService {
         };
 
         for (const ev of events) {
+          if (isResultEventOnQualityHold(ev)) continue;
+
           const parsed = this._parseEventLabel(ev.event);
           if (!parsed) continue;
 
           const { gender, pureEvent, round } = parsed;
           const division = ev.division || '';
-          const results = ev.results || [];
+          const results = (ev.results || []).filter((row) => {
+            if (row.parseStatus === 'unverified') return false;
+            return !hasRelayResultTextPollution(row);
+          });
 
           // suppression(정정/삭제 요청) 사전 판정: 행별 null | 'mask' | 'hide' | 'remove'
           //   mask   : 검토 중 — 검색 매칭 제외, 단 컨텍스트로는 "비공개 요청 처리 중" 마스킹 노출

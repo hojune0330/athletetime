@@ -65641,71 +65641,12 @@
         "date": "2020-11-15",
         "venue": "서울-임진각",
         "wind": null,
-        "results": [
-          {
-            "rank": 1,
-            "name": "신용민서울[49]  22:16",
-            "affiliation": "이동규서울[42]  23:35",
-            "record": "김태진서울[42]  29:43",
-            "personal_best": "",
-            "note": "최병수경북[40]  23:13",
-            "newRecord": ""
-          },
-          {
-            "rank": 2,
-            "name": "임형윤23:42  21:09:13",
-            "affiliation": "김현민25:33  31:34:46",
-            "record": "황보한빈32:39  12:07:25",
-            "personal_best": "",
-            "note": "이재웅22:42  12:30:07",
-            "newRecord": ""
-          },
-          {
-            "rank": 3,
-            "name": "안성현24:14  31:09:57",
-            "affiliation": "노성우25:26  21:35:23",
-            "record": "김영호32:41  22:08:04",
-            "personal_best": "",
-            "note": "연지환24:33  32:32:37",
-            "newRecord": ""
-          },
-          {
-            "rank": 4,
-            "name": "김태훈23:36  11:11:13",
-            "affiliation": "김진만25:07  11:36:20",
-            "record": "임채우33:13  32:09:33",
-            "personal_best": "",
-            "note": "유기태25:08  42:34:41",
-            "newRecord": ""
-          },
-          {
-            "rank": 5,
-            "name": "김성호25:25  41:15:15",
-            "affiliation": "이수철26:09  41:41:24",
-            "record": "임강철35:56  52:17:20",
-            "personal_best": "",
-            "note": "장재후25:42  52:43:02",
-            "newRecord": ""
-          },
-          {
-            "rank": 6,
-            "name": "서종윤26:48  51:17:07",
-            "affiliation": "임지훈28:38  51:45:45",
-            "record": "김상태34:03  42:19:48",
-            "personal_best": "",
-            "note": "방준석24:04  22:43:52",
-            "newRecord": ""
-          },
-          {
-            "rank": 7,
-            "name": "문진영0  0",
-            "affiliation": "박형섭0  0",
-            "record": "이건재0  0",
-            "personal_best": "",
-            "note": "김승민0  0",
-            "newRecord": ""
-          }
-        ]
+        "results": [],
+        "tableType": "relay",
+        "resultsStatus": "source_reverify_needed",
+        "qualityHold": true,
+        "qualityMessage": "기록 확인 중이에요",
+        "heldResultCount": 7
       }
     ]
   }

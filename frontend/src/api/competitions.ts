@@ -296,6 +296,11 @@ export interface ResultEvent {
   wind: string | null;
   hasWind: boolean;
   eventType: string; // 'track' | 'field' | 'hurdle' | etc
+  tableType?: string;
+  resultsStatus?: string;
+  qualityHold?: boolean;
+  qualityMessage?: string;
+  heldResultCount?: number;
   results: ResultAthleteRecord[];
   totalAthletes: number;
 }
