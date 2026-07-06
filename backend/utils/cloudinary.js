@@ -6,6 +6,22 @@
 
 const cloudinary = require('cloudinary').v2;
 
+// 분리형 환경변수 지원 (레거시 Render 설정 호환)
+// - CLOUDINARY_URL 하나짜리 형태는 라이브러리가 자동 인식
+// - CLOUDINARY_CLOUD_NAME / API_KEY / API_SECRET 3개 분리형은 명시 설정 필요
+if (
+  !process.env.CLOUDINARY_URL &&
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
+
 /**
  * Cloudinary 설정 확인
  */
