@@ -1,0 +1,57 @@
+AthleteTime PR #5 W1-W4 continuation evidence
+
+Worktree
+- Path: C:/Users/SAMSUNG/Documents/2026 첫프젝/2026-first-item-pr5-w1w4
+- Base: origin/codex/launch-week-ux-trust at b930c3c
+- Dirty root repo was not touched.
+
+Implemented
+- W1: Deleted unused launch-era files:
+  - frontend/src/pages/HomePage.tsx
+  - frontend/src/components/layout/Sidebar.tsx
+  - frontend/src/components/layout/RightBanner.tsx
+- W2: Header /pacerise more-menu label changed from "실업 라이브" to "실업 대회 결과".
+- W3: Zero-result search aggregation now stores raw query text only after the same normalized query appears on 3 distinct dates.
+  - Before threshold: fingerprint-only.
+  - After threshold: operator summary can include rawQuery via explicit includeRawQuery option.
+  - Public summary masks rawQuery while honestly reporting rawQueryStored.
+  - IP, userAgent, userId, and exact timestamps remain unstored.
+- W4: Added docs/athletetime-migration-execution-plan.md before any migration code.
+
+RED evidence
+- .omo/evidence/launch-week-p1-fix/red-targeted-node-test.txt
+  - Expected failures captured for W1/W2/W3/W4 before implementation.
+  - Server health failures were traced to missing root node_modules in the isolated worktree, not application logic.
+
+GREEN evidence
+- .omo/evidence/launch-week-p1-fix/final-targeted-node-test.txt
+  - node --test backend/tests/launch-surface-nav.test.js backend/tests/launch-week-p1.test.js
+  - 16/16 pass
+- .omo/evidence/launch-week-p1-fix/final-full-npm-test.txt
+  - npm test
+  - 118/118 pass
+- .omo/evidence/launch-week-p1-fix/final-frontend-typecheck.txt
+  - npm --prefix frontend run type-check
+  - pass
+- .omo/evidence/launch-week-p1-fix/final-frontend-build.txt
+  - npm --prefix frontend run build
+  - pass
+- .omo/evidence/launch-week-p1-fix/git-diff-check.txt
+  - git diff --check
+  - pass
+
+Manual QA
+- HTTP health:
+  - .omo/evidence/launch-week-p1-fix/http-health.json
+  - /health returned healthy standalone mode.
+- HTTP zero-result:
+  - .omo/evidence/launch-week-p1-fix/http-zero-summary-2.txt
+  - /api/card-studio/analytics/records/zero-result-summary returned 200 with rawQueryStored=false after one day.
+- Browser:
+  - .omo/evidence/launch-week-p1-fix/browser-more-menu-playwright.json
+  - .omo/evidence/launch-week-p1-fix/browser-more-menu-playwright.png
+  - Chromium rendered home page, opened "더보기", found "실업 대회 결과", did not find "실업 라이브", console errors 0.
+
+Known non-blocking observations
+- npm install reported existing dependency audit warnings. No package.json or package-lock.json changes are part of this PR.
+- Frontend build reported existing Browserslist/baseline data age warnings.

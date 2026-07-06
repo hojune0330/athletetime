@@ -61,6 +61,32 @@ test('secondary tools stay reachable through the more menu group', () => {
   assert.match(moreBlock, /PaceRise \uc5f0\ub3d9/);
 });
 
+test('W2-PACERISE-LABEL-001: pacerise more-menu label describes result lookup, not live coverage', () => {
+  const header = readSource('frontend/src/components/layout/Header.tsx');
+
+  const moreBlock = header.slice(
+    header.indexOf('const moreNavItems'),
+    header.indexOf('const navItems'),
+  );
+
+  assert.match(moreBlock, /label: '실업 대회 결과'/);
+  assert.equal(moreBlock.includes("label: '실업 라이브'"), false);
+});
+
+test('W1-DEAD-FILES-001: retired launch-surface files stay deleted after staged IA consolidation', () => {
+  for (const retiredPath of [
+    'frontend/src/pages/HomePage.tsx',
+    'frontend/src/components/layout/Sidebar.tsx',
+    'frontend/src/components/layout/RightBanner.tsx',
+  ]) {
+    assert.equal(
+      fs.existsSync(path.join(ROOT, retiredPath)),
+      false,
+      `${retiredPath} should stay deleted; the launch surface uses MainPage/Header instead`,
+    );
+  }
+});
+
 test('mobile tab bar mirrors the same core loop entries', () => {
   const tabBar = readSource('frontend/src/components/layout/MobileTabBar.tsx');
 

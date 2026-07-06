@@ -16,6 +16,27 @@ function tempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
+function snapshotZeroResultEnv() {
+  return {
+    jwt: process.env.JWT_SECRET,
+    nodeEnv: process.env.NODE_ENV,
+    store: process.env.ZERO_RESULT_SEARCH_STORE,
+    zeroSecret: process.env.ZERO_RESULT_SEARCH_SECRET,
+  };
+}
+
+function restoreZeroResultEnv(previous) {
+  if (previous.jwt === undefined) delete process.env.JWT_SECRET;
+  else process.env.JWT_SECRET = previous.jwt;
+  if (previous.zeroSecret === undefined) delete process.env.ZERO_RESULT_SEARCH_SECRET;
+  else process.env.ZERO_RESULT_SEARCH_SECRET = previous.zeroSecret;
+  if (previous.nodeEnv === undefined) delete process.env.NODE_ENV;
+  else process.env.NODE_ENV = previous.nodeEnv;
+  if (previous.store === undefined) delete process.env.ZERO_RESULT_SEARCH_STORE;
+  else process.env.ZERO_RESULT_SEARCH_STORE = previous.store;
+  delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
+}
+
 function request(baseUrl, requestPath) {
   return new Promise((resolve, reject) => {
     const req = http.request(`${baseUrl}${requestPath}`, { method: 'GET' }, (res) => {
@@ -101,22 +122,91 @@ test('P1-ZERO-001: Given a /records zero-result query When searched Then only an
 
 test('P1-ZERO-002: Given direct aggregate recording When repeated Then counts merge without retaining raw query text', () => {
   const storePath = path.join(tempDir('athletetime-zero-search-unit-'), 'zero-result-searches.json');
-  process.env.ZERO_RESULT_SEARCH_STORE = storePath;
-  process.env.ZERO_RESULT_SEARCH_SECRET = 'test-zero-result-secret';
-  delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
-  const zeroResultSearchService = require('../../card-studio/services/zeroResultSearchService');
+  const previous = snapshotZeroResultEnv();
 
-  zeroResultSearchService.recordZeroResultSearch({ query: '진짜없는이름', surface: 'records' });
-  zeroResultSearchService.recordZeroResultSearch({ query: ' 진짜없는이름 ', surface: 'records' });
-  const summary = zeroResultSearchService.getZeroResultSearchSummary();
-  const stored = fs.readFileSync(storePath, 'utf8');
+  try {
+    process.env.ZERO_RESULT_SEARCH_STORE = storePath;
+    process.env.ZERO_RESULT_SEARCH_SECRET = 'test-zero-result-secret';
+    delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
+    const zeroResultSearchService = require('../../card-studio/services/zeroResultSearchService');
 
-  assert.equal(summary.totalEvents, 2);
-  assert.equal(summary.items.length, 1);
-  assert.equal(summary.items[0].count, 2);
-  assert.equal(stored.includes('진짜없는이름'), false);
-  assert.equal(stored.includes('records'), true);
-  fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
+    zeroResultSearchService.recordZeroResultSearch({ query: '진짜없는이름', surface: 'records' });
+    zeroResultSearchService.recordZeroResultSearch({ query: ' 진짜없는이름 ', surface: 'records' });
+    const summary = zeroResultSearchService.getZeroResultSearchSummary();
+    const stored = fs.readFileSync(storePath, 'utf8');
+
+    assert.equal(summary.totalEvents, 2);
+    assert.equal(summary.items.length, 1);
+    assert.equal(summary.items[0].count, 2);
+    assert.equal(summary.privacy.rawQueryStored, false);
+    assert.equal(summary.items[0].rawQueryStored, false);
+    assert.equal(summary.items[0].distinctSeenDays, 1);
+    assert.equal(stored.includes('진짜없는이름'), false);
+    assert.equal(stored.includes('records'), true);
+  } finally {
+    restoreZeroResultEnv(previous);
+    fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
+  }
+});
+
+test('P1-ZERO-005: Given a failed query seen on fewer than 3 days When aggregated Then raw text stays fingerprint-only', () => {
+  const storePath = path.join(tempDir('athletetime-zero-search-kanon-low-'), 'zero-result-searches.json');
+  const rawQuery = '제천고 기록 없음';
+  const previous = snapshotZeroResultEnv();
+
+  try {
+    process.env.ZERO_RESULT_SEARCH_STORE = storePath;
+    process.env.ZERO_RESULT_SEARCH_SECRET = 'test-zero-result-secret';
+    delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
+    const zeroResultSearchService = require('../../card-studio/services/zeroResultSearchService');
+
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-01' });
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-01' });
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-02' });
+    const summary = zeroResultSearchService.getZeroResultSearchSummary({ includeRawQuery: true });
+    const stored = fs.readFileSync(storePath, 'utf8');
+
+    assert.equal(summary.totalEvents, 3);
+    assert.equal(summary.privacy.rawQueryStored, false);
+    assert.equal(summary.items[0].count, 3);
+    assert.equal(summary.items[0].distinctSeenDays, 2);
+    assert.equal(summary.items[0].rawQueryStored, false);
+    assert.equal(summary.items[0].rawQuery, undefined);
+    assert.equal(stored.includes(rawQuery), false);
+  } finally {
+    restoreZeroResultEnv(previous);
+    fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
+  }
+});
+
+test('P1-ZERO-006: Given the same failed query on 3 different days When aggregated Then operator raw text is stored but public summary masks it', () => {
+  const storePath = path.join(tempDir('athletetime-zero-search-kanon-pass-'), 'zero-result-searches.json');
+  const rawQuery = '춘천오픈 여자 1500m 결과';
+  const previous = snapshotZeroResultEnv();
+
+  try {
+    process.env.ZERO_RESULT_SEARCH_STORE = storePath;
+    process.env.ZERO_RESULT_SEARCH_SECRET = 'test-zero-result-secret';
+    delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
+    const zeroResultSearchService = require('../../card-studio/services/zeroResultSearchService');
+
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-01' });
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-02' });
+    zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-03' });
+    const publicSummary = zeroResultSearchService.getZeroResultSearchSummary();
+    const operatorSummary = zeroResultSearchService.getZeroResultSearchSummary({ includeRawQuery: true });
+    const stored = fs.readFileSync(storePath, 'utf8');
+
+    assert.equal(publicSummary.privacy.rawQueryStored, true);
+    assert.equal(publicSummary.items[0].rawQueryStored, true);
+    assert.equal(publicSummary.items[0].distinctSeenDays, 3);
+    assert.equal(publicSummary.items[0].rawQuery, undefined);
+    assert.equal(operatorSummary.items[0].rawQuery, rawQuery);
+    assert.equal(stored.includes(rawQuery), true);
+  } finally {
+    restoreZeroResultEnv(previous);
+    fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
+  }
 });
 
 test('P1-ZERO-003: Given analytics storage failure When records search has no result Then search still succeeds', async () => {
@@ -155,12 +245,7 @@ test('P1-ZERO-003: Given analytics storage failure When records search has no re
 });
 
 test('P1-ZERO-004: Given production without an aggregation secret When recording Then default salt is not used', () => {
-  const previous = {
-    jwt: process.env.JWT_SECRET,
-    nodeEnv: process.env.NODE_ENV,
-    store: process.env.ZERO_RESULT_SEARCH_STORE,
-    zeroSecret: process.env.ZERO_RESULT_SEARCH_SECRET,
-  };
+  const previous = snapshotZeroResultEnv();
   const storePath = path.join(tempDir('athletetime-zero-search-prod-'), 'zero-result-searches.json');
 
   try {
@@ -174,32 +259,22 @@ test('P1-ZERO-004: Given production without an aggregation secret When recording
     assert.equal(zeroResultSearchService.recordZeroResultSearch({ query: '운영비밀없음', surface: 'records' }), null);
     assert.equal(fs.existsSync(storePath), false);
   } finally {
-    if (previous.jwt === undefined) delete process.env.JWT_SECRET;
-    else process.env.JWT_SECRET = previous.jwt;
-    if (previous.zeroSecret === undefined) delete process.env.ZERO_RESULT_SEARCH_SECRET;
-    else process.env.ZERO_RESULT_SEARCH_SECRET = previous.zeroSecret;
-    if (previous.nodeEnv === undefined) delete process.env.NODE_ENV;
-    else process.env.NODE_ENV = previous.nodeEnv;
-    if (previous.store === undefined) delete process.env.ZERO_RESULT_SEARCH_STORE;
-    else process.env.ZERO_RESULT_SEARCH_STORE = previous.store;
+    restoreZeroResultEnv(previous);
     fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
-    delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
   }
 });
 
-test('P1-FRESH-001: Result competition metadata and schedule UI expose collection freshness without official wording', () => {
-  const resultsStore = readSource('card-studio/services/resultsStore.js');
-  const searchService = readSource('card-studio/services/searchService.js');
-  const api = readSource('frontend/src/api/competitions.ts');
+test('P1-FRESH-001(revised): freshness badge removed by owner decision — match results are immutable, collection date adds no user value', () => {
+  // 결정 근거: PR #5 리뷰 스레드. 확정된 경기결과에 "수집일" 라벨은 정보가 아니라 노이즈다.
+  // collectedAt 데이터 플럼빙(resultsStore/searchService/api)은 무해하므로 남긴다(현재 데이터에 값 없음, UI 미사용).
   const schedule = readSource('frontend/src/components/competitions/tabs/ScheduleTab.tsx');
-  const badge = readSource('frontend/src/components/competitions/ResultFreshnessBadge.tsx');
 
-  assert.match(resultsStore, /collectedAt: raw\.meta\.crawled_at/);
-  assert.match(searchService, /collectedAt: c\.collectedAt/);
-  assert.match(api, /collectedAt\?: string/);
-  assert.match(schedule, /ResultFreshnessBadge/);
-  assert.match(badge, /며칠 전 수집|오늘 수집|수집일 미상/);
-  assert.equal(`${schedule}\n${badge}`.includes('공식 순위'), false);
+  assert.equal(schedule.includes('ResultFreshnessBadge'), false);
+  assert.equal(
+    fs.existsSync(path.join(ROOT, 'frontend/src/components/competitions/ResultFreshnessBadge.tsx')),
+    false,
+  );
+  assert.equal(schedule.includes('공식 순위'), false);
 });
 
 test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out of the launch entry chunk', () => {
@@ -215,4 +290,24 @@ test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out o
   assert.match(vite, /page-records/);
   assert.match(vite, /page-competitions/);
   assert.match(vite, /page-tools/);
+});
+
+test('P1-FIX-W4: Migration execution plan exists before migration code and covers launch transition risks', () => {
+  const plan = readSource('docs/athletetime-migration-execution-plan.md');
+
+  assert.match(plan, /legacy PostgreSQL|레거시 PostgreSQL/);
+  assert.match(plan, /community posts|커뮤니티 글/);
+  assert.match(plan, /comments|댓글/);
+  assert.match(plan, /market|마켓/);
+  assert.match(plan, /new schema|신규 스키마/);
+  assert.match(plan, /P2-SHARE-001/);
+  assert.match(plan, /redirect map|리다이렉트 맵/);
+  assert.match(plan, /legacy ws chat|레거시 ws 채팅/);
+  assert.match(plan, /VITE_WS_URL/);
+  assert.match(plan, /검증[\s\S]*도메인 전환[\s\S]*레거시 백엔드 종료/);
+  assert.match(plan, /rollback|롤백/i);
+  for (const secretName of ['JWT_SECRET', 'ZERO_RESULT_SEARCH_SECRET', 'DATABASE_URL', 'Cloudinary']) {
+    assert.match(plan, new RegExp(secretName));
+  }
+  assert.match(plan, /No migration code before this document|이 문서 전에는 마이그레이션 코드를 작성하지 않는다/);
 });

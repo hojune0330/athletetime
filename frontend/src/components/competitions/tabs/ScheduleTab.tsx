@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowTopRightOnSquareIcon, CalendarIcon, FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import type { Competition, ResultCompetition } from '../../../api/competitions';
 import { getResultCompetitions } from '../../../api/competitions';
-import { ResultFreshnessBadge } from '../ResultFreshnessBadge';
 import { useCompetitions } from '../../../hooks/useCompetitions';
 import { CATEGORY_ORDER, currentYear, DdayBadge, EmptyState, formatDateRange, LoadingSpinner, STATUS_OPTIONS, YEAR_OPTIONS } from './shared';
 
@@ -171,7 +170,6 @@ function ScheduleCategorySection({ categoryLabel, categoryBg, competitions, resu
                           📊 결과
                         </span>
                       )}
-                      {hasResults && <ResultFreshnessBadge collectedAt={resultCompetition?.collectedAt} />}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-neutral-600 text-center">{formatDateRange(comp.start_date, comp.end_date)}</td>
@@ -216,7 +214,6 @@ function ScheduleCategorySection({ categoryLabel, categoryBg, competitions, resu
                         📊
                       </span>
                     )}
-                    {hasResults && <ResultFreshnessBadge collectedAt={resultCompetition?.collectedAt} />}
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
                     <span>{formatDateRange(comp.start_date, comp.end_date)}</span>

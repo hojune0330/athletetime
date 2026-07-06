@@ -294,7 +294,7 @@ export default function Header() {
 
   // 보조 도구·부가 기능 — 핵심 루프 밖 화면은 '더보기'로 묶는다.
   const moreNavItems = [
-    { path: '/pacerise', label: '실업 라이브', note: 'PaceRise 연동' },
+    { path: '/pacerise', label: '실업 대회 결과', note: 'PaceRise 연동' },
     { path: '/pace-calculator', label: '페이스 계산기', note: '훈련 보조' },
     { path: '/training-calculator', label: '훈련 계산기', note: '훈련 보조' },
     { path: '/marketplace', label: '중고 마켓', note: '사용자 거래' },
