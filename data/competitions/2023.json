@@ -1,0 +1,614 @@
+[
+  {
+    "id": "2023-road-004",
+    "kaafSeq": null,
+    "toCd": "E010171245",
+    "name": "2023 서울마라톤대회 겸 제93회 동아마라톤대회",
+    "period": {
+      "start": "2023-03-19",
+      "end": "2023-03-19"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010171245&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 87
+  },
+  {
+    "id": "2023-road-005",
+    "kaafSeq": null,
+    "toCd": "E015360096",
+    "name": "2023 동아일보 서울주니어하프마라톤대회",
+    "period": {
+      "start": "2023-03-19",
+      "end": "2023-03-19"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015360096&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2023-road-006",
+    "kaafSeq": null,
+    "toCd": "E013900167",
+    "name": "제39회 코오롱구간마라톤대회(중학교부)",
+    "period": {
+      "start": "2023-03-25",
+      "end": "2023-03-25"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E013900167&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 18
+  },
+  {
+    "id": "2023-road-007",
+    "kaafSeq": null,
+    "toCd": "E012390226",
+    "name": "2023 인천국제하프마라톤대회",
+    "period": {
+      "start": "2023-03-26",
+      "end": "2023-03-26"
+    },
+    "venue": "인천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E012390226&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 62
+  },
+  {
+    "id": "2023-road-008",
+    "kaafSeq": null,
+    "toCd": "E014030155",
+    "name": "2023 대구국제마라톤대회",
+    "period": {
+      "start": "2023-04-02",
+      "end": "2023-04-02"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E014030155&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 161
+  },
+  {
+    "id": "2023-road-009",
+    "kaafSeq": null,
+    "toCd": "E015370086",
+    "name": "2023 대구주니어하프마라톤대회",
+    "period": {
+      "start": "2023-04-02",
+      "end": "2023-04-02"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015370086&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 24
+  },
+  {
+    "id": "2023-road-010",
+    "kaafSeq": null,
+    "toCd": "E015060105",
+    "name": "2023 군산새만금마라톤대회",
+    "period": {
+      "start": "2023-04-09",
+      "end": "2023-04-09"
+    },
+    "venue": "군산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015060105&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 83
+  },
+  {
+    "id": "2023-road-011",
+    "kaafSeq": null,
+    "toCd": "E015390076",
+    "name": "2023 군산새만금주니어하프마라톤대회",
+    "period": {
+      "start": "2023-04-09",
+      "end": "2023-04-09"
+    },
+    "venue": "군산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015390076&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 12
+  },
+  {
+    "id": "2023-road-001",
+    "kaafSeq": null,
+    "toCd": "M00006006X",
+    "name": "2023 전국생활체육대축전(육상경기)",
+    "period": {
+      "start": "2023-04-29",
+      "end": "2023-04-30"
+    },
+    "venue": "구미",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=M00006006X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 154,
+    "athleteCount": 989
+  },
+  {
+    "id": "2023-track_field-001",
+    "kaafSeq": null,
+    "toCd": "E010050531",
+    "name": "제51회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2023-05-05",
+      "end": "2023-05-09"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010050531&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 121,
+    "athleteCount": 1372
+  },
+  {
+    "id": "2023-track_field-002",
+    "kaafSeq": null,
+    "toCd": "E015110123",
+    "name": "제51회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2023-05-05",
+      "end": "2023-05-09"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015110123&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 64,
+    "athleteCount": 619
+  },
+  {
+    "id": "2023-junior-001",
+    "kaafSeq": null,
+    "toCd": "E010040502",
+    "name": "제52회 전국소년체육대회(육상경기)",
+    "period": {
+      "start": "2023-05-27",
+      "end": "2023-05-28"
+    },
+    "venue": "울산",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010040502&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 50,
+    "athleteCount": 906
+  },
+  {
+    "id": "2023-junior-002",
+    "kaafSeq": null,
+    "toCd": "E01193023A",
+    "name": "제25회전국꿈나무선수선발육상경기대회",
+    "period": {
+      "start": "2023-06-18",
+      "end": "2023-06-19"
+    },
+    "venue": "문경",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E01193023A&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 71,
+    "athleteCount": 721
+  },
+  {
+    "id": "2023-track_field-003",
+    "kaafSeq": null,
+    "toCd": "E010020773",
+    "name": "제77회 전국육상경기선수권대회",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010020773&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 61,
+    "athleteCount": 452
+  },
+  {
+    "id": "2023-junior-003",
+    "kaafSeq": null,
+    "toCd": "E01510012D",
+    "name": "제14회 한국U18육상경기대회",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E01510012D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 57,
+    "athleteCount": 442
+  },
+  {
+    "id": "2023-junior-004",
+    "kaafSeq": null,
+    "toCd": "E01242021C",
+    "name": "제23회 한국U20육상경기선수권대회",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E01242021C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 55,
+    "athleteCount": 266
+  },
+  {
+    "id": "2023-junior-005",
+    "kaafSeq": null,
+    "toCd": "E010121214",
+    "name": "2023 교보생명컵전국초등학교시.도대항육상경기대회",
+    "period": {
+      "start": "2023-07-02",
+      "end": "2023-07-02"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010121214&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 26,
+    "athleteCount": 430
+  },
+  {
+    "id": "2023-track_field-004",
+    "kaafSeq": null,
+    "toCd": "E010010561",
+    "name": "제52회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2023-07-06",
+      "end": "2023-07-10"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010010561&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 199,
+    "athleteCount": 1626
+  },
+  {
+    "id": "2023-track_field-005",
+    "kaafSeq": null,
+    "toCd": "E010100482",
+    "name": "문화체육관광부장관기 제44회 전국시.도대항육상경기대회",
+    "period": {
+      "start": "2023-08-19",
+      "end": "2023-08-21"
+    },
+    "venue": "목포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010100482&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 120,
+    "athleteCount": 1189
+  },
+  {
+    "id": "2023-road-002",
+    "kaafSeq": null,
+    "toCd": "M00007007X",
+    "name": "문화체육관광부장관배 제31회 전국생활체육육상경기대회",
+    "period": {
+      "start": "2023-08-19",
+      "end": "2023-08-20"
+    },
+    "venue": "목포",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=M00007007X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 84,
+    "athleteCount": 274
+  },
+  {
+    "id": "2023-road-012",
+    "kaafSeq": null,
+    "toCd": "E010380548",
+    "name": "제53회 대통령기 전국통일구간마라톤대회(시도대항)",
+    "period": {
+      "start": "2023-09-03",
+      "end": "2023-09-03"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010380548&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2023-road-013",
+    "kaafSeq": null,
+    "toCd": "E015230117",
+    "name": "제53회 대통령기 전국통일구간마라톤대회(소속대항)",
+    "period": {
+      "start": "2023-09-03",
+      "end": "2023-09-03"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015230117&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2023-road-003",
+    "kaafSeq": null,
+    "toCd": "M00003007X",
+    "name": "대한체육회장배 2023 대구 전국생활체육육상경기대회",
+    "period": {
+      "start": "2023-09-10",
+      "end": "2023-09-10"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=M00003007X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 74,
+    "athleteCount": 317
+  },
+  {
+    "id": "2023-track_field-006",
+    "kaafSeq": null,
+    "toCd": "E010031062",
+    "name": "제104회 전국체육대회 (육상경기)",
+    "period": {
+      "start": "2023-10-15",
+      "end": "2023-10-18"
+    },
+    "venue": "목포",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010031062&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 123,
+    "athleteCount": 1630
+  },
+  {
+    "id": "2023-road-014",
+    "kaafSeq": null,
+    "toCd": "E014010155",
+    "name": "동아일보 2023 경주국제마라톤대회",
+    "period": {
+      "start": "2023-10-21",
+      "end": "2023-10-21"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E014010155&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 45
+  },
+  {
+    "id": "2023-road-015",
+    "kaafSeq": null,
+    "toCd": "E015570066",
+    "name": "2023 동아일보 경주 주니어하프마라톤대회",
+    "period": {
+      "start": "2023-10-21",
+      "end": "2023-10-21"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015570066&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 3
+  },
+  {
+    "id": "2023-single_event-001",
+    "kaafSeq": null,
+    "toCd": "E01590002C",
+    "name": "2023 목포전국육상투척경기대회(U20)",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E01590002C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 14
+  },
+  {
+    "id": "2023-single_event-002",
+    "kaafSeq": null,
+    "toCd": "E01591002D",
+    "name": "2023 목포전국육상투척경기대회(U18)",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E01591002D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 44
+  },
+  {
+    "id": "2023-single_event-003",
+    "kaafSeq": null,
+    "toCd": "E016130013",
+    "name": "2023 목포전국육상투척경기대회(대학일반)",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E016130013&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 7,
+    "athleteCount": 36
+  },
+  {
+    "id": "2023-road-016",
+    "kaafSeq": null,
+    "toCd": "E010141225",
+    "name": "2023 조선일보마라톤대회 겸 제77회 전국마라톤선수권대회",
+    "period": {
+      "start": "2023-10-29",
+      "end": "2023-10-29"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E010141225&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 52
+  },
+  {
+    "id": "2023-road-017",
+    "kaafSeq": null,
+    "toCd": "E015480086",
+    "name": "2023 조선일보 주니어하프마라톤대회",
+    "period": {
+      "start": "2023-10-29",
+      "end": "2023-10-29"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015480086&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2023-road-018",
+    "kaafSeq": null,
+    "toCd": "E012670215",
+    "name": "2023 JTBC서울마라톤대회",
+    "period": {
+      "start": "2023-11-05",
+      "end": "2023-11-05"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E012670215&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 71
+  },
+  {
+    "id": "2023-road-019",
+    "kaafSeq": null,
+    "toCd": "E015470086",
+    "name": "2023 JTBC서울 주니어하프마라톤대회",
+    "period": {
+      "start": "2023-11-05",
+      "end": "2023-11-05"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=E015470086&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 9
+  },
+  {
+    "id": "2023-road-020",
+    "kaafSeq": null,
+    "toCd": "M00008009P",
+    "name": "평화의섬 2023 국무총리기 전국생활체육구간마라톤대회",
+    "period": {
+      "start": "2023-11-11",
+      "end": "2023-11-11"
+    },
+    "venue": "제주도",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2023&to_cd=M00008009P&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 6
+  }
+]

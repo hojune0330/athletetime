@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width={{width}}">
+  <title>Profile Card - Corner V2</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0A0A0A;
+      --white: #FFFFFF;
+      --volt: #C3FF00;
+      --volt-dim: rgba(195,255,0,0.7);
+    }
+
+    body { margin: 0; padding: 0; background: #000; }
+
+    .profile-card {
+      width: {{width}}px;
+      height: {{height}}px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--black);
+    }
+
+    /* ─── 배경 사진 ─── */
+    .pc__photo {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('{{photoUrl}}');
+      background-size: cover;
+      background-position: center;
+      filter: contrast(1.08) saturate(0.9);
+    }
+
+    /* ─── 비네팅 ─── */
+    .pc__vignette {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 25%, rgba(10,10,10,0.55) 100%);
+    }
+
+    /* ─── 좌하단 글래스 블록 (매거진 카드뉴스 스타일) ─── */
+    .pc__block {
+      position: absolute;
+      bottom: 48px;
+      left: 48px;
+      background: rgba(10,10,10,0.84);
+      backdrop-filter: blur(32px) saturate(1.6);
+      -webkit-backdrop-filter: blur(32px) saturate(1.6);
+      border-radius: 28px;
+      padding: 44px 52px 40px;
+      color: var(--white);
+      min-width: 420px;
+      max-width: 580px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ─── 종목 태그 (필 배지 스타일) ─── */
+    .pc__event-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .pc__event-tag-pill {
+      display: inline-block;
+      background: var(--volt);
+      color: var(--black);
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 10px 22px;
+      border-radius: 100px;
+    }
+
+    .pc__event-tag-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ─── 선수명 (대형 — 뉴스 헤드라인) ─── */
+    .pc__athlete-name {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 8px;
+    }
+
+    .pc__athlete-aff {
+      font-size: 22px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+    }
+
+    /* ─── 스탯 그리드 (기록 — 히어로 넘버) ─── */
+    .pc__stats {
+      display: flex;
+      gap: 0;
+      margin-bottom: 10px;
+    }
+
+    .pc__stat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-right: 32px;
+    }
+
+    .pc__stat + .pc__stat {
+      border-left: 1px solid rgba(255,255,255,0.08);
+      padding-left: 32px;
+      padding-right: 0;
+    }
+
+    .pc__stat-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .pc__stat-value {
+      font-size: 68px;
+      font-weight: 900;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -3px;
+      line-height: 0.88;
+    }
+
+    .pc__stat-value--accent {
+      color: var(--volt);
+    }
+
+    .pc__stat-unit {
+      font-size: 22px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      margin-left: 4px;
+    }
+
+    /* ─── 풍속 ─── */
+    .pc__wind {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.3);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pc__wind::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* ─── 코멘트 ─── */
+    .pc__comment {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 18px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    /* ─── 하단 메타 ─── */
+    .pc__meta {
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pc__comp {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+
+    .pc__comp-date {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.2);
+      margin-top: 3px;
+    }
+
+    .pc__brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+      margin-left: 24px;
+    }
+
+    .pc__brand-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--volt);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    .pc__brand-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ─── 우상단: 순위 원형 뱃지 (대형 인팩트) ─── */
+    .pc__rank-float {
+      position: absolute;
+      top: 44px;
+      right: 48px;
+      z-index: 5;
+      width: 100px;
+      height: 100px;
+      background: var(--volt);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 48px rgba(195,255,0,0.35);
+    }
+
+    .pc__rank-float-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(10,10,10,0.5);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: -2px;
+    }
+
+    .pc__rank-float-value {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--black);
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-card">
+  <div class="pc__photo"></div>
+  <div class="pc__vignette"></div>
+
+  <!-- 순위 뱃지 (우상단) -->
+  <div class="pc__rank-float">
+    <div class="pc__rank-float-label">RANK</div>
+    <div class="pc__rank-float-value">{{rank}}</div>
+  </div>
+
+  <!-- 좌하단 블록 -->
+  <div class="pc__block">
+    <div class="pc__event-tag">
+      <span class="pc__event-tag-pill">{{event}}</span>
+    </div>
+    <div class="pc__athlete-name">{{name}}</div>
+    <div class="pc__athlete-aff">{{affiliation}}</div>
+
+    <div class="pc__stats">
+      <div class="pc__stat">
+        <div class="pc__stat-label">Record</div>
+        <div class="pc__stat-value">{{record}}<span class="pc__stat-unit">{{recordUnit}}</span></div>
+        {{#hasWind}}<div class="pc__wind">WIND {{wind}} m/s</div>{{/hasWind}}
+      </div>
+    </div>
+
+    {{#hasComment}}<div class="pc__comment">"{{comment}}"</div>{{/hasComment}}
+
+    <div class="pc__meta">
+      <div class="pc__comp">
+        {{competition}}
+        <span class="pc__comp-date">{{date}} · {{venue}}</span>
+      </div>
+      <div class="pc__brand">
+        <div class="pc__brand-dot"></div>
+        <span class="pc__brand-text">AthleTime</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

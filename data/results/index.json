@@ -1,0 +1,3222 @@
+[
+  {
+    "id": "2018-road-004",
+    "toCd": "E010171195",
+    "name": "2018 서울국제마라톤대회 겸 제89회 동아마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-03-18",
+      "end": "2018-03-18"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 140
+  },
+  {
+    "id": "2018-road-005",
+    "toCd": "E010400347",
+    "name": "제34회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2018",
+    "period": {
+      "start": "2018-03-24",
+      "end": "2018-03-24"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 19
+  },
+  {
+    "id": "2018-road-006",
+    "toCd": "E013900127",
+    "name": "제34회 코오롱구간마라톤대회(중학교부)",
+    "year": "2018",
+    "period": {
+      "start": "2018-03-24",
+      "end": "2018-03-24"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 21
+  },
+  {
+    "id": "2018-road-007",
+    "toCd": "E012390186",
+    "name": "2018 인천국제하프마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-03-25",
+      "end": "2018-03-25"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 93
+  },
+  {
+    "id": "2018-road-008",
+    "toCd": "E014030115",
+    "name": "2018 대구국제마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-04-01",
+      "end": "2018-04-01"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 131
+  },
+  {
+    "id": "2018-road-009",
+    "toCd": "E015060075",
+    "name": "2018 군산새만금국제마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-04-08",
+      "end": "2018-04-08"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 133
+  },
+  {
+    "id": "2018-road-018",
+    "toCd": "E015650021",
+    "name": "2018 서울나이키국제10Km대회 겸 나이키러닝페스티벌",
+    "year": "2018",
+    "period": {
+      "start": "2018-04-22",
+      "end": "2018-04-22"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 51
+  },
+  {
+    "id": "2018-track_field-001",
+    "toCd": "E010010471",
+    "name": "제47회 전국종별육상경기선수권대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-05-03",
+      "end": "2018-05-07"
+    },
+    "venue": "김천",
+    "category": "track_field",
+    "eventCount": 201,
+    "athleteCount": 1866
+  },
+  {
+    "id": "2018-road-001",
+    "toCd": "M00003002X",
+    "name": "2018 대한체육회장배 전국마스터즈육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-05-06",
+      "end": "2018-05-06"
+    },
+    "venue": "김천",
+    "category": "road",
+    "eventCount": 56,
+    "athleteCount": 164
+  },
+  {
+    "id": "2018-road-002",
+    "toCd": "M00006002X",
+    "name": "2018 전국생활체육대축전(육상경기)",
+    "year": "2018",
+    "period": {
+      "start": "2018-05-12",
+      "end": "2018-05-13"
+    },
+    "venue": "아산",
+    "category": "road",
+    "eventCount": 156,
+    "athleteCount": 1111
+  },
+  {
+    "id": "2018-junior-001",
+    "toCd": "E010040472",
+    "name": "제47회 전국소년체육대회(육상경기)",
+    "year": "2018",
+    "period": {
+      "start": "2018-05-26",
+      "end": "2018-05-27"
+    },
+    "venue": "충주",
+    "category": "junior",
+    "eventCount": 49,
+    "athleteCount": 945
+  },
+  {
+    "id": "2018-junior-002",
+    "toCd": "E01193021A",
+    "name": "제20회전국꿈나무선수선발육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-05",
+      "end": "2018-06-06"
+    },
+    "venue": "광주",
+    "category": "junior",
+    "eventCount": 70,
+    "athleteCount": 627
+  },
+  {
+    "id": "2018-track_field-002",
+    "toCd": "E010050471",
+    "name": "제46회 KBS배 전국육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-14",
+      "end": "2018-06-18"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 117,
+    "athleteCount": 1279
+  },
+  {
+    "id": "2018-track_field-003",
+    "toCd": "E015110073",
+    "name": "제46회 KBS배 전국육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-14",
+      "end": "2018-06-18"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 61,
+    "athleteCount": 543
+  },
+  {
+    "id": "2018-track_field-004",
+    "toCd": "E01568002",
+    "name": "2018 코리아오픈국제육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-16",
+      "end": "2018-06-17"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 16,
+    "athleteCount": 132
+  },
+  {
+    "id": "2018-track_field-005",
+    "toCd": "E010020723",
+    "name": "제72회 전국육상경기선수권대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 61,
+    "athleteCount": 537
+  },
+  {
+    "id": "2018-junior-003",
+    "toCd": "E01242016C",
+    "name": "제18회 한국U20육상경기선수권대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 59,
+    "athleteCount": 338
+  },
+  {
+    "id": "2018-junior-004",
+    "toCd": "E01510007D",
+    "name": "제9회 한국U18육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 57,
+    "athleteCount": 423
+  },
+  {
+    "id": "2018-track_field-006",
+    "toCd": "E010100392",
+    "name": "문화체육관광부장관기 제39회 전국시.도대항육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-07-28",
+      "end": "2018-07-30"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 119,
+    "athleteCount": 1266
+  },
+  {
+    "id": "2018-road-003",
+    "toCd": "M00007002X",
+    "name": "문화체육관광부장관기 제26회 전국마스터즈(생활체육)시.도대항육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-07-28",
+      "end": "2018-07-30"
+    },
+    "venue": "익산",
+    "category": "road",
+    "eventCount": 92,
+    "athleteCount": 530
+  },
+  {
+    "id": "2018-junior-005",
+    "toCd": "E010121184",
+    "name": "2018교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-08-04",
+      "end": "2018-08-04"
+    },
+    "venue": "양산",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 403
+  },
+  {
+    "id": "2018-junior-006",
+    "toCd": "E01575001C",
+    "name": "제26회 한.중.일 주니어종합경기대회(육상경기 1일)",
+    "year": "2018",
+    "period": {
+      "start": "2018-08-25",
+      "end": "2018-08-25"
+    },
+    "venue": "여수",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 120
+  },
+  {
+    "id": "2018-junior-007",
+    "toCd": "E01575002C",
+    "name": "제26회 한.중.일 주니어종합경기대회(육상경기 2일)",
+    "year": "2018",
+    "period": {
+      "start": "2018-08-26",
+      "end": "2018-08-26"
+    },
+    "venue": "여수",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 128
+  },
+  {
+    "id": "2018-junior-008",
+    "toCd": "E015730011",
+    "name": "2018 한국전력배 전국중.고등학교 중.장거리육상경기대회(2,3학년부)",
+    "year": "2018",
+    "period": {
+      "start": "2018-09-01",
+      "end": "2018-09-01"
+    },
+    "venue": "나주",
+    "category": "junior",
+    "eventCount": 8,
+    "athleteCount": 158
+  },
+  {
+    "id": "2018-junior-009",
+    "toCd": "E015730021",
+    "name": "2018 한국전력배 전국중.고등학교 중.장거리육상경기대회(1학년부)",
+    "year": "2018",
+    "period": {
+      "start": "2018-09-01",
+      "end": "2018-09-01"
+    },
+    "venue": "나주",
+    "category": "junior",
+    "eventCount": 8,
+    "athleteCount": 91
+  },
+  {
+    "id": "2018-road-010",
+    "toCd": "E010380478",
+    "name": "제48회 대통령기전국통일구간마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-09-09",
+      "end": "2018-09-09"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2018-single_event-001",
+    "toCd": "E013490141",
+    "name": "2018 목포국제육상투척경기대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-09-15",
+      "end": "2018-09-16"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 22,
+    "athleteCount": 255
+  },
+  {
+    "id": "2018-track_field-007",
+    "toCd": "E010030992",
+    "name": "제99회 전국체육대회(육상경기)",
+    "year": "2018",
+    "period": {
+      "start": "2018-10-14",
+      "end": "2018-10-17"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 147,
+    "athleteCount": 1940
+  },
+  {
+    "id": "2018-road-011",
+    "toCd": "E015570036",
+    "name": "2018 동아일보 경주 주니어하프마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-10-20",
+      "end": "2018-10-20"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 3
+  },
+  {
+    "id": "2018-road-012",
+    "toCd": "E014010125",
+    "name": "동아일보 2018 경주국제마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-10-21",
+      "end": "2018-10-21"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 88
+  },
+  {
+    "id": "2018-road-013",
+    "toCd": "E010141185",
+    "name": "2018 조선일보마라톤대회 겸 제72회 전국마라톤선수권대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-10-28",
+      "end": "2018-10-28"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 75
+  },
+  {
+    "id": "2018-road-014",
+    "toCd": "E015480046",
+    "name": "2018 조선일보 주니어하프마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-10-28",
+      "end": "2018-10-28"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2018-road-015",
+    "toCd": "E012670185",
+    "name": "2018 JTBC서울마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-11-04",
+      "end": "2018-11-04"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 99
+  },
+  {
+    "id": "2018-road-016",
+    "toCd": "E015470046",
+    "name": "2018 JTBC서울 주니어하프마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-11-04",
+      "end": "2018-11-04"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2018-road-017",
+    "toCd": "M00008002P",
+    "name": "2018 국무총리기 전국마스터즈(생활체육) 구간마라톤대회",
+    "year": "2018",
+    "period": {
+      "start": "2018-11-17",
+      "end": "2018-11-17"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 13
+  },
+  {
+    "id": "2019-road-004",
+    "toCd": "E010171205",
+    "name": "2019 서울국제마라톤대회 겸 제90회 동아마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-03-17",
+      "end": "2019-03-17"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 129
+  },
+  {
+    "id": "2019-road-005",
+    "toCd": "E010400357",
+    "name": "제35회 코오롱구간마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-03-30",
+      "end": "2019-03-30"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 27
+  },
+  {
+    "id": "2019-road-006",
+    "toCd": "E013900137",
+    "name": "제35회 코오롱구간마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-03-30",
+      "end": "2019-03-30"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2019-road-007",
+    "toCd": "E012390196",
+    "name": "2019 인천국제하프마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-03-31",
+      "end": "2019-03-31"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 94
+  },
+  {
+    "id": "2019-road-008",
+    "toCd": "E014030125",
+    "name": "2019 대구국제마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-04-07",
+      "end": "2019-04-07"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 162
+  },
+  {
+    "id": "2019-road-009",
+    "toCd": "E015060085",
+    "name": "2019 군산새만금국제마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-04-14",
+      "end": "2019-04-14"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 117
+  },
+  {
+    "id": "2019-road-001",
+    "toCd": "M00006003X",
+    "name": "2019 전국생활체육대축전(육상경기)",
+    "year": "2019",
+    "period": {
+      "start": "2019-04-27",
+      "end": "2019-04-28"
+    },
+    "venue": "충주",
+    "category": "road",
+    "eventCount": 153,
+    "athleteCount": 1047
+  },
+  {
+    "id": "2019-track_field-001",
+    "toCd": "E010010511",
+    "name": "제48회 전국종별육상경기선수권대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-05-02",
+      "end": "2019-05-06"
+    },
+    "venue": "충주",
+    "category": "track_field",
+    "eventCount": 223,
+    "athleteCount": 1982
+  },
+  {
+    "id": "2019-road-002",
+    "toCd": "M00003003X",
+    "name": "2019 대한체육회장배 전국생활체육 육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-05-05",
+      "end": "2019-05-05"
+    },
+    "venue": "충주",
+    "category": "road",
+    "eventCount": 49,
+    "athleteCount": 95
+  },
+  {
+    "id": "2019-junior-001",
+    "toCd": "E010040482",
+    "name": "제48회 전국소년체육대회(육상경기)",
+    "year": "2019",
+    "period": {
+      "start": "2019-05-25",
+      "end": "2019-05-26"
+    },
+    "venue": "익산",
+    "category": "junior",
+    "eventCount": 49,
+    "athleteCount": 956
+  },
+  {
+    "id": "2019-junior-002",
+    "toCd": "E01193022A",
+    "name": "제21회전국꿈나무선수선발육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-06",
+      "end": "2019-06-07"
+    },
+    "venue": "광주",
+    "category": "junior",
+    "eventCount": 71,
+    "athleteCount": 657
+  },
+  {
+    "id": "2019-track_field-002",
+    "toCd": "E015680033",
+    "name": "2019 코리아오픈국제육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-06",
+      "end": "2019-06-07"
+    },
+    "venue": "광주",
+    "category": "track_field",
+    "eventCount": 17,
+    "athleteCount": 145
+  },
+  {
+    "id": "2019-track_field-003",
+    "toCd": "E015110083",
+    "name": "제47회 KBS배 전국육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-13",
+      "end": "2019-06-17"
+    },
+    "venue": "김천",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 570
+  },
+  {
+    "id": "2019-track_field-004",
+    "toCd": "E010050481",
+    "name": "제47회 KBS배 전국육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-13",
+      "end": "2019-06-17"
+    },
+    "venue": "김천",
+    "category": "track_field",
+    "eventCount": 119,
+    "athleteCount": 1328
+  },
+  {
+    "id": "2019-track_field-005",
+    "toCd": "E015890013",
+    "name": "2019 한중일친선육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-15",
+      "end": "2019-06-15"
+    },
+    "venue": "김천",
+    "category": "track_field",
+    "eventCount": 16,
+    "athleteCount": 104
+  },
+  {
+    "id": "2019-track_field-006",
+    "toCd": "E010020733",
+    "name": "제73회 전국육상경기선수권대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-25",
+      "end": "2019-06-28"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 565
+  },
+  {
+    "id": "2019-junior-003",
+    "toCd": "E01510008D",
+    "name": "제10회 한국U18육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-25",
+      "end": "2019-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 45,
+    "athleteCount": 394
+  },
+  {
+    "id": "2019-junior-004",
+    "toCd": "E01242017C",
+    "name": "제19회 한국U20육상경기선수권대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-06-25",
+      "end": "2019-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 47,
+    "athleteCount": 308
+  },
+  {
+    "id": "2019-junior-005",
+    "toCd": "E010121194",
+    "name": "2019교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-07-06",
+      "end": "2019-07-06"
+    },
+    "venue": "나주",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 431
+  },
+  {
+    "id": "2019-track_field-007",
+    "toCd": "E010100402",
+    "name": "문화체육관광부장관기 제40회 전국시.도대항육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-07-27",
+      "end": "2019-07-29"
+    },
+    "venue": "잠실",
+    "category": "track_field",
+    "eventCount": 121,
+    "athleteCount": 1226
+  },
+  {
+    "id": "2019-road-003",
+    "toCd": "M00007003X",
+    "name": "문화체육관광부장관기 제27회 전국생활체육시도대항육상경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-07-27",
+      "end": "2019-07-28"
+    },
+    "venue": "잠실",
+    "category": "road",
+    "eventCount": 88,
+    "athleteCount": 438
+  },
+  {
+    "id": "2019-road-018",
+    "toCd": "E014900101",
+    "name": "2019 평창대관령전국고교10km대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-08-16",
+      "end": "2019-08-16"
+    },
+    "venue": "횡계",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 108
+  },
+  {
+    "id": "2019-single_event-001",
+    "toCd": "E013490151",
+    "name": "2019 목포국제육상투척경기대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-08-24",
+      "end": "2019-08-25"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 6,
+    "athleteCount": 45
+  },
+  {
+    "id": "2019-track_field-008",
+    "toCd": "E015930011",
+    "name": "2019 나주 전국 육상 경보경기 챌린지대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-08-31",
+      "end": "2019-08-31"
+    },
+    "venue": "나주",
+    "category": "track_field",
+    "eventCount": 6,
+    "athleteCount": 44
+  },
+  {
+    "id": "2019-road-010",
+    "toCd": "E010380488",
+    "name": "제49회 대통령기전국통일구간마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-09-08",
+      "end": "2019-09-08"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2019-track_field-009",
+    "toCd": "E010031002",
+    "name": "제100회 전국체육대회(육상경기)",
+    "year": "2019",
+    "period": {
+      "start": "2019-10-06",
+      "end": "2019-10-09"
+    },
+    "venue": "잠실",
+    "category": "track_field",
+    "eventCount": 147,
+    "athleteCount": 1972
+  },
+  {
+    "id": "2019-road-011",
+    "toCd": "E014010135",
+    "name": "동아일보 2019 경주국제마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-10-20",
+      "end": "2019-10-20"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 87
+  },
+  {
+    "id": "2019-road-012",
+    "toCd": "E015570046",
+    "name": "2019 동아일보 경주 주니어하프마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-10-20",
+      "end": "2019-10-20"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 16
+  },
+  {
+    "id": "2019-road-013",
+    "toCd": "E010141195",
+    "name": "2019 조선일보마라톤대회 겸 제73회 전국마라톤선수권대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-10-27",
+      "end": "2019-10-27"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 66
+  },
+  {
+    "id": "2019-road-014",
+    "toCd": "E015480056",
+    "name": "2019 조선일보 주니어하프마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-10-27",
+      "end": "2019-10-27"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 13
+  },
+  {
+    "id": "2019-road-015",
+    "toCd": "E012670195",
+    "name": "2019 JTBC서울마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-11-03",
+      "end": "2019-11-03"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 85
+  },
+  {
+    "id": "2019-road-016",
+    "toCd": "E015470066",
+    "name": "2019 JTBC서울 주니어하프마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-11-03",
+      "end": "2019-11-03"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 15
+  },
+  {
+    "id": "2019-road-017",
+    "toCd": "M00008003P",
+    "name": "평화의섬 2019 국무총리기 전국생활체육구간마라톤대회",
+    "year": "2019",
+    "period": {
+      "start": "2019-11-16",
+      "end": "2019-11-16"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2020-track_field-001",
+    "toCd": "E010020743",
+    "name": "제74회 전국육상경기선수권대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 520
+  },
+  {
+    "id": "2020-junior-001",
+    "toCd": "E01510009D",
+    "name": "제11회 한국U18육상경기대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 53,
+    "athleteCount": 346
+  },
+  {
+    "id": "2020-junior-002",
+    "toCd": "E01242018C",
+    "name": "제20회 한국U20육상경기선수권대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 38,
+    "athleteCount": 287
+  },
+  {
+    "id": "2020-track_field-002",
+    "toCd": "E010010521",
+    "name": "제49회 전국종별육상경기선수권대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-07-09",
+      "end": "2020-07-13"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 208,
+    "athleteCount": 1646
+  },
+  {
+    "id": "2020-track_field-003",
+    "toCd": "E010050491",
+    "name": "제48회 KBS배 전국육상경기대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-07-24",
+      "end": "2020-07-28"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 107,
+    "athleteCount": 1081
+  },
+  {
+    "id": "2020-track_field-004",
+    "toCd": "E015110093",
+    "name": "제48회 KBS배 전국육상경기대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-07-24",
+      "end": "2020-07-28"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 569
+  },
+  {
+    "id": "2020-road-002",
+    "toCd": "E014900111",
+    "name": "2020 평창대관령전국고교10km대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-08-22",
+      "end": "2020-08-22"
+    },
+    "venue": "횡계",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 100
+  },
+  {
+    "id": "2020-track_field-005",
+    "toCd": "E010100412",
+    "name": "문화체육관광부장관기 제41회 전국시.도대항육상경기대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-10-19",
+      "end": "2020-10-23"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 119,
+    "athleteCount": 1250
+  },
+  {
+    "id": "2020-university-001",
+    "toCd": "E016010011",
+    "name": "2020 예천 전국대학일반육상경기대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-10-19",
+      "end": "2020-10-23"
+    },
+    "venue": "예천",
+    "category": "university",
+    "eventCount": 109,
+    "athleteCount": 723
+  },
+  {
+    "id": "2020-road-001",
+    "toCd": "E010380498",
+    "name": "제50회 대통령기 전국통일구간마라톤대회",
+    "year": "2020",
+    "period": {
+      "start": "2020-11-15",
+      "end": "2020-11-15"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 7
+  },
+  {
+    "id": "2021-road-001",
+    "toCd": "E016020015",
+    "name": "2021 도쿄올림픽 마라톤 국가대표 선발대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-04-04",
+      "end": "2021-04-04"
+    },
+    "venue": "예천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 69
+  },
+  {
+    "id": "2021-track_field-001",
+    "toCd": "E010050511",
+    "name": "제49회 KBS배 전국육상경기대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-03",
+      "end": "2021-06-07"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 123,
+    "athleteCount": 1618
+  },
+  {
+    "id": "2021-track_field-002",
+    "toCd": "E015110103",
+    "name": "제49회 KBS배 전국육상경기대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-03",
+      "end": "2021-06-07"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 626
+  },
+  {
+    "id": "2021-track_field-003",
+    "toCd": "E010010541",
+    "name": "제50회 전국종별육상경기선수권대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-13",
+      "end": "2021-06-17"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 209,
+    "athleteCount": 1716
+  },
+  {
+    "id": "2021-track_field-004",
+    "toCd": "E010020753",
+    "name": "제75회 전국육상경기선수권대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-25",
+      "end": "2021-06-28"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 512
+  },
+  {
+    "id": "2021-junior-001",
+    "toCd": "E01242019C",
+    "name": "제21회 한국U20육상경기선수권대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-25",
+      "end": "2021-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 56,
+    "athleteCount": 407
+  },
+  {
+    "id": "2021-junior-002",
+    "toCd": "E01510010D",
+    "name": "제12회 한국U18육상경기대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-25",
+      "end": "2021-06-28"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 19,
+    "athleteCount": 165
+  },
+  {
+    "id": "2021-track_field-005",
+    "toCd": "E015380323",
+    "name": "2021 높이뛰기 우수선수초청(남자) 공인기록회",
+    "year": "2021",
+    "period": {
+      "start": "2021-06-29",
+      "end": "2021-06-29"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2021-track_field-006",
+    "toCd": "E010031022",
+    "name": "제102회 전국체육대회(육상경기)",
+    "year": "2021",
+    "period": {
+      "start": "2021-10-10",
+      "end": "2021-10-13"
+    },
+    "venue": "구미",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 873
+  },
+  {
+    "id": "2021-junior-003",
+    "toCd": "E015380341",
+    "name": "문화체육관광부장관기 제42회 전국육상경기대회 겸 제50회 전국소년체육대회(육상경기)",
+    "year": "2021",
+    "period": {
+      "start": "2021-11-12",
+      "end": "2021-11-16"
+    },
+    "venue": "구미",
+    "category": "junior",
+    "eventCount": 49,
+    "athleteCount": 993
+  },
+  {
+    "id": "2021-track_field-007",
+    "toCd": "E015380351",
+    "name": "문화체육관광부장관기 제42회 전국육상경기대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-11-12",
+      "end": "2021-11-16"
+    },
+    "venue": "구미",
+    "category": "track_field",
+    "eventCount": 60,
+    "athleteCount": 505
+  },
+  {
+    "id": "2021-road-002",
+    "toCd": "E010380508",
+    "name": "제51회 대통령기 전국통일구간마라톤대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-11-21",
+      "end": "2021-11-21"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 7
+  },
+  {
+    "id": "2021-road-003",
+    "toCd": "E015230097",
+    "name": "제51회 대통령기 전국통일구간마라톤대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-11-21",
+      "end": "2021-11-21"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2021-road-004",
+    "toCd": "E010171225",
+    "name": "2021 동아마라톤대회",
+    "year": "2021",
+    "period": {
+      "start": "2021-11-28",
+      "end": "2021-11-28"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 33
+  },
+  {
+    "id": "2022-road-003",
+    "toCd": "E014030145",
+    "name": "2022 대구국제마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-04-03",
+      "end": "2022-04-03"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 140
+  },
+  {
+    "id": "2022-road-004",
+    "toCd": "E010171235",
+    "name": "2022 서울마라톤대회 겸 제92회 동아마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-04-17",
+      "end": "2022-04-17"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 117
+  },
+  {
+    "id": "2022-track_field-001",
+    "toCd": "E010010551",
+    "name": "제51회 전국종별육상경기선수권대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-04-19",
+      "end": "2022-04-23"
+    },
+    "venue": "대구",
+    "category": "track_field",
+    "eventCount": 230,
+    "athleteCount": 1958
+  },
+  {
+    "id": "2022-junior-001",
+    "toCd": "E01538049C",
+    "name": "2022 세계U20육상경기선수권대회 선발대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-04-19",
+      "end": "2022-04-23"
+    },
+    "venue": "대구",
+    "category": "junior",
+    "eventCount": 2,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-junior-002",
+    "toCd": "E010040492",
+    "name": "제51회 전국소년체육대회(육상경기)",
+    "year": "2022",
+    "period": {
+      "start": "2022-05-28",
+      "end": "2022-05-29"
+    },
+    "venue": "구미",
+    "category": "junior",
+    "eventCount": 49,
+    "athleteCount": 839
+  },
+  {
+    "id": "2022-track_field-002",
+    "toCd": "E010050521",
+    "name": "제50회 KBS배 전국육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-02",
+      "end": "2022-06-06"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 117,
+    "athleteCount": 1107
+  },
+  {
+    "id": "2022-track_field-003",
+    "toCd": "E015110113",
+    "name": "제50회 KBS배 전국육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-02",
+      "end": "2022-06-06"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 493
+  },
+  {
+    "id": "2022-road-001",
+    "toCd": "M00003006X",
+    "name": "제28회 대한체육회장배 전국생활체육육상경기대회 2022 전국생활체육대축전",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-04",
+      "end": "2022-06-05"
+    },
+    "venue": "예천",
+    "category": "road",
+    "eventCount": 93,
+    "athleteCount": 672
+  },
+  {
+    "id": "2022-track_field-004",
+    "toCd": "E010020763",
+    "name": "제76회 전국육상경기선수권대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 575
+  },
+  {
+    "id": "2022-junior-003",
+    "toCd": "E01242020C",
+    "name": "제22회 한국U20육상경기선수권대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 54,
+    "athleteCount": 378
+  },
+  {
+    "id": "2022-junior-004",
+    "toCd": "E01510011D",
+    "name": "제13회 한국U18육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-06-22",
+      "end": "2022-06-25"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 56,
+    "athleteCount": 466
+  },
+  {
+    "id": "2022-junior-005",
+    "toCd": "E010121204",
+    "name": "2022 교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-07-10",
+      "end": "2022-07-10"
+    },
+    "venue": "영천",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 399
+  },
+  {
+    "id": "2022-track_field-005",
+    "toCd": "E010100462",
+    "name": "문화체육관광부장관기 제43회 전국시.도대항육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-07-23",
+      "end": "2022-07-25"
+    },
+    "venue": "울산",
+    "category": "track_field",
+    "eventCount": 121,
+    "athleteCount": 1194
+  },
+  {
+    "id": "2022-road-002",
+    "toCd": "M00007006X",
+    "name": "문화체육관광부장관배 제30회 전국생활체육시도대항육상경기대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-07-23",
+      "end": "2022-07-24"
+    },
+    "venue": "울산",
+    "category": "road",
+    "eventCount": 83,
+    "athleteCount": 293
+  },
+  {
+    "id": "2022-road-005",
+    "toCd": "E010380518",
+    "name": "제52회 대통령기 전국통일구간마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-09-04",
+      "end": "2022-09-04"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-006",
+    "toCd": "E015230107",
+    "name": "제52회 대통령기 전국통일구간마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-09-04",
+      "end": "2022-09-04"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-007",
+    "toCd": "E010400377",
+    "name": "제38회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2022",
+    "period": {
+      "start": "2022-09-24",
+      "end": "2022-09-24"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 15
+  },
+  {
+    "id": "2022-track_field-006",
+    "toCd": "E010031032",
+    "name": "제103회 전국체육대회 (육상경기)",
+    "year": "2022",
+    "period": {
+      "start": "2022-10-09",
+      "end": "2022-10-12"
+    },
+    "venue": "울산",
+    "category": "track_field",
+    "eventCount": 150,
+    "athleteCount": 1972
+  },
+  {
+    "id": "2022-road-008",
+    "toCd": "E015570056",
+    "name": "2022 동아일보 경주 주니어하프마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-10-16",
+      "end": "2022-10-16"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-009",
+    "toCd": "E014010145",
+    "name": "동아일보 2022 경주국제마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-10-16",
+      "end": "2022-10-16"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 53
+  },
+  {
+    "id": "2022-road-010",
+    "toCd": "E015480076",
+    "name": "2022 조선일보 주니어하프마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-10-23",
+      "end": "2022-10-23"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2022-road-011",
+    "toCd": "E010141215",
+    "name": "2022 조선일보마라톤대회 겸 제76회 전국마라톤선수권대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-10-23",
+      "end": "2022-10-23"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 37
+  },
+  {
+    "id": "2022-road-012",
+    "toCd": "E015470076",
+    "name": "2022 JTBC서울 주니어하프마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-11-06",
+      "end": "2022-11-06"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 11
+  },
+  {
+    "id": "2022-road-013",
+    "toCd": "E012670205",
+    "name": "2022 JTBC서울마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-11-06",
+      "end": "2022-11-06"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 74
+  },
+  {
+    "id": "2022-road-014",
+    "toCd": "M00008007P",
+    "name": "평화의섬 2022 국무총리기 전국생활체육구간마라톤대회",
+    "year": "2022",
+    "period": {
+      "start": "2022-11-12",
+      "end": "2022-11-12"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 7
+  },
+  {
+    "id": "2023-road-004",
+    "toCd": "E010171245",
+    "name": "2023 서울마라톤대회 겸 제93회 동아마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-03-19",
+      "end": "2023-03-19"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 87
+  },
+  {
+    "id": "2023-road-005",
+    "toCd": "E015360096",
+    "name": "2023 동아일보 서울주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-03-19",
+      "end": "2023-03-19"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2023-road-006",
+    "toCd": "E013900167",
+    "name": "제39회 코오롱구간마라톤대회(중학교부)",
+    "year": "2023",
+    "period": {
+      "start": "2023-03-25",
+      "end": "2023-03-25"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 18
+  },
+  {
+    "id": "2023-road-007",
+    "toCd": "E012390226",
+    "name": "2023 인천국제하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-03-26",
+      "end": "2023-03-26"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 62
+  },
+  {
+    "id": "2023-road-008",
+    "toCd": "E014030155",
+    "name": "2023 대구국제마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-04-02",
+      "end": "2023-04-02"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 161
+  },
+  {
+    "id": "2023-road-009",
+    "toCd": "E015370086",
+    "name": "2023 대구주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-04-02",
+      "end": "2023-04-02"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 24
+  },
+  {
+    "id": "2023-road-010",
+    "toCd": "E015060105",
+    "name": "2023 군산새만금마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-04-09",
+      "end": "2023-04-09"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 83
+  },
+  {
+    "id": "2023-road-011",
+    "toCd": "E015390076",
+    "name": "2023 군산새만금주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-04-09",
+      "end": "2023-04-09"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 12
+  },
+  {
+    "id": "2023-road-001",
+    "toCd": "M00006006X",
+    "name": "2023 전국생활체육대축전(육상경기)",
+    "year": "2023",
+    "period": {
+      "start": "2023-04-29",
+      "end": "2023-04-30"
+    },
+    "venue": "구미",
+    "category": "road",
+    "eventCount": 154,
+    "athleteCount": 989
+  },
+  {
+    "id": "2023-track_field-001",
+    "toCd": "E010050531",
+    "name": "제51회 KBS배 전국육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-05-05",
+      "end": "2023-05-09"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 121,
+    "athleteCount": 1372
+  },
+  {
+    "id": "2023-track_field-002",
+    "toCd": "E015110123",
+    "name": "제51회 KBS배 전국육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-05-05",
+      "end": "2023-05-09"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 64,
+    "athleteCount": 619
+  },
+  {
+    "id": "2023-junior-001",
+    "toCd": "E010040502",
+    "name": "제52회 전국소년체육대회(육상경기)",
+    "year": "2023",
+    "period": {
+      "start": "2023-05-27",
+      "end": "2023-05-28"
+    },
+    "venue": "울산",
+    "category": "junior",
+    "eventCount": 50,
+    "athleteCount": 906
+  },
+  {
+    "id": "2023-junior-002",
+    "toCd": "E01193023A",
+    "name": "제25회전국꿈나무선수선발육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-06-18",
+      "end": "2023-06-19"
+    },
+    "venue": "문경",
+    "category": "junior",
+    "eventCount": 71,
+    "athleteCount": 721
+  },
+  {
+    "id": "2023-track_field-003",
+    "toCd": "E010020773",
+    "name": "제77회 전국육상경기선수권대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 61,
+    "athleteCount": 452
+  },
+  {
+    "id": "2023-junior-003",
+    "toCd": "E01510012D",
+    "name": "제14회 한국U18육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 57,
+    "athleteCount": 442
+  },
+  {
+    "id": "2023-junior-004",
+    "toCd": "E01242021C",
+    "name": "제23회 한국U20육상경기선수권대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-06-23",
+      "end": "2023-06-26"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 55,
+    "athleteCount": 266
+  },
+  {
+    "id": "2023-junior-005",
+    "toCd": "E010121214",
+    "name": "2023 교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-07-02",
+      "end": "2023-07-02"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 26,
+    "athleteCount": 430
+  },
+  {
+    "id": "2023-track_field-004",
+    "toCd": "E010010561",
+    "name": "제52회 전국종별육상경기선수권대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-07-06",
+      "end": "2023-07-10"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 199,
+    "athleteCount": 1626
+  },
+  {
+    "id": "2023-track_field-005",
+    "toCd": "E010100482",
+    "name": "문화체육관광부장관기 제44회 전국시.도대항육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-08-19",
+      "end": "2023-08-21"
+    },
+    "venue": "목포",
+    "category": "track_field",
+    "eventCount": 120,
+    "athleteCount": 1189
+  },
+  {
+    "id": "2023-road-002",
+    "toCd": "M00007007X",
+    "name": "문화체육관광부장관배 제31회 전국생활체육육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-08-19",
+      "end": "2023-08-20"
+    },
+    "venue": "목포",
+    "category": "road",
+    "eventCount": 84,
+    "athleteCount": 274
+  },
+  {
+    "id": "2023-road-012",
+    "toCd": "E010380548",
+    "name": "제53회 대통령기 전국통일구간마라톤대회(시도대항)",
+    "year": "2023",
+    "period": {
+      "start": "2023-09-03",
+      "end": "2023-09-03"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 10
+  },
+  {
+    "id": "2023-road-013",
+    "toCd": "E015230117",
+    "name": "제53회 대통령기 전국통일구간마라톤대회(소속대항)",
+    "year": "2023",
+    "period": {
+      "start": "2023-09-03",
+      "end": "2023-09-03"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2023-road-003",
+    "toCd": "M00003007X",
+    "name": "대한체육회장배 2023 대구 전국생활체육육상경기대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-09-10",
+      "end": "2023-09-10"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 74,
+    "athleteCount": 317
+  },
+  {
+    "id": "2023-track_field-006",
+    "toCd": "E010031062",
+    "name": "제104회 전국체육대회 (육상경기)",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-15",
+      "end": "2023-10-18"
+    },
+    "venue": "목포",
+    "category": "track_field",
+    "eventCount": 123,
+    "athleteCount": 1630
+  },
+  {
+    "id": "2023-road-014",
+    "toCd": "E014010155",
+    "name": "동아일보 2023 경주국제마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-21",
+      "end": "2023-10-21"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 45
+  },
+  {
+    "id": "2023-road-015",
+    "toCd": "E015570066",
+    "name": "2023 동아일보 경주 주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-21",
+      "end": "2023-10-21"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 3
+  },
+  {
+    "id": "2023-single_event-001",
+    "toCd": "E01590002C",
+    "name": "2023 목포전국육상투척경기대회(U20)",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 8,
+    "athleteCount": 14
+  },
+  {
+    "id": "2023-single_event-002",
+    "toCd": "E01591002D",
+    "name": "2023 목포전국육상투척경기대회(U18)",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 8,
+    "athleteCount": 44
+  },
+  {
+    "id": "2023-single_event-003",
+    "toCd": "E016130013",
+    "name": "2023 목포전국육상투척경기대회(대학일반)",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-24",
+      "end": "2023-10-25"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 7,
+    "athleteCount": 36
+  },
+  {
+    "id": "2023-road-016",
+    "toCd": "E010141225",
+    "name": "2023 조선일보마라톤대회 겸 제77회 전국마라톤선수권대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-29",
+      "end": "2023-10-29"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 52
+  },
+  {
+    "id": "2023-road-017",
+    "toCd": "E015480086",
+    "name": "2023 조선일보 주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-10-29",
+      "end": "2023-10-29"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2023-road-018",
+    "toCd": "E012670215",
+    "name": "2023 JTBC서울마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-11-05",
+      "end": "2023-11-05"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 71
+  },
+  {
+    "id": "2023-road-019",
+    "toCd": "E015470086",
+    "name": "2023 JTBC서울 주니어하프마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-11-05",
+      "end": "2023-11-05"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 9
+  },
+  {
+    "id": "2023-road-020",
+    "toCd": "M00008009P",
+    "name": "평화의섬 2023 국무총리기 전국생활체육구간마라톤대회",
+    "year": "2023",
+    "period": {
+      "start": "2023-11-11",
+      "end": "2023-11-11"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2024-road-004",
+    "toCd": "E015360106",
+    "name": "2024 동아일보 서울하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-03-17",
+      "end": "2024-03-17"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 34
+  },
+  {
+    "id": "2024-road-005",
+    "toCd": "E010171255",
+    "name": "2024 서울마라톤대회 겸 제94회 동아마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-03-17",
+      "end": "2024-03-17"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 108
+  },
+  {
+    "id": "2024-road-006",
+    "toCd": "E010400397",
+    "name": "제40회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2024",
+    "period": {
+      "start": "2024-03-30",
+      "end": "2024-03-30"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2024-road-007",
+    "toCd": "E013900177",
+    "name": "제40회 코오롱구간마라톤대회(중학교부)",
+    "year": "2024",
+    "period": {
+      "start": "2024-03-30",
+      "end": "2024-03-30"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 25
+  },
+  {
+    "id": "2024-road-008",
+    "toCd": "E014030165",
+    "name": "2024 대구마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-04-07",
+      "end": "2024-04-07"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 140
+  },
+  {
+    "id": "2024-road-009",
+    "toCd": "E015370096",
+    "name": "2024 대구하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-04-07",
+      "end": "2024-04-07"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2024-road-010",
+    "toCd": "E015060115",
+    "name": "2024 군산새만금마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-04-14",
+      "end": "2024-04-14"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 78
+  },
+  {
+    "id": "2024-road-011",
+    "toCd": "E015390086",
+    "name": "2024 군산새만금하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-04-14",
+      "end": "2024-04-14"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 17
+  },
+  {
+    "id": "2024-road-001",
+    "toCd": "M00010002X",
+    "name": "2024 전국생활체육대축전(육상경기)",
+    "year": "2024",
+    "period": {
+      "start": "2024-04-27",
+      "end": "2024-04-28"
+    },
+    "venue": "울산",
+    "category": "road",
+    "eventCount": 161,
+    "athleteCount": 1051
+  },
+  {
+    "id": "2024-track_field-001",
+    "toCd": "E010050541",
+    "name": "제52회 KBS배 전국육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-05-03",
+      "end": "2024-05-07"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 123,
+    "athleteCount": 1519
+  },
+  {
+    "id": "2024-track_field-002",
+    "toCd": "E015110133",
+    "name": "제52회 KBS배 전국육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-05-03",
+      "end": "2024-05-07"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 531
+  },
+  {
+    "id": "2024-road-002",
+    "toCd": "M00003008X",
+    "name": "제30회 대한체육회장배 전국생활체육육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-05-06",
+      "end": "2024-05-06"
+    },
+    "venue": "예천",
+    "category": "road",
+    "eventCount": 54,
+    "athleteCount": 133
+  },
+  {
+    "id": "2024-road-012",
+    "toCd": "E012390236",
+    "name": "2024 인천국제하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-05-12",
+      "end": "2024-05-12"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 43
+  },
+  {
+    "id": "2024-junior-001",
+    "toCd": "E010040512",
+    "name": "제53회 전국소년체육대회(육상경기)",
+    "year": "2024",
+    "period": {
+      "start": "2024-05-25",
+      "end": "2024-05-26"
+    },
+    "venue": "목포",
+    "category": "junior",
+    "eventCount": 50,
+    "athleteCount": 954
+  },
+  {
+    "id": "2024-track_field-003",
+    "toCd": "E010010571",
+    "name": "제53회 전국종별육상경기선수권대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-06-13",
+      "end": "2024-06-17"
+    },
+    "venue": "목포",
+    "category": "track_field",
+    "eventCount": 213,
+    "athleteCount": 1751
+  },
+  {
+    "id": "2024-track_field-004",
+    "toCd": "E010020783",
+    "name": "제78회 전국육상경기선수권대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-06-23",
+      "end": "2024-06-26"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 492
+  },
+  {
+    "id": "2024-junior-002",
+    "toCd": "E01510013D",
+    "name": "제15회 한국U18육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-06-23",
+      "end": "2024-06-26"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 58,
+    "athleteCount": 476
+  },
+  {
+    "id": "2024-junior-003",
+    "toCd": "E01242022C",
+    "name": "제24회 한국U20육상경기선수권대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-06-23",
+      "end": "2024-06-26"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 57,
+    "athleteCount": 317
+  },
+  {
+    "id": "2024-track_field-005",
+    "toCd": "E016200011",
+    "name": "백제왕도 익산 2024 전국육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-07-06",
+      "end": "2024-07-09"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 207,
+    "athleteCount": 1610
+  },
+  {
+    "id": "2024-junior-004",
+    "toCd": "E010121224",
+    "name": "2024 교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-07-13",
+      "end": "2024-07-13"
+    },
+    "venue": "예천",
+    "category": "junior",
+    "eventCount": 26,
+    "athleteCount": 454
+  },
+  {
+    "id": "2024-track_field-006",
+    "toCd": "E010100492",
+    "name": "문화체육관광부장관기 제45회 전국시.도대항육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-08-17",
+      "end": "2024-08-19"
+    },
+    "venue": "김해",
+    "category": "track_field",
+    "eventCount": 120,
+    "athleteCount": 1254
+  },
+  {
+    "id": "2024-road-003",
+    "toCd": "M00007008X",
+    "name": "문화체육관광부장관배 제32회 전국생활체육육상경기대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-08-17",
+      "end": "2024-08-18"
+    },
+    "venue": "김해",
+    "category": "road",
+    "eventCount": 100,
+    "athleteCount": 442
+  },
+  {
+    "id": "2024-junior-005",
+    "toCd": "E01575007C",
+    "name": "제32회 한중일주니어종합경기대회(육상1일경기)",
+    "year": "2024",
+    "period": {
+      "start": "2024-08-27",
+      "end": "2024-08-27"
+    },
+    "venue": "예천",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 107
+  },
+  {
+    "id": "2024-junior-006",
+    "toCd": "E01575008C",
+    "name": "제32회 한중일주니어종합경기대회(육상2일경기)",
+    "year": "2024",
+    "period": {
+      "start": "2024-08-29",
+      "end": "2024-08-29"
+    },
+    "venue": "예천",
+    "category": "junior",
+    "eventCount": 24,
+    "athleteCount": 103
+  },
+  {
+    "id": "2024-road-013",
+    "toCd": "E010380558",
+    "name": "제54회 대통령기 전국통일구간마라톤대회(시도대항)",
+    "year": "2024",
+    "period": {
+      "start": "2024-09-08",
+      "end": "2024-09-08"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2024-road-014",
+    "toCd": "E015230127",
+    "name": "제54회 대통령기 전국통일구간마라톤대회(소속대항)",
+    "year": "2024",
+    "period": {
+      "start": "2024-09-08",
+      "end": "2024-09-08"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 4
+  },
+  {
+    "id": "2024-track_field-007",
+    "toCd": "E010031072",
+    "name": "제105회 전국체육대회 (육상경기)",
+    "year": "2024",
+    "period": {
+      "start": "2024-10-13",
+      "end": "2024-10-16"
+    },
+    "venue": "김해",
+    "category": "track_field",
+    "eventCount": 150,
+    "athleteCount": 1874
+  },
+  {
+    "id": "2024-road-015",
+    "toCd": "E014010165",
+    "name": "동아일보 2024 경주국제마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-10-19",
+      "end": "2024-10-19"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 45
+  },
+  {
+    "id": "2024-road-016",
+    "toCd": "E015570076",
+    "name": "2024 동아일보 경주하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-10-19",
+      "end": "2024-10-19"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 32
+  },
+  {
+    "id": "2024-road-017",
+    "toCd": "E010141235",
+    "name": "2024 조선일보마라톤대회 겸 제78회 전국마라톤선수권대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-10-27",
+      "end": "2024-10-27"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2024-road-018",
+    "toCd": "E015480096",
+    "name": "2024 조선일보 하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-10-27",
+      "end": "2024-10-27"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 16
+  },
+  {
+    "id": "2024-road-019",
+    "toCd": "E015470096",
+    "name": "2024 JTBC서울하프마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-11-03",
+      "end": "2024-11-03"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 34
+  },
+  {
+    "id": "2024-road-020",
+    "toCd": "E012670225",
+    "name": "2024 JTBC서울마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-11-03",
+      "end": "2024-11-03"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 56
+  },
+  {
+    "id": "2024-road-021",
+    "toCd": "M00008011P",
+    "name": "평화의섬 2024 국무총리기 전국생활체육구간마라톤대회",
+    "year": "2024",
+    "period": {
+      "start": "2024-11-09",
+      "end": "2024-11-09"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 5
+  },
+  {
+    "id": "2025-road-004",
+    "toCd": "E014030175",
+    "name": "2025 대구마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-02-23",
+      "end": "2025-02-23"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 106
+  },
+  {
+    "id": "2025-road-005",
+    "toCd": "E015370106",
+    "name": "2025 대구하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-02-23",
+      "end": "2025-02-23"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 52
+  },
+  {
+    "id": "2025-road-006",
+    "toCd": "E015360116",
+    "name": "2025 동아일보 서울하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-03-16",
+      "end": "2025-03-16"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 55
+  },
+  {
+    "id": "2025-road-007",
+    "toCd": "E010171265",
+    "name": "2025 서울마라톤대회 겸 제95회 동아마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-03-16",
+      "end": "2025-03-16"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 105
+  },
+  {
+    "id": "2025-road-008",
+    "toCd": "E013900187",
+    "name": "제41회 코오롱구간마라톤대회(중학교부)",
+    "year": "2025",
+    "period": {
+      "start": "2025-03-29",
+      "end": "2025-03-29"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 26
+  },
+  {
+    "id": "2025-road-009",
+    "toCd": "E010400407",
+    "name": "제41회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2025",
+    "period": {
+      "start": "2025-03-29",
+      "end": "2025-03-29"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 23
+  },
+  {
+    "id": "2025-road-010",
+    "toCd": "E012390246",
+    "name": "2025 인천국제하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-03-30",
+      "end": "2025-03-30"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 40
+  },
+  {
+    "id": "2025-junior-001",
+    "toCd": "E012940371",
+    "name": "제39회 전국체육고등학교체육대회(육상경기)",
+    "year": "2025",
+    "period": {
+      "start": "2025-04-05",
+      "end": "2025-04-06"
+    },
+    "venue": "대구",
+    "category": "junior",
+    "eventCount": 1,
+    "athleteCount": 14
+  },
+  {
+    "id": "2025-road-011",
+    "toCd": "E015060125",
+    "name": "2025 군산새만금마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-04-06",
+      "end": "2025-04-06"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 101
+  },
+  {
+    "id": "2025-road-012",
+    "toCd": "E015390096",
+    "name": "2025 군산새만금하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-04-06",
+      "end": "2025-04-06"
+    },
+    "venue": "군산",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 28
+  },
+  {
+    "id": "2025-track_field-002",
+    "toCd": "E015381653",
+    "name": "2025 구미아시아육상경기선수권대회 최종선발대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-04-21",
+      "end": "2025-04-23"
+    },
+    "venue": "구미",
+    "category": "track_field",
+    "eventCount": 63,
+    "athleteCount": 468
+  },
+  {
+    "id": "2025-road-001",
+    "toCd": "M00010003X",
+    "name": "2025 전국생활체육대축전(육상경기)",
+    "year": "2025",
+    "period": {
+      "start": "2025-04-26",
+      "end": "2025-04-27"
+    },
+    "venue": "목포",
+    "category": "road",
+    "eventCount": 165,
+    "athleteCount": 1137
+  },
+  {
+    "id": "2025-junior-002",
+    "toCd": "E010040522",
+    "name": "제54회 전국소년체육대회(육상경기)",
+    "year": "2025",
+    "period": {
+      "start": "2025-05-17",
+      "end": "2025-05-18"
+    },
+    "venue": "김해",
+    "category": "junior",
+    "eventCount": 50,
+    "athleteCount": 941
+  },
+  {
+    "id": "2025-track_field-003",
+    "toCd": "E010010581",
+    "name": "제54회 전국종별육상경기선수권대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-05-19",
+      "end": "2025-05-23"
+    },
+    "venue": "밀양",
+    "category": "track_field",
+    "eventCount": 211,
+    "athleteCount": 1607
+  },
+  {
+    "id": "2025-track_field-001",
+    "toCd": "E015110143",
+    "name": "제53회 KBS배 전국육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-05",
+      "end": "2025-06-10"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 30,
+    "athleteCount": 272
+  },
+  {
+    "id": "2025-track_field-004",
+    "toCd": "E010050551",
+    "name": "제53회 KBS배 전국육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-05",
+      "end": "2025-06-10"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 127,
+    "athleteCount": 1451
+  },
+  {
+    "id": "2025-road-002",
+    "toCd": "M00003009X",
+    "name": "제31회 대한체육회장배 전국생활체육육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-06",
+      "end": "2025-06-06"
+    },
+    "venue": "예천",
+    "category": "road",
+    "eventCount": 75,
+    "athleteCount": 181
+  },
+  {
+    "id": "2025-track_field-005",
+    "toCd": "E015680043",
+    "name": "2025 코리아오픈국제육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-07",
+      "end": "2025-06-08"
+    },
+    "venue": "예천",
+    "category": "track_field",
+    "eventCount": 12,
+    "athleteCount": 81
+  },
+  {
+    "id": "2025-track_field-006",
+    "toCd": "E010020793",
+    "name": "제79회 전국육상경기선수권대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "category": "track_field",
+    "eventCount": 62,
+    "athleteCount": 469
+  },
+  {
+    "id": "2025-junior-003",
+    "toCd": "E01510014D",
+    "name": "제16회 한국U18육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 56,
+    "athleteCount": 388
+  },
+  {
+    "id": "2025-junior-004",
+    "toCd": "E01242023C",
+    "name": "제25회 한국U20육상경기선수권대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-06-21",
+      "end": "2025-06-24"
+    },
+    "venue": "정선",
+    "category": "junior",
+    "eventCount": 55,
+    "athleteCount": 319
+  },
+  {
+    "id": "2025-track_field-007",
+    "toCd": "E016200021",
+    "name": "백제왕도 익산 2025 전국육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-07-06",
+      "end": "2025-07-10"
+    },
+    "venue": "익산",
+    "category": "track_field",
+    "eventCount": 56,
+    "athleteCount": 541
+  },
+  {
+    "id": "2025-junior-005",
+    "toCd": "E010121234",
+    "name": "2025 교보생명컵전국초등학교시.도대항육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-07-12",
+      "end": "2025-07-12"
+    },
+    "venue": "서천",
+    "category": "junior",
+    "eventCount": 26,
+    "athleteCount": 451
+  },
+  {
+    "id": "2025-road-003",
+    "toCd": "M00007009X",
+    "name": "문화체육관광부장관배 제33회 전국생활체육육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-07-26",
+      "end": "2025-07-27"
+    },
+    "venue": "부산",
+    "category": "road",
+    "eventCount": 99,
+    "athleteCount": 514
+  },
+  {
+    "id": "2025-track_field-008",
+    "toCd": "E010100502",
+    "name": "문화체육관광부장관기 제46회 전국시.도대항육상경기대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-07-26",
+      "end": "2025-07-28"
+    },
+    "venue": "부산",
+    "category": "track_field",
+    "eventCount": 124,
+    "athleteCount": 1304
+  },
+  {
+    "id": "2025-single_event-001",
+    "toCd": "E01590003C",
+    "name": "제21회 목포전국육상투척경기대회(U20)",
+    "year": "2025",
+    "period": {
+      "start": "2025-08-21",
+      "end": "2025-08-22"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 8,
+    "athleteCount": 48
+  },
+  {
+    "id": "2025-single_event-002",
+    "toCd": "E01591003D",
+    "name": "제21회 목포전국육상투척경기대회(U18)",
+    "year": "2025",
+    "period": {
+      "start": "2025-08-21",
+      "end": "2025-08-22"
+    },
+    "venue": "목포",
+    "category": "single_event",
+    "eventCount": 8,
+    "athleteCount": 32
+  },
+  {
+    "id": "2025-road-013",
+    "toCd": "E010380568",
+    "name": "제55회 대통령기 전국통일구간마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-09-07",
+      "end": "2025-09-07"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2025-road-014",
+    "toCd": "E015230137",
+    "name": "제55회 대통령기 전국통일구간마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-09-07",
+      "end": "2025-09-07"
+    },
+    "venue": "서울-임진각",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 5
+  },
+  {
+    "id": "2025-road-015",
+    "toCd": "E014010175",
+    "name": "동아일보 2025 경주국제마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-10-18",
+      "end": "2025-10-18"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 41
+  },
+  {
+    "id": "2025-road-016",
+    "toCd": "E015570086",
+    "name": "2025 동아일보 경주하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-10-18",
+      "end": "2025-10-18"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 13
+  },
+  {
+    "id": "2025-track_field-009",
+    "toCd": "E010031082",
+    "name": "제106회 전국체육대회 (육상경기)",
+    "year": "2025",
+    "period": {
+      "start": "2025-10-19",
+      "end": "2025-10-22"
+    },
+    "venue": "부산",
+    "category": "track_field",
+    "eventCount": 150,
+    "athleteCount": 1853
+  },
+  {
+    "id": "2025-road-017",
+    "toCd": "E010141245",
+    "name": "2025 조선일보마라톤대회 겸 제79회 전국마라톤선수권대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-10-26",
+      "end": "2025-10-26"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 27
+  },
+  {
+    "id": "2025-road-018",
+    "toCd": "E015480106",
+    "name": "2025 조선일보 하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-10-26",
+      "end": "2025-10-26"
+    },
+    "venue": "춘천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 16
+  },
+  {
+    "id": "2025-road-019",
+    "toCd": "E015470106",
+    "name": "2025 JTBC서울하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-11-02",
+      "end": "2025-11-02"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 44
+  },
+  {
+    "id": "2025-road-020",
+    "toCd": "E012670235",
+    "name": "2025 JTBC서울마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-11-02",
+      "end": "2025-11-02"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 54
+  },
+  {
+    "id": "2025-road-021",
+    "toCd": "M00008014P",
+    "name": "평화의섬 2025 국무총리기 전국생활체육구간마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-11-08",
+      "end": "2025-11-08"
+    },
+    "venue": "제주도",
+    "category": "road",
+    "eventCount": 1,
+    "athleteCount": 7
+  },
+  {
+    "id": "2025-road-022",
+    "toCd": "E016300015",
+    "name": "2025 인천마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-11-23",
+      "end": "2025-11-23"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 74
+  },
+  {
+    "id": "2025-road-023",
+    "toCd": "E016310016",
+    "name": "2025 인천하프마라톤대회",
+    "year": "2025",
+    "period": {
+      "start": "2025-11-23",
+      "end": "2025-11-23"
+    },
+    "venue": "인천",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 13
+  },
+  {
+    "id": "2026-road-001",
+    "toCd": "E014030185",
+    "name": "2026 대구마라톤대회",
+    "year": "2026",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 112
+  },
+  {
+    "id": "2026-road-002",
+    "toCd": "E015370116",
+    "name": "2026 대구하프마라톤대회",
+    "year": "2026",
+    "period": {
+      "start": "2026-02-22",
+      "end": "2026-02-22"
+    },
+    "venue": "대구",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 59
+  },
+  {
+    "id": "2026-road-003",
+    "toCd": "E010171275",
+    "name": "2026 서울마라톤대회 겸 제96회 동아마라톤대회",
+    "year": "2026",
+    "period": {
+      "start": "2026-03-15",
+      "end": "2026-03-15"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 123
+  },
+  {
+    "id": "2026-road-004",
+    "toCd": "E015360126",
+    "name": "2026 동아일보 서울하프마라톤대회",
+    "year": "2026",
+    "period": {
+      "start": "2026-03-15",
+      "end": "2026-03-15"
+    },
+    "venue": "서울",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 50
+  },
+  {
+    "id": "2026-road-005",
+    "toCd": "E013900197",
+    "name": "제42회 코오롱구간마라톤대회(중학교부)",
+    "year": "2026",
+    "period": {
+      "start": "2026-03-28",
+      "end": "2026-03-28"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 33
+  },
+  {
+    "id": "2026-road-006",
+    "toCd": "E010400417",
+    "name": "제42회 코오롱구간마라톤대회(고등학교부)",
+    "year": "2026",
+    "period": {
+      "start": "2026-03-28",
+      "end": "2026-03-28"
+    },
+    "venue": "경주",
+    "category": "road",
+    "eventCount": 2,
+    "athleteCount": 22
+  }
+]

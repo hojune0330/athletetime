@@ -33,7 +33,10 @@ async function seed() {
     console.log(`✅ 카테고리 ${categoriesResult.rows.length}개 확인`);
     
     // 3. 공지사항 게시글 생성
-    const passwordHash = await bcrypt.hash('admin', 10);
+    // 공지글 수정용 비밀번호: 추측 가능한 'admin' 대신 환경변수 또는 무작위 값 사용
+    const crypto = require('crypto');
+    const noticePassword = process.env.NOTICE_POST_PASSWORD || crypto.randomBytes(12).toString('base64url');
+    const passwordHash = await bcrypt.hash(noticePassword, 10);
     
     // 공지사항 1: 커뮤니티 규칙
     await client.query(`

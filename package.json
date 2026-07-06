@@ -1,0 +1,45 @@
+{
+  "name": "athletetime-unified",
+  "version": "4.0.0",
+  "description": "AthleTime 통합 플랫폼 - 육상 커뮤니티 + 카드 스튜디오",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "server": "node src/server.js",
+    "server:dev": "node src/server.js",
+    "pipeline": "node card-studio/pipeline.js",
+    "pipeline:url": "node card-studio/pipeline.js --url",
+    "pipeline:all": "node card-studio/pipeline.js --process-all",
+    "generate": "node card-studio/generate.js",
+    "scrape": "node card-studio/scraper.js",
+    "watch": "node card-studio/watcher.js",
+    "test": "node --test backend/tests/athlete-user-ux.test.js backend/tests/launch-surface-nav.test.js backend/tests/launch-week-p1.test.js backend/tests/record-to-community-readiness.test.js backend/tests/auth-public-routes.test.js backend/tests/auth-cookie-csrf.test.js backend/tests/auth-security-readiness.test.js backend/tests/data-rights-policy.test.js backend/tests/data-rights-copy.test.js backend/tests/frontend-auth-cookie-contract.test.js backend/tests/operator-guide.test.js backend/tests/operator-guide-source.test.js backend/tests/competition-dates.test.js backend/tests/competition-identifiers.test.js backend/tests/competition-results-order.test.js backend/tests/about-data-content.test.js backend/tests/source-inventory.test.js backend/tests/source-ledger.test.js backend/tests/source-download.test.js backend/tests/source-download-cli.test.js backend/tests/coverage-matrix.test.js backend/tests/kaaf-schedule-result-harvester.test.js backend/tests/kaaf-result-original-search.test.js backend/tests/kaaf-result-catalog.test.js backend/tests/deployment-wiring.test.js"
+  },
+  "keywords": [
+    "athletics",
+    "track-and-field",
+    "community",
+    "card-news",
+    "infographic"
+  ],
+  "author": "Hojune Jang",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.11.3",
+    "playwright": "^1.58.2",
+    "puppeteer": "^23.0.0",
+    "resend": "^6.3.0",
+    "ws": "^8.19.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

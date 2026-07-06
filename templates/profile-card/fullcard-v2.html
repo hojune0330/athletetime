@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width={{width}}">
+  <title>Profile Card - Fullcard V2</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0A0A0A;
+      --white: #FFFFFF;
+      --volt: #C3FF00;
+      --volt-dim: rgba(195,255,0,0.8);
+      --gray-900: #1A1A1A;
+    }
+
+    body { margin: 0; padding: 0; background: #000; }
+
+    .profile-card {
+      width: {{width}}px;
+      height: {{height}}px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      background: var(--black);
+    }
+
+    /* ─── 상단 헤더 바 (뉴스 배너 스타일) ─── */
+    .pc__header {
+      background: var(--black);
+      padding: 40px 60px 30px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 3;
+    }
+
+    .pc__header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .pc__header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pc__comp-label {
+      font-size: 17px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .pc__event-title {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -2.5px;
+      line-height: 1;
+    }
+
+    /* 순위 뱃지 (사각형 — 브레이킹뉴스 스타일) */
+    .pc__rank-badge {
+      background: var(--volt);
+      border-radius: 14px;
+      padding: 14px 26px;
+      text-align: center;
+      min-width: 90px;
+    }
+
+    .pc__rank-badge-label {
+      font-size: 11px;
+      font-weight: 900;
+      color: rgba(10,10,10,0.45);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0;
+    }
+
+    .pc__rank-badge-value {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--black);
+      line-height: 0.88;
+    }
+
+    /* 헤더 하단 볼트 바 */
+    .pc__header-bar {
+      height: 5px;
+      background: linear-gradient(to right, var(--volt) 0%, var(--volt) 40%, transparent 100%);
+      border-radius: 3px;
+    }
+
+    /* ─── 중앙 사진 영역 ─── */
+    .pc__photo-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pc__photo {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('{{photoUrl}}');
+      background-size: cover;
+      background-position: center;
+      filter: contrast(1.05) brightness(0.92);
+    }
+
+    .pc__photo-fade {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(to top, var(--black) 0%, transparent 100%);
+    }
+
+    .pc__photo-fade-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 20%;
+      background: linear-gradient(to bottom, var(--black) 0%, transparent 100%);
+    }
+
+    /* ─── 하단 데이터 바 (스포츠 스코어보드 스타일) ─── */
+    .pc__footer {
+      background: var(--black);
+      padding: 36px 60px 52px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 3;
+    }
+
+    /* 선수 + 기록 행 */
+    .pc__main-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 26px;
+    }
+
+    .pc__athlete-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pc__athlete-name {
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+    }
+
+    .pc__athlete-aff {
+      font-size: 22px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      margin-top: 8px;
+      letter-spacing: 1px;
+    }
+
+    .pc__record-col {
+      text-align: right;
+    }
+
+    .pc__record-value {
+      font-size: 96px;
+      font-weight: 900;
+      color: var(--volt);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -5px;
+      line-height: 0.85;
+    }
+
+    .pc__record-unit {
+      font-size: 26px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      margin-left: 4px;
+    }
+
+    .pc__record-wind {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.25);
+      margin-top: 8px;
+    }
+
+    /* 코멘트 */
+    .pc__comment {
+      font-size: 19px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      font-style: italic;
+      margin-bottom: 22px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      line-height: 1.5;
+    }
+
+    /* 메타 행 */
+    .pc__meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .pc__meta-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .pc__brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pc__brand-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--volt);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    .pc__brand-text {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ─── 장식: 사이드 스트라이프 ─── */
+    .pc__stripe {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 6px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--volt) 0%, transparent 45%, var(--volt) 100%);
+      opacity: 0.18;
+      z-index: 4;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-card">
+  <div class="pc__stripe"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="pc__header">
+    <div class="pc__header-top">
+      <div class="pc__header-left">
+        <div class="pc__comp-label">{{competition}}</div>
+        <div class="pc__event-title">{{event}}</div>
+      </div>
+      <div class="pc__rank-badge">
+        <div class="pc__rank-badge-label">RANK</div>
+        <div class="pc__rank-badge-value">{{rank}}</div>
+      </div>
+    </div>
+    <div class="pc__header-bar"></div>
+  </div>
+
+  <!-- 중앙 사진 -->
+  <div class="pc__photo-area">
+    <div class="pc__photo"></div>
+    <div class="pc__photo-fade-top"></div>
+    <div class="pc__photo-fade"></div>
+  </div>
+
+  <!-- 하단 데이터 -->
+  <div class="pc__footer">
+    <div class="pc__main-row">
+      <div class="pc__athlete-col">
+        <div class="pc__athlete-name">{{name}}</div>
+        <div class="pc__athlete-aff">{{affiliation}}</div>
+      </div>
+      <div class="pc__record-col">
+        <div class="pc__record-value">{{record}}<span class="pc__record-unit">{{recordUnit}}</span></div>
+        {{#hasWind}}<div class="pc__record-wind">WIND {{wind}} m/s</div>{{/hasWind}}
+      </div>
+    </div>
+
+    {{#hasComment}}<div class="pc__comment">"{{comment}}"</div>{{/hasComment}}
+
+    <div class="pc__meta-row">
+      <span class="pc__meta-text">{{date}} · {{venue}}</span>
+      <div class="pc__brand">
+        <div class="pc__brand-dot"></div>
+        <span class="pc__brand-text">AthleTime</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

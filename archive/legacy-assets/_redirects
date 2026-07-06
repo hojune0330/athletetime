@@ -1,5 +1,0 @@
-# SPA Routing - Community Section
-/community/* /index.html 200
-
-# SPA Routing - All other paths
-/* /index.html 200

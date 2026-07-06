@@ -19,8 +19,6 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   success: boolean;
   message: string;
-  accessToken?: string;
-  refreshToken?: string;
   user?: {
     id: number;
     email: string;
@@ -51,8 +49,6 @@ export interface VerifyEmailRequest {
 export interface VerifyEmailResponse {
   success: boolean;
   message: string;
-  accessToken?: string;
-  refreshToken?: string;
   user?: {
     id: number;
     email: string;
@@ -76,8 +72,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  accessToken?: string;
-  refreshToken?: string;
   user?: {
     id: number;
     email: string;
@@ -87,6 +81,11 @@ export interface LoginResponse {
     isAdmin: boolean;
   };
   error?: string;
+}
+
+export interface CsrfTokenResponse {
+  success: boolean;
+  csrfToken: string;
 }
 
 // ============================================
@@ -248,8 +247,13 @@ export async function getMe(): Promise<GetMeResponse> {
 // 로그아웃
 // ============================================
 
-export async function logout(refreshToken?: string): Promise<void> {
-  await apiClient.post('/api/auth/logout', { refreshToken });
+export async function getCsrfToken(): Promise<CsrfTokenResponse> {
+  const response = await apiClient.get<CsrfTokenResponse>('/api/auth/csrf-token');
+  return response.data;
+}
+
+export async function logout(): Promise<void> {
+  await apiClient.post('/api/auth/logout', {});
 }
 
 // ============================================

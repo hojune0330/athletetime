@@ -1,0 +1,170 @@
+{
+  "id": "split-magazine",
+  "name": "Split Magazine",
+  "description": "좌우 분할 레이아웃 – 왼쪽 사진, 오른쪽 데이터",
+  "version": "1.2.0",
+
+  "card": {
+    "background": "#FFFFFF",
+    "css": ".profile-card { display:flex; flex-direction:row; }",
+    "style": { "display": "flex", "flexDirection": "row" }
+  },
+
+  "layers": [
+    {
+      "id": "left-photo",
+      "type": "group",
+      "label": "사진 영역",
+      "style": { "width": "48%", "height": "100%", "position": "relative", "overflow": "hidden", "flexShrink": 0 },
+      "children": [
+        {
+          "id": "photo",
+          "type": "component",
+          "componentId": "photo",
+          "label": "사진",
+          "componentStyle": { "filter": "grayscale(100%) contrast(1.1)" }
+        },
+        {
+          "id": "photo-fade",
+          "type": "component",
+          "componentId": "photoFade",
+          "label": "사진 페이드",
+          "componentStyle": {
+            "direction": "to left",
+            "fromColor": "#FFFFFF",
+            "top": 0, "right": 0, "bottom": 0, "left": "auto",
+            "width": "35%", "height": "100%"
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "right-data",
+      "type": "group",
+      "label": "데이터 영역",
+      "style": { "width": "52%", "height": "100%", "display": "flex", "flexDirection": "column", "justifyContent": "space-between", "padding": "56px 56px 80px 28px", "position": "relative", "flexShrink": 0 },
+      "children": [
+        {
+          "id": "top-section",
+          "type": "group",
+          "style": { "gap": 36, "direction": "column" },
+          "children": [
+            {
+              "id": "brand",
+              "type": "component",
+              "componentId": "brand",
+              "label": "브랜드 로고",
+              "componentStyle": { "color": "#111", "borderColor": "#111", "strokeColor": "#111", "logoSize": 26, "text": { "fontSize": 13, "letterSpacing": 4 } }
+            },
+            {
+              "id": "event-block",
+              "type": "group",
+              "style": { "gap": 6 },
+              "children": [
+                {
+                  "id": "event",
+                  "type": "component",
+                  "componentId": "event",
+                  "label": "종목",
+                  "componentStyle": { "fontSize": 20, "fontWeight": 800, "color": "#AAA", "letterSpacing": 2 }
+                },
+                {
+                  "id": "competition",
+                  "type": "component",
+                  "componentId": "competition",
+                  "label": "대회명",
+                  "componentStyle": { "fontSize": 15, "fontWeight": 600, "color": "#CCC" }
+                }
+              ]
+            }
+          ]
+        },
+
+        {
+          "id": "middle-section",
+          "type": "group",
+          "style": { "gap": 0 },
+          "children": [
+            {
+              "id": "record",
+              "type": "component",
+              "componentId": "record",
+              "label": "기록",
+              "componentStyle": { "fontSize": 120, "fontWeight": 900, "color": "#111", "letterSpacing": -5, "lineHeight": 0.92, "unit": { "fontSize": 24, "fontWeight": 700, "color": "#BBB" } }
+            },
+            {
+              "id": "wind",
+              "type": "component",
+              "componentId": "wind",
+              "label": "풍속",
+              "componentStyle": { "fontSize": 15, "fontWeight": 500, "color": "#CCC", "letterSpacing": 1.5, "marginTop": 14 }
+            }
+          ]
+        },
+
+        {
+          "id": "bottom-section",
+          "type": "group",
+          "style": { "gap": 0 },
+          "children": [
+            {
+              "id": "bottom-divider",
+              "type": "component",
+              "componentId": "divider",
+              "label": "구분선",
+              "componentStyle": { "height": 4, "background": "#111", "width": 60, "marginBottom": 24 }
+            },
+            {
+              "id": "athleteName",
+              "type": "component",
+              "componentId": "athleteName",
+              "label": "선수명",
+              "componentStyle": { "fontSize": 48, "fontWeight": 900, "color": "#111", "letterSpacing": -1, "lineHeight": 1.1 }
+            },
+            {
+              "id": "affiliation",
+              "type": "component",
+              "componentId": "affiliation",
+              "label": "소속",
+              "componentStyle": { "fontSize": 20, "fontWeight": 500, "color": "#999", "marginTop": 12 }
+            },
+            {
+              "id": "rank-row",
+              "type": "row",
+              "style": { "justify": "space-between", "align": "flex-end", "marginTop": 20 },
+              "children": [
+                {
+                  "id": "rank",
+                  "type": "component",
+                  "componentId": "rank",
+                  "label": "순위",
+                  "componentStyle": {
+                    "layout": "inline",
+                    "label": { "fontSize": 12, "fontWeight": 800, "color": "#CCC", "letterSpacing": 4 },
+                    "value": { "fontSize": 52, "fontWeight": 900, "color": "#111", "lineHeight": 1 },
+                    "container": {}
+                  }
+                },
+                {
+                  "id": "date",
+                  "type": "component",
+                  "componentId": "date",
+                  "label": "날짜·장소",
+                  "componentStyle": { "fontSize": 14, "fontWeight": 400, "color": "#CCC", "textAlign": "right" }
+                }
+              ]
+            },
+            {
+              "id": "comment",
+              "type": "component",
+              "componentId": "comment",
+              "label": "코멘트",
+              "componentStyle": { "fontSize": 17, "fontWeight": 500, "color": "#999", "fontStyle": "italic", "marginTop": 22, "paddingTop": 18, "borderTop": "1px solid #E5E5E5", "lineHeight": 1.5 }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

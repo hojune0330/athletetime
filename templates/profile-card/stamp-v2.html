@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width={{width}}">
+  <title>Profile Card - Stamp V2</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0A0A0A;
+      --white: #FFFFFF;
+      --volt: #C3FF00;
+      --volt-dim: rgba(195,255,0,0.6);
+      --gray-100: #F5F5F5;
+      --gray-200: #E5E5E5;
+      --gray-400: #999999;
+      --gray-600: #666666;
+      --gray-800: #333333;
+      --accent: var(--volt);
+    }
+
+    body { margin: 0; padding: 0; background: #000; }
+
+    .profile-card {
+      width: {{width}}px;
+      height: {{height}}px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+      background: var(--black);
+    }
+
+    /* ─── 배경 사진 ─── */
+    .pc__photo {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('{{photoUrl}}');
+      background-size: cover;
+      background-position: center top;
+      filter: contrast(1.1) brightness(0.85);
+    }
+
+    /* ─── 하단 그라데이션 (극적 - ESPN 스타일) ─── */
+    .pc__gradient {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 80%;
+      background: linear-gradient(
+        to top,
+        rgba(10,10,10,1) 0%,
+        rgba(10,10,10,0.98) 18%,
+        rgba(10,10,10,0.88) 32%,
+        rgba(10,10,10,0.55) 55%,
+        rgba(10,10,10,0.15) 75%,
+        transparent 100%
+      );
+    }
+
+    /* ─── 상단: 종목 태그 (눈에 띄는 필) ─── */
+    .pc__top-tag {
+      position: absolute;
+      top: 44px;
+      left: 56px;
+      z-index: 5;
+    }
+
+    .pc__top-tag span {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--black);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 10px 24px;
+      border-radius: 6px;
+    }
+
+    /* ─── 우상단: 순위 뱃지 (임팩트 대형) ─── */
+    .pc__rank-badge {
+      position: absolute;
+      top: 40px;
+      right: 56px;
+      z-index: 5;
+      text-align: center;
+    }
+
+    .pc__rank-badge-label {
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .pc__rank-badge-value {
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 0.85;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 6px 40px rgba(0,0,0,0.7);
+    }
+
+    /* ─── 데이터 영역 (하단) ─── */
+    .pc__data {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0 64px 56px;
+      color: var(--white);
+      z-index: 3;
+    }
+
+    /* ─── 기록 디스플레이 (히어로 - 가장 눈에 띄어야 함) ─── */
+    .pc__record-display {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .pc__record-value {
+      font-size: 144px;
+      font-weight: 900;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -7px;
+      line-height: 0.82;
+    }
+
+    .pc__record-unit {
+      font-size: 32px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    /* ─── 종목 + 풍속 라인 ─── */
+    .pc__record-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .pc__event-label {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .pc__wind {
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    /* ─── 구분선 (볼트 액센트) ─── */
+    .pc__divider {
+      height: 4px;
+      background: linear-gradient(to right, var(--accent), transparent 75%);
+      margin-bottom: 28px;
+      width: 100%;
+    }
+
+    /* ─── 선수 정보 ─── */
+    .pc__athlete {
+      margin-bottom: 28px;
+    }
+
+    .pc__athlete-name {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .pc__athlete-aff {
+      font-size: 24px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 1.5px;
+    }
+
+    /* ─── 대회 정보 행 ─── */
+    .pc__comp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pc__comp-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pc__comp-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.5px;
+    }
+
+    .pc__comp-date {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ─── 브랜딩 ─── */
+    .pc__brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pc__brand-icon {
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pc__brand-icon svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .pc__brand-text {
+      font-size: 12px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ─── 코멘트 ─── */
+    .pc__comment {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 18px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      font-style: italic;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+    }
+
+    /* ─── 장식: 액센트 라인들 ─── */
+    .pc__accent-line {
+      position: absolute;
+      top: 0;
+      right: 180px;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent 5%, var(--volt-dim) 35%, transparent 75%);
+      opacity: 0.1;
+      z-index: 2;
+    }
+
+    .pc__accent-line-2 {
+      position: absolute;
+      top: 0;
+      right: 196px;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(to bottom, transparent 15%, var(--volt-dim) 30%, transparent 60%);
+      opacity: 0.05;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-card">
+  <div class="pc__photo"></div>
+  <div class="pc__accent-line"></div>
+  <div class="pc__accent-line-2"></div>
+  <div class="pc__gradient"></div>
+
+  <!-- 상단 태그 -->
+  <div class="pc__top-tag">
+    <span>{{event}}</span>
+  </div>
+
+  <!-- 순위 뱃지 -->
+  <div class="pc__rank-badge">
+    <div class="pc__rank-badge-label">RANK</div>
+    <div class="pc__rank-badge-value">{{rank}}</div>
+  </div>
+
+  <!-- 하단 데이터 -->
+  <div class="pc__data">
+    <!-- 기록 (히어로 - 가장 큰 요소) -->
+    <div class="pc__record-display">
+      <span class="pc__record-value">{{record}}</span>
+      <span class="pc__record-unit">{{recordUnit}}</span>
+    </div>
+
+    <div class="pc__record-meta">
+      <span class="pc__event-label">{{event}}</span>
+      {{#hasWind}}<span class="pc__wind">WIND {{wind}} m/s</span>{{/hasWind}}
+    </div>
+
+    <div class="pc__divider"></div>
+
+    <!-- 선수 정보 -->
+    <div class="pc__athlete">
+      <div class="pc__athlete-name">{{name}}</div>
+      <div class="pc__athlete-aff">{{affiliation}}</div>
+    </div>
+
+    <!-- 대회 정보 -->
+    <div class="pc__comp-row">
+      <div class="pc__comp-info">
+        <span class="pc__comp-name">{{competition}}</span>
+        <span class="pc__comp-date">{{date}} · {{venue}}</span>
+      </div>
+      <div class="pc__brand">
+        <div class="pc__brand-icon">
+          <svg fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <span class="pc__brand-text">AthleTime</span>
+      </div>
+    </div>
+
+    {{#hasComment}}<div class="pc__comment">"{{comment}}"</div>{{/hasComment}}
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,562 @@
+
+> athletetime-unified@4.0.0 test
+> node --test backend/tests/athlete-user-ux.test.js backend/tests/auth-public-routes.test.js backend/tests/auth-cookie-csrf.test.js backend/tests/auth-security-readiness.test.js backend/tests/data-rights-policy.test.js backend/tests/data-rights-copy.test.js backend/tests/frontend-auth-cookie-contract.test.js backend/tests/operator-guide.test.js backend/tests/operator-guide-source.test.js backend/tests/competition-dates.test.js backend/tests/competition-identifiers.test.js backend/tests/competition-results-order.test.js backend/tests/about-data-content.test.js backend/tests/source-inventory.test.js backend/tests/source-ledger.test.js backend/tests/source-download.test.js backend/tests/source-download-cli.test.js backend/tests/coverage-matrix.test.js backend/tests/kaaf-schedule-result-harvester.test.js backend/tests/kaaf-result-original-search.test.js backend/tests/kaaf-result-catalog.test.js
+
+TAP version 13
+# Subtest: AboutData content explains source ledger and KOGL type 4
+ok 1 - AboutData content explains source ledger and KOGL type 4
+  ---
+  duration_ms: 3.7702
+  type: 'test'
+  ...
+# Subtest: Footer links to the public data collection explanation
+ok 2 - Footer links to the public data collection explanation
+  ---
+  duration_ms: 1.3313
+  type: 'test'
+  ...
+# Subtest: home page sends users to their own record search instead of a sample showcase
+ok 3 - home page sends users to their own record search instead of a sample showcase
+  ---
+  duration_ms: 12663.7129
+  type: 'test'
+  ...
+# Subtest: fake card-news sample data is not kept as a default user path
+ok 4 - fake card-news sample data is not kept as a default user path
+  ---
+  duration_ms: 11.5773
+  type: 'test'
+  ...
+# Subtest: records search gives same-name candidates practical narrowing controls
+ok 5 - records search gives same-name candidates practical narrowing controls
+  ---
+  duration_ms: 1.9631
+  type: 'test'
+  ...
+# Subtest: records athlete selection creates a shareable records URL instead of state-only detail
+ok 6 - records athlete selection creates a shareable records URL instead of state-only detail
+  ---
+  duration_ms: 1.5023
+  type: 'test'
+  ...
+# Subtest: records athlete detail exposes a plain link share action without official wording
+ok 7 - records athlete detail exposes a plain link share action without official wording
+  ---
+  duration_ms: 2.9413
+  type: 'test'
+  ...
+# Subtest: records shared athlete detail keeps identity and coverage safeguards visible
+ok 8 - records shared athlete detail keeps identity and coverage safeguards visible
+  ---
+  duration_ms: 2.3146
+  type: 'test'
+  ...
+# Subtest: records shared athlete URL prioritizes the athlete panel before candidate lists
+ok 9 - records shared athlete URL prioritizes the athlete panel before candidate lists
+  ---
+  duration_ms: 3.4301
+  type: 'test'
+  ...
+# Subtest: competition results tab opens the latest available result instead of a blank selector
+ok 10 - competition results tab opens the latest available result instead of a blank selector
+  ---
+  duration_ms: 4.5808
+  type: 'test'
+  ...
+# Subtest: competition results tab explains current-first ordering without ranking language
+ok 11 - competition results tab explains current-first ordering without ranking language
+  ---
+  duration_ms: 4.2304
+  type: 'test'
+  ...
+# Subtest: community page avoids unimplemented optional widgets in the main anonymous journey
+ok 12 - community page avoids unimplemented optional widgets in the main anonymous journey
+  ---
+  duration_ms: 5.4909
+  type: 'test'
+  ...
+# Subtest: marketplace and pace calculator have real first-use empty states
+ok 13 - marketplace and pace calculator have real first-use empty states
+  ---
+  duration_ms: 2.52
+  type: 'test'
+  ...
+# Subtest: optional trend APIs return graceful empty data while features are not ready
+ok 14 - optional trend APIs return graceful empty data while features are not ready
+  ---
+  duration_ms: 59.0535
+  type: 'test'
+  ...
+# Subtest: login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+ok 15 - login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+  ---
+  duration_ms: 12944.9284
+  type: 'test'
+  ...
+# Subtest: auth session JSON bodies omit access and refresh tokens
+ok 16 - auth session JSON bodies omit access and refresh tokens
+  ---
+  duration_ms: 336.0445
+  type: 'test'
+  ...
+# Subtest: auth route source never serializes session tokens into JSON response bodies
+ok 17 - auth route source never serializes session tokens into JSON response bodies
+  ---
+  duration_ms: 2.8175
+  type: 'test'
+  ...
+# Subtest: csrf hint cookie lasts as long as the refresh session cookie
+ok 18 - csrf hint cookie lasts as long as the refresh session cookie
+  ---
+  duration_ms: 353.5747
+  type: 'test'
+  ...
+# Subtest: standalone csrf endpoint issues the long-lived session hint
+ok 19 - standalone csrf endpoint issues the long-lived session hint
+  ---
+  duration_ms: 3.6304
+  type: 'test'
+  ...
+# Subtest: cookie authenticated unsafe auth writes require a valid CSRF token
+ok 20 - cookie authenticated unsafe auth writes require a valid CSRF token
+  ---
+  duration_ms: 331.7464
+  type: 'test'
+  ...
+# Subtest: malformed cookie encoding is rejected without a server error
+ok 21 - malformed cookie encoding is rejected without a server error
+  ---
+  duration_ms: 2.7306
+  type: 'test'
+  ...
+# Subtest: global unsafe cookie-auth routes require CSRF before route authorization
+ok 22 - global unsafe cookie-auth routes require CSRF before route authorization
+  ---
+  duration_ms: 309.5631
+  type: 'test'
+  ...
+# Subtest: refresh rotates session cookies using refresh cookie without request body token
+ok 23 - refresh rotates session cookies using refresh cookie without request body token
+  ---
+  duration_ms: 337.5281
+  type: 'test'
+  ...
+# Subtest: register keeps normal users non-admin
+ok 24 - register keeps normal users non-admin
+  ---
+  duration_ms: 12771.1066
+  type: 'test'
+  ...
+# Subtest: refresh rotates valid tokens and rejects malformed tokens
+ok 25 - refresh rotates valid tokens and rejects malformed tokens
+  ---
+  duration_ms: 241.7666
+  type: 'test'
+  ...
+# Subtest: serves public categories and marketplace without DATABASE_URL
+ok 26 - serves public categories and marketplace without DATABASE_URL
+  ---
+  duration_ms: 17.4038
+  type: 'test'
+  ...
+# Subtest: startup logs do not expose the generated development admin password
+ok 27 - startup logs do not expose the generated development admin password
+  ---
+  duration_ms: 12422.596
+  type: 'test'
+  ...
+# Subtest: forgot password does not reveal whether an email is registered
+ok 28 - forgot password does not reveal whether an email is registered
+  ---
+  duration_ms: 291.6987
+  type: 'test'
+  ...
+# Subtest: verification and reset requests do not print one-time codes to server logs
+ok 29 - verification and reset requests do not print one-time codes to server logs
+  ---
+  duration_ms: 234.6694
+  type: 'test'
+  ...
+# Subtest: malformed auth JSON does not leak raw request bodies or passwords to logs
+ok 30 - malformed auth JSON does not leak raw request bodies or passwords to logs
+  ---
+  duration_ms: 10.3552
+  type: 'test'
+  ...
+# Subtest: set-admin is disabled unless ADMIN_SECRET_KEY is explicitly configured
+ok 31 - set-admin is disabled unless ADMIN_SECRET_KEY is explicitly configured
+  ---
+  duration_ms: 184.7846
+  type: 'test'
+  ...
+# Subtest: auth privacy contract documents launch-blocking guarantees
+ok 32 - auth privacy contract documents launch-blocking guarantees
+  ---
+  duration_ms: 1.5758
+  type: 'test'
+  ...
+# Subtest: src service: computeStatus uses the Korea service day around midnight
+ok 33 - src service: computeStatus uses the Korea service day around midnight
+  ---
+  duration_ms: 6.1928
+  type: 'test'
+  ...
+# Subtest: src service: getDDay uses the Korea service day around midnight
+ok 34 - src service: getDDay uses the Korea service day around midnight
+  ---
+  duration_ms: 5.8597
+  type: 'test'
+  ...
+# Subtest: card-studio service: computeStatus uses the Korea service day around midnight
+ok 35 - card-studio service: computeStatus uses the Korea service day around midnight
+  ---
+  duration_ms: 1.5278
+  type: 'test'
+  ...
+# Subtest: card-studio service: getDDay uses the Korea service day around midnight
+ok 36 - card-studio service: getDDay uses the Korea service day around midnight
+  ---
+  duration_ms: 0.5219
+  type: 'test'
+  ...
+# [CompetitionService] 데이터 무결성 검증 경고:
+# [무결성 경고] "2026 대구마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafSeq 누락 (검증 불가)
+# [CompetitionService] 데이터 무결성 검증 경고:
+# [무결성 경고] "2026 대구마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafSeq 누락 (검증 불가)
+# Subtest: src service: decorated 2026 competitions expose unique stable keys
+ok 37 - src service: decorated 2026 competitions expose unique stable keys
+  ---
+  duration_ms: 20.1357
+  type: 'test'
+  ...
+# Subtest: card-studio service: decorated 2026 competitions expose unique stable keys
+ok 38 - card-studio service: decorated 2026 competitions expose unique stable keys
+  ---
+  duration_ms: 6.6267
+  type: 'test'
+  ...
+# Subtest: result competitions are listed newest first for the results tab default
+ok 39 - result competitions are listed newest first for the results tab default
+  ---
+  duration_ms: 512.5136
+  type: 'test'
+  ...
+# Subtest: Given 2010 to current request When local data starts in 2018 Then missing years and partial current year are explicit
+ok 40 - Given 2010 to current request When local data starts in 2018 Then missing years and partial current year are explicit
+  ---
+  duration_ms: 35.6263
+  type: 'test'
+  ...
+# Subtest: Given markdown rendering When matrix is incomplete Then it states the service must not claim full coverage
+ok 41 - Given markdown rendering When matrix is incomplete Then it states the service must not claim full coverage
+  ---
+  duration_ms: 0.6771
+  type: 'test'
+  ...
+# Subtest: Given CLI invocation When writing coverage artifacts Then JSON and Markdown are created
+ok 42 - Given CLI invocation When writing coverage artifacts Then JSON and Markdown are created
+  ---
+  duration_ms: 230.7105
+  type: 'test'
+  ...
+# Subtest: Given CLI malformed year When invoked Then it prints a short operator error without stack trace
+ok 43 - Given CLI malformed year When invoked Then it prints a short operator error without stack trace
+  ---
+  duration_ms: 446.7773
+  type: 'test'
+  ...
+# Subtest: frontend trust surfaces use public-record indexing copy instead of workaround framing
+ok 44 - frontend trust surfaces use public-record indexing copy instead of workaround framing
+  ---
+  duration_ms: 6.1616
+  type: 'test'
+  ...
+# Subtest: active docs point to data-request and avoid legal loophole positioning
+ok 45 - active docs point to data-request and avoid legal loophole positioning
+  ---
+  duration_ms: 2.4324
+  type: 'test'
+  ...
+# Subtest: data-policy endpoint describes public-record indexing with source tiers
+ok 46 - data-policy endpoint describes public-record indexing with source tiers
+  ---
+  duration_ms: 12310.3119
+  type: 'test'
+  ...
+# Subtest: record APIs expose public provenance and no restricted identifiers
+ok 47 - record APIs expose public provenance and no restricted identifiers
+  ---
+  duration_ms: 42.8011
+  type: 'test'
+  ...
+# Subtest: public data request status redacts contact and reason
+ok 48 - public data request status redacts contact and reason
+  ---
+  duration_ms: 86.3011
+  type: 'test'
+  ...
+# Subtest: frontend auth client uses cookie credentials and CSRF instead of auth localStorage tokens
+ok 49 - frontend auth client uses cookie credentials and CSRF instead of auth localStorage tokens
+  ---
+  duration_ms: 88.265
+  type: 'test'
+  ...
+# Subtest: frontend does not probe protected me endpoint for anonymous public visitors
+ok 50 - frontend does not probe protected me endpoint for anonymous public visitors
+  ---
+  duration_ms: 0.9009
+  type: 'test'
+  ...
+# Subtest: CAT-001 Given a manifest When building a catalog Then each file has stable canonical organization fields
+ok 51 - CAT-001 Given a manifest When building a catalog Then each file has stable canonical organization fields
+  ---
+  duration_ms: 53.7714
+  type: 'test'
+  ...
+# Subtest: CAT-002 Given repeated sha256 files When building a catalog Then duplicate groups are explicit
+ok 52 - CAT-002 Given repeated sha256 files When building a catalog Then duplicate groups are explicit
+  ---
+  duration_ms: 18.2633
+  type: 'test'
+  ...
+# Subtest: CAT-003 Given catalog entries When searching by query and filters Then canonical hits explain match fields
+ok 53 - CAT-003 Given catalog entries When searching by query and filters Then canonical hits explain match fields
+  ---
+  duration_ms: 19.3704
+  type: 'test'
+  ...
+# Subtest: CAT-004 Given a catalog When summarizing Then year and extension buckets are deterministic
+ok 54 - CAT-004 Given a catalog When summarizing Then year and extension buckets are deterministic
+  ---
+  duration_ms: 37.4168
+  type: 'test'
+  ...
+# Subtest: CAT-005 Given CLI invocation When writing catalog artifacts Then JSON catalog and Markdown report are created
+ok 55 - CAT-005 Given CLI invocation When writing catalog artifacts Then JSON catalog and Markdown report are created
+  ---
+  duration_ms: 215.4879
+  type: 'test'
+  ...
+# Subtest: CAT-006 Given CLI search filters When searching catalog Then only matching canonical entries are returned
+ok 56 - CAT-006 Given CLI search filters When searching catalog Then only matching canonical entries are returned
+  ---
+  duration_ms: 251.3809
+  type: 'test'
+  ...
+# Subtest: CAT-007 Given noisy KAAF filenames When building a catalog Then normalized titles remove copy and repeated-date noise
+ok 57 - CAT-007 Given noisy KAAF filenames When building a catalog Then normalized titles remove copy and repeated-date noise
+  ---
+  duration_ms: 18.8908
+  type: 'test'
+  ...
+# Subtest: Given original result files When auditing manifest Then hash and policy violations are reported
+ok 58 - Given original result files When auditing manifest Then hash and policy violations are reported
+  ---
+  duration_ms: 39.372
+  type: 'test'
+  ...
+# Subtest: Given a player query When searching originals Then UTF-16 file content matches without exposing raw body
+ok 59 - Given a player query When searching originals Then UTF-16 file content matches without exposing raw body
+  ---
+  duration_ms: 34.293
+  type: 'test'
+  ...
+# Subtest: Given a competition query When searching originals Then filename metadata matches
+ok 60 - Given a competition query When searching originals Then filename metadata matches
+  ---
+  duration_ms: 27.3724
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-001 extracts only deduped non-life-sport FILEs_4 result attachments
+ok 61 - KAAF-HARVEST-001 extracts only deduped non-life-sport FILEs_4 result attachments
+  ---
+  duration_ms: 6.2412
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-002 builds year page URLs without touching result.kaaf.or.kr
+ok 62 - KAAF-HARVEST-002 builds year page URLs without touching result.kaaf.or.kr
+  ---
+  duration_ms: 0.3959
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-003 downloads direct result files and writes manifest without raw body
+ok 63 - KAAF-HARVEST-003 downloads direct result files and writes manifest without raw body
+  ---
+  duration_ms: 86.5879
+  type: 'test'
+  ...
+# Subtest: operator guide route is nested under admin route and linked only from admin chrome
+ok 64 - operator guide route is nested under admin route and linked only from admin chrome
+  ---
+  duration_ms: 10.9502
+  type: 'test'
+  ...
+# Subtest: public about-data FAQ exists without internal runbook details
+ok 65 - public about-data FAQ exists without internal runbook details
+  ---
+  duration_ms: 0.8853
+  type: 'test'
+  ...
+# Subtest: frontend source does not embed internal operator scenario content
+ok 66 - frontend source does not embed internal operator scenario content
+  ---
+  duration_ms: 101.1198
+  type: 'test'
+  ...
+# Subtest: operator guide admin API enforces 401, 403, and admin-only 200
+ok 67 - operator guide admin API enforces 401, 403, and admin-only 200
+  ---
+  duration_ms: 12789.4986
+  type: 'test'
+  ...
+# Subtest: public data policy API does not leak internal operator runbook details
+ok 68 - public data policy API does not leak internal operator runbook details
+  ---
+  duration_ms: 6.445
+  type: 'test'
+  ...
+# Subtest: SRC-DL-CLI-001: Given a ledger source When CLI downloads Then JSON result points to saved private file
+ok 69 - SRC-DL-CLI-001: Given a ledger source When CLI downloads Then JSON result points to saved private file
+  ---
+  duration_ms: 281.9465
+  type: 'test'
+  ...
+# Subtest: SRC-DL-CLI-002: Given an unapproved ledger source When CLI downloads Then it exits nonzero with typed error
+ok 70 - SRC-DL-CLI-002: Given an unapproved ledger source When CLI downloads Then it exits nonzero with typed error
+  ---
+  duration_ms: 182.121
+  type: 'test'
+  ...
+# Subtest: SRC-DL-001-private-storage-root: Given downloader defaults When inspected Then originals stay under private ignored data sources path
+ok 71 - SRC-DL-001-private-storage-root: Given downloader defaults When inspected Then originals stay under private ignored data sources path
+  ---
+  duration_ms: 2.2457
+  type: 'test'
+  ...
+# Subtest: SRC-DL-002-approved-only: Given an unapproved download source When downloading Then no request is sent
+ok 72 - SRC-DL-002-approved-only: Given an unapproved download source When downloading Then no request is sent
+  ---
+  duration_ms: 89.9328
+  type: 'test'
+  ...
+# Subtest: SRC-DL-003-block-result-kaaf: Given a blocked host source When downloading Then it is rejected before storage
+ok 73 - SRC-DL-003-block-result-kaaf: Given a blocked host source When downloading Then it is rejected before storage
+  ---
+  duration_ms: 19.1225
+  type: 'test'
+  ...
+# Subtest: SRC-DL-005-download-metadata: Given an approved ledgered source When downloading Then private file and metadata are persisted
+ok 74 - SRC-DL-005-download-metadata: Given an approved ledgered source When downloading Then private file and metadata are persisted
+  ---
+  duration_ms: 85.8354
+  type: 'test'
+  ...
+# Subtest: SRC-DL-004-malformed-source: Given a non-download reference source When downloading Then no file is written
+ok 75 - SRC-DL-004-malformed-source: Given a non-download reference source When downloading Then no file is written
+  ---
+  duration_ms: 11.9829
+  type: 'test'
+  ...
+# Subtest: SRC-DL-007-path-containment: Given a path traversal filename When downloading Then the file stays inside source directory
+ok 76 - SRC-DL-007-path-containment: Given a path traversal filename When downloading Then the file stays inside source directory
+  ---
+  duration_ms: 57.1544
+  type: 'test'
+  ...
+# Subtest: SRC-DL-009-source-id-containment: Given a path traversal sourceId When downloading Then the storage root is not escaped
+ok 77 - SRC-DL-009-source-id-containment: Given a path traversal sourceId When downloading Then the storage root is not escaped
+  ---
+  duration_ms: 14.4418
+  type: 'test'
+  ...
+# Subtest: SRC-DL-006-http-failure-cleanup: Given an HTTP failure When downloading Then failed status is stored without a partial file
+ok 78 - SRC-DL-006-http-failure-cleanup: Given an HTTP failure When downloading Then failed status is stored without a partial file
+  ---
+  duration_ms: 28.3175
+  type: 'test'
+  ...
+# Subtest: SRC-DL-008-redirect-blocked-host: Given a redirect to blocked host When downloading Then it fails without a final file
+ok 79 - SRC-DL-008-redirect-blocked-host: Given a redirect to blocked host When downloading Then it fails without a final file
+  ---
+  duration_ms: 32.2795
+  type: 'test'
+  ...
+# Subtest: Given a result.kaaf URL When building inventory Then it is blocked without download
+ok 80 - Given a result.kaaf URL When building inventory Then it is blocked without download
+  ---
+  duration_ms: 7.5048
+  type: 'test'
+  ...
+# Subtest: Given Batch B When building inventory Then verified KAAF recordsport attachments are queued only
+ok 81 - Given Batch B When building inventory Then verified KAAF recordsport attachments are queued only
+  ---
+  duration_ms: 2.1837
+  type: 'test'
+  ...
+# Subtest: Given reference batches When building inventory Then reference pages are not file downloads
+ok 82 - Given reference batches When building inventory Then reference pages are not file downloads
+  ---
+  duration_ms: 4.5024
+  type: 'test'
+  ...
+# Subtest: Given Batch A When building inventory Then data.go.kr datasets include IDs and privacy notes
+ok 83 - Given Batch A When building inventory Then data.go.kr datasets include IDs and privacy notes
+  ---
+  duration_ms: 1.1049
+  type: 'test'
+  ...
+# Subtest: Given missing required source fields When creating source Then typed validation error is returned
+ok 84 - Given missing required source fields When creating source Then typed validation error is returned
+  ---
+  duration_ms: 3.6033
+  type: 'test'
+  ...
+# Subtest: Given restricted identifier metadata When creating source Then the source is rejected
+ok 85 - Given restricted identifier metadata When creating source Then the source is rejected
+  ---
+  duration_ms: 1.6545
+  type: 'test'
+  ...
+# Subtest: Given a valid inventory candidate When promoted Then ledger persists metadata without raw file body
+ok 86 - Given a valid inventory candidate When promoted Then ledger persists metadata without raw file body
+  ---
+  duration_ms: 16.6186
+  type: 'test'
+  ...
+# Subtest: Given duplicate source URL and filename When promoting twice Then existing source is returned
+ok 87 - Given duplicate source URL and filename When promoting twice Then existing source is returned
+  ---
+  duration_ms: 8.4567
+  type: 'test'
+  ...
+1..87
+# tests 87
+# suites 0
+# pass 87
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18059.7284

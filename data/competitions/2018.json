@@ -1,0 +1,632 @@
+[
+  {
+    "id": "2018-road-004",
+    "kaafSeq": null,
+    "toCd": "E010171195",
+    "name": "2018 서울국제마라톤대회 겸 제89회 동아마라톤대회",
+    "period": {
+      "start": "2018-03-18",
+      "end": "2018-03-18"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010171195&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 140
+  },
+  {
+    "id": "2018-road-005",
+    "kaafSeq": null,
+    "toCd": "E010400347",
+    "name": "제34회 코오롱구간마라톤대회(고등학교부)",
+    "period": {
+      "start": "2018-03-24",
+      "end": "2018-03-24"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010400347&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 19
+  },
+  {
+    "id": "2018-road-006",
+    "kaafSeq": null,
+    "toCd": "E013900127",
+    "name": "제34회 코오롱구간마라톤대회(중학교부)",
+    "period": {
+      "start": "2018-03-24",
+      "end": "2018-03-24"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E013900127&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 21
+  },
+  {
+    "id": "2018-road-007",
+    "kaafSeq": null,
+    "toCd": "E012390186",
+    "name": "2018 인천국제하프마라톤대회",
+    "period": {
+      "start": "2018-03-25",
+      "end": "2018-03-25"
+    },
+    "venue": "인천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E012390186&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 93
+  },
+  {
+    "id": "2018-road-008",
+    "kaafSeq": null,
+    "toCd": "E014030115",
+    "name": "2018 대구국제마라톤대회",
+    "period": {
+      "start": "2018-04-01",
+      "end": "2018-04-01"
+    },
+    "venue": "대구",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E014030115&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 131
+  },
+  {
+    "id": "2018-road-009",
+    "kaafSeq": null,
+    "toCd": "E015060075",
+    "name": "2018 군산새만금국제마라톤대회",
+    "period": {
+      "start": "2018-04-08",
+      "end": "2018-04-08"
+    },
+    "venue": "군산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015060075&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 133
+  },
+  {
+    "id": "2018-road-018",
+    "kaafSeq": null,
+    "toCd": "E015650021",
+    "name": "2018 서울나이키국제10Km대회 겸 나이키러닝페스티벌",
+    "period": {
+      "start": "2018-04-22",
+      "end": "2018-04-22"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015650021&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 51
+  },
+  {
+    "id": "2018-track_field-001",
+    "kaafSeq": null,
+    "toCd": "E010010471",
+    "name": "제47회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2018-05-03",
+      "end": "2018-05-07"
+    },
+    "venue": "김천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010010471&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 201,
+    "athleteCount": 1866
+  },
+  {
+    "id": "2018-road-001",
+    "kaafSeq": null,
+    "toCd": "M00003002X",
+    "name": "2018 대한체육회장배 전국마스터즈육상경기대회",
+    "period": {
+      "start": "2018-05-06",
+      "end": "2018-05-06"
+    },
+    "venue": "김천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=M00003002X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 56,
+    "athleteCount": 164
+  },
+  {
+    "id": "2018-road-002",
+    "kaafSeq": null,
+    "toCd": "M00006002X",
+    "name": "2018 전국생활체육대축전(육상경기)",
+    "period": {
+      "start": "2018-05-12",
+      "end": "2018-05-13"
+    },
+    "venue": "아산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=M00006002X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 156,
+    "athleteCount": 1111
+  },
+  {
+    "id": "2018-junior-001",
+    "kaafSeq": null,
+    "toCd": "E010040472",
+    "name": "제47회 전국소년체육대회(육상경기)",
+    "period": {
+      "start": "2018-05-26",
+      "end": "2018-05-27"
+    },
+    "venue": "충주",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010040472&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 49,
+    "athleteCount": 945
+  },
+  {
+    "id": "2018-junior-002",
+    "kaafSeq": null,
+    "toCd": "E01193021A",
+    "name": "제20회전국꿈나무선수선발육상경기대회",
+    "period": {
+      "start": "2018-06-05",
+      "end": "2018-06-06"
+    },
+    "venue": "광주",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01193021A&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 70,
+    "athleteCount": 627
+  },
+  {
+    "id": "2018-track_field-002",
+    "kaafSeq": null,
+    "toCd": "E010050471",
+    "name": "제46회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2018-06-14",
+      "end": "2018-06-18"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010050471&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 117,
+    "athleteCount": 1279
+  },
+  {
+    "id": "2018-track_field-003",
+    "kaafSeq": null,
+    "toCd": "E015110073",
+    "name": "제46회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2018-06-14",
+      "end": "2018-06-18"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015110073&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 61,
+    "athleteCount": 543
+  },
+  {
+    "id": "2018-track_field-004",
+    "kaafSeq": null,
+    "toCd": "E01568002",
+    "name": "2018 코리아오픈국제육상경기대회",
+    "period": {
+      "start": "2018-06-16",
+      "end": "2018-06-17"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01568002&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 16,
+    "athleteCount": 132
+  },
+  {
+    "id": "2018-track_field-005",
+    "kaafSeq": null,
+    "toCd": "E010020723",
+    "name": "제72회 전국육상경기선수권대회",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010020723&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 61,
+    "athleteCount": 537
+  },
+  {
+    "id": "2018-junior-003",
+    "kaafSeq": null,
+    "toCd": "E01242016C",
+    "name": "제18회 한국U20육상경기선수권대회",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01242016C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 59,
+    "athleteCount": 338
+  },
+  {
+    "id": "2018-junior-004",
+    "kaafSeq": null,
+    "toCd": "E01510007D",
+    "name": "제9회 한국U18육상경기대회",
+    "period": {
+      "start": "2018-06-26",
+      "end": "2018-06-29"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01510007D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 57,
+    "athleteCount": 423
+  },
+  {
+    "id": "2018-track_field-006",
+    "kaafSeq": null,
+    "toCd": "E010100392",
+    "name": "문화체육관광부장관기 제39회 전국시.도대항육상경기대회",
+    "period": {
+      "start": "2018-07-28",
+      "end": "2018-07-30"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010100392&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 119,
+    "athleteCount": 1266
+  },
+  {
+    "id": "2018-road-003",
+    "kaafSeq": null,
+    "toCd": "M00007002X",
+    "name": "문화체육관광부장관기 제26회 전국마스터즈(생활체육)시.도대항육상경기대회",
+    "period": {
+      "start": "2018-07-28",
+      "end": "2018-07-30"
+    },
+    "venue": "익산",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=M00007002X&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 92,
+    "athleteCount": 530
+  },
+  {
+    "id": "2018-junior-005",
+    "kaafSeq": null,
+    "toCd": "E010121184",
+    "name": "2018교보생명컵전국초등학교시.도대항육상경기대회",
+    "period": {
+      "start": "2018-08-04",
+      "end": "2018-08-04"
+    },
+    "venue": "양산",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010121184&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 24,
+    "athleteCount": 403
+  },
+  {
+    "id": "2018-junior-006",
+    "kaafSeq": null,
+    "toCd": "E01575001C",
+    "name": "제26회 한.중.일 주니어종합경기대회(육상경기 1일)",
+    "period": {
+      "start": "2018-08-25",
+      "end": "2018-08-25"
+    },
+    "venue": "여수",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01575001C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 24,
+    "athleteCount": 120
+  },
+  {
+    "id": "2018-junior-007",
+    "kaafSeq": null,
+    "toCd": "E01575002C",
+    "name": "제26회 한.중.일 주니어종합경기대회(육상경기 2일)",
+    "period": {
+      "start": "2018-08-26",
+      "end": "2018-08-26"
+    },
+    "venue": "여수",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E01575002C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 24,
+    "athleteCount": 128
+  },
+  {
+    "id": "2018-junior-008",
+    "kaafSeq": null,
+    "toCd": "E015730011",
+    "name": "2018 한국전력배 전국중.고등학교 중.장거리육상경기대회(2,3학년부)",
+    "period": {
+      "start": "2018-09-01",
+      "end": "2018-09-01"
+    },
+    "venue": "나주",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015730011&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 158
+  },
+  {
+    "id": "2018-junior-009",
+    "kaafSeq": null,
+    "toCd": "E015730021",
+    "name": "2018 한국전력배 전국중.고등학교 중.장거리육상경기대회(1학년부)",
+    "period": {
+      "start": "2018-09-01",
+      "end": "2018-09-01"
+    },
+    "venue": "나주",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015730021&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 8,
+    "athleteCount": 91
+  },
+  {
+    "id": "2018-road-010",
+    "kaafSeq": null,
+    "toCd": "E010380478",
+    "name": "제48회 대통령기전국통일구간마라톤대회",
+    "period": {
+      "start": "2018-09-09",
+      "end": "2018-09-09"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010380478&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2018-single_event-001",
+    "kaafSeq": null,
+    "toCd": "E013490141",
+    "name": "2018 목포국제육상투척경기대회",
+    "period": {
+      "start": "2018-09-15",
+      "end": "2018-09-16"
+    },
+    "venue": "목포",
+    "section": "단일종목",
+    "category": "single_event",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E013490141&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 22,
+    "athleteCount": 255
+  },
+  {
+    "id": "2018-track_field-007",
+    "kaafSeq": null,
+    "toCd": "E010030992",
+    "name": "제99회 전국체육대회(육상경기)",
+    "period": {
+      "start": "2018-10-14",
+      "end": "2018-10-17"
+    },
+    "venue": "익산",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010030992&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 147,
+    "athleteCount": 1940
+  },
+  {
+    "id": "2018-road-011",
+    "kaafSeq": null,
+    "toCd": "E015570036",
+    "name": "2018 동아일보 경주 주니어하프마라톤대회",
+    "period": {
+      "start": "2018-10-20",
+      "end": "2018-10-20"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015570036&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 3
+  },
+  {
+    "id": "2018-road-012",
+    "kaafSeq": null,
+    "toCd": "E014010125",
+    "name": "동아일보 2018 경주국제마라톤대회",
+    "period": {
+      "start": "2018-10-21",
+      "end": "2018-10-21"
+    },
+    "venue": "경주",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E014010125&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 88
+  },
+  {
+    "id": "2018-road-013",
+    "kaafSeq": null,
+    "toCd": "E010141185",
+    "name": "2018 조선일보마라톤대회 겸 제72회 전국마라톤선수권대회",
+    "period": {
+      "start": "2018-10-28",
+      "end": "2018-10-28"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E010141185&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 75
+  },
+  {
+    "id": "2018-road-014",
+    "kaafSeq": null,
+    "toCd": "E015480046",
+    "name": "2018 조선일보 주니어하프마라톤대회",
+    "period": {
+      "start": "2018-10-28",
+      "end": "2018-10-28"
+    },
+    "venue": "춘천",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015480046&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 6
+  },
+  {
+    "id": "2018-road-015",
+    "kaafSeq": null,
+    "toCd": "E012670185",
+    "name": "2018 JTBC서울마라톤대회",
+    "period": {
+      "start": "2018-11-04",
+      "end": "2018-11-04"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E012670185&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 99
+  },
+  {
+    "id": "2018-road-016",
+    "kaafSeq": null,
+    "toCd": "E015470046",
+    "name": "2018 JTBC서울 주니어하프마라톤대회",
+    "period": {
+      "start": "2018-11-04",
+      "end": "2018-11-04"
+    },
+    "venue": "서울",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=E015470046&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 8
+  },
+  {
+    "id": "2018-road-017",
+    "kaafSeq": null,
+    "toCd": "M00008002P",
+    "name": "2018 국무총리기 전국마스터즈(생활체육) 구간마라톤대회",
+    "period": {
+      "start": "2018-11-17",
+      "end": "2018-11-17"
+    },
+    "venue": "제주도",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2018&to_cd=M00008002P&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 13
+  }
+]

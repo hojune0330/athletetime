@@ -56,12 +56,14 @@ export const LOCAL_WEBSOCKET_URL = 'ws://localhost:3005';
 export const getSandboxBackendUrl = (): string | null => {
   const hostname = window.location.hostname;
   
-  if (!hostname.includes('e2b.dev')) {
+  // e2b.dev 또는 sandbox.novita.ai 환경 감지
+  const isSandbox = hostname.includes('e2b.dev') || hostname.includes('sandbox.novita.ai');
+  if (!isSandbox) {
     return null;
   }
   
-  // 현재 URL: https://5173-sandbox-id.e2b.dev
-  // 변환 URL: https://3005-sandbox-id.e2b.dev
+  // 현재 URL: https://5173-sandbox-id.e2b.dev 또는 https://5173-xxx.sandbox.novita.ai
+  // 변환 URL: https://3005-sandbox-id.e2b.dev 또는 https://3005-xxx.sandbox.novita.ai
   const currentHost = window.location.host;
   const apiHost = currentHost.replace(/^\d+/, '3005');
   return `https://${apiHost}`;

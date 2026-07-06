@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeftIcon, PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import axios from 'axios';
+import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import {
   useMarketplaceItem,
   useCreateMarketplaceItem,
@@ -48,13 +49,7 @@ export default function MarketplaceFormPage() {
   const createMutation = useCreateMarketplaceItem();
   const updateMutation = useUpdateMarketplaceItem();
 
-  // 로그인 체크
-  useEffect(() => {
-    if (!user) {
-      alert('로그인이 필요합니다.');
-      navigate('/login');
-    }
-  }, [user, navigate]);
+  // 로그인 보호는 라우트 가드(RequireAuth)에서 처리합니다.
 
   // 수정 모드: 기존 데이터 로드
   useEffect(() => {
@@ -140,18 +135,20 @@ export default function MarketplaceFormPage() {
       e.target.value = '';
       
       alert(`${uploadedUrls.length}개 이미지가 업로드되었습니다.`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ 이미지 업로드 오류:', error);
-      console.error('❌ 에러 상세:', error.response?.data);
+      if (axios.isAxiosError(error)) {
+        console.error('❌ 에러 상세:', error.response?.data);
+      }
       
       // 더 자세한 에러 메시지
       let errorMessage = '이미지 업로드에 실패했습니다.';
       
-      if (error.response?.status === 401) {
+      if (axios.isAxiosError<{ error?: string }>(error) && error.response?.status === 401) {
         errorMessage = '로그인이 필요합니다. 로그인 후 다시 시도해주세요.';
-      } else if (error.response?.status === 400) {
+      } else if (axios.isAxiosError<{ error?: string }>(error) && error.response?.status === 400) {
         errorMessage = error.response?.data?.error || '잘못된 요청입니다.';
-      } else if (error.message) {
+      } else if (error instanceof Error && error.message) {
         errorMessage = error.message;
       }
       
@@ -243,7 +240,7 @@ export default function MarketplaceFormPage() {
         alert('상품이 등록되었습니다.');
         navigate(`/marketplace/${result.item.id}`);
       }
-    } catch (error) {
+    } catch {
       alert(isEditMode ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
     }
   };
@@ -397,7 +394,7 @@ export default function MarketplaceFormPage() {
                         alt={`상품 이미지 ${index + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = '/placeholder-image.png';
+                          e.currentTarget.style.opacity = '0';
                         }}
                       />
 

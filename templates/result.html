@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080">
+  <title>{{competition}} - {{event}}</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="margin:0; padding:0; background:#fff;">
+
+<div class="card-container">
+
+  <div class="header">
+    <div class="event-label">{{competition}}</div>
+    <div class="event-name">{{event}}</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="results">
+    <div class="results-head">
+      <span class="col-rank">#</span>
+      <span class="col-name">선수</span>
+      <span class="col-affiliation">소속</span>
+      <span class="col-record">{{recordHeader}}</span>
+      <span class="col-pb">PB</span>
+    </div>
+    {{#all_results}}
+    <div class="row" data-rank="{{rank}}">
+      <span class="col-rank">{{rank}}</span>
+      <span class="col-name">{{name}}</span>
+      <span class="col-affiliation">{{affiliation}}</span>
+      <span class="col-record">{{record}}</span>
+      <span class="col-pb">{{personal_best}}</span>
+    </div>
+    {{/all_results}}
+  </div>
+
+  <div class="divider" style="margin-bottom:0;"></div>
+
+  <div class="meta">
+    <div class="meta-left">
+      <div class="meta-item">{{date}} &middot; {{venue}}</div>
+      {{#hasWind}}
+      <div class="meta-item">바람 <span>{{wind}} m/s</span></div>
+      {{/hasWind}}
+    </div>
+    <div class="meta-right">Athletic News</div>
+  </div>
+
+</div>
+
+</body>
+</html>

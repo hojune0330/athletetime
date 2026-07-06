@@ -1,0 +1,182 @@
+[
+  {
+    "id": "2020-track_field-001",
+    "kaafSeq": null,
+    "toCd": "E010020743",
+    "name": "제74회 전국육상경기선수권대회",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E010020743&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 62,
+    "athleteCount": 520
+  },
+  {
+    "id": "2020-junior-001",
+    "kaafSeq": null,
+    "toCd": "E01510009D",
+    "name": "제11회 한국U18육상경기대회",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E01510009D&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 53,
+    "athleteCount": 346
+  },
+  {
+    "id": "2020-junior-002",
+    "kaafSeq": null,
+    "toCd": "E01242018C",
+    "name": "제20회 한국U20육상경기선수권대회",
+    "period": {
+      "start": "2020-06-25",
+      "end": "2020-06-28"
+    },
+    "venue": "정선",
+    "section": "트랙 및 필드",
+    "category": "junior",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E01242018C&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 38,
+    "athleteCount": 287
+  },
+  {
+    "id": "2020-track_field-002",
+    "kaafSeq": null,
+    "toCd": "E010010521",
+    "name": "제49회 전국종별육상경기선수권대회",
+    "period": {
+      "start": "2020-07-09",
+      "end": "2020-07-13"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E010010521&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 208,
+    "athleteCount": 1646
+  },
+  {
+    "id": "2020-track_field-003",
+    "kaafSeq": null,
+    "toCd": "E010050491",
+    "name": "제48회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2020-07-24",
+      "end": "2020-07-28"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E010050491&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 107,
+    "athleteCount": 1081
+  },
+  {
+    "id": "2020-track_field-004",
+    "kaafSeq": null,
+    "toCd": "E015110093",
+    "name": "제48회 KBS배 전국육상경기대회",
+    "period": {
+      "start": "2020-07-24",
+      "end": "2020-07-28"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E015110093&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 62,
+    "athleteCount": 569
+  },
+  {
+    "id": "2020-road-002",
+    "kaafSeq": null,
+    "toCd": "E014900111",
+    "name": "2020 평창대관령전국고교10km대회",
+    "period": {
+      "start": "2020-08-22",
+      "end": "2020-08-22"
+    },
+    "venue": "횡계",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E014900111&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 2,
+    "athleteCount": 100
+  },
+  {
+    "id": "2020-track_field-005",
+    "kaafSeq": null,
+    "toCd": "E010100412",
+    "name": "문화체육관광부장관기 제41회 전국시.도대항육상경기대회",
+    "period": {
+      "start": "2020-10-19",
+      "end": "2020-10-23"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "track_field",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E010100412&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 119,
+    "athleteCount": 1250
+  },
+  {
+    "id": "2020-university-001",
+    "kaafSeq": null,
+    "toCd": "E016010011",
+    "name": "2020 예천 전국대학일반육상경기대회",
+    "period": {
+      "start": "2020-10-19",
+      "end": "2020-10-23"
+    },
+    "venue": "예천",
+    "section": "트랙 및 필드",
+    "category": "university",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E016010011&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 109,
+    "athleteCount": 723
+  },
+  {
+    "id": "2020-road-001",
+    "kaafSeq": null,
+    "toCd": "E010380498",
+    "name": "제50회 대통령기 전국통일구간마라톤대회",
+    "period": {
+      "start": "2020-11-15",
+      "end": "2020-11-15"
+    },
+    "venue": "서울-임진각",
+    "section": "도로",
+    "category": "road",
+    "kaafUrl": "",
+    "resultUrl": "http://result.kaaf.or.kr/tourInfo/resultInfo.do?reg_year=2020&to_cd=E010380498&gubun=E&domestic=0&resultType=TRM&kind_cd=&tabs_id=toKor",
+    "source": "kaaf_crawl_20260406",
+    "eventCount": 1,
+    "athleteCount": 7
+  }
+]

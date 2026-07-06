@@ -1,0 +1,64 @@
+{
+  "_설명": "KAAF 경기결과 페이지(result.kaaf.or.kr) 셀렉터 및 코드 매핑 정의",
+
+  "종목목록페이지": {
+    "_설명": "resultInfo.do 종목 목록 페이지 셀렉터",
+    "대회명": "h2",
+    "기간_장소_목록": "ul.head_base li p",
+    "종목테이블": "table.table.table-hover.team_table",
+    "종목행": "tbody tr",
+    "보기버튼": "a.btn_middle",
+    "컬럼순서": ["종목", "종별", "라운드", "상태", "실시간결과"],
+    "결승표시": {
+      "스타일": "font-weight:bold;color:#FF0000;",
+      "텍스트": "결승"
+    }
+  },
+
+  "결과페이지": {
+    "_설명": "info_command.do 결과 페이지 셀렉터",
+    "대회명": ".header h2",
+    "기간": ".head_date",
+    "장소": ".head_place",
+    "메타정보박스_제목": ".info_line .info_box_title",
+    "메타정보박스_값": ".info_line .info_box_content input.input_base",
+    "결과테이블": "table.table.table-hover.team_table",
+    "결과행": "tbody tr.border_bg",
+    "트랙컬럼순서": ["순위", "레인", "배번", "성명", "소속", "기록", "풍속", "비고", "신기록"],
+    "필드컬럼순서": ["순위", "순서", "배번", "성명", "소속", "기록", "비고", "신기록"],
+    "메타라벨": {
+      "종목명": ["종목명", "EVENT"],
+      "종별": ["종별", "DIVISION"],
+      "라운드": ["라운드", "ROUND"],
+      "일자": ["일자", "DATE"]
+    }
+  },
+
+  "종별코드": {
+    "_설명": "kind_cd → 성별 라벨 매핑 (go_result 3번째 인자)",
+    "10": "남자",
+    "20": "여자",
+    "30": "통합"
+  },
+
+  "라운드코드": {
+    "_설명": "round → 라운드 라벨 매핑 (go_result 5번째 인자)",
+    "1": "예선",
+    "2": "1차예선",
+    "3": "준결승",
+    "4": "결승"
+  },
+
+  "폼필드": {
+    "_설명": "go_result() form submit에 사용되는 필드명",
+    "폼이름": "printForm",
+    "뒤로가기폼이름": "MoveForm",
+    "command값": "RESULT_LIST",
+    "action경로": "/tourInfo/info_command.do",
+    "고정값": {
+      "domestic": "0",
+      "gubun": "E",
+      "tabs_id": "toKor"
+    }
+  }
+}

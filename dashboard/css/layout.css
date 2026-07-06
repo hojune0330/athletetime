@@ -1,0 +1,127 @@
+/* ============================================
+ * 레이아웃 (Layout)
+ * ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* 헤더 */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  background: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.header__title h1 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.header__icon {
+  font-size: 24px;
+}
+
+.header__status {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* 메인 */
+.main {
+  padding: var(--space-xl);
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* 상단 패널 영역 (2열) */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+/* 하단 영역 (로그 + 갤러리) */
+.bottom-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+}
+
+/* 패널 공통 */
+.panel {
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.panel__header h2 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.panel__body {
+  padding: var(--space-lg);
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .panels {
+    grid-template-columns: 1fr;
+  }
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: var(--space-md);
+  }
+  .header {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+  .header nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .header nav a {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+  }
+}

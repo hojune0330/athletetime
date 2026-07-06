@@ -140,7 +140,7 @@ export default function WritePage() {
       });
       
       showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
-      setTimeout(() => navigate(`/post/${post.id}`), 500);
+      setTimeout(() => navigate(`/community/post/${post.id}`), 500);
     } catch (err: any) {
       console.error('게시글 작성 실패:', err);
       setError(err.message || '게시글 작성에 실패했습니다.');

@@ -159,7 +159,7 @@ interface PollSectionProps {
   hasVoted: boolean;
 }
 
-function PollSection({ poll, postId, onVote, isVoting, hasVoted }: PollSectionProps) {
+function PollSection({ poll, onVote, isVoting, hasVoted }: PollSectionProps) {
   const visitorId = getAnonymousId();
   const userHasVoted = hasVoted || (poll.voters && poll.voters.includes(visitorId));
   

@@ -15,7 +15,7 @@ const TYPE_OPTIONS = ['국내경기', '국제경기'] as const;
 
 // 카테고리 옵션
 const CATEGORY_OPTIONS = [
-  '대한육상연맹사업',
+  '연맹사업',
   '트랙 및 필드',
   '로드레이스',
   '단일종목경기',
@@ -42,6 +42,10 @@ const initialFormData: FormData = {
   description: '',
 };
 
+function isCompetitionType(value: string): value is FormData['type'] {
+  return TYPE_OPTIONS.some((option) => option === value);
+}
+
 export default function CompetitionFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -55,7 +59,7 @@ export default function CompetitionFormPage() {
   
   // API 훅
   const { data: competition, isLoading: isLoadingCompetition } = useCompetition(
-    isEditMode ? parseInt(id) : 0
+    isEditMode ? id : ''
   );
   const createMutation = useCreateCompetition();
   const updateMutation = useUpdateCompetition();
@@ -65,7 +69,7 @@ export default function CompetitionFormPage() {
     if (isEditMode && competition) {
       setFormData({
         name: competition.name,
-        type: competition.type,
+        type: isCompetitionType(competition.type) ? competition.type : '국내경기',
         category: competition.category,
         start_date: competition.start_date.split('T')[0],
         end_date: competition.end_date.split('T')[0],
@@ -135,7 +139,7 @@ export default function CompetitionFormPage() {
     try {
       if (isEditMode) {
         await updateMutation.mutateAsync({
-          id: parseInt(id),
+          id: id!,
           data: formData,
         });
         alert('대회가 수정되었습니다.');

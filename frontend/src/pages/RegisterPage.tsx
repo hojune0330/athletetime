@@ -8,9 +8,13 @@
  */
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -204,19 +208,14 @@ export default function RegisterPage() {
       });
       
       if (response.success) {
-        // 토큰 저장 (자동 로그인)
-        if (response.accessToken && response.refreshToken) {
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
-        }
         alert('회원가입이 완료되었습니다!');
         // 페이지 새로고침으로 헤더 업데이트
         window.location.href = '/';
       } else {
         setErrors({ submit: response.error || '회원가입에 실패했습니다' });
       }
-    } catch (error: any) {
-      setErrors({ submit: error.message || '회원가입에 실패했습니다' });
+    } catch (error: unknown) {
+      setErrors({ submit: getErrorMessage(error, '회원가입에 실패했습니다') });
     } finally {
       setLoading(false);
     }
@@ -361,6 +360,7 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
+                  autoComplete="new-password"
                   className={`input ${errors.password ? 'border-danger-500' : ''}`}
                   placeholder="8자 이상, 영문+숫자"
                 />
@@ -379,6 +379,7 @@ export default function RegisterPage() {
                   name="passwordConfirm"
                   value={formData.passwordConfirm}
                   onChange={handleChange}
+                  autoComplete="new-password"
                   className={`input ${errors.passwordConfirm ? 'border-danger-500' : ''}`}
                   placeholder="비밀번호 재입력"
                 />

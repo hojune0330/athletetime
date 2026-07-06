@@ -20,11 +20,11 @@ export const VdotScoreCard: React.FC<VdotScoreCardProps> = ({
         분석 결과
       </h3>
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="text-center p-4 bg-indigo-50 rounded-lg">
-          <div className="text-4xl font-bold text-indigo-600">{vdot}</div>
-          <div className="text-sm text-indigo-600/80 mt-1">VDOT 점수</div>
+        <div className="text-center p-4 bg-primary-50 rounded-lg">
+          <div className="text-4xl font-bold text-primary-600">{vdot}</div>
+          <div className="text-sm text-primary-600/80 mt-1">VDOT 점수</div>
           {adjustmentNote && (
-            <div className="text-xs text-indigo-500 mt-1">{adjustmentNote}</div>
+            <div className="text-xs text-primary-500 mt-1">{adjustmentNote}</div>
           )}
         </div>
         <div className="text-center p-4 bg-purple-50 rounded-lg">

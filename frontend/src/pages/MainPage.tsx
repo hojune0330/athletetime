@@ -1,458 +1,516 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { 
+import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRightIcon,
+  CalendarDaysIcon,
+  ChartBarIcon,
   ChatBubbleLeftRightIcon,
   ClockIcon,
-  AcademicCapIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
-  ShoppingBagIcon,
-  TrophyIcon,
-  ChevronRightIcon,
-  PlayIcon
+  MagnifyingGlassIcon,
+  PlusIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../context/AuthContext';
+import { Button, buttonVariants } from '../components/ui/button';
+import { Card, CardContent } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { SectionHeader } from '../components/ui/trainoracle';
+import { cn } from '../lib/utils';
+import { getCompetitionsCurrent, type Competition } from '../api/competitions';
 
-/**
- * MainPage 컴포넌트
- * 
- * 전체 애플리케이션의 메인 랜딩 페이지
- * - Hero 섹션 (전체 화면 배경)
- * - 주요 기능 카드
- * - 갤러리 섹션
- * - CTA 버튼
- */
-
-interface Feature {
+type HomeShortcut = {
   id: string;
-  icon: React.ReactNode;
-  emoji: string;
-  title: string;
+  label: string;
   description: string;
-  link?: string;
-  onClick?: () => void;
-  gradient: string;
-  iconBg: string;
-  available: boolean;
-}
-
-const MainPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  // URL 쿼리 파라미터 또는 sessionStorage로 로그인 모달 트리거
-  useEffect(() => {
-    // URL 쿼리 파라미터 확인
-    if (searchParams.get('showLogin') === 'true') {
-      setShowLoginModal(true);
-      searchParams.delete('showLogin');
-      setSearchParams(searchParams, { replace: true });
-    }
-    // sessionStorage 확인 (RegisterPage에서 뒤로가기 시)
-    if (sessionStorage.getItem('showLoginModal') === 'true') {
-      setShowLoginModal(true);
-      sessionStorage.removeItem('showLoginModal');
-    }
-  }, [searchParams, setSearchParams]);
-
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    
-    if (!loginForm.email || !loginForm.password) {
-      setLoginError('이메일과 비밀번호를 입력해주세요.');
-      return;
-    }
-    
-    setIsLoggingIn(true);
-    
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginForm)
-      });
-      
-      const data = await response.json();
-      
-      if (data.success && data.accessToken && data.refreshToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        setShowLoginModal(false);
-        setLoginForm({ email: '', password: '' });
-        window.location.reload(); // 새로고침으로 상태 업데이트
-      } else {
-        setLoginError(data.error || '로그인에 실패했습니다.');
-      }
-    } catch (error: any) {
-      setLoginError(error.message || '로그인에 실패했습니다.');
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  const closeLoginModal = () => {
-    setShowLoginModal(false);
-    setLoginForm({ email: '', password: '' });
-    setLoginError('');
-  };
-
-  const showComingSoon = (featureName: string) => {
-    alert(`${featureName}\n\n이 기능은 현재 개발 중입니다.\n곧 만나보실 수 있습니다!`);
-  };
-
-  const features: Feature[] = [
-    {
-      id: 'community',
-      icon: <ChatBubbleLeftRightIcon className="w-7 h-7" />,
-      emoji: '💬',
-      title: '익명 커뮤니티',
-      description: '로그인 없이 바로 참여하는 익명 육상인 커뮤니티',
-      link: '/community',
-      gradient: 'from-rose-500 to-pink-500',
-      iconBg: 'bg-gradient-to-br from-rose-50 to-pink-50',
-      available: true
-    },
-    {
-      id: 'pace',
-      icon: <ClockIcon className="w-7 h-7" />,
-      emoji: '⏱️',
-      title: '페이스 계산기',
-      description: '정확한 페이스 계산과 기록 예측',
-      link: '/pace-calculator',
-      gradient: 'from-orange-500 to-red-500',
-      iconBg: 'bg-gradient-to-br from-orange-50 to-red-50',
-      available: true
-    },
-    {
-      id: 'training',
-      icon: <AcademicCapIcon className="w-7 h-7" />,
-      emoji: '💪',
-      title: '훈련 계획',
-      description: '과학적인 훈련 계획과 관리',
-      link: '/training-calculator',
-      gradient: 'from-indigo-500 to-purple-500',
-      iconBg: 'bg-gradient-to-br from-indigo-50 to-purple-50',
-      available: true
-    },
-    {
-      id: 'chat',
-      icon: <ChatBubbleOvalLeftEllipsisIcon className="w-7 h-7" />,
-      emoji: '💭',
-      title: '실시간 채팅',
-      description: '육상인들과의 실시간 소통',
-      link: '/chat',
-      gradient: 'from-teal-500 to-green-500',
-      iconBg: 'bg-gradient-to-br from-teal-50 to-green-50',
-      available: true
-    },
-    {
-      id: 'marketplace',
-      icon: <ShoppingBagIcon className="w-7 h-7" />,
-      emoji: '🛒',
-      title: '중고 거래',
-      description: '육상 용품 거래 마켓플레이스',
-      onClick: () => showComingSoon('중고 거래'),
-      gradient: 'from-blue-500 to-cyan-500',
-      iconBg: 'bg-gradient-to-br from-blue-50 to-cyan-50',
-      available: false
-    },
-    {
-      id: 'results',
-      icon: <TrophyIcon className="w-7 h-7" />,
-      emoji: '🏆',
-      title: '경기 결과',
-      description: '실시간 결과 업데이트와 기록 관리',
-      link: '/competitions',
-      gradient: 'from-emerald-500 to-teal-500',
-      iconBg: 'bg-gradient-to-br from-emerald-50 to-teal-50',
-      available: true
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Full Screen Background */}
-      <section className="relative h-[600px] md:h-[700px] overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          {/* Unsplash 육상 이미지 */}
-          <img 
-            src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=2070&auto=format&fit=crop" 
-            alt="Running Track" 
-            className="w-full h-full object-cover"
-          />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70"></div>
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative h-full flex items-center justify-center px-4">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Small Title */}
-            <div className="mb-6 animate-fadeIn">
-              <p className="text-white/90 text-lg md:text-xl font-medium tracking-wider uppercase mb-2">
-                Train With Us &
-              </p>
-            </div>
-            
-            {/* Main Title */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-8 leading-tight animate-fadeInUp">
-              FEEL THE
-              <br />
-              <span className="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-                ADRENALIN
-              </span>
-            </h1>
-            
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-white/90 mb-12 font-light animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
-              한국 육상인들을 위한 통합 플랫폼
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
-              <Link
-                to="/community"
-                className="px-8 py-4 bg-primary-500 text-white font-bold rounded-lg hover:bg-primary-600 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl min-w-[200px]"
-              >
-                커뮤니티 시작하기
-              </Link>
-              <Link
-                to="/pace-calculator"
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-white/20 border-2 border-white/30 transform hover:scale-105 transition-all duration-300 min-w-[200px]"
-              >
-                페이스 계산기
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex items-start justify-center p-2">
-            <div className="w-1.5 h-3 bg-white/50 rounded-full"></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-neutral-50">
-        <div className="container mx-auto px-4">
-          {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <p className="text-primary-600 text-sm font-bold tracking-wider uppercase mb-4">
-              Our Services
-            </p>
-            <h2 className="text-3xl md:text-5xl font-black text-neutral-900 mb-6">
-              육상인을 위한
-              <br />
-              <span className="text-primary-600">All-in-One Platform</span>
-            </h2>
-            <p className="text-lg text-neutral-600">
-              페이스 계산부터 훈련 관리, 커뮤니티까지 - 당신에게 필요한 모든 것
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {features.map((feature, index) => {
-              const CardContent = (
-                <>
-                  {/* Icon */}
-                  <div className={`w-16 h-16 ${feature.iconBg} rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <span className="text-3xl">{feature.emoji}</span>
-                  </div>
-                  
-                  {/* Title */}
-                  <h3 className="text-xl font-bold text-neutral-900 mb-3 flex items-center gap-2">
-                    {feature.title}
-                    {!feature.available && (
-                      <span className="text-xs font-medium px-2 py-1 bg-neutral-200 text-neutral-600 rounded-full">
-                        준비중
-                      </span>
-                    )}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-neutral-600 mb-6 leading-relaxed">
-                    {feature.description}
-                  </p>
-
-                  {/* CTA */}
-                  <div className={`inline-flex items-center gap-2 text-sm font-bold bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent group-hover:gap-3 transition-all duration-300`}>
-                    자세히 보기
-                    <ChevronRightIcon className="w-4 h-4 text-primary-600" />
-                  </div>
-                </>
-              );
-
-              if (feature.link) {
-                return (
-                  <Link
-                    key={feature.id}
-                    to={feature.link}
-                    className="group bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-neutral-100 animate-fadeInUp"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    {CardContent}
-                  </Link>
-                );
-              } else {
-                return (
-                  <button
-                    key={feature.id}
-                    onClick={feature.onClick}
-                    className="group bg-white p-8 rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-neutral-100 text-left animate-fadeInUp"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    {CardContent}
-                  </button>
-                );
-              }
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-neutral-900 border-t border-neutral-800 text-neutral-400">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-6xl mx-auto">
-            {/* Top */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-              {/* Brand */}
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">🏃‍♂️</span>
-                  <span className="text-xl font-bold text-white">ATHLETE TIME</span>
-                </div>
-                <p className="text-sm text-neutral-500 mb-4">
-                  한국 육상인들을 위한 올인원 플랫폼
-                </p>
-              </div>
-
-              {/* Links */}
-              <div>
-                <h4 className="font-bold text-white mb-3">서비스</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><Link to="/community" className="hover:text-primary-400 transition-colors">커뮤니티</Link></li>
-                  <li><Link to="/pace-calculator" className="hover:text-primary-400 transition-colors">페이스 계산기</Link></li>
-                  <li><Link to="/training-calculator" className="hover:text-primary-400 transition-colors">훈련 계획</Link></li>
-                  <li><Link to="/chat" className="hover:text-primary-400 transition-colors">실시간 채팅</Link></li>
-                </ul>
-              </div>
-
-              {/* Info */}
-              <div>
-                <h4 className="font-bold text-white mb-3">정보</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><button className="hover:text-primary-400 transition-colors">이용약관</button></li>
-                  <li><button className="hover:text-primary-400 transition-colors">개인정보처리방침</button></li>
-                  <li><button className="hover:text-primary-400 transition-colors">문의하기</button></li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Bottom */}
-            <div className="pt-8 border-t border-neutral-800 text-center text-sm">
-              <p>© 2025 Athlete Time. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* 로그인 모달 */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-xl">
-            <div className="p-6">
-              {/* 모달 헤더 */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-neutral-900">로그인</h2>
-                <button
-                  onClick={closeLoginModal}
-                  className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* 에러 메시지 */}
-              {loginError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-                  {loginError}
-                </div>
-              )}
-
-              {/* 로그인 폼 */}
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    이메일
-                  </label>
-                  <input
-                    type="email"
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="example@email.com"
-                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    disabled={isLoggingIn}
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    비밀번호
-                  </label>
-                  <input
-                    type="password"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="비밀번호를 입력하세요"
-                    className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    disabled={isLoggingIn}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoggingIn}
-                  className="w-full py-3 bg-primary-500 text-white font-medium rounded-xl hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                >
-                  {isLoggingIn ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>로그인 중...</span>
-                    </>
-                  ) : (
-                    '로그인'
-                  )}
-                </button>
-              </form>
-
-              {/* 하단 링크 */}
-              <div className="mt-4 text-center text-sm text-neutral-500">
-                계정이 없으신가요?{' '}
-                <Link
-                  to="/register"
-                  onClick={closeLoginModal}
-                  className="text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  회원가입
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  to: string;
 };
 
-export default MainPage;
+const SHORTCUT_STORAGE_KEY = 'athletetime.home.shortcuts';
+const DEFAULT_SHORTCUT_IDS = ['today', 'records', 'calendar'];
+
+const quickSearches = [
+  { label: '내 이름으로 기록 찾기', to: '/records' },
+  { label: '시즌 기록표', to: '/records' },
+  { label: '오늘 경기', to: '/competitions?tab=results' },
+  { label: '내일 일정', to: '/competitions' },
+  { label: '기록카드 만들기', to: '/profile-card' },
+];
+
+const utilityCards = [
+  {
+    title: '오늘',
+    description: '대회 기간에는 일정과 결과 흐름을 먼저 봅니다.',
+    to: '/competitions?tab=results',
+    icon: ClockIcon,
+  },
+  {
+    title: '일정',
+    description: '연간 대회 일정과 다가오는 경기를 한 곳에서 확인합니다.',
+    to: '/competitions',
+    icon: CalendarDaysIcon,
+  },
+  {
+    title: '기록 검색',
+    description: '자기 이름을 넣고 소속과 연도를 보며 내 기록을 찾아요.',
+    to: '/records',
+    icon: ChartBarIcon,
+  },
+  {
+    title: '기록 카드',
+    description: '내 기록을 공유하기 좋은 이미지 카드로 만들 수 있어요.',
+    to: '/profile-card',
+    icon: SparklesIcon,
+  },
+  {
+    title: '커뮤니티',
+    description: '대회와 기록 이야기를 자유롭게 나누는 공간이에요.',
+    to: '/community',
+    icon: ChatBubbleLeftRightIcon,
+  },
+];
+
+const visitModes = [
+  {
+    title: '대회 기간',
+    summary: '시간표, 결과, 현장 흐름',
+    points: ['경기 전에는 순서와 시간', '경기 중에는 공개된 결과', '경기 후에는 기록 변화'],
+  },
+  {
+    title: '대회 전후',
+    summary: '연간 일정과 출전 준비',
+    points: ['다가오는 대회', '종목별 일정', '선수와 팀 검색'],
+  },
+  {
+    title: '평소',
+    summary: '기록 탐색과 이야기',
+    points: ['선수 기록 비교', '흥미로운 기록 질문', '커뮤니티 토론'],
+  },
+];
+
+const todayBoard: Array<[string, string]> = [
+  ['대회 시간표', '대회 전후에는 일정부터 확인'],
+  ['경기 결과', '공개된 결과 기준으로 조회'],
+  ['내 기록 검색', '이름을 넣고 소속·연도·종목으로 확인'],
+];
+
+const recordFlowSteps: Array<[string, string]> = [
+  ['자기 이름을 입력합니다', '지금 확인하고 싶은 이름으로 바로 시작합니다.'],
+  ['후보를 직접 고릅니다', '동명이인이 있으면 소속·연도·종목을 보고 나에게 맞는 기록을 고릅니다.'],
+  ['기록의 흐름을 봅니다', 'PB, 이번 시즌 최고, 최근 기록, 시즌 기록표로 바로 이어집니다.'],
+];
+
+const shortcutOptions: HomeShortcut[] = [
+  { id: 'today', label: '오늘 경기', description: '결과와 대회 흐름', to: '/competitions?tab=results' },
+  { id: 'records', label: '선수 기록', description: '이름과 소속 검색', to: '/records' },
+  { id: 'calendar', label: '연간 일정', description: '다가오는 대회', to: '/competitions' },
+  { id: 'community', label: '커뮤니티', description: '기록 이야기', to: '/community' },
+  { id: 'card', label: '기록 카드', description: '내 기록 공유', to: '/profile-card' },
+];
+
+const operatingRules = [
+  '공개된 경기 기록과 출처가 있는 정보만 보여드려요.',
+  '건강, 멘탈, 성격, 부상 같은 민감한 내용은 다루지 않아요.',
+  '잘못된 기록은 알려주시면 확인하고 바로잡아요.',
+];
+
+function readShortcutIds() {
+  if (typeof window === 'undefined') return DEFAULT_SHORTCUT_IDS;
+  try {
+    const saved = window.localStorage.getItem(SHORTCUT_STORAGE_KEY);
+    const parsed = saved ? JSON.parse(saved) : DEFAULT_SHORTCUT_IDS;
+    if (Array.isArray(parsed)) {
+      return parsed.filter((id): id is string => typeof id === 'string');
+    }
+  } catch {
+    return DEFAULT_SHORTCUT_IDS;
+  }
+  return DEFAULT_SHORTCUT_IDS;
+}
+
+/**
+ * 진행 중 대회의 D-day 배지를 사람 언어로 보여준다.
+ * 서버 표준은 '3일차'이며, 과거 'DAY 3' 응답이 캐시에 남아도 홈에서는 자연스럽게 보정한다.
+ * 다가오는 대회 'D-8', 종료된 대회 '종료'는 한국에서 통용되는 표기라 그대로 둔다.
+ */
+function formatDdayBadge(text: string): string {
+  const liveMatch = /^DAY\s+(\d+)$/i.exec(text.trim());
+  return liveMatch ? `${liveMatch[1]}일차` : text;
+}
+
+export default function MainPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [query, setQuery] = useState('');
+  const [shortcutIds, setShortcutIds] = useState<string[]>(readShortcutIds);
+
+  // 지금 열리는/다가오는 대회 — 서버가 dday·status를 계산해 내려준다.
+  // 실패하거나 데이터가 없으면 아래 정적 안내(todayBoard)로 자연스럽게 대체된다.
+  const [liveComps, setLiveComps] = useState<Competition[]>([]);
+  const [nextComp, setNextComp] = useState<Competition | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    getCompetitionsCurrent()
+      .then((data) => {
+        if (!active) return;
+        setLiveComps(data.live || []);
+        setNextComp(data.next || null);
+      })
+      .catch(() => {
+        // 네트워크/서버 문제 시 조용히 정적 안내(todayBoard)로 폴백한다.
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // 카드에 보여줄 대회 목록(진행 중 우선, 없으면 다음 대회). 최대 3개.
+  const featuredComps = (liveComps.length > 0
+    ? liveComps
+    : nextComp
+      ? [nextComp]
+      : []
+  ).slice(0, 3);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(SHORTCUT_STORAGE_KEY, JSON.stringify(shortcutIds));
+    } catch {
+      // Shortcut preferences are intentionally local-only and optional.
+    }
+  }, [shortcutIds]);
+
+  const pinnedShortcuts = shortcutOptions.filter((shortcut) => shortcutIds.includes(shortcut.id));
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    if (trimmed) {
+      navigate(`/records?q=${encodeURIComponent(trimmed)}`);
+      return;
+    }
+    navigate('/records');
+  };
+
+  const toggleShortcut = (shortcutId: string) => {
+    setShortcutIds((current) =>
+      current.includes(shortcutId)
+        ? current.filter((id) => id !== shortcutId)
+        : [...current, shortcutId],
+    );
+  };
+
+  return (
+    <main className="min-h-screen bg-bg text-ink">
+      <section className="mx-auto max-w-frame px-4 pb-12 pt-12 sm:px-6 lg:px-8 lg:pb-16 lg:pt-16">
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 text-body-sm font-medium text-ink-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-ok" />
+              공개 육상 기록을 이름으로 찾는 곳
+            </div>
+
+            <h1 className="mt-5 text-h1 font-medium text-ink">
+              내 이름으로 기록 찾기
+              <span className="block text-brand">소속·연도까지 확인합니다.</span>
+            </h1>
+
+            <p className="mt-5 max-w-xl text-body-lg leading-relaxed text-ink-3">
+              자기 이름을 넣으면 공개된 대회 기록을 찾아 보여드려요.
+              최고 기록(PB), 이번 시즌 기록, 최근 기록까지 한 번에 볼 수 있어요.
+            </p>
+
+            <form onSubmit={handleSearch} className="mt-8">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <label className="relative flex-1">
+                  <span className="sr-only">통합 검색</span>
+                  <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-4" />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="내 이름이나 소속(학교·팀)을 입력하세요"
+                    className="h-12 rounded-md pl-11 pr-4 text-body-lg"
+                  />
+                </label>
+                <Button type="submit" size="lg" className="h-12 px-7">
+                  검색
+                </Button>
+              </div>
+            </form>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {quickSearches.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="inline-flex items-center rounded-sm border border-line bg-surface px-3 py-1.5 text-body-sm font-medium text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2 hover:text-ink"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* 첫 방문 신뢰 앵커 — 무엇을 보게 되는지를 검색 전에 한 줄로 고지한다. */}
+            <p className="mt-5 text-body-sm leading-relaxed text-ink-4">
+              공개된 경기결과를 모아 정리한 자료로, 공식 기록 서비스는 아니에요.{' '}
+              <Link to="/about-data" className="font-medium text-brand underline-offset-2 hover:underline">
+                어떻게 모았는지 보기
+              </Link>
+              {' · '}
+              <Link to="/data-request" className="font-medium text-brand underline-offset-2 hover:underline">
+                기록 정정·숨김 요청
+              </Link>
+            </p>
+          </div>
+
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between border-b border-hair px-5 py-4">
+              <div>
+                <h2 className="text-h3 font-semibold tracking-tight text-ink">
+                  {featuredComps.length > 0
+                    ? liveComps.length > 0
+                      ? '지금 열리는 대회'
+                      : '다가오는 대회'
+                    : '오늘 볼 것'}
+                </h2>
+              </div>
+              {featuredComps.length > 0 && (
+                <Link
+                  to="/competitions"
+                  className="text-body-sm font-medium text-ink-2 underline underline-offset-[3px] hover:text-ink"
+                >
+                  전체 일정
+                </Link>
+              )}
+            </div>
+
+            {featuredComps.length > 0 ? (
+              <div className="divide-y divide-hair">
+                {featuredComps.map((comp) => (
+                  <Link
+                    key={`${comp.id}-${comp.kaafSeq ?? comp.start_date}`}
+                    to={comp.status === 'finished' ? `/competitions?tab=results` : '/competitions'}
+                    className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-2"
+                  >
+                    {comp.dday && (
+                      <span
+                        className={cn(
+                          'inline-flex shrink-0 items-center rounded-md px-2.5 py-1 text-body-sm font-semibold',
+                          comp.dday.isLive ? 'bg-ok/15 text-ok' : 'bg-brand/10 text-brand',
+                        )}
+                      >
+                        {formatDdayBadge(comp.dday.text)}
+                      </span>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-ink">{comp.shortName || comp.name}</p>
+                      <p className="mt-0.5 truncate text-body-sm text-ink-3">
+                        {comp.periodLabel || ''}
+                        {comp.location ? ` · ${comp.location}` : ''}
+                      </p>
+                    </div>
+                    <ArrowRightIcon className="h-4 w-4 shrink-0 text-ink-4" />
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y divide-hair">
+                {todayBoard.map(([title, description]) => (
+                  <div key={title} className="flex items-start gap-3 px-5 py-4">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    <div className="min-w-0">
+                      <p className="font-medium text-ink">{title}</p>
+                      <p className="mt-0.5 text-body-sm text-ink-3">{description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t border-hair p-4">
+              <Link to="/records" className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-between')}>
+                내 기록 찾기
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-frame px-4 pb-12 sm:px-6 lg:px-8">
+        <div className="grid border-l border-t border-line md:grid-cols-2 lg:grid-cols-5">
+          {utilityCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                to={card.to}
+                className="group block border-b border-r border-line bg-surface p-6 transition-colors hover:bg-surface-2"
+              >
+                <div className="flex items-center justify-end">
+                  <Icon className="h-5 w-5 text-ink-3 transition-colors group-hover:text-brand" />
+                </div>
+                <h2 className="mt-6 text-h3 font-semibold tracking-tight text-ink">{card.title}</h2>
+                <p className="mt-2 text-body-sm leading-relaxed text-ink-3">{card.description}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-body-sm font-medium text-ink-3 transition-colors group-hover:text-brand">
+                  열기 <ArrowRightIcon className="h-3 w-3" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-frame gap-5 px-4 pb-12 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
+        <Card>
+          <CardContent className="p-6">
+            <SectionHeader title="내 바로가기" />
+            <h2 className="text-h3 font-semibold tracking-tight text-ink">자주 쓰는 화면만 남기기</h2>
+
+            {user ? (
+              <>
+                <p className="mt-3 text-body-sm leading-relaxed text-ink-3">
+                  {user.nickname}님이 자주 보는 화면을 지금 쓰는 브라우저에 저장해요.
+                </p>
+                <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                  {pinnedShortcuts.length > 0 ? (
+                    pinnedShortcuts.map((shortcut) => (
+                      <Link
+                        key={shortcut.id}
+                        to={shortcut.to}
+                        className="border border-line bg-surface p-4 transition-colors hover:border-line-2 hover:bg-surface-2"
+                      >
+                        <p className="font-medium text-ink">{shortcut.label}</p>
+                        <p className="mt-1 text-body-sm text-ink-3">{shortcut.description}</p>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="border border-dashed border-line p-4 text-body-sm text-ink-3 sm:col-span-2">
+                      고정된 바로가기가 없습니다. 아래에서 하나를 선택해 보세요.
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {shortcutOptions.map((shortcut) => {
+                    const selected = shortcutIds.includes(shortcut.id);
+                    return (
+                      <Button
+                        key={shortcut.id}
+                        type="button"
+                        variant={selected ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => toggleShortcut(shortcut.id)}
+                      >
+                        {selected ? <XMarkIcon className="h-3.5 w-3.5" /> : <PlusIcon className="h-3.5 w-3.5" />}
+                        {shortcut.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="mt-5 border border-line bg-surface-2 p-5">
+                <p className="text-body font-medium text-ink">
+                  로그인 후 관심 선수와 대회를 첫 화면에 고정할 수 있습니다.
+                </p>
+                <p className="mt-2 text-body-sm leading-relaxed text-ink-3">
+                  바로가기는 지금 쓰는 브라우저에 저장돼요.
+                </p>
+                <Link to="/?showLogin=true" className={cn(buttonVariants(), 'mt-4')}>
+                  로그인하고 고정하기
+                  <ArrowRightIcon className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <SectionHeader title="기록 발견" />
+            <h2 className="text-h3 font-semibold tracking-tight text-ink">내 기록을 확인하는 순서</h2>
+            <p className="mt-3 text-body-sm leading-relaxed text-ink-3">
+              내가 궁금한 이름을 직접 넣고, 소속과 연도를 보며 맞는 후보를 고르는 흐름입니다.
+            </p>
+            <div className="mt-5 divide-y divide-hair border-y border-hair">
+              {recordFlowSteps.map(([title, description], index) => (
+                <Link
+                  key={title}
+                  to="/records"
+                  className="flex items-center justify-between gap-3 px-1 py-3.5 transition-colors hover:text-brand"
+                >
+                  <span>
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand/10 text-body-sm font-semibold text-brand">{index + 1}</span>
+                    <span className="ml-3 text-body-sm font-medium text-ink-2">{title}</span>
+                    <span className="mt-1 block pl-9 text-body-sm text-ink-4">{description}</span>
+                  </span>
+                  <ArrowRightIcon className="h-4 w-4 shrink-0 text-ink-4" />
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mx-auto max-w-frame px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid border-l border-t border-line lg:grid-cols-3">
+          {visitModes.map((mode) => (
+            <div key={mode.title} className="border-b border-r border-line bg-surface p-6">
+              <p className="text-body-sm font-semibold text-brand">{mode.title}</p>
+              <h2 className="mt-2 text-h3 font-semibold tracking-tight text-ink">{mode.summary}</h2>
+              <ul className="mt-5 space-y-3">
+                {mode.points.map((point) => (
+                  <li key={point} className="flex items-center gap-3 text-body-sm text-ink-2">
+                    <span className="h-1 w-1 rounded-full bg-brand" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1fr]">
+          <Card className="border-ink">
+            <CardContent className="p-6">
+              <SectionHeader title="커뮤니티" />
+              <h2 className="text-h3 font-semibold tracking-tight text-ink">기록 이야기를 나눠보세요.</h2>
+              <p className="mt-2 text-body-sm text-ink-3">
+                대회 후기, 훈련 이야기, 궁금한 점을 자유롭게 올릴 수 있어요.
+              </p>
+              <Link to="/community" className={cn(buttonVariants(), 'mt-5')}>
+                커뮤니티 보기
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-line bg-surface-2 text-ink">
+                  <ShieldCheckIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <SectionHeader title="운영 원칙" />
+                  <h2 className="text-h3 font-semibold tracking-tight text-ink">이렇게 운영해요.</h2>
+                  <ul className="mt-4 space-y-3">
+                    {operatingRules.map((rule) => (
+                      <li key={rule} className="flex gap-3 text-body-sm leading-relaxed text-ink-2">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
+                        {rule}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </main>
+  );
+}

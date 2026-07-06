@@ -22,8 +22,6 @@ interface TargetTableProps {
 }
 
 const TargetTable: React.FC<TargetTableProps> = ({ title, distance, targets, showColumns }) => {
-  const distanceKm = distance / 1000;
-  
   return (
     <div className="mb-4">
       <h4 className="font-bold text-sm mb-2 text-gray-700">{title}</h4>
@@ -86,7 +84,7 @@ export const TargetPaceTable: React.FC<{ id?: string }> = ({ id = 'chart2' }) =>
       
       {/* 제목 */}
       <h3 className="text-xl font-bold mb-3 text-center">
-        <i className="fas fa-trophy text-orange-500 mr-2"></i>
+        <i className="fas fa-trophy text-accent-500 mr-2"></i>
         목표 기록별 필요 페이스 분석
       </h3>
       
@@ -102,8 +100,8 @@ export const TargetPaceTable: React.FC<{ id?: string }> = ({ id = 'chart2' }) =>
       
       {/* 설명 박스 */}
       <div className="info-box info-box-orange mb-4">
-        <h4 className="font-bold text-orange-900 text-sm mb-1">🎯 이 차트는 언제 사용하나요?</h4>
-        <p className="text-xs text-orange-800 leading-relaxed">
+        <h4 className="font-bold text-accent-700 text-sm mb-1">🎯 이 차트는 언제 사용하나요?</h4>
+        <p className="text-xs text-accent-700 leading-relaxed">
           <strong>"5km를 20분에 완주하려면..."</strong> 이라고 생각할 때 사용합니다.<br />
           • 대회 목표 기록을 설정하고 필요한 페이스를 확인할 때<br />
           • 인기 목표 시간별로 km 페이스, 400m 랩타임, 속도를 한눈에 확인 가능

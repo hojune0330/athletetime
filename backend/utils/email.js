@@ -10,6 +10,19 @@ const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@athletetime.com';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '애슬리트 타임';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://athlete-time.netlify.app';
 
+function redactEmail(email) {
+  if (typeof email !== 'string' || !email.includes('@')) {
+    return '[redacted-email]';
+  }
+
+  const [name, domain] = email.split('@');
+  return `${name.slice(0, 2)}***@${domain}`;
+}
+
+function getSafeErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 // API 키 경고
 if (!resend) {
   console.warn('⚠️  RESEND_API_KEY가 설정되지 않았습니다. 이메일 기능이 비활성화됩니다.');
@@ -357,12 +370,12 @@ function getResetPasswordCodeEmailHtml(code, nickname) {
  */
 async function sendVerificationEmail(email, code, nickname) {
   if (!resend) {
-    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다. 인증 코드:', code);
+    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다.');
     return { success: false, error: 'Email service not configured' };
   }
   
   try {
-    console.log('📧 이메일 발송 시도:', { to: email, from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
+    console.log('📧 이메일 발송 시도:', { to: redactEmail(email), from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
     
     const result = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
@@ -374,9 +387,7 @@ async function sendVerificationEmail(email, code, nickname) {
     console.log('✅ 인증 이메일 발송 성공:', JSON.stringify(result, null, 2));
     return { success: true, messageId: result.id };
   } catch (error) {
-    console.error('❌ 인증 이메일 발송 실패:', JSON.stringify(error, null, 2));
-    console.error('❌ 에러 메시지:', error.message);
-    console.error('❌ 에러 상세:', error.response?.data || error);
+    console.error('❌ 인증 이메일 발송 실패:', getSafeErrorMessage(error));
     throw new Error('이메일 발송에 실패했습니다');
   }
 }
@@ -413,12 +424,12 @@ async function sendResetPasswordEmail(email, resetToken, nickname) {
  */
 async function sendResetPasswordCodeEmail(email, code, nickname) {
   if (!resend) {
-    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다. 인증 코드:', code);
+    console.warn('⚠️  Resend API가 설정되지 않아 이메일을 발송하지 않습니다.');
     return { success: false, error: 'Email service not configured' };
   }
   
   try {
-    console.log('📧 비밀번호 재설정 인증 코드 이메일 발송 시도:', { to: email, from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
+    console.log('📧 비밀번호 재설정 인증 코드 이메일 발송 시도:', { to: redactEmail(email), from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
     
     const result = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
@@ -430,8 +441,7 @@ async function sendResetPasswordCodeEmail(email, code, nickname) {
     console.log('✅ 비밀번호 재설정 인증 코드 이메일 발송 성공:', JSON.stringify(result, null, 2));
     return { success: true, messageId: result.id };
   } catch (error) {
-    console.error('❌ 비밀번호 재설정 인증 코드 이메일 발송 실패:', JSON.stringify(error, null, 2));
-    console.error('❌ 에러 메시지:', error.message);
+    console.error('❌ 비밀번호 재설정 인증 코드 이메일 발송 실패:', getSafeErrorMessage(error));
     throw new Error('이메일 발송에 실패했습니다');
   }
 }

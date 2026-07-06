@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AthleTime — 운영 대시보드</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <script>
+    /* ── Admin Gate: redirect non-admin users ── */
+    (function() {
+      var token = localStorage.getItem('accessToken');
+      if (!token) { window.location.href = '/'; return; }
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/auth/me', false);
+      xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      try {
+        xhr.send();
+        var d = JSON.parse(xhr.responseText);
+        if (!(d.success && d.user && d.user.isAdmin)) {
+          window.location.href = '/';
+        }
+      } catch(e) { window.location.href = '/'; }
+    })();
+  </script>
+</head>
+<body>
+  <!-- 헤더 -->
+  <header class="header">
+    <div class="header__title">
+      <div style="width:28px;height:28px;background:#C3FF00;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#0A0A0A;flex-shrink:0;">AT</div>
+      <h1>AthleTime</h1>
+      <span id="ws-status" class="badge badge--offline" style="margin-left:8px;">오프라인</span>
+    </div>
+    <nav style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+      <a href="/profile-card-wizard.html" style="font-size:13px;font-weight:500;color:#8b8fa3;padding:8px 12px;border-radius:8px;text-decoration:none;">프로필 카드</a>
+      <a href="/profile-card-modular.html" style="font-size:13px;font-weight:500;color:#8b8fa3;padding:8px 12px;border-radius:8px;text-decoration:none;">모듈러 빌더</a>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,0.08);margin:0 4px;"></span>
+      <a href="/" style="font-size:13px;font-weight:700;color:#C3FF00;background:rgba(195,255,0,0.1);padding:8px 12px;border-radius:8px;text-decoration:none;">운영 대시보드</a>
+      <a href="/admin.html" style="font-size:13px;font-weight:500;color:#8b8fa3;padding:8px 12px;border-radius:8px;text-decoration:none;">창작 콘텐츠</a>
+      <span style="font-size:9px;color:#EF4444;background:rgba(239,68,68,0.12);padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.5px;">ADMIN</span>
+    </nav>
+  </header>
+
+  <!-- 메인 콘텐츠 -->
+  <main class="main">
+    <!-- 탭 네비게이션 -->
+    <nav class="tab-nav">
+      <button class="tab-nav__btn tab-nav__btn--active" data-tab="dashboard" onclick="app.switchTab('dashboard')">대시보드</button>
+      <button class="tab-nav__btn" data-tab="search" onclick="app.switchTab('search')">검색</button>
+    </nav>
+
+    <!-- 탭: 대시보드 -->
+    <div class="tab-content tab-content--active" id="tab-dashboard">
+    <!-- 상단 패널 영역 -->
+    <div class="panels">
+      <!-- 상태 패널 -->
+      <section class="panel" id="status-panel">
+        <div class="panel__header">
+          <h2>📊 시스템 상태</h2>
+          <button class="btn btn--small" onclick="app.refreshStatus()">새로고침</button>
+        </div>
+        <div class="panel__body">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card__label">서버 상태</div>
+              <div class="stat-card__value" id="stat-server">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">파이프라인</div>
+              <div class="stat-card__value" id="stat-pipeline">대기</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">감시 상태</div>
+              <div class="stat-card__value" id="stat-watcher">중지</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">생성 이미지</div>
+              <div class="stat-card__value" id="stat-images">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">메모리 사용</div>
+              <div class="stat-card__value" id="stat-memory">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card__label">WS 클라이언트</div>
+              <div class="stat-card__value" id="stat-ws">0</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 제어 패널 -->
+      <section class="panel" id="control-panel">
+        <div class="panel__header">
+          <h2>🎮 제어 패널</h2>
+        </div>
+        <div class="panel__body">
+          <!-- 파이프라인 제어 -->
+          <div class="control-group">
+            <h3>파이프라인 실행</h3>
+            <div class="control-row">
+              <select id="pipeline-mode" class="input">
+                <option value="input">JSON 입력</option>
+                <option value="url">URL 스크래핑</option>
+                <option value="processAll">Raw 일괄 처리</option>
+              </select>
+              <button class="btn btn--primary" id="btn-pipeline-run" onclick="app.runPipeline()">▶ 실행</button>
+            </div>
+            <div class="control-row" id="input-path-row">
+              <input type="text" id="pipeline-input" class="input input--wide" placeholder="data/normalized/result.json 또는 data/normalized/">
+            </div>
+            <div class="control-row" id="url-input-row" style="display:none;">
+              <input type="text" id="pipeline-url" class="input input--wide" placeholder="http://result.kaaf.or.kr/tourInfo/resultInfo.do?...">
+              <input type="number" id="pipeline-max" class="input input--small" placeholder="최대 종목" value="10">
+            </div>
+          </div>
+
+          <!-- 감시 제어 -->
+          <div class="control-group">
+            <h3>실시간 감시</h3>
+            <div class="control-row">
+              <input type="text" id="watcher-url" class="input input--wide" placeholder="감시 URL (KAAF)">
+              <input type="number" id="watcher-interval" class="input input--small" placeholder="주기(초)" value="300">
+            </div>
+            <div class="control-row">
+              <button class="btn btn--success" onclick="app.startWatcher()">▶ 감시 시작</button>
+              <button class="btn btn--danger" onclick="app.stopWatcher()">■ 중지</button>
+              <button class="btn btn--small" onclick="app.scanOnce()">🔄 1회 스캔</button>
+              <button class="btn btn--small btn--danger" onclick="app.resetWatcher()">초기화</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 하단 영역 (갤러리 + 로그) -->
+    <div class="bottom-section">
+      <!-- 활동 로그 -->
+      <section class="panel" id="activity-panel">
+        <div class="panel__header">
+          <h2>📋 활동 로그</h2>
+          <button class="btn btn--small" onclick="app.clearLogs()">로그 지우기</button>
+        </div>
+        <div class="panel__body">
+          <div id="activity-log" class="log-container">
+            <div class="log-entry log-entry--info">대시보드에 연결 중...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 갤러리 -->
+      <section class="panel" id="gallery-panel">
+        <div class="panel__header">
+          <h2>🖼️ 카드뉴스 갤러리</h2>
+          <div>
+            <select id="gallery-sort" class="input input--small" onchange="app.loadGallery()">
+              <option value="newest">최신순</option>
+              <option value="oldest">오래된순</option>
+              <option value="name">이름순</option>
+            </select>
+            <button class="btn btn--small" onclick="app.loadGallery()">새로고침</button>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div id="gallery-grid" class="gallery-grid">
+            <div class="gallery-empty" style="display:flex;align-items:center;justify-content:center;gap:8px;"><span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.1);border-top-color:#4a8cff;border-radius:50%;animation:spin 0.8s linear infinite;"></span> 이미지를 로딩 중...</div>
+          <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+          </div>
+          <div id="gallery-pagination" class="pagination"></div>
+        </div>
+      </section>
+    </div>
+    </div>
+
+    <!-- 탭: 검색 -->
+    <div class="tab-content" id="tab-search">
+      <section class="panel">
+        <div class="panel__header">
+          <h2>🔍 선수 / 소속 검색</h2>
+        </div>
+        <div class="panel__body">
+          <!-- 검색 입력 영역 -->
+          <div class="search-bar">
+            <input type="text" id="search-input" class="input input--wide" placeholder="선수명 또는 소속을 입력하세요 (2글자 이상)">
+            <select id="search-type" class="input">
+              <option value="all">전체</option>
+              <option value="name">선수명</option>
+              <option value="affiliation">소속</option>
+            </select>
+            <select id="search-comp" class="input">
+              <option value="">전체 대회</option>
+            </select>
+            <button id="search-btn" class="btn btn--primary">검색</button>
+          </div>
+
+          <!-- 검색 결과 -->
+          <div id="search-results">
+            <div class="search-empty">선수 이름이나 소속팀을 검색하세요.<br><span style="font-size:12px;color:#5d6177;margin-top:4px;display:inline-block;">예: 이은빈, 수원시청, 100m</span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- 이미지 오버레이 -->
+  <div id="image-overlay" class="overlay" style="display:none;" onclick="app.closeOverlay(event)">
+    <div class="overlay__content">
+      <button class="overlay__close" onclick="app.closeOverlay()">&times;</button>
+      <img id="overlay-image" class="overlay__image" src="" alt="카드뉴스">
+      <div id="overlay-info" class="overlay__info"></div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="js/api.js"></script>
+  <script src="js/statusPanel.js"></script>
+  <script src="js/controlPanel.js"></script>
+  <script src="js/gallery.js"></script>
+  <script src="js/activityLog.js"></script>
+  <script src="js/imageOverlay.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

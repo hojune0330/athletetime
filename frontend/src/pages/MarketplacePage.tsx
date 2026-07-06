@@ -41,7 +41,7 @@ interface ProductCardProps {
 function ProductCard({ item }: ProductCardProps) {
   const thumbnailUrl = item.images && item.images.length > 0
     ? item.images[item.thumbnail_index] || item.images[0]
-    : '/placeholder-image.png';
+    : null;
 
   const statusColor = {
     '판매중': 'bg-success-500',
@@ -58,14 +58,19 @@ function ProductCard({ item }: ProductCardProps) {
     >
       {/* 썸네일 */}
       <div className="relative aspect-square bg-neutral-100">
-        <img
-          src={thumbnailUrl}
-          alt={item.title}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.src = '/placeholder-image.png';
-          }}
-        />
+        {thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt={item.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-neutral-900 text-center text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+            AthleteTime
+            <br />
+            Gear
+          </div>
+        )}
         {/* 상태 배지 */}
         <div className={`absolute top-2 left-2 ${statusColor} text-white text-xs font-medium px-2 py-1 rounded`}>
           {item.status}
@@ -102,7 +107,6 @@ function ProductCard({ item }: ProductCardProps) {
 
 // 메인 컴포넌트
 export default function MarketplacePage() {
-  const navigate = useNavigate();
   const { user } = useAuth();
   
   // 상태
@@ -139,6 +143,8 @@ export default function MarketplacePage() {
     setSort(newSort);
     setPage(1);
   };
+
+  const hasActiveFilter = Boolean(search.trim() || status);
 
   return (
     <div>
@@ -236,19 +242,7 @@ export default function MarketplacePage() {
       {!isLoading && !isError && (
         <>
           {data?.items.length === 0 ? (
-            <div className="empty-state py-16">
-              <div className="empty-state-icon">🛒</div>
-              <h3 className="empty-state-title">등록된 상품이 없습니다</h3>
-              <p className="empty-state-description">
-                첫 번째 상품을 등록해보세요!
-              </p>
-              {user && (
-                <Link to="/marketplace/new" className="btn-primary mt-4">
-                  <PlusIcon className="w-5 h-5" />
-                  상품 등록하기
-                </Link>
-              )}
-            </div>
+            <MarketplaceEmptyState userSignedIn={Boolean(user)} hasActiveFilter={hasActiveFilter} />
           ) : (
             <>
               {/* 상품 그리드 */}
@@ -283,6 +277,42 @@ export default function MarketplacePage() {
             </>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+function MarketplaceEmptyState({
+  userSignedIn,
+  hasActiveFilter,
+}: {
+  userSignedIn: boolean;
+  hasActiveFilter: boolean;
+}) {
+  return (
+    <div className="empty-state py-16">
+      <div className="empty-state-icon">🛒</div>
+      <h3 className="empty-state-title">
+        {hasActiveFilter ? '조건에 맞는 장비가 아직 없어요' : '찾는 장비를 먼저 남겨보세요'}
+      </h3>
+      <p className="empty-state-description">
+        스파이크, 러닝화, 워치, 유니폼처럼 실제로 찾는 장비가 모이면 마켓이 살아납니다.
+        지금은 가짜 상품 없이 실제 등록만 보여줘요.
+      </p>
+      <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-neutral-500">
+        {['스파이크', '러닝화', '워치', '유니폼'].map((label) => (
+          <span key={label} className="rounded-full border border-neutral-200 bg-white px-3 py-1">
+            {label}
+          </span>
+        ))}
+      </div>
+      {userSignedIn ? (
+        <Link to="/marketplace/new" className="btn-primary mt-5">
+          <PlusIcon className="w-5 h-5" />
+          장비 등록하기
+        </Link>
+      ) : (
+        <p className="mt-5 text-sm text-neutral-500">로그인하면 판매 글을 등록할 수 있어요.</p>
       )}
     </div>
   );

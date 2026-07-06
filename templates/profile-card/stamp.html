@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width={{width}}">
+  <title>프로필 카드 - Stamp</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #111111;
+      --white: #FFFFFF;
+      --gray-100: #F5F5F5;
+      --gray-200: #E5E5E5;
+      --gray-400: #999999;
+      --gray-600: #666666;
+      --naver-green: #03C75A;
+    }
+
+    body { margin: 0; padding: 0; background: #000; }
+
+    .profile-card {
+      width: {{width}}px;
+      height: {{height}}px;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, sans-serif;
+    }
+
+    /* 배경 사진 */
+    .profile-card__photo {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url('{{photoUrl}}');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* 하단 그라데이션 오버레이 (강화) */
+    .profile-card__gradient {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 65%;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.95) 0%,
+        rgba(0,0,0,0.85) 35%,
+        rgba(0,0,0,0.45) 65%,
+        transparent 100%
+      );
+    }
+
+    /* 스탬프 데이터 영역 (하단) */
+    .profile-card__data {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 0 60px 52px;
+      color: var(--white);
+    }
+
+    /* 대회명 */
+    .stamp__comp {
+      font-size: 16px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* 종목명 */
+    .stamp__event {
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 8px;
+    }
+
+    /* 날짜 + 장소 */
+    .stamp__meta {
+      font-size: 15px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 32px;
+    }
+
+    /* 구분선 */
+    .stamp__divider {
+      height: 2px;
+      background: rgba(255,255,255,0.2);
+      margin-bottom: 28px;
+    }
+
+    /* 메인 기록 카드 */
+    .stamp__main {
+      display: flex;
+      align-items: flex-end;
+      gap: 36px;
+      margin-bottom: 24px;
+    }
+
+    .stamp__rank-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stamp__rank-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .stamp__rank-value {
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--naver-green);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stamp__record-block {
+      flex: 1;
+    }
+
+    .stamp__athlete {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .stamp__affiliation {
+      font-size: 18px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 16px;
+    }
+
+    .stamp__record {
+      font-size: 64px;
+      font-weight: 900;
+      color: var(--white);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .stamp__record-unit {
+      font-size: 22px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      margin-left: 4px;
+    }
+
+    /* 풍속 */
+    .stamp__wind {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 8px;
+    }
+
+    /* 코멘트 */
+    .stamp__comment {
+      font-size: 17px;
+      color: rgba(255,255,255,0.7);
+      font-style: italic;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      line-height: 1.45;
+    }
+
+    /* 하단 브랜딩 */
+    .stamp__brand {
+      position: absolute;
+      bottom: 18px;
+      right: 60px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-card">
+  <div class="profile-card__photo"></div>
+  <div class="profile-card__gradient"></div>
+  <div class="profile-card__data">
+    <div class="stamp__comp">{{competition}}</div>
+    <div class="stamp__event">{{event}}</div>
+    <div class="stamp__meta">{{date}} · {{venue}}</div>
+    <div class="stamp__divider"></div>
+    <div class="stamp__main">
+      <div class="stamp__rank-block">
+        <div class="stamp__rank-label">RANK</div>
+        <div class="stamp__rank-value">{{rank}}</div>
+      </div>
+      <div class="stamp__record-block">
+        <div class="stamp__athlete">{{name}}</div>
+        <div class="stamp__affiliation">{{affiliation}}</div>
+        <div class="stamp__record">{{record}}<span class="stamp__record-unit">{{recordUnit}}</span></div>
+        {{#hasWind}}<div class="stamp__wind">풍속 {{wind}} m/s</div>{{/hasWind}}
+      </div>
+    </div>
+    {{#hasComment}}<div class="stamp__comment">"{{comment}}"</div>{{/hasComment}}
+  </div>
+  <div class="stamp__brand">AthleTime</div>
+</div>
+</body>
+</html>

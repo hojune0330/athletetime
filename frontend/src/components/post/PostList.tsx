@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon, FireIcon } from '@heroicons/react/24/outline';
 import { usePosts } from '../../hooks/usePosts';
 import type { Post } from '../../types';
+import QuickReaction from '../trending/QuickReaction';
 
 // ============================================
 // 유틸리티 함수
@@ -138,6 +139,15 @@ function PostItem({ post }: PostItemProps) {
                 </span>
               </div>
             </div>
+
+            {/* 빠른 이모지 리액션 */}
+            <div className="mt-2" onClick={(e) => e.preventDefault()}>
+              <QuickReaction
+                targetId={post.id}
+                targetType="post"
+                compact={true}
+              />
+            </div>
           </div>
         </div>
       </article>
@@ -183,15 +193,40 @@ function LoadingSkeleton() {
 // ============================================
 
 function ErrorDisplay({ error, onRetry }: { error: Error; onRetry: () => void }) {
+  const status = (error as Error & { response?: { status?: number } }).response?.status;
+  const isAuthError = status === 401 || /401/.test(error.message);
+
+  if (isAuthError) {
+    return (
+      <div className="card">
+        <div className="empty-state">
+          <div className="empty-state-icon">🔒</div>
+          <h3 className="empty-state-title">
+            로그인하면 글을 볼 수 있어요
+          </h3>
+          <p className="empty-state-description">
+            커뮤니티 글과 댓글은 로그인한 뒤에 확인할 수 있어요.
+          </p>
+          <Link
+            to="/login"
+            className="btn-primary"
+          >
+            로그인
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="card">
       <div className="empty-state">
-        <div className="empty-state-icon">⚠️</div>
+        <div className="empty-state-icon">🛠️</div>
         <h3 className="empty-state-title">
-          게시글을 불러올 수 없습니다
+          커뮤니티를 준비 중이에요
         </h3>
         <p className="empty-state-description">
-          {error.message || '알 수 없는 오류가 발생했습니다.'}
+          지금은 게시글을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
         </p>
         <button
           onClick={onRetry}
@@ -214,10 +249,10 @@ function EmptyState() {
       <div className="empty-state">
         <div className="empty-state-icon">📝</div>
         <h3 className="empty-state-title">
-          게시글이 없습니다
+          아직 올라온 글이 없어요
         </h3>
         <p className="empty-state-description">
-          첫 번째 게시글을 작성해보세요!
+          첫 글을 남겨 이야기를 시작해 보세요.
         </p>
         <Link
           to="/write"

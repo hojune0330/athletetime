@@ -1,0 +1,29 @@
+Launch-week UX trust improvements — evidence summary
+Date: 2026-07-06 KST
+Branch: codex/final-service-readiness-handoff (working base), shipped on genspark_ai_developer feature branch
+
+Scope (🟠 High — open first week, UX trust):
+1. Header IA: primary nav reduced from 9 items to core loop 4 (기록/대회/기록카드/커뮤니티);
+   secondary tools (라이브/계산기/훈련/마켓/채팅) moved under "더보기" dropdown (desktop)
+   and "도구·부가 기능" group (mobile drawer) with expectation notes.
+2. NotFoundPage: rebuilt as recovery surface — record search form, human-language
+   explanation for changed share links, 3 core recovery links, design tokens unified.
+3. MainPage hero: first-visit trust anchor under search — one-line identity notice
+   + /about-data + /data-request links before first search.
+4. Footer identity line aligned with records-first positioning.
+5. New contract test backend/tests/launch-surface-nav.test.js (5 tests) locks the
+   staged-launch nav shape; registered in package.json test script.
+6. New planning doc docs/athletetime-service-purpose-and-retention.md — service
+   purpose, 3 retention loops, launch-week metrics, follow-up priorities P1/P2.
+
+Verification:
+- npm test: 107/107 pass (102 existing + 5 new).
+- npm --prefix frontend run type-check: pass.
+- npm --prefix frontend run build: pass (pre-existing chunk-size warning only).
+- Browser smoke (Vite QA :4330 + backend :3005 standalone/mock):
+  /, /records, /this-path-does-not-exist rendered with 0 console errors.
+- QA servers stopped after smoke.
+
+Trust-tone check:
+- No 공식/랭킹/검증/예측/평가 claims added; no future-promise wording (곧/예정) in new copy.
+- New 404/hero copy uses "모아 정리" positioning per dataPolicy SERVICE_IDENTITY.

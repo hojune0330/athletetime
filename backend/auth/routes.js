@@ -6,11 +6,23 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const db = require('../utils/db');
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
+const { generateAccessToken, generateRefreshToken, verifyToken } = require('../utils/jwt');
 const { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordCodeEmail } = require('../utils/email');
 const { authenticateToken } = require('../middleware/auth');
+const {
+  REFRESH_COOKIE,
+  clearAuthCookies,
+  getCookie,
+  requireCsrfForCookieAuth,
+  setAuthCookies,
+  setCsrfCookie,
+} = require('../utils/authCookies');
 
 const router = express.Router();
+const AUTH_CODE_SENT_RESPONSE = {
+  success: true,
+  message: '인증 코드가 발송되었습니다',
+};
 
 /**
  * 6자리 랜덤 인증 코드 생성
@@ -18,6 +30,49 @@ const router = express.Router();
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
+
+function sendAuthCodeAccepted(res) {
+  return res.json({ ...AUTH_CODE_SENT_RESPONSE });
+}
+
+function getErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function extractRefreshToken(req) {
+  if (req.body && typeof req.body.refreshToken === 'string') {
+    return req.body.refreshToken;
+  }
+
+  const cookieRefreshToken = getCookie(req, REFRESH_COOKIE);
+  if (cookieRefreshToken) {
+    return cookieRefreshToken;
+  }
+
+  const authHeader = req.headers.authorization;
+  if (typeof authHeader !== 'string') {
+    return null;
+  }
+
+  const [scheme, token] = authHeader.split(' ');
+  if (scheme !== 'Bearer' || !token) {
+    return null;
+  }
+
+  return token;
+}
+
+function issueSession(res, accessToken, refreshToken) {
+  setAuthCookies(res, accessToken, refreshToken);
+}
+
+router.get('/csrf-token', (req, res) => {
+  const csrfToken = setCsrfCookie(res);
+  res.json({
+    success: true,
+    csrfToken,
+  });
+});
 
 /**
  * POST /api/auth/send-verification
@@ -93,17 +148,12 @@ router.post('/send-verification', async (req, res) => {
     // 인증 이메일 발송
     try {
       await sendVerificationEmail(email, verificationCode, '회원');
-      console.log(`✅ 인증 코드 발송: ${email} -> ${verificationCode}`);
+      console.log('✅ 인증 코드 발송 요청 처리 완료');
     } catch (emailError) {
-      console.error('이메일 발송 실패:', emailError);
-      // 개발 환경에서는 코드 로그로 출력
-      console.log(`📧 [DEV] 인증 코드: ${verificationCode}`);
+      console.error('이메일 발송 실패:', getErrorMessage(emailError));
     }
 
-    res.json({
-      success: true,
-      message: '인증 코드가 발송되었습니다'
-    });
+    sendAuthCodeAccepted(res);
 
   } catch (error) {
     console.error('❌ 인증 코드 발송 오류:', error);
@@ -394,6 +444,7 @@ router.post('/register', async (req, res) => {
     // JWT 토큰 생성 (회원가입 즉시 로그인)
     const accessToken = generateAccessToken(user.id, email);
     const refreshToken = generateRefreshToken(user.id, email);
+    issueSession(res, accessToken, refreshToken);
 
     // Refresh token 저장
     await db.query(
@@ -405,15 +456,13 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       success: true,
       message: '회원가입이 완료되었습니다.',
-      accessToken,
-      refreshToken,
       user: {
         id: user.id,
         email: user.email,
         nickname: user.nickname,
         username: user.nickname,
-        emailVerified: false,
-        isAdmin: false
+        emailVerified: user.email_verified || false,
+        isAdmin: user.is_admin || false
       }
     });
 
@@ -498,6 +547,7 @@ router.post('/verify-email', async (req, res) => {
     // JWT 토큰 생성
     const accessToken = generateAccessToken(user.id, email);
     const refreshToken = generateRefreshToken(user.id, email);
+    issueSession(res, accessToken, refreshToken);
 
     // Refresh token 저장
     await db.query(
@@ -514,8 +564,6 @@ router.post('/verify-email', async (req, res) => {
     res.json({
       success: true,
       message: '이메일 인증이 완료되었습니다',
-      accessToken,
-      refreshToken,
       user: {
         id: user.id,
         email,
@@ -663,6 +711,7 @@ router.post('/login', async (req, res) => {
     // JWT 토큰 생성
     const accessToken = generateAccessToken(user.id, email);
     const refreshToken = generateRefreshToken(user.id, email);
+    issueSession(res, accessToken, refreshToken);
 
     // Refresh token 저장
     await db.query(
@@ -687,8 +736,6 @@ router.post('/login', async (req, res) => {
     res.json({
       success: true,
       message: '로그인 성공',
-      accessToken,
-      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -708,13 +755,102 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.post('/refresh', requireCsrfForCookieAuth, async (req, res) => {
+  try {
+    const refreshToken = extractRefreshToken(req);
+
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'refreshToken이 필요합니다'
+      });
+    }
+
+    const decoded = verifyToken(refreshToken);
+
+    if (decoded.type !== 'refresh') {
+      return res.status(401).json({
+        success: false,
+        error: 'refresh token이 아닙니다'
+      });
+    }
+
+    const tokenResult = await db.query(
+      `SELECT 
+        rt.user_id, rt.token, rt.expires_at, rt.is_revoked,
+        u.email, u.is_active
+       FROM refresh_tokens rt
+       JOIN users u ON u.id = rt.user_id
+       WHERE rt.token = $1
+       LIMIT 1`,
+      [refreshToken]
+    );
+
+    if (tokenResult.rows.length === 0) {
+      return res.status(401).json({
+        success: false,
+        error: '등록되지 않은 refresh token입니다'
+      });
+    }
+
+    const storedToken = tokenResult.rows[0];
+
+    if (storedToken.is_revoked) {
+      return res.status(401).json({
+        success: false,
+        error: '이미 만료된 refresh token입니다'
+      });
+    }
+
+    if (new Date(storedToken.expires_at) <= new Date()) {
+      return res.status(401).json({
+        success: false,
+        error: 'refresh token이 만료되었습니다'
+      });
+    }
+
+    if (!storedToken.is_active || storedToken.user_id !== decoded.userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'refresh token을 사용할 수 없습니다'
+      });
+    }
+
+    const accessToken = generateAccessToken(storedToken.user_id, storedToken.email);
+    const nextRefreshToken = generateRefreshToken(storedToken.user_id, storedToken.email);
+    issueSession(res, accessToken, nextRefreshToken);
+
+    await db.query(
+      'UPDATE refresh_tokens SET is_revoked = TRUE, revoked_at = NOW() WHERE token = $1',
+      [refreshToken]
+    );
+
+    await db.query(
+      `INSERT INTO refresh_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, NOW() + INTERVAL '30 days')`,
+      [storedToken.user_id, nextRefreshToken]
+    );
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+    console.error('❌ 토큰 재발급 오류:', error);
+    res.status(401).json({
+      success: false,
+      error: 'refresh token을 확인할 수 없습니다'
+    });
+  }
+});
+
 /**
  * POST /api/auth/logout
  * 로그아웃
  */
-router.post('/logout', authenticateToken, async (req, res) => {
+router.post('/logout', requireCsrfForCookieAuth, authenticateToken, async (req, res) => {
   try {
-    const { refreshToken } = req.body;
+    const refreshToken = extractRefreshToken(req);
 
     if (refreshToken) {
       // Refresh token 무효화
@@ -723,6 +859,8 @@ router.post('/logout', authenticateToken, async (req, res) => {
         [refreshToken]
       );
     }
+
+    clearAuthCookies(res);
 
     res.json({
       success: true,
@@ -830,10 +968,7 @@ router.post('/forgot-password', async (req, res) => {
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: '해당 이메일로 가입된 계정이 없습니다'
-      });
+      return sendAuthCodeAccepted(res);
     }
 
     const user = userResult.rows[0];
@@ -871,17 +1006,12 @@ router.post('/forgot-password', async (req, res) => {
     // 인증 이메일 발송
     try {
       await sendResetPasswordCodeEmail(email, verificationCode, user.nickname);
-      console.log(`✅ 비밀번호 재설정 인증 코드 발송: ${email} -> ${verificationCode}`);
+      console.log('✅ 비밀번호 재설정 인증 코드 발송 요청 처리 완료');
     } catch (emailError) {
-      console.error('이메일 발송 실패:', emailError);
-      // 개발 환경에서는 코드 로그로 출력
-      console.log(`📧 [DEV] 비밀번호 재설정 인증 코드: ${verificationCode}`);
+      console.error('이메일 발송 실패:', getErrorMessage(emailError));
     }
 
-    res.json({
-      success: true,
-      message: '인증 코드가 발송되었습니다'
-    });
+    sendAuthCodeAccepted(res);
 
   } catch (error) {
     console.error('❌ 비밀번호 찾기 오류:', error);
@@ -1044,7 +1174,7 @@ router.post('/reset-password', async (req, res) => {
       [email]
     );
 
-    console.log(`✅ 비밀번호 재설정 완료: ${email}`);
+    console.log('✅ 비밀번호 재설정 완료');
 
     res.json({
       success: true,
@@ -1064,11 +1194,9 @@ router.post('/reset-password', async (req, res) => {
  * PUT /api/auth/profile
  * 프로필 수정
  */
-router.put('/profile', authenticateToken, async (req, res) => {
+router.put('/profile', requireCsrfForCookieAuth, authenticateToken, async (req, res) => {
   try {
     const { nickname, password } = req.body;
-    
-    console.log('📝 프로필 수정 요청:', { userId: req.user.id, nickname, hasPassword: !!password });
 
     // 닉네임 변경 시 중복 체크
     if (nickname && nickname !== req.user.nickname) {
@@ -1142,10 +1270,18 @@ router.post('/set-admin', async (req, res) => {
   try {
     const { email, secretKey } = req.body;
 
-    // 비밀 키 검증 (환경변수 또는 하드코딩된 키)
-    const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY || 'athletetime-admin-2024';
-    
-    if (secretKey !== ADMIN_SECRET_KEY) {
+    // 비밀 키 검증: 예측 가능한 하드코딩 기본값을 제거한다.
+    // ADMIN_SECRET_KEY가 설정되지 않으면 이 엔드포인트는 비활성화(차단)한다.
+    const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
+
+    if (!ADMIN_SECRET_KEY || ADMIN_SECRET_KEY.trim().length === 0) {
+      return res.status(403).json({
+        success: false,
+        error: '관리자 설정 기능이 비활성화되어 있습니다.'
+      });
+    }
+
+    if (typeof secretKey !== 'string' || secretKey !== ADMIN_SECRET_KEY) {
       return res.status(403).json({
         success: false,
         error: '권한이 없습니다.'
