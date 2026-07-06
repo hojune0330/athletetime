@@ -307,8 +307,18 @@ export interface ResultEvent {
 
 /** 대회 볼거리 (규칙 기반 하이라이트) */
 export interface CompetitionHighlight {
-  type: 'record' | 'photo_finish' | 'sweep' | 'multi_winner' | 'crowd';
+  type:
+    | 'record'
+    | 'series_best'
+    | 'streak'
+    | 'vs_last'
+    | 'photo_finish'
+    | 'champion'
+    | 'sweep'
+    | 'multi_winner'
+    | 'crowd';
   title: string;
+  stat?: string;
   detail: string;
   eventName: string;
 }
