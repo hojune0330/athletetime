@@ -44,6 +44,13 @@
 5. **UI 아이콘은 SVG(heroicons)만.** 이모지를 UI 아이콘으로 쓰지 않는다.
 6. **커밋 메시지**: conventional commit (`feat(scope): ...`), 한국어 본문 권장.
 
+추가 운영 기준:
+
+- 프로덕션 mainline 정책은 [`docs/athletetime-production-mainline-policy.md`](./docs/athletetime-production-mainline-policy.md)를 따른다.
+- `2026-first-item`에서 가져올 작업은 반드시 [`docs/athletetime-2026-first-item-port-map.md`](./docs/athletetime-2026-first-item-port-map.md)의 분류를 먼저 확인한다.
+- 인증/보안, 원본 데이터, 공개 검색, 운영자 기능은 서로 섞어 커밋하지 않는다.
+- 기존 작업트리에 dirty 변경이 있으면 clean worktree를 만들어 작업한다.
+
 ## 4. 주요 코드 지도
 
 | 영역 | 경로 |
