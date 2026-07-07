@@ -271,6 +271,27 @@ Practical conclusion:
   4. confirm externally through World Athletics/JAAF/etc.,
   5. store only normalized result + source provenance.
 
+Operator handoff command:
+
+```text
+Run one manual missing-result verification.
+Start from KAAF schedule attachments. If no attachment covers the suspected record, use KAAF TOP records to seed a candidate, then use athlete-history lookup to confirm the candidate line. Do not automate bulk queries. Do not store person_no, birth data, raw athlete-history HTML, or any restricted identifier. Confirm the candidate against World Athletics/JAAF/Taiwan federation/official PDF before marking it publishable. Report the query conditions, sanitized result line, external confirmation source, and final decision.
+```
+
+Completion report fields:
+
+- operator
+- date
+- target event/category
+- KAAF schedule attachment status
+- TOP-record query parameters
+- sanitized TOP-record candidate
+- athlete-history same-name count
+- sanitized athlete-history result line
+- external confirmation URL/file
+- restricted fields not stored
+- decision: `publishable`, `held`, or `discarded`
+
 ## Reviewer checklist
 
 - Can the reviewer reproduce the source discovery with the listed URLs and queries?
