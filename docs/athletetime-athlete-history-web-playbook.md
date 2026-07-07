@@ -103,6 +103,42 @@ AthleteTime 누락 기록 보강 작업을 진행하세요.
 - 다음 조치:
 ```
 
+## 자료를 모아두는 위치
+
+다른 에이전트나 직원이 같이 쓰려면 자료를 세 종류로 나눠 저장한다.
+
+| 자료 종류 | 저장 위치 | Git 공유 | 설명 |
+| --- | --- | --- | --- |
+| 원본 PDF/XLS/XLSX | `data/sources/import/originals/{batch}/` | 아니오 | 공개 첨부라도 원본은 대용량·권리·재배포 이슈가 있어 비공개 저장 |
+| 임시 선수이력 메모/HTML | 로컬 임시 폴더 | 절대 아님 | 작업 후 삭제. `person_no`, 생년 정보가 섞일 수 있음 |
+| 공유 가능한 후보 | `docs/data-candidates/batches/{YYYYMMDD-topic}/` | 예 | 제한 식별자를 제거한 후보 기록, 출처 원장, 리뷰 보고서 |
+
+공유 후보 배치 구조:
+
+```text
+docs/data-candidates/batches/20260707-distance-challenge-proof/
+  candidate-records.jsonl
+  source-ledger.jsonl
+  review-report.md
+```
+
+파일 역할:
+
+- `candidate-records.jsonl`: 정규화 후보 1줄당 JSON 1개.
+- `source-ledger.jsonl`: 출처 URL, 파일명, hash, 수동 확인 여부.
+- `review-report.md`: 사람이 읽는 작업 보고서.
+
+규격:
+
+- 스키마: `docs/data-candidates/missing-result-candidate.schema.json`
+- 설명: `docs/data-candidates/README.md`
+
+중요:
+
+- `docs/data-candidates`에는 공개·리뷰 가능한 후보만 둔다.
+- 원본 응답 JSON, 원본 HTML, `person_no`, `PERSON_NO1`, 생년월일, 쿠키, 세션 ID는 넣지 않는다.
+- 외부 공식 결과 재확인 전에는 `status`를 `needs_external_confirmation`으로 둔다.
+
 ## 0. 조회 경로 지도
 
 | 단계 | 조회 경로 | 주 용도 | 자동화 판단 |

@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://athletetime.local/schemas/missing-result-candidate.schema.json",
+  "title": "AthleteTime Missing Result Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "candidateId",
+    "status",
+    "discoveryMethod",
+    "discoveredAt",
+    "operator",
+    "competitionName",
+    "competitionAliases",
+    "date",
+    "event",
+    "round",
+    "place",
+    "record",
+    "athleteDisplayName",
+    "teamDisplayName",
+    "category",
+    "sourceRefs",
+    "restrictedFieldsDropped",
+    "notes"
+  ],
+  "properties": {
+    "candidateId": {
+      "type": "string",
+      "pattern": "^MRC-[0-9]{8}-[0-9]{4}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "needs_external_confirmation",
+        "confirmed",
+        "held",
+        "discarded"
+      ]
+    },
+    "discoveryMethod": {
+      "type": "string",
+      "enum": [
+        "kaaf_schedule_attachment",
+        "kaaf_top_record_manual",
+        "kaaf_athlete_history_manual",
+        "self_submitted_material",
+        "external_official_result"
+      ]
+    },
+    "discoveredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "operator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "competitionName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "competitionAliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "event": {
+      "type": "string",
+      "minLength": 1
+    },
+    "round": {
+      "type": ["string", "null"]
+    },
+    "place": {
+      "type": ["integer", "null"],
+      "minimum": 1
+    },
+    "record": {
+      "type": "string",
+      "minLength": 1
+    },
+    "athleteDisplayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "teamDisplayName": {
+      "type": ["string", "null"]
+    },
+    "category": {
+      "type": ["string", "null"]
+    },
+    "sourceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "restrictedFieldsDropped": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "person_no",
+          "PERSON_NO1",
+          "birthDate",
+          "birthYear",
+          "rawAthleteHistoryHtml",
+          "institutionIdentifier",
+          "residentRegistrationNumber",
+          "phone",
+          "email",
+          "cookie",
+          "sessionId"
+        ]
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}
