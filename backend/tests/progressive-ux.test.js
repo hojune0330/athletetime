@@ -91,6 +91,33 @@ test('UX-COMBINE-002: search candidates offer direct "나" designation with inst
   assert.match(card, /markSortValue/, 'record marks compared numerically');
 });
 
+test('UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable', () => {
+  // 후보 카드: 모호한 "나" 대신 문장형 라벨 + 담김 상태 + 해제 안내
+  const results = readSource('frontend/src/components/records/RecordSearchResults.tsx');
+  assert.match(results, /내 기록이에요/, 'plain-sentence designation label');
+  assert.match(results, /내 기록에 담김/, 'designated state is explicit');
+  assert.match(results, /누르면 빼요/, 'undo affordance on the same button');
+  // 담긴 묶음이 있으면 하단 고정 바(장바구니 패턴)로 다음 행동 안내
+  assert.match(results, /fixed inset-x-0 bottom-0/, 'sticky merge bar');
+  assert.match(results, /합친 기록 보기/);
+
+  // 순위·날짜·비고 보기/숨기기 토글 — 기기 단위 기억
+  const pref = readSource('frontend/src/components/record-insights/useRecordDetailPref.ts');
+  assert.match(pref, /athletetime\.record-detail\.v1/, 'stable storage key');
+  assert.match(pref, /localStorage/);
+
+  const page = readSource('frontend/src/pages/RecordsPage.tsx');
+  assert.match(page, /useRecordDetailPref/);
+  assert.match(page, /record\.rank/, 'per-record rank shown');
+  assert.match(page, /간단히 보기|자세히 보기|detailToggleLabel/, 'toggle label');
+  // 데이터 범위 투명성 — 2005-2017은 아직 정리 중임을 명시
+  assert.match(page, /2018년 이후 기록/, 'coverage transparency');
+
+  const myCard = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
+  assert.match(myCard, /useRecordDetailPref/);
+  assert.match(myCard, /record\.rank/, 'rank in merged dashboard rows');
+});
+
 test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser', () => {
   const log = readSource('frontend/src/pages/TrainingCalculatorPage/components/TrainingLogLite.tsx');
   assert.match(log, /athletetime\.training-log\.v1/, 'stable storage key');

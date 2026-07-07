@@ -56,14 +56,14 @@ export function RecordSearchResults({
   const sameNameCount = countSameName(athletes, query);
 
   return (
-    <section className="space-y-4">
+    <section className={`space-y-4 ${myCount > 0 ? 'pb-20' : ''}`}>
       <div className="border border-line bg-surface p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-ink">후보를 좁혀보세요</p>
             <p className="mt-1 text-xs leading-5 text-ink-4">
               {sameNameCount >= 2
-                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 내 기록이면 카드의 "나"를 누르세요 — 여러 개 누르면 전부 합쳐져요.`
+                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 내 기록인 카드마다 "내 기록이에요"를 누르면 전부 하나로 합쳐져요.`
                 : '이름이 같은 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'}
             </p>
           </div>
@@ -85,21 +85,6 @@ export function RecordSearchResults({
           onSelect={setTeamFilter}
         />
       </div>
-
-      {myCount > 0 && (
-        <div className="flex items-center justify-between gap-3 border border-brand bg-brand/5 px-4 py-3">
-          <p className="text-sm text-ink">
-            <span className="font-semibold text-brand">내 기록</span>으로 {myCount}개 묶음이 합쳐져 있어요.
-          </p>
-          <button
-            type="button"
-            onClick={onViewMyRecords}
-            className="shrink-0 border border-brand bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
-          >
-            합친 기록 보기
-          </button>
-        </div>
-      )}
 
       {filteredAthletes.length === 0 ? (
         <div role="status" className="border border-dashed border-line bg-surface-2 p-5 text-sm text-ink-3">
@@ -123,6 +108,24 @@ export function RecordSearchResults({
       )}
 
       {compareNotice && <p role="status" className="text-xs text-warn">{compareNotice}</p>}
+
+      {/* 장바구니 패턴: 담긴 게 있으면 화면 하단에 항상 떠 있는 합치기 바 */}
+      {myCount > 0 && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-brand bg-surface px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+            <p className="min-w-0 truncate text-sm text-ink">
+              <span className="font-semibold text-brand">내 기록</span>에 {myCount}개 묶음 담김 — 누른 기록은 전부 하나로 합쳐져요
+            </p>
+            <button
+              type="button"
+              onClick={onViewMyRecords}
+              className="shrink-0 border border-brand bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              합친 기록 보기
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -200,7 +203,7 @@ function AthleteResultCard({
     >
       {mine && (
         <span className="absolute right-3 top-3 border border-brand bg-brand px-2 py-0.5 text-[11px] font-semibold text-white">
-          ✓ 내 기록
+          ✓ 내 기록에 담김
         </span>
       )}
       <button type="button" onClick={onSelect} className="block w-full text-left">
@@ -233,22 +236,23 @@ function AthleteResultCard({
         <span className="mt-4 inline-flex text-sm font-semibold text-brand">이 기록 보기</span>
       </button>
 
+      {/* 주 액션: 내 기록 담기 — 크고 모호함 없는 한 줄 버튼 */}
       <button
         type="button"
         onClick={onToggleMine}
         aria-pressed={mine}
-        className={`mt-3 mr-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+        className={`mt-3 flex w-full items-center justify-center gap-1.5 border px-3 py-2.5 text-sm font-semibold transition ${
           mine
             ? 'border-brand-500 bg-brand-500 text-white'
-            : 'border-brand-500/60 bg-surface text-brand hover:bg-brand-50'
+            : 'border-brand-500 bg-surface text-brand hover:bg-brand-50'
         }`}
       >
-        {mine ? '✓ 나' : '나'}
+        {mine ? '✓ 내 기록에 담김 — 누르면 빼요' : '내 기록이에요'}
       </button>
       <button
         type="button"
         onClick={onToggleCompare}
-        className={`mt-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+        className={`mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
           inTray
             ? 'border-brand-500 bg-brand-500 text-white'
             : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'

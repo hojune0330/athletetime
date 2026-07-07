@@ -1,20 +1,31 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  formatTime, 
-  formatPace, 
+import React, { useMemo, useState } from 'react';
+import { MetricCell } from '../../../components/ui/trainoracle';
+import {
+  formatTime,
+  formatPace,
   calculatePaceFromTarget,
   calculate400mLap,
   calculate100mTime,
   calculateSpeed,
 } from '../utils/paceCalculations';
 
-// 빠른 거리 선택 옵션
+type PaceResult = {
+  readonly pacePerKm: string;
+  readonly pace400m: string;
+  readonly pace100m: string;
+  readonly speedKmh: string;
+  readonly finishTime: string;
+};
+
 const QUICK_DISTANCES = [
   { label: '5km', value: 5000 },
   { label: '10km', value: 10000 },
   { label: '하프', value: 21097.5 },
   { label: '풀코스', value: 42195 },
-];
+] as const;
+
+const numberInputClass =
+  'h-11 rounded-sm border border-line bg-surface px-3 text-center font-mono text-base text-ink [font-variant-numeric:tabular-nums] transition-colors focus:border-ink focus:outline-none';
 
 export const TargetPaceCalculator: React.FC = () => {
   const [distance, setDistance] = useState<number>(5000);
@@ -23,48 +34,37 @@ export const TargetPaceCalculator: React.FC = () => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(20);
   const [seconds, setSeconds] = useState(0);
-  const [result, setResult] = useState<{
-    pacePerKm: string;
-    pace400m: string;
-    pace100m: string;
-    speedKmh: string;
-    finishTime: string;
-  } | null>(null);
+  const [result, setResult] = useState<PaceResult | null>(null);
 
-  const targetTimeSeconds = useMemo(() => {
-    return hours * 3600 + minutes * 60 + seconds;
-  }, [hours, minutes, seconds]);
+  const targetTimeSeconds = useMemo(() => hours * 3600 + minutes * 60 + seconds, [hours, minutes, seconds]);
+  const distanceKm = (distance / 1000).toFixed(3);
 
-  const handleDistanceSelect = (dist: number) => {
-    setDistance(dist);
+  const handleDistanceSelect = (selectedDistance: number) => {
+    setDistance(selectedDistance);
     setIsCustom(false);
   };
 
   const handleCustomDistanceChange = (value: string) => {
     setCustomDistance(value);
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue > 0) {
-      setDistance(numValue * 1000); // km to meters
+    const nextDistanceKm = Number.parseFloat(value);
+    if (Number.isFinite(nextDistanceKm) && nextDistanceKm > 0) {
+      setDistance(nextDistanceKm * 1000);
     }
     setIsCustom(true);
   };
 
   const calculate = () => {
     if (targetTimeSeconds <= 0 || distance <= 0) {
-      alert('올바른 거리와 시간을 입력해주세요.');
+      alert('거리와 시간을 입력해 주세요.');
       return;
     }
 
     const pacePerKm = calculatePaceFromTarget(targetTimeSeconds, distance);
-    const pace400m = calculate400mLap(pacePerKm);
-    const pace100m = calculate100mTime(pacePerKm);
-    const speed = calculateSpeed(distance, targetTimeSeconds);
-
     setResult({
       pacePerKm: formatPace(pacePerKm),
-      pace400m: formatTime(pace400m),
-      pace100m: formatTime(pace100m),
-      speedKmh: speed.toFixed(2),
+      pace400m: formatTime(calculate400mLap(pacePerKm)),
+      pace100m: formatTime(calculate100mTime(pacePerKm)),
+      speedKmh: calculateSpeed(distance, targetTimeSeconds).toFixed(2),
       finishTime: formatTime(targetTimeSeconds),
     });
   };
@@ -75,196 +75,156 @@ export const TargetPaceCalculator: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="card p-6">
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <span className="text-3xl">🎯</span>
-          목표 페이스 계산기
-        </h2>
-
-        {/* 거리 선택 */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            📏 목표 거리
-          </label>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {QUICK_DISTANCES.map((d) => (
-              <button
-                key={d.value}
-                type="button"
-                onClick={() => handleDistanceSelect(d.value)}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                  !isCustom && distance === d.value
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
-                }`}
-              >
-                {d.label}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setIsCustom(true)}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                isCustom
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
-              }`}
-            >
-              직접 입력
-            </button>
+      <section className="border border-line bg-surface p-5 md:p-6">
+        <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
+              PACE INPUT
+            </p>
+            <h2 className="mt-1 text-h3 font-semibold tracking-tight text-ink">목표 페이스 계산기</h2>
           </div>
-          
-          {isCustom && (
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={customDistance}
-                onChange={(e) => handleCustomDistanceChange(e.target.value)}
-                min="0.1"
-                step="0.1"
-                className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="거리"
-              />
-              <span className="text-gray-600">km</span>
-            </div>
-          )}
-          
-          <p className="text-sm text-gray-500 mt-2">
-            현재 선택: <span className="font-semibold">{(distance / 1000).toFixed(3)}km</span>
+          <p className="max-w-md text-body-sm leading-relaxed text-ink-3">
+            목표 거리와 완주 시간을 넣으면 km·400m·100m 기준 페이스를 바로 계산해요.
           </p>
         </div>
 
-        {/* 목표 시간 */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            ⏱️ 목표 완주 시간
-          </label>
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col items-center">
-              <input
-                type="number"
-                value={hours}
-                onChange={(e) => setHours(Number(e.target.value))}
-                min="0"
-                max="12"
-                className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-xs text-gray-500 mt-1">시간</span>
+        <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
+          <div>
+            <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
+              Distance
+            </label>
+            <div className="grid grid-cols-2 border border-line bg-surface sm:grid-cols-5">
+              {QUICK_DISTANCES.map((option, index) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleDistanceSelect(option.value)}
+                  className={`h-11 border-hair font-mono text-[12px] font-medium transition-colors ${
+                    index > 0 ? 'border-l max-sm:[&:nth-child(odd)]:border-l-0' : ''
+                  } ${!isCustom && distance === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setIsCustom(true)}
+                className={`h-11 border-l border-hair font-mono text-[12px] font-medium transition-colors sm:col-auto ${
+                  isCustom ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
+                }`}
+              >
+                직접
+              </button>
             </div>
-            <span className="text-2xl font-bold text-gray-400">:</span>
-            <div className="flex flex-col items-center">
-              <input
-                type="number"
-                value={minutes}
-                onChange={(e) => setMinutes(Number(e.target.value))}
-                min="0"
-                max="59"
-                className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-xs text-gray-500 mt-1">분</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-400">:</span>
-            <div className="flex flex-col items-center">
-              <input
-                type="number"
-                value={seconds}
-                onChange={(e) => setSeconds(Number(e.target.value))}
-                min="0"
-                max="59"
-                className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
-              />
-              <span className="text-xs text-gray-500 mt-1">초</span>
+
+            {isCustom && (
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="number"
+                  value={customDistance}
+                  onChange={(event) => handleCustomDistanceChange(event.target.value)}
+                  min="0.1"
+                  step="0.1"
+                  className={`${numberInputClass} w-28`}
+                  placeholder="거리"
+                />
+                <span className="text-body-sm text-ink-3">km</span>
+              </div>
+            )}
+            <p className="mt-2 font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
+              SELECTED {distanceKm}KM
+            </p>
+          </div>
+
+          <div>
+            <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
+              Finish time
+            </label>
+            <div className="flex items-start gap-1.5">
+              <TimeField label="시간" value={hours} max={12} onChange={setHours} />
+              <Separator />
+              <TimeField label="분" value={minutes} max={59} onChange={setMinutes} />
+              <Separator />
+              <TimeField label="초" value={seconds} max={59} onChange={setSeconds} />
             </div>
           </div>
         </div>
 
-        {/* 계산 버튼 */}
         <button
           type="button"
           onClick={calculate}
-          className="w-full py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-[1.02]"
+          className="mt-6 h-12 w-full bg-ink font-mono text-[12px] font-semibold uppercase tracking-widest-2 text-bg transition-colors hover:bg-brand-ink"
         >
-          <i className="fas fa-calculator mr-2"></i>
-          페이스 계산하기
+          Calculate pace
         </button>
-      </div>
+      </section>
 
-      {/* 결과 */}
       {result ? (
-        <div className="card p-6">
-          <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-            📋 계산 결과
-          </h3>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-blue-50 rounded-xl text-center">
-              <div className="text-sm text-blue-600 mb-1">km 페이스</div>
-              <div className="text-3xl font-bold text-blue-800">{result.pacePerKm}</div>
-              <div className="text-xs text-blue-500">/km</div>
-            </div>
-            <div className="p-4 bg-green-50 rounded-xl text-center">
-              <div className="text-sm text-green-600 mb-1">400m 랩</div>
-              <div className="text-3xl font-bold text-green-800">{result.pace400m}</div>
-              <div className="text-xs text-green-500">초</div>
-            </div>
-            <div className="p-4 bg-accent-50 rounded-xl text-center">
-              <div className="text-sm text-accent-600 mb-1">100m 타임</div>
-              <div className="text-3xl font-bold text-accent-700">{result.pace100m}</div>
-              <div className="text-xs text-accent-500">초</div>
-            </div>
-            <div className="p-4 bg-purple-50 rounded-xl text-center">
-              <div className="text-sm text-purple-600 mb-1">평균 속도</div>
-              <div className="text-3xl font-bold text-purple-800">{result.speedKmh}</div>
-              <div className="text-xs text-purple-500">km/h</div>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl text-center col-span-2 md:col-span-1">
-              <div className="text-sm text-gray-600 mb-1">목표 거리</div>
-              <div className="text-3xl font-bold text-gray-800">{(distance / 1000).toFixed(3)}</div>
-              <div className="text-xs text-gray-500">km</div>
-            </div>
-            <div className="p-4 bg-red-50 rounded-xl text-center col-span-2 md:col-span-1">
-              <div className="text-sm text-red-600 mb-1">완주 시간</div>
-              <div className="text-3xl font-bold text-red-800">{result.finishTime}</div>
-            </div>
+        <section className="border border-line bg-surface p-5 md:p-6">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h3 className="text-h3 font-semibold tracking-tight text-ink">계산 결과</h3>
+            <span className="font-mono text-[10px] uppercase tracking-widest-2 text-ink-4">PACE OUTPUT</span>
           </div>
 
-          {/* 추가 정보 */}
-          <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200">
-            <h4 className="font-bold text-sm mb-2 text-yellow-800">💡 참고 정보</h4>
-            <ul className="text-sm text-yellow-700 space-y-1">
-              <li>• 이 페이스는 균등 페이스 기준입니다</li>
-              <li>• 실제 레이스에서는 급수, 코스 난이도에 따라 변동됩니다</li>
-              <li>• 트랙 경기의 경우 레인에 따라 실제 거리가 다릅니다</li>
-            </ul>
+          <div className="grid border-y border-ink bg-surface sm:grid-cols-2 lg:grid-cols-3">
+            <MetricCell label="km 페이스" value={result.pacePerKm} unit="/km" />
+            <MetricCell label="400m 랩" value={result.pace400m} unit="초" />
+            <MetricCell label="100m" value={result.pace100m} unit="초" />
+            <MetricCell label="속도" value={result.speedKmh} unit="km/h" />
+            <MetricCell label="거리" value={distanceKm} unit="km" />
+            <MetricCell label="완주 시간" value={result.finishTime} />
           </div>
 
-          {/* 리셋 버튼 */}
+          <div className="mt-4 border-l-2 border-ink pl-3 text-body-sm leading-relaxed text-ink-3">
+            균등 페이스 기준 참고값이에요. 실제 레이스에서는 코스, 날씨, 급수 지점에 따라 달라질 수 있어요.
+          </div>
+
           <button
             type="button"
             onClick={reset}
-            className="mt-4 w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors"
+            className="mt-4 h-11 w-full border border-line bg-surface font-mono text-[11px] font-semibold uppercase tracking-widest-2 text-ink transition-colors hover:bg-surface-2"
           >
-            <i className="fas fa-redo mr-2"></i>
-            새로 계산하기
+            Reset
           </button>
-        </div>
+        </section>
       ) : (
-        /* 계산 전 안내 */
-        <div className="card p-8 text-center">
-          <div className="text-5xl mb-4">🎯</div>
-          <h3 className="text-lg font-bold text-gray-700 mb-2">목표 페이스를 확인해보세요!</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            목표 거리와 완주 시간을 입력하고<br />
-            <strong>"페이스 계산하기"</strong> 버튼을 클릭하세요.
+        <section className="border border-dashed border-line bg-surface p-6 text-center">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
+            WAITING INPUT
           </p>
-          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-            <span>📏</span>
-            <span>거리는 드롭다운에서 선택하거나 직접 입력할 수 있습니다.</span>
-          </div>
-        </div>
+          <h3 className="mt-2 text-body font-semibold text-ink">목표 기록을 넣으면 바로 계산해요.</h3>
+          <p className="mt-1 text-body-sm text-ink-3">거리와 완주 시간을 입력한 뒤 계산 버튼을 누르세요.</p>
+        </section>
       )}
     </div>
   );
 };
+
+type TimeFieldProps = {
+  readonly label: string;
+  readonly value: number;
+  readonly max: number;
+  readonly onChange: (value: number) => void;
+};
+
+const TimeField: React.FC<TimeFieldProps> = ({ label, value, max, onChange }) => (
+  <div className="flex flex-1 flex-col items-center">
+    <input
+      type="number"
+      value={value}
+      onChange={(event) => onChange(Number(event.target.value))}
+      min="0"
+      max={max}
+      className={`${numberInputClass} w-full`}
+    />
+    <span className="mt-1 text-caption text-ink-4">{label}</span>
+  </div>
+);
+
+const Separator: React.FC = () => (
+  <span className="pt-2.5 font-mono text-lg text-ink-4" aria-hidden>
+    :
+  </span>
+);
 
 export default TargetPaceCalculator;

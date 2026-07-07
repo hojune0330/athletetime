@@ -1,0 +1,7 @@
+## policy files
+WORKFLOW.md
+
+## claim scan in new docs
+docs/athletetime-production-mainline-policy.md:69:- "2000년부터 오늘까지 모든 기록 검색 가능" until row-level coverage evidence proves it.
+docs/athletetime-2026-first-item-port-map.md:45:   - Unsafe claim: "2000년부터 오늘까지 모든 선수 행 검색 가능".
+WORKFLOW.md:38:   - 기록/결과 관련 표현에 공식·인증·검증·랭킹·예측·평가 단어 금지.

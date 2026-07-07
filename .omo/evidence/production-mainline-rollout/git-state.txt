@@ -1,0 +1,40 @@
+## git status
+## codex/production-mainline-rollout...origin/main
+ M WORKFLOW.md
+?? docs/athletetime-2026-first-item-port-map.md
+?? docs/athletetime-production-mainline-policy.md
+
+## remotes
+first-item	https://github.com/hojune0330/2026-first-item.git (fetch)
+first-item	https://github.com/hojune0330/2026-first-item.git (push)
+origin	https://github.com/hojune0330/athletetime.git (fetch)
+origin	https://github.com/hojune0330/athletetime.git (push)
+
+## origin head
+ref: refs/heads/main	HEAD
+9a1f4e14527a85917d64ae616aeedaf98e0d0b6b	HEAD
+
+## recent commits
+9a1f4e1 (HEAD -> codex/production-mainline-rollout, origin/main, origin/HEAD) Merge pull request #17 from hojune0330/migration/2026-service
+f7b3a90 (origin/migration/2026-service) feat(ux): 토스식 단계 공개 + 내 기록 원버튼 + 추정 묶음 모아 보기 + 훈련 일지 라이트 + WORKFLOW.md 총괄 문서 (snapshot e6caf80)
+30c60d6 Merge pull request #16 from hojune0330/migration/2026-service
+3b40aaf sync: competition highlights v3 — 마라톤 국제부/국내부 구분
+48c5dd2 Merge pull request #15 from hojune0330/migration/2026-service
+918435f sync: competition highlights v2 — 역대 회차 맥락 + 중계 자막 형식
+049e524 Merge pull request #14 from hojune0330/migration/2026-service
+7ab84e5 sync: rule-based competition highlights (이 대회 볼거리)
+8e897a2 Merge pull request #13 from hojune0330/migration/2026-service
+969f197 sync: chimhaha-style community UX + relay results quality hold
+93c0745 Merge pull request #12 from hojune0330/migration/2026-service
+5081df9 feat(card-studio): creative freedom layer — photo grading, stickers, Instagram direct share
+61aa659 Merge pull request #11 from hojune0330/migration/2026-service
+ce71ac7 feat(card-studio): rebuild profile card builder as live-preview studio with manual record entry
+66de354 Merge pull request #10 from hojune0330/migration/2026-service
+9018c7e fix(migration): _redirects carries API proxy (overrides netlify.toml)
+92aab9a Merge pull request #9 from hojune0330/migration/2026-service
+3a2bb80 fix(migration): refresh — /api/health alias for Render Blueprint healthCheckPath
+e50517a fix(migration): refresh — split CLOUDINARY_* env var support (matches owner's Render env)
+309857f fix(migration): refresh to 6e33254 — add missing cloudinary dependency (production boot crash fix)
+
+## current branch
+codex/production-mainline-rollout
