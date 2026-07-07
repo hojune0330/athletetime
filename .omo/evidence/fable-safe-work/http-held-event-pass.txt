@@ -1,0 +1,23 @@
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-Token
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: strict-origin-when-cross-origin
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 59
+X-RateLimit-Reset: 60
+Content-Type: application/json; charset=utf-8
+Content-Length: 1099
+ETag: W/"44b-Geqv1cF5CKujuLYa5gQ9h1msc7I"
+Date: Mon, 06 Jul 2026 15:20:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"success":true,"data":{"meta":{"competition":"제42회 코오롱구간마라톤대회(중학교부)","year":"2026","period":"2026-03-28 ~ 2026-03-28","venue":"경주","source":"kaaf","sourceLabel":"대한육상연맹 공개 경기결과","sourceUrl":"","collectedAt":"","sourceTier":"L","scopeNotice":"공개 경기기록을 모아 정리했어요. 공식 기록 서비스는 아니에요.","correctionUrl":"/data-request"},"events":[{"event":"12 역전경기 1일차","division":"남자중학교부","date":"2026-03-28","wind":null,"hasWind":false,"eventType":"track","tableType":"relay","resultsStatus":"source_reverify_needed","qualityHold":true,"qualityMessage":"기록 확인 중이에요","heldResultCount":21,"results":[],"totalAthletes":0},{"event":"22 역전경기 1일차","division":"여자중학교부","date":"2026-03-28","wind":null,"hasWind":false,"eventType":"track","tableType":"relay","resultsStatus":"source_reverify_needed","qualityHold":true,"qualityMessage":"기록 확인 중이에요","heldResultCount":12,"results":[],"totalAthletes":0}],"totalEvents":2,"totalAthletes":0}}

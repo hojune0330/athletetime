@@ -310,6 +310,7 @@ export interface CompetitionHighlight {
   type:
     | 'record'
     | 'series_best'
+    | 'domestic_champion'
     | 'streak'
     | 'vs_last'
     | 'photo_finish'

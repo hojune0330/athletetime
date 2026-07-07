@@ -1,0 +1,10 @@
+# Relay source availability audit
+
+## data/sources
+data/sources/.gitkeep
+
+## local raw duplicate hints
+data/raw_duplicates/2026-03-09T23-46-35_제53회_KBS배_전국육상경기대회_raw.json
+data/raw_duplicates/2026-03-10T00-04-28_제53회_KBS배_전국육상경기대회_raw.json
+data/raw_duplicates/2026-03-10T01-27-52_제53회_KBS배_전국육상경기대회_raw.json
+data/raw_duplicates/2026-03-10T01-37-30_제53회_KBS배_전국육상경기대회_raw.json

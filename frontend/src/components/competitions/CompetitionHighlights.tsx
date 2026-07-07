@@ -25,6 +25,7 @@ const TYPE_STYLE: Record<
 > = {
   record: { icon: SparklesIcon, chip: 'bg-accent-50 text-accent-700', stat: 'text-accent-700', label: '신기록' },
   series_best: { icon: ArrowTrendingUpIcon, chip: 'bg-accent-50 text-accent-700', stat: 'text-accent-700', label: '역대 최고' },
+  domestic_champion: { icon: FlagIcon, chip: 'bg-primary-50 text-primary-700', stat: 'text-primary-700', label: '국내부 1위' },
   streak: { icon: FlagIcon, chip: 'bg-primary-50 text-primary-700', stat: 'text-primary-700', label: '연속 우승' },
   vs_last: { icon: ClockIcon, chip: 'bg-primary-50 text-primary-700', stat: 'text-primary-700', label: '지난 회차 비교' },
   photo_finish: { icon: BoltIcon, chip: 'bg-primary-50 text-primary-700', stat: 'text-primary-700', label: '박빙' },

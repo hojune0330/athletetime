@@ -1,11 +1,15 @@
 const assert = require('node:assert/strict');
+const { execFile } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
+const { promisify } = require('node:util');
 
 const harvester = require('../../card-studio/services/kaafScheduleResultHarvesterService');
+const execFileAsync = promisify(execFile);
+const rootDir = path.join(__dirname, '..', '..');
 
 function tempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -59,6 +63,55 @@ test('KAAF-HARVEST-002 builds year page URLs without touching result.kaaf.or.kr'
     'https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2025',
     'https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026',
   ]);
+});
+
+test('KAAF-HARVEST-004 keeps legacy OLD FILEs_4 attachments as approved result candidates', () => {
+  const result = harvester.extractScheduleResultFiles(
+    '<a href="https://www.kaaf.or.kr/DATA/schedule/OLD/FILEs_4//05child_result.xls">결과</a>',
+    { sourceUrl: 'https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2005', year: 2005 },
+  );
+
+  assert.equal(result.candidates.length, 1);
+  assert.equal(result.candidates[0].year, 2005);
+  assert.equal(result.candidates[0].originalFilename, '05child_result.xls');
+  assert.equal(result.candidates[0].collectionAction, 'download_file');
+  assert.equal(result.candidates[0].reviewStatus, 'approved');
+  assert.match(result.candidates[0].downloadUrl, /\/DATA\/schedule\/OLD\/FILEs_4\/\//);
+});
+
+test('KAAF-HARVEST-005 discovery CLI writes candidate JSON and report without downloading files', async () => {
+  const root = tempDir('athletetime-kaaf-discovery-cli-');
+  const pagePath = path.join(root, 'page.html');
+  const outputPath = path.join(root, 'candidates.json');
+  const reportPath = path.join(root, 'report.md');
+
+  try {
+    fs.writeFileSync(pagePath, fixtureHtml(), 'utf8');
+    const { stdout } = await execFileAsync(process.execPath, [
+      'tools/discover-kaaf-result-sources.js',
+      '--page-file',
+      pagePath,
+      '--source-url',
+      'https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026',
+      '--year',
+      '2026',
+      '--output',
+      outputPath,
+      '--report',
+      reportPath,
+      '--json',
+    ], { cwd: rootDir, encoding: 'utf8' });
+    const result = JSON.parse(stdout);
+    const written = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
+
+    assert.equal(result.ok, true);
+    assert.equal(result.totalCandidates, 2);
+    assert.equal(written.candidates.length, 2);
+    assert.equal(written.files, undefined);
+    assert.match(fs.readFileSync(reportPath, 'utf8'), /KAAF 경기결과 후보 발견 보고서/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('KAAF-HARVEST-003 downloads direct result files and writes manifest without raw body', async () => {

@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "hits": [
+    {
+      "canonicalId": "kaaf-result-2005-68ba9c326ce7",
+      "provider": "KAAF",
+      "sourceTier": "kaaf_schedule_result_file",
+      "originalFilename": "KBS대회_종합기록.xls",
+      "normalizedTitle": "KBS대회 종합기록",
+      "season": 2005,
+      "extension": ".xls",
+      "magicType": "compound_office",
+      "fileSize": 97280,
+      "sha256": "68ba9c326ce79bebdab316a91e1b724aa0b47f0604b83a2398747aaf29e6906a",
+      "categoryHint": "track_field",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2005",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/OLD/FILEs_4//KBS%EB%8C%80%ED%9A%8C_%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D.xls",
+      "privateStoragePath": "data/sources/import/originals/legacy-kaaf-results-2000-2017-20260707/004_KBS대회_종합기록.xls",
+      "searchText": "kbs대회 종합기록 kbs대회_종합기록.xls 2005 .xls https://kaaf.or.kr/ver3/info/internal.asp?currentyear=2005 https://www.kaaf.or.kr/data/schedule/old/files_4//kbs%eb%8c%80%ed%9a%8c_%ec%a2%85%ed%95%a9%ea%b8%b0%eb%a1%9d.xls",
+      "matchFields": [
+        "title"
+      ]
+    }
+  ]
+}

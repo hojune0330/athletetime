@@ -28,7 +28,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
-const { holdUnsafeRelayEvents } = require('./relayResultQualityService');
+const { holdUnsafeResultEvents } = require('./relayResultQualityService');
 
 const LIFE_SPORT_COMPETITION_PATTERNS = [/생활체육/i, /마스터즈/i, /대축전/i, /recordsport/i];
 
@@ -124,7 +124,7 @@ function _toRawShape(year, comp) {
       competition_id: comp.competitionId != null ? String(comp.competitionId) : '',
       to_cd: comp.toCd || '',
     },
-    events: holdUnsafeRelayEvents(Array.isArray(comp.events) ? comp.events : [], { competitionName }),
+    events: holdUnsafeResultEvents(Array.isArray(comp.events) ? comp.events : [], { competitionName }),
   };
 }
 

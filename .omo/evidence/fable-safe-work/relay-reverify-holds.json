@@ -1,0 +1,507 @@
+{
+  "generatedAt": "2026-07-06T15:37:19.265Z",
+  "summary": {
+    "publicHeldCompetitions": 25,
+    "publicHeldEvents": 36,
+    "publicHeldRows": 372
+  },
+  "blocked": {
+    "reason": "source_files_or_dom_fixtures_required",
+    "required": [
+      "original_result_file_or_html_per_competition",
+      "relay_table_dom_fixture_with_rowspan_colspan",
+      "fable_review_before_restoring_rows"
+    ],
+    "note": "Held rows are intentionally not reconstructed from polluted name/affiliation/record fields."
+  },
+  "items": [
+    {
+      "filename": "2018.json",
+      "year": 2018,
+      "competitionId": "2018-road-005",
+      "competitionName": "제34회 코오롱구간마라톤대회(고등학교부)",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 19
+        }
+      ]
+    },
+    {
+      "filename": "2018.json",
+      "year": 2018,
+      "competitionId": "2018-road-006",
+      "competitionName": "제34회 코오롱구간마라톤대회(중학교부)",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 12
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 9
+        }
+      ]
+    },
+    {
+      "filename": "2018.json",
+      "year": 2018,
+      "competitionId": "2018-road-010",
+      "competitionName": "제48회 대통령기전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2019.json",
+      "year": 2019,
+      "competitionId": "2019-road-005",
+      "competitionName": "제35회 코오롱구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 18
+        },
+        {
+          "event": "23 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 9
+        }
+      ]
+    },
+    {
+      "filename": "2019.json",
+      "year": 2019,
+      "competitionId": "2019-road-006",
+      "competitionName": "제35회 코오롱구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 15
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2019.json",
+      "year": 2019,
+      "competitionId": "2019-road-010",
+      "competitionName": "제49회 대통령기전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 10
+        }
+      ]
+    },
+    {
+      "filename": "2020.json",
+      "year": 2020,
+      "competitionId": "2020-road-001",
+      "competitionName": "제50회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 7
+        }
+      ]
+    },
+    {
+      "filename": "2021.json",
+      "year": 2021,
+      "competitionId": "2021-road-002",
+      "competitionName": "제51회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 7
+        }
+      ]
+    },
+    {
+      "filename": "2021.json",
+      "year": 2021,
+      "competitionId": "2021-road-003",
+      "competitionName": "제51회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2022.json",
+      "year": 2022,
+      "competitionId": "2022-road-005",
+      "competitionName": "제52회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2022.json",
+      "year": 2022,
+      "competitionId": "2022-road-006",
+      "competitionName": "제52회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2022.json",
+      "year": 2022,
+      "competitionId": "2022-road-007",
+      "competitionName": "제38회 코오롱구간마라톤대회(고등학교부)",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 10
+        },
+        {
+          "event": "23 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 5
+        }
+      ]
+    },
+    {
+      "filename": "2023.json",
+      "year": 2023,
+      "competitionId": "2023-road-006",
+      "competitionName": "제39회 코오롱구간마라톤대회(중학교부)",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 7
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 11
+        }
+      ]
+    },
+    {
+      "filename": "2023.json",
+      "year": 2023,
+      "competitionId": "2023-road-012",
+      "competitionName": "제53회 대통령기 전국통일구간마라톤대회(시도대항)",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 10
+        }
+      ]
+    },
+    {
+      "filename": "2023.json",
+      "year": 2023,
+      "competitionId": "2023-road-013",
+      "competitionName": "제53회 대통령기 전국통일구간마라톤대회(소속대항)",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 6
+        }
+      ]
+    },
+    {
+      "filename": "2024.json",
+      "year": 2024,
+      "competitionId": "2024-road-006",
+      "competitionName": "제40회 코오롱구간마라톤대회(고등학교부)",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 14
+        },
+        {
+          "event": "23 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 9
+        }
+      ]
+    },
+    {
+      "filename": "2024.json",
+      "year": 2024,
+      "competitionId": "2024-road-007",
+      "competitionName": "제40회 코오롱구간마라톤대회(중학교부)",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 17
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2024.json",
+      "year": 2024,
+      "competitionId": "2024-road-013",
+      "competitionName": "제54회 대통령기 전국통일구간마라톤대회(시도대항)",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2024.json",
+      "year": 2024,
+      "competitionId": "2024-road-014",
+      "competitionName": "제54회 대통령기 전국통일구간마라톤대회(소속대항)",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 4
+        }
+      ]
+    },
+    {
+      "filename": "2025.json",
+      "year": 2025,
+      "competitionId": "2025-road-008",
+      "competitionName": "제41회 코오롱구간마라톤대회(중학교부)",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 16
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 10
+        }
+      ]
+    },
+    {
+      "filename": "2025.json",
+      "year": 2025,
+      "competitionId": "2025-road-009",
+      "competitionName": "제41회 코오롱구간마라톤대회(고등학교부)",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 14
+        },
+        {
+          "event": "23 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 9
+        }
+      ]
+    },
+    {
+      "filename": "2025.json",
+      "year": 2025,
+      "competitionId": "2025-road-013",
+      "competitionName": "제55회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    },
+    {
+      "filename": "2025.json",
+      "year": 2025,
+      "competitionId": "2025-road-014",
+      "competitionName": "제55회 대통령기 전국통일구간마라톤대회",
+      "heldEvents": [
+        {
+          "event": "남자 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 5
+        }
+      ]
+    },
+    {
+      "filename": "2026.json",
+      "year": 2026,
+      "competitionId": "2026-road-005",
+      "competitionName": "제42회 코오롱구간마라톤대회(중학교부)",
+      "heldEvents": [
+        {
+          "event": "12 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 21
+        },
+        {
+          "event": "22 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 12
+        }
+      ]
+    },
+    {
+      "filename": "2026.json",
+      "year": 2026,
+      "competitionId": "2026-road-006",
+      "competitionName": "제42회 코오롱구간마라톤대회(고등학교부)",
+      "heldEvents": [
+        {
+          "event": "13 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 14
+        },
+        {
+          "event": "23 역전경기 1일차",
+          "tableType": "relay",
+          "resultsStatus": "source_reverify_needed",
+          "qualityHold": true,
+          "qualityMessage": "기록 확인 중이에요",
+          "heldResultCount": 8
+        }
+      ]
+    }
+  ]
+}

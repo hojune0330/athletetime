@@ -1,0 +1,8 @@
+warning: in the working copy of '.omo/evidence/fable-safe-work/frontend-build-final.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/frontend-type-check-final.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/git-diff-check-final.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/npm-test-final.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/relay-results-standard-green.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/relay-reverify-holds.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/relay-reverify-holds.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.omo/evidence/fable-safe-work/relay-validator.json', LF will be replaced by CRLF the next time Git touches it
