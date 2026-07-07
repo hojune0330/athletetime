@@ -9,6 +9,8 @@ type Props = {
   athleteKey: string;
   /** 추정 묶음 안의 다른 기록(athleteKey)을 눌렀을 때 이동 콜백 (선택) */
   onSelectAthlete?: (athleteKey: string) => void;
+  /** 묶음 전체를 한 화면에 모아 보기 (화면 임시 모음 — 데이터 병합 아님) */
+  onCombine?: (athleteKeys: string[]) => void;
 };
 
 /**
@@ -22,7 +24,7 @@ type Props = {
  * - 응답에 cluster가 없으면(추정 묶음이 없으면) 아무것도 그리지 않는다(조용히 숨김).
  * - 로드 실패도 조용히 숨긴다 — 제안은 부가 기능이라 화면을 망치면 안 된다.
  */
-export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete }: Props) {
+export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete, onCombine }: Props) {
   const [state, setState] = useState<LoadState>('idle');
   const [cluster, setCluster] = useState<ShadowCluster | null>(null);
 
@@ -81,8 +83,18 @@ export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete }: Props)
         {others.map((seg) => (
           <SegmentRow key={seg.athleteKey} segment={seg} onSelect={onSelectAthlete} />
         ))}
+        {onCombine && (
+          <button
+            type="button"
+            onClick={() => onCombine(cluster.segments.map((seg) => seg.athleteKey))}
+            className="w-full rounded-lg border border-amber-400 bg-white px-3 py-2.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-100"
+          >
+            이 기록들 한 화면에 모아 보기
+          </button>
+        )}
         <p className="pt-1 text-xs leading-5 text-amber-800/70">
           이 추정은 공개된 소속·연도 흐름만으로 만든 것이고, 순위나 공식 기록이 아니에요.
+          모아 보기도 화면에서만 임시로 모으는 것이고 데이터를 합치지 않아요.
         </p>
       </CardContent>
     </Card>

@@ -17,7 +17,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input';
 import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
+import { CombinedRecordsCard } from '../components/record-insights/CombinedRecordsCard';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
+import { useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
 import { AthleteHighlightBadges } from '../components/record-insights/AthleteHighlightBadges';
 import { CompareTray } from '../components/record-insights/CompareTray';
@@ -51,7 +53,9 @@ export default function RecordsPage() {
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
   const [compareNotice, setCompareNotice] = useState('');
+  const [combineKeys, setCombineKeys] = useState<string[]>([]);
   const compareTray = useCompareTray();
+  const { myAthlete, save: saveMyAthlete, clear: clearMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
 
   useEffect(() => {
@@ -228,13 +232,24 @@ export default function RecordsPage() {
               이름이나 소속(학교·팀)으로 검색하면 모아 둔 대회 기록을 보여드려요.
             </p>
           </div>
-          <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
-            <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
-              기록 한눈에
-            </ModeButton>
-            <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
-              시즌 기록표
-            </ModeButton>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            {myAthlete && (
+              <button
+                type="button"
+                onClick={() => handleSelectAthlete(myAthlete.athleteKey)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
+              >
+                내 기록 바로 보기 — {myAthlete.name}
+              </button>
+            )}
+            <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
+              <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
+                기록 한눈에
+              </ModeButton>
+              <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
+                시즌 기록표
+              </ModeButton>
+            </div>
           </div>
         </div>
 
@@ -317,12 +332,36 @@ export default function RecordsPage() {
         </div>
       )}
 
+      {combineKeys.length >= 2 && (
+        <CombinedRecordsCard
+          athleteKeys={combineKeys}
+          onClose={() => setCombineKeys([])}
+          onSelectAthlete={(key) => {
+            setCombineKeys([]);
+            handleSelectAthlete(key);
+          }}
+        />
+      )}
+
       {shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
           state={profileState}
           isSharedLinkFallback={isSharedLinkFallback}
           inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
+          isMyAthlete={profile ? myAthlete?.athleteKey === profile.athlete.athleteKey : false}
+          onSetMyAthlete={() => {
+            if (!profile) return;
+            if (myAthlete?.athleteKey === profile.athlete.athleteKey) {
+              clearMyAthlete();
+            } else {
+              saveMyAthlete({
+                athleteKey: profile.athlete.athleteKey,
+                name: profile.athlete.name,
+                team: profile.athlete.team,
+              });
+            }
+          }}
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
             if (!profile) return;
@@ -366,6 +405,19 @@ export default function RecordsPage() {
           profile={profile}
           state={profileState}
           inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
+          isMyAthlete={profile ? myAthlete?.athleteKey === profile.athlete.athleteKey : false}
+          onSetMyAthlete={() => {
+            if (!profile) return;
+            if (myAthlete?.athleteKey === profile.athlete.athleteKey) {
+              clearMyAthlete();
+            } else {
+              saveMyAthlete({
+                athleteKey: profile.athlete.athleteKey,
+                name: profile.athlete.name,
+                team: profile.athlete.team,
+              });
+            }
+          }}
           onToggleCompare={() => {
             if (!profile) return;
             const res = compareTray.toggle({
@@ -385,6 +437,9 @@ export default function RecordsPage() {
         <EstimatedSameAthleteCard
           athleteKey={selectedAthleteKey}
           onSelectAthlete={handleSelectAthlete}
+          onCombine={(keys) => {
+            setCombineKeys(keys);
+          }}
         />
       )}
 
@@ -479,6 +534,8 @@ function AthletePanel({
   state,
   isSharedLinkFallback = false,
   inTray = false,
+  isMyAthlete = false,
+  onSetMyAthlete,
   onShowSearchCandidates,
   onToggleCompare,
 }: {
@@ -486,11 +543,15 @@ function AthletePanel({
   state: LoadState;
   isSharedLinkFallback?: boolean;
   inTray?: boolean;
+  isMyAthlete?: boolean;
+  onSetMyAthlete?: () => void;
   onShowSearchCandidates?: () => void;
   onToggleCompare?: () => void;
 }) {
   const [showShareCard, setShowShareCard] = useState(false);
   const [shareLinkMessage, setShareLinkMessage] = useState('');
+  // 토스식 단계 공개 — 요약은 바로, 발자취/전체 기록은 누르면 열림
+  const [openSection, setOpenSection] = useState<'' | 'trail' | 'records'>('');
   const shareCopyStartedAtRef = useRef(0);
 
   if (state === 'loading') {
@@ -561,6 +622,19 @@ function AthletePanel({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              {onSetMyAthlete && (
+                <button
+                  type="button"
+                  onClick={onSetMyAthlete}
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                    isMyAthlete
+                      ? 'border-brand-500 bg-brand-500 text-white'
+                      : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'
+                  }`}
+                >
+                  {isMyAthlete ? '✓ 내 기록으로 지정됨' : '나로 지정'}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onToggleCompare}
@@ -637,27 +711,70 @@ function AthletePanel({
         <ShareCard profile={profile} onClose={() => setShowShareCard(false)} />
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>기록 발자취</CardTitle>
-          <p className="text-sm text-ink-3">공개 기록의 흐름이에요. 평가나 예측은 하지 않아요.</p>
-        </CardHeader>
-        <CardContent>
-          <AthleteEventTrail profile={profile} />
-        </CardContent>
-      </Card>
+      {/* 단계 공개: 요약 아래는 눌러야 열리는 섹션 — 한번에 다 보여주지 않는다 */}
+      <DisclosureSection
+        title="기록 발자취"
+        description="종목별 기록 흐름을 그래프로 보여줘요"
+        open={openSection === 'trail'}
+        onToggle={() => setOpenSection(openSection === 'trail' ? '' : 'trail')}
+      >
+        <p className="mb-3 text-sm text-ink-3">공개 기록의 흐름이에요. 평가나 예측은 하지 않아요.</p>
+        <AthleteEventTrail profile={profile} />
+      </DisclosureSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>최근 모은 기록</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <DisclosureSection
+        title="최근 모은 기록"
+        description={`최근 기록 ${Math.min(profile.records.length, 8)}개를 한 줄씩 보여줘요`}
+        open={openSection === 'records'}
+        onToggle={() => setOpenSection(openSection === 'records' ? '' : 'records')}
+      >
+        <div className="space-y-2">
           {profile.records.slice(0, 8).map((record) => (
             <RecordLine key={record.id} record={record} />
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </DisclosureSection>
     </section>
+  );
+}
+
+/** 토스식 단계 공개 카드 — 제목줄을 누르면 내용이 열린다 */
+function DisclosureSection({
+  title,
+  description,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  description: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Card>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 p-6 text-left transition hover:bg-surface-2/60"
+      >
+        <div>
+          <p className="text-lg font-semibold text-ink">{title}</p>
+          {!open && <p className="mt-1 text-sm text-ink-3">{description}</p>}
+        </div>
+        <svg
+          aria-hidden
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className={`h-5 w-5 shrink-0 text-ink-4 transition-transform ${open ? 'rotate-180' : ''}`}
+        >
+          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+        </svg>
+      </button>
+      {open && <CardContent className="pt-0">{children}</CardContent>}
+    </Card>
   );
 }
 

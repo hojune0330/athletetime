@@ -11,6 +11,7 @@ import {
   RecommendationsView,
 } from './components';
 import { useTrainingCalculator } from './hooks/useTrainingCalculator';
+import TrainingLogLite from './components/TrainingLogLite';
 import PageHeader from '../../components/common/PageHeader';
 import './styles/training-calculator.css';
 
@@ -153,6 +154,9 @@ const TrainingCalculatorPage: React.FC = () => {
             <RecommendationsView recommendations={results.recommendations} />
           </div>
         )}
+
+        {/* 훈련 일지 라이트 — TRAINORACLE 맛보기 */}
+        <TrainingLogLite />
 
       </div>
     </div>
