@@ -1,20 +1,47 @@
 'use strict';
 
-const OVERSEAS_PATTERNS = Object.freeze([
+const COMPETITIONS = Object.freeze([
   {
-    pattern: /일본\s*디스턴스\s*챌린지/i,
-    label: '일본 디스턴스 챌린지',
-    queries: ['World Athletics 일본 디스턴스 챌린지 results', 'JAAF Distance Challenge results'],
+    aliases: [
+      '\uC77C\uBCF8 \uB514\uC2A4\uD134\uC2A4 \uCC4C\uB9B0\uC9C0',
+      'Japan Distance Challenge',
+      'JAAF Distance Challenge',
+    ],
+    label: '\uC77C\uBCF8 \uB514\uC2A4\uD134\uC2A4 \uCC4C\uB9B0\uC9C0',
+    queries: [
+      'World Athletics Japan Distance Challenge results',
+      'JAAF Distance Challenge results',
+      'Japan Distance Challenge athletics results',
+    ],
   },
   {
-    pattern: /오사카\s*오픈/i,
-    label: '오사카 오픈 육상경기대회',
-    queries: ['JAAF Osaka Open athletics results', 'World Athletics Osaka Open results'],
+    aliases: [
+      '\uC624\uC0AC\uCE74 \uC624\uD508',
+      '\uC624\uC0AC\uCE74\uC624\uD508',
+      'Osaka Open',
+      'Osaka Open Athletics',
+    ],
+    label: '\uC624\uC0AC\uCE74 \uC624\uD508 \uC721\uC0C1\uACBD\uAE30\uB300\uD68C',
+    queries: [
+      'JAAF Osaka Open athletics results',
+      'World Athletics Osaka Open results',
+      'Osaka Open Athletics results',
+    ],
   },
   {
-    pattern: /대만\s*오픈/i,
-    label: '대만오픈 육상선수권대회',
-    queries: ['Taiwan Open Athletics results', 'Chinese Taipei Athletics Open results'],
+    aliases: [
+      '\uB300\uB9CC\uC624\uD508',
+      '\uB300\uB9CC \uC624\uD508',
+      '\uB300\uB9CC\uC624\uD508 \uC721\uC0C1\uC120\uC218\uAD8C\uB300\uD68C',
+      'Taiwan Open',
+      'Chinese Taipei Athletics Open',
+    ],
+    label: '\uB300\uB9CC\uC624\uD508 \uC721\uC0C1\uC120\uC218\uAD8C\uB300\uD68C',
+    queries: [
+      'Taiwan Open Athletics results',
+      'Chinese Taipei Athletics Open results',
+      'World Athletics Taiwan Open results',
+    ],
   },
 ]);
 
@@ -31,6 +58,19 @@ function splitLines(text) {
   return normalizeText(text).split('\n').map((line) => line.trim()).filter(Boolean);
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findCompetition(line) {
+  return COMPETITIONS.find((competition) => competition.aliases.some((alias) => {
+    const compactLine = String(line).replace(/\s+/g, '');
+    const compactAlias = String(alias).replace(/\s+/g, '');
+    const pattern = new RegExp(escapeRegExp(compactAlias), 'i');
+    return pattern.test(compactLine);
+  })) || null;
+}
+
 function dateFromLine(line) {
   const match = String(line).match(/\b((?:19|20)\d{2})[.\/-](\d{1,2})[.\/-](\d{1,2})\b/);
   if (!match) return null;
@@ -38,7 +78,7 @@ function dateFromLine(line) {
 }
 
 function eventFromLine(line) {
-  const match = String(line).match(/\b(\d{2,5}m|마라톤|하프마라톤|10km|5km)\b/i);
+  const match = String(line).match(/\b(\d{2,5}m|marathon|half marathon|10km|5km|\uB9C8\uB77C\uD1A4|\uD558\uD504\uB9C8\uB77C\uD1A4)\b/i);
   return match ? match[1] : null;
 }
 
@@ -49,24 +89,24 @@ function recordFromLine(line) {
 }
 
 function rankFromLine(line) {
-  const match = String(line).match(/(?:^|\s)(\d{1,3})\s*위(?:\s|$)/);
+  const match = String(line).match(/(?:^|\s)(\d{1,3})\s*(?:\uC704|place|st|nd|rd|th)(?:\s|$)/i);
   return match ? Number(match[1]) : null;
 }
 
 function hintForLine(line, options) {
-  const source = OVERSEAS_PATTERNS.find((item) => item.pattern.test(line));
-  if (!source) return null;
+  const competition = findCompetition(line);
+  if (!competition) return null;
   return {
     sourceTier: 'athlete_history_discovery_hint',
     evidenceBasis: options.consentBasis || 'operator_manual_review',
-    competitionName: source.label,
+    competitionName: competition.label,
     date: dateFromLine(line),
     event: eventFromLine(line),
     record: recordFromLine(line),
     rank: rankFromLine(line),
     confirmationStatus: 'needs_external_confirmation',
     allowedNextStep: 'confirm_against_external_official_result',
-    searchQueries: source.queries,
+    searchQueries: competition.queries,
   };
 }
 
@@ -78,6 +118,8 @@ function extractHistoryEvidenceHints(rawText, options = {}) {
     generatedAt: options.now || new Date().toISOString(),
     inputHandling: 'manual_text_review_sanitized',
     storagePolicy: 'restricted_identity_fields_and_raw_history_are_not_stored',
+    updateMode: 'operator_managed_watchlist_only',
+    rankingPolicy: 'rankings_are_manually_updated_by_owner_or_operator',
     hints,
   };
 }

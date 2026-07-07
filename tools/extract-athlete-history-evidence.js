@@ -23,26 +23,29 @@ function writeFile(filePath, content) {
 
 function renderReport(result) {
   const lines = [
-    '# 선수이력 기반 해외대회 발견 힌트',
+    '# Athlete history overseas-result discovery hints',
     '',
-    `- 힌트 수: ${result.hints.length}`,
-    `- 입력 처리: ${result.inputHandling}`,
-    `- 저장 원칙: ${result.storagePolicy}`,
+    `- Hints: ${result.hints.length}`,
+    `- Input handling: ${result.inputHandling}`,
+    `- Storage policy: ${result.storagePolicy}`,
+    `- Update mode: ${result.updateMode}`,
+    `- Ranking policy: ${result.rankingPolicy}`,
     '',
-    '## 힌트',
+    '## Hints',
     '',
     ...result.hints.map((hint) => [
-      `- ${hint.date || '날짜 미확인'} ${hint.competitionName}`,
-      `  - 종목/기록/순위: ${hint.event || '-'} / ${hint.record || '-'} / ${hint.rank || '-'}`,
-      `  - 상태: ${hint.confirmationStatus}`,
-      `  - 다음 확인: ${hint.searchQueries.join(' | ')}`,
+      `- ${hint.date || 'date unknown'} ${hint.competitionName}`,
+      `  - Event/record/place: ${hint.event || '-'} / ${hint.record || '-'} / ${hint.rank || '-'}`,
+      `  - Status: ${hint.confirmationStatus}`,
+      `  - Next confirmation: ${hint.searchQueries.join(' | ')}`,
     ].join('\n')),
     '',
-    '## 운영 원칙',
+    '## Operating policy',
     '',
-    '- 선수이력조회 내용은 자동 확정 원천이 아니라 해외대회 발견 힌트로만 쓴다.',
-    '- 선수 이름, 생년 정보, 기관 식별자, 원본 이력 전문은 저장하지 않는다.',
-    '- 서비스 반영 전 외부 공식 결과 또는 본인 제출 증빙으로 한 번 더 확인한다.',
+    '- Athlete-history screens are discovery hints only, not an automatic source of record truth.',
+    '- The operator or owner manually maintains the high-value watchlist and any ranking-related updates.',
+    '- Do not store athlete names, birth data, institution identifiers, or the raw athlete-history text.',
+    '- Do not publish a hint until it is confirmed against an external official result or a submitted proof package.',
   ];
   return `${lines.join('\n')}\n`;
 }

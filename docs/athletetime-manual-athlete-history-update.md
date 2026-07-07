@@ -1,36 +1,55 @@
-# 상위기록권·요청 기반 수동 기록 보강 운영안
+# Manual Athlete-History Update Policy
 
-작성일: 2026-07-07
+Created: 2026-07-07
 
-## 한 줄 결론
+## Core decision
 
-선수이력조회는 자동 대량 수집 경로가 아니라, 담당자가 누락 해외대회를 발견하는 수동 검토 단서로만 사용한다.
+AthleteTime will not bulk-scrape or automatically refresh athlete-history pages.
 
-## 왜 필요한가
+For missing overseas competitions such as Japan Distance Challenge, Osaka Open, and Taiwan Open, athlete-history pages may be used only as a manual discovery hint. Any ranking-related or high-value record update is maintained directly by the owner or an assigned operator.
 
-일본 디스턴스 챌린지, 오사카 오픈, 대만오픈처럼 대한육상연맹 일정/결과 첨부에 없는 해외대회는 기존 `대회 → 결과파일` 수집만으로 빠진다. 이런 기록은 선수 이력 화면에는 보일 수 있으므로, 상위기록권 선수나 본인 요청 건은 담당자가 직접 확인해 보강해야 한다.
+This is a deliberate operating model:
 
-## 운영 범위
+- Ranking/watchlist updates are human-maintained, not crawler-maintained.
+- Athlete-history text is not treated as an automatic source of truth.
+- A hint is not published until an external official result or a submitted proof package confirms it.
 
-| 구분 | 처리 방식 | 이유 |
+## Why this exists
+
+Some overseas competitions are not managed as KAAF domestic schedule/result attachments. Athletes may have those performances listed in athlete-history views because they requested result registration later.
+
+The right product behavior is not "collect every athlete history page." The right behavior is:
+
+1. Prioritize high-value athletes or user-submitted cases.
+2. Use athlete-history content only to discover a missing competition.
+3. Confirm the competition against an independent official result.
+4. Enter the normalized result with source evidence and uncertainty notes.
+
+## Operating scope
+
+| Case | Handling | Reason |
 | --- | --- | --- |
-| 상위기록권 워치리스트 | 담당자가 정기 수동 검토 | 사용자가 실제로 찾을 가능성이 높음 |
-| 본인·지도자·관계자 요청 | 요청 건별 수동 검토 | 본인/관계자 제공 단서가 있어 오결합 위험이 낮음 |
-| 일반 전체 선수 | 자동 조회 금지 | 동명이인·개인정보·과수집 리스크가 큼 |
+| Owner/operator watchlist | Manual review | High user demand, controlled scope |
+| Self-submitted athlete/coach request | Case-by-case manual review | Lower identity-mismatch risk |
+| All athletes in bulk | Do not automate | High privacy, mismatch, and over-collection risk |
 
-주의: 공개 화면에서는 “랭킹 10위”라고 단정하지 않는다. 공식 랭킹처럼 보일 수 있으므로 내부 운영명은 `상위기록권 워치리스트`로 둔다.
+Internal term: `operator watchlist`.
 
-## 수동 업데이트 절차
+Public copy must not say "top 10 ranking" or imply an official ranking. If user-facing copy is needed, use "records we are checking by request or operator review."
 
-1. 담당자가 선수이력조회 화면에서 누락 의심 해외대회를 확인한다.
-2. 선수 이름, 생년 정보, 기관 식별자, 원본 이력 전문은 저장하지 않는다.
-3. 필요한 경기 줄만 내부 검토 텍스트로 옮겨 `tools/extract-athlete-history-evidence.js`에 넣는다.
-4. 도구는 해외대회 힌트만 남긴다: 대회명, 날짜, 종목, 기록, 순위, 확인용 검색어.
-5. World Athletics, JAAF, 대만육협, 대회 공식 PDF/HTML 등 외부 공식 결과로 한 번 더 확인한다.
-6. 확인된 사실만 AthleteTime 독자 스키마에 입력한다.
-7. 출처에는 “선수이력조회에서 발견, 외부 공식 결과로 확인”처럼 발견 경로와 확정 출처를 분리해 남긴다.
+## Manual update flow
 
-## 도구 사용
+1. The owner or assigned operator checks an athlete-history page for a missing overseas competition.
+2. Do not save the athlete name, birth data, institutional identifier, or raw athlete-history text.
+3. Copy only the necessary competition line into a temporary local input file.
+4. Run `tools/extract-athlete-history-evidence.js` to produce sanitized hints.
+5. Confirm the hint against an external official source such as World Athletics, JAAF, the Taiwan athletics federation, an official PDF, or a competition host result page.
+6. Only confirmed facts are entered into the AthleteTime normalized result schema.
+7. Store source provenance separately:
+   - discovery path: athlete-history manual review or self-submitted proof
+   - confirmation path: external official result URL/file/hash
+
+## Tool usage
 
 ```bash
 node tools/extract-athlete-history-evidence.js \
@@ -41,33 +60,38 @@ node tools/extract-athlete-history-evidence.js \
   --json
 ```
 
-입력 파일은 임시 파일이다. 작업 후 삭제한다. PR에는 입력 원문을 올리지 않는다.
+The input file is temporary and must be deleted after the job. It must not be committed.
 
-## 서비스 반영 기준
+## Service reflection rules
 
-| 상태 | 서비스 반영 |
+| Status | Public service behavior |
 | --- | --- |
-| 선수이력에서만 발견 | 공개 반영 금지. 내부 힌트 |
-| 외부 공식 결과 확인 | 반영 가능 |
-| 본인 제출 증빙만 있고 외부 확인 불가 | “본인 제출 자료 검토 중”으로 보류 |
-| 동명이인 가능성 있음 | 자동 병합 금지. 별도 후보로 둠 |
+| Found only in athlete history | Do not publish. Keep as internal hint. |
+| Confirmed by external official result | Eligible for normalized import. |
+| Self-submitted proof only, no external confirmation | Hold as "submitted material under review." |
+| Possible same-name mismatch | Do not merge. Keep as separate candidate. |
 
-## 금지
+## Prohibitions
 
-- 선수이력조회 화면을 자동 대량 조회하지 않는다.
-- 기관 식별자나 생년 정보를 저장하지 않는다.
-- 선수이력 조회 결과만으로 공식 기록처럼 확정 표시하지 않는다.
-- “공식 랭킹”, “전체 랭킹”, “전국 N위 확정” 같은 표현을 쓰지 않는다.
-- 타인의 기록을 본인 기록으로 묶지 않는다.
+- Do not run automated bulk lookup against athlete-history pages.
+- Do not store birth data, personal identifiers, institution identifiers, or raw athlete-history text.
+- Do not present athlete-history-only data as an official confirmed record.
+- Do not use "official ranking", "overall ranking", or "confirmed national place" copy.
+- Do not merge another person's record into an athlete profile based only on name or school.
 
-## 사용자에게 설명할 문구
+## User-facing copy candidates
 
-- “일부 해외대회 기록은 공개 결과와 요청 자료를 담당자가 확인해 보강해요.”
-- “이름이 같은 선수가 있을 수 있어요. 소속과 대회 정보를 함께 확인해 주세요.”
-- “빠진 기록이 있으면 기록 보강을 요청할 수 있어요.”
+- "Some overseas results are added after an operator checks public results and submitted materials."
+- "Athletes with the same name may exist. Please check school, team, and year together."
+- "If a record is missing, you can request a record update."
 
-## 다음 개발 과제
+## Follow-up development
 
-- 운영자 전용 보강 큐: `발견 힌트 → 외부 확인 필요 → 확정 → 반영 → 보류`.
-- 외부 결과 출처 카탈로그: World Athletics/JAAF/대만육협/대회 공식 PDF 링크와 hash 기록.
-- 검색 화면 고지: 해외대회는 수집 범위가 다를 수 있고, 요청으로 보강 가능하다는 짧은 안내.
+- Build an operator-only queue with these states:
+  - `discovered_hint`
+  - `external_confirmation_needed`
+  - `confirmed`
+  - `published`
+  - `held`
+- Build an external result source catalog for World Athletics, JAAF, Taiwan federation, official PDFs, and host result pages.
+- Add search-page copy that explains overseas records may be incomplete and can be supplemented by request.
