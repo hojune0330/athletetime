@@ -95,3 +95,10 @@ test('CALC-DS-005: calculator copy keeps trust tone', () => {
     assert.doesNotMatch(readSource(file), banned, `${file}: trust-violating words banned`);
   }
 });
+
+test('CALC-ROUTE-001: legacy calculators route opens the training calculator instead of 404', () => {
+  const app = readSource('frontend/src/App.tsx');
+
+  assert.match(app, /path="\/training-calculator"/, 'canonical training calculator route exists');
+  assert.match(app, /path="\/calculators"/, 'legacy calculators route stays compatible');
+});
