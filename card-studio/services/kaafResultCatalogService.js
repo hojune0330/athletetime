@@ -79,22 +79,35 @@ function toEntry(file, duplicateIndex) {
   const normalizedTitle = normalizeTitle(file.originalFilename);
   const season = seasonFrom(file);
   const ext = extension(file.originalFilename);
+  const competitionName = String(file.competitionName || '').trim();
+  const competitionText = [
+    competitionName,
+    file.competitionPeriod,
+    file.venue,
+    file.detailUrl,
+  ].filter(Boolean).join(' ');
+  const categoryText = [competitionName, normalizedTitle].filter(Boolean).join(' ');
   return {
     canonicalId: makeCanonicalId(file, season, duplicateIndex),
     provider: 'KAAF',
     sourceTier: 'kaaf_schedule_result_file',
     originalFilename: file.originalFilename,
+    competitionName: competitionName || null,
+    competitionPeriod: file.competitionPeriod || null,
+    venue: file.venue || null,
+    detailUrl: file.detailUrl || null,
     normalizedTitle,
     season,
     extension: ext,
     magicType: magicType(body),
     fileSize: Number(file.fileSize || body.length || 0),
     sha256: file.sha256 || null,
-    categoryHint: categoryHint(normalizedTitle),
+    categoryHint: categoryHint(categoryText),
     sourceUrl: file.sourceUrl || '',
     downloadUrl: file.downloadUrl || '',
     privateStoragePath: file.privateStoragePath || '',
     searchText: [
+      competitionText,
       normalizedTitle,
       file.originalFilename,
       season,
@@ -159,6 +172,9 @@ function searchCatalog(catalog, filters = {}) {
       const matchFields = [];
       if (query && `${entry.normalizedTitle} ${entry.originalFilename}`.toLocaleLowerCase().includes(query)) {
         matchFields.push('title');
+      }
+      if (query && `${entry.competitionName || ''} ${entry.venue || ''}`.toLocaleLowerCase().includes(query)) {
+        matchFields.push('competition');
       }
       if (query && String(entry.season).includes(query)) matchFields.push('season');
       if (query && entry.extension.includes(query)) matchFields.push('extension');

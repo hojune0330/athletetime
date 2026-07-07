@@ -1,0 +1,926 @@
+{
+  "query": "도효자",
+  "fromYear": 2000,
+  "toYear": 2026,
+  "pages": [
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2000",
+      "year": 2000,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2001",
+      "year": 2001,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2002",
+      "year": 2002,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2003",
+      "year": 2003,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2004",
+      "year": 2004,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2005",
+      "year": 2005,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2006",
+      "year": 2006,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2007",
+      "year": 2007,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2008",
+      "year": 2008,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2009",
+      "year": 2009,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2010",
+      "year": 2010,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2011",
+      "year": 2011,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2012",
+      "year": 2012,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2013",
+      "year": 2013,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2014",
+      "year": 2014,
+      "matches": [],
+      "candidates": [],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2015",
+      "year": 2015,
+      "matches": [
+        {
+          "competitionName": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "02.14",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2015&SEQ=427&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20151013.pdf",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2015",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2015/10/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20151013.pdf",
+              "originalFilename": "예천결과20151013.pdf",
+              "year": 2015,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "02.14",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2015&SEQ=427&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20151013.pdf",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2015",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2015/10/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20151013.pdf",
+          "originalFilename": "예천결과20151013.pdf",
+          "year": 2015,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "02.14",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2015&SEQ=427&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2016",
+      "year": 2016,
+      "matches": [
+        {
+          "competitionName": "2016 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.06",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2016&SEQ=498&WPAGE=1",
+          "candidates": []
+        }
+      ],
+      "candidates": [],
+      "missingResultRows": [
+        {
+          "competitionName": "2016 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.06",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2016&SEQ=498&WPAGE=1",
+          "reason": "no_result_file_attachment"
+        }
+      ]
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2017",
+      "year": 2017,
+      "matches": [
+        {
+          "competitionName": "제3회 예천 도효자배전국고교10Km대회 겸 중학교5Km대회",
+          "competitionPeriod": "02.26",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2017&SEQ=522&WPAGE=1",
+          "candidates": []
+        }
+      ],
+      "candidates": [],
+      "missingResultRows": [
+        {
+          "competitionName": "제3회 예천 도효자배전국고교10Km대회 겸 중학교5Km대회",
+          "competitionPeriod": "02.26",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2017&SEQ=522&WPAGE=1",
+          "reason": "no_result_file_attachment"
+        }
+      ]
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2018",
+      "year": 2018,
+      "matches": [
+        {
+          "competitionName": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.04",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2018&SEQ=629&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20180319.pdf",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2018",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2018/03/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20180319.pdf",
+              "originalFilename": "예천결과20180319.pdf",
+              "year": 2018,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "03.04",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2018&SEQ=629&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20180319.pdf",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2018",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2018/03/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20180319.pdf",
+          "originalFilename": "예천결과20180319.pdf",
+          "year": 2018,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.04",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2018&SEQ=629&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2019",
+      "year": 2019,
+      "matches": [
+        {
+          "competitionName": "제5회 예천 도효자배전국고교10km 겸 중학교5km대회",
+          "competitionPeriod": "11.10",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2019&SEQ=723&WPAGE=1",
+          "candidates": []
+        }
+      ],
+      "candidates": [],
+      "missingResultRows": [
+        {
+          "competitionName": "제5회 예천 도효자배전국고교10km 겸 중학교5km대회",
+          "competitionPeriod": "11.10",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2019&SEQ=723&WPAGE=1",
+          "reason": "no_result_file_attachment"
+        }
+      ]
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2020",
+      "year": 2020,
+      "matches": [
+        {
+          "competitionName": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "11.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2020&SEQ=788&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20210118.xlsx",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2020",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/01/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20210118.xlsx",
+              "originalFilename": "종합기록(전체)20210118.xlsx",
+              "year": 2021,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "11.08",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2020&SEQ=788&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20210118.xlsx",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2020",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/01/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20210118.xlsx",
+          "originalFilename": "종합기록(전체)20210118.xlsx",
+          "year": 2021,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "11.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2020&SEQ=788&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2021",
+      "year": 2021,
+      "matches": [
+        {
+          "competitionName": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "11.28",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2021&SEQ=885&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20211215.xls",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2021",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/12/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20211215.xls",
+              "originalFilename": "종합기록(전체)20211215.xls",
+              "year": 2021,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "11.28",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2021&SEQ=885&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20211215.xls",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2021",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/12/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20211215.xls",
+          "originalFilename": "종합기록(전체)20211215.xls",
+          "year": 2021,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "11.28",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2021&SEQ=885&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2022",
+      "year": 2022,
+      "matches": [
+        {
+          "competitionName": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.06",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2022&SEQ=937&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 제8회 도효자배 종합기록(전체)20220318.xlsx",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2022",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2022/03/FILEs_4//%EC%A0%9C8%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20220318.xlsx",
+              "originalFilename": "제8회 도효자배 종합기록(전체)20220318.xlsx",
+              "year": 2022,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "03.06",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2022&SEQ=937&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 제8회 도효자배 종합기록(전체)20220318.xlsx",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2022",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2022/03/FILEs_4//%EC%A0%9C8%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20220318.xlsx",
+          "originalFilename": "제8회 도효자배 종합기록(전체)20220318.xlsx",
+          "year": 2022,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.06",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2022&SEQ=937&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2023",
+      "year": 2023,
+      "matches": [
+        {
+          "competitionName": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.05",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2023&SEQ=997&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 9회도효자종합기록20230306.xls",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2023",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2023/03/FILEs_4//9%ED%9A%8C%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20230306.xls",
+              "originalFilename": "9회도효자종합기록20230306.xls",
+              "year": 2023,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+              "competitionPeriod": "03.05",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2023&SEQ=997&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 9회도효자종합기록20230306.xls",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2023",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2023/03/FILEs_4//9%ED%9A%8C%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20230306.xls",
+          "originalFilename": "9회도효자종합기록20230306.xls",
+          "year": 2023,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+          "competitionPeriod": "03.05",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2023&SEQ=997&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2024",
+      "year": 2024,
+      "matches": [
+        {
+          "competitionName": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.03",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2024&SEQ=1070&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회 — 제10회 도효자배 기록지20240326.pdf",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2024",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2024/03/FILEs_4//%EC%A0%9C10%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EA%B8%B0%EB%A1%9D%EC%A7%8020240326.pdf",
+              "originalFilename": "제10회 도효자배 기록지20240326.pdf",
+              "year": 2024,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회",
+              "competitionPeriod": "03.03",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2024&SEQ=1070&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회 — 제10회 도효자배 기록지20240326.pdf",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2024",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2024/03/FILEs_4//%EC%A0%9C10%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EA%B8%B0%EB%A1%9D%EC%A7%8020240326.pdf",
+          "originalFilename": "제10회 도효자배 기록지20240326.pdf",
+          "year": 2024,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.03",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2024&SEQ=1070&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2025",
+      "year": 2025,
+      "matches": [
+        {
+          "competitionName": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2025&SEQ=1138&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회 — 종합기록지20250312.pdf",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2025",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2025/03/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D%EC%A7%8020250312.pdf",
+              "originalFilename": "종합기록지20250312.pdf",
+              "year": 2025,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회",
+              "competitionPeriod": "03.08",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2025&SEQ=1138&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회 — 종합기록지20250312.pdf",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2025",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2025/03/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D%EC%A7%8020250312.pdf",
+          "originalFilename": "종합기록지20250312.pdf",
+          "year": 2025,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2025&SEQ=1138&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    },
+    {
+      "query": "도효자",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026",
+      "year": 2026,
+      "matches": [
+        {
+          "competitionName": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1181&WPAGE=1",
+          "candidates": [
+            {
+              "provider": "대한육상연맹",
+              "sourceClass": "kaaf_schedule_result_attachment",
+              "sourceType": "kaaf_schedule_result_attachment",
+              "collectionAction": "download_file",
+              "title": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회 — 2026도효자종합기록20260318.pdf",
+              "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026",
+              "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2026/03/FILEs_4//2026%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20260318.pdf",
+              "originalFilename": "2026도효자종합기록20260318.pdf",
+              "year": 2026,
+              "licenseType": "unknown_kaaf_public_schedule_attachment",
+              "reviewStatus": "approved",
+              "extractionMethod": "kaaf_internal_file_slot_4",
+              "robotsPosture": "kaaf_public_schedule_attachment",
+              "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+              "competitionName": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회",
+              "competitionPeriod": "03.08",
+              "venue": "예천",
+              "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1181&WPAGE=1"
+            }
+          ]
+        }
+      ],
+      "candidates": [
+        {
+          "provider": "대한육상연맹",
+          "sourceClass": "kaaf_schedule_result_attachment",
+          "sourceType": "kaaf_schedule_result_attachment",
+          "collectionAction": "download_file",
+          "title": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회 — 2026도효자종합기록20260318.pdf",
+          "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026",
+          "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2026/03/FILEs_4//2026%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20260318.pdf",
+          "originalFilename": "2026도효자종합기록20260318.pdf",
+          "year": 2026,
+          "licenseType": "unknown_kaaf_public_schedule_attachment",
+          "reviewStatus": "approved",
+          "extractionMethod": "kaaf_internal_file_slot_4",
+          "robotsPosture": "kaaf_public_schedule_attachment",
+          "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+          "competitionName": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회",
+          "competitionPeriod": "03.08",
+          "venue": "예천",
+          "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1181&WPAGE=1"
+        }
+      ],
+      "missingResultRows": []
+    }
+  ],
+  "candidates": [
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20151013.pdf",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2015",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2015/10/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20151013.pdf",
+      "originalFilename": "예천결과20151013.pdf",
+      "year": 2015,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "2015 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "02.14",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2015&SEQ=427&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회 — 예천결과20180319.pdf",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2018",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2018/03/FILEs_4//%EC%98%88%EC%B2%9C%EA%B2%B0%EA%B3%BC20180319.pdf",
+      "originalFilename": "예천결과20180319.pdf",
+      "year": 2018,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제4회 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "03.04",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2018&SEQ=629&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20210118.xlsx",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2020",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/01/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20210118.xlsx",
+      "originalFilename": "종합기록(전체)20210118.xlsx",
+      "year": 2021,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제6회 예천도효자배전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "11.08",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2020&SEQ=788&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회 — 종합기록(전체)20211215.xls",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2021",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2021/12/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20211215.xls",
+      "originalFilename": "종합기록(전체)20211215.xls",
+      "year": 2021,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제7회 예천도효자배 전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "11.28",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2021&SEQ=885&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 제8회 도효자배 종합기록(전체)20220318.xlsx",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2022",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2022/03/FILEs_4//%EC%A0%9C8%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D(%EC%A0%84%EC%B2%B4)20220318.xlsx",
+      "originalFilename": "제8회 도효자배 종합기록(전체)20220318.xlsx",
+      "year": 2022,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제8회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "03.06",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2022&SEQ=937&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회 — 9회도효자종합기록20230306.xls",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2023",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2023/03/FILEs_4//9%ED%9A%8C%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20230306.xls",
+      "originalFilename": "9회도효자종합기록20230306.xls",
+      "year": 2023,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제9회 예천 도효자배 전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "03.05",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2023&SEQ=997&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회 — 제10회 도효자배 기록지20240326.pdf",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2024",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2024/03/FILEs_4//%EC%A0%9C10%ED%9A%8C%20%EB%8F%84%ED%9A%A8%EC%9E%90%EB%B0%B0%20%EA%B8%B0%EB%A1%9D%EC%A7%8020240326.pdf",
+      "originalFilename": "제10회 도효자배 기록지20240326.pdf",
+      "year": 2024,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제10회 예천 도효자배 전국 고교 10km대회 겸 중학교 5km대회",
+      "competitionPeriod": "03.03",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2024&SEQ=1070&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회 — 종합기록지20250312.pdf",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2025",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2025/03/FILEs_4//%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D%EC%A7%8020250312.pdf",
+      "originalFilename": "종합기록지20250312.pdf",
+      "year": 2025,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제11회 예천도효자배 전국고교10km대회 겸 중학교 5km대회",
+      "competitionPeriod": "03.08",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2025&SEQ=1138&WPAGE=1"
+    },
+    {
+      "provider": "대한육상연맹",
+      "sourceClass": "kaaf_schedule_result_attachment",
+      "sourceType": "kaaf_schedule_result_attachment",
+      "collectionAction": "download_file",
+      "title": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회 — 2026도효자종합기록20260318.pdf",
+      "sourceUrl": "https://kaaf.or.kr/ver3/info/internal.asp?currentYear=2026",
+      "downloadUrl": "https://www.kaaf.or.kr/DATA/schedule/2026/03/FILEs_4//2026%EB%8F%84%ED%9A%A8%EC%9E%90%EC%A2%85%ED%95%A9%EA%B8%B0%EB%A1%9D20260318.pdf",
+      "originalFilename": "2026도효자종합기록20260318.pdf",
+      "year": 2026,
+      "licenseType": "unknown_kaaf_public_schedule_attachment",
+      "reviewStatus": "approved",
+      "extractionMethod": "kaaf_internal_file_slot_4",
+      "robotsPosture": "kaaf_public_schedule_attachment",
+      "notes": "KAAF 국내경기 연간 페이지의 FILEs_4 결과파일 링크에서 수집한 원본 첨부입니다. 대회명 기반 누락 감사에서 행 문맥으로 확인했습니다.",
+      "competitionName": "제12회 예천 도효자배 전국고교10km대회 겸 중학교 5km대회",
+      "competitionPeriod": "03.08",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2026&SEQ=1181&WPAGE=1"
+    }
+  ],
+  "missingResultRows": [
+    {
+      "competitionName": "2016 예천 도효자배전국고교10km대회 겸 중학교5km대회",
+      "competitionPeriod": "03.06",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2016&SEQ=498&WPAGE=1",
+      "reason": "no_result_file_attachment"
+    },
+    {
+      "competitionName": "제3회 예천 도효자배전국고교10Km대회 겸 중학교5Km대회",
+      "competitionPeriod": "02.26",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2017&SEQ=522&WPAGE=1",
+      "reason": "no_result_file_attachment"
+    },
+    {
+      "competitionName": "제5회 예천 도효자배전국고교10km 겸 중학교5km대회",
+      "competitionPeriod": "11.10",
+      "venue": "예천",
+      "detailUrl": "https://kaaf.or.kr/ver3/info/view.asp?YEAR=2019&SEQ=723&WPAGE=1",
+      "reason": "no_result_file_attachment"
+    }
+  ]
+}
