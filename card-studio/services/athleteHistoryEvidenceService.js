@@ -10,7 +10,9 @@ const COMPETITIONS = Object.freeze([
     label: '\uC77C\uBCF8 \uB514\uC2A4\uD134\uC2A4 \uCC4C\uB9B0\uC9C0',
     queries: [
       'World Athletics Japan Distance Challenge results',
+      'World Athletics HOKUREN Distance Challenge results',
       'JAAF Distance Challenge results',
+      'HOKUREN Distance Challenge results',
       'Japan Distance Challenge athletics results',
     ],
   },
@@ -26,6 +28,9 @@ const COMPETITIONS = Object.freeze([
       'JAAF Osaka Open athletics results',
       'World Athletics Osaka Open results',
       'Osaka Open Athletics results',
+      'World Athletics EDION Distance Challenge in Osaka results',
+      'EDION Distance Challenge in Osaka results',
+      '\u5927\u962A\u30AA\u30FC\u30D7\u30F3 \u9678\u4E0A \u7D50\u679C',
     ],
   },
   {
