@@ -17,8 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input';
 import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
-import { CombinedRecordsCard } from '../components/record-insights/CombinedRecordsCard';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
+import { MyRecordsCard } from '../components/record-insights/MyRecordsCard';
 import { useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
 import { AthleteHighlightBadges } from '../components/record-insights/AthleteHighlightBadges';
@@ -53,9 +53,9 @@ export default function RecordsPage() {
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
   const [compareNotice, setCompareNotice] = useState('');
-  const [combineKeys, setCombineKeys] = useState<string[]>([]);
+  const [showMyRecords, setShowMyRecords] = useState(false);
   const compareTray = useCompareTray();
-  const { myAthlete, save: saveMyAthlete, clear: clearMyAthlete } = useMyAthlete();
+  const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
 
   useEffect(() => {
@@ -225,21 +225,18 @@ export default function RecordsPage() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
-            <h1 className="mt-4 text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
               내 기록, 이름만 알면 찾아요.
             </h1>
-            <p className="mt-4 text-sm leading-6 text-ink-3">
-              이름이나 소속(학교·팀)으로 검색하면 모아 둔 대회 기록을 보여드려요.
-            </p>
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            {myAthlete && (
+            {myEntries.length > 0 && (
               <button
                 type="button"
-                onClick={() => handleSelectAthlete(myAthlete.athleteKey)}
+                onClick={() => setShowMyRecords(true)}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
               >
-                내 기록 바로 보기 — {myAthlete.name}
+                내 기록 바로 보기 — {myEntries[0].name}
               </button>
             )}
             <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
@@ -272,20 +269,6 @@ export default function RecordsPage() {
         <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
           두 글자 이상 입력하면 검색할 수 있어요.
         </p>
-
-        <p className="mt-4 text-xs leading-5 text-ink-4">
-          {DATA_NOTICE}{' '}
-          <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
-            데이터 안내 보기
-          </Link>
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {TRUST_POINTS.map((point) => (
-            <span key={point} className="border border-line bg-surface-2 px-2.5 py-1 text-xs font-medium text-ink-3">
-              {point}
-            </span>
-          ))}
-        </div>
       </section>
 
       {compareKeys.length >= 2 && (
@@ -332,14 +315,11 @@ export default function RecordsPage() {
         </div>
       )}
 
-      {combineKeys.length >= 2 && (
-        <CombinedRecordsCard
-          athleteKeys={combineKeys}
-          onClose={() => setCombineKeys([])}
-          onSelectAthlete={(key) => {
-            setCombineKeys([]);
-            handleSelectAthlete(key);
-          }}
+      {showMyRecords && myEntries.length > 0 && (
+        <MyRecordsCard
+          entries={myEntries}
+          onClose={() => setShowMyRecords(false)}
+          onRemove={removeMyAthlete}
         />
       )}
 
@@ -349,18 +329,16 @@ export default function RecordsPage() {
           state={profileState}
           isSharedLinkFallback={isSharedLinkFallback}
           inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
-          isMyAthlete={profile ? myAthlete?.athleteKey === profile.athlete.athleteKey : false}
+          isMyAthlete={profile ? isMine(profile.athlete.athleteKey) : false}
           onSetMyAthlete={() => {
             if (!profile) return;
-            if (myAthlete?.athleteKey === profile.athlete.athleteKey) {
-              clearMyAthlete();
-            } else {
-              saveMyAthlete({
-                athleteKey: profile.athlete.athleteKey,
-                name: profile.athlete.name,
-                team: profile.athlete.team,
-              });
-            }
+            const wasMine = isMine(profile.athlete.athleteKey);
+            toggleMyAthlete({
+              athleteKey: profile.athlete.athleteKey,
+              name: profile.athlete.name,
+              team: profile.athlete.team,
+            });
+            if (!wasMine) setShowMyRecords(true);
           }}
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
@@ -405,18 +383,16 @@ export default function RecordsPage() {
           profile={profile}
           state={profileState}
           inTray={profile ? compareTray.isInTray(profile.athlete.athleteKey) : false}
-          isMyAthlete={profile ? myAthlete?.athleteKey === profile.athlete.athleteKey : false}
+          isMyAthlete={profile ? isMine(profile.athlete.athleteKey) : false}
           onSetMyAthlete={() => {
             if (!profile) return;
-            if (myAthlete?.athleteKey === profile.athlete.athleteKey) {
-              clearMyAthlete();
-            } else {
-              saveMyAthlete({
-                athleteKey: profile.athlete.athleteKey,
-                name: profile.athlete.name,
-                team: profile.athlete.team,
-              });
-            }
+            const wasMine = isMine(profile.athlete.athleteKey);
+            toggleMyAthlete({
+              athleteKey: profile.athlete.athleteKey,
+              name: profile.athlete.name,
+              team: profile.athlete.team,
+            });
+            if (!wasMine) setShowMyRecords(true);
           }}
           onToggleCompare={() => {
             if (!profile) return;
@@ -436,9 +412,12 @@ export default function RecordsPage() {
       {shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
         <EstimatedSameAthleteCard
           athleteKey={selectedAthleteKey}
+          athleteName={profile?.athlete.name || ''}
           onSelectAthlete={handleSelectAthlete}
-          onCombine={(keys) => {
-            setCombineKeys(keys);
+          onCombine={(segments) => {
+            // 원탭 합산 — 묶음 전부를 바로 내 기록으로 (확인 절차 없음, 빼기는 나중에)
+            addManyMyAthletes(segments);
+            setShowMyRecords(true);
           }}
         />
       )}
@@ -458,6 +437,14 @@ export default function RecordsPage() {
         />
       )}
 
+      {/* 안내·신뢰 문구는 페이지 맨 아래 한 줄로 */}
+      <p className="text-[11px] leading-4 text-ink-4">
+        {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
+        <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
+          데이터 안내 보기
+        </Link>
+      </p>
+
       {/* 비교 트레이 분량만큼 하단 여백 (담은 게 있을 때만) */}
       {compareTray.count > 0 && <div aria-hidden className="h-28 sm:h-24" />}
       <CompareTray
@@ -471,61 +458,19 @@ export default function RecordsPage() {
 
 function StartPanel({ onSeasonMode }: { onSeasonMode: () => void }) {
   return (
-    <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-      <Card className="overflow-hidden">
-        <CardContent className="p-0">
-          <div className="border-b border-line bg-ink p-6 text-white">
-            <p className="text-sm font-semibold text-white/70">여기서 시작하세요</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight">위 검색창에 이름을 적어보세요.</h2>
-            <p className="mt-2 text-sm leading-6 text-white/65">
-              내 이름이면 충분해요. 같은 이름이 여러 명이면 소속을 보고 고르면 돼요.
-            </p>
-          </div>
-          <div className="grid gap-0 sm:grid-cols-3">
-            <StartFeature
-              step={1}
-              title="이름 입력"
-              description="내 이름을 그대로 적으면 돼요. 예: 홍길동"
-            />
-            <StartFeature
-              step={2}
-              title="나 찾기"
-              description="같은 이름이 여러 명 나오면 학교나 팀 이름을 보고 고르세요."
-            />
-            <StartFeature
-              step={3}
-              title="기록 확인"
-              description="최고 기록부터 최근 기록까지 한눈에 보고 카드로 공유해요."
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">시즌 기록표</CardTitle>
-          <p className="text-sm text-ink-3">검색어가 없어도 시즌·종목·부문을 골라 기록표를 볼 수 있어요.</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-xs leading-5 text-ink-4">
-            종목과 시즌을 고르면 모은 기록을 빠른 순으로 정렬해 보여줘요.
+    <Card>
+      <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight text-ink">위 검색창에 이름을 적어보세요.</h2>
+          <p className="mt-1 text-sm text-ink-3">
+            같은 이름이 여러 명이면 소속을 보고 고르고, "나로 지정"을 누르면 바로 내 기록이 돼요.
           </p>
-          <Button type="button" variant="outline" onClick={onSeasonMode}>
-            시즌 기록표 보기
-          </Button>
-        </CardContent>
-      </Card>
-    </section>
-  );
-}
-
-function StartFeature({ step, title, description }: { step: number; title: string; description: string }) {
-  return (
-    <div className="border-b border-line p-5 sm:border-b-0 sm:border-r sm:last:border-r-0">
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-brand/10 text-sm font-semibold text-brand">{step}</span>
-      <h3 className="mt-3 text-lg font-semibold text-ink">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-ink-3">{description}</p>
-    </div>
+        </div>
+        <Button type="button" variant="outline" onClick={onSeasonMode} className="shrink-0">
+          시즌 기록표 보기
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -617,22 +562,19 @@ function AthletePanel({
               <p className="text-sm font-semibold text-brand">기록 한눈에</p>
               <CardTitle className="mt-2 text-3xl">{athlete.name}</CardTitle>
               <p className="mt-2 text-sm text-ink-3">{athlete.team || '소속 미상'} · {formatYearRange(athlete.years)}</p>
-              <p className="mt-3 text-xs leading-5 text-ink-4">
-                같은 이름의 다른 선수일 수 있어요. 소속·연도를 함께 확인하세요.
-              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {onSetMyAthlete && (
                 <button
                   type="button"
                   onClick={onSetMyAthlete}
-                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                     isMyAthlete
                       ? 'border-brand-500 bg-brand-500 text-white'
-                      : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'
+                      : 'border-brand-500 bg-white text-brand hover:bg-brand-50'
                   }`}
                 >
-                  {isMyAthlete ? '✓ 내 기록으로 지정됨' : '나로 지정'}
+                  {isMyAthlete ? '✓ 내 기록' : '나로 지정'}
                 </button>
               )}
               <button
@@ -681,15 +623,12 @@ function AthletePanel({
               </Link>
             </div>
           </div>
-          <div className="mt-3 flex flex-col gap-1 text-xs leading-5 text-ink-4 sm:items-end">
-            <p>링크는 이 화면을 다시 열기 위한 주소예요. 공식 기록 서비스는 아니에요. {TRUST_NOTICE.partial}</p>
-            {shareLinkMessage && (
-              <div role="status" className="space-y-1 text-right">
-                <p className="font-medium text-brand">{shareLinkMessage}</p>
-                <p>틀렸거나 빼고 싶다면 이 화면에서 정정·비노출을 요청할 수 있어요.</p>
-              </div>
-            )}
-          </div>
+          {shareLinkMessage && (
+            <div role="status" className="mt-2 space-y-1 text-xs leading-5 text-ink-4 sm:text-right">
+              <p className="font-medium text-brand">{shareLinkMessage}</p>
+              <p>틀렸거나 빼고 싶다면 이 화면에서 정정·비노출을 요청할 수 있어요.</p>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-4">
@@ -702,8 +641,12 @@ function AthletePanel({
               <p className="mt-1 text-xs text-ink-4">비교 가능 기록 {summary.comparableResultCount}</p>
             </div>
           </div>
-          <p className="mt-4 text-xs leading-5 text-ink-4">{summary.disclaimer}</p>
           <AthleteHighlightBadges profile={profile} />
+          {/* 안내문구는 전부 맨 아래로 */}
+          <div className="mt-4 border-t border-hair pt-3 text-[11px] leading-4 text-ink-4">
+            <p>같은 이름의 다른 선수일 수 있어요. 소속·연도를 함께 확인하세요. {summary.disclaimer}</p>
+            <p className="mt-1">링크는 이 화면을 다시 열기 위한 주소예요. 공식 기록 서비스는 아니에요. {TRUST_NOTICE.partial}</p>
+          </div>
         </CardContent>
       </Card>
 

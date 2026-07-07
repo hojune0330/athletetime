@@ -1,30 +1,34 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent } from '../ui/card';
 import { getShadowCluster, type ShadowCluster, type ShadowClusterSegment } from '../../api/recordAnalytics';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
+export type CombineEntry = { athleteKey: string; name: string; team: string };
+
 type Props = {
   /** 현재 보고 있는 선수의 athleteKey. 이 화면에서만 추정 제안을 띄운다. */
   athleteKey: string;
+  /** 현재 보고 있는 선수 이름 — 묶음 합산 시 표시명으로 쓴다 */
+  athleteName?: string;
   /** 추정 묶음 안의 다른 기록(athleteKey)을 눌렀을 때 이동 콜백 (선택) */
   onSelectAthlete?: (athleteKey: string) => void;
-  /** 묶음 전체를 한 화면에 모아 보기 (화면 임시 모음 — 데이터 병합 아님) */
-  onCombine?: (athleteKeys: string[]) => void;
+  /** 원탭 합산 — 누르면 묶음 전체가 바로 내 기록이 된다 */
+  onCombine?: (entries: CombineEntry[]) => void;
 };
 
 /**
- * "같은 선수로 추정되는 기록" 제안 카드.
+ * "이 기록도 내 것 같아요?" 제안 카드 — 심플 버전.
  *
- * 신뢰 원칙 (인문/신뢰 도메인 — Claude 몫)
- * - 이것은 **추정**이다. 확정 병합이 아니다. 자동으로 합치지 않는다.
- * - "추정" 표현은 반드시 **"직접 확인"** 안내와 함께 둔다.
- * - person_no를 쓰지 않고 만들어진 묶음임을 사용자가 오해하지 않도록, 단정/공식/검증 같은 말을 쓰지 않는다.
- * - 동명이인일 수 있으므로 "다른 선수일 수 있어요"를 항상 남긴다.
- * - 응답에 cluster가 없으면(추정 묶음이 없으면) 아무것도 그리지 않는다(조용히 숨김).
- * - 로드 실패도 조용히 숨긴다 — 제안은 부가 기능이라 화면을 망치면 안 된다.
+ * 소속 변화(예: 진학)로 나뉜 기록 묶음을 보여주고, 버튼 한 번으로 바로 합친다.
+ * 확인 절차 없음 — 잘못 합쳤으면 내 기록 화면에서 빼면 된다.
+ *
+ * 신뢰 원칙 (유지):
+ * - 이것은 추정이다. 서버 데이터를 자동으로 합치지 않는다 (화면 합산만).
+ * - 동명이인 가능성 고지는 하단 한 줄로 유지한다.
+ * - 응답에 cluster가 없거나 실패하면 조용히 숨긴다.
  */
-export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete, onCombine }: Props) {
+export function EstimatedSameAthleteCard({ athleteKey, athleteName = '', onSelectAthlete, onCombine }: Props) {
   const [state, setState] = useState<LoadState>('idle');
   const [cluster, setCluster] = useState<ShadowCluster | null>(null);
 
@@ -63,89 +67,70 @@ export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete, onCombin
     return null;
   }
 
+  const handleCombine = () => {
+    if (!onCombine) return;
+    onCombine(
+      cluster.segments.map((seg) => ({
+        athleteKey: seg.athleteKey,
+        name: athleteName,
+        team: seg.teamLabel || '소속 미상',
+      })),
+    );
+  };
+
   return (
     <Card className="border-dashed border-amber-300 bg-amber-50/40">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-700/70">Estimated · 추정</p>
-            <CardTitle className="mt-1 text-base text-amber-900">같은 선수로 추정되는 기록</CardTitle>
+      <CardContent className="p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-base font-semibold text-amber-900">
+              소속이 다른 같은 이름 기록이 {others.length}개 더 있어요
+            </p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {others.map((seg) => (
+                <SegmentChip key={seg.athleteKey} segment={seg} onSelect={onSelectAthlete} />
+              ))}
+            </div>
           </div>
-          <ConfidenceBadge band={cluster.confidenceBand} />
+          {onCombine && (
+            <button
+              type="button"
+              onClick={handleCombine}
+              className="shrink-0 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700"
+            >
+              모두 내 기록으로 합치기
+            </button>
+          )}
         </div>
-        <p className="mt-2 text-sm leading-6 text-amber-900/80">
-          소속 변화(예: 진학)로 보아 <strong>같은 선수일 수 있다고 추정</strong>한 기록이에요.
-          확정이 아니고 <strong>자동으로 합치지 않아요</strong>. 동명이인일 수 있으니 소속·연도를 보고
-          <strong> 직접 확인</strong>해 주세요.
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-2 pt-0">
-        {others.map((seg) => (
-          <SegmentRow key={seg.athleteKey} segment={seg} onSelect={onSelectAthlete} />
-        ))}
-        {onCombine && (
-          <button
-            type="button"
-            onClick={() => onCombine(cluster.segments.map((seg) => seg.athleteKey))}
-            className="w-full rounded-lg border border-amber-400 bg-white px-3 py-2.5 text-sm font-semibold text-amber-900 transition hover:bg-amber-100"
-          >
-            이 기록들 한 화면에 모아 보기
-          </button>
-        )}
-        <p className="pt-1 text-xs leading-5 text-amber-800/70">
-          이 추정은 공개된 소속·연도 흐름만으로 만든 것이고, 순위나 공식 기록이 아니에요.
-          모아 보기도 화면에서만 임시로 모으는 것이고 데이터를 합치지 않아요.
+        <p className="mt-3 text-[11px] leading-4 text-amber-800/60">
+          소속·연도 흐름으로 추정한 묶음이에요 (원본 데이터는 그대로예요). 동명이인이면 내 기록 화면에서 빼면 돼요.
         </p>
       </CardContent>
     </Card>
   );
 }
 
-function SegmentRow({
+function SegmentChip({
   segment,
   onSelect,
 }: {
   segment: ShadowClusterSegment;
   onSelect?: (athleteKey: string) => void;
 }) {
-  const yearLabel = formatSegmentYears(segment);
-  const team = segment.teamLabel || '소속 미상';
-  const content = (
-    <div className="flex w-full items-center justify-between gap-3">
-      <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-amber-950">{team}</p>
-        <p className="mt-0.5 text-xs text-amber-800/75">{yearLabel}</p>
-      </div>
-      <div className="shrink-0 text-right">
-        <p className="text-xs text-amber-800/75">기록 {segment.recordCount}개</p>
-        {segment.eventCount > 0 && (
-          <p className="text-[11px] text-amber-700/60">종목 {segment.eventCount}개</p>
-        )}
-      </div>
-    </div>
-  );
-
+  const label = `${segment.teamLabel || '소속 미상'} · ${formatSegmentYears(segment)} · 기록 ${segment.recordCount}개`;
   if (onSelect) {
     return (
       <button
         type="button"
         onClick={() => onSelect(segment.athleteKey)}
-        className="w-full rounded-lg border border-amber-200 bg-white/70 px-3 py-2 text-left transition hover:border-amber-400 hover:bg-white"
+        className="rounded-lg border border-amber-200 bg-white/70 px-2.5 py-1.5 text-xs font-medium text-amber-950 transition hover:border-amber-400 hover:bg-white"
       >
-        {content}
+        {label}
       </button>
     );
   }
   return (
-    <div className="w-full rounded-lg border border-amber-200 bg-white/70 px-3 py-2">{content}</div>
-  );
-}
-
-function ConfidenceBadge({ band }: { band: 'low' | 'medium' }) {
-  // 신뢰 원칙: 숫자(0.71 등)는 노출하지 않는다. "추정 강도"는 정성적 표현으로만.
-  const label = band === 'medium' ? '추정 강도: 보통' : '추정 강도: 낮음';
-  return (
-    <span className="shrink-0 rounded-full border border-amber-300 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-amber-800">
+    <span className="rounded-lg border border-amber-200 bg-white/70 px-2.5 py-1.5 text-xs font-medium text-amber-950">
       {label}
     </span>
   );
