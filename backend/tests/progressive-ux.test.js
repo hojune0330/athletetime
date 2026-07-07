@@ -72,6 +72,25 @@ test('UX-COMBINE-001: one-tap merge — instant summation, after-the-fact remova
   assert.doesNotMatch(page, /window\.confirm/, 'no confirmation dialogs in one-tap flow');
 });
 
+test('UX-COMBINE-002: search candidates offer direct "나" designation with instant merge', () => {
+  // 검색 후보 카드에서 바로 "나" 지정 — 여러 카드를 누르면 전부 내 기록으로 합산
+  const results = readSource('frontend/src/components/records/RecordSearchResults.tsx');
+  assert.match(results, /onToggleMine/, 'candidate card exposes one-tap mine toggle');
+  assert.match(results, /✓ 내 기록/, 'designated card shows mine badge');
+  assert.match(results, /합친 기록 보기/, 'merged dashboard entry point above candidates');
+  assert.match(results, /aria-pressed=\{mine\}/, 'mine toggle is accessible');
+
+  const page = readSource('frontend/src/pages/RecordsPage.tsx');
+  assert.match(page, /onToggleMine=\{/, 'page wires candidate mine toggle');
+  assert.match(page, /onViewMyRecords=\{/, 'page wires merged dashboard opener');
+
+  // 대시보드: 종목별 베스트·시즌 베스트도 묶음 전체 합산
+  const card = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
+  assert.match(card, /eventBests/, 'per-event bests merged across clusters');
+  assert.match(card, /seasonBest/, 'season best merged across clusters');
+  assert.match(card, /markSortValue/, 'record marks compared numerically');
+});
+
 test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser', () => {
   const log = readSource('frontend/src/pages/TrainingCalculatorPage/components/TrainingLogLite.tsx');
   assert.match(log, /athletetime\.training-log\.v1/, 'stable storage key');
