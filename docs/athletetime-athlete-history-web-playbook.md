@@ -363,7 +363,145 @@ World Athletics Taiwan Open results
 13. 확인되면 정규 스키마에 입력한다.
 14. 불확실하면 `held` 상태로 둔다.
 
-## 7. 운영자 보강 큐 설계
+## 7. 단일 실측 사례
+
+목표:
+
+- KAAF 국내/국제 일정 페이지에는 보이지 않지만, 외부 공식 결과에서 한국 선수 기록을 확인할 수 있는 사례 1건을 찾는다.
+- 사용자님이 제안한 `result.kaaf.or.kr/recInfo/topRecList.do`와 선수이력조회 경로가 실제로 이어지는지 확인한다.
+
+확인일:
+
+- 2026-07-07
+
+### 7-1. TOP 기록 화면에서 후보 찾기
+
+조회 화면:
+
+```text
+https://result.kaaf.or.kr/recInfo/topRecList.do
+```
+
+실제 조회 조건:
+
+| 파라미터 | 값 |
+| --- | --- |
+| `start_dt` | `20250101` |
+| `end_dt` | `20251231` |
+| `check_dt` | `N` |
+| `check_round` | `Y` |
+| `check_ref` | `N` |
+| `gubun` | `E` |
+| `kind_cd` | `15` |
+| `detail_class_cd` | `14` |
+| `rank_cnt` | `5` |
+
+조회 의미:
+
+- 2025년 남자일반부 800m, 예선·준결승 포함, 참고기록 제외, 상위 5개 기록.
+
+실제 응답에서 확인한 후보:
+
+| 항목 | 값 |
+| --- | --- |
+| 대회명 | `2025 디스턴스첼린지대회(5차)` |
+| 날짜 | `2025-07-19` |
+| 선수 | `이재웅` |
+| 소속 | `국군체육부대` |
+| 종목 | `800m` |
+| 기록 | `1:46.51` |
+| 라운드 | `결승` |
+
+중요 발견:
+
+- 응답에는 `PERSON_NO1` 같은 제한 식별자가 함께 내려온다.
+- 따라서 `topRecList` 응답을 그대로 저장하면 안 된다.
+- 저장 가능 필드는 대회명, 날짜, 선수 표시명, 소속 표시명, 종목, 기록, 라운드, 출처 확인 상태 정도로 제한해야 한다.
+
+### 7-2. 선수이력조회에서 같은 후보 확인
+
+조회 화면:
+
+```text
+https://result.kaaf.or.kr/history/playerHistory.do
+```
+
+실제 목록 조회 조건:
+
+| 파라미터 | 값 |
+| --- | --- |
+| `pageIndex` | `1` |
+| `gubun` | `E` |
+| `kor_nm` | `이재웅` |
+| `status` | empty |
+| `kind_cd` | empty |
+| `detail_class_cd` | empty |
+| `searchKey` | `S` |
+
+목록 결과:
+
+- 동명이인 4명 확인.
+- `국군체육부대`, 등록년도 `(2026)`, 선수구분 `전문선수`, 종목 `1500m` 행이 확인됨.
+
+상세 팝업:
+
+```text
+/history/popHistoryPlayer.do
+```
+
+주의:
+
+- 상세 팝업 호출에는 `person_no`가 필요하다.
+- 이번 확인에서는 메모리에서만 사용했고 출력·저장하지 않았다.
+- 실제 운영에서도 `person_no`는 저장하지 않는다.
+
+상세 팝업에서 확인한 경기실적 한 줄:
+
+```text
+2025.07.19 | 2025 디스턴스첼린지대회(5차) | 800m | 결승 2 | 1:46.51
+```
+
+해석:
+
+- `topRecList`에서 찾은 후보와 선수이력조회 상세의 경기실적이 서로 맞물린다.
+- 그래서 사용자님 말처럼 “랭킹/상위기록권 후보 → 선수이력조회 확인” 방식은 실제로 가능하다.
+- 다만 동명이인이 있으므로, 선수명만으로 자동 연결하면 안 된다.
+
+### 7-3. KAAF 국내/국제 일정 첨부에 없는지 확인
+
+대회:
+
+- `HOKUREN Distance Challenge 2025 in ABASHIRI`
+
+KAAF 일정 페이지 확인:
+
+| 페이지 | 검색어 | 결과 |
+| --- | --- | --- |
+| `https://www.kaaf.or.kr/ver3/info/internal.asp?currentYear=2025` | `HOKUREN`, `호쿠렌`, `디스턴스`, `Distance Challenge`, `ABASHIRI` | 없음 |
+| `https://www.kaaf.or.kr/ver3/info/international.asp?currentYear=2025` | 같은 검색어 | 없음 |
+| `https://www.kaaf.or.kr/ver3/info/internal.asp?currentYear=2026` | 같은 검색어 | 없음 |
+| `https://www.kaaf.or.kr/ver3/info/international.asp?currentYear=2026` | 같은 검색어 | 없음 |
+
+외부 공식 확인:
+
+- World Athletics Calendar & Results에서 `HOKUREN Distance Challenge 2025 in ABASHIRI` 결과 확인.
+- 예시 기록: 2025-07-19, Men 800m Final 1, `Jae-ung LEE`(KOR) 1:46.51, 2위.
+- 같은 결과 묶음에서 `Kang Dong-hyung`(KOR) 1:49.44도 확인 가능.
+
+이 사례의 의미:
+
+- KAAF 국내/국제 일정 첨부만 보면 누락될 수 있는 해외 경기다.
+- 선수이력조회에서 해당 기록을 발견했다면, AthleteTime은 그 줄을 바로 공개하지 않고 World Athletics 결과로 재확인한 뒤 반영한다.
+- 이 기록을 반영할 때 출처는 `선수이력조회에서 발견`과 `World Athletics 공식 결과로 확인`을 분리해 남긴다.
+- KAAF 내부 대회명은 `2025 디스턴스첼린지대회(5차)`이고, 외부 공식 대회명은 `HOKUREN Distance Challenge 2025 in ABASHIRI`로 다를 수 있다. 정규화 시 alias로 묶는다.
+
+금지:
+
+- `person_no` 저장 금지.
+- 선수이력 원문 저장 금지.
+- 이 사례를 근거로 `HOKUREN` 계열 전체를 자동 대량 수집하지 않기.
+
+## 8. 운영자 보강 큐 설계
 
 권장 상태:
 
@@ -403,7 +541,7 @@ World Athletics Taiwan Open results
 - `phone`
 - `email`
 
-## 8. 페이블/리뷰어 체크리스트
+## 9. 페이블/리뷰어 체크리스트
 
 - 이 문서만 보고 담당자가 실제 조회 화면에 들어갈 수 있는가.
 - `result.kaaf.or.kr`가 자동 대량 조회 대상이 아니라는 점이 충분히 선명한가.

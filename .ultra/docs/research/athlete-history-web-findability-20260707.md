@@ -174,6 +174,103 @@ Useful `detail_class_cd` values:
 - `61`: half marathon
 - `62`: marathon
 
+## Single-case proof: missing from KAAF schedule, present in official external results
+
+Goal:
+
+- Find exactly one example of an overseas performance that is not visible in KAAF domestic/international schedule pages, but can be confirmed from an external official result surface.
+- Verify that the user's proposed path works: KAAF TOP record query -> athlete-history lookup -> external official confirmation.
+
+Date checked:
+
+- 2026-07-07
+
+Case:
+
+- Competition: `HOKUREN Distance Challenge 2025 in ABASHIRI`
+- Official external source: World Athletics Calendar & Results
+- Example result observed in search result snippet:
+  - `19 JUL 2025`
+  - Men 800m Final 1
+  - `Jae-ung LEE` (KOR)
+  - `1:46.51`
+  - place `2`
+
+KAAF schedule absence check:
+
+- Checked `https://www.kaaf.or.kr/ver3/info/internal.asp?currentYear=2025`
+- Checked `https://www.kaaf.or.kr/ver3/info/international.asp?currentYear=2025`
+- Checked `https://www.kaaf.or.kr/ver3/info/internal.asp?currentYear=2026`
+- Checked `https://www.kaaf.or.kr/ver3/info/international.asp?currentYear=2026`
+- Searched these terms in fetched HTML:
+  - `HOKUREN`
+  - `Hokuren`
+  - `호쿠렌`
+  - `디스턴스`
+  - `Distance Challenge`
+  - `ABASHIRI`
+  - `Abashiri`
+  - `아바시리`
+- Hits: none.
+
+Operational interpretation:
+
+- This is the kind of record KAAF attachment collection can miss.
+- If the operator sees this performance in athlete history, the athlete-history line is only a discovery hint.
+- World Athletics is the confirmation source for publication.
+- Do not store `person_no` or raw athlete-history text.
+
+Manual TOP-record check performed:
+
+- Page: `https://result.kaaf.or.kr/recInfo/topRecList.do`
+- Internal endpoint called once, as a manual-equivalent test: `/recInfo/searchTopRecList.do`
+- Request body:
+  - `start_dt=20250101`
+  - `end_dt=20251231`
+  - `check_dt=N`
+  - `check_round=Y`
+  - `check_ref=N`
+  - `gubun=E`
+  - `kind_cd=15`
+  - `detail_class_cd=14`
+  - `rank_cnt=5`
+- Result row observed:
+  - `TO_NM=2025 디스턴스첼린지대회(5차)`
+  - `GDATE=2025-07-19`
+  - `KOR_NM=이재웅`
+  - `TEAM_NM=국군체육부대`
+  - `DETAIL_CLASS_NM=800m`
+  - `GREC_FORMAT=1:46.51`
+  - `GROUND_NM=결승`
+- Restricted-field warning:
+  - the JSON response also contains `PERSON_NO1`; this must be dropped before any storage/log/report.
+
+Manual athlete-history check performed:
+
+- Page: `https://result.kaaf.or.kr/history/playerHistory.do`
+- Query:
+  - `gubun=E`
+  - `kor_nm=이재웅`
+  - no category/event narrowing
+- Result:
+  - four same-name candidates appeared.
+  - the relevant candidate was distinguishable by `국군체육부대`, registration year `(2026)`, and professional athlete status.
+- Detail modal:
+  - `/history/popHistoryPlayer.do`
+  - requires `person_no`; used in memory only and not printed/stored.
+- Matching competition line observed:
+  - `2025.07.19 | 2025 디스턴스첼린지대회(5차) | 800m | 결승 2 | 1:46.51`
+
+Practical conclusion:
+
+- The workflow works.
+- The safe version is:
+  1. manually seed candidate from TOP records,
+  2. manually confirm same athlete in athlete-history,
+  3. strip restricted identifiers,
+  4. confirm externally through World Athletics/JAAF/etc.,
+  5. store only normalized result + source provenance.
+
 ## Reviewer checklist
 
 - Can the reviewer reproduce the source discovery with the listed URLs and queries?
