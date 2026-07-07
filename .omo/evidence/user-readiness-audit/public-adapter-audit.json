@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-07",
+  "scope": "Public results adapter after life-sport exclusion and quality holds",
+  "competitions": 207,
+  "events": 7836,
+  "rows": 79838,
+  "heldEvents": 244,
+  "heldRows": 1730,
+  "pollutedVisibleRows": 0,
+  "combinedHeldEvents": 208,
+  "relayHeldEvents": 36,
+  "searchSmoke": [
+    {
+      "query": "심종섭",
+      "totalMatches": 26,
+      "totalEvents": 3
+    },
+    {
+      "query": "한세현",
+      "totalMatches": 10,
+      "totalEvents": 1
+    },
+    {
+      "query": "김민지",
+      "totalMatches": 39,
+      "totalEvents": 8
+    }
+  ],
+  "launchPositioning": "Public record index and athlete self-check surface",
+  "notLaunchPositioning": "Official athlete history, official ranking, or performance certificate replacement"
+}

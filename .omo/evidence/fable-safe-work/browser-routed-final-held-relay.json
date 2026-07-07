@@ -1,0 +1,28 @@
+{
+  "url": "http://127.0.0.1:5185/competitions?tab=results&comp=2026__2026-road-005.json",
+  "consoleErrors": [],
+  "routed": [
+    {
+      "source": "http://127.0.0.1:5185/api/card-studio/results/competitions",
+      "target": "http://127.0.0.1:5317/api/card-studio/results/competitions",
+      "status": 200
+    },
+    {
+      "source": "http://127.0.0.1:5185/api/card-studio/results/2026__2026-road-005.json/events",
+      "target": "http://127.0.0.1:5317/api/card-studio/results/2026__2026-road-005.json/events",
+      "status": 200
+    },
+    {
+      "source": "http://127.0.0.1:5185/api/card-studio/results/competitions",
+      "target": "http://127.0.0.1:5317/api/card-studio/results/competitions",
+      "status": 200
+    },
+    {
+      "source": "http://127.0.0.1:5185/api/card-studio/results/2026__2026-road-005.json/events",
+      "target": "http://127.0.0.1:5317/api/card-studio/results/2026__2026-road-005.json/events",
+      "status": 200
+    }
+  ],
+  "bodyLength": 11806,
+  "hasHoldCopy": true
+}

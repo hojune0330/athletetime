@@ -284,6 +284,96 @@ test('HIGHLIGHT-FORM-002: champion cards appear only for small road meets and sk
   assert.equal(bigHighlights.some((h) => h.type === 'champion'), false);
 });
 
+test('HIGHLIGHT-INTL-001: domestic champion card appears only when a foreign athlete wins a mixed field', () => {
+  // 외국 선수(소속=국가명) 우승 + 국내 선수 혼재 → 국내부 1위 카드
+  const mixedField = makeEvent({
+    event: '남자 마라톤 결승',
+    eventType: 'marathon',
+    results: [
+      { rank: 1, name: '외국우승자', affiliation: '케냐', record: '2:05:00', newRecord: '' },
+      { rank: 2, name: '외국선수', affiliation: '에티오피아', record: '2:05:30', newRecord: '' },
+      { rank: 3, name: '국내선수', affiliation: '국군체육부대', record: '2:11:00', newRecord: '' },
+    ],
+  });
+  const mixedHighlights = buildCompetitionHighlights([mixedField]);
+  const domestic = mixedHighlights.find((h) => h.type === 'domestic_champion');
+  assert.ok(domestic, 'mixed international field must yield domestic champion card');
+  assert.match(domestic.title, /국내선수/);
+  assert.equal(domestic.stat, '2:11:00');
+  assert.match(domestic.detail, /국내부 1위/);
+  assert.match(domestic.detail, /전체 3위/);
+
+  // 국내 선수가 전체 우승 → 국내부 카드 없음 (중복 방지)
+  const domesticWin = makeEvent({
+    event: '남자 마라톤 결승',
+    eventType: 'marathon',
+    results: [
+      { rank: 1, name: '국내우승자', affiliation: '삼성전자(주)', record: '2:08:00', newRecord: '' },
+      { rank: 2, name: '외국선수', affiliation: '케냐', record: '2:08:30', newRecord: '' },
+    ],
+  });
+  assert.equal(
+    buildCompetitionHighlights([domesticWin]).some((h) => h.type === 'domestic_champion'),
+    false,
+  );
+
+  // 전원 국내 선수 → 국제 필드가 아니므로 국내부 카드 없음
+  const allDomestic = makeEvent({
+    event: '남자 마라톤 결승',
+    eventType: 'marathon',
+    results: [
+      { rank: 1, name: '가', affiliation: '청주시청', record: '2:12:00', newRecord: '' },
+      { rank: 2, name: '나', affiliation: '충남도청', record: '2:12:30', newRecord: '' },
+    ],
+  });
+  assert.equal(
+    buildCompetitionHighlights([allDomestic]).some((h) => h.type === 'domestic_champion'),
+    false,
+  );
+
+  // "케냐-코오롱" 같은 혼합 표기도 국제부로 판별
+  const { isInternationalRow } = require(path.join(ROOT, 'card-studio/services/competitionHighlightsService'));
+  assert.equal(isInternationalRow({ affiliation: '케냐-코오롱' }), true);
+  assert.equal(isInternationalRow({ affiliation: '코오롱' }), false);
+  assert.equal(isInternationalRow({ affiliation: '한국전력공사' }), false);
+});
+
+test('HIGHLIGHT-INTL-002: history comparison runs separately for domestic scope on mixed fields', () => {
+  const current = makeEvent({
+    event: '남자 마라톤 결승',
+    eventType: 'marathon',
+    results: [
+      { rank: 1, name: '외국우승자', affiliation: '케냐', record: '2:05:00', newRecord: '' },
+      { rank: 5, name: '국내선수', affiliation: '국군체육부대', record: '2:10:00', newRecord: '' },
+    ],
+  });
+  const past = (year, intlRecord, domesticRecord) => ({
+    year,
+    events: [
+      makeEvent({
+        event: '남자 마라톤 결승',
+        eventType: 'marathon',
+        results: [
+          { rank: 1, name: '옛외국우승자', affiliation: '에티오피아', record: intlRecord, newRecord: '' },
+          { rank: 6, name: '옛국내선수', affiliation: '충남도청', record: domesticRecord, newRecord: '' },
+        ],
+      }),
+    ],
+  });
+  const history = [past('2025', '2:05:30', '2:12:00'), past('2024', '2:06:00', '2:13:00')];
+  const highlights = buildCompetitionHighlights([current], { history });
+
+  // 전체 기준 series_best (2:05:00 < 2:05:30, 2:06:00)
+  const overallBest = highlights.find((h) => h.type === 'series_best' && !/국내부/.test(h.detail));
+  assert.ok(overallBest, 'overall series_best expected');
+
+  // 국내부 기준 series_best (2:10:00 < 2:12:00, 2:13:00) — 별도 카드
+  const domesticBest = highlights.find((h) => h.type === 'series_best' && /국내부/.test(h.detail));
+  assert.ok(domesticBest, 'domestic-scope series_best expected');
+  assert.equal(domesticBest.stat, '2:10:00');
+  assert.match(domesticBest.detail, /수집된 3개 회차 기준/);
+});
+
 test('HIGHLIGHT-UI-001: results tab renders highlights card with SVG icons and fact notice', () => {
   const card = readSource('frontend/src/components/competitions/CompetitionHighlights.tsx');
   const tab = readSource('frontend/src/components/competitions/tabs/ResultsTab.tsx');

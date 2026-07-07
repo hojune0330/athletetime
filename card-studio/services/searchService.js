@@ -18,7 +18,7 @@ const config = require('../config');
 const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
 const {
-  hasRelayResultTextPollution,
+  hasResultTextPollution,
   isResultEventOnQualityHold,
 } = require('./relayResultQualityService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
@@ -141,7 +141,7 @@ class SearchService {
           const division = ev.division || '';
           const results = (ev.results || []).filter((row) => {
             if (row.parseStatus === 'unverified') return false;
-            return !hasRelayResultTextPollution(row);
+            return !hasResultTextPollution(row);
           });
 
           // suppression(정정/삭제 요청) 사전 판정: 행별 null | 'mask' | 'hide' | 'remove'

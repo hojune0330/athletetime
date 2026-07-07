@@ -1,0 +1,23 @@
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-Token
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: strict-origin-when-cross-origin
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 29
+X-RateLimit-Reset: 60
+Content-Type: application/json; charset=utf-8
+Content-Length: 123
+ETag: W/"7b-2vW8RVytDe0liwLNoPfdCTv5pos"
+Date: Mon, 06 Jul 2026 15:20:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"success":true,"data":{"query":"오대찬","type":"all","competitions":[],"totalMatches":0,"totalEvents":0,"sections":[]}}

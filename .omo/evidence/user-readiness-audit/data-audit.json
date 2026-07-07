@@ -1,0 +1,590 @@
+{
+  "files": [
+    "2018.json",
+    "2019.json",
+    "2020.json",
+    "2021.json",
+    "2022.json",
+    "2023.json",
+    "2024.json",
+    "2025.json",
+    "2026.json"
+  ],
+  "range": "2018-2026",
+  "totals": {
+    "competitions": 230,
+    "events": 9578,
+    "rows": 90632,
+    "rowsWithRecord": 64517,
+    "statusOnlyRows": 26115,
+    "emptyRecords": 26115,
+    "heldEvents": 36,
+    "heldRows": 372,
+    "pollutedVisibleRows": 1106,
+    "missingSourceCompetitions": 230,
+    "missingKaafUrlCompetitions": 230,
+    "badNameRows": 372,
+    "deletedRows": 0,
+    "underReviewRows": 0
+  },
+  "byYear": {
+    "2018": {
+      "competitions": 35,
+      "events": 1394,
+      "rows": 13696,
+      "rowsWithRecord": 9776,
+      "heldEvents": 4,
+      "heldRows": 48,
+      "missingSourceCompetitions": 35
+    },
+    "2019": {
+      "competitions": 33,
+      "events": 1333,
+      "rows": 13209,
+      "rowsWithRecord": 9338,
+      "heldEvents": 5,
+      "heldRows": 60,
+      "missingSourceCompetitions": 33
+    },
+    "2020": {
+      "competitions": 10,
+      "events": 761,
+      "rows": 6522,
+      "rowsWithRecord": 4738,
+      "heldEvents": 1,
+      "heldRows": 7,
+      "missingSourceCompetitions": 10
+    },
+    "2021": {
+      "competitions": 14,
+      "events": 709,
+      "rows": 7523,
+      "rowsWithRecord": 5537,
+      "heldEvents": 2,
+      "heldRows": 15,
+      "missingSourceCompetitions": 14
+    },
+    "2022": {
+      "competitions": 25,
+      "events": 1121,
+      "rows": 10809,
+      "rowsWithRecord": 7566,
+      "heldEvents": 4,
+      "heldRows": 31,
+      "missingSourceCompetitions": 25
+    },
+    "2023": {
+      "competitions": 34,
+      "events": 1309,
+      "rows": 11960,
+      "rowsWithRecord": 8408,
+      "heldEvents": 4,
+      "heldRows": 34,
+      "missingSourceCompetitions": 34
+    },
+    "2024": {
+      "competitions": 34,
+      "events": 1524,
+      "rows": 13722,
+      "rowsWithRecord": 9748,
+      "heldEvents": 6,
+      "heldRows": 60,
+      "missingSourceCompetitions": 34
+    },
+    "2025": {
+      "competitions": 39,
+      "events": 1415,
+      "rows": 12847,
+      "rowsWithRecord": 9225,
+      "heldEvents": 6,
+      "heldRows": 62,
+      "missingSourceCompetitions": 39
+    },
+    "2026": {
+      "competitions": 6,
+      "events": 12,
+      "rows": 344,
+      "rowsWithRecord": 181,
+      "heldEvents": 4,
+      "heldRows": 55,
+      "missingSourceCompetitions": 6
+    }
+  },
+  "topNames": [
+    {
+      "name": "0",
+      "count": 306
+    },
+    {
+      "name": "이종현",
+      "count": 233
+    },
+    {
+      "name": "최동휘",
+      "count": 217
+    },
+    {
+      "name": "김수빈",
+      "count": 209
+    },
+    {
+      "name": "김주현",
+      "count": 191
+    },
+    {
+      "name": "김민지",
+      "count": 191
+    },
+    {
+      "name": "박준영",
+      "count": 186
+    },
+    {
+      "name": "김도연",
+      "count": 167
+    },
+    {
+      "name": "이승현",
+      "count": 165
+    },
+    {
+      "name": "김승찬",
+      "count": 161
+    },
+    {
+      "name": "윤서준",
+      "count": 156
+    },
+    {
+      "name": "신지애",
+      "count": 156
+    },
+    {
+      "name": "정유나",
+      "count": 155
+    },
+    {
+      "name": "최희태",
+      "count": 152
+    },
+    {
+      "name": "김민서",
+      "count": 147
+    },
+    {
+      "name": "문세훈",
+      "count": 146
+    },
+    {
+      "name": "배상화",
+      "count": 144
+    },
+    {
+      "name": "김지원",
+      "count": 142
+    },
+    {
+      "name": "강지원",
+      "count": 142
+    },
+    {
+      "name": "백광열",
+      "count": 141
+    }
+  ],
+  "homonymNamesWith20PlusRows": 1325,
+  "distinctNameCount": 11562,
+  "distinctNameTeamCount": 31938,
+  "samples": {
+    "polluted": [
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "13 10종경기 결승",
+        "row": {
+          "name": "5390",
+          "aff": "이리공업고등학교",
+          "record": "302"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "13 10종경기 결승",
+        "row": {
+          "name": "5060",
+          "aff": "전남체육고등학교",
+          "record": "441"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "13 10종경기 결승",
+        "row": {
+          "name": "4723",
+          "aff": "충남고등학교",
+          "record": "414"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "13 10종경기 결승",
+        "row": {
+          "name": "4665",
+          "aff": "포항두호고등학교",
+          "record": "263"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "13 10종경기 결승",
+        "row": {
+          "name": "4110",
+          "aff": "서울체육고등학교",
+          "record": "209"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "15 10종경기 결승",
+        "row": {
+          "name": "7122",
+          "aff": "연제구청",
+          "record": "696"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "15 10종경기 결승",
+        "row": {
+          "name": "6818",
+          "aff": "국군체육부대",
+          "record": "711"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "15 10종경기 결승",
+        "row": {
+          "name": "6093",
+          "aff": "음성군청",
+          "record": "660"
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "23 7종경기 결승",
+        "row": {
+          "name": "3701",
+          "aff": "경북체육고등학교",
+          "record": ""
+        }
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회",
+        "event": "23 7종경기 결승",
+        "row": {
+          "name": "3124",
+          "aff": "신명고등학교",
+          "record": ""
+        }
+      }
+    ],
+    "missingSource": [
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "name": "2018 서울국제마라톤대회 겸 제89회 동아마라톤대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-005",
+        "name": "제34회 코오롱구간마라톤대회(고등학교부)"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-006",
+        "name": "제34회 코오롱구간마라톤대회(중학교부)"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-007",
+        "name": "2018 인천국제하프마라톤대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-008",
+        "name": "2018 대구국제마라톤대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-009",
+        "name": "2018 군산새만금국제마라톤대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-018",
+        "name": "2018 서울나이키국제10Km대회 겸 나이키러닝페스티벌"
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "name": "제47회 전국종별육상경기선수권대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-001",
+        "name": "2018 대한체육회장배 전국마스터즈육상경기대회"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-002",
+        "name": "2018 전국생활체육대축전(육상경기)"
+      }
+    ],
+    "badName": [
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "12 1500m 결승",
+        "name": "고**",
+        "aff": "경기체육중학교",
+        "record": "4:59.32"
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "12 3000m 결승",
+        "name": "고**",
+        "aff": "경기체육중학교",
+        "record": "10:50.99"
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "13 10종경기 결승",
+        "name": "0",
+        "aff": "이리공업고등학교",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "13 10종경기 결승",
+        "name": "0",
+        "aff": "부산체육고등학교",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "13 10종경기 결승",
+        "name": "0",
+        "aff": "서울체육고등학교",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "15 10종경기 결승",
+        "name": "0",
+        "aff": "경산시청",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "15 10종경기 결승",
+        "name": "0",
+        "aff": "성남시청",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "24 7종경기 결승",
+        "name": "0",
+        "aff": "충북대학교",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "12 5종경기_남 결승",
+        "name": "0",
+        "aff": "목포하당중학교",
+        "record": ""
+      },
+      {
+        "year": "2018",
+        "id": "2018-track_field-001",
+        "event": "12 5종경기_남 결승",
+        "name": "0",
+        "aff": "목포하당중학교",
+        "record": ""
+      }
+    ],
+    "noRecord": [
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "스탠리 은지하 카마우",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "엘리웃 카리우키 은조로지",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "에드윈 로티치",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "도미닉 킵쿠르갓 레팅",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "루벤 나리",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "에비사 딘키시나 압다타",
+        "aff": "에티오피아"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "케네디 무리티 은지루",
+        "aff": "케냐"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "이상민",
+        "aff": "충주시청"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "박대성",
+        "aff": "충주시청"
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-004",
+        "event": "남자 마라톤 결승",
+        "name": "손병환",
+        "aff": "한국체육대학교"
+      }
+    ],
+    "held": [
+      {
+        "year": "2018",
+        "id": "2018-road-005",
+        "name": "제34회 코오롱구간마라톤대회(고등학교부)",
+        "event": "13 역전경기 1일차",
+        "heldResultCount": 19
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-006",
+        "name": "제34회 코오롱구간마라톤대회(중학교부)",
+        "event": "12 역전경기 1일차",
+        "heldResultCount": 12
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-006",
+        "name": "제34회 코오롱구간마라톤대회(중학교부)",
+        "event": "22 역전경기 1일차",
+        "heldResultCount": 9
+      },
+      {
+        "year": "2018",
+        "id": "2018-road-010",
+        "name": "제48회 대통령기전국통일구간마라톤대회",
+        "event": "남자 역전경기 1일차",
+        "heldResultCount": 8
+      },
+      {
+        "year": "2019",
+        "id": "2019-road-005",
+        "name": "제35회 코오롱구간마라톤대회",
+        "event": "13 역전경기 1일차",
+        "heldResultCount": 18
+      },
+      {
+        "year": "2019",
+        "id": "2019-road-005",
+        "name": "제35회 코오롱구간마라톤대회",
+        "event": "23 역전경기 1일차",
+        "heldResultCount": 9
+      },
+      {
+        "year": "2019",
+        "id": "2019-road-006",
+        "name": "제35회 코오롱구간마라톤대회",
+        "event": "12 역전경기 1일차",
+        "heldResultCount": 15
+      },
+      {
+        "year": "2019",
+        "id": "2019-road-006",
+        "name": "제35회 코오롱구간마라톤대회",
+        "event": "22 역전경기 1일차",
+        "heldResultCount": 8
+      },
+      {
+        "year": "2019",
+        "id": "2019-road-010",
+        "name": "제49회 대통령기전국통일구간마라톤대회",
+        "event": "남자 역전경기 1일차",
+        "heldResultCount": 10
+      },
+      {
+        "year": "2020",
+        "id": "2020-road-001",
+        "name": "제50회 대통령기 전국통일구간마라톤대회",
+        "event": "남자 역전경기 1일차",
+        "heldResultCount": 7
+      }
+    ]
+  }
+}

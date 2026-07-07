@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: Given stored relay result data When validating all years Then polluted relay rows are absent
+ok 1 - Given stored relay result data When validating all years Then polluted relay rows are absent
+  ---
+  duration_ms: 413.1854
+  type: 'test'
+  ...
+# Subtest: Given a contaminated Kolon relay event When source is not re-parsed Then public data is held for recheck
+ok 2 - Given a contaminated Kolon relay event When source is not re-parsed Then public data is held for recheck
+  ---
+  duration_ms: 5.009
+  type: 'test'
+  ...
+# Subtest: Given held relay events When backend exposes public results Then users receive hold copy instead of rows
+ok 3 - Given held relay events When backend exposes public results Then users receive hold copy instead of rows
+  ---
+  duration_ms: 2.6247
+  type: 'test'
+  ...
+# Subtest: Given held relay events When searching records Then polluted runner strings are not indexed
+ok 4 - Given held relay events When searching records Then polluted runner strings are not indexed
+  ---
+  duration_ms: 1.4408
+  type: 'test'
+  ...
+# Subtest: Given a relay result table When scrapers parse it Then fixed track columns are bypassed
+ok 5 - Given a relay result table When scrapers parse it Then fixed track columns are bypassed
+  ---
+  duration_ms: 1.5406
+  type: 'test'
+  ...
+# Subtest: Given held relay events When preparing source recheck Then a machine-readable blocker report is emitted
+ok 6 - Given held relay events When preparing source recheck Then a machine-readable blocker report is emitted
+  ---
+  duration_ms: 405.263
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 983.0618

@@ -1,0 +1,32 @@
+{
+  "aiSlopCleaner": {
+    "status": "passed",
+    "evidence": "Small scoped JS/test/evidence change; self-review found no speculative product claims or fake normalized rows."
+  },
+  "verification": {
+    "status": "passed",
+    "commands": [
+      "node --test backend/tests/kaaf-schedule-result-harvester.test.js",
+      "git diff --check",
+      "npm test",
+      "git check-ignore -v data/sources/import/originals/legacy-kaaf-results-2000-2017-20260707/001_05child_result.xls"
+    ],
+    "evidence": ".omo/evidence/legacy-results-normalization/regression.md"
+  },
+  "codeReview": {
+    "recommendation": "APPROVE",
+    "architectStatus": "CLEAR",
+    "evidence": "UNCONDITIONAL APPROVAL: low-risk additive CLI/test/evidence lane. No public UI or row-level search exposure changed. Raw files remain under ignored private storage."
+  },
+  "criteriaCoverage": {
+    "totalCriteria": 3,
+    "passCount": 3,
+    "adversarialClassesCovered": [
+      "blocked_host",
+      "raw_file_commit_risk",
+      "unsupported_legacy_format",
+      "misleading_completion_claim",
+      "current_service_regression"
+    ]
+  }
+}
