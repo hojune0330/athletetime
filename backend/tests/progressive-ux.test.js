@@ -1,10 +1,10 @@
 /**
- * 토스식 단계 공개 UX + 내 기록 원버튼 + 모아 보기 + 훈련 일지 라이트 계약 테스트
+ * 토스식 단계 공개 UX + 원탭 나로 지정 즉시 합산 + 훈련 일지 라이트 계약 테스트
  *
  * 계약:
  * - UX-DISCLOSE-001: 선수 패널의 발자취/전체 기록은 눌러야 열리는 DisclosureSection
  * - UX-MYREC-001: "나로 지정" → localStorage 저장 → "내 기록 바로 보기" 버튼
- * - UX-COMBINE-001: 추정 묶음 "모아 보기"는 화면 임시 모음 (자동 병합 아님, 소속 배지 유지)
+ * - UX-COMBINE-001: 원탭 즉시 합산 — 누르면 바로 내 기록, 사후 ×로 빼기, 원본 데이터 불변
  * - UX-TRAINLOG-001: 훈련 일지 라이트 — 로컬 저장, 주간 요약, TRAINORACLE 기대감 카드
  * - UX-TONE-001: 신규 표면에 공식/랭킹/예측/평가 표현 금지
  */
@@ -44,20 +44,32 @@ test('UX-MYREC-001: my-athlete pin saves locally and offers one-tap view', () =>
   assert.match(page, /나로 지정/);
 });
 
-test('UX-COMBINE-001: combined view is screen-only merge with source badges', () => {
-  const card = readSource('frontend/src/components/record-insights/CombinedRecordsCard.tsx');
-  // 화면 임시 모음 명시 — 데이터 병합 아님
-  assert.match(card, /화면에서만 임시로 모았/);
-  assert.match(card, /동명이인일 수 있으니/);
-  // 각 기록에 원래 소속 배지 유지
-  assert.match(card, /sourceTeam/);
+test('UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched', () => {
+  // 훅: 다중 지정 배열 + 한 번에 묶음 지정(addMany) + 사후 제거(remove)
+  const hook = readSource('frontend/src/components/record-insights/useMyAthlete.ts');
+  assert.match(hook, /addMany/, 'hook must support one-tap cluster merge');
+  assert.match(hook, /remove/, 'hook must support after-the-fact removal');
+  assert.match(hook, /toggle/, 'hook must support one-tap toggle');
 
+  // 내 기록 카드: 지정한 묶음 전부 합산 표시 + 소속 배지 유지 + × 빼기 + 원본 불변 안내
+  const card = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
+  assert.match(card, /sourceTeam/, 'each record keeps its source team badge');
+  assert.match(card, /onRemove/, 'removal chips are the correction path');
+  assert.match(card, /원본 데이터는 그대로/, 'screen-only merge disclosure');
+
+  // 추정 묶음 카드: 확인 대화 없이 원탭 합치기 CTA
   const estimated = readSource('frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx');
-  assert.match(estimated, /모아 보기/);
+  assert.match(estimated, /모두 내 기록으로 합치기/, 'single one-tap merge CTA');
   assert.match(estimated, /onCombine/);
+  assert.doesNotMatch(estimated, /모아 보기/, 'two-step screen-only view removed');
 
+  // 페이지 배선: 누르면 바로 합쳐진 내 기록 카드가 열린다 (중간 단계 없음)
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
-  assert.match(page, /CombinedRecordsCard/);
+  assert.match(page, /MyRecordsCard/);
+  assert.match(page, /addManyMyAthletes/);
+  assert.match(page, /toggleMyAthlete/);
+  assert.doesNotMatch(page, /CombinedRecordsCard/, 'legacy screen-only card removed');
+  assert.doesNotMatch(page, /window\.confirm/, 'no confirmation dialogs in one-tap flow');
 });
 
 test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser', () => {
@@ -74,7 +86,8 @@ test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and 
 
 test('UX-TONE-001: new surfaces avoid trust-violating words', () => {
   const files = [
-    'frontend/src/components/record-insights/CombinedRecordsCard.tsx',
+    'frontend/src/components/record-insights/MyRecordsCard.tsx',
+    'frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx',
     'frontend/src/components/record-insights/useMyAthlete.ts',
     'frontend/src/pages/TrainingCalculatorPage/components/TrainingLogLite.tsx',
   ];
