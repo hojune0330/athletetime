@@ -7,6 +7,9 @@ import React, { useEffect, useMemo, useState } from 'react';
  * - localStorage 저장 (기기 단위, 가입 없이 바로 씀)
  * - 최근 기록으로 이번 주 요약(횟수/거리/컨디션 흐름)을 보여줘 "쌓이는 재미"를 준다
  * - TRAINORACLE(훈련 분석·코칭 도구)로 발전 예정임을 알리는 기대감 카드 포함
+ *
+ * 디자인: TRAINORACLE Scientific Minimalism — 각진 모서리, hairline,
+ * 모노 숫자, 색은 정보 전달용으로만.
  */
 
 const STORAGE_KEY = 'athletetime.training-log.v1';
@@ -49,6 +52,9 @@ function todayString(): string {
   const dd = String(now.getDate()).padStart(2, '0');
   return `${now.getFullYear()}-${mm}-${dd}`;
 }
+
+const inputClass =
+  'h-11 rounded-sm border border-line bg-surface px-3 text-body-sm text-ink transition-colors focus:border-ink focus:outline-none';
 
 export const TrainingLogLite: React.FC = () => {
   const [entries, setEntries] = useState<LogEntry[]>([]);
@@ -98,33 +104,37 @@ export const TrainingLogLite: React.FC = () => {
   };
 
   return (
-    <section className="mt-8 rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm">
+    <section className="mt-10 rounded-sm border border-line bg-surface p-5 sm:p-6">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-emerald-600">훈련 일지 라이트</p>
-          <h2 className="mt-1 text-xl font-bold text-neutral-900">오늘 훈련, 한 줄로 남겨두세요</h2>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
+            TRAINING LOG · LITE
+          </p>
+          <h2 className="mt-1 text-h3 font-semibold tracking-tight text-ink">오늘 훈련, 한 줄로 남겨두세요</h2>
+          <p className="mt-1 text-body-sm text-ink-3">
             이 기기에만 저장돼요. 꾸준히 쌓이면 내 훈련 흐름이 보여요.
           </p>
         </div>
         {entries.length > 0 && (
-          <div className="mt-3 flex gap-4 sm:mt-0">
-            <MiniStat label="최근 7일 훈련" value={`${weekSummary.count}회`} />
-            {weekSummary.totalKm > 0 && <MiniStat label="달린 거리" value={`${weekSummary.totalKm.toFixed(1)}km`} />}
+          <div className="mt-3 flex divide-x divide-hair border-y border-ink sm:mt-0">
+            <MiniStat label="최근 7일 훈련" value={`${weekSummary.count}`} unit="회" />
+            {weekSummary.totalKm > 0 && (
+              <MiniStat label="달린 거리" value={weekSummary.totalKm.toFixed(1)} unit="km" />
+            )}
             {weekSummary.count > 0 && (
-              <MiniStat label="컨디션 평균" value={FEEL_LABELS[Math.round(weekSummary.avgFeel)] || '보통'} />
+              <MiniStat label="컨디션" value={FEEL_LABELS[Math.round(weekSummary.avgFeel)] || '보통'} />
             )}
           </div>
         )}
       </div>
 
       {/* 입력 줄 */}
-      <div className="mt-5 grid gap-3 sm:grid-cols-[auto_110px_1fr_auto]">
+      <div className="mt-5 grid gap-2 sm:grid-cols-[auto_110px_1fr_auto]">
         <select
           value={kind}
           onChange={(event) => setKind(event.target.value)}
           aria-label="훈련 종류"
-          className="h-11 rounded-lg border border-neutral-200 bg-white px-3 text-sm"
+          className={inputClass}
         >
           {KINDS.map((option) => (
             <option key={option} value={option}>{option}</option>
@@ -139,7 +149,7 @@ export const TrainingLogLite: React.FC = () => {
           onChange={(event) => setDistance(event.target.value)}
           placeholder="km"
           aria-label="거리 (km)"
-          className="h-11 rounded-lg border border-neutral-200 bg-white px-3 text-sm"
+          className={`${inputClass} font-mono [font-variant-numeric:tabular-nums]`}
         />
         <input
           type="text"
@@ -148,30 +158,30 @@ export const TrainingLogLite: React.FC = () => {
           placeholder="메모 (예: 400m×8 78초, 마지막 2개 힘듦)"
           aria-label="훈련 메모"
           maxLength={120}
-          className="h-11 rounded-lg border border-neutral-200 bg-white px-3 text-sm"
+          className={inputClass}
         />
         <button
           type="button"
           onClick={handleSave}
-          className="h-11 rounded-lg bg-emerald-600 px-5 text-sm font-bold text-white transition hover:bg-emerald-700"
+          className="h-11 rounded-sm bg-ink px-6 text-body-sm font-semibold text-bg transition-colors hover:bg-ink-2"
         >
           {savedFlash ? '저장됨' : '기록'}
         </button>
       </div>
 
       {/* 컨디션 선택 */}
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-neutral-500">오늘 컨디션:</span>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-4">RPE</span>
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}
             type="button"
             aria-pressed={feel === value}
             onClick={() => setFeel(value as 1 | 2 | 3 | 4 | 5)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+            className={`rounded-sm border px-3 py-1.5 text-caption font-medium transition-colors ${
               feel === value
-                ? 'border-emerald-500 bg-emerald-500 text-white'
-                : 'border-neutral-200 bg-neutral-50 text-neutral-600 hover:border-emerald-300'
+                ? 'border-ink bg-ink text-bg'
+                : 'border-line bg-surface text-ink-2 hover:border-line-2'
             }`}
           >
             {FEEL_LABELS[value]}
@@ -181,27 +191,31 @@ export const TrainingLogLite: React.FC = () => {
 
       {/* 최근 일지 */}
       {entries.length > 0 && (
-        <div className="mt-5 space-y-1.5">
+        <div className="mt-5 border-t border-ink">
           {entries.slice(0, 5).map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50/70 px-3 py-2"
+              className="flex items-center justify-between gap-3 border-b border-hair px-1 py-2.5"
             >
-              <div className="flex min-w-0 items-center gap-2 text-sm">
-                <span className="shrink-0 font-mono text-xs text-neutral-400">{entry.date.slice(5)}</span>
-                <span className="shrink-0 font-semibold text-neutral-800">{entry.kind}</span>
+              <div className="flex min-w-0 items-center gap-2.5 text-body-sm">
+                <span className="shrink-0 font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
+                  {entry.date.slice(5)}
+                </span>
+                <span className="shrink-0 font-semibold text-ink">{entry.kind}</span>
                 {entry.distanceKm !== null && (
-                  <span className="shrink-0 font-mono text-xs text-emerald-700">{entry.distanceKm}km</span>
+                  <span className="shrink-0 font-mono text-[11px] text-ink-2 [font-variant-numeric:tabular-nums]">
+                    {entry.distanceKm}km
+                  </span>
                 )}
-                {entry.memo && <span className="truncate text-xs text-neutral-500">{entry.memo}</span>}
+                {entry.memo && <span className="truncate text-caption text-ink-3">{entry.memo}</span>}
               </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <span className="text-xs text-neutral-400">{FEEL_LABELS[entry.feel]}</span>
+              <div className="flex shrink-0 items-center gap-3">
+                <span className="text-caption text-ink-4">{FEEL_LABELS[entry.feel]}</span>
                 <button
                   type="button"
                   onClick={() => handleDelete(entry.id)}
                   aria-label="이 일지 삭제"
-                  className="text-xs text-neutral-300 transition hover:text-red-500"
+                  className="text-caption text-ink-4 underline underline-offset-2 transition-colors hover:text-err"
                 >
                   삭제
                 </button>
@@ -212,10 +226,13 @@ export const TrainingLogLite: React.FC = () => {
       )}
 
       {/* TRAINORACLE 기대감 카드 */}
-      <div className="mt-6 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/60 p-4">
-        <p className="text-sm font-bold text-emerald-800">이 일지가 나중에 코치가 됩니다</p>
-        <p className="mt-1 text-sm leading-6 text-emerald-700/90">
-          지금 쌓는 훈련 일지와 계산기 데이터는 앞으로 나올 <strong>트레인오라클(TRAINORACLE)</strong>에서
+      <div className="mt-6 border-l-2 border-brand bg-surface-2 p-4">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-brand">
+          TRAINORACLE · COMING
+        </p>
+        <p className="mt-1.5 text-body-sm font-semibold text-ink">이 일지가 나중에 코치가 됩니다</p>
+        <p className="mt-1 text-body-sm leading-relaxed text-ink-2">
+          지금 쌓는 훈련 일지와 계산기 데이터는 앞으로 나올 <strong className="text-ink">트레인오라클(TRAINORACLE)</strong>에서
           훈련 부하 흐름, 회복 리듬, 다음 목표 페이스 제안까지 이어질 준비 과정이에요.
           꾸준히 남길수록 내 몸에 맞는 분석이 가능해져요.
         </p>
@@ -224,11 +241,14 @@ export const TrainingLogLite: React.FC = () => {
   );
 };
 
-function MiniStat({ label, value }: { label: string; value: string }) {
+function MiniStat({ label, value, unit }: { label: string; value: string; unit?: string }) {
   return (
-    <div className="text-right">
-      <p className="text-[11px] text-neutral-400">{label}</p>
-      <p className="font-mono text-base font-bold text-emerald-700">{value}</p>
+    <div className="px-3.5 py-2 first:pl-0 sm:px-4">
+      <p className="font-mono text-[9px] font-medium uppercase tracking-widest-2 text-ink-4">{label}</p>
+      <p className="mt-0.5 font-mono text-[15px] font-medium text-ink [font-variant-numeric:tabular-nums]">
+        {value}
+        {unit && <span className="ml-0.5 text-[10px] font-normal text-ink-3">{unit}</span>}
+      </p>
     </div>
   );
 }

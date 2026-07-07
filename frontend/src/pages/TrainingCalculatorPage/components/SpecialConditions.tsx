@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Conditions } from '../utils/adjustments';
 import { CONDITION_OPTIONS } from '../utils/adjustments';
+import { CalcSection } from './CalcSection';
 
 interface SpecialConditionsProps {
   conditions: Conditions;
@@ -12,33 +13,33 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
   onConditionChange,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-      <h2 className="text-2xl font-bold mb-6 flex items-center">
-        <span className="bg-purple-100 text-purple-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg">
-          3
-        </span>
-        특별 고려사항 (선택)
-      </h2>
-      
-      <div className="grid md:grid-cols-3 gap-4">
-        {CONDITION_OPTIONS.map(option => (
-          <label
-            key={option.id}
-            className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition"
-          >
-            <input
-              type="checkbox"
-              checked={conditions[option.id as keyof Conditions]}
-              onChange={(e) => onConditionChange(option.id as keyof Conditions, e.target.checked)}
-              className="mr-3 w-5 h-5 accent-purple-600"
-            />
-            <div>
-              <div className="font-medium">{option.label}</div>
-              <div className="text-xs text-gray-600">{option.description}</div>
-            </div>
-          </label>
-        ))}
+    <CalcSection step="03" title="특별 고려사항" hint="해당하는 항목만 선택 (선택)">
+      <div className="grid gap-2 md:grid-cols-3">
+        {CONDITION_OPTIONS.map(option => {
+          const checked = conditions[option.id as keyof Conditions];
+          return (
+            <label
+              key={option.id}
+              className={`flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors ${
+                checked
+                  ? 'border-ink bg-surface-2'
+                  : 'border-line bg-surface hover:border-line-2'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={(e) => onConditionChange(option.id as keyof Conditions, e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+              />
+              <span className="min-w-0">
+                <span className="block text-body-sm font-medium text-ink">{option.label}</span>
+                <span className="mt-0.5 block text-caption text-ink-3">{option.description}</span>
+              </span>
+            </label>
+          );
+        })}
       </div>
-    </div>
+    </CalcSection>
   );
 };

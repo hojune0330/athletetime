@@ -1,4 +1,5 @@
 import React from 'react';
+import { MetricCell } from '../../../components/ui/trainoracle';
 
 interface VdotScoreCardProps {
   vdot: number;
@@ -7,6 +8,10 @@ interface VdotScoreCardProps {
   adjustmentNote?: string;
 }
 
+/**
+ * 분석 결과 요약 — TRAINORACLE MetricCell 스트립.
+ * 상/하단 잉크 보더, 셀 사이 hairline, 모노 숫자.
+ */
 export const VdotScoreCard: React.FC<VdotScoreCardProps> = ({
   vdot,
   performanceLevel,
@@ -14,28 +19,26 @@ export const VdotScoreCard: React.FC<VdotScoreCardProps> = ({
   adjustmentNote,
 }) => {
   return (
-    <div className="bg-white border border-neutral-200 rounded-xl p-6 mb-6 shadow-sm">
-      <h3 className="text-lg font-bold text-neutral-800 mb-4 flex items-center gap-2">
-        <span className="text-2xl">📊</span>
-        분석 결과
-      </h3>
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="text-center p-4 bg-primary-50 rounded-lg">
-          <div className="text-4xl font-bold text-primary-600">{vdot}</div>
-          <div className="text-sm text-primary-600/80 mt-1">VDOT 점수</div>
-          {adjustmentNote && (
-            <div className="text-xs text-primary-500 mt-1">{adjustmentNote}</div>
-          )}
-        </div>
-        <div className="text-center p-4 bg-purple-50 rounded-lg">
-          <div className="text-2xl font-semibold text-purple-600">{performanceLevel}</div>
-          <div className="text-sm text-purple-600/80 mt-1">수준 평가</div>
-        </div>
-        <div className="text-center p-4 bg-pink-50 rounded-lg">
-          <div className="text-2xl font-semibold text-pink-600">{vo2max}</div>
-          <div className="text-sm text-pink-600/80 mt-1">예상 VO₂max (ml/kg/min)</div>
-        </div>
+    <div className="mb-8">
+      <div className="mb-3.5 flex items-baseline justify-between">
+        <h3 className="text-h3 font-semibold tracking-tight text-ink">분석 결과</h3>
+        <span className="font-mono text-[10px] uppercase tracking-widest-2 text-ink-4">
+          VDOT · Jack Daniels
+        </span>
       </div>
+      <div className="flex border-y border-ink bg-surface">
+        <MetricCell
+          label="VDOT"
+          value={vdot}
+          sub={adjustmentNote || undefined}
+          subKind="neutral"
+        />
+        <MetricCell label="수준" value={<span className="text-[17px]">{performanceLevel}</span>} />
+        <MetricCell label="예상 VO2max" value={vo2max} unit="ml/kg/min" />
+      </div>
+      <p className="mt-2 text-caption text-ink-3">
+        입력한 기록과 프로필로 계산한 참고치예요. 실제 훈련 반응에 따라 조정하세요.
+      </p>
     </div>
   );
 };
