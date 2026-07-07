@@ -130,6 +130,9 @@ function App() {
             <Route path="/training-calculator" element={<Layout />}>
               <Route index element={lazyPage(<TrainingCalculatorPage />)} />
             </Route>
+            <Route path="/calculators" element={<Layout />}>
+              <Route index element={lazyPage(<TrainingCalculatorPage />)} />
+            </Route>
 
             {/* 채팅 페이지 */}
             <Route path="/chat" element={<Layout />}>
