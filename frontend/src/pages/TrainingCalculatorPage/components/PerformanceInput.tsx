@@ -1,6 +1,7 @@
 import React from 'react';
 import { DISTANCE_OPTIONS } from '../utils/vdotCalculations';
 import type { TimeInput } from '../hooks/useTrainingCalculator';
+import { CalcSection, FieldLabel, selectClass } from './CalcSection';
 
 interface PerformanceInputProps {
   distance: string;
@@ -11,6 +12,9 @@ interface PerformanceInputProps {
   timeInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
+const timeInputClass =
+  'h-11 w-full rounded-sm border border-line bg-surface text-center font-mono text-base text-ink [font-variant-numeric:tabular-nums] transition-colors focus:border-ink focus:outline-none';
+
 export const PerformanceInput: React.FC<PerformanceInputProps> = ({
   distance,
   time,
@@ -20,22 +24,16 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
   timeInputRef,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-      <h2 className="text-2xl font-bold mb-6 flex items-center">
-        <span className="bg-purple-100 text-purple-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg">
-          2
-        </span>
-        기준 기록 입력
-      </h2>
-      
-      <div className="grid md:grid-cols-2 gap-6">
+    <CalcSection step="02" title="기준 기록" hint="가장 최근의 대회 또는 타임트라이얼 기록">
+      <div className="grid gap-x-8 gap-y-5 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium mb-2">종목 선택</label>
+          <FieldLabel htmlFor="calc-distance">종목</FieldLabel>
           <select
+            id="calc-distance"
             ref={distanceSelectRef}
             value={distance}
             onChange={(e) => onDistanceChange(e.target.value)}
-            className="w-full p-3 border rounded-lg bg-white"
+            className={selectClass}
           >
             <option value="">종목을 선택하세요</option>
             {DISTANCE_OPTIONS.map(opt => (
@@ -43,42 +41,47 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
             ))}
           </select>
         </div>
-        
+
         <div>
-          <label className="block text-sm font-medium mb-2">기록 입력</label>
-          <div className="grid grid-cols-3 gap-2">
+          <FieldLabel>기록 (시 : 분 : 초)</FieldLabel>
+          <div className="flex items-center gap-1.5">
             <input
               ref={timeInputRef}
               type="number"
-              placeholder="시"
+              placeholder="0"
               min={0}
               max={23}
               value={time.hours || ''}
               onChange={(e) => onTimeChange('hours', parseInt(e.target.value) || 0)}
-              className="p-3 border rounded-lg text-center"
+              aria-label="시"
+              className={timeInputClass}
             />
+            <span className="font-mono text-lg text-ink-4" aria-hidden>:</span>
             <input
               type="number"
-              placeholder="분"
+              placeholder="00"
               min={0}
               max={59}
               value={time.minutes || ''}
               onChange={(e) => onTimeChange('minutes', parseInt(e.target.value) || 0)}
-              className="p-3 border rounded-lg text-center"
+              aria-label="분"
+              className={timeInputClass}
             />
+            <span className="font-mono text-lg text-ink-4" aria-hidden>:</span>
             <input
               type="number"
-              placeholder="초"
+              placeholder="00"
               min={0}
               max={59}
               step={0.1}
               value={time.seconds || ''}
               onChange={(e) => onTimeChange('seconds', parseFloat(e.target.value) || 0)}
-              className="p-3 border rounded-lg text-center"
+              aria-label="초"
+              className={timeInputClass}
             />
           </div>
         </div>
       </div>
-    </div>
+    </CalcSection>
   );
 };

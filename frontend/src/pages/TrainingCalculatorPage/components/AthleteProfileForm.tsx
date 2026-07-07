@@ -14,6 +14,7 @@ import {
   FREQUENCY_OPTIONS,
   TRAINING_PHASE_OPTIONS
 } from '../utils/adjustments';
+import { CalcSection, FieldLabel, selectClass } from './CalcSection';
 
 interface AthleteProfileFormProps {
   gender: Gender | null;
@@ -47,123 +48,105 @@ export const AthleteProfileForm: React.FC<AthleteProfileFormProps> = ({
   genderSectionRef,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-      <h2 className="text-2xl font-bold mb-6 flex items-center">
-        <span className="bg-purple-100 text-purple-600 w-10 h-10 rounded-full flex items-center justify-center mr-3 text-lg">
-          1
-        </span>
-        선수 프로필 설정
-      </h2>
-      
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* 기본 정보 */}
-        <div>
-          <h3 className="font-semibold mb-3 text-gray-700">기본 정보</h3>
-          
-          {/* 성별 선택 */}
-          <div className="mb-4" ref={genderSectionRef}>
-            <label className="block text-sm font-medium mb-2">성별</label>
-            <div className="grid grid-cols-2 gap-2">
+    <CalcSection step="01" title="선수 프로필" hint="맞춤 조정에 쓰여요">
+      <div className="grid gap-x-8 gap-y-5 md:grid-cols-3">
+        {/* 성별 — 세그먼트 토글 */}
+        <div ref={genderSectionRef}>
+          <FieldLabel>성별</FieldLabel>
+          <div className="inline-flex w-full rounded-sm border border-line" role="group" aria-label="성별 선택">
+            {([
+              { value: 'male' as Gender, label: '남성' },
+              { value: 'female' as Gender, label: '여성' },
+            ]).map((option, index) => (
               <button
+                key={option.value}
                 type="button"
-                onClick={() => onGenderChange('male')}
-                className={`p-3 border-2 rounded-lg transition text-center hover:border-purple-500 ${
-                  gender === 'male' ? 'border-purple-500 bg-purple-50' : 'border-gray-200'
+                aria-pressed={gender === option.value}
+                onClick={() => onGenderChange(option.value)}
+                className={`h-11 flex-1 text-body-sm font-medium transition-colors ${
+                  index > 0 ? 'border-l border-line' : ''
+                } ${
+                  gender === option.value
+                    ? 'bg-ink text-bg'
+                    : 'bg-surface text-ink-2 hover:bg-surface-2'
                 }`}
               >
-                <i className="fas fa-mars text-blue-500 text-xl" />
-                <div className="text-sm mt-1">남성</div>
+                {option.label}
               </button>
-              <button
-                type="button"
-                onClick={() => onGenderChange('female')}
-                className={`p-3 border-2 rounded-lg transition text-center hover:border-purple-500 ${
-                  gender === 'female' ? 'border-purple-500 bg-purple-50' : 'border-gray-200'
-                }`}
-              >
-                <i className="fas fa-venus text-pink-500 text-xl" />
-                <div className="text-sm mt-1">여성</div>
-              </button>
-            </div>
-          </div>
-          
-          {/* 연령대 */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">연령대</label>
-            <select
-              value={ageGroup}
-              onChange={(e) => onAgeGroupChange(e.target.value as AgeGroup)}
-              className="w-full p-2 border rounded-lg bg-white"
-            >
-              {AGE_GROUP_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            ))}
           </div>
         </div>
 
-        {/* 훈련 수준 */}
         <div>
-          <h3 className="font-semibold mb-3 text-gray-700">훈련 수준</h3>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">경력</label>
-            <select
-              value={experience}
-              onChange={(e) => onExperienceChange(e.target.value as Experience)}
-              className="w-full p-2 border rounded-lg bg-white"
-            >
-              {EXPERIENCE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">주간 훈련량</label>
-            <select
-              value={weeklyVolume}
-              onChange={(e) => onWeeklyVolumeChange(e.target.value as WeeklyVolume)}
-              className="w-full p-2 border rounded-lg bg-white"
-            >
-              {WEEKLY_VOLUME_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <FieldLabel htmlFor="calc-age-group">연령대</FieldLabel>
+          <select
+            id="calc-age-group"
+            value={ageGroup}
+            onChange={(e) => onAgeGroupChange(e.target.value as AgeGroup)}
+            className={selectClass}
+          >
+            {AGE_GROUP_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </div>
 
-        {/* 훈련 패턴 */}
         <div>
-          <h3 className="font-semibold mb-3 text-gray-700">훈련 패턴</h3>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">훈련 빈도</label>
-            <select
-              value={frequency}
-              onChange={(e) => onFrequencyChange(e.target.value as TrainingFrequency)}
-              className="w-full p-2 border rounded-lg bg-white"
-            >
-              {FREQUENCY_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">현재 훈련 단계</label>
-            <select
-              value={trainingPhase}
-              onChange={(e) => onTrainingPhaseChange(e.target.value as TrainingPhase)}
-              className="w-full p-2 border rounded-lg bg-white"
-            >
-              {TRAINING_PHASE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <FieldLabel htmlFor="calc-experience">경력</FieldLabel>
+          <select
+            id="calc-experience"
+            value={experience}
+            onChange={(e) => onExperienceChange(e.target.value as Experience)}
+            className={selectClass}
+          >
+            {EXPERIENCE_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <FieldLabel htmlFor="calc-weekly-volume">주간 훈련량</FieldLabel>
+          <select
+            id="calc-weekly-volume"
+            value={weeklyVolume}
+            onChange={(e) => onWeeklyVolumeChange(e.target.value as WeeklyVolume)}
+            className={selectClass}
+          >
+            {WEEKLY_VOLUME_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <FieldLabel htmlFor="calc-frequency">훈련 빈도</FieldLabel>
+          <select
+            id="calc-frequency"
+            value={frequency}
+            onChange={(e) => onFrequencyChange(e.target.value as TrainingFrequency)}
+            className={selectClass}
+          >
+            {FREQUENCY_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <FieldLabel htmlFor="calc-phase">현재 훈련 단계</FieldLabel>
+          <select
+            id="calc-phase"
+            value={trainingPhase}
+            onChange={(e) => onTrainingPhaseChange(e.target.value as TrainingPhase)}
+            className={selectClass}
+          >
+            {TRAINING_PHASE_OPTIONS.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
         </div>
       </div>
-    </div>
+    </CalcSection>
   );
 };

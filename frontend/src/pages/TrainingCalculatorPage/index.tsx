@@ -69,15 +69,16 @@ const TrainingCalculatorPage: React.FC = () => {
       <div>
         {/* Header */}
         <PageHeader
-          title="전문 훈련 페이스 계산기"
-          icon="🏋️"
-          description="과학적 데이터 기반 개인 맞춤형 훈련 계획"
+          title="훈련 페이스 계산기"
+          description="기준 기록과 프로필로 구역별 페이스와 훈련 구성을 계산해요"
         />
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
-            <i className="fas fa-exclamation-circle mr-2" />
+          <div
+            role="alert"
+            className="mb-4 rounded-sm border border-err/40 border-l-2 border-l-err bg-surface px-4 py-3 text-body-sm text-err"
+          >
             {error}
           </div>
         )}
@@ -116,15 +117,17 @@ const TrainingCalculatorPage: React.FC = () => {
         />
 
         {/* Calculate Button */}
-        <div className="mb-6">
+        <div className="mb-10">
           <button
             type="button"
             onClick={handleCalculate}
-            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition hover:scale-[1.01] text-lg shadow-md"
+            className="h-14 w-full rounded-sm bg-ink text-base font-semibold text-bg transition-colors hover:bg-ink-2"
           >
-            <i className="fas fa-calculator mr-2" />
             훈련 계획 생성
           </button>
+          <p className="mt-2 text-center text-caption text-ink-4">
+            입력값은 저장되지 않아요. 계산 결과는 참고용이에요.
+          </p>
         </div>
 
         {/* Results Section */}
