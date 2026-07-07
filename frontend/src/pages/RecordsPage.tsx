@@ -19,6 +19,7 @@ import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
 import { MyRecordsCard } from '../components/record-insights/MyRecordsCard';
+import { useRecordDetailPref, detailToggleLabel } from '../components/record-insights/useRecordDetailPref';
 import { useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
 import { AthleteHighlightBadges } from '../components/record-insights/AthleteHighlightBadges';
@@ -450,7 +451,7 @@ export default function RecordsPage() {
 
       {/* 안내·신뢰 문구는 페이지 맨 아래 한 줄로 */}
       <p className="text-[11px] leading-4 text-ink-4">
-        {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
+        지금은 2018년 이후 기록을 보여드려요 (2005-2017 기록은 정리 중). {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
         <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
           데이터 안내 보기
         </Link>
@@ -474,7 +475,7 @@ function StartPanel({ onSeasonMode }: { onSeasonMode: () => void }) {
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-ink">위 검색창에 이름을 적어보세요.</h2>
           <p className="mt-1 text-sm text-ink-3">
-            같은 이름이 여러 명이면 소속을 보고 고르고, "나로 지정"을 누르면 바로 내 기록이 돼요.
+            같은 이름이 여러 명이면 소속을 보고, "내 기록이에요"를 누르면(=나로 지정) 바로 내 기록이 돼요.
           </p>
         </div>
         <Button type="button" variant="outline" onClick={onSeasonMode} className="shrink-0">
@@ -508,6 +509,8 @@ function AthletePanel({
   const [shareLinkMessage, setShareLinkMessage] = useState('');
   // 토스식 단계 공개 — 요약은 바로, 발자취/전체 기록은 누르면 열림
   const [openSection, setOpenSection] = useState<'' | 'trail' | 'records'>('');
+  // 날짜·순위·비고 표시 여부 (기기 단위 기억)
+  const detailPref = useRecordDetailPref();
   const shareCopyStartedAtRef = useRef(0);
 
   if (state === 'loading') {
@@ -585,7 +588,7 @@ function AthletePanel({
                       : 'border-brand-500 bg-white text-brand hover:bg-brand-50'
                   }`}
                 >
-                  {isMyAthlete ? '✓ 내 기록' : '나로 지정'}
+                  {isMyAthlete ? '✓ 내 기록에 담김' : '내 기록이에요'}
                 </button>
               )}
               <button
@@ -682,9 +685,20 @@ function AthletePanel({
         open={openSection === 'records'}
         onToggle={() => setOpenSection(openSection === 'records' ? '' : 'records')}
       >
+        {/* 날짜·순위·비고 보기/숨기기 — 디자인이 답답하면 간단히로 접기 */}
+        <div className="mb-2 flex justify-end">
+          <button
+            type="button"
+            onClick={detailPref.toggle}
+            aria-pressed={detailPref.detail}
+            className="border border-line bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-3 transition hover:border-line-2 hover:text-ink"
+          >
+            {detailToggleLabel(detailPref.detail)}
+          </button>
+        </div>
         <div className="space-y-2">
           {profile.records.slice(0, 8).map((record) => (
-            <RecordLine key={record.id} record={record} />
+            <RecordLine key={record.id} record={record} detail={detailPref.detail} />
           ))}
         </div>
       </DisclosureSection>
@@ -912,19 +926,26 @@ function MetricCard({ label, record }: { label: string; record: PublicRecord | n
   );
 }
 
-function RecordLine({ record }: { record: PublicRecord }) {
+function RecordLine({ record, detail = true }: { record: PublicRecord; detail?: boolean }) {
   const display = resolveRecordDisplay(record.record, record.note);
   return (
-    <div className="grid gap-2 border border-line p-3 sm:grid-cols-[110px_1fr_auto] sm:items-center">
-      <div className="font-mono text-xs text-ink-4">{record.date}</div>
-      <div>
-        <p className="font-semibold text-ink">{record.eventLabel} · {record.competitionName}</p>
-        <p className="text-xs text-ink-4">{record.divisionLabel} · {record.venue || '장소 미상'} · 출처 {resolveProviderLabel(record.source.provider)}</p>
+    <div className="border border-line p-3">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="min-w-0 truncate text-sm font-semibold text-ink">
+          {record.eventLabel} · {record.competitionName}
+        </p>
+        <p className={`shrink-0 font-mono tabular-nums ${display.hasMark ? 'text-base font-semibold text-ink' : 'text-sm font-medium text-ink-4'}`}>
+          {display.text}
+          {detail && record.rank != null && (
+            <span className="ml-1.5 text-xs font-medium text-ink-4">{record.rank}위</span>
+          )}
+        </p>
       </div>
-      {display.hasMark ? (
-        <div className="text-lg font-semibold text-ink">{display.text}</div>
-      ) : (
-        <div className="text-sm font-medium text-ink-4">{display.text}</div>
+      {detail && (
+        <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
+          <p className="min-w-0 truncate">{record.divisionLabel} · {record.venue || '장소 미상'} · 출처 {resolveProviderLabel(record.source.provider)}</p>
+          <p className="shrink-0 font-mono tabular-nums">{record.date}</p>
+        </div>
       )}
     </div>
   );

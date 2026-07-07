@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import { getAthleteAnalytics, type AthleteAnalyticsProfile, type PublicRecord } from '../../api/recordAnalytics';
 import { resolveRecordDisplay } from '../../lib/recordStatus';
 import type { MyAthleteEntry } from './useMyAthlete';
+import { useRecordDetailPref, detailToggleLabel } from './useRecordDetailPref';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -59,6 +60,8 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
   const [state, setState] = useState<LoadState>('loading');
   const [profiles, setProfiles] = useState<AthleteAnalyticsProfile[]>([]);
   const [showAll, setShowAll] = useState(false);
+  // 날짜·순위·비고 보기/숨기기 (기기 단위 기억)
+  const detailPref = useRecordDetailPref();
 
   useEffect(() => {
     if (keys.length === 0) return;
@@ -182,6 +185,18 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
         {state === 'error' && (
           <p role="alert" className="py-3 text-sm text-ink-3">기록을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p>
         )}
+        {state === 'ready' && merged.rows.length > 0 && (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={detailPref.toggle}
+              aria-pressed={detailPref.detail}
+              className="border border-line bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-3 transition hover:border-line-2 hover:text-ink"
+            >
+              {detailToggleLabel(detailPref.detail)}
+            </button>
+          </div>
+        )}
         {state === 'ready' && visibleRows.map((record) => {
           const display = resolveRecordDisplay(record.record, record.note);
           return (
@@ -193,12 +208,17 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
                 <p className="min-w-0 truncate text-sm font-semibold text-ink">{record.eventLabel} · {record.competitionName}</p>
                 <p className={`shrink-0 font-mono tabular-nums ${display.hasMark ? 'text-base font-semibold text-ink' : 'text-sm font-medium text-ink-4'}`}>
                   {display.text}
+                  {detailPref.detail && record.rank != null && (
+                    <span className="ml-1.5 text-xs font-medium text-ink-4">{record.rank}위</span>
+                  )}
                 </p>
               </div>
-              <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
-                <p className="min-w-0 truncate">{record.divisionLabel} · {record.sourceTeam}</p>
-                <p className="shrink-0 font-mono tabular-nums">{record.date}</p>
-              </div>
+              {detailPref.detail && (
+                <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
+                  <p className="min-w-0 truncate">{record.divisionLabel} · {record.sourceTeam}</p>
+                  <p className="shrink-0 font-mono tabular-nums">{record.date}</p>
+                </div>
+              )}
             </div>
           );
         })}
