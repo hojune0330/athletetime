@@ -9,6 +9,11 @@ type Props = {
   isInCompareTray: (athleteKey: string) => boolean;
   onSelectAthlete: (athleteKey: string) => void;
   onToggleCompare: (athlete: AthleteSearchCard) => void;
+  /** 후보 카드에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 */
+  isMine: (athleteKey: string) => boolean;
+  onToggleMine: (athlete: AthleteSearchCard) => void;
+  myCount: number;
+  onViewMyRecords: () => void;
 };
 
 type FilterOption = {
@@ -24,6 +29,10 @@ export function RecordSearchResults({
   isInCompareTray,
   onSelectAthlete,
   onToggleCompare,
+  isMine,
+  onToggleMine,
+  myCount,
+  onViewMyRecords,
 }: Props) {
   const [eventFilter, setEventFilter] = useState('');
   const [teamFilter, setTeamFilter] = useState('');
@@ -54,7 +63,7 @@ export function RecordSearchResults({
             <p className="text-sm font-semibold text-ink">후보를 좁혀보세요</p>
             <p className="mt-1 text-xs leading-5 text-ink-4">
               {sameNameCount >= 2
-                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 같은 이름을 자동으로 합치지 않고, 소속·연도·종목으로 직접 고르게 합니다.`
+                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 내 기록이면 카드의 "나"를 누르세요 — 여러 개 누르면 전부 합쳐져요.`
                 : '이름이 같은 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'}
             </p>
           </div>
@@ -77,6 +86,21 @@ export function RecordSearchResults({
         />
       </div>
 
+      {myCount > 0 && (
+        <div className="flex items-center justify-between gap-3 border border-brand bg-brand/5 px-4 py-3">
+          <p className="text-sm text-ink">
+            <span className="font-semibold text-brand">내 기록</span>으로 {myCount}개 묶음이 합쳐져 있어요.
+          </p>
+          <button
+            type="button"
+            onClick={onViewMyRecords}
+            className="shrink-0 border border-brand bg-brand px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
+          >
+            합친 기록 보기
+          </button>
+        </div>
+      )}
+
       {filteredAthletes.length === 0 ? (
         <div role="status" className="border border-dashed border-line bg-surface-2 p-5 text-sm text-ink-3">
           선택한 조건에 맞는 후보가 없어요. 종목이나 소속 필터를 하나씩 풀어보세요.
@@ -89,8 +113,10 @@ export function RecordSearchResults({
               athlete={athlete}
               selected={selectedAthleteKey === athlete.athleteKey}
               inTray={isInCompareTray(athlete.athleteKey)}
+              mine={isMine(athlete.athleteKey)}
               onSelect={() => onSelectAthlete(athlete.athleteKey)}
               onToggleCompare={() => onToggleCompare(athlete)}
+              onToggleMine={() => onToggleMine(athlete)}
             />
           ))}
         </div>
@@ -147,30 +173,43 @@ function AthleteResultCard({
   athlete,
   selected,
   inTray,
+  mine,
   onSelect,
   onToggleCompare,
+  onToggleMine,
 }: {
   athlete: AthleteSearchCard;
   selected: boolean;
   inTray: boolean;
+  mine: boolean;
   onSelect: () => void;
   onToggleCompare: () => void;
+  onToggleMine: () => void;
 }) {
   const isHomonym = athlete.ambiguity === 'name_team' || athlete.ambiguity === 'name';
 
   return (
     <div
       className={`relative border p-4 transition-colors ${
-        selected ? 'border-brand bg-brand/5' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
+        mine
+          ? 'border-brand bg-brand/10'
+          : selected
+            ? 'border-brand bg-brand/5'
+            : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
       }`}
     >
+      {mine && (
+        <span className="absolute right-3 top-3 border border-brand bg-brand px-2 py-0.5 text-[11px] font-semibold text-white">
+          ✓ 내 기록
+        </span>
+      )}
       <button type="button" onClick={onSelect} className="block w-full text-left">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold tracking-tight text-ink">{athlete.name}</h2>
             <p className="mt-1 text-sm text-ink-3">{athlete.team || '소속 미상'}</p>
           </div>
-          <span className="font-mono text-xs text-ink-4">기록 {athlete.recordCount}건</span>
+          {!mine && <span className="font-mono text-xs text-ink-4">기록 {athlete.recordCount}건</span>}
         </div>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
@@ -194,6 +233,18 @@ function AthleteResultCard({
         <span className="mt-4 inline-flex text-sm font-semibold text-brand">이 기록 보기</span>
       </button>
 
+      <button
+        type="button"
+        onClick={onToggleMine}
+        aria-pressed={mine}
+        className={`mt-3 mr-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+          mine
+            ? 'border-brand-500 bg-brand-500 text-white'
+            : 'border-brand-500/60 bg-surface text-brand hover:bg-brand-50'
+        }`}
+      >
+        {mine ? '✓ 나' : '나'}
+      </button>
       <button
         type="button"
         onClick={onToggleCompare}

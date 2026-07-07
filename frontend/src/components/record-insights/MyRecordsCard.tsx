@@ -16,6 +16,36 @@ type Props = {
 
 type MergedRecord = PublicRecord & { sourceTeam: string; sourceKey: string };
 
+type EventBest = {
+  eventKey: string;
+  eventLabel: string;
+  recordCount: number;
+  best: MergedRecord | null;
+};
+
+/** 기록 문자열 → 비교가능 숫자. 시간형(mm:ss.xx)은 초, 거리형(12.34m)은 음수로 뒤집어 "작을수록 좋음" 통일 */
+function markSortValue(record: string): number | null {
+  const raw = (record || '').trim();
+  if (!raw) return null;
+  const distance = raw.match(/^(\d+(?:\.\d+)?)\s*m$/i);
+  if (distance) return -parseFloat(distance[1]);
+  const time = raw.match(/^(?:(\d+):)?(?:(\d+):)?(\d+(?:\.\d+)?)$/);
+  if (!time) return null;
+  const [, a, b, c] = time;
+  const parts = [a, b, c].filter((v) => v !== undefined).map(Number);
+  if (parts.some((v) => Number.isNaN(v))) return null;
+  return parts.reduce((acc, v) => acc * 60 + v, 0);
+}
+
+function pickBetter(a: MergedRecord | null, b: MergedRecord): MergedRecord | null {
+  if (!a) return b;
+  const av = markSortValue(a.record);
+  const bv = markSortValue(b.record);
+  if (bv === null) return a;
+  if (av === null) return b;
+  return bv < av ? b : a;
+}
+
 /**
  * "내 기록" 합산 카드.
  *
@@ -48,21 +78,48 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
 
   const merged = useMemo(() => {
     const rows: MergedRecord[] = [];
-    const events = new Set<string>();
     const years = new Set<number>();
+    const eventMap = new Map<string, EventBest>();
+    let latestSeason = 0;
     for (const profile of profiles) {
       for (const record of profile.records) {
-        rows.push({ ...record, sourceTeam: profile.athlete.team || '소속 미상', sourceKey: profile.athlete.athleteKey });
-        events.add(record.eventLabel);
-        if (record.season) years.add(record.season);
+        const row: MergedRecord = {
+          ...record,
+          sourceTeam: profile.athlete.team || '소속 미상',
+          sourceKey: profile.athlete.athleteKey,
+        };
+        rows.push(row);
+        if (record.season) {
+          years.add(record.season);
+          if (record.season > latestSeason) latestSeason = record.season;
+        }
+        // 종목별 베스트 — 묶음 전체를 합쳐서 계산 (시즌 베스트도 같은 방식으로 합산)
+        const bucket = eventMap.get(record.eventKey) || {
+          eventKey: record.eventKey,
+          eventLabel: record.eventLabel,
+          recordCount: 0,
+          best: null,
+        };
+        bucket.recordCount += 1;
+        bucket.best = pickBetter(bucket.best, row);
+        eventMap.set(record.eventKey, bucket);
       }
     }
     rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    // 이번(최근) 시즌 베스트 — 묶음 전체 합산 기준
+    let seasonBest: MergedRecord | null = null;
+    for (const row of rows) {
+      if (row.season === latestSeason) seasonBest = pickBetter(seasonBest, row);
+    }
     const sortedYears = Array.from(years).sort((a, b) => a - b);
+    const eventBests = Array.from(eventMap.values()).sort((a, b) => b.recordCount - a.recordCount);
     return {
       rows,
       totalCount: rows.length,
-      eventCount: events.size,
+      eventCount: eventMap.size,
+      eventBests,
+      seasonBest,
+      latestSeason,
       latest: rows[0] || null,
       yearRange:
         sortedYears.length === 0
@@ -89,16 +146,33 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
           </Button>
         </div>
 
-        {/* 합산 요약 — 모든 묶음 합쳐서 */}
+        {/* 합산 요약 — 모든 묶음 합쳐서 (대시보드 상단) */}
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <SumStat label="모은 기록" value={state === 'ready' ? `${merged.totalCount}개` : '…'} />
           <SumStat label="종목" value={state === 'ready' ? `${merged.eventCount}개` : '…'} />
           <SumStat label="활동 연도" value={state === 'ready' ? merged.yearRange : '…'} />
           <SumStat
-            label="최근 기록"
-            value={state === 'ready' && merged.latest ? resolveRecordDisplay(merged.latest.record, merged.latest.note).text : '…'}
+            label={state === 'ready' && merged.latestSeason ? `${merged.latestSeason} 시즌 베스트` : '시즌 베스트'}
+            value={state === 'ready' && merged.seasonBest ? resolveRecordDisplay(merged.seasonBest.record, merged.seasonBest.note).text : '…'}
           />
         </div>
+
+        {/* 종목별 베스트 — 묶음 전체 합산 */}
+        {state === 'ready' && merged.eventBests.length > 0 && (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {merged.eventBests.slice(0, 4).map((event) => (
+              <div key={event.eventKey} className="flex items-baseline justify-between gap-2 border border-line bg-surface p-3">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-ink-2">{event.eventLabel}</p>
+                  <p className="mt-0.5 font-mono text-[11px] tabular-nums text-ink-4">{event.recordCount}개 기록</p>
+                </div>
+                <p className="shrink-0 font-mono text-lg font-semibold tabular-nums text-ink">
+                  {event.best ? resolveRecordDisplay(event.best.record, event.best.note).text : '-'}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-2">
@@ -113,18 +187,18 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
           return (
             <div
               key={`${record.sourceKey}-${record.id}`}
-              className="grid gap-1.5 border border-line p-3 sm:grid-cols-[96px_1fr_auto] sm:items-center sm:gap-2"
+              className="border border-line p-3"
             >
-              <div className="font-mono text-xs text-ink-4">{record.date}</div>
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-ink">{record.eventLabel} · {record.competitionName}</p>
-                <p className="text-xs text-ink-4">{record.divisionLabel} · {record.sourceTeam}</p>
+              <div className="flex items-baseline justify-between gap-2">
+                <p className="min-w-0 truncate text-sm font-semibold text-ink">{record.eventLabel} · {record.competitionName}</p>
+                <p className={`shrink-0 font-mono tabular-nums ${display.hasMark ? 'text-base font-semibold text-ink' : 'text-sm font-medium text-ink-4'}`}>
+                  {display.text}
+                </p>
               </div>
-              {display.hasMark ? (
-                <div className="text-lg font-semibold text-ink">{display.text}</div>
-              ) : (
-                <div className="text-sm font-medium text-ink-4">{display.text}</div>
-              )}
+              <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
+                <p className="min-w-0 truncate">{record.divisionLabel} · {record.sourceTeam}</p>
+                <p className="shrink-0 font-mono tabular-nums">{record.date}</p>
+              </div>
             </div>
           );
         })}

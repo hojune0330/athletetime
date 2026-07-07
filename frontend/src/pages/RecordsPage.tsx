@@ -363,6 +363,17 @@ export default function RecordsPage() {
           selectedAthleteKey={selectedAthleteKey}
           compareNotice={compareNotice}
           isInCompareTray={compareTray.isInTray}
+          isMine={isMine}
+          myCount={myEntries.length}
+          onViewMyRecords={() => setShowMyRecords(true)}
+          onToggleMine={(athlete) => {
+            // 검색 후보에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 (여러 개 누르면 전부 합산)
+            toggleMyAthlete({
+              athleteKey: athlete.athleteKey,
+              name: athlete.name,
+              team: athlete.team,
+            });
+          }}
           onSelectAthlete={handleSelectAthlete}
           onToggleCompare={(athlete) => {
             const res = compareTray.toggle({
@@ -791,37 +802,60 @@ function SeasonPanel({
               <span>{table.season} · {table.eventLabel} · {table.divisionLabel}</span>
               <span>{scopeCount(table.totalIndexedAthletes, '명')}</span>
             </div>
-            <div className="overflow-x-auto border border-line">
-              <table className="w-full min-w-[720px] border-collapse text-sm">
+            {/* 데스크탑: 표 — 기록/일자는 줄바꿈 없이 모노 폰트로 선명하게 */}
+            <div className="hidden overflow-x-auto border border-line sm:block">
+              <table className="w-full min-w-[640px] border-collapse text-sm">
                 <thead className="bg-surface-2 text-left text-xs text-ink-4">
                   <tr>
-                    <th className="sticky left-0 z-20 w-14 bg-surface-2 p-3">기록 순서</th>
-                    <th className="sticky left-14 z-20 bg-surface-2 p-3">선수</th>
-                    <th className="p-3">기록</th>
-                    <th className="p-3">대회</th>
-                    <th className="p-3">일자</th>
-                    <th className="p-3">풍속</th>
+                    <th className="w-12 p-2.5">순서</th>
+                    <th className="p-2.5">선수</th>
+                    <th className="w-28 p-2.5">기록</th>
+                    <th className="p-2.5">대회</th>
+                    <th className="w-28 p-2.5">일자</th>
+                    <th className="w-16 p-2.5">풍속</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {table.rows.map((row) => {
-                    const rowBg = row.highlighted ? 'bg-brand/5' : 'bg-surface';
-                    return (
-                      <tr key={`${row.rank}-${row.athleteKey}`} className={row.highlighted ? 'bg-brand/5' : 'border-t border-line'}>
-                        <td className={`sticky left-0 z-10 w-14 p-3 font-mono text-ink-3 ${rowBg}`}>{row.rank}</td>
-                        <td className={`sticky left-14 z-10 p-3 ${rowBg}`}>
-                          <p className="font-semibold text-ink">{row.name}</p>
-                          <p className="text-xs text-ink-4">{row.team || '소속 미상'}</p>
-                        </td>
-                        <td className="p-3 text-lg font-semibold text-ink">{row.record}</td>
-                        <td className="p-3 text-ink-3">{row.competitionName}</td>
-                        <td className="p-3 text-ink-3">{row.date}</td>
-                        <td className="p-3 text-ink-3">{row.wind || '-'}</td>
-                      </tr>
-                    );
-                  })}
+                  {table.rows.map((row) => (
+                    <tr
+                      key={`${row.rank}-${row.athleteKey}`}
+                      className={row.highlighted ? 'bg-brand/5' : 'border-t border-line'}
+                    >
+                      <td className="w-12 p-2.5 font-mono tabular-nums text-ink-3">{row.rank}</td>
+                      <td className="max-w-[180px] p-2.5">
+                        <p className="truncate font-semibold text-ink">{row.name}</p>
+                        <p className="truncate text-xs text-ink-4">{row.team || '소속 미상'}</p>
+                      </td>
+                      <td className="w-28 whitespace-nowrap p-2.5 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</td>
+                      <td className="max-w-[220px] truncate p-2.5 text-ink-3">{row.competitionName}</td>
+                      <td className="w-28 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.date}</td>
+                      <td className="w-16 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.wind || '-'}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* 모바일: 가로 스크롤 없는 카드 행 — 기록·대회·일자가 한눈에 */}
+            <div className="space-y-1.5 sm:hidden">
+              {table.rows.map((row) => (
+                <div
+                  key={`m-${row.rank}-${row.athleteKey}`}
+                  className={`border p-3 ${row.highlighted ? 'border-brand bg-brand/5' : 'border-line bg-surface'}`}
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="min-w-0 truncate text-sm font-semibold text-ink">
+                      <span className="mr-1.5 font-mono text-xs tabular-nums text-ink-4">{row.rank}</span>
+                      {row.name}
+                    </p>
+                    <p className="shrink-0 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</p>
+                  </div>
+                  <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
+                    <p className="min-w-0 truncate">{row.team || '소속 미상'} · {row.competitionName}</p>
+                    <p className="shrink-0 font-mono tabular-nums">{row.date}{row.wind ? ` · ${row.wind}` : ''}</p>
+                  </div>
+                </div>
+              ))}
             </div>
             <p className="mt-3 text-xs leading-5 text-ink-4">{table.disclaimer}</p>
           </>
