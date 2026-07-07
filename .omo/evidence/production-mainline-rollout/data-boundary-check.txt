@@ -1,0 +1,7 @@
+## originals ignore rule
+57:data/sources/import/originals/
+
+## analytics ignore rule
+28:data/analytics/*.json
+
+## tracked original files scan
