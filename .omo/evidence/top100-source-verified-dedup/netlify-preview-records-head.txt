@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Accept-Ranges: bytes
+Age: 0
+Cache-Control: public,max-age=0,must-revalidate
+Cache-Status: "Netlify Edge"; fwd=miss
+Content-Length: 2153
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com; connect-src 'self' https://athletetime-backend.onrender.com wss://athletetime-backend.onrender.com https://fonts.googleapis.com https://fonts.gstatic.com;
+Content-Type: text/html; charset=UTF-8
+Date: Wed, 08 Jul 2026 07:58:18 GMT
+Etag: "957506c532b4ff33d102fa685a7ad190-ssl"
+Referrer-Policy: strict-origin-when-cross-origin
+Server: Netlify
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Nf-Request-Id: 01KX0BR7GHHZW0YQV334SQZKS2
+X-Robots-Tag: noindex
+

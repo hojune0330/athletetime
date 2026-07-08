@@ -172,6 +172,7 @@ function warmup() {
     athletes: idx.athletes.length,
     seasons: idx.seasons.length,
     events: idx.events.length,
+    manualTopRecords: idx.manualTopRecordStats,
   };
 }
 
@@ -182,6 +183,15 @@ function buildIndex() {
   const eventLabelByKey = new Map();
   const divisionLabelByKey = new Map();
   const defaultDivisionByEventCounts = new Map();
+  const manualTopRecordDedupKeys = new Set();
+  const manualTopRecordStats = {
+    totalCandidates: 0,
+    appended: 0,
+    skippedDuplicates: 0,
+    skippedSuppressed: 0,
+    skippedInvalidName: 0,
+    skippedInvalidRecord: 0,
+  };
   const filenames = resultsStore.listFilenames();
 
   for (const filename of filenames) {
@@ -301,6 +311,8 @@ function buildIndex() {
         };
 
         records.push(record);
+        const manualTopDedupKey = buildManualTopRecordDedupKey(record);
+        if (manualTopDedupKey) manualTopRecordDedupKeys.add(manualTopDedupKey);
         if (!athleteByKey.has(athleteKey)) {
           athleteByKey.set(athleteKey, {
             athleteKey,
@@ -338,6 +350,8 @@ function buildIndex() {
     eventLabelByKey,
     divisionLabelByKey,
     defaultDivisionByEventCounts,
+    manualTopRecordDedupKeys,
+    manualTopRecordStats,
   });
 
   const athletes = [...athleteByKey.values()].map((athlete) => {
@@ -396,13 +410,18 @@ function buildIndex() {
     defaultDivisionKeyByEvent,
     eventLabelByKey,
     divisionLabelByKey,
+    manualTopRecordStats,
   };
 }
 
 function appendManualTopRecordCandidates(context) {
   for (const candidate of manualTopRecordsService.listIndexableRecords()) {
+    context.manualTopRecordStats.totalCandidates += 1;
     const name = clean(candidate.athleteName, 100);
-    if (!isIndexableAthleteName(name)) continue;
+    if (!isIndexableAthleteName(name)) {
+      context.manualTopRecordStats.skippedInvalidName += 1;
+      continue;
+    }
 
     const team = clean(candidate.team, 100);
     const competitionName = clean(candidate.competitionName, 220);
@@ -411,13 +430,20 @@ function appendManualTopRecordCandidates(context) {
       affiliation: team,
       competition: competitionName,
     });
-    if (suppression) continue;
+    if (suppression) {
+      context.manualTopRecordStats.skippedSuppressed += 1;
+      continue;
+    }
 
     const eventMeta = normalizeCandidateTopEvent(candidate);
     const parsed = parseRecord(candidate.record, eventMeta.direction);
-    if (!parsed) continue;
+    if (!parsed) {
+      context.manualTopRecordStats.skippedInvalidRecord += 1;
+      continue;
+    }
 
     const season = Number.parseInt(String(candidate.date || '').slice(0, 4), 10) || 0;
+    const date = clean(candidate.date, 20);
     const wind = clean(candidate.wind, 20);
     const windLegal = isWindLegal(wind);
     const needsWindCheck = eventMeta.windRelevant || isWindRelevant(eventMeta.eventLabel);
@@ -440,6 +466,17 @@ function appendManualTopRecordCandidates(context) {
       athleteKey,
       candidate.record,
     ].join('|'));
+    const dedupKey = buildManualTopRecordDedupKey({
+      name,
+      eventKey: eventMeta.eventKey,
+      date,
+      recordDisplay: parsed.display,
+    });
+    if (dedupKey && context.manualTopRecordDedupKeys.has(dedupKey)) {
+      context.manualTopRecordStats.skippedDuplicates += 1;
+      continue;
+    }
+    if (dedupKey) context.manualTopRecordDedupKeys.add(dedupKey);
 
     const record = {
       id: recordId,
@@ -449,7 +486,7 @@ function appendManualTopRecordCandidates(context) {
       season,
       competitionId: `manual-top100-${candidate.batch}`,
       competitionName,
-      date: clean(candidate.date, 20),
+      date,
       venue: '',
       eventKey: eventMeta.eventKey,
       eventLabel: eventMeta.eventLabel,
@@ -465,10 +502,10 @@ function appendManualTopRecordCandidates(context) {
       windLegal,
       isComparable,
       note: [
-        'KAAF TOP100 candidate',
+        'KAAF TOP100',
         candidate.category ? `${candidate.category} #${candidate.sourceRank || '-'}` : '',
         candidate.recordType || '',
-        candidate.reviewStatus || '',
+        formatManualTopReviewStatus(candidate.reviewStatus),
       ].filter(Boolean).join(' · '),
       source: {
         provider: 'KAAF',
@@ -483,6 +520,7 @@ function appendManualTopRecordCandidates(context) {
     };
 
     context.records.push(record);
+    context.manualTopRecordStats.appended += 1;
     if (!context.athleteByKey.has(athleteKey)) {
       context.athleteByKey.set(athleteKey, {
         athleteKey,
@@ -855,6 +893,32 @@ function toPublicRecord(record) {
 
 function seasonTableKey(season, eventKey, divisionKey) {
   return `${season}|${eventKey}|${divisionKey}`;
+}
+
+function buildManualTopRecordDedupKey(record) {
+  const name = normalizeManualTopName(record.name);
+  const eventKey = clean(record.eventKey, 80);
+  const date = clean(record.date, 20);
+  const recordMark = normalizeManualTopRecordMark(record.recordDisplay || record.record);
+  if (!name || !eventKey || !date || !recordMark) return '';
+  return `${name}|${eventKey}|${date}|${recordMark}`;
+}
+
+function normalizeManualTopName(name) {
+  return clean(name, 100).replace(/\s+/g, '').toLowerCase();
+}
+
+function normalizeManualTopRecordMark(mark) {
+  return clean(mark, 40)
+    .replace(/,/g, '')
+    .replace(/[^\d:.]/g, '')
+    .replace(/^0+(?=\d)/, '');
+}
+
+function formatManualTopReviewStatus(status) {
+  if (status === 'source_verified') return 'KAAF 공개 기록';
+  if (status === 'needs_external_confirmation') return '외부 결과 확인 대기';
+  return clean(status, 80);
 }
 
 function buildSignature() {

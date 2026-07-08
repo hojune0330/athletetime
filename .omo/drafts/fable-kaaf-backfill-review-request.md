@@ -5,6 +5,8 @@ Please review this branch before launch merge.
 ## What changed
 
 - TOP100 candidate records remain service-searchable through analytics.
+- Domestic TOP100 rows are now `source_verified`; overseas / foreign-hosted hint rows remain `needs_external_confirmation`.
+- TOP100 analytics indexing now dedups against `data/results`; existing result rows win.
 - Fable's 2005-2017 backup tar is imported into ignored private original storage.
 - Only manifest/report are committed for the backup originals.
 - Importer uses safe internal filenames and preserves original archive paths in manifest.
@@ -28,8 +30,10 @@ Please review this branch before launch merge.
 2. Does TOP100 candidate handling stay conservative enough?
    - `sourceType=public_top_record_candidate`
    - `sourceTier=B`
-   - `reviewStatus=needs_external_confirmation`
+   - domestic rows: `reviewStatus=source_verified`
+   - overseas / foreign-hosted hint rows: `reviewStatus=needs_external_confirmation`
    - Not mixed into `data/results` as official competition rows.
+   - Dedup keeps one public row for the same normalized name + event + date + record.
 
 3. Is the operator workflow acceptable?
    - If a signed-in athlete requests a missing record, operators use this source vault/manifest plus athlete-history evidence to manually add reviewed normalized rows.
@@ -43,6 +47,7 @@ Please review this branch before launch merge.
 - HTTP current results: `.omo/evidence/kaaf-backfill-service-readiness/http-current-competitions-2024.txt`
 - HTTP season records with TOP100 source: `.omo/evidence/kaaf-backfill-service-readiness/http-season-records-2026-100m.txt`
 - Full summary: `.omo/evidence/kaaf-backfill-service-readiness/summary.md`
+- P0 source verification + dedup evidence: `.omo/evidence/top100-source-verified-dedup/summary.md`
 
 ## Known boundary
 

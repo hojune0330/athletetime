@@ -1,0 +1,16 @@
+
+> athletetime-unified@4.0.0 data:check:kaaf-top100
+> node tools/promote-kaaf-top100-review-status.js --batch 20260708-kaaf-top100 --check
+
+{
+  "batch": "20260708-kaaf-top100",
+  "changed": false,
+  "candidateCount": 24630,
+  "indexableCandidateCount": 16885,
+  "heldCandidateCount": 7745,
+  "reviewStatus": {
+    "source_verified": 23861,
+    "needs_external_confirmation": 769
+  },
+  "externalHintCount": 769
+}
