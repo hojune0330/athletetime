@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: manual TOP100 batch is safe to store as candidate data
+ok 1 - manual TOP100 batch is safe to store as candidate data
+  ---
+  duration_ms: 354.899
+  type: 'test'
+  ...
+# Subtest: manual TOP100 review status policy promotes domestic rows and keeps overseas hints pending
+ok 2 - manual TOP100 review status policy promotes domestic rows and keeps overseas hints pending
+  ---
+  duration_ms: 406.8434
+  type: 'test'
+  ...
+# Subtest: manual TOP100 service exposes only athlete-searchable candidate rows
+ok 3 - manual TOP100 service exposes only athlete-searchable candidate rows
+  ---
+  duration_ms: 219.5988
+  type: 'test'
+  ...
+# Subtest: manual TOP100 candidates are searchable without becoming official-result rows
+ok 4 - manual TOP100 candidates are searchable without becoming official-result rows
+  ---
+  duration_ms: 2860.467
+  type: 'test'
+  ...
+# Subtest: manual TOP100 index dedup keeps one public row per same athlete event date record
+ok 5 - manual TOP100 index dedup keeps one public row per same athlete event date record
+  ---
+  duration_ms: 10.3427
+  type: 'test'
+  ...
+# Subtest: UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections
+ok 6 - UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections
+  ---
+  duration_ms: 2.7756
+  type: 'test'
+  ...
+# Subtest: UX-MYREC-001: my-athlete pin saves locally and merged card is always visible
+ok 7 - UX-MYREC-001: my-athlete pin saves locally and merged card is always visible
+  ---
+  duration_ms: 3.0113
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched
+ok 8 - UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched
+  ---
+  duration_ms: 5.4485
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-002: search candidates offer direct "나" designation with instant merge
+ok 9 - UX-COMBINE-002: search candidates offer direct "나" designation with instant merge
+  ---
+  duration_ms: 2.8998
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable
+ok 10 - UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable
+  ---
+  duration_ms: 5.5176
+  type: 'test'
+  ...
+# Subtest: UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser
+ok 11 - UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser
+  ---
+  duration_ms: 2.1734
+  type: 'test'
+  ...
+# Subtest: UX-TONE-001: new surfaces avoid trust-violating words
+ok 12 - UX-TONE-001: new surfaces avoid trust-violating words
+  ---
+  duration_ms: 6.3564
+  type: 'test'
+  ...
+# Subtest: UX-WORKFLOW-001: workflow doc anchors the athletetime-first development flow
+ok 13 - UX-WORKFLOW-001: workflow doc anchors the athletetime-first development flow
+  ---
+  duration_ms: 2.4719
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-001 promoted 2015 Yecheon result is available through resultsStore and competition search
+ok 14 - TRACK-A-SERVICE-001 promoted 2015 Yecheon result is available through resultsStore and competition search
+  ---
+  duration_ms: 450.6584
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as public result rows
+ok 15 - TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as public result rows
+  ---
+  duration_ms: 2852.6558
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-003 records page copy states partial 2015-2017 coverage without claiming full history
+ok 16 - TRACK-A-SERVICE-003 records page copy states partial 2015-2017 coverage without claiming full history
+  ---
+  duration_ms: 1.0545
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+ok 17 - TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+  ---
+  duration_ms: 269.0799
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+ok 18 - TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+  ---
+  duration_ms: 286.8394
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+ok 19 - TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+  ---
+  duration_ms: 107.7886
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4121.434

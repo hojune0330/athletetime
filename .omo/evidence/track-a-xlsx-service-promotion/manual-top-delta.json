@@ -1,0 +1,26 @@
+{
+  "before": {
+    "totalCandidates": 16885,
+    "appended": 9564,
+    "skippedDuplicates": 7321,
+    "skippedSuppressed": 0,
+    "skippedInvalidName": 0,
+    "skippedInvalidRecord": 0
+  },
+  "after": {
+    "totalCandidates": 16885,
+    "appended": 9564,
+    "skippedDuplicates": 7321,
+    "skippedSuppressed": 0,
+    "skippedInvalidName": 0,
+    "skippedInvalidRecord": 0
+  },
+  "delta": {
+    "totalCandidates": 0,
+    "appended": 0,
+    "skippedDuplicates": 0,
+    "skippedSuppressed": 0,
+    "skippedInvalidName": 0,
+    "skippedInvalidRecord": 0
+  }
+}

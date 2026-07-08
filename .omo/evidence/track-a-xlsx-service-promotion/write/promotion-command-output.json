@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "mode": "write",
+  "candidateRows": 4292,
+  "promotedRows": 3563,
+  "promotedWorkbooks": 9,
+  "heldWorkbooks": [
+    {
+      "year": 2016,
+      "competitionName": "2016 전국대구실내육상경기대회",
+      "sourceFile": "014_2016 전국대구실내육상경기대회 기록지20161201.xlsx",
+      "candidateRows": 729,
+      "reason": "UNSAFE_EVENT_LABELS",
+      "unsafeEventRows": 729,
+      "headerRows": 131
+    }
+  ],
+  "heldRows": 729,
+  "years": [
+    2015,
+    2016,
+    2017
+  ],
+  "byYear": {
+    "2015": 1009,
+    "2016": 1661,
+    "2017": 893
+  },
+  "deferredXlsFiles": 83,
+  "excludedNonEliteFiles": 1,
+  "outDir": "data/results",
+  "index": "data/results/index.json",
+  "evidenceDir": ".omo/evidence/track-a-xlsx-service-promotion/write"
+}

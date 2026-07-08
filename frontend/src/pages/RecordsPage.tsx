@@ -468,7 +468,7 @@ export default function RecordsPage() {
 
       {/* 안내·신뢰 문구는 페이지 맨 아래 한 줄로 */}
       <p className="text-[11px] leading-4 text-ink-4">
-        지금은 2018년 이후 기록을 보여드려요 (2005-2017 기록은 정리 중). {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
+        2015-2017 일부 기록과 2018년 이후 기록을 먼저 보여드려요. 2005년 이후 자료는 계속 보강 중이에요. {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
         <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
           데이터 안내 보기
         </Link>
