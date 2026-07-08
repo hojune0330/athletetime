@@ -11,7 +11,8 @@
   "indexableCandidateCount": 16885,
   "heldCandidateCount": 7745,
   "reviewStatus": {
-    "needs_external_confirmation": 24630
+    "source_verified": 23861,
+    "needs_external_confirmation": 769
   },
   "eventCount": 55,
   "categoryCount": 14,
@@ -39,5 +40,12 @@
     "sourceUrls": {
       "https://result.kaaf.or.kr/recInfo/topRecList.do": 854
     }
+  },
+  "reviewPolicy": {
+    "domesticStatus": "source_verified",
+    "externalHintStatus": "needs_external_confirmation",
+    "externalHintCount": 769,
+    "sourceVerifiedCount": 23861,
+    "rule": "KAAF TOP100 domestic rows are source_verified; overseas/foreign-hosted hints remain needs_external_confirmation."
   }
 }
