@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
 const identityResolver = require('./identityResolver');
+const manualTopRecordsService = require('./manualTopRecordsService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 const INVALID_MARK = /^(dns|dnf|dq|dsq|nm|nt|nr|-|)$/i;
@@ -10,6 +11,23 @@ const FIELD_HINTS = /(높이|멀리|세단|장대|포환|원반|창던|공던|�
 const ROAD_HINTS = /(마라톤|하프|10km|5km|road|도로|경보)/i;
 const RELAY_HINTS = /(계주|릴레이|relay|4x|400mR|1600mR)/i;
 const WIND_RELEVANT = /(^|\D)(100m|200m|110mH|100mH)(\D|$)|멀리|세단|LJ|TJ/i;
+
+const CANDIDATE_FIELD_EVENTS = new Map([
+  ['높이뛰기', { key: 'high-jump', label: '높이뛰기' }],
+  ['멀리뛰기', { key: 'long-jump', label: '멀리뛰기', windRelevant: true }],
+  ['세단뛰기', { key: 'triple-jump', label: '세단뛰기', windRelevant: true }],
+  ['삼단뛰기', { key: 'triple-jump', label: '삼단뛰기', windRelevant: true }],
+  ['장대높이뛰기', { key: 'pole-vault', label: '장대높이뛰기' }],
+  ['포환던지기', { key: 'shot-put', label: '포환던지기' }],
+  ['원반던지기', { key: 'discus', label: '원반던지기' }],
+  ['창던지기', { key: 'javelin', label: '창던지기' }],
+  ['해머던지기', { key: 'hammer', label: '해머던지기' }],
+]);
+const CANDIDATE_ROAD_EVENTS = new Map([
+  ['마라톤', { key: 'marathon', label: '마라톤' }],
+  ['하프마라톤', { key: 'half-marathon', label: '하프마라톤' }],
+  ['역전경기', { key: 'road-relay', label: '역전경기', isRelay: true }],
+]);
 
 let cachedIndex = null;
 let cachedSignature = '';
@@ -313,6 +331,15 @@ function buildIndex() {
     }
   }
 
+  appendManualTopRecordCandidates({
+    records,
+    athleteByKey,
+    seasonBuckets,
+    eventLabelByKey,
+    divisionLabelByKey,
+    defaultDivisionByEventCounts,
+  });
+
   const athletes = [...athleteByKey.values()].map((athlete) => {
     const years = [...athlete.years].sort((a, b) => a - b);
     const events = [...athlete.events].sort();
@@ -325,7 +352,15 @@ function buildIndex() {
       divisions,
       teams,
       recordCount: athlete.records.length,
-      searchText: [athlete.name, athlete.team, ...teams, ...events, ...divisions].join(' ').toLowerCase(),
+      searchText: [
+        athlete.name,
+        athlete.team,
+        athlete.englishName,
+        ...(athlete.aliases || []),
+        ...teams,
+        ...events,
+        ...divisions,
+      ].join(' ').toLowerCase(),
       ambiguity: 'name_team',
     };
   });
@@ -361,6 +396,162 @@ function buildIndex() {
     defaultDivisionKeyByEvent,
     eventLabelByKey,
     divisionLabelByKey,
+  };
+}
+
+function appendManualTopRecordCandidates(context) {
+  for (const candidate of manualTopRecordsService.listIndexableRecords()) {
+    const name = clean(candidate.athleteName, 100);
+    if (!isIndexableAthleteName(name)) continue;
+
+    const team = clean(candidate.team, 100);
+    const competitionName = clean(candidate.competitionName, 220);
+    const suppression = dataRequestService.checkSuppression({
+      name,
+      affiliation: team,
+      competition: competitionName,
+    });
+    if (suppression) continue;
+
+    const eventMeta = normalizeCandidateTopEvent(candidate);
+    const parsed = parseRecord(candidate.record, eventMeta.direction);
+    if (!parsed) continue;
+
+    const season = Number.parseInt(String(candidate.date || '').slice(0, 4), 10) || 0;
+    const wind = clean(candidate.wind, 20);
+    const windLegal = isWindLegal(wind);
+    const needsWindCheck = eventMeta.windRelevant || isWindRelevant(eventMeta.eventLabel);
+    const isComparable = !!eventMeta.eventKey
+      && !!eventMeta.divisionKey
+      && !eventMeta.isRelay
+      && Number.isFinite(parsed.value)
+      && parsed.value > 0
+      && (!needsWindCheck || !wind || windLegal);
+    const normalizedTeam = normalizeTeam(team);
+    const baseKey = stableId(`${name}|${normalizedTeam}`);
+    const athleteKey = identityResolver.resolve({
+      athleteKey: baseKey,
+      matchKey: `${name}|${normalizedTeam}`,
+    }) || baseKey;
+    const recordId = stableId([
+      'manual-top100',
+      candidate.batch,
+      candidate.sourceRowId,
+      athleteKey,
+      candidate.record,
+    ].join('|'));
+
+    const record = {
+      id: recordId,
+      athleteKey,
+      name,
+      team,
+      season,
+      competitionId: `manual-top100-${candidate.batch}`,
+      competitionName,
+      date: clean(candidate.date, 20),
+      venue: '',
+      eventKey: eventMeta.eventKey,
+      eventLabel: eventMeta.eventLabel,
+      rawEvent: clean(candidate.event, 160),
+      divisionKey: eventMeta.divisionKey,
+      divisionLabel: eventMeta.divisionLabel,
+      phase: eventMeta.phase,
+      recordValue: parsed.value,
+      recordDisplay: parsed.display,
+      direction: eventMeta.direction,
+      rank: Number.parseInt(candidate.sourceRank, 10) || null,
+      wind: wind || null,
+      windLegal,
+      isComparable,
+      note: [
+        'KAAF TOP100 candidate',
+        candidate.category ? `${candidate.category} #${candidate.sourceRank || '-'}` : '',
+        candidate.recordType || '',
+        candidate.reviewStatus || '',
+      ].filter(Boolean).join(' · '),
+      source: {
+        provider: 'KAAF',
+        sourceType: 'public_top_record_candidate',
+        sourceTier: 'B',
+        sourceId: `${candidate.batchFilename}:${candidate.sourceRowId}`,
+        sourceUrl: clean(candidate.sourceUrl, 300),
+        capturedAt: clean(candidate.batchSummary?.generatedAt, 40),
+        reviewStatus: candidate.reviewStatus,
+        batch: candidate.batch,
+      },
+    };
+
+    context.records.push(record);
+    if (!context.athleteByKey.has(athleteKey)) {
+      context.athleteByKey.set(athleteKey, {
+        athleteKey,
+        name,
+        team,
+        englishName: clean(candidate.athleteEnglishName, 160),
+        aliases: [clean(candidate.athleteEnglishName, 160)].filter(Boolean),
+        records: [],
+        years: new Set(),
+        events: new Set(),
+        divisions: new Set(),
+        teams: new Set(team ? [team] : []),
+        searchText: '',
+      });
+    }
+
+    const athlete = context.athleteByKey.get(athleteKey);
+    if (candidate.athleteEnglishName) {
+      athlete.englishName = athlete.englishName || clean(candidate.athleteEnglishName, 160);
+      athlete.aliases = [...new Set([...(athlete.aliases || []), clean(candidate.athleteEnglishName, 160)].filter(Boolean))];
+    }
+    athlete.records.push(record);
+    if (season) athlete.years.add(season);
+    if (record.eventLabel) athlete.events.add(record.eventLabel);
+    if (record.divisionLabel) athlete.divisions.add(record.divisionLabel);
+    if (team) athlete.teams.add(team);
+
+    if (record.isComparable) {
+      const key = seasonTableKey(season, record.eventKey, record.divisionKey);
+      if (!context.seasonBuckets.has(key)) context.seasonBuckets.set(key, []);
+      context.seasonBuckets.get(key).push(record);
+    }
+
+    if (eventMeta.eventKey && !context.eventLabelByKey.has(eventMeta.eventKey)) {
+      context.eventLabelByKey.set(eventMeta.eventKey, eventMeta.eventLabel);
+    }
+    if (eventMeta.divisionKey) {
+      context.divisionLabelByKey.set(eventMeta.divisionKey, eventMeta.divisionLabel);
+      if (!context.defaultDivisionByEventCounts.has(eventMeta.eventKey)) {
+        context.defaultDivisionByEventCounts.set(eventMeta.eventKey, new Map());
+      }
+      const counts = context.defaultDivisionByEventCounts.get(eventMeta.eventKey);
+      counts.set(eventMeta.divisionKey, (counts.get(eventMeta.divisionKey) || 0) + 1);
+    }
+  }
+}
+
+function normalizeCandidateTopEvent(candidate) {
+  const rawEvent = clean(candidate.event, 120);
+  const divisionLabel = clean(candidate.category, 120) || '구분 미상';
+  const field = CANDIDATE_FIELD_EVENTS.get(rawEvent);
+  const road = CANDIDATE_ROAD_EVENTS.get(rawEvent);
+  const mapped = field || road || null;
+  const base = normalizeEvent(rawEvent, divisionLabel);
+  const detailClassCd = clean(candidate.detailClassCd, 20).toLowerCase();
+  const eventKey = mapped?.key || stableSlug(rawEvent || detailClassCd);
+  const isField = !!field;
+  const phase = /결승|final/i.test(clean(candidate.phase, 80)) ? 'final' : base.phase;
+
+  return {
+    ...base,
+    eventKey,
+    eventLabel: mapped?.label || rawEvent || base.eventLabel,
+    divisionKey: candidate.kindCd ? `kaaf-kind-${clean(candidate.kindCd, 20).toLowerCase()}` : stableSlug(divisionLabel),
+    divisionLabel,
+    phase,
+    direction: isField ? 'higher' : base.direction,
+    isRelay: !!mapped?.isRelay || base.isRelay,
+    windRelevant: !!mapped?.windRelevant,
   };
 }
 
@@ -668,11 +859,12 @@ function seasonTableKey(season, eventKey, divisionKey) {
 
 function buildSignature() {
   const filenames = resultsStore.listFilenames().join('|');
+  const manualTopRecords = manualTopRecordsService.getSignature();
   const suppressions = dataRequestService
     .getActiveSuppressions()
     .map((item) => `${item.key}:${item.mode}:${item.since}`)
     .join('|');
-  return `${filenames}::${suppressions}`;
+  return `${filenames}::${manualTopRecords}::${suppressions}`;
 }
 
 function isWindRelevant(eventLabel) {

@@ -1,0 +1,43 @@
+{
+  "batch": "20260708-kaaf-top100",
+  "generatedAt": "2026-07-08T04:04:59.260Z",
+  "sourceFiles": {
+    "candidateRecords": "candidate-records.jsonl",
+    "sourceLedger": "source-ledger.jsonl"
+  },
+  "sourceUrl": "https://result.kaaf.or.kr/recInfo/topRecList.do",
+  "apiEndpoint": "searchTopRecList.do",
+  "candidateCount": 24630,
+  "indexableCandidateCount": 16885,
+  "heldCandidateCount": 7745,
+  "reviewStatus": {
+    "needs_external_confirmation": 24630
+  },
+  "eventCount": 55,
+  "categoryCount": 14,
+  "yearRange": {
+    "from": 2005,
+    "to": 2026
+  },
+  "sensitiveScan": {
+    "rawSensitiveKeyHits": [],
+    "outputContainsRestrictedIdentifiers": false,
+    "strippedKeysExpectedFromLedger": [
+      "ORG_KIND_CD1",
+      "PERSON_NO1"
+    ]
+  },
+  "sourceLedger": {
+    "total": 854,
+    "status": {
+      "success": 854
+    },
+    "stripped": 854,
+    "endpoints": {
+      "searchTopRecList.do": 854
+    },
+    "sourceUrls": {
+      "https://result.kaaf.or.kr/recInfo/topRecList.do": 854
+    }
+  }
+}
