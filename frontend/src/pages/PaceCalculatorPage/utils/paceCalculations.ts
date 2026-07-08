@@ -332,16 +332,70 @@ export const TARGETS_FULL: TargetRecord[] = [
   { time: 360 * 60, label: '완주 목표', highlight: true }
 ];
 
-// 3000m 장애물 경주 계산
+// 3000m 장애물(3000mSC) 경주 계산
+//
+// 물웅덩이(water jump) 위치에 따라 실제 랩 거리가 달라진다:
+// - INSIDE: 물웅덩이가 트랙 안쪽(2번 곡선 안)에 설치된 표준 구성 — 랩이 400m보다 짧다
+// - OUTSIDE: 물웅덩이가 8레인 바깥에 설치된 경기장 — 랩이 400m보다 길다
+// 두 구성 모두 스타트 구간 + 7랩 = 정확히 3000m.
 export const STEEPLECHASE_SPECS = {
   INSIDE: {
     lapDistance: 396.084,
     startDistance: 227.412,
-    description: 'World Athletics 표준'
+    label: '물웅덩이 안쪽',
+    description: 'World Athletics 표준 — 랩 396.084m · 스타트 227.412m'
   },
   OUTSIDE: {
     lapDistance: 419.407,
     startDistance: 64.151,
-    description: '일부 경기장 구성'
+    label: '물웅덩이 바깥쪽',
+    description: '8레인 밖 설치 경기장 — 랩 419.407m · 스타트 64.151m'
   }
-};
+} as const;
+
+export type SteepleVariant = keyof typeof STEEPLECHASE_SPECS;
+
+export interface TrackSplit {
+  label: string;
+  distance: number;        // 이 구간 거리 (m)
+  cumulativeDistance: number;
+  time: number;            // 이 구간 목표 시간 (초)
+  cumulativeTime: number;  // 누적 목표 시간 (초)
+}
+
+/** 균등 페이스 기준 구간 분할 — 스타트 구간 + 반복 랩 */
+function buildSplits(totalSeconds: number, totalDistance: number, startDistance: number, lapDistance: number, laps: number): TrackSplit[] {
+  const splits: TrackSplit[] = [];
+  let cumDist = 0;
+  let cumTime = 0;
+  const push = (label: string, dist: number) => {
+    const time = (dist / totalDistance) * totalSeconds;
+    cumDist += dist;
+    cumTime += time;
+    splits.push({ label, distance: dist, cumulativeDistance: cumDist, time, cumulativeTime: cumTime });
+  };
+  if (startDistance > 0.5) push('스타트 구간', startDistance);
+  for (let i = 1; i <= laps; i += 1) push(`${i}랩`, lapDistance);
+  return splits;
+}
+
+/** 3000mSC 구간 계산 — 물웅덩이 위치(variant)에 따라 랩 거리가 다르다 */
+export function calculateSteepleSplits(targetSeconds: number, variant: SteepleVariant): TrackSplit[] {
+  const spec = STEEPLECHASE_SPECS[variant];
+  return buildSplits(targetSeconds, 3000, spec.startDistance, spec.lapDistance, 7);
+}
+
+/** 트랙 종목 구간 계산 — 800m(2×400), 1500m(300 스타트 + 3×400) */
+export function calculateTrackSplits(distanceMeters: number, targetSeconds: number): TrackSplit[] {
+  if (distanceMeters === 800) return buildSplits(targetSeconds, 800, 0, 400, 2);
+  if (distanceMeters === 1500) return buildSplits(targetSeconds, 1500, 300, 400, 3);
+  return [];
+}
+
+/** 초 → "m:ss.d" (트랙 구간용 — 0.1초 단위까지) */
+export function formatSplitTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds - mins * 60;
+  if (mins === 0) return secs.toFixed(1);
+  return `${mins}:${secs.toFixed(1).padStart(4, '0')}`;
+}

@@ -4,3 +4,4 @@ export { TrackLaneCalculator } from './TrackLaneCalculator';
 export { SplitCalculator } from './SplitCalculator';
 export { TargetPaceCalculator } from './TargetPaceCalculator';
 export { ChartDownloadButtons } from './ChartDownloadButtons';
+export { TrackEventSplits } from './TrackEventSplits';
