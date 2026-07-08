@@ -21,7 +21,7 @@
 ## Test gates
 - `npm run data:verify:kaaf-backfill`: pass, 3/3.
 - `node --test backend/tests/manual-top-records-ingest.test.js`: pass, 3/3.
-- `npm test`: pass, 192/192.
+- `npm test`: pass, 206/206 after rebase onto `origin/main`.
 - `npm --prefix frontend run type-check`: pass.
 - `npm --prefix frontend run build`: pass. Only Browserslist/baseline data age warnings.
 
