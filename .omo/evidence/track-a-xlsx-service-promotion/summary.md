@@ -30,5 +30,10 @@
 - HTTP QA: `.omo/evidence/track-a-xlsx-service-promotion/http-qa-final/http-transcript.txt` and `http-assertions.json`.
 - Cleanup receipt: `.omo/evidence/track-a-xlsx-service-promotion/http-qa-final/cleanup.txt`.
 
+## Deploy Preview Caveat
+- Netlify deploy preview for PR #35 serves the branch frontend successfully.
+- The preview `/api` surface is not authoritative for this branch's promoted result data because it is wired to the shared backend surface rather than a branch-specific backend dataset.
+- Branch data-service proof is therefore the local HTTP QA evidence above. After PR merge and backend deploy, verify production with `GET /api/analytics/records/search?q=김국영` and confirm the promoted 2015 Yecheon row appears in the relevant athlete profile.
+
 ## User/Fable Follow-up
 The user clarified that 2005+ expansion should not be unnecessarily delayed after this safe slice. This PR therefore completes the safe part of the approved 2015-2017 XLSX promotion and leaves the next step as immediate 2005-2014 / `.xls` converter-track expansion plus review of the held 2016 indoor workbook, not an indefinite pause.
