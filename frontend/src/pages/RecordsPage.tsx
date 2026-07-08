@@ -54,7 +54,14 @@ export default function RecordsPage() {
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
   const [compareNotice, setCompareNotice] = useState('');
-  const [showMyRecords, setShowMyRecords] = useState(false);
+  // 내 기록 카드는 담긴 게 있으면 버튼 없이 항상 보인다 — 접기만 가능(숨김 아님)
+  const [myRecordsCollapsed, setMyRecordsCollapsed] = useState(false);
+  const revealMyRecords = () => {
+    setMyRecordsCollapsed(false);
+    window.setTimeout(() => {
+      document.getElementById('my-records')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+  };
   const compareTray = useCompareTray();
   const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
@@ -231,15 +238,6 @@ export default function RecordsPage() {
             </h1>
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            {myEntries.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setShowMyRecords(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
-              >
-                내 기록 바로 보기 — {myEntries[0].name}
-              </button>
-            )}
             <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
               <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
                 기록 한눈에
@@ -316,12 +314,31 @@ export default function RecordsPage() {
         </div>
       )}
 
-      {showMyRecords && myEntries.length > 0 && (
-        <MyRecordsCard
-          entries={myEntries}
-          onClose={() => setShowMyRecords(false)}
-          onRemove={removeMyAthlete}
-        />
+      {/* 내 기록 — 별도 진입 버튼 없이 항상 보임. 접으면 슬림 바로 남는다. */}
+      {myEntries.length > 0 && (
+        myRecordsCollapsed ? (
+          <button
+            type="button"
+            id="my-records"
+            onClick={() => setMyRecordsCollapsed(false)}
+            className="flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
+          >
+            <span className="min-w-0 truncate text-sm text-ink">
+              <span className="font-bold text-brand">내 기록</span>
+              <span className="ml-2 font-semibold">{myEntries[0].name}</span>
+              <span className="ml-2 text-ink-4">{myEntries.length}개 묶음 합산 중</span>
+            </span>
+            <span className="shrink-0 text-sm font-semibold text-brand">펼치기</span>
+          </button>
+        ) : (
+          <div id="my-records">
+            <MyRecordsCard
+              entries={myEntries}
+              onClose={() => setMyRecordsCollapsed(true)}
+              onRemove={removeMyAthlete}
+            />
+          </div>
+        )
       )}
 
       {shouldPrioritizeAthletePanel && (
@@ -339,7 +356,7 @@ export default function RecordsPage() {
               name: profile.athlete.name,
               team: profile.athlete.team,
             });
-            if (!wasMine) setShowMyRecords(true);
+            if (!wasMine) revealMyRecords();
           }}
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
@@ -366,7 +383,7 @@ export default function RecordsPage() {
           isInCompareTray={compareTray.isInTray}
           isMine={isMine}
           myCount={myEntries.length}
-          onViewMyRecords={() => setShowMyRecords(true)}
+          onViewMyRecords={revealMyRecords}
           onToggleMine={(athlete) => {
             // 검색 후보에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 (여러 개 누르면 전부 합산)
             toggleMyAthlete({
@@ -404,7 +421,7 @@ export default function RecordsPage() {
               name: profile.athlete.name,
               team: profile.athlete.team,
             });
-            if (!wasMine) setShowMyRecords(true);
+            if (!wasMine) revealMyRecords();
           }}
           onToggleCompare={() => {
             if (!profile) return;
@@ -429,7 +446,7 @@ export default function RecordsPage() {
           onCombine={(segments) => {
             // 원탭 합산 — 묶음 전부를 바로 내 기록으로 (확인 절차 없음, 빼기는 나중에)
             addManyMyAthletes(segments);
-            setShowMyRecords(true);
+            revealMyRecords();
           }}
         />
       )}

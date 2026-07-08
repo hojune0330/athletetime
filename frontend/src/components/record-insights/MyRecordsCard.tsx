@@ -137,15 +137,17 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
   const visibleRows = showAll ? merged.rows : merged.rows.slice(0, 10);
 
   return (
-    <Card className="border-brand">
-      <CardHeader>
+    <Card className="overflow-hidden border-brand border-l-4 shadow-sm">
+      {/* 내 기록만의 특별한 느낌 — brand 틴트 헤더로 다른 카드와 확실히 구분 */}
+      <CardHeader className="bg-brand/5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-brand">내 기록</p>
-            <CardTitle className="mt-1 text-2xl">{name}</CardTitle>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand">MY RECORDS · 내 기록</p>
+            <CardTitle className="mt-1.5 text-2xl">{name}</CardTitle>
+            <p className="mt-1 text-xs text-ink-4">{entries.length}개 묶음 합산 중 · 항상 여기 뜨 있어요</p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={onClose}>
-            닫기
+            접기
           </Button>
         </div>
 
