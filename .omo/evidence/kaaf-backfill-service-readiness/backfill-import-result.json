@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "batch": "20260708-kaaf-backfill-2005-2017",
+  "archiveEntries": 451,
+  "fileCount": 428,
+  "extractionMode": "safe-entry-js",
+  "storageRoot": "C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\data\\sources\\import\\originals\\20260708-kaaf-backfill-2005-2017",
+  "manifestPath": "C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\data\\sources\\manifests\\20260708-kaaf-backfill-2005-2017-manifest.json",
+  "reportPath": "C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\data\\sources\\manifests\\20260708-kaaf-backfill-2005-2017-report.md",
+  "storageTrackedByGit": false
+}

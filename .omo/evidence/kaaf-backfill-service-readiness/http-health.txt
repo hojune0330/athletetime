@@ -1,0 +1,18 @@
+﻿HTTP 200 OK
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH
+Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-Token
+Access-Control-Allow-Credentials: true
+Access-Control-Max-Age: 86400
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: strict-origin-when-cross-origin
+Connection: keep-alive
+Keep-Alive: timeout=5
+Content-Length: 239
+Content-Type: application/json; charset=utf-8
+Date: Wed, 08 Jul 2026 06:38:15 GMT
+ETag: W/"ef-VBLwMbfuhXVH1x0Kskm+Ai765Gg"
+
+{"status":"healthy","version":"4.0.0","mode":"standalone","services":{"cardStudio":"active","community":"mock","auth":"active","database":"mock-memory","email":"console-only","externalData":"active"},"timestamp":"2026-07-08T06:38:15.341Z"}
