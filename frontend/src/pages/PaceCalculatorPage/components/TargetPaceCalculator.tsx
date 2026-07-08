@@ -7,6 +7,7 @@ import {
   calculate400mLap,
   calculate100mTime,
   calculateSpeed,
+  STEEPLECHASE_SPECS,
 } from '../utils/paceCalculations';
 
 type PaceResult = {
@@ -18,11 +19,16 @@ type PaceResult = {
 };
 
 const QUICK_DISTANCES = [
+  { label: '800m', value: 800 },
+  { label: '1500m', value: 1500 },
   { label: '5km', value: 5000 },
   { label: '10km', value: 10000 },
   { label: '하프', value: 21097.5 },
   { label: '풀코스', value: 42195 },
 ] as const;
+
+/** 3000mSC 물웅덩이 위치 — 경기장마다 달라 랩 거리와 스타트 위치가 바뀐다 */
+type WaterJumpPlacement = 'INSIDE' | 'OUTSIDE';
 
 const numberInputClass =
   'h-11 rounded-sm border border-line bg-surface px-3 text-center font-mono text-base text-ink [font-variant-numeric:tabular-nums] transition-colors focus:border-ink focus:outline-none';
@@ -31,6 +37,9 @@ export const TargetPaceCalculator: React.FC = () => {
   const [distance, setDistance] = useState<number>(5000);
   const [customDistance, setCustomDistance] = useState<string>('5');
   const [isCustom, setIsCustom] = useState(false);
+  // 3000m 장애물(steeplechase) 모드 — 물웅덩이 안쪽/바깥쪽에 따라 랩 구성이 다르다
+  const [isSteeple, setIsSteeple] = useState(false);
+  const [waterJump, setWaterJump] = useState<WaterJumpPlacement>('INSIDE');
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(20);
   const [seconds, setSeconds] = useState(0);
@@ -42,6 +51,13 @@ export const TargetPaceCalculator: React.FC = () => {
   const handleDistanceSelect = (selectedDistance: number) => {
     setDistance(selectedDistance);
     setIsCustom(false);
+    setIsSteeple(false);
+  };
+
+  const handleSteepleSelect = () => {
+    setDistance(3000);
+    setIsCustom(false);
+    setIsSteeple(true);
   };
 
   const handleCustomDistanceChange = (value: string) => {
@@ -51,7 +67,28 @@ export const TargetPaceCalculator: React.FC = () => {
       setDistance(nextDistanceKm * 1000);
     }
     setIsCustom(true);
+    setIsSteeple(false);
   };
+
+  // 3000mSC 랩 스플릿 — 스타트 구간 + 7랩 누적 통과 타임 (균등 페이스)
+  const steepleSplits = useMemo(() => {
+    if (!isSteeple || !result || targetTimeSeconds <= 0) return null;
+    const spec = STEEPLECHASE_SPECS[waterJump];
+    const pacePerMeter = targetTimeSeconds / 3000;
+    const startTime = spec.startDistance * pacePerMeter;
+    const lapTime = spec.lapDistance * pacePerMeter;
+    const rows: Array<{ label: string; distance: number; cumulative: number }> = [
+      { label: '스타트 구간', distance: spec.startDistance, cumulative: startTime },
+    ];
+    for (let lap = 1; lap <= 7; lap += 1) {
+      rows.push({
+        label: `${lap}바퀴`,
+        distance: spec.startDistance + spec.lapDistance * lap,
+        cumulative: startTime + lapTime * lap,
+      });
+    }
+    return { spec, startTime, lapTime, rows };
+  }, [isSteeple, result, targetTimeSeconds, waterJump]);
 
   const calculate = () => {
     if (targetTimeSeconds <= 0 || distance <= 0) {
@@ -93,29 +130,72 @@ export const TargetPaceCalculator: React.FC = () => {
             <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
               Distance
             </label>
-            <div className="grid grid-cols-2 border border-line bg-surface sm:grid-cols-5">
-              {QUICK_DISTANCES.map((option, index) => (
+            <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
+              {QUICK_DISTANCES.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   onClick={() => handleDistanceSelect(option.value)}
-                  className={`h-11 border-hair font-mono text-[12px] font-medium transition-colors ${
-                    index > 0 ? 'border-l max-sm:[&:nth-child(odd)]:border-l-0' : ''
-                  } ${!isCustom && distance === option.value ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'}`}
+                  className={`h-11 font-mono text-[12px] font-medium transition-colors ${
+                    !isCustom && !isSteeple && distance === option.value
+                      ? 'bg-ink text-bg'
+                      : 'bg-surface text-ink-2 hover:bg-surface-2'
+                  }`}
                 >
                   {option.label}
                 </button>
               ))}
               <button
                 type="button"
-                onClick={() => setIsCustom(true)}
-                className={`h-11 border-l border-hair font-mono text-[12px] font-medium transition-colors sm:col-auto ${
+                onClick={handleSteepleSelect}
+                className={`h-11 font-mono text-[12px] font-medium transition-colors ${
+                  isSteeple ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
+                }`}
+              >
+                3000mSC
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustom(true);
+                  setIsSteeple(false);
+                }}
+                className={`h-11 font-mono text-[12px] font-medium transition-colors ${
                   isCustom ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
                 }`}
               >
                 직접
               </button>
             </div>
+
+            {isSteeple && (
+              <div className="mt-3 border border-line bg-surface-2 p-3">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-3">
+                  Water jump · 물웅덩이 위치
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-px border border-line bg-line">
+                  {(['INSIDE', 'OUTSIDE'] as const).map((placement) => (
+                    <button
+                      key={placement}
+                      type="button"
+                      onClick={() => setWaterJump(placement)}
+                      className={`flex h-12 flex-col items-center justify-center font-mono text-[11px] transition-colors ${
+                        waterJump === placement ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
+                      }`}
+                    >
+                      <span className="font-semibold">{placement === 'INSIDE' ? '트랙 안쪽' : '트랙 바깥쪽'}</span>
+                      <span className="text-[10px] opacity-70 [font-variant-numeric:tabular-nums]">
+                        랩 {STEEPLECHASE_SPECS[placement].lapDistance.toFixed(1)}m
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-ink-4">
+                  안쪽({STEEPLECHASE_SPECS.INSIDE.description}): 스타트 {STEEPLECHASE_SPECS.INSIDE.startDistance.toFixed(1)}m + 7랩 × {STEEPLECHASE_SPECS.INSIDE.lapDistance.toFixed(1)}m ·
+                  바깥쪽({STEEPLECHASE_SPECS.OUTSIDE.description}): 스타트 {STEEPLECHASE_SPECS.OUTSIDE.startDistance.toFixed(1)}m + 7랩 × {STEEPLECHASE_SPECS.OUTSIDE.lapDistance.toFixed(1)}m
+                </p>
+              </div>
+            )}
 
             {isCustom && (
               <div className="mt-3 flex items-center gap-2">
@@ -132,7 +212,7 @@ export const TargetPaceCalculator: React.FC = () => {
               </div>
             )}
             <p className="mt-2 font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
-              SELECTED {distanceKm}KM
+              SELECTED {isSteeple ? '3000M STEEPLECHASE' : `${distanceKm}KM`}
             </p>
           </div>
 
@@ -168,15 +248,51 @@ export const TargetPaceCalculator: React.FC = () => {
 
           <div className="grid border-y border-ink bg-surface sm:grid-cols-2 lg:grid-cols-3">
             <MetricCell label="km 페이스" value={result.pacePerKm} unit="/km" />
-            <MetricCell label="400m 랩" value={result.pace400m} unit="초" />
+            {steepleSplits ? (
+              <MetricCell
+                label={`SC 랩 (${steepleSplits.spec.lapDistance.toFixed(1)}m)`}
+                value={formatTime(steepleSplits.lapTime)}
+                unit="초"
+              />
+            ) : (
+              <MetricCell label="400m 랩" value={result.pace400m} unit="초" />
+            )}
             <MetricCell label="100m" value={result.pace100m} unit="초" />
             <MetricCell label="속도" value={result.speedKmh} unit="km/h" />
             <MetricCell label="거리" value={distanceKm} unit="km" />
             <MetricCell label="완주 시간" value={result.finishTime} />
           </div>
 
+          {steepleSplits && (
+            <div className="mt-4 border border-line">
+              <div className="flex items-baseline justify-between border-b border-line bg-surface-2 px-3 py-2">
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-3">
+                  SC LAP SPLITS · {waterJump === 'INSIDE' ? '트랙 안쪽' : '트랙 바깥쪽'}
+                </p>
+                <p className="font-mono text-[10px] text-ink-4 [font-variant-numeric:tabular-nums]">
+                  스타트 {steepleSplits.spec.startDistance.toFixed(1)}m · 랩 {steepleSplits.spec.lapDistance.toFixed(1)}m
+                </p>
+              </div>
+              <div className="divide-y divide-hair">
+                {steepleSplits.rows.map((row) => (
+                  <div key={row.label} className="grid grid-cols-[1fr_auto_auto] items-baseline gap-3 px-3 py-1.5">
+                    <span className="text-body-sm text-ink-2">{row.label}</span>
+                    <span className="font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
+                      {row.distance.toFixed(1)}m
+                    </span>
+                    <span className="font-mono text-body-sm font-semibold text-ink [font-variant-numeric:tabular-nums]">
+                      {formatTime(row.cumulative)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 border-l-2 border-ink pl-3 text-body-sm leading-relaxed text-ink-3">
-            균등 페이스 기준 참고값이에요. 실제 레이스에서는 코스, 날씨, 급수 지점에 따라 달라질 수 있어요.
+            {steepleSplits
+              ? '균등 페이스 기준 참고값이에요. 장애물 넘기·물웅덩이 감속은 반영되지 않았으니 실제 랩은 조금 느려질 수 있어요. 경기장의 물웅덩이 위치를 꼭 확인하세요.'
+              : '균등 페이스 기준 참고값이에요. 실제 레이스에서는 코스, 날씨, 급수 지점에 따라 달라질 수 있어요.'}
           </div>
 
           <button

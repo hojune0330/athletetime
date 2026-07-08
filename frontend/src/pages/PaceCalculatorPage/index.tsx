@@ -5,11 +5,12 @@ import {
   TrackLaneCalculator,
   SplitCalculator,
   TargetPaceCalculator,
+  TrackEventSplits,
 } from './components';
 import PageHeader from '../../components/common/PageHeader';
 import './styles/pace-calculator.css';
 
-type TabType = 'target' | 'chart' | 'lane' | 'split';
+type TabType = 'target' | 'track' | 'chart' | 'lane' | 'split';
 
 type TabConfig = {
   readonly id: TabType;
@@ -19,6 +20,7 @@ type TabConfig = {
 
 const TABS = [
   { id: 'target', label: '목표 페이스', eyebrow: 'MAIN' },
+  { id: 'track', label: '트랙 종목', eyebrow: '800·1500·SC' },
   { id: 'chart', label: '페이스 차트', eyebrow: 'TABLE' },
   { id: 'lane', label: '트랙 레인', eyebrow: 'TRACK' },
   { id: 'split', label: '스플릿 계산', eyebrow: 'SPLIT' },
@@ -103,7 +105,7 @@ const PaceCalculatorPage: React.FC = () => {
         </section>
 
         <nav className="mb-6 no-print" role="tablist" aria-label="페이스 계산기 메뉴">
-          <div className="grid border border-line bg-surface sm:grid-cols-4">
+          <div className="grid border border-line bg-surface sm:grid-cols-5">
             {TABS.map((tab, index) => (
               <button
                 key={tab.id}
@@ -157,6 +159,12 @@ const PaceCalculatorPage: React.FC = () => {
           {activeTab === 'target' && (
             <div id="target-content" role="tabpanel" aria-labelledby="tab-target">
               <TargetPaceCalculator />
+            </div>
+          )}
+
+          {activeTab === 'track' && (
+            <div id="track-content" role="tabpanel" aria-labelledby="tab-track">
+              <TrackEventSplits />
             </div>
           )}
 
