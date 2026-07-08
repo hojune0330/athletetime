@@ -1,0 +1,13 @@
+{
+  "total": 854,
+  "status": {
+    "success": 854
+  },
+  "stripped": 854,
+  "endpoints": {
+    "searchTopRecList.do": 854
+  },
+  "sourceUrls": {
+    "https://result.kaaf.or.kr/recInfo/topRecList.do": 854
+  }
+}
