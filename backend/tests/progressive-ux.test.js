@@ -3,7 +3,7 @@
  *
  * 계약:
  * - UX-DISCLOSE-001: 선수 패널의 발자취/전체 기록은 눌러야 열리는 DisclosureSection
- * - UX-MYREC-001: "나로 지정" → localStorage 저장 → "내 기록 바로 보기" 버튼
+ * - UX-MYREC-001: 지정 → localStorage 저장 → 내 기록 카드는 버튼 없이 항상 표시(접기만 가능)
  * - UX-COMBINE-001: 원탭 즉시 합산 — 누르면 바로 내 기록, 사후 ×로 빼기, 원본 데이터 불변
  * - UX-TRAINLOG-001: 훈련 일지 라이트 — 로컬 저장, 주간 요약, TRAINORACLE 기대감 카드
  * - UX-TONE-001: 신규 표면에 공식/랭킹/예측/평가 표현 금지
@@ -31,7 +31,7 @@ test('UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections', ()
   assert.match(page, /\{open && <CardContent/);
 });
 
-test('UX-MYREC-001: my-athlete pin saves locally and offers one-tap view', () => {
+test('UX-MYREC-001: my-athlete pin saves locally and merged card is always visible', () => {
   const hook = readSource('frontend/src/components/record-insights/useMyAthlete.ts');
   assert.match(hook, /athletetime\.my-athlete\.v1/, 'stable storage key');
   assert.match(hook, /localStorage/);
@@ -40,8 +40,13 @@ test('UX-MYREC-001: my-athlete pin saves locally and offers one-tap view', () =>
 
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
   assert.match(page, /useMyAthlete/);
-  assert.match(page, /내 기록 바로 보기/);
-  assert.match(page, /나로 지정/);
+  // 담긴 게 있으면 버튼 없이 바로 보임 — 숨김이 아니라 접기만 가능
+  assert.match(page, /myEntries\.length > 0 && \(/, 'card renders whenever entries exist');
+  assert.match(page, /myRecordsCollapsed/, 'collapse-not-hide model');
+  assert.match(page, /펼치기/, 'collapsed slim bar reopens the card');
+  assert.doesNotMatch(page, /내 기록 바로 보기/, 'separate view button removed — card itself is the entry');
+  // 지정 언어는 문장형 버튼 하나로 통일
+  assert.match(page, /내 기록이에요/);
 });
 
 test('UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched', () => {
