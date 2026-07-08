@@ -1,0 +1,558 @@
+{
+  "workbooks": [
+    {
+      "year": 2015,
+      "originalFilename": "002_제29회 체육고등학교 종합기록20150810.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0288_002_29_20150810_88cda4821c.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 20
+        },
+        {
+          "name": "여고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 19
+        },
+        {
+          "name": "종합득점",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 246
+    },
+    {
+      "year": 2015,
+      "originalFilename": "029_2015 전국로드레이스20150112.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0315_029_2015_20150112_306041dd85.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "제주",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "마라톤결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2015,
+      "originalFilename": "030_제9회 크로스컨트리대회_결과20150128.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0316_030_9_20150128_3a0930e935.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "대회결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "마라톤결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "필드수동",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2015,
+      "originalFilename": "031_2015 경기국제하프마라톤대회_기록20150302.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0317_031_2015_20150302_56d9680019.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "종합",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "개인",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "국제부_개인",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2015,
+      "originalFilename": "032_예천_종합기록지20150504.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0318_032_20150504_3547596acd.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 22
+        },
+        {
+          "name": "여자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 22
+        }
+      ],
+      "candidateRecords": 247
+    },
+    {
+      "year": 2015,
+      "originalFilename": "033_2015 고성통일 종합기록20151013.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0319_033_2015_20151013_e57a3b4416.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 22
+        },
+        {
+          "name": "여자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        }
+      ],
+      "candidateRecords": 238
+    },
+    {
+      "year": 2015,
+      "originalFilename": "034_2015 평창하프20151013.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0320_034_2015_20151013_e00e53dbd6.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "평창",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "개인기록(실업)",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "개인기록(실업&대학)",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2015,
+      "originalFilename": "035_제27회 전국실업단대항_최종기록20151013.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0321_035_27_20151013_4bc7d82378.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 23
+        },
+        {
+          "name": "여자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 23
+        }
+      ],
+      "candidateRecords": 278
+    },
+    {
+      "year": 2016,
+      "originalFilename": "014_2016 전국대구실내육상경기대회 기록지20161201.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0340_014_2016_20161201_a6b58e02f5.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "60m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 51
+        },
+        {
+          "name": "200m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 42
+        },
+        {
+          "name": "400m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 41
+        },
+        {
+          "name": "800m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 48
+        },
+        {
+          "name": "1500m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 58
+        },
+        {
+          "name": "3000m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 45
+        },
+        {
+          "name": "60mH",
+          "layout": "horizontal_podium",
+          "resultRowCount": 17
+        },
+        {
+          "name": "높이뛰기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 16
+        },
+        {
+          "name": "장대높이뛰기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 3
+        },
+        {
+          "name": "멀리뛰기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 47
+        },
+        {
+          "name": "세단뛰기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 8
+        },
+        {
+          "name": "포환던지기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 58
+        },
+        {
+          "name": "원반던지기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 45
+        },
+        {
+          "name": "해머던지기",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "창던지기",
+          "layout": "horizontal_podium",
+          "resultRowCount": 53
+        },
+        {
+          "name": "3000mW",
+          "layout": "horizontal_podium",
+          "resultRowCount": 13
+        },
+        {
+          "name": "4X200m",
+          "layout": "horizontal_podium",
+          "resultRowCount": 4
+        },
+        {
+          "name": "하프",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 729
+    },
+    {
+      "year": 2016,
+      "originalFilename": "028_2016 전국로드레이스_기록20160518.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0354_028_2016_20160518_34c315fe43.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "마라톤결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "제주",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2016,
+      "originalFilename": "029_제10회_크로스컨트리대회_기록20160518.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0355_029_10_20160518_c3d0236c44.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "마라톤결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "대회결과",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "필드수동",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2016,
+      "originalFilename": "030_2016 경기국제하프마라톤대회_기록20160518.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0356_030_2016_20160518_a346d7a6d5.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "마라톤결과(국제)",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "국제",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "마라톤결과(국내)",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "국내",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2016,
+      "originalFilename": "031_제20회 전국실업육상경기선수권대회_종합기록지20160518.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0357_031_20_20160518_912b41f7d6.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 22
+        },
+        {
+          "name": "여자부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 22
+        }
+      ],
+      "candidateRecords": 247
+    },
+    {
+      "year": 2016,
+      "originalFilename": "033_45회춘계종합기록지20160518.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0359_033_45_20160518_cdb28b348a.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남초,여초",
+          "layout": "horizontal_podium",
+          "resultRowCount": 16
+        },
+        {
+          "name": "남중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 18
+        },
+        {
+          "name": "여중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 17
+        },
+        {
+          "name": "중 1학년부 ",
+          "layout": "horizontal_podium",
+          "resultRowCount": 10
+        },
+        {
+          "name": "남고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "여고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "고 1학년부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 15
+        }
+      ],
+      "candidateRecords": 775
+    },
+    {
+      "year": 2016,
+      "originalFilename": "034_태백14회종합기록지20160812.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0360_034_14_20160812_7ad489cc13.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 18
+        },
+        {
+          "name": "여중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 17
+        },
+        {
+          "name": "중 1학년부 ",
+          "layout": "horizontal_podium",
+          "resultRowCount": 10
+        },
+        {
+          "name": "남고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "여고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "고 1학년부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 18
+        }
+      ],
+      "candidateRecords": 639
+    },
+    {
+      "year": 2017,
+      "originalFilename": "001_제31회체고대회종합기록지120170516.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0362_001_31_120170516_e7a5e2678f.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남자",
+          "layout": "horizontal_podium",
+          "resultRowCount": 20
+        },
+        {
+          "name": "여자",
+          "layout": "horizontal_podium",
+          "resultRowCount": 19
+        }
+      ],
+      "candidateRecords": 247
+    },
+    {
+      "year": 2017,
+      "originalFilename": "003_대한체육회장배종합기록20170507.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0364_003_20170507_a085ef01c5.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "종합점수",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "남자",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "여자",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2017,
+      "originalFilename": "028_국무총리기 경기결과(홈)20171118.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0389_028_20171118_1245c88aff.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "국무총리기 종합기록",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        },
+        {
+          "name": "성적발표",
+          "layout": "unsupported",
+          "resultRowCount": 0
+        }
+      ],
+      "candidateRecords": 0
+    },
+    {
+      "year": 2017,
+      "originalFilename": "034_정선15회종합기록지420170816.xlsx",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0395_034_15_420170816_4a5a422bbe.xlsx",
+      "error": null,
+      "sheetLayouts": [
+        {
+          "name": "남중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 18
+        },
+        {
+          "name": "여중",
+          "layout": "horizontal_podium",
+          "resultRowCount": 16
+        },
+        {
+          "name": "중 1학년부 ",
+          "layout": "horizontal_podium",
+          "resultRowCount": 10
+        },
+        {
+          "name": "남고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "여고",
+          "layout": "horizontal_podium",
+          "resultRowCount": 21
+        },
+        {
+          "name": "고 1학년부",
+          "layout": "horizontal_podium",
+          "resultRowCount": 17
+        }
+      ],
+      "candidateRecords": 646
+    }
+  ],
+  "horizontalPodiumWorkbooks": 10,
+  "candidateRecords": 4292,
+  "byYear": {
+    "2015": 1009,
+    "2016": 2390,
+    "2017": 893
+  },
+  "errors": 0
+}
