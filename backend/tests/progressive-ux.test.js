@@ -115,8 +115,8 @@ test('UX-COMBINE-003: mine designation is unambiguous and detail info is togglea
   assert.match(page, /useRecordDetailPref/);
   assert.match(page, /record\.rank/, 'per-record rank shown');
   assert.match(page, /간단히 보기|자세히 보기|detailToggleLabel/, 'toggle label');
-  // 데이터 범위 투명성 — 2005-2017은 아직 정리 중임을 명시
-  assert.match(page, /2018년 이후 기록/, 'coverage transparency');
+  assert.match(page, /2015-2017 일부 기록/, 'coverage transparency');
+  assert.match(page, /2005년 이후 자료는 계속 보강 중/, 'no full-history claim');
 
   const myCard = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
   assert.match(myCard, /useRecordDetailPref/);

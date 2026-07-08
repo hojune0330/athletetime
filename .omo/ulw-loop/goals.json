@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "createdAt": "2026-07-08T13:23:05.135Z",
+  "updatedAt": "2026-07-08T13:23:05.135Z",
+  "briefPath": ".omo/ulw-loop/brief.md",
+  "goalsPath": ".omo/ulw-loop/goals.json",
+  "ledgerPath": ".omo/ulw-loop/ledger.jsonl",
+  "codexGoalMode": "aggregate",
+  "goals": [
+    {
+      "id": "G001-promote-the-approved-athletetime-tra",
+      "title": "Promote the approved AthleteTime Track A horizontal XLSX legacy resul...",
+      "objective": "Promote the approved AthleteTime Track A horizontal XLSX legacy result candidates into service data. Deliver: 2015-2017 data/results JSON from 10 approved XLSX workbooks / 4,292 rows, deterministic public-safe schema, tests RED->GREEN, manual QA evidence, manual TOP100 skippedDuplicates delta report, PR update to Fable explaining the user wants 2005+ expansion to continue immediately after this safe slice instead of being unnecessarily delayed. Guardrails: do not promote 83 .xls files yet, do not change candidate-records.jsonl, do not commit raw originals, do not expose privateStoragePath or sensitive fields, do not claim full 2005-present coverage.",
+      "status": "pending",
+      "successCriteria": [
+        {
+          "id": "C001",
+          "scenario": "happy path for: Promote the approved AthleteTime Track A horizontal XLSX legacy result candid...",
+          "userModel": "happy",
+          "expectedEvidence": "Replace via revise_criterion with observable happy-path proof for goal 1.",
+          "capturedEvidence": null,
+          "status": "pending"
+        },
+        {
+          "id": "C002",
+          "scenario": "edge case (boundary/empty/malformed)",
+          "userModel": "edge",
+          "expectedEvidence": "Replace via revise_criterion with boundary or malformed-input proof for: Promote the approved AthleteTime Track A horizontal XLSX legacy result candid....",
+          "capturedEvidence": null,
+          "status": "pending"
+        },
+        {
+          "id": "C003",
+          "scenario": "regression: adjacent surface still works",
+          "userModel": "regression",
+          "expectedEvidence": "Replace via revise_criterion with regression proof for neighboring behavior after: Promote the approved AthleteTime Track A horizontal XLSX legacy result candid....",
+          "capturedEvidence": null,
+          "status": "pending"
+        }
+      ],
+      "attempt": 0,
+      "createdAt": "2026-07-08T13:23:05.135Z",
+      "updatedAt": "2026-07-08T13:23:05.135Z"
+    }
+  ],
+  "codexObjective": "Complete the durable ulw-loop plan in .omo/ulw-loop/goals.json, including later accepted/appended stories, under the original brief constraints; use .omo/ulw-loop/ledger.jsonl as the audit trail."
+}

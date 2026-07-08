@@ -1,0 +1,1354 @@
+
+> athletetime-unified@4.0.0 test
+> node --test backend/tests/athlete-user-ux.test.js backend/tests/launch-surface-nav.test.js backend/tests/launch-week-zero-result.test.js backend/tests/launch-week-p1.test.js backend/tests/record-to-community-readiness.test.js backend/tests/auth-public-routes.test.js backend/tests/auth-cookie-csrf.test.js backend/tests/auth-security-readiness.test.js backend/tests/data-rights-policy.test.js backend/tests/data-rights-copy.test.js backend/tests/frontend-auth-cookie-contract.test.js backend/tests/operator-guide.test.js backend/tests/operator-guide-source.test.js backend/tests/competition-dates.test.js backend/tests/competition-identifiers.test.js backend/tests/competition-results-order.test.js backend/tests/about-data-content.test.js backend/tests/source-inventory.test.js backend/tests/source-ledger.test.js backend/tests/source-download.test.js backend/tests/source-download-cli.test.js backend/tests/data-candidate-batch.test.js backend/tests/coverage-matrix.test.js backend/tests/kaaf-schedule-result-harvester.test.js backend/tests/kaaf-competition-result-audit.test.js backend/tests/athlete-history-evidence.test.js backend/tests/kaaf-result-original-search.test.js backend/tests/kaaf-result-catalog.test.js backend/tests/kaaf-result-catalog-context.test.js backend/tests/relay-results-standard.test.js backend/tests/manual-top-records-ingest.test.js backend/tests/kaaf-backfill-originals-import.test.js backend/tests/legacy-result-normalization.test.js backend/tests/track-a-xlsx-promotion.test.js backend/tests/track-a-service-surface.test.js backend/tests/deployment-wiring.test.js backend/tests/profile-card-studio.test.js backend/tests/community-chimhaha-ux.test.js backend/tests/competition-highlights.test.js backend/tests/progressive-ux.test.js backend/tests/training-calculator-design.test.js backend/tests/pace-calculator-design.test.js
+
+TAP version 13
+# Subtest: AboutData content explains source ledger and KOGL type 4
+ok 1 - AboutData content explains source ledger and KOGL type 4
+  ---
+  duration_ms: 6.3151
+  type: 'test'
+  ...
+# Subtest: Footer links to the public data collection explanation
+ok 2 - Footer links to the public data collection explanation
+  ---
+  duration_ms: 1.7644
+  type: 'test'
+  ...
+# Subtest: Given self-submitted athlete history text When extracting hints Then overseas events are isolated without identifiers
+ok 3 - Given self-submitted athlete history text When extracting hints Then overseas events are isolated without identifiers
+  ---
+  duration_ms: 9.5739
+  type: 'test'
+  ...
+# Subtest: Given CLI input When extracting athlete history evidence Then output and report remain sanitized
+ok 4 - Given CLI input When extracting athlete history evidence Then output and report remain sanitized
+  ---
+  duration_ms: 201.5982
+  type: 'test'
+  ...
+# Subtest: home page sends users to their own record search instead of a sample showcase
+ok 5 - home page sends users to their own record search instead of a sample showcase
+  ---
+  duration_ms: 12977.4602
+  type: 'test'
+  ...
+# Subtest: fake card-news sample data is not kept as a default user path
+ok 6 - fake card-news sample data is not kept as a default user path
+  ---
+  duration_ms: 7.5282
+  type: 'test'
+  ...
+# Subtest: records search gives same-name candidates practical narrowing controls
+ok 7 - records search gives same-name candidates practical narrowing controls
+  ---
+  duration_ms: 2.2767
+  type: 'test'
+  ...
+# Subtest: records candidate count is written for Korean athletes instead of debug English
+ok 8 - records candidate count is written for Korean athletes instead of debug English
+  ---
+  duration_ms: 1.6425
+  type: 'test'
+  ...
+# Subtest: records athlete selection creates a shareable records URL instead of state-only detail
+ok 9 - records athlete selection creates a shareable records URL instead of state-only detail
+  ---
+  duration_ms: 1.4115
+  type: 'test'
+  ...
+# Subtest: records athlete detail exposes a plain link share action without official wording
+ok 10 - records athlete detail exposes a plain link share action without official wording
+  ---
+  duration_ms: 1.6067
+  type: 'test'
+  ...
+# Subtest: record share card gives a community follow-up without pretending it writes a post
+ok 11 - record share card gives a community follow-up without pretending it writes a post
+  ---
+  duration_ms: 1.5901
+  type: 'test'
+  ...
+# Subtest: records shared athlete detail keeps identity and coverage safeguards visible
+ok 12 - records shared athlete detail keeps identity and coverage safeguards visible
+  ---
+  duration_ms: 3.6301
+  type: 'test'
+  ...
+# Subtest: records shared athlete detail does not use non-exposure jargon as a standalone action label
+ok 13 - records shared athlete detail does not use non-exposure jargon as a standalone action label
+  ---
+  duration_ms: 1.6932
+  type: 'test'
+  ...
+# Subtest: records broken athlete share links guide users back to search candidates
+ok 14 - records broken athlete share links guide users back to search candidates
+  ---
+  duration_ms: 1.2929
+  type: 'test'
+  ...
+# Subtest: records shared athlete URL prioritizes the athlete panel before candidate lists
+ok 15 - records shared athlete URL prioritizes the athlete panel before candidate lists
+  ---
+  duration_ms: 1.0889
+  type: 'test'
+  ...
+# Subtest: competition results tab opens the latest available result instead of a blank selector
+ok 16 - competition results tab opens the latest available result instead of a blank selector
+  ---
+  duration_ms: 1.2914
+  type: 'test'
+  ...
+# Subtest: competition results tab explains current-first ordering without ranking language
+ok 17 - competition results tab explains current-first ordering without ranking language
+  ---
+  duration_ms: 1.5477
+  type: 'test'
+  ...
+# Subtest: competition results tab surfaces provenance as a first-class trust summary
+ok 18 - competition results tab surfaces provenance as a first-class trust summary
+  ---
+  duration_ms: 2.7153
+  type: 'test'
+  ...
+# Subtest: competition search keeps dense result scope compact and repeats same-name caution
+ok 19 - competition search keeps dense result scope compact and repeats same-name caution
+  ---
+  duration_ms: 1.229
+  type: 'test'
+  ...
+# Subtest: competition results route blocks direct access to public-index-excluded files
+ok 20 - competition results route blocks direct access to public-index-excluded files
+  ---
+  duration_ms: 0.9687
+  type: 'test'
+  ...
+# Subtest: competition mobile rows prioritize record value over decorative metadata
+ok 21 - competition mobile rows prioritize record value over decorative metadata
+  ---
+  duration_ms: 2.8331
+  type: 'test'
+  ...
+# Subtest: competition event and gender badges stay neutral instead of implying status
+ok 22 - competition event and gender badges stay neutral instead of implying status
+  ---
+  duration_ms: 2.9622
+  type: 'test'
+  ...
+# Subtest: competition card links keep intentional discovery policy and accessible labels
+ok 23 - competition card links keep intentional discovery policy and accessible labels
+  ---
+  duration_ms: 2.9967
+  type: 'test'
+  ...
+# Subtest: profile card studio carries selected athlete name into the editor prefill
+ok 24 - profile card studio carries selected athlete name into the editor prefill
+  ---
+  duration_ms: 1.3955
+  type: 'test'
+  ...
+# Subtest: community page avoids unimplemented optional widgets in the main anonymous journey
+ok 25 - community page avoids unimplemented optional widgets in the main anonymous journey
+  ---
+  duration_ms: 1.362
+  type: 'test'
+  ...
+# Subtest: marketplace and pace calculator have real first-use empty states
+ok 26 - marketplace and pace calculator have real first-use empty states
+  ---
+  duration_ms: 3.375
+  type: 'test'
+  ...
+# Subtest: optional trend APIs return graceful empty data while features are not ready
+ok 27 - optional trend APIs return graceful empty data while features are not ready
+  ---
+  duration_ms: 29.0816
+  type: 'test'
+  ...
+# Subtest: login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+ok 28 - login issues HttpOnly session cookies and /me accepts cookie auth without Authorization
+  ---
+  duration_ms: 12558.8722
+  type: 'test'
+  ...
+# Subtest: auth session JSON bodies omit access and refresh tokens
+ok 29 - auth session JSON bodies omit access and refresh tokens
+  ---
+  duration_ms: 445.6305
+  type: 'test'
+  ...
+# Subtest: auth route source never serializes session tokens into JSON response bodies
+ok 30 - auth route source never serializes session tokens into JSON response bodies
+  ---
+  duration_ms: 3.6354
+  type: 'test'
+  ...
+# Subtest: csrf hint cookie lasts as long as the refresh session cookie
+ok 31 - csrf hint cookie lasts as long as the refresh session cookie
+  ---
+  duration_ms: 303.8598
+  type: 'test'
+  ...
+# Subtest: standalone csrf endpoint issues the long-lived session hint
+ok 32 - standalone csrf endpoint issues the long-lived session hint
+  ---
+  duration_ms: 3.2789
+  type: 'test'
+  ...
+# Subtest: cookie authenticated unsafe auth writes require a valid CSRF token
+ok 33 - cookie authenticated unsafe auth writes require a valid CSRF token
+  ---
+  duration_ms: 357.0794
+  type: 'test'
+  ...
+# Subtest: malformed cookie encoding is rejected without a server error
+ok 34 - malformed cookie encoding is rejected without a server error
+  ---
+  duration_ms: 2.1741
+  type: 'test'
+  ...
+# Subtest: global unsafe cookie-auth routes require CSRF before route authorization
+ok 35 - global unsafe cookie-auth routes require CSRF before route authorization
+  ---
+  duration_ms: 333.4948
+  type: 'test'
+  ...
+# Subtest: refresh rotates session cookies using refresh cookie without request body token
+ok 36 - refresh rotates session cookies using refresh cookie without request body token
+  ---
+  duration_ms: 295.2774
+  type: 'test'
+  ...
+# Subtest: register keeps normal users non-admin
+ok 37 - register keeps normal users non-admin
+  ---
+  duration_ms: 13269.4509
+  type: 'test'
+  ...
+# Subtest: refresh rotates valid tokens and rejects malformed tokens
+ok 38 - refresh rotates valid tokens and rejects malformed tokens
+  ---
+  duration_ms: 206.4491
+  type: 'test'
+  ...
+# Subtest: serves public categories and marketplace without DATABASE_URL
+ok 39 - serves public categories and marketplace without DATABASE_URL
+  ---
+  duration_ms: 8.3146
+  type: 'test'
+  ...
+# Subtest: startup logs do not expose the generated development admin password
+ok 40 - startup logs do not expose the generated development admin password
+  ---
+  duration_ms: 12965.2243
+  type: 'test'
+  ...
+# Subtest: forgot password does not reveal whether an email is registered
+ok 41 - forgot password does not reveal whether an email is registered
+  ---
+  duration_ms: 239.1047
+  type: 'test'
+  ...
+# Subtest: verification and reset requests do not print one-time codes to server logs
+ok 42 - verification and reset requests do not print one-time codes to server logs
+  ---
+  duration_ms: 195.3778
+  type: 'test'
+  ...
+# Subtest: malformed auth JSON does not leak raw request bodies or passwords to logs
+ok 43 - malformed auth JSON does not leak raw request bodies or passwords to logs
+  ---
+  duration_ms: 6.9531
+  type: 'test'
+  ...
+# Subtest: set-admin is disabled unless ADMIN_SECRET_KEY is explicitly configured
+ok 44 - set-admin is disabled unless ADMIN_SECRET_KEY is explicitly configured
+  ---
+  duration_ms: 193.7933
+  type: 'test'
+  ...
+# Subtest: auth privacy contract documents launch-blocking guarantees
+ok 45 - auth privacy contract documents launch-blocking guarantees
+  ---
+  duration_ms: 2.8499
+  type: 'test'
+  ...
+# Subtest: COMM-BEST-001: best strip has period tabs and horizontal card strip
+ok 46 - COMM-BEST-001: best strip has period tabs and horizontal card strip
+  ---
+  duration_ms: 4.0149
+  type: 'test'
+  ...
+# Subtest: COMM-BOARD-001: board tabs cover 전체글 + category boards and stay extensible
+ok 47 - COMM-BOARD-001: board tabs cover 전체글 + category boards and stay extensible
+  ---
+  duration_ms: 1.6364
+  type: 'test'
+  ...
+# Subtest: COMM-LIST-001: post list renders dense chimhaha-style rows
+ok 48 - COMM-LIST-001: post list renders dense chimhaha-style rows
+  ---
+  duration_ms: 2.8354
+  type: 'test'
+  ...
+# Subtest: COMM-PAGE-001: community page composes strip + board tabs + sorted list
+ok 49 - COMM-PAGE-001: community page composes strip + board tabs + sorted list
+  ---
+  duration_ms: 2.6072
+  type: 'test'
+  ...
+# Subtest: COMM-PAGE-002: board page uses light theme (no legacy dark classes)
+ok 50 - COMM-PAGE-002: board page uses light theme (no legacy dark classes)
+  ---
+  duration_ms: 1.9753
+  type: 'test'
+  ...
+# Subtest: COMM-TONE-001: community surfaces avoid forbidden trust words and emoji icons in chrome
+ok 51 - COMM-TONE-001: community surfaces avoid forbidden trust words and emoji icons in chrome
+  ---
+  duration_ms: 8.8359
+  type: 'test'
+  ...
+# Subtest: src service: computeStatus uses the Korea service day around midnight
+ok 52 - src service: computeStatus uses the Korea service day around midnight
+  ---
+  duration_ms: 2.5871
+  type: 'test'
+  ...
+# Subtest: src service: getDDay uses the Korea service day around midnight
+ok 53 - src service: getDDay uses the Korea service day around midnight
+  ---
+  duration_ms: 2.0917
+  type: 'test'
+  ...
+# Subtest: card-studio service: computeStatus uses the Korea service day around midnight
+ok 54 - card-studio service: computeStatus uses the Korea service day around midnight
+  ---
+  duration_ms: 0.5279
+  type: 'test'
+  ...
+# Subtest: card-studio service: getDDay uses the Korea service day around midnight
+ok 55 - card-studio service: getDDay uses the Korea service day around midnight
+  ---
+  duration_ms: 0.8323
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-RULE-001: record rows produce record highlights sorted 한국신 first
+ok 56 - HIGHLIGHT-RULE-001: record rows produce record highlights sorted 한국신 first
+  ---
+  duration_ms: 6.027
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-RULE-002: photo finish requires small gap on track events only
+ok 57 - HIGHLIGHT-RULE-002: photo finish requires small gap on track events only
+  ---
+  duration_ms: 1.3492
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-RULE-003: sweep and multi-winner detection
+ok 58 - HIGHLIGHT-RULE-003: sweep and multi-winner detection
+  ---
+  duration_ms: 1.8504
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-SAFE-001: masked rows, quality-hold events, combined events excluded
+ok 59 - HIGHLIGHT-SAFE-001: masked rows, quality-hold events, combined events excluded
+  ---
+  duration_ms: 2.9918
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-SAFE-002: recordToSeconds parses times and rejects garbage
+ok 60 - HIGHLIGHT-SAFE-002: recordToSeconds parses times and rejects garbage
+  ---
+  duration_ms: 0.3336
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-API-001: result events route returns highlights with series history context
+ok 61 - HIGHLIGHT-API-001: result events route returns highlights with series history context
+  ---
+  duration_ms: 1.4601
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-HISTORY-001: series comparison produces series_best / streak / vs_last
+ok 62 - HIGHLIGHT-HISTORY-001: series comparison produces series_best / streak / vs_last
+  ---
+  duration_ms: 2.2271
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-HISTORY-002: vs_last reports gap against previous edition
+ok 63 - HIGHLIGHT-HISTORY-002: vs_last reports gap against previous edition
+  ---
+  duration_ms: 0.7223
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-HISTORY-003: helpers normalize series names and format gaps
+ok 64 - HIGHLIGHT-HISTORY-003: helpers normalize series names and format gaps
+  ---
+  duration_ms: 1.6972
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-FORM-001: highlights carry stat field and record dedup groups multiple record rows
+ok 65 - HIGHLIGHT-FORM-001: highlights carry stat field and record dedup groups multiple record rows
+  ---
+  duration_ms: 1.4836
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-FORM-002: champion cards appear only for small road meets and skip covered events
+ok 66 - HIGHLIGHT-FORM-002: champion cards appear only for small road meets and skip covered events
+  ---
+  duration_ms: 3.8838
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-INTL-001: domestic champion card appears only when a foreign athlete wins a mixed field
+ok 67 - HIGHLIGHT-INTL-001: domestic champion card appears only when a foreign athlete wins a mixed field
+  ---
+  duration_ms: 1.3919
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-INTL-002: history comparison runs separately for domestic scope on mixed fields
+ok 68 - HIGHLIGHT-INTL-002: history comparison runs separately for domestic scope on mixed fields
+  ---
+  duration_ms: 0.6284
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-UI-001: results tab renders highlights card with SVG icons and fact notice
+ok 69 - HIGHLIGHT-UI-001: results tab renders highlights card with SVG icons and fact notice
+  ---
+  duration_ms: 14.8526
+  type: 'test'
+  ...
+# Subtest: HIGHLIGHT-TONE-001: highlights avoid forbidden trust words
+ok 70 - HIGHLIGHT-TONE-001: highlights avoid forbidden trust words
+  ---
+  duration_ms: 2.4254
+  type: 'test'
+  ...
+# [CompetitionService] 데이터 무결성 검증 경고:
+# [무결성 경고] "2026 대구마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafSeq 누락 (검증 불가)
+# [CompetitionService] 데이터 무결성 검증 경고:
+# [무결성 경고] "2026 대구마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 대구하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 서울마라톤대회 겸 제96회 동아마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "2026 동아일보 서울하프마라톤대회" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(중학교부)" — kaafSeq 누락 (검증 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafUrl 누락 (출처 추적 불가)
+# [무결성 경고] "제42회 코오롱구간마라톤대회(고등학교부)" — kaafSeq 누락 (검증 불가)
+# Subtest: src service: decorated 2026 competitions expose unique stable keys
+ok 71 - src service: decorated 2026 competitions expose unique stable keys
+  ---
+  duration_ms: 18.0021
+  type: 'test'
+  ...
+# Subtest: card-studio service: decorated 2026 competitions expose unique stable keys
+ok 72 - card-studio service: decorated 2026 competitions expose unique stable keys
+  ---
+  duration_ms: 13.2331
+  type: 'test'
+  ...
+# Subtest: result competitions are listed newest first for the results tab default
+ok 73 - result competitions are listed newest first for the results tab default
+  ---
+  duration_ms: 552.8953
+  type: 'test'
+  ...
+# Subtest: result competitions public index excludes life-sport competitions
+ok 74 - result competitions public index excludes life-sport competitions
+  ---
+  duration_ms: 5.531
+  type: 'test'
+  ...
+# Subtest: life-sport result originals stay stored while public filename index excludes them
+ok 75 - life-sport result originals stay stored while public filename index excludes them
+  ---
+  duration_ms: 73.2369
+  type: 'test'
+  ...
+# Subtest: Given 2010 to current request When local data starts in 2018 Then missing years and partial current year are explicit
+ok 76 - Given 2010 to current request When local data starts in 2018 Then missing years and partial current year are explicit
+  ---
+  duration_ms: 34.516
+  type: 'test'
+  ...
+# Subtest: Given markdown rendering When matrix is incomplete Then it states the service must not claim full coverage
+ok 77 - Given markdown rendering When matrix is incomplete Then it states the service must not claim full coverage
+  ---
+  duration_ms: 0.7465
+  type: 'test'
+  ...
+# Subtest: Given CLI invocation When writing coverage artifacts Then JSON and Markdown are created
+ok 78 - Given CLI invocation When writing coverage artifacts Then JSON and Markdown are created
+  ---
+  duration_ms: 270.6648
+  type: 'test'
+  ...
+# Subtest: Given CLI malformed year When invoked Then it prints a short operator error without stack trace
+ok 79 - Given CLI malformed year When invoked Then it prints a short operator error without stack trace
+  ---
+  duration_ms: 319.7076
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-001: Given a sanitized candidate batch When validating Then counts and years are reported
+ok 80 - DATA-CANDIDATE-001: Given a sanitized candidate batch When validating Then counts and years are reported
+  ---
+  duration_ms: 42.2184
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-002: Given a missing source ref When validating Then publication is blocked
+ok 81 - DATA-CANDIDATE-002: Given a missing source ref When validating Then publication is blocked
+  ---
+  duration_ms: 18.103
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-003: Given raw identifiers or session material When validating Then the batch is rejected
+ok 82 - DATA-CANDIDATE-003: Given raw identifiers or session material When validating Then the batch is rejected
+  ---
+  duration_ms: 13.5747
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-004: Given stale year-checklist counts When validating Then the batch is rejected
+ok 83 - DATA-CANDIDATE-004: Given stale year-checklist counts When validating Then the batch is rejected
+  ---
+  duration_ms: 54.7374
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-005: Given the real 2005-current batch When CLI validates Then JSON output is safe and successful
+ok 84 - DATA-CANDIDATE-005: Given the real 2005-current batch When CLI validates Then JSON output is safe and successful
+  ---
+  duration_ms: 248.0908
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-006: Given unsafe rejected input When CLI fails Then raw values are not echoed
+ok 85 - DATA-CANDIDATE-006: Given unsafe rejected input When CLI fails Then raw values are not echoed
+  ---
+  duration_ms: 170.0615
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-007: Given malformed source-ledger rows When validating Then source contract violations are rejected
+ok 86 - DATA-CANDIDATE-007: Given malformed source-ledger rows When validating Then source contract violations are rejected
+  ---
+  duration_ms: 10.6434
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-008: Given unsafe batch path When CLI fails Then path is not echoed
+ok 87 - DATA-CANDIDATE-008: Given unsafe batch path When CLI fails Then path is not echoed
+  ---
+  duration_ms: 179.0598
+  type: 'test'
+  ...
+# Subtest: DATA-CANDIDATE-009: Given restricted-looking safe characters in batch name When CLI fails Then name is redacted
+ok 88 - DATA-CANDIDATE-009: Given restricted-looking safe characters in batch name When CLI fails Then name is redacted
+  ---
+  duration_ms: 173.959
+  type: 'test'
+  ...
+# Subtest: frontend trust surfaces use public-record indexing copy instead of workaround framing
+ok 89 - frontend trust surfaces use public-record indexing copy instead of workaround framing
+  ---
+  duration_ms: 10.4847
+  type: 'test'
+  ...
+# Subtest: active docs point to data-request and avoid legal loophole positioning
+ok 90 - active docs point to data-request and avoid legal loophole positioning
+  ---
+  duration_ms: 6.0907
+  type: 'test'
+  ...
+# Subtest: data-policy endpoint describes public-record indexing with source tiers
+ok 91 - data-policy endpoint describes public-record indexing with source tiers
+  ---
+  duration_ms: 12943.9973
+  type: 'test'
+  ...
+# Subtest: record APIs expose public provenance and no restricted identifiers
+ok 92 - record APIs expose public provenance and no restricted identifiers
+  ---
+  duration_ms: 55.9339
+  type: 'test'
+  ...
+# Subtest: public data request status redacts contact and reason
+ok 93 - public data request status redacts contact and reason
+  ---
+  duration_ms: 44.5649
+  type: 'test'
+  ...
+# Subtest: DEPLOY-WS-001: src/server.js wires chat WebSocket via noServer upgrade routing at /ws/chat
+ok 94 - DEPLOY-WS-001: src/server.js wires chat WebSocket via noServer upgrade routing at /ws/chat
+  ---
+  duration_ms: 4.3671
+  type: 'test'
+  ...
+# Subtest: DEPLOY-WS-002: card-studio wsManager must NOT use { server, path } (destroys other WSS upgrades)
+ok 95 - DEPLOY-WS-002: card-studio wsManager must NOT use { server, path } (destroys other WSS upgrades)
+  ---
+  duration_ms: 9.904
+  type: 'test'
+  ...
+# Subtest: DEPLOY-WS-003: /api/chat/check-nickname route exists with legacy contract (2-10 chars)
+ok 96 - DEPLOY-WS-003: /api/chat/check-nickname route exists with legacy contract (2-10 chars)
+  ---
+  duration_ms: 3.4857
+  type: 'test'
+  ...
+# Subtest: DEPLOY-WS-004: chat rooms preserved (main/training/race/injury) in backend/utils/websocket.js
+ok 97 - DEPLOY-WS-004: chat rooms preserved (main/training/race/injury) in backend/utils/websocket.js
+  ---
+  duration_ms: 3.267
+  type: 'test'
+  ...
+# Subtest: DEPLOY-WS-005: frontend chat hook defaults to same-origin /ws/chat with VITE_WS_URL override
+ok 98 - DEPLOY-WS-005: frontend chat hook defaults to same-origin /ws/chat with VITE_WS_URL override
+  ---
+  duration_ms: 4.6176
+  type: 'test'
+  ...
+# Subtest: DEPLOY-NETLIFY-001: netlify.toml matches new build layout (publish=community, frontend build)
+ok 99 - DEPLOY-NETLIFY-001: netlify.toml matches new build layout (publish=community, frontend build)
+  ---
+  duration_ms: 1.8471
+  type: 'test'
+  ...
+# Subtest: DEPLOY-RUNTIME-001: two path-scoped WSS coexist on one HTTP server (handshake integration)
+ok 100 - DEPLOY-RUNTIME-001: two path-scoped WSS coexist on one HTTP server (handshake integration)
+  ---
+  duration_ms: 118.4426
+  type: 'test'
+  ...
+# Subtest: frontend auth client uses cookie credentials and CSRF instead of auth localStorage tokens
+ok 101 - frontend auth client uses cookie credentials and CSRF instead of auth localStorage tokens
+  ---
+  duration_ms: 252.4116
+  type: 'test'
+  ...
+# Subtest: frontend does not probe protected me endpoint for anonymous public visitors
+ok 102 - frontend does not probe protected me endpoint for anonymous public visitors
+  ---
+  duration_ms: 2.6755
+  type: 'test'
+  ...
+# Subtest: BACKFILL-IMPORT-001 Given a KAAF backfill tar When importing Then originals are private and manifest is commit-safe
+ok 103 - BACKFILL-IMPORT-001 Given a KAAF backfill tar When importing Then originals are private and manifest is commit-safe
+  ---
+  duration_ms: 251.6673
+  type: 'test'
+  ...
+# Subtest: BACKFILL-IMPORT-002 Given a missing archive When importing Then a typed operator error is returned
+ok 104 - BACKFILL-IMPORT-002 Given a missing archive When importing Then a typed operator error is returned
+  ---
+  duration_ms: 300.4426
+  type: 'test'
+  ...
+# Subtest: BACKFILL-IMPORT-003 Given direct tar extraction is unsafe When safe-entry mode is used Then original archive names are preserved separately
+ok 105 - BACKFILL-IMPORT-003 Given direct tar extraction is unsafe When safe-entry mode is used Then original archive names are preserved separately
+  ---
+  duration_ms: 314.7756
+  type: 'test'
+  ...
+# Subtest: Given generic result filenames When auditing by competition name Then row context identifies Dohyoja files
+ok 106 - Given generic result filenames When auditing by competition name Then row context identifies Dohyoja files
+  ---
+  duration_ms: 8.3886
+  type: 'test'
+  ...
+# Subtest: Given CLI fixture When auditing competition result coverage Then compact JSON and report are written
+ok 107 - Given CLI fixture When auditing competition result coverage Then compact JSON and report are written
+  ---
+  duration_ms: 259.9974
+  type: 'test'
+  ...
+# Subtest: Given manifest competition context When building catalog Then generic filenames remain searchable by competition name
+ok 108 - Given manifest competition context When building catalog Then generic filenames remain searchable by competition name
+  ---
+  duration_ms: 19.0418
+  type: 'test'
+  ...
+# Subtest: CAT-001 Given a manifest When building a catalog Then each file has stable canonical organization fields
+ok 109 - CAT-001 Given a manifest When building a catalog Then each file has stable canonical organization fields
+  ---
+  duration_ms: 22.4114
+  type: 'test'
+  ...
+# Subtest: CAT-002 Given repeated sha256 files When building a catalog Then duplicate groups are explicit
+ok 110 - CAT-002 Given repeated sha256 files When building a catalog Then duplicate groups are explicit
+  ---
+  duration_ms: 20.7922
+  type: 'test'
+  ...
+# Subtest: CAT-003 Given catalog entries When searching by query and filters Then canonical hits explain match fields
+ok 111 - CAT-003 Given catalog entries When searching by query and filters Then canonical hits explain match fields
+  ---
+  duration_ms: 16.4694
+  type: 'test'
+  ...
+# Subtest: CAT-004 Given a catalog When summarizing Then year and extension buckets are deterministic
+ok 112 - CAT-004 Given a catalog When summarizing Then year and extension buckets are deterministic
+  ---
+  duration_ms: 33.1207
+  type: 'test'
+  ...
+# Subtest: CAT-005 Given CLI invocation When writing catalog artifacts Then JSON catalog and Markdown report are created
+ok 113 - CAT-005 Given CLI invocation When writing catalog artifacts Then JSON catalog and Markdown report are created
+  ---
+  duration_ms: 169.4788
+  type: 'test'
+  ...
+# Subtest: CAT-006 Given CLI search filters When searching catalog Then only matching canonical entries are returned
+ok 114 - CAT-006 Given CLI search filters When searching catalog Then only matching canonical entries are returned
+  ---
+  duration_ms: 137.5945
+  type: 'test'
+  ...
+# Subtest: CAT-007 Given noisy KAAF filenames When building a catalog Then normalized titles remove copy and repeated-date noise
+ok 115 - CAT-007 Given noisy KAAF filenames When building a catalog Then normalized titles remove copy and repeated-date noise
+  ---
+  duration_ms: 16.8666
+  type: 'test'
+  ...
+# Subtest: Given original result files When auditing manifest Then hash and policy violations are reported
+ok 116 - Given original result files When auditing manifest Then hash and policy violations are reported
+  ---
+  duration_ms: 21.5605
+  type: 'test'
+  ...
+# Subtest: Given a player query When searching originals Then UTF-16 file content matches without exposing raw body
+ok 117 - Given a player query When searching originals Then UTF-16 file content matches without exposing raw body
+  ---
+  duration_ms: 18.9068
+  type: 'test'
+  ...
+# Subtest: Given a competition query When searching originals Then filename metadata matches
+ok 118 - Given a competition query When searching originals Then filename metadata matches
+  ---
+  duration_ms: 24.9568
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-001 extracts only deduped non-life-sport FILEs_4 result attachments
+ok 119 - KAAF-HARVEST-001 extracts only deduped non-life-sport FILEs_4 result attachments
+  ---
+  duration_ms: 5.4172
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-002 builds year page URLs without touching result.kaaf.or.kr
+ok 120 - KAAF-HARVEST-002 builds year page URLs without touching result.kaaf.or.kr
+  ---
+  duration_ms: 0.386
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-004 keeps legacy OLD FILEs_4 attachments as approved result candidates
+ok 121 - KAAF-HARVEST-004 keeps legacy OLD FILEs_4 attachments as approved result candidates
+  ---
+  duration_ms: 0.4545
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-005 discovery CLI writes candidate JSON and report without downloading files
+ok 122 - KAAF-HARVEST-005 discovery CLI writes candidate JSON and report without downloading files
+  ---
+  duration_ms: 170.6717
+  type: 'test'
+  ...
+# Subtest: KAAF-HARVEST-003 downloads direct result files and writes manifest without raw body
+ok 123 - KAAF-HARVEST-003 downloads direct result files and writes manifest without raw body
+  ---
+  duration_ms: 79.5526
+  type: 'test'
+  ...
+# Subtest: header primary nav only exposes the core record loop
+ok 124 - header primary nav only exposes the core record loop
+  ---
+  duration_ms: 4.434
+  type: 'test'
+  ...
+# Subtest: secondary tools stay reachable through the more menu group
+ok 125 - secondary tools stay reachable through the more menu group
+  ---
+  duration_ms: 2.5737
+  type: 'test'
+  ...
+# Subtest: W2-PACERISE-LABEL-001: pacerise more-menu label describes result lookup, not live coverage
+ok 126 - W2-PACERISE-LABEL-001: pacerise more-menu label describes result lookup, not live coverage
+  ---
+  duration_ms: 1.6615
+  type: 'test'
+  ...
+# Subtest: W1-DEAD-FILES-001: retired launch-surface files stay deleted after staged IA consolidation
+ok 127 - W1-DEAD-FILES-001: retired launch-surface files stay deleted after staged IA consolidation
+  ---
+  duration_ms: 0.7918
+  type: 'test'
+  ...
+# Subtest: mobile tab bar mirrors the same core loop entries
+ok 128 - mobile tab bar mirrors the same core loop entries
+  ---
+  duration_ms: 1.1676
+  type: 'test'
+  ...
+# Subtest: not-found page recovers users into the record search loop
+ok 129 - not-found page recovers users into the record search loop
+  ---
+  duration_ms: 1.4321
+  type: 'test'
+  ...
+# Subtest: home hero carries a first-visit trust anchor to about-data and data-request
+ok 130 - home hero carries a first-visit trust anchor to about-data and data-request
+  ---
+  duration_ms: 1.2955
+  type: 'test'
+  ...
+# Subtest: P1-FRESH-001(revised): freshness badge removed by owner decision — match results are immutable, collection date adds no user value
+ok 131 - P1-FRESH-001(revised): freshness badge removed by owner decision — match results are immutable, collection date adds no user value
+  ---
+  duration_ms: 23.9683
+  type: 'test'
+  ...
+# Subtest: P1-CHUNK-001: Frontend routing and Vite config split secondary pages out of the launch entry chunk
+ok 132 - P1-CHUNK-001: Frontend routing and Vite config split secondary pages out of the launch entry chunk
+  ---
+  duration_ms: 7.4175
+  type: 'test'
+  ...
+# Subtest: P1-FIX-W4: Migration execution plan exists before migration code and covers launch transition risks
+ok 133 - P1-FIX-W4: Migration execution plan exists before migration code and covers launch transition risks
+  ---
+  duration_ms: 3.244
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-001: Given a /records zero-result query When searched Then only anonymous aggregate data is stored
+ok 134 - P1-ZERO-001: Given a /records zero-result query When searched Then only anonymous aggregate data is stored
+  ---
+  duration_ms: 13263.2453
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-002: Given direct aggregate recording When repeated Then counts merge without retaining raw query text
+ok 135 - P1-ZERO-002: Given direct aggregate recording When repeated Then counts merge without retaining raw query text
+  ---
+  duration_ms: 24.3136
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-005: Given a failed query seen on fewer than 3 days When aggregated Then raw text stays fingerprint-only
+ok 136 - P1-ZERO-005: Given a failed query seen on fewer than 3 days When aggregated Then raw text stays fingerprint-only
+  ---
+  duration_ms: 60.2266
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-006: Given the same failed query on 3 different days When aggregated Then operator raw text is stored but public summary masks it
+ok 137 - P1-ZERO-006: Given the same failed query on 3 different days When aggregated Then operator raw text is stored but public summary masks it
+  ---
+  duration_ms: 16.4112
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-003: Given analytics storage failure When records search has no result Then search still succeeds
+ok 138 - P1-ZERO-003: Given analytics storage failure When records search has no result Then search still succeeds
+  ---
+  duration_ms: 7303.878
+  type: 'test'
+  ...
+# Subtest: P1-ZERO-004: Given production without an aggregation secret When recording Then default salt is not used
+ok 139 - P1-ZERO-004: Given production without an aggregation secret When recording Then default salt is not used
+  ---
+  duration_ms: 2.8541
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A Then safe and blocked spreadsheets are separated
+ok 140 - LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A Then safe and blocked spreadsheets are separated
+  ---
+  duration_ms: 118.3457
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python
+ok 141 - LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python
+  ---
+  duration_ms: 23.3986
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source
+ok 142 - LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source
+  ---
+  duration_ms: 17.1315
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-004 Given the original vault When checking git Then no raw original file is committed
+ok 143 - LEGACY-NORMALIZE-004 Given the original vault When checking git Then no raw original file is committed
+  ---
+  duration_ms: 137.9685
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals
+ok 144 - LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals
+  ---
+  duration_ms: 881.7968
+  type: 'test'
+  ...
+# Subtest: manual TOP100 batch is safe to store as candidate data
+ok 145 - manual TOP100 batch is safe to store as candidate data
+  ---
+  duration_ms: 604.3901
+  type: 'test'
+  ...
+# Subtest: manual TOP100 review status policy promotes domestic rows and keeps overseas hints pending
+ok 146 - manual TOP100 review status policy promotes domestic rows and keeps overseas hints pending
+  ---
+  duration_ms: 691.1173
+  type: 'test'
+  ...
+# Subtest: manual TOP100 service exposes only athlete-searchable candidate rows
+ok 147 - manual TOP100 service exposes only athlete-searchable candidate rows
+  ---
+  duration_ms: 483.3358
+  type: 'test'
+  ...
+# Subtest: manual TOP100 candidates are searchable without becoming official-result rows
+ok 148 - manual TOP100 candidates are searchable without becoming official-result rows
+  ---
+  duration_ms: 7330.1764
+  type: 'test'
+  ...
+# Subtest: manual TOP100 index dedup keeps one public row per same athlete event date record
+ok 149 - manual TOP100 index dedup keeps one public row per same athlete event date record
+  ---
+  duration_ms: 10.5072
+  type: 'test'
+  ...
+# Subtest: operator guide route is nested under admin route and linked only from admin chrome
+ok 150 - operator guide route is nested under admin route and linked only from admin chrome
+  ---
+  duration_ms: 12.2866
+  type: 'test'
+  ...
+# Subtest: public about-data FAQ exists without internal runbook details
+ok 151 - public about-data FAQ exists without internal runbook details
+  ---
+  duration_ms: 1.7215
+  type: 'test'
+  ...
+# Subtest: frontend source does not embed internal operator scenario content
+ok 152 - frontend source does not embed internal operator scenario content
+  ---
+  duration_ms: 159.2793
+  type: 'test'
+  ...
+# Subtest: operator guide admin API enforces 401, 403, and admin-only 200
+ok 153 - operator guide admin API enforces 401, 403, and admin-only 200
+  ---
+  duration_ms: 7968.8065
+  type: 'test'
+  ...
+# Subtest: public data policy API does not leak internal operator runbook details
+ok 154 - public data policy API does not leak internal operator runbook details
+  ---
+  duration_ms: 3.9842
+  type: 'test'
+  ...
+# Subtest: PACE-DS-001: default pace surface removes old decorative UI
+ok 155 - PACE-DS-001: default pace surface removes old decorative UI
+  ---
+  duration_ms: 7.4801
+  type: 'test'
+  ...
+# Subtest: PACE-DS-002: target pace result uses TRAINORACLE numeric primitives
+ok 156 - PACE-DS-002: target pace result uses TRAINORACLE numeric primitives
+  ---
+  duration_ms: 1.8366
+  type: 'test'
+  ...
+# Subtest: PACE-SC-001: track events 800m/1500m/3000mSC with water-jump placement are supported
+ok 157 - PACE-SC-001: track events 800m/1500m/3000mSC with water-jump placement are supported
+  ---
+  duration_ms: 4.0152
+  type: 'test'
+  ...
+# Subtest: PACE-DS-003: pace page copy is direct and not a training-plan duplicate
+ok 158 - PACE-DS-003: pace page copy is direct and not a training-plan duplicate
+  ---
+  duration_ms: 1.3773
+  type: 'test'
+  ...
+# Subtest: PACE-DS-004: track event splits expose steeplechase water-jump variants
+ok 159 - PACE-DS-004: track event splits expose steeplechase water-jump variants
+  ---
+  duration_ms: 4.3579
+  type: 'test'
+  ...
+# Subtest: CARD-TRUST-001: trust badge and watermark are wired into the canvas and cannot be omitted
+ok 160 - CARD-TRUST-001: trust badge and watermark are wired into the canvas and cannot be omitted
+  ---
+  duration_ms: 4.6586
+  type: 'test'
+  ...
+# Subtest: CARD-PRIVACY-001: studio does no network calls — photo/records stay in the browser
+ok 161 - CARD-PRIVACY-001: studio does no network calls — photo/records stay in the browser
+  ---
+  duration_ms: 10.3823
+  type: 'test'
+  ...
+# Subtest: CARD-UX-001: old mode-select/iframe builder is gone — studio opens straight into editing
+ok 162 - CARD-UX-001: old mode-select/iframe builder is gone — studio opens straight into editing
+  ---
+  duration_ms: 2.2149
+  type: 'test'
+  ...
+# Subtest: CARD-INPUT-001: records are manual entry — today/PB/season kinds with add/remove
+ok 163 - CARD-INPUT-001: records are manual entry — today/PB/season kinds with add/remove
+  ---
+  duration_ms: 1.8414
+  type: 'test'
+  ...
+# Subtest: CARD-A11Y-001: accessibility contract — labels, aria-pressed, inputmode, no emoji icons
+ok 164 - CARD-A11Y-001: accessibility contract — labels, aria-pressed, inputmode, no emoji icons
+  ---
+  duration_ms: 3.2075
+  type: 'test'
+  ...
+# Subtest: CARD-EXPORT-001: export captures at full 1080px size and offers Web Share with download fallback
+ok 165 - CARD-EXPORT-001: export captures at full 1080px size and offers Web Share with download fallback
+  ---
+  duration_ms: 2.1726
+  type: 'test'
+  ...
+# Subtest: CARD-THEME-001: theme system — 6 themes, token-complete, layout stays common
+ok 166 - CARD-THEME-001: theme system — 6 themes, token-complete, layout stays common
+  ---
+  duration_ms: 2.1671
+  type: 'test'
+  ...
+# Subtest: CARD-TONE-001: no forbidden trust words on the studio surface (공식/랭킹/검증/예측/평가)
+ok 167 - CARD-TONE-001: no forbidden trust words on the studio surface (공식/랭킹/검증/예측/평가)
+  ---
+  duration_ms: 5.7747
+  type: 'test'
+  ...
+# Subtest: CARD-FILTER-001: photo adjustments are baked — preview equals export, with manual-pixel fallback
+ok 168 - CARD-FILTER-001: photo adjustments are baked — preview equals export, with manual-pixel fallback
+  ---
+  duration_ms: 3.9918
+  type: 'test'
+  ...
+# Subtest: CARD-STICKER-001: free-position sticker layer — emoji/text, drag, % coords, clamped, capped
+ok 169 - CARD-STICKER-001: free-position sticker layer — emoji/text, drag, % coords, clamped, capped
+  ---
+  duration_ms: 6.1309
+  type: 'test'
+  ...
+# Subtest: CARD-INSTA-001: Instagram share — mobile share sheet first, story-camera deeplink fallback
+ok 170 - CARD-INSTA-001: Instagram share — mobile share sheet first, story-camera deeplink fallback
+  ---
+  duration_ms: 2.3111
+  type: 'test'
+  ...
+# Subtest: UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections
+ok 171 - UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections
+  ---
+  duration_ms: 3.769
+  type: 'test'
+  ...
+# Subtest: UX-MYREC-001: my-athlete pin saves locally and merged card is always visible
+ok 172 - UX-MYREC-001: my-athlete pin saves locally and merged card is always visible
+  ---
+  duration_ms: 5.8656
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched
+ok 173 - UX-COMBINE-001: one-tap merge — instant summation, after-the-fact removal, originals untouched
+  ---
+  duration_ms: 3.8478
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-002: search candidates offer direct "나" designation with instant merge
+ok 174 - UX-COMBINE-002: search candidates offer direct "나" designation with instant merge
+  ---
+  duration_ms: 3.3844
+  type: 'test'
+  ...
+# Subtest: UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable
+ok 175 - UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable
+  ---
+  duration_ms: 5.8849
+  type: 'test'
+  ...
+# Subtest: UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser
+ok 176 - UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser
+  ---
+  duration_ms: 2.275
+  type: 'test'
+  ...
+# Subtest: UX-TONE-001: new surfaces avoid trust-violating words
+ok 177 - UX-TONE-001: new surfaces avoid trust-violating words
+  ---
+  duration_ms: 3.8578
+  type: 'test'
+  ...
+# Subtest: UX-WORKFLOW-001: workflow doc anchors the athletetime-first development flow
+ok 178 - UX-WORKFLOW-001: workflow doc anchors the athletetime-first development flow
+  ---
+  duration_ms: 2.2564
+  type: 'test'
+  ...
+# Subtest: Given a selected athlete name When opening profile card static builders Then the name query is preserved in the handoff UI
+ok 179 - Given a selected athlete name When opening profile card static builders Then the name query is preserved in the handoff UI
+  ---
+  duration_ms: 5.9659
+  type: 'test'
+  ...
+# Subtest: Given a record query When opening community Then it shows a discussion prompt without auto-post wording
+ok 180 - Given a record query When opening community Then it shows a discussion prompt without auto-post wording
+  ---
+  duration_ms: 6.1249
+  type: 'test'
+  ...
+# Subtest: Given stored relay result data When validating all years Then polluted relay rows are absent
+ok 181 - Given stored relay result data When validating all years Then polluted relay rows are absent
+  ---
+  duration_ms: 803.496
+  type: 'test'
+  ...
+# Subtest: Given a contaminated Kolon relay event When source is not re-parsed Then public data is held for recheck
+ok 182 - Given a contaminated Kolon relay event When source is not re-parsed Then public data is held for recheck
+  ---
+  duration_ms: 5.2013
+  type: 'test'
+  ...
+# Subtest: Given held relay events When backend exposes public results Then users receive hold copy instead of rows
+ok 183 - Given held relay events When backend exposes public results Then users receive hold copy instead of rows
+  ---
+  duration_ms: 1.4676
+  type: 'test'
+  ...
+# Subtest: Given a contaminated combined event When backend exposes public results Then numeric names are held for recheck
+ok 184 - Given a contaminated combined event When backend exposes public results Then numeric names are held for recheck
+  ---
+  duration_ms: 772.6326
+  type: 'test'
+  ...
+# Subtest: Given a valid athlete with numeric military affiliation When filtering result quality Then the athlete remains searchable
+ok 185 - Given a valid athlete with numeric military affiliation When filtering result quality Then the athlete remains searchable
+  ---
+  duration_ms: 2.3889
+  type: 'test'
+  ...
+# Subtest: Given held relay events When searching records Then polluted runner strings are not indexed
+ok 186 - Given held relay events When searching records Then polluted runner strings are not indexed
+  ---
+  duration_ms: 1.2687
+  type: 'test'
+  ...
+# Subtest: Given a relay result table When scrapers parse it Then fixed track columns are bypassed
+ok 187 - Given a relay result table When scrapers parse it Then fixed track columns are bypassed
+  ---
+  duration_ms: 4.9015
+  type: 'test'
+  ...
+# Subtest: Given held relay events When preparing source recheck Then a machine-readable blocker report is emitted
+ok 188 - Given held relay events When preparing source recheck Then a machine-readable blocker report is emitted
+  ---
+  duration_ms: 652.405
+  type: 'test'
+  ...
+# Subtest: SRC-DL-CLI-001: Given a ledger source When CLI downloads Then JSON result points to saved private file
+ok 189 - SRC-DL-CLI-001: Given a ledger source When CLI downloads Then JSON result points to saved private file
+  ---
+  duration_ms: 346.6334
+  type: 'test'
+  ...
+# Subtest: SRC-DL-CLI-002: Given an unapproved ledger source When CLI downloads Then it exits nonzero with typed error
+ok 190 - SRC-DL-CLI-002: Given an unapproved ledger source When CLI downloads Then it exits nonzero with typed error
+  ---
+  duration_ms: 305.899
+  type: 'test'
+  ...
+# Subtest: SRC-DL-001-private-storage-root: Given downloader defaults When inspected Then originals stay under private ignored data sources path
+ok 191 - SRC-DL-001-private-storage-root: Given downloader defaults When inspected Then originals stay under private ignored data sources path
+  ---
+  duration_ms: 2.0275
+  type: 'test'
+  ...
+# Subtest: SRC-DL-002-approved-only: Given an unapproved download source When downloading Then no request is sent
+ok 192 - SRC-DL-002-approved-only: Given an unapproved download source When downloading Then no request is sent
+  ---
+  duration_ms: 59.8414
+  type: 'test'
+  ...
+# Subtest: SRC-DL-003-block-result-kaaf: Given a blocked host source When downloading Then it is rejected before storage
+ok 193 - SRC-DL-003-block-result-kaaf: Given a blocked host source When downloading Then it is rejected before storage
+  ---
+  duration_ms: 10.2116
+  type: 'test'
+  ...
+# Subtest: SRC-DL-005-download-metadata: Given an approved ledgered source When downloading Then private file and metadata are persisted
+ok 194 - SRC-DL-005-download-metadata: Given an approved ledgered source When downloading Then private file and metadata are persisted
+  ---
+  duration_ms: 132.986
+  type: 'test'
+  ...
+# Subtest: SRC-DL-004-malformed-source: Given a non-download reference source When downloading Then no file is written
+ok 195 - SRC-DL-004-malformed-source: Given a non-download reference source When downloading Then no file is written
+  ---
+  duration_ms: 6.707
+  type: 'test'
+  ...
+# Subtest: SRC-DL-007-path-containment: Given a path traversal filename When downloading Then the file stays inside source directory
+ok 196 - SRC-DL-007-path-containment: Given a path traversal filename When downloading Then the file stays inside source directory
+  ---
+  duration_ms: 47.5775
+  type: 'test'
+  ...
+# Subtest: SRC-DL-009-source-id-containment: Given a path traversal sourceId When downloading Then the storage root is not escaped
+ok 197 - SRC-DL-009-source-id-containment: Given a path traversal sourceId When downloading Then the storage root is not escaped
+  ---
+  duration_ms: 14.6286
+  type: 'test'
+  ...
+# Subtest: SRC-DL-006-http-failure-cleanup: Given an HTTP failure When downloading Then failed status is stored without a partial file
+ok 198 - SRC-DL-006-http-failure-cleanup: Given an HTTP failure When downloading Then failed status is stored without a partial file
+  ---
+  duration_ms: 29.8072
+  type: 'test'
+  ...
+# Subtest: SRC-DL-008-redirect-blocked-host: Given a redirect to blocked host When downloading Then it fails without a final file
+ok 199 - SRC-DL-008-redirect-blocked-host: Given a redirect to blocked host When downloading Then it fails without a final file
+  ---
+  duration_ms: 20.4945
+  type: 'test'
+  ...
+# Subtest: Given a result.kaaf URL When building inventory Then it is blocked without download
+ok 200 - Given a result.kaaf URL When building inventory Then it is blocked without download
+  ---
+  duration_ms: 5.7903
+  type: 'test'
+  ...
+# Subtest: Given Batch B When building inventory Then verified KAAF recordsport attachments are queued only
+ok 201 - Given Batch B When building inventory Then verified KAAF recordsport attachments are queued only
+  ---
+  duration_ms: 2.0382
+  type: 'test'
+  ...
+# Subtest: Given reference batches When building inventory Then reference pages are not file downloads
+ok 202 - Given reference batches When building inventory Then reference pages are not file downloads
+  ---
+  duration_ms: 3.6324
+  type: 'test'
+  ...
+# Subtest: Given Batch A When building inventory Then data.go.kr datasets include IDs and privacy notes
+ok 203 - Given Batch A When building inventory Then data.go.kr datasets include IDs and privacy notes
+  ---
+  duration_ms: 0.6712
+  type: 'test'
+  ...
+# Subtest: Given missing required source fields When creating source Then typed validation error is returned
+ok 204 - Given missing required source fields When creating source Then typed validation error is returned
+  ---
+  duration_ms: 3.2871
+  type: 'test'
+  ...
+# Subtest: Given restricted identifier metadata When creating source Then the source is rejected
+ok 205 - Given restricted identifier metadata When creating source Then the source is rejected
+  ---
+  duration_ms: 3.8725
+  type: 'test'
+  ...
+# Subtest: Given a valid inventory candidate When promoted Then ledger persists metadata without raw file body
+ok 206 - Given a valid inventory candidate When promoted Then ledger persists metadata without raw file body
+  ---
+  duration_ms: 14.5396
+  type: 'test'
+  ...
+# Subtest: Given duplicate source URL and filename When promoting twice Then existing source is returned
+ok 207 - Given duplicate source URL and filename When promoting twice Then existing source is returned
+  ---
+  duration_ms: 8.0503
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-001 promoted 2015 Yecheon result is available through resultsStore and competition search
+ok 208 - TRACK-A-SERVICE-001 promoted 2015 Yecheon result is available through resultsStore and competition search
+  ---
+  duration_ms: 726.0879
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as public result rows
+ok 209 - TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as public result rows
+  ---
+  duration_ms: 4233.2789
+  type: 'test'
+  ...
+# Subtest: TRACK-A-SERVICE-003 records page copy states partial 2015-2017 coverage without claiming full history
+ok 210 - TRACK-A-SERVICE-003 records page copy states partial 2015-2017 coverage without claiming full history
+  ---
+  duration_ms: 2.2558
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+ok 211 - TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+  ---
+  duration_ms: 496.6714
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+ok 212 - TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+  ---
+  duration_ms: 394.8582
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+ok 213 - TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+  ---
+  duration_ms: 166.1692
+  type: 'test'
+  ...
+# Subtest: CALC-DS-001: calculator surfaces obey TRAINORACLE prohibitions
+ok 214 - CALC-DS-001: calculator surfaces obey TRAINORACLE prohibitions
+  ---
+  duration_ms: 29.7414
+  type: 'test'
+  ...
+# Subtest: CALC-DS-002: calculator uses TRAINORACLE primitives
+ok 215 - CALC-DS-002: calculator uses TRAINORACLE primitives
+  ---
+  duration_ms: 4.6342
+  type: 'test'
+  ...
+# Subtest: CALC-DS-003: results include visual encodings
+ok 216 - CALC-DS-003: results include visual encodings
+  ---
+  duration_ms: 17.1059
+  type: 'test'
+  ...
+# Subtest: CALC-DS-004: numerics are monospaced with tabular figures
+ok 217 - CALC-DS-004: numerics are monospaced with tabular figures
+  ---
+  duration_ms: 4.0638
+  type: 'test'
+  ...
+# Subtest: CALC-DS-005: calculator copy keeps trust tone
+ok 218 - CALC-DS-005: calculator copy keeps trust tone
+  ---
+  duration_ms: 10.2336
+  type: 'test'
+  ...
+# Subtest: CALC-ROUTE-001: legacy calculators route opens the training calculator instead of 404
+ok 219 - CALC-ROUTE-001: legacy calculators route opens the training calculator instead of 404
+  ---
+  duration_ms: 1.3182
+  type: 'test'
+  ...
+1..219
+# tests 219
+# suites 0
+# pass 219
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 27823.0814

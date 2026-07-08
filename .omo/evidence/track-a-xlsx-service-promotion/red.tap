@@ -1,0 +1,204 @@
+TAP version 13
+# node:internal/modules/cjs/loader:1404
+#   throw err;
+#   ^
+# Error: Cannot find module 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\tools\\promote-track-a-xlsx-results.js'
+#     at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+#     at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+#     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+#     at Function._load (node:internal/modules/cjs/loader:1211:37)
+#     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+#     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+#     at node:internal/main/run_main_module:36:49 {
+#   code: 'MODULE_NOT_FOUND',
+#   requireStack: []
+# }
+# Node.js v22.17.1
+# node:internal/modules/cjs/loader:1404
+#   throw err;
+#   ^
+# Error: Cannot find module 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\tools\\promote-track-a-xlsx-results.js'
+#     at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+#     at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+#     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+#     at Function._load (node:internal/modules/cjs/loader:1211:37)
+#     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+#     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+#     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+#     at node:internal/main/run_main_module:36:49 {
+#   code: 'MODULE_NOT_FOUND',
+#   requireStack: []
+# }
+# Node.js v22.17.1
+# Subtest: TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+not ok 1 - TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+  ---
+  duration_ms: 75.7485
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\track-a-xlsx-promotion.test.js:62:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: C:\Program Files\nodejs\node.exe tools/promote-track-a-xlsx-results.js --candidate-file C:\Users\SAMSUNG\Documents\GitHub\athletetime\.omo\evidence\legacy-results-normalization\track-a-2015-2017\normalized-candidates.jsonl --inspection-file C:\Users\SAMSUNG\Documents\GitHub\athletetime\.omo\evidence\legacy-results-normalization\track-a-2015-2017\xlsx-inspection.json --out-dir C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-results-MH9XT2 --index C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-results-MH9XT2\index.json --evidence-dir C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-evidence-Z3JtR3 --dry-run --json
+    node:internal/modules/cjs/loader:1404
+      throw err;
+      ^
+    
+    Error: Cannot find module 'C:\Users\SAMSUNG\Documents\GitHub\athletetime\tools\promote-track-a-xlsx-results.js'
+        at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+        at Function._load (node:internal/modules/cjs/loader:1211:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+        at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+        at node:internal/main/run_main_module:36:49 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+    
+    Node.js v22.17.1
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+    defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+    resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+    Function._load (node:internal/modules/cjs/loader:1211:37)
+    TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    node:internal/main/run_main_module:36:49 {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    checkExecSyncError (node:child_process:883:11)
+    execFileSync (node:child_process:919:15)
+    runPromotion (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\track-a-xlsx-promotion.test.js:33:18)
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\track-a-xlsx-promotion.test.js:63:43)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+not ok 2 - TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+  ---
+  duration_ms: 66.8592
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\track-a-xlsx-promotion.test.js:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: C:\Program Files\nodejs\node.exe tools/promote-track-a-xlsx-results.js --candidate-file C:\Users\SAMSUNG\Documents\GitHub\athletetime\.omo\evidence\legacy-results-normalization\track-a-2015-2017\normalized-candidates.jsonl --inspection-file C:\Users\SAMSUNG\Documents\GitHub\athletetime\.omo\evidence\legacy-results-normalization\track-a-2015-2017\xlsx-inspection.json --out-dir C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-results-sfZtWv --index C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-results-sfZtWv\index.json --evidence-dir C:\Users\SAMSUNG\AppData\Local\Temp\athletetime-track-a-evidence-n1Pxks --dry-run --json
+    node:internal/modules/cjs/loader:1404
+      throw err;
+      ^
+    
+    Error: Cannot find module 'C:\Users\SAMSUNG\Documents\GitHub\athletetime\tools\promote-track-a-xlsx-results.js'
+        at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+        at Function._load (node:internal/modules/cjs/loader:1211:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+        at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+        at node:internal/main/run_main_module:36:49 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+    
+    Node.js v22.17.1
+    
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+    defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+    resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+    Function._load (node:internal/modules/cjs/loader:1211:37)
+    TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+    node:internal/main/run_main_module:36:49 {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    checkExecSyncError (node:child_process:883:11)
+    execFileSync (node:child_process:919:15)
+    runPromotion (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\track-a-xlsx-promotion.test.js:33:18)
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\track-a-xlsx-promotion.test.js:84:35)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+  ...
+# Subtest: TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+not ok 3 - TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+  ---
+  duration_ms: 69.3308
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\track-a-xlsx-promotion.test.js:111:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /TRACK_A_INVALID_CANDIDATE_ROW/. Input:
+    
+    '\n' +
+      'node:internal/modules/cjs/loader:1404\r\n' +
+      '  throw err;\r\n' +
+      '  ^\r\n' +
+      '\r\n' +
+      "Error: Cannot find module 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\tools\\promote-track-a-xlsx-results.js'\r\n" +
+      '    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n' +
+      '    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n' +
+      '    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n' +
+      '    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n' +
+      '    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n' +
+      '    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n' +
+      '    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n' +
+      '    at node:internal/main/run_main_module:36:49 {\r\n' +
+      "  code: 'MODULE_NOT_FOUND',\r\n" +
+      '  requireStack: []\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'Node.js v22.17.1\r\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    
+    node:internal/modules/cjs/loader:1404
+      throw err;
+      ^
+    
+    Error: Cannot find module 'C:\Users\SAMSUNG\Documents\GitHub\athletetime\tools\promote-track-a-xlsx-results.js'
+        at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+        at Function._load (node:internal/modules/cjs/loader:1211:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+        at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+        at node:internal/main/run_main_module:36:49 {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+    
+    Node.js v22.17.1
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\track-a-xlsx-promotion.test.js:141:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 0
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 314.6174
