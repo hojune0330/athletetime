@@ -107,17 +107,15 @@
       "items": {
         "type": "string",
         "enum": [
-          "person_no",
-          "PERSON_NO1",
-          "birthDate",
-          "birthYear",
-          "rawAthleteHistoryHtml",
+          "sourceAthleteIdentifier",
+          "sourceTopRecordIdentifier",
+          "birthData",
+          "rawSourceMarkup",
           "institutionIdentifier",
           "residentRegistrationNumber",
           "phone",
           "email",
-          "cookie",
-          "sessionId"
+          "sessionMaterial"
         ]
       }
     },

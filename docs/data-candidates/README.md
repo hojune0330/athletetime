@@ -2,7 +2,7 @@
 
 This folder is for public-safe, reviewable data candidates only.
 
-Raw source files, cookies, HTML dumps, full athlete-history pages, `person_no`, birth data, and source-side identifiers must not be stored here.
+Raw source files, cookies, HTML dumps, full athlete-history pages, birth data, and source-side identifier values must not be stored here.
 
 ## Folder Layout
 
@@ -90,8 +90,26 @@ For manual checks where no raw file is saved, use:
 2. Fill `source-ledger.jsonl` first.
 3. Fill `candidate-records.jsonl` only with sanitized facts.
 4. Write `review-report.md` using the template below.
-5. Run `git diff --check`.
-6. Ask another reviewer to verify source links and forbidden-field absence.
+5. Run the validation gate:
+
+```sh
+node tools/validate-data-candidates.js --batch docs/data-candidates/batches/YYYYMMDD-topic --json
+```
+
+For the 2005-current backfill checklist, pin the service window explicitly:
+
+```sh
+node tools/validate-data-candidates.js \
+  --batch docs/data-candidates/batches/2005-current-backfill \
+  --start-year 2005 \
+  --current-year 2026 \
+  --json
+```
+
+The validator blocks missing source references, malformed candidate rows, duplicate IDs, unsafe raw HTML/session material, and restricted source-side identifier keys. Its output is intentionally summary-only: it must not echo candidate raw bodies, cookies, session IDs, or source-side identifier values.
+
+6. Run `git diff --check`.
+7. Ask another reviewer to verify source links and forbidden-field absence.
 
 ## Review Report Template
 

@@ -27,11 +27,11 @@ Prove one manual workflow for finding a record that may be absent from KAAF sche
 
 ## Restricted Fields Dropped
 
-- `PERSON_NO1`
-- `person_no`
-- `birthYear`
-- raw athlete-history HTML
-- cookies/session IDs
+- source-side TOP-record identifier
+- source-side athlete identifier
+- birth data
+- raw source markup
+- session material
 
 ## External Confirmation
 
@@ -46,4 +46,4 @@ Pending. Reviewer should confirm against World Athletics, JAAF, or another offic
 ## Reviewer Notes
 
 - Same-name candidates existed in athlete-history lookup, so name-only matching is unsafe.
-- KAAF TOP record JSON includes restricted identifiers; never store raw response.
+- KAAF TOP record JSON includes source-side identifiers; never store raw response.
