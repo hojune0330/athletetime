@@ -1,0 +1,845 @@
+{
+  "batch": "20260708-kaaf-backfill-2005-2017",
+  "years": [
+    2015,
+    2016,
+    2017
+  ],
+  "files": [
+    {
+      "year": 2015,
+      "originalFilename": "001_종합기록20150226(0).xls",
+      "extension": ".xls",
+      "sha256": "f71ff76f0e459f86b842ac2f9a09d069e76bb3b175080370ee102501a4818dca",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0287_001_20150226_0_b09ed150f7.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "002_제29회 체육고등학교 종합기록20150810.xlsx",
+      "extension": ".xlsx",
+      "sha256": "282a9954ebfb4dd79953eaf5f85ffc09315b463895e643c0780c91e494b5814e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0288_002_29_20150810_88cda4821c.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "003_종별종합기록20150507.xls",
+      "extension": ".xls",
+      "sha256": "53d651068c49b845d39ec5ffd58fd5d8966f2b3b3a05cb48c0f135df1b803ed8",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0289_003_20150507_9f6875a1c9.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "004_제44회 전국소년체육대회 육상 종합기록20150531.xls",
+      "extension": ".xls",
+      "sha256": "b1a4a2e47d8d041c7c885d3434dd1f79df77bea94d18a1481df2b385fbb63a0a",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0290_004_44_20150531_dc0a5747ab.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "005_KBS배종합기록20150611(2).xls",
+      "extension": ".xls",
+      "sha256": "068314c393aebc2a6bcd72fc4c25557761dcd2690346f1cda134fc8da9f9ac54",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0291_005_KBS_20150611_2_4a48a04f1a.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "006_KBS배종합기록20150611(1).xls",
+      "extension": ".xls",
+      "sha256": "068314c393aebc2a6bcd72fc4c25557761dcd2690346f1cda134fc8da9f9ac54",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0292_006_KBS_20150611_1_4d969d5bea.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "007_2015선수권종합기록20180405.xls",
+      "extension": ".xls",
+      "sha256": "42c7932b107a4b3c1a5a727776c2a03ffb81c48d2b724fe42a65d5770fd86b8d",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0293_007_2015_20180405_5682123ab1.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "008_주니어종합기록20150630.xls",
+      "extension": ".xls",
+      "sha256": "00a6c01ab5117497adfdf52119761b5e7e071eceddd6a295d22e60efc129569e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0294_008_20150630_9667a0c1d0.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "009_청소년 종합기록20150630.xls",
+      "extension": ".xls",
+      "sha256": "bf5124de04586802d6e6b6c2a6f850009df91435884503e21fdb699d6a91095e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0295_009_20150630_e41cf639fc.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "010_교보대회 종합결과20150725(0).xls",
+      "extension": ".xls",
+      "sha256": "fa65500b5c31ac578388095b2947d220532c46d5ae09728f906f77b72a6ebf59",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0296_010_20150725_0_ebf5318d62.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "011_문광부종합201520150823.xls",
+      "extension": ".xls",
+      "sha256": "b11baa4f1fd4d01a4ebb4398cf7167366d98d8a737c557af613b42f179c31819",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0297_011_201520150823_528d64e311.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "013_2015꿈나무종합기록20150920.xls",
+      "extension": ".xls",
+      "sha256": "cf6070934e0a6031195c6bd7af8553be0dad054cf5859bd91c1aad144b4aaf38",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0299_013_2015_20150920_87ad6050be.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "014_전국체육대회 종합성적20151022.xls",
+      "extension": ".xls",
+      "sha256": "205c4cd1cf162f1a61395e1ecfa2136c92c10f617f4f8193a6128b0f703e17a6",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0300_014_20151022_8317aaaf3a.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "015_2015서울동아마라톤 종합성적20150315.xls",
+      "extension": ".xls",
+      "sha256": "890c22084c05f200d8ac59f2491afcd5f281f004b7f97165e826dcc5cfa1b4c1",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0301_015_2015_20150315_67d7f348b7.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "016_2015코오롱구간마라톤 종합20150328(0).xls",
+      "extension": ".xls",
+      "sha256": "2625ff5f16c5cc9e95afed9f425d0561b67648a55a7c3c8690d746fcd59e8b2d",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0302_016_2015_20150328_0_24b1550a6b.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "017_2015인천국제하프마라톤20150329.xls",
+      "extension": ".xls",
+      "sha256": "c20cec25179b7a92b3c6c6bba8ac2b537a4a3124216369f712336381d5a21e48",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0303_017_2015_20150329_ec0ed0c2fc.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "018_2015대구국제마라톤20150405.xls",
+      "extension": ".xls",
+      "sha256": "19f47bff43f1f11afd0670ed277a17615f883d99b10a1139e2ab87569e78280f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0304_018_2015_20150405_009b741233.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "019_2015군산새만금마라톤20150412(0).xls",
+      "extension": ".xls",
+      "sha256": "38b562488d4161be5117dde105c56c2cfef83efd43538943565007c83eae4182",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0305_019_2015_20150412_0_be15393b29.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "020_2015대통령기통일역전종합결과20150913.xls",
+      "extension": ".xls",
+      "sha256": "f13ca597c66ff6ee70db7abc1d447c1e64ae6e61235df00fe22bea5395cfcf24",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0306_020_2015_20150913_6298b15e34.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "021_경주동아201520151011(0).xls",
+      "extension": ".xls",
+      "sha256": "876893af98b7800a71bea8be7c6f21421dac5908b49def04e1cd1dd018f88e7c",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0307_021_201520151011_0_cc554672ac.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "022_2015조선마라톤1120151025.xls",
+      "extension": ".xls",
+      "sha256": "944716a29474488059ea11d22ae5f4c31661a49512f4090f1a47e64e1a517020",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0308_022_2015_1120151025_452bf90429.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "023_2015중앙일보마라톤종합20151101.xls",
+      "extension": ".xls",
+      "sha256": "11e52bd69b0f0a7aa7cd0e3504f176ec7568502ab3b0e53d357c35deafcb1632",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0309_023_2015_20151101_c9287b8edd.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "024_제61회 한반도통일대역전경주대회 결과20151121.xls",
+      "extension": ".xls",
+      "sha256": "e344a03493cb3518af2a7a28479c3599fab4faf79facce233db7636522171959",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0310_024_61_20151121_1d1bf44a42.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "026_2015목포투척경대회20150906(1).xls",
+      "extension": ".xls",
+      "sha256": "2f4bd81cd04d3e2beca6aa94f8033ade4b624b6341b9347bd7d13765ead0968b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0312_026_2015_20150906_1_be2670ab03.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "027_2015목포투척경대회20150906(0).xls",
+      "extension": ".xls",
+      "sha256": "2f4bd81cd04d3e2beca6aa94f8033ade4b624b6341b9347bd7d13765ead0968b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0313_027_2015_20150906_0_31ab2372ea.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "028_2015목포투척경대회20150906.xls",
+      "extension": ".xls",
+      "sha256": "2f4bd81cd04d3e2beca6aa94f8033ade4b624b6341b9347bd7d13765ead0968b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0314_028_2015_20150906_48ef7b6e5c.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "029_2015 전국로드레이스20150112.xlsx",
+      "extension": ".xlsx",
+      "sha256": "1012911f8dc78d3636cb7c1f566fe36e48494b9fdfede400392ff4fc7cd035c5",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0315_029_2015_20150112_306041dd85.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "030_제9회 크로스컨트리대회_결과20150128.xlsx",
+      "extension": ".xlsx",
+      "sha256": "14bfaef9ca5b0bb252d4af829531e9c0612c147f0f6363bdaf59d6fabb5041b9",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0316_030_9_20150128_3a0930e935.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "031_2015 경기국제하프마라톤대회_기록20150302.xlsx",
+      "extension": ".xlsx",
+      "sha256": "2fb6610d3c0118e796439bd68157f76861143b7b31f7194d28ffa69d65b65462",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0317_031_2015_20150302_56d9680019.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "032_예천_종합기록지20150504.xlsx",
+      "extension": ".xlsx",
+      "sha256": "5b5556532a7af5a272cd754ad720c7f1d55f679939e7c8d68a5d226ea79f8cfd",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0318_032_20150504_3547596acd.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "033_2015 고성통일 종합기록20151013.xlsx",
+      "extension": ".xlsx",
+      "sha256": "e26382a7b531132d74821c6dc487d2fe067293476be368b9d239d20a5072e8e1",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0319_033_2015_20151013_e57a3b4416.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "034_2015 평창하프20151013.xlsx",
+      "extension": ".xlsx",
+      "sha256": "1486571969376c69be7bce84a7477ee4411ef3170ee2a367eb8ca82fbc971aec",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0320_034_2015_20151013_e00e53dbd6.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "035_제27회 전국실업단대항_최종기록20151013.xlsx",
+      "extension": ".xlsx",
+      "sha256": "bf44f53a379366a12520c070b3425e64fa100977dcd13f314aebe9d5fa6c5721",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0321_035_27_20151013_4bc7d82378.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "036_2015 인천송도국제하프마라톤_기록지20151011.xls",
+      "extension": ".xls",
+      "sha256": "c9e3255c47f49d58c2f14e29c6b1ad70671dee308f1aa0a7631b099fbb7bc9f8",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0322_036_2015_20151011_e788d7b40c.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "038_춘계종합기록지20150420.xls",
+      "extension": ".xls",
+      "sha256": "91bd42baf3ebd7e35a899f19ea809241435a71f0cd68bfd7e90471b992afba99",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0324_038_20150420_234a486bf1.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "039_태백산배13회종합기록20151013.xls",
+      "extension": ".xls",
+      "sha256": "f8d2d72a1a34cfdd4984f168ba80d4b8cb37faf8851c80f16e2b1c5566f459af",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0325_039_13_20151013_fd069fb757.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "040_44회추계종합기록지20151013.xls",
+      "extension": ".xls",
+      "sha256": "42ccd3acd3ec3aa904bce66d01046b696292337d2a97717bc45ceacc2212ae17",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2015/0326_040_44_20151013_a937e1d00f.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "001_체고대항기록지(최종) (1)20160518.xls",
+      "extension": ".xls",
+      "sha256": "364bbff84cec6576557a03ef87d3d72c7c7af2b9369b9c3680ef4ba6c7e587b5",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0327_001_1_20160518_faeb85651b.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "002_제45회 전국종별육상경기대회20160505.xls",
+      "extension": ".xls",
+      "sha256": "c447ef20fd611b12e38d8167435ece3ced1ed46c761796c582c2fe295db80a1b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0328_002_45_20160505_2777e6109b.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "003_종합기록20160529.xls",
+      "extension": ".xls",
+      "sha256": "d4c5420b9781b35e02e99710493f216e6ef8d9cb6897c2b5932909c40d6a91e5",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0329_003_20160529_4573ca4bb5.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "004_주니어종합기록20160605.xls",
+      "extension": ".xls",
+      "sha256": "d4b8ae5b0773a97d5b0fb70dd68d2e8c99845bd0aeb44c62fa88a6aab087f340",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0330_004_20160605_800dcb6366.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "005_청소년종합기록20160605.xls",
+      "extension": ".xls",
+      "sha256": "384258f322341e541bcab01900ec72bdb36c85372c00025e28280d4ad6647054",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0331_005_20160605_1777b17ba1.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "006_선수권종합기록20160605.xls",
+      "extension": ".xls",
+      "sha256": "f07bc5be126c2fe5a47ddce7f4cb7c069333ae89d4d57c662f4404f679d31ab4",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0332_006_20160605_d066387ef4.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "007_종합기록20160615.xls",
+      "extension": ".xls",
+      "sha256": "2b2d757981ec84fcdf0b2768b7928fd12f9c8087f5f66cdbc095ac401d3700a2",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0333_007_20160615_2bd53108d5.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "008_KBS초중고종합기록20160705.xls",
+      "extension": ".xls",
+      "sha256": "3b263311249854453d524529595c9690a16d80f2ed6876db9b8e60e33e7509da",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0334_008_KBS_20160705_64be3215fb.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "009_KBS대학일반종합기록20160705.xls",
+      "extension": ".xls",
+      "sha256": "48f09fdd724fd6ed0bf2b5bc277fa87fca1736011172d41c8d68569e49aa81cb",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0335_009_KBS_20160705_3e8a9597e3.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "010_2016교보 종합기록20160723.xls",
+      "extension": ".xls",
+      "sha256": "70e5d10f9480a42b2c757451763a280442532c55dfdff62848b97236d4dd72ff",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0336_010_2016_20160723_89f6b041c9.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "011_종합기록20160730.xls",
+      "extension": ".xls",
+      "sha256": "24c12ba98e87a74c0cc3ba7a4987e69aa101f8ddd724617dbae48a1e8490c36a",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0337_011_20160730_788d732c47.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "012_전국체육대회 종합성적 (최종)20161012.xls",
+      "extension": ".xls",
+      "sha256": "39041a5cdc6953fb21ae2c6cb967fccaf1d6f6291ae91e95b4f60b877a16af2a",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0338_012_20161012_b4f33cc200.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "013_대구전국실내20161127.xls",
+      "extension": ".xls",
+      "sha256": "5fa32d1bfea40cf81482535043dcc6f0d058055fe7a1a5f6b34d5c14855e0932",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0339_013_20161127_9744869015.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "014_2016 전국대구실내육상경기대회 기록지20161201.xlsx",
+      "extension": ".xlsx",
+      "sha256": "a9d20108a7373ef40a0ac247d0f5788e6c0049c9e61c0431fd41b04ffce1e351",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0340_014_2016_20161201_a6b58e02f5.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "015_2016서울동아마라톤 종합성적20160320.xls",
+      "extension": ".xls",
+      "sha256": "058ae45d5d7216bd816fea31e97bb7543af3ca1f5021e7cb2ed292f710b7389f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0341_015_2016_20160320_1a1253b886.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "016_2016코오롱구간마라톤 종합20160326.xls",
+      "extension": ".xls",
+      "sha256": "6aaedaa468b3cdef395558ed5ce623c59694a203360d7488bd4139140be7ae94",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0342_016_2016_20160326_b408c5824a.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "017_2016인천하프마라톤 종합20160327.xls",
+      "extension": ".xls",
+      "sha256": "64cb7769c7dc5410d9e34fafc7a01d0d8c2156aee1852f5b72e0a347da89d3cc",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0343_017_2016_20160327_7786797a07.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "018_2016대구국제마라톤 종합기록20160403.xls",
+      "extension": ".xls",
+      "sha256": "cb05cc7832660dc9bb0d965f4869a67b2b5f2e3a7c6a00856e3964eeb2336918",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0344_018_2016_20160403_e53fb1a850.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "019_2016군산새만금마라톤20160410.xls",
+      "extension": ".xls",
+      "sha256": "c20c06e37d1dc624149acae0efcc663b4cdf5d109e7b00a29b1c14c6c88722b9",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0345_019_2016_20160410_7af853a45d.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "020_2016 서울나이키우먼스하프20160522.xls",
+      "extension": ".xls",
+      "sha256": "179f0929b18445a91979ab279b9c94281edc7e227a4d67515688a71e2869488e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0346_020_2016_20160522_1a8dc8d9b3.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "021_2016대통령기통일역전종합결과20160911.xls",
+      "extension": ".xls",
+      "sha256": "7edcea12045e1f0fcaf2ddf4fbb6208a41941d233da586271accf54e82769c59",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0347_021_2016_20160911_97cf4cb023.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "022_경주동아20161016.xls",
+      "extension": ".xls",
+      "sha256": "f4684109c5024b4081b5c8371a933c7978c4d1cdf64dd8a088b1d8f450047e3c",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0348_022_20161016_3b05a55dad.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "023_2016조선마라톤120161023.xls",
+      "extension": ".xls",
+      "sha256": "e9d98148a4863c7ad2400ec1db2388db64ff105b894b72b46416f66005a4a1c5",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0349_023_2016_120161023_b5cdae7590.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "024_2016중앙일보마라톤종합20161106.xls",
+      "extension": ".xls",
+      "sha256": "510a88e3711cf14482437b0e85d6f0f540c60224c98e489b93004c51cc9f9dcd",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0350_024_2016_20161106_f1572870eb.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "025_제62회 부산_서울 종합20161119.xls",
+      "extension": ".xls",
+      "sha256": "9cca8da7fdc066319d0385253e74b98088bf2af2ed8face42d7697c28c21bc28",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0351_025_62_20161119_23a13577ea.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "026_2016평창자료 (2)20161201(0).xls",
+      "extension": ".xls",
+      "sha256": "8619db3f3c68420cdaea40d406acd8736f86f3aba61db82d5e040f773978169e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0352_026_2016_2_20161201_0_2711debfd4.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "027_2016 목포투척종합20160904.xls",
+      "extension": ".xls",
+      "sha256": "6fb6d1ca4cda0f81cc6cfef31582c99aafaccab282a44c49085bd34bb1c24c9f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0353_027_2016_20160904_e1571fe10a.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "028_2016 전국로드레이스_기록20160518.xlsx",
+      "extension": ".xlsx",
+      "sha256": "cc89d6116f56317315e6015b3a51b10af8f19cd1542ca38a6c6415e34762dac0",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0354_028_2016_20160518_34c315fe43.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "029_제10회_크로스컨트리대회_기록20160518.xlsx",
+      "extension": ".xlsx",
+      "sha256": "d0c2e77e2a5d1cb1227cc0549295a4a0778259306b5d38bdac8eccb691fa7ceb",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0355_029_10_20160518_c3d0236c44.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "030_2016 경기국제하프마라톤대회_기록20160518.xlsx",
+      "extension": ".xlsx",
+      "sha256": "49cc0a4b1e6e80d4f33f0639642c734e7b191200815bd81ece487e112d321528",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0356_030_2016_20160518_a346d7a6d5.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "031_제20회 전국실업육상경기선수권대회_종합기록지20160518.xlsx",
+      "extension": ".xlsx",
+      "sha256": "3a99cdc257d31b725a7d2203214df25e13504e0435b1bd3ba092c5493fbbeb3d",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0357_031_20_20160518_912b41f7d6.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "032_2016평창자료 (2)20161201.xls",
+      "extension": ".xls",
+      "sha256": "8619db3f3c68420cdaea40d406acd8736f86f3aba61db82d5e040f773978169e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0358_032_2016_2_20161201_c17875aa7a.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "033_45회춘계종합기록지20160518.xlsx",
+      "extension": ".xlsx",
+      "sha256": "91592da44f5cb27ac530ddf6278ec9041d2b60c5e9957f4d1d1a1eb6bb41bbd7",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0359_033_45_20160518_cdb28b348a.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "034_태백14회종합기록지20160812.xlsx",
+      "extension": ".xlsx",
+      "sha256": "e708923c8c1201b2076f3552569b9172f6952a91724aecf3b379753f3d0fab66",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0360_034_14_20160812_7ad489cc13.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2016,
+      "originalFilename": "035_45회추계종합기록지20161014(0).xls",
+      "extension": ".xls",
+      "sha256": "daea1e8d440f12434e2df90f796d3d5527a41451908d0d9624c775b3363e48ed",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2016/0361_035_45_20161014_0_c269303896.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "001_제31회체고대회종합기록지120170516.xlsx",
+      "extension": ".xlsx",
+      "sha256": "79e139da89ae19901b7b809920a5501fb17d12dab5efa6229aed12c6996b8308",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0362_001_31_120170516_e7a5e2678f.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "002_제46회 종별종합기록20170508.xls",
+      "extension": ".xls",
+      "sha256": "b0c22305bac077cef8eeee7d5ed7afdbca48f33ce1ff4f4b0814d52671008eda",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0363_002_46_20170508_2dc87d0426.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "003_대한체육회장배종합기록20170507.xlsx",
+      "extension": ".xlsx",
+      "sha256": "fc41806a9160e96fc6b40a7cf8adc9636ef78e3d872d231529072ae33ac0224b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0364_003_20170507_a085ef01c5.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "004_제46회 전국소년체육대회20170528.xls",
+      "extension": ".xls",
+      "sha256": "3d3e16457986670cea1832fe86b8cb35b55d3812512d1ad2899d1174a4ba4109",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0365_004_46_20170528_fbe8e58cd7.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "005_선수권종합기록20170607.xls",
+      "extension": ".xls",
+      "sha256": "4b78f738966da6c84d895ac78bd9914eceeef809740b7a4faa7c5d9d44d6f758",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0366_005_20170607_cd07c05c76.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "006_주니어종합기록20170607.xls",
+      "extension": ".xls",
+      "sha256": "6c78913459face1b105a56e160380d66358045e6b54379b82d567fd9781e0db6",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0367_006_20170607_e4f2e226e3.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "007_청소년종합기록201720170617.xls",
+      "extension": ".xls",
+      "sha256": "5515b49abb7194f7aa25e579663935baedab6a5020058a525fa843289fdf256f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0368_007_201720170617_dfad5c6c5f.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "008_2017꿈나무20170618.xls",
+      "extension": ".xls",
+      "sha256": "4c464f2bc52112ab31c70ebeaebbb76560f01598dcb03a1e43f9228b53032dbf",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0369_008_2017_20170618_524a647d44.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "009_종합기록(초증고)20170628.xls",
+      "extension": ".xls",
+      "sha256": "c0e41a5eb40ffa7c828ac78261653bf234592b52487d31d55e41c7807830787e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0370_009_20170628_b129cfb73c.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "010_종합기록(대학_일반)20170628.xls",
+      "extension": ".xls",
+      "sha256": "4619ce3a04bab7d091e0580bf3491131c162788dad7eea3fced45e720627bc5f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0371_010_20170628_fc8773bfc6.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "012_종합기록20170731.xls",
+      "extension": ".xls",
+      "sha256": "dd6e297363bf97d61e9ca1584f23f726b4fe756ff18cf445a5f295a84b339aa1",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0373_012_20170731_28ce2ed90e.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "013_2017교보 종합기록20170805(0).xls",
+      "extension": ".xls",
+      "sha256": "3381298ceeb77f0ec8a54d0f1f0ae4ceaf7a78d60c23ae4fe6fc58aa0eb769b0",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0374_013_2017_20170805_0_7ddd2e13fd.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "015_문체부(마스터즈)결과20170927.xlsx",
+      "extension": ".xlsx",
+      "sha256": "958d85670432291f81f8e34353cb9f498f0465ae5aa8ea30071ed6b83e05fdd2",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0376_015_20170927_e5342d1edf.xlsx",
+      "status": "excluded_non_elite"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "016_전국체육대회 종합성적120171027.xls",
+      "extension": ".xls",
+      "sha256": "e77550128290ff087185c5100c33306af55ede834697f68cca82e0ca35b1c19f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0377_016_120171027_fb980c5ad2.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "018_서울동아마라톤 종합성적20170319.xls",
+      "extension": ".xls",
+      "sha256": "2a9f6fe7f8a67c80df4ee3bdb83e72bd95fd614acb04b11987eeb23dc862e037",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0379_018_20170319_0e2e00ce32.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "019_2017코오롱구간마라톤 종합20170325.xls",
+      "extension": ".xls",
+      "sha256": "7c16ea18e31ac8cc59f720a7e20d8e6bec272fa23767b5f3a1ddde7b6d88b9ea",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0380_019_2017_20170325_37c8a9a912.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "020_2017인천하프마라톤 종합20170326.xls",
+      "extension": ".xls",
+      "sha256": "3171b502df0206f6bc6b2cd6e43ae98e62f3fb91a41a9ae517c2f538f63220e7",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0381_020_2017_20170326_3341871ea3.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "021_2017대구국제마라톤 종합기록320170409.xls",
+      "extension": ".xls",
+      "sha256": "eec2094fff90d14d6df679fb6702060fb6a58fde3da23ca768fec058d5e88126",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0382_021_2017_320170409_82bdd8fe78.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "022_2017군산새만금마라톤결과20170409.xls",
+      "extension": ".xls",
+      "sha256": "04300b50380845a5ac135991376c6708e6c05a06135ac9fc84fe8827d24fff99",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0383_022_2017_20170409_60a0fbe3f7.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "023_2017 서울나이키우먼스하프마라톤20170529.xls",
+      "extension": ".xls",
+      "sha256": "167e1bbaeeeba4fed455c60bae4719d09092a6e553047bcd5dcddb361cc7dbbe",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0384_023_2017_20170529_7e69905bc4.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "024_2017대통령기통일종합결과20170910.xls",
+      "extension": ".xls",
+      "sha256": "bdd25f5b29d8066cb9349c116cf293058977d755a8245a90816b13fd304a6b0e",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0385_024_2017_20170910_5dd80e0294.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "025_2017경주동아20171015.xls",
+      "extension": ".xls",
+      "sha256": "3164ff58293fd7c69227985c96032fece264241cd64132814f5a5b770242a529",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0386_025_2017_20171015_b2e5116a4f.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "026_2017조선마라톤20171029.xls",
+      "extension": ".xls",
+      "sha256": "d38969462b53230314218322d556201267ee625d7a2f704b2c1cd0f20d5edd87",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0387_026_2017_20171029_371cbc0424.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "027_2017중앙일보마라톤종합20171105.xls",
+      "extension": ".xls",
+      "sha256": "60a12f9a89c3459cf878a38878696e3e03c4fc7638569d6ffc7b0c5e384f2533",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0388_027_2017_20171105_9cc651d484.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "028_국무총리기 경기결과(홈)20171118.xlsx",
+      "extension": ".xlsx",
+      "sha256": "0de19feaee4bb22da6d4f1e2f865737325cf3a244428991589acebb7af57d475",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0389_028_20171118_1245c88aff.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "030_2017평창자료20170820.xls",
+      "extension": ".xls",
+      "sha256": "b026d0b135692040c18bf9fc27a1088ec5b7c83ec99e1a74433796b821c1aeb7",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0391_030_2017_20170820_063a5bf924.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "031_2017 목포투척 종합20170903.xls",
+      "extension": ".xls",
+      "sha256": "848c0369399ab369a5dc52bbd0716361ecca4ab1755e21fab2bf9d173eb4b02f",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0392_031_2017_20170903_eda5d3a270.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "032_종합기록20170924.xls",
+      "extension": ".xls",
+      "sha256": "04b4f09e2c4b0c32d51947bae32e45143369e43182b2721dbdc12f9bc826e5b9",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0393_032_20170924_e3100dd7df.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "033_46회추계종합기록지520170816(0).xls",
+      "extension": ".xls",
+      "sha256": "7e5134dbdaafc3de41065675d531011887984b7451fca696d6ca24a370c0930b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0394_033_46_520170816_0_04b538a30e.xls",
+      "status": "legacy_xls_needs_conversion"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "034_정선15회종합기록지420170816.xlsx",
+      "extension": ".xlsx",
+      "sha256": "ba125f10dddf75fb7a89babceaaf01f5b3eca326da5413fb6ca63517b3fa8f5d",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0395_034_15_420170816_4a5a422bbe.xlsx",
+      "status": "xlsx_inspect_candidate"
+    },
+    {
+      "year": 2017,
+      "originalFilename": "035_46회추계종합기록지520170816.xls",
+      "extension": ".xls",
+      "sha256": "7e5134dbdaafc3de41065675d531011887984b7451fca696d6ca24a370c0930b",
+      "sourcePath": "data/sources/import/originals/20260708-kaaf-backfill-2005-2017/2017/0396_035_46_520170816_c3f196ca60.xls",
+      "status": "legacy_xls_needs_conversion"
+    }
+  ],
+  "totals": {
+    "spreadsheetFiles": 103,
+    "xlsxFiles": 20,
+    "xlsFiles": 83,
+    "rawOriginalsTrackedByGit": 0,
+    "statusCounts": {
+      "legacy_xls_needs_conversion": 83,
+      "xlsx_inspect_candidate": 19,
+      "excluded_non_elite": 1
+    }
+  }
+}

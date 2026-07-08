@@ -1,0 +1,22 @@
+{
+  "athletes": 18029,
+  "records": 66859,
+  "manualTopRecordStats": {
+    "totalCandidates": 16885,
+    "appended": 9564,
+    "skippedDuplicates": 7321,
+    "skippedSuppressed": 0,
+    "skippedInvalidName": 0,
+    "skippedInvalidRecord": 0
+  },
+  "searchSmoke": {
+    "query": "김국영",
+    "count": 4,
+    "first": {
+      "name": "김국영",
+      "team": "광주광역시청",
+      "recordCount": 16
+    }
+  },
+  "note": "Track A generated evidence candidates only; data/results was not mutated, so skippedDuplicates delta is not applicable in this slice."
+}
