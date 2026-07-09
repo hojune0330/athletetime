@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+ok 1 - LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+  ---
+  duration_ms: 206.3099
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+ok 2 - LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+  ---
+  duration_ms: 145.1093
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+ok 3 - LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+  ---
+  duration_ms: 645.486
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+ok 4 - LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+  ---
+  duration_ms: 169.6203
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+ok 5 - LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+  ---
+  duration_ms: 182.8655
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+ok 6 - LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+  ---
+  duration_ms: 43.1836
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+ok 7 - LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+  ---
+  duration_ms: 94.7124
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+ok 8 - LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+  ---
+  duration_ms: 0.741
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+ok 9 - LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+  ---
+  duration_ms: 78.1553
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+ok 10 - LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+  ---
+  duration_ms: 74.4432
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+ok 11 - LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+  ---
+  duration_ms: 865.9633
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+ok 12 - LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+  ---
+  duration_ms: 401.5835
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+ok 13 - LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+  ---
+  duration_ms: 2179.7237
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-LAYOUT-001 Given representative sheet shapes When classifying Then core layout families are detected
+ok 14 - LEGACY-XLS-LAYOUT-001 Given representative sheet shapes When classifying Then core layout families are detected
+  ---
+  duration_ms: 6.9984
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-LAYOUT-002 Given synthetic workbooks When dry-running Then workbook and sheet layouts are summarized safely
+ok 15 - LEGACY-XLS-LAYOUT-002 Given synthetic workbooks When dry-running Then workbook and sheet layouts are summarized safely
+  ---
+  duration_ms: 121.1815
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-LAYOUT-003 Given 2015-2017 xls originals When dry-running all Then 83 workbooks are classified and counted
+ok 16 - LEGACY-XLS-LAYOUT-003 Given 2015-2017 xls originals When dry-running all Then 83 workbooks are classified and counted
+  ---
+  duration_ms: 3056.856
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-LAYOUT-004 Given operator CLI When writing layout evidence Then reports include counts and do not mutate service data
+ok 17 - LEGACY-XLS-LAYOUT-004 Given operator CLI When writing layout evidence Then reports include counts and do not mutate service data
+  ---
+  duration_ms: 2563.8075
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+ok 18 - TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+  ---
+  duration_ms: 338.2331
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+ok 19 - TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+  ---
+  duration_ms: 394.5034
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+ok 20 - TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+  ---
+  duration_ms: 184.3682
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6238.7243
