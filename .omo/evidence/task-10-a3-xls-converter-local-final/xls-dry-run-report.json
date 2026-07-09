@@ -1,0 +1,58 @@
+{
+  "title": "A-3 Legacy XLS Converter Dry Run",
+  "status": "dry_run_complete",
+  "years": [
+    2015,
+    2016,
+    2017
+  ],
+  "attemptedFiles": 3,
+  "convertedFiles": 3,
+  "failedFiles": 0,
+  "totalQueuedFiles": 83,
+  "serviceDataMutated": false,
+  "privatePathsExcluded": true,
+  "rawOriginalsTrackedByGit": 0,
+  "workbooks": [
+    {
+      "year": 2015,
+      "originalFilename": "001_종합기록20150226(0).xls",
+      "extension": ".xls",
+      "sha256Prefix": "f71ff76f0e45",
+      "sheetNames": [
+        "종합기록"
+      ],
+      "sheetCount": 1,
+      "rowCount": 65,
+      "status": "converted_for_dry_run"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "003_종별종합기록20150507.xls",
+      "extension": ".xls",
+      "sha256Prefix": "53d651068c49",
+      "sheetNames": [
+        "종합성적",
+        "신기록현황"
+      ],
+      "sheetCount": 2,
+      "rowCount": 264,
+      "status": "converted_for_dry_run"
+    },
+    {
+      "year": 2015,
+      "originalFilename": "004_제44회 전국소년체육대회 육상 종합기록20150531.xls",
+      "extension": ".xls",
+      "sha256Prefix": "b1a4a2e47d8d",
+      "sheetNames": [
+        "종합기록",
+        "우수선수 현황",
+        "신기록현황"
+      ],
+      "sheetCount": 3,
+      "rowCount": 115,
+      "status": "converted_for_dry_run"
+    }
+  ],
+  "errors": []
+}

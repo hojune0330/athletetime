@@ -13,16 +13,20 @@ const {
   inspectLegacyXlsxWorkbook,
 } = require('../../card-studio/services/legacyResultNormalizationService');
 
-const TRACK_A_SAMPLE = path.join(
-  ROOT,
-  'data',
-  'sources',
-  'import',
-  'originals',
-  '20260708-kaaf-backfill-2005-2017',
-  '2017',
-  '0362_001_31_120170516_e7a5e2678f.xlsx',
-);
+const ORIGINAL_FIXTURE_ROOT = process.env.ATHLETETIME_LEGACY_ORIGINAL_FIXTURE_ROOT
+  ? path.resolve(process.env.ATHLETETIME_LEGACY_ORIGINAL_FIXTURE_ROOT)
+  : path.join(
+    ROOT,
+    'data',
+    'sources',
+    'import',
+    'originals',
+    '20260708-kaaf-backfill-2005-2017',
+  );
+const TRACK_A_SAMPLE = path.join(ORIGINAL_FIXTURE_ROOT, '2017', '0362_001_31_120170516_e7a5e2678f.xlsx');
+const ORIGINAL_FIXTURE_SKIP_REASON = fs.existsSync(TRACK_A_SAMPLE)
+  ? false
+  : 'private original workbook not present';
 
 test('LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A Then safe and blocked spreadsheets are separated', () => {
   const plan = buildLegacyNormalizationPlan({ years: [2015, 2016, 2017] });
@@ -36,9 +40,7 @@ test('LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A 
   assert.equal(plan.files.every((file) => file.sourcePath.startsWith('data/sources/import/originals/')), true);
 });
 
-test('LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python', () => {
-  assert.equal(fs.existsSync(TRACK_A_SAMPLE), true);
-
+test('LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python', { skip: ORIGINAL_FIXTURE_SKIP_REASON }, () => {
   const workbook = inspectLegacyXlsxWorkbook(TRACK_A_SAMPLE);
 
   assert.deepEqual(workbook.sheetNames, ['남자', '여자']);
@@ -47,7 +49,7 @@ test('LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Th
   assert.equal(workbook.sheets[0].resultRowCount, 20);
 });
 
-test('LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source', () => {
+test('LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source', { skip: ORIGINAL_FIXTURE_SKIP_REASON }, () => {
   const workbook = inspectLegacyXlsxWorkbook(TRACK_A_SAMPLE);
   const results = extractHorizontalPodiumResults({
     competitionName: '제31회 전국체육고등학교체육대회(육상경기)',
@@ -76,7 +78,7 @@ test('LEGACY-NORMALIZE-004 Given the original vault When checking git Then no ra
   assert.equal(stdout.trim(), '');
 });
 
-test('LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals', () => {
+test('LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals', { skip: ORIGINAL_FIXTURE_SKIP_REASON }, () => {
   const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'athletetime-legacy-evidence-'));
   try {
     const stdout = execFileSync(process.execPath, [

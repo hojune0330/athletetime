@@ -46,13 +46,15 @@ test('LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 
   assertNoPrivateSourcePath(report);
 });
 
-test('LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approval-gated and not converted', () => {
+test('LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion', () => {
   const report = buildLegacyExpansionPreflightReport({ years: [2015, 2016, 2017] });
 
-  assert.equal(report.a3XlsQueue.status, 'blocked_pending_converter_approval');
+  assert.equal(report.a3XlsQueue.status, 'ready_for_dry_run');
   assert.equal(report.a3XlsQueue.xlsFiles, 83);
   assert.deepEqual(report.a3XlsQueue.byYear, { 2015: 29, 2016: 28, 2017: 26 });
-  assert.equal(report.a3XlsQueue.requiresDependencyApproval, true);
+  assert.equal(report.a3XlsQueue.dryRunDependencyApproved, true);
+  assert.equal(report.a3XlsQueue.requiresDependencyApproval, false);
+  assert.equal(report.a3XlsQueue.servicePromotionAllowed, false);
   assert.equal(report.a3XlsQueue.conversionAttempted, false);
   assert.equal(report.safety.rawOriginalsTrackedByGit, 0);
   assert.equal(report.safety.serviceDataMutated, false);
@@ -116,7 +118,8 @@ test('LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exa
 
   assert.match(markdown, /2016 전국대구실내육상경기대회/u);
   assert.match(markdown, /2015=29, 2016=28, 2017=26/u);
-  assert.match(markdown, /SheetJS 같은 BIFF \.xls 파서 의존성은 승인 후 추가/u);
+  assert.match(markdown, /SheetJS\/BIFF \.xls 파서는 dry-run 용도로 승인/u);
+  assert.match(markdown, /Service promotion allowed: no/u);
   assert.match(markdown, /서비스 데이터는 변경하지 않음/u);
   assertNoPrivateSourcePath(markdown);
 });
@@ -125,7 +128,7 @@ test('LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue T
   const years = Array.from({ length: 13 }, (_, index) => 2005 + index);
   const report = buildLegacyExpansionPreflightReport({ years });
 
-  assert.equal(report.a3XlsQueue.status, 'blocked_pending_converter_approval');
+  assert.equal(report.a3XlsQueue.status, 'ready_for_dry_run');
   assert.equal(report.a3XlsQueue.spreadsheetFiles, 372);
   assert.equal(report.a3XlsQueue.xlsxFiles, 37);
   assert.equal(report.a3XlsQueue.xlsFiles, 335);

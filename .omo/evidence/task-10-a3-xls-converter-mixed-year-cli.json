@@ -1,0 +1,5 @@
+{
+  "ok": false,
+  "code": "LEGACY_XLS_DRY_RUN_FAILED",
+  "message": "Invalid --years value"
+}

@@ -1,0 +1,5 @@
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/tests/legacy-expansion-preflight.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'backend/tests/legacy-result-normalization.test.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'card-studio/services/legacyExpansionPreflightService.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it

@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+ok 1 - LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+  ---
+  duration_ms: 246.0971
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+ok 2 - LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+  ---
+  duration_ms: 209.9251
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+ok 3 - LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+  ---
+  duration_ms: 687.4725
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+ok 4 - LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+  ---
+  duration_ms: 150.6326
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+ok 5 - LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+  ---
+  duration_ms: 152.2414
+  type: 'test'
+  ...
+# Subtest: LEGACY-FIXTURE-GUARD-001 Given private originals are unavailable When normalization tests run Then original-dependent cases skip instead of failing
+ok 6 - LEGACY-FIXTURE-GUARD-001 Given private originals are unavailable When normalization tests run Then original-dependent cases skip instead of failing
+  ---
+  duration_ms: 576.9863
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A Then safe and blocked spreadsheets are separated
+ok 7 - LEGACY-NORMALIZE-001 Given 2015-2017 backfill files When planning Track A Then safe and blocked spreadsheets are separated
+  ---
+  duration_ms: 87.592
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python
+ok 8 - LEGACY-NORMALIZE-002 Given a horizontal podium workbook When inspecting Then the workbook layout is detected without Python
+  ---
+  duration_ms: 26.633
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source
+ok 9 - LEGACY-NORMALIZE-003 Given a horizontal podium workbook When extracting Then athlete result candidates keep event, rank, name, team, record, and source
+  ---
+  duration_ms: 22.6044
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-004 Given the original vault When checking git Then no raw original file is committed
+ok 10 - LEGACY-NORMALIZE-004 Given the original vault When checking git Then no raw original file is committed
+  ---
+  duration_ms: 81.6293
+  type: 'test'
+  ...
+# Subtest: LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals
+ok 11 - LEGACY-NORMALIZE-005 Given Track A years When generating evidence Then candidates and review report are written without raw originals
+  ---
+  duration_ms: 870.6388
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+ok 12 - LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+  ---
+  duration_ms: 54.1691
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+ok 13 - LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+  ---
+  duration_ms: 124.4272
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+ok 14 - LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+  ---
+  duration_ms: 0.78
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+ok 15 - LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+  ---
+  duration_ms: 107.1094
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+ok 16 - LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+  ---
+  duration_ms: 86.2086
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+ok 17 - LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+  ---
+  duration_ms: 706.3804
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+ok 18 - LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+  ---
+  duration_ms: 429.0822
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+ok 19 - LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+  ---
+  duration_ms: 2523.5187
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+ok 20 - TRACK-A-PROMOTE-001 Given approved XLSX candidates When promoted in dry run Then service-shaped year files are generated
+  ---
+  duration_ms: 426.389
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+ok 21 - TRACK-A-PROMOTE-002 Given promoted temp output Then ids, source fields, and public schema are deterministic and safe
+  ---
+  duration_ms: 464.1434
+  type: 'test'
+  ...
+# Subtest: TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+ok 22 - TRACK-A-PROMOTE-003 Given malformed candidate row When promoting Then it fails before writing output
+  ---
+  duration_ms: 150.2168
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4662.1854

@@ -1,0 +1,7 @@
+{
+  "status": "existing_vulnerabilities_remain",
+  "total": 12,
+  "high": 4,
+  "xlsxListed": false,
+  "note": "SheetJS CDN xlsx@0.20.3 is not listed in npm audit vulnerabilities. Remaining items are pre-existing dependency advisories outside the A-3 dry-run converter path."
+}
