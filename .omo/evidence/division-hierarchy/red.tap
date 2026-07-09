@@ -1,0 +1,988 @@
+TAP version 13
+# Subtest: DIVISION-HIERARCHY-001 maps source labels to one canonical hierarchy key
+not ok 1 - DIVISION-HIERARCHY-001 maps source labels to one canonical hierarchy key
+  ---
+  duration_ms: 11.0405
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\division-hierarchy.test.js:9:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + '남자고등학교부'
+    - 'men-high'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'men-high'
+  actual: '남자고등학교부'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\division-hierarchy.test.js:15:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: DIVISION-HIERARCHY-002 analytics filters remove kaaf-kind keys and keep TOP100 counts stable
+not ok 2 - DIVISION-HIERARCHY-002 analytics filters remove kaaf-kind keys and keep TOP100 counts stable
+  ---
+  duration_ms: 8390.782
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\division-hierarchy.test.js:32:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+
+    + [
+    +   {
+    +     key: 'kaaf-kind-13',
+    +     label: '남자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1x',
+    +     label: '남자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1n',
+    +     label: '남자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-14',
+    +     label: '남자대학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-10',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1o',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1c',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-12',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1l',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1m',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-11',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1a',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1g',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1b',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1i',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1j',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1k',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1e',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1d',
+    +     label: '남자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-15',
+    +     label: '남자일반부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-1y',
+    +     label: '남자일반부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-23',
+    +     label: '여자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2n',
+    +     label: '여자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2y',
+    +     label: '여자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2x',
+    +     label: '여자고등학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-24',
+    +     label: '여자대학교부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-20',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-22',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2k',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2l',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2i',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2o',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2e',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2m',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2a',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-21',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2g',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2b',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2d',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2j',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-2c',
+    +     label: '여자부'
+    +   },
+    +   {
+    +     key: 'kaaf-kind-25',
+    +     label: '여자일반부'
+    +   }
+    + ]
+    - []
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+    0:
+      key: 'kaaf-kind-13'
+      label: '남자고등학교부'
+    1:
+      key: 'kaaf-kind-1x'
+      label: '남자고등학교부'
+    2:
+      key: 'kaaf-kind-1n'
+      label: '남자고등학교부'
+    3:
+      key: 'kaaf-kind-14'
+      label: '남자대학교부'
+    4:
+      key: 'kaaf-kind-10'
+      label: '남자부'
+    5:
+      key: 'kaaf-kind-1o'
+      label: '남자부'
+    6:
+      key: 'kaaf-kind-1c'
+      label: '남자부'
+    7:
+      key: 'kaaf-kind-12'
+      label: '남자부'
+    8:
+      key: 'kaaf-kind-1l'
+      label: '남자부'
+    9:
+      key: 'kaaf-kind-1m'
+      label: '남자부'
+    10:
+      key: 'kaaf-kind-11'
+      label: '남자부'
+    11:
+      key: 'kaaf-kind-1a'
+      label: '남자부'
+    12:
+      key: 'kaaf-kind-1g'
+      label: '남자부'
+    13:
+      key: 'kaaf-kind-1b'
+      label: '남자부'
+    14:
+      key: 'kaaf-kind-1i'
+      label: '남자부'
+    15:
+      key: 'kaaf-kind-1j'
+      label: '남자부'
+    16:
+      key: 'kaaf-kind-1k'
+      label: '남자부'
+    17:
+      key: 'kaaf-kind-1e'
+      label: '남자부'
+    18:
+      key: 'kaaf-kind-1d'
+      label: '남자부'
+    19:
+      key: 'kaaf-kind-15'
+      label: '남자일반부'
+    20:
+      key: 'kaaf-kind-1y'
+      label: '남자일반부'
+    21:
+      key: 'kaaf-kind-23'
+      label: '여자고등학교부'
+    22:
+      key: 'kaaf-kind-2n'
+      label: '여자고등학교부'
+    23:
+      key: 'kaaf-kind-2y'
+      label: '여자고등학교부'
+    24:
+      key: 'kaaf-kind-2x'
+      label: '여자고등학교부'
+    25:
+      key: 'kaaf-kind-24'
+      label: '여자대학교부'
+    26:
+      key: 'kaaf-kind-20'
+      label: '여자부'
+    27:
+      key: 'kaaf-kind-22'
+      label: '여자부'
+    28:
+      key: 'kaaf-kind-2k'
+      label: '여자부'
+    29:
+      key: 'kaaf-kind-2l'
+      label: '여자부'
+    30:
+      key: 'kaaf-kind-2i'
+      label: '여자부'
+    31:
+      key: 'kaaf-kind-2o'
+      label: '여자부'
+    32:
+      key: 'kaaf-kind-2e'
+      label: '여자부'
+    33:
+      key: 'kaaf-kind-2m'
+      label: '여자부'
+    34:
+      key: 'kaaf-kind-2a'
+      label: '여자부'
+    35:
+      key: 'kaaf-kind-21'
+      label: '여자부'
+    36:
+      key: 'kaaf-kind-2g'
+      label: '여자부'
+    37:
+      key: 'kaaf-kind-2b'
+      label: '여자부'
+    38:
+      key: 'kaaf-kind-2d'
+      label: '여자부'
+    39:
+      key: 'kaaf-kind-2j'
+      label: '여자부'
+    40:
+      key: 'kaaf-kind-2c'
+      label: '여자부'
+    41:
+      key: 'kaaf-kind-25'
+      label: '여자일반부'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\division-hierarchy.test.js:38:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: DIVISION-HIERARCHY-003 season records expose gender rollup and fixed level ordering
+not ok 3 - DIVISION-HIERARCHY-003 season records expose gender rollup and fixed level ordering
+  ---
+  duration_ms: 6.1101
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\division-hierarchy.test.js:50:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'key')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\division-hierarchy.test.js:54:32)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: DIVISION-HIERARCHY-004 records page uses two-step gender and level controls
+not ok 4 - DIVISION-HIERARCHY-004 records page uses two-step gender and level controls
+  ---
+  duration_ms: 4.0959
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\division-hierarchy.test.js:79:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /genderOptions/. Input:
+
+    "import { apiClient } from './client';\r\n" +
+      '\r\n' +
+      "const BASE = '/api/card-studio/analytics';\r\n" +
+      '\r\n' +
+      'type ApiListResponse<T> = {\r\n' +
+      '  success: boolean;\r\n' +
+      '  data: T[];\r\n' +
+      '  total?: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'type ApiItemResponse<T> = {\r\n' +
+      '  success: boolean;\r\n' +
+      '  data: T;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type AnalyticsFilterOption = {\r\n' +
+      '  key: string;\r\n' +
+      '  label: string;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type AnalyticsFilters = {\r\n' +
+      '  seasons: number[];\r\n' +
+      '  events: AnalyticsFilterOption[];\r\n' +
+      '  divisions: AnalyticsFilterOption[];\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type AthleteSearchCard = {\r\n' +
+      '  athleteKey: string;\r\n' +
+      '  name: string;\r\n' +
+      '  team: string;\r\n' +
+      '  teams: string[];\r\n' +
+      '  years: number[];\r\n' +
+      '  events: string[];\r\n' +
+      '  divisions: string[];\r\n' +
+      '  recordCount: number;\r\n' +
+      '  ambiguity: string;\r\n' +
+      '  note: string;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type PublicRecord = {\r\n' +
+      '  id: string;\r\n' +
+      '  athleteKey: string;\r\n' +
+      '  name: string;\r\n' +
+      '  team: string;\r\n' +
+      '  season: number;\r\n' +
+      '  competitionName: string;\r\n' +
+      '  date: string;\r\n' +
+      '  venue: string;\r\n' +
+      '  eventKey: string;\r\n' +
+      '  eventLabel: string;\r\n' +
+      '  divisionKey: string;\r\n' +
+      '  divisionLabel: string;\r\n' +
+      '  phase: string;\r\n' +
+      '  record: string;\r\n' +
+      '  recordValue: number;\r\n' +
+      "  direction: 'lower' | 'higher';\r\n" +
+      '  rank: number | null;\r\n' +
+      '  wind: string | null;\r\n' +
+      '  windLegal: boolean;\r\n' +
+      '  isComparable: boolean;\r\n' +
+      '  note: string;\r\n' +
+      '  source: {\r\n' +
+      '    provider: string;\r\n' +
+      '    sourceType: string;\r\n' +
+      '    sourceId: string;\r\n' +
+      '    sourceUrl: string;\r\n' +
+      '    capturedAt: string;\r\n' +
+      '  };\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type RecordDelta = {\r\n' +
+      '  from: PublicRecord;\r\n' +
+      '  to: PublicRecord;\r\n' +
+      '  rawDelta: number;\r\n' +
+      '  display: string;\r\n' +
+      '  improved: boolean;\r\n' +
+      '} | null;\r\n' +
+      '\r\n' +
+      'export type RecordTrailPoint = {\r\n' +
+      '  id: string;\r\n' +
+      '  date: string;\r\n' +
+      '  season: number;\r\n' +
+      '  value: number;\r\n' +
+      '  record: string;\r\n' +
+      '  eventLabel: string;\r\n' +
+      '  competitionName: string;\r\n' +
+      '  isComparable: boolean;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type AthleteAnalyticsProfile = {\r\n' +
+      '  athlete: AthleteSearchCard;\r\n' +
+      '  summary: {\r\n' +
+      '    indexedBest: PublicRecord | null;\r\n' +
+      '    seasonBest: PublicRecord | null;\r\n' +
+      '    latest: PublicRecord | null;\r\n' +
+      '    delta: RecordDelta;\r\n' +
+      '    indexedResultCount: number;\r\n' +
+      '    comparableResultCount: number;\r\n' +
+      '    sourceScope: string;\r\n' +
+      '    disclaimer: string;\r\n' +
+      '  };\r\n' +
+      '  events: Array<{\r\n' +
+      '    eventKey: string;\r\n' +
+      '    eventLabel: string;\r\n' +
+      '    recordCount: number;\r\n' +
+      '    best: PublicRecord | null;\r\n' +
+      '  }>;\r\n' +
+      '  recordTrail: RecordTrailPoint[];\r\n' +
+      '  records: PublicRecord[];\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type SeasonRecordRow = {\r\n' +
+      '  rank: number;\r\n' +
+      '  athleteKey: string;\r\n' +
+      '  name: string;\r\n' +
+      '  team: string;\r\n' +
+      '  record: string;\r\n' +
+      '  recordValue: number;\r\n' +
+      '  date: string;\r\n' +
+      '  competitionName: string;\r\n' +
+      '  wind: string | null;\r\n' +
+      '  windLegal: boolean;\r\n' +
+      '  highlighted: boolean;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type SeasonRecordTable = {\r\n' +
+      '  season: number;\r\n' +
+      '  eventKey: string;\r\n' +
+      '  divisionKey: string;\r\n' +
+      '  eventLabel: string;\r\n' +
+      '  divisionLabel: string;\r\n' +
+      '  totalIndexedAthletes: number;\r\n' +
+      '  rows: SeasonRecordRow[];\r\n' +
+      '  filters: AnalyticsFilters;\r\n' +
+      '  disclaimer: string;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type PopularEvent = {\r\n' +
+      '  key: string;\r\n' +
+      '  label: string;\r\n' +
+      '  recordCount: number;\r\n' +
+      '  athleteCount: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type PopularEvents = {\r\n' +
+      '  season: number;\r\n' +
+      '  events: PopularEvent[];\r\n' +
+      '  note: string;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export async function getAnalyticsFilters(): Promise<AnalyticsFilters> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<AnalyticsFilters>>(`${BASE}/filters`);\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export async function getPopularEvents(params: { season?: number; limit?: number } = {}): Promise<PopularEvents> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<PopularEvents>>(`${BASE}/popular-events`, {\r\n' +
+      '    params,\r\n' +
+      '  });\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export type EventConcentration = {\r\n' +
+      '  eventKey: string;\r\n' +
+      '  eventLabel: string;\r\n' +
+      '  recordCount: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type RegionActivity = {\r\n' +
+      '  regionCode: string;\r\n' +
+      '  regionLabel: string;\r\n' +
+      '  recordCount: number;\r\n' +
+      '  eventCount: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type SeasonPulseBucket = {\r\n' +
+      '  weekStart: string;\r\n' +
+      '  weekEnd: string;\r\n' +
+      '  recordCount: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type SeasonPulse = {\r\n' +
+      '  windowDays: number;\r\n' +
+      '  from?: string;\r\n' +
+      '  to?: string;\r\n' +
+      '  buckets: SeasonPulseBucket[];\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type AnonymousInsights = {\r\n' +
+      '  generatedAt: string;\r\n' +
+      '  scope: string;\r\n' +
+      '  privacy: {\r\n' +
+      '    includesNames: boolean;\r\n' +
+      '    includesTeams: boolean;\r\n' +
+      '    includesAthleteKeys: boolean;\r\n' +
+      '    minGroupSize: number;\r\n' +
+      '  };\r\n' +
+      '  season: number;\r\n' +
+      '  eventConcentration: EventConcentration[];\r\n' +
+      '  regionActivity: RegionActivity[];\r\n' +
+      '  seasonPulse: SeasonPulse;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export async function getAnonymousInsights(\r\n' +
+      '  params: { season?: number; limit?: number; minGroupSize?: number; windowDays?: number } = {},\r\n' +
+      '): Promise<AnonymousInsights> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<AnonymousInsights>>(`${BASE}/insights`, {\r\n' +
+      '    params,\r\n' +
+      '  });\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export type ShadowClusterSegment = {\r\n' +
+      '  athleteKey: string;\r\n' +
+      '  teamLabel: string;\r\n' +
+      '  teamStage: string;\r\n' +
+      '  years: number[];\r\n' +
+      '  fromYear: number | null;\r\n' +
+      '  toYear: number | null;\r\n' +
+      '  recordCount: number;\r\n' +
+      '  eventCount: number;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type ShadowCluster = {\r\n' +
+      '  clusterId: string;\r\n' +
+      '  status: string;\r\n' +
+      '  confidence: number;\r\n' +
+      "  confidenceBand: 'low' | 'medium';\r\n" +
+      '  reasonCodes: string[];\r\n' +
+      '  athleteKeys: string[];\r\n' +
+      '  segments: ShadowClusterSegment[];\r\n' +
+      '  disclaimer: string;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      'export type ShadowClusterResponse = {\r\n' +
+      '  generatedAt: string;\r\n' +
+      '  scope: string;\r\n' +
+      '  policy: {\r\n' +
+      '    noAutoMerge: boolean;\r\n' +
+      '    estimateOnly: boolean;\r\n' +
+      '    personNoUsed: boolean;\r\n' +
+      '    personNoStored: boolean;\r\n' +
+      '    bulkPersonNoCleanupAllowed: boolean;\r\n' +
+      '    sourcePolicy: string;\r\n' +
+      '  };\r\n' +
+      '  summary: {\r\n' +
+      '    totalNames: number;\r\n' +
+      '    multiTeamNames: number;\r\n' +
+      '    homonymNames: number;\r\n' +
+      '    shadowClusterNames: number;\r\n' +
+      '    shadowClusterAthleteKeys: number;\r\n' +
+      '    policy: string;\r\n' +
+      '  };\r\n' +
+      '  cluster: ShadowCluster | null;\r\n' +
+      '};\r\n' +
+      '\r\n' +
+      '// 추정 전용(estimate-only). 확정 병합 아님 · person_no 미사용/미저장.\r\n' +
+      '// 특정 선수 화면에서만 "같은 선수로 추정되는 기록" 제안에 사용.\r\n' +
+      'export async function getShadowCluster(athleteKey: string): Promise<ShadowClusterResponse> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<ShadowClusterResponse>>(\r\n' +
+      '    `${BASE}/identity/shadow-cluster`,\r\n' +
+      '    { params: { athleteKey } },\r\n' +
+      '  );\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export async function searchRecordAthletes(query: string, limit = 12): Promise<AthleteSearchCard[]> {\r\n' +
+      '  const { data } = await apiClient.get<ApiListResponse<AthleteSearchCard>>(`${BASE}/records/search`, {\r\n' +
+      '    params: { q: query, limit },\r\n' +
+      '  });\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export async function getAthleteAnalytics(athleteKey: string): Promise<AthleteAnalyticsProfile> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<AthleteAnalyticsProfile>>(\r\n' +
+      '    `${BASE}/athletes/${encodeURIComponent(athleteKey)}`,\r\n' +
+      '  );\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n' +
+      '\r\n' +
+      'export async function getSeasonRecordTable(params: {\r\n' +
+      '  season?: number;\r\n' +
+      '  eventKey?: string;\r\n' +
+      '  divisionKey?: string;\r\n' +
+      '  athleteKey?: string;\r\n' +
+      '  limit?: number;\r\n' +
+      '}): Promise<SeasonRecordTable> {\r\n' +
+      '  const { data } = await apiClient.get<ApiItemResponse<SeasonRecordTable>>(`${BASE}/season-records`, {\r\n' +
+      '    params,\r\n' +
+      '  });\r\n' +
+      '  return data.data;\r\n' +
+      '}\r\n'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    import { apiClient } from './client';
+
+    const BASE = '/api/card-studio/analytics';
+
+    type ApiListResponse<T> = {
+      success: boolean;
+      data: T[];
+      total?: number;
+    };
+
+    type ApiItemResponse<T> = {
+      success: boolean;
+      data: T;
+    };
+
+    export type AnalyticsFilterOption = {
+      key: string;
+      label: string;
+    };
+
+    export type AnalyticsFilters = {
+      seasons: number[];
+      events: AnalyticsFilterOption[];
+      divisions: AnalyticsFilterOption[];
+    };
+
+    export type AthleteSearchCard = {
+      athleteKey: string;
+      name: string;
+      team: string;
+      teams: string[];
+      years: number[];
+      events: string[];
+      divisions: string[];
+      recordCount: number;
+      ambiguity: string;
+      note: string;
+    };
+
+    export type PublicRecord = {
+      id: string;
+      athleteKey: string;
+      name: string;
+      team: string;
+      season: number;
+      competitionName: string;
+      date: string;
+      venue: string;
+      eventKey: string;
+      eventLabel: string;
+      divisionKey: string;
+      divisionLabel: string;
+      phase: string;
+      record: string;
+      recordValue: number;
+      direction: 'lower' | 'higher';
+      rank: number | null;
+      wind: string | null;
+      windLegal: boolean;
+      isComparable: boolean;
+      note: string;
+      source: {
+        provider: string;
+        sourceType: string;
+        sourceId: string;
+        sourceUrl: string;
+        capturedAt: string;
+      };
+    };
+
+    export type RecordDelta = {
+      from: PublicRecord;
+      to: PublicRecord;
+      rawDelta: number;
+      display: string;
+      improved: boolean;
+    } | null;
+
+    export type RecordTrailPoint = {
+      id: string;
+      date: string;
+      season: number;
+      value: number;
+      record: string;
+      eventLabel: string;
+      competitionName: string;
+      isComparable: boolean;
+    };
+
+    export type AthleteAnalyticsProfile = {
+      athlete: AthleteSearchCard;
+      summary: {
+        indexedBest: PublicRecord | null;
+        seasonBest: PublicRecord | null;
+        latest: PublicRecord | null;
+        delta: RecordDelta;
+        indexedResultCount: number;
+        comparableResultCount: number;
+        sourceScope: string;
+        disclaimer: string;
+      };
+      events: Array<{
+        eventKey: string;
+        eventLabel: string;
+        recordCount: number;
+        best: PublicRecord | null;
+      }>;
+      recordTrail: RecordTrailPoint[];
+      records: PublicRecord[];
+    };
+
+    export type SeasonRecordRow = {
+      rank: number;
+      athleteKey: string;
+      name: string;
+      team: string;
+      record: string;
+      recordValue: number;
+      date: string;
+      competitionName: string;
+      wind: string | null;
+      windLegal: boolean;
+      highlighted: boolean;
+    };
+
+    export type SeasonRecordTable = {
+      season: number;
+      eventKey: string;
+      divisionKey: string;
+      eventLabel: string;
+      divisionLabel: string;
+      totalIndexedAthletes: number;
+      rows: SeasonRecordRow[];
+      filters: AnalyticsFilters;
+      disclaimer: string;
+    };
+
+    export type PopularEvent = {
+      key: string;
+      label: string;
+      recordCount: number;
+      athleteCount: number;
+    };
+
+    export type PopularEvents = {
+      season: number;
+      events: PopularEvent[];
+      note: string;
+    };
+
+    export async function getAnalyticsFilters(): Promise<AnalyticsFilters> {
+      const { data } = await apiClient.get<ApiItemResponse<AnalyticsFilters>>(`${BASE}/filters`);
+      return data.data;
+    }
+
+    export async function getPopularEvents(params: { season?: number; limit?: number } = {}): Promise<PopularEvents> {
+      const { data } = await apiClient.get<ApiItemResponse<PopularEvents>>(`${BASE}/popular-events`, {
+        params,
+      });
+      return data.data;
+    }
+
+    export type EventConcentration = {
+      eventKey: string;
+      eventLabel: string;
+      recordCount: number;
+    };
+
+    export type RegionActivity = {
+      regionCode: string;
+      regionLabel: string;
+      recordCount: number;
+      eventCount: number;
+    };
+
+    export type SeasonPulseBucket = {
+      weekStart: string;
+      weekEnd: string;
+      recordCount: number;
+    };
+
+    export type SeasonPulse = {
+      windowDays: number;
+      from?: string;
+      to?: string;
+      buckets: SeasonPulseBucket[];
+    };
+
+    export type AnonymousInsights = {
+      generatedAt: string;
+      scope: string;
+      privacy: {
+        includesNames: boolean;
+        includesTeams: boolean;
+        includesAthleteKeys: boolean;
+        minGroupSize: number;
+      };
+      season: number;
+      eventConcentration: EventConcentration[];
+      regionActivity: RegionActivity[];
+      seasonPulse: SeasonPulse;
+    };
+
+    export async function getAnonymousInsights(
+      params: { season?: number; limit?: number; minGroupSize?: number; windowDays?: number } = {},
+    ): Promise<AnonymousInsights> {
+      const { data } = await apiClient.get<ApiItemResponse<AnonymousInsights>>(`${BASE}/insights`, {
+        params,
+      });
+      return data.data;
+    }
+
+    export type ShadowClusterSegment = {
+      athleteKey: string;
+      teamLabel: string;
+      teamStage: string;
+      years: number[];
+      fromYear: number | null;
+      toYear: number | null;
+      recordCount: number;
+      eventCount: number;
+    };
+
+    export type ShadowCluster = {
+      clusterId: string;
+      status: string;
+      confidence: number;
+      confidenceBand: 'low' | 'medium';
+      reasonCodes: string[];
+      athleteKeys: string[];
+      segments: ShadowClusterSegment[];
+      disclaimer: string;
+    };
+
+    export type ShadowClusterResponse = {
+      generatedAt: string;
+      scope: string;
+      policy: {
+        noAutoMerge: boolean;
+        estimateOnly: boolean;
+        personNoUsed: boolean;
+        personNoStored: boolean;
+        bulkPersonNoCleanupAllowed: boolean;
+        sourcePolicy: string;
+      };
+      summary: {
+        totalNames: number;
+        multiTeamNames: number;
+        homonymNames: number;
+        shadowClusterNames: number;
+        shadowClusterAthleteKeys: number;
+        policy: string;
+      };
+      cluster: ShadowCluster | null;
+    };
+
+    // 추정 전용(estimate-only). 확정 병합 아님 · person_no 미사용/미저장.
+    // 특정 선수 화면에서만 "같은 선수로 추정되는 기록" 제안에 사용.
+    export async function getShadowCluster(athleteKey: string): Promise<ShadowClusterResponse> {
+      const { data } = await apiClient.get<ApiItemResponse<ShadowClusterResponse>>(
+        `${BASE}/identity/shadow-cluster`,
+        { params: { athleteKey } },
+      );
+      return data.data;
+    }
+
+    export async function searchRecordAthletes(query: string, limit = 12): Promise<AthleteSearchCard[]> {
+      const { data } = await apiClient.get<ApiListResponse<AthleteSearchCard>>(`${BASE}/records/search`, {
+        params: { q: query, limit },
+      });
+      return data.data;
+    }
+
+    export async function getAthleteAnalytics(athleteKey: string): Promise<AthleteAnalyticsProfile> {
+      const { data } = await apiClient.get<ApiItemResponse<AthleteAnalyticsProfile>>(
+        `${BASE}/athletes/${encodeURIComponent(athleteKey)}`,
+      );
+      return data.data;
+    }
+
+    export async function getSeasonRecordTable(params: {
+      season?: number;
+      eventKey?: string;
+      divisionKey?: string;
+      athleteKey?: string;
+      limit?: number;
+    }): Promise<SeasonRecordTable> {
+      const { data } = await apiClient.get<ApiItemResponse<SeasonRecordTable>>(`${BASE}/season-records`, {
+        params,
+      });
+      return data.data;
+    }
+
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\division-hierarchy.test.js:83:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8746.8352

@@ -1,0 +1,16 @@
+{
+  "url": "http://localhost:3000/records",
+  "actions": [
+    "open season panel",
+    "select 100m",
+    "click 여자",
+    "select 고등부"
+  ],
+  "finalSeasonLabelVisible": true,
+  "sampleAthleteVisible": true,
+  "finalRenderedRows": 1,
+  "finalSeasonRecordRequest": "http://localhost:3000/api/card-studio/analytics/season-records?season=2026&eventKey=100m&divisionKey=women-high&limit=100",
+  "requestHasWomenHigh": true,
+  "consoleErrors": [],
+  "screenshotPath": "C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\.omo\\evidence\\division-hierarchy\\records-division-filter-interaction.png"
+}

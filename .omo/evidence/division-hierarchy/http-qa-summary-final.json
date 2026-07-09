@@ -1,0 +1,32 @@
+{
+  "base": "http://localhost:3000",
+  "filtersStatus": 200,
+  "seasonStatus": 200,
+  "recordsStatus": 200,
+  "defaultSeasonSelection": {
+    "season": 2026,
+    "eventKey": "marathon",
+    "eventLabel": "마라톤",
+    "divisionKey": "men-all",
+    "divisionLabel": "남자 전체(부 통합)",
+    "genderKey": "men",
+    "divisionLevel": "all",
+    "rowCount": 84
+  },
+  "defaultRows": 10,
+  "seasonLabel": "남자 전체(부 통합)",
+  "hasKaafKind": false,
+  "levelOptionKeys": [
+    "all",
+    "general",
+    "high",
+    "university",
+    "middle",
+    "elementary",
+    "u20",
+    "u18",
+    "masters",
+    "unspecified"
+  ],
+  "recordsHasRoot": true
+}
