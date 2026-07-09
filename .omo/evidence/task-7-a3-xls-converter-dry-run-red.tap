@@ -1,0 +1,170 @@
+TAP version 13
+# Subtest: LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+ok 1 - LEGACY-PREFLIGHT-001 Given Track A candidates When auditing A-2 Then held 2016 indoor workbook remains blocked with parser rules
+  ---
+  duration_ms: 155.1585
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+not ok 2 - LEGACY-PREFLIGHT-002 Given 2015-2017 legacy manifest When auditing A-3 Then 83 xls files are approved for dry-run but not service promotion
+  ---
+  duration_ms: 107.6353
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\legacy-expansion-preflight.test.js:49:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + 'blocked_pending_converter_approval'
+    - 'ready_for_dry_run'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'ready_for_dry_run'
+  actual: 'blocked_pending_converter_approval'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\legacy-expansion-preflight.test.js:52:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+ok 3 - LEGACY-PREFLIGHT-003 Given operator CLI When writing preflight evidence Then output is sanitized and service data is untouched
+  ---
+  duration_ms: 350.8489
+  type: 'test'
+  ...
+# Subtest: LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+not ok 4 - LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exact next actions without raw originals
+  ---
+  duration_ms: 110.7734
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\legacy-expansion-preflight.test.js:115:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /SheetJS\/BIFF \.xls 파서는 dry-run 용도로 승인/u. Input:
+
+    '# A-2/A-3 Legacy Expansion Preflight\n' +
+      '\n' +
+      '- Years: 2015, 2016, 2017\n' +
+      '- 서비스 데이터는 변경하지 않음: 예\n' +
+      '- 원본 파일 git 추적 수: 0\n' +
+      '- 내부 원본 경로 제외: 예\n' +
+      '\n' +
+      '## A-2 Held Indoor Workbook\n' +
+      '\n' +
+      '- 2016 전국대구실내육상경기대회: 729행 보류, reason=UNSAFE_EVENT_LABELS, headerRows=131, source=014_2016 전국대구실내육상경기대회 기록지20161201.xlsx\n' +
+      '\n' +
+      '### Parser Rules Required\n' +
+      '\n' +
+      '- strip-indoor-heat-suffix: 60m 4처럼 조/레인 숫자가 붙은 실내 종목명을 종목+보조정보로 분리\n' +
+      '- drop-header-pollution: 성명/소속/기록 헤더 행은 선수 결과로 승격하지 않음\n' +
+      '- preserve-indoor-event-keys: 실내 60m와 60mH는 실외 100m 계열과 별도 eventKey로 보존\n' +
+      '- still-held-on-ambiguity: 파서가 확신하지 못한 행은 삭제하지 않고 still-held로 보류\n' +
+      '\n' +
+      '## A-3 Legacy XLS Queue\n' +
+      '\n' +
+      '- Status: blocked_pending_converter_approval\n' +
+      '- .xls files: 83\n' +
+      '- By year: 2015=29, 2016=28, 2017=26\n' +
+      '- Dependency approval required: yes\n' +
+      '- Conversion attempted: no\n' +
+      '- Note: SheetJS 같은 BIFF .xls 파서 의존성은 승인 후 추가하고, 변환 결과는 기존 정규화 파이프라인으로 다시 검증한다.\n' +
+      '\n' +
+      '## Next Actions\n' +
+      '\n' +
+      '- A-2 실내 보류 파일 전용 파서를 테스트 먼저 추가한다.\n' +
+      '- A-3 .xls 변환 의존성은 PR에서 승인받은 뒤 추가한다.\n' +
+      '- 변환 성공 파일만 normalized-candidates -> dry-run promotion -> reviewer 승인 순서로 이동한다.\n' +
+      '- 애매한 파일은 still-held 사유를 남기고 서비스 데이터에는 올리지 않는다.\n'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    # A-2/A-3 Legacy Expansion Preflight
+
+    - Years: 2015, 2016, 2017
+    - 서비스 데이터는 변경하지 않음: 예
+    - 원본 파일 git 추적 수: 0
+    - 내부 원본 경로 제외: 예
+
+    ## A-2 Held Indoor Workbook
+
+    - 2016 전국대구실내육상경기대회: 729행 보류, reason=UNSAFE_EVENT_LABELS, headerRows=131, source=014_2016 전국대구실내육상경기대회 기록지20161201.xlsx
+
+    ### Parser Rules Required
+
+    - strip-indoor-heat-suffix: 60m 4처럼 조/레인 숫자가 붙은 실내 종목명을 종목+보조정보로 분리
+    - drop-header-pollution: 성명/소속/기록 헤더 행은 선수 결과로 승격하지 않음
+    - preserve-indoor-event-keys: 실내 60m와 60mH는 실외 100m 계열과 별도 eventKey로 보존
+    - still-held-on-ambiguity: 파서가 확신하지 못한 행은 삭제하지 않고 still-held로 보류
+
+    ## A-3 Legacy XLS Queue
+
+    - Status: blocked_pending_converter_approval
+    - .xls files: 83
+    - By year: 2015=29, 2016=28, 2017=26
+    - Dependency approval required: yes
+    - Conversion attempted: no
+    - Note: SheetJS 같은 BIFF .xls 파서 의존성은 승인 후 추가하고, 변환 결과는 기존 정규화 파이프라인으로 다시 검증한다.
+
+    ## Next Actions
+
+    - A-2 실내 보류 파일 전용 파서를 테스트 먼저 추가한다.
+    - A-3 .xls 변환 의존성은 PR에서 승인받은 뒤 추가한다.
+    - 변환 성공 파일만 normalized-candidates -> dry-run promotion -> reviewer 승인 순서로 이동한다.
+    - 애매한 파일은 still-held 사유를 남기고 서비스 데이터에는 올리지 않는다.
+
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\legacy-expansion-preflight.test.js:121:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+not ok 5 - LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion
+  ---
+  duration_ms: 116.1881
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\GitHub\\athletetime\\backend\\tests\\legacy-expansion-preflight.test.js:127:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+
+    + 'blocked_pending_converter_approval'
+    - 'ready_for_dry_run'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'ready_for_dry_run'
+  actual: 'blocked_pending_converter_approval'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\GitHub\athletetime\backend\tests\legacy-expansion-preflight.test.js:131:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 2
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1006.8603

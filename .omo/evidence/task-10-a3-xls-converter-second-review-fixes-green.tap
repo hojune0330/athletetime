@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+ok 1 - LEGACY-XLS-DRYRUN-001 Given a synthetic BIFF .xls workbook When reading Then sheet names and rows are available
+  ---
+  duration_ms: 31.2865
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+ok 2 - LEGACY-XLS-DRYRUN-002 Given a manifest with xls files When building report Then output is sanitized and non-mutating
+  ---
+  duration_ms: 57.8851
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+ok 3 - LEGACY-XLS-DRYRUN-003 Given unsafe summary input When sanitizing Then private fields and raw rows are dropped
+  ---
+  duration_ms: 0.4351
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+ok 4 - LEGACY-XLS-DRYRUN-004 Given private tokens in workbook metadata When reporting Then JSON and markdown redact them
+  ---
+  duration_ms: 57.9488
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+ok 5 - LEGACY-XLS-DRYRUN-005 Given private tokens in missing workbook metadata When reporting errors Then JSON and markdown redact them
+  ---
+  duration_ms: 51.2719
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+ok 6 - LEGACY-XLS-DRYRUN-006 Given operator CLI When running dry-run Then evidence is written and data results are untouched
+  ---
+  duration_ms: 434.1191
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+ok 7 - LEGACY-XLS-DRYRUN-007 Given missing manifest When running CLI Then structured error is returned
+  ---
+  duration_ms: 253.9015
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+ok 8 - LEGACY-XLS-DRYRUN-008 Given malformed CLI arguments When running CLI Then structured validation errors are returned
+  ---
+  duration_ms: 1903.7667
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3121.2366

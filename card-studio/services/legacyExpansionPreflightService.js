@@ -128,16 +128,18 @@ function buildA3XlsQueueSummary({ years }) {
     });
 
   return {
-    status: workbooks.length ? 'blocked_pending_converter_approval' : 'clear',
+    status: workbooks.length ? 'ready_for_dry_run' : 'clear',
     years: plan.years,
     spreadsheetFiles: plan.totals.spreadsheetFiles,
     xlsxFiles: plan.totals.xlsxFiles,
     xlsFiles: workbooks.length,
     byYear: countByYear(workbooks),
     workbooks,
-    requiresDependencyApproval: workbooks.length > 0,
+    dryRunDependencyApproved: workbooks.length > 0,
+    requiresDependencyApproval: false,
+    servicePromotionAllowed: false,
     conversionAttempted: false,
-    approvalNote: 'SheetJS 같은 BIFF .xls 파서 의존성은 승인 후 추가하고, 변환 결과는 기존 정규화 파이프라인으로 다시 검증한다.',
+    approvalNote: 'SheetJS/BIFF .xls 파서는 dry-run 용도로 승인됨. 서비스 승격은 별도 리뷰와 PR 전까지 허용하지 않는다.',
     rawOriginalsTrackedByGit: plan.totals.rawOriginalsTrackedByGit,
   };
 }
@@ -163,8 +165,8 @@ function buildLegacyExpansionPreflightReport({
     },
     nextActions: [
       'A-2 실내 보류 파일 전용 파서를 테스트 먼저 추가한다.',
-      'A-3 .xls 변환 의존성은 PR에서 승인받은 뒤 추가한다.',
-      '변환 성공 파일만 normalized-candidates -> dry-run promotion -> reviewer 승인 순서로 이동한다.',
+      'A-3 .xls 변환은 dry-run evidence만 만들고 서비스 승격은 별도 계획으로 분리한다.',
+      '변환 성공 파일도 sanitized evidence -> reviewer 승인 -> 별도 service-promotion PR 순서로만 이동한다.',
       '애매한 파일은 still-held 사유를 남기고 서비스 데이터에는 올리지 않는다.',
     ],
   };
@@ -211,7 +213,8 @@ function renderLegacyExpansionPreflightMarkdown(report) {
     `- Status: ${report.a3XlsQueue.status}`,
     `- .xls files: ${report.a3XlsQueue.xlsFiles}`,
     `- By year: ${renderByYear(report.a3XlsQueue.byYear)}`,
-    `- Dependency approval required: ${report.a3XlsQueue.requiresDependencyApproval ? 'yes' : 'no'}`,
+    `- SheetJS/BIFF .xls 파서는 dry-run 용도로 승인: ${report.a3XlsQueue.dryRunDependencyApproved ? 'yes' : 'no'}`,
+    `- Service promotion allowed: ${report.a3XlsQueue.servicePromotionAllowed ? 'yes' : 'no'}`,
     `- Conversion attempted: ${report.a3XlsQueue.conversionAttempted ? 'yes' : 'no'}`,
     `- Note: ${report.a3XlsQueue.approvalNote}`,
     '',
