@@ -120,3 +120,31 @@ test('LEGACY-PREFLIGHT-004 Given rendered operator report Then Fable can see exa
   assert.match(markdown, /서비스 데이터는 변경하지 않음/u);
   assertNoPrivateSourcePath(markdown);
 });
+
+test('LEGACY-PREFLIGHT-005 Given 2005-2017 years When auditing expansion queue Then older files are counted without promotion', () => {
+  const years = Array.from({ length: 13 }, (_, index) => 2005 + index);
+  const report = buildLegacyExpansionPreflightReport({ years });
+
+  assert.equal(report.a3XlsQueue.status, 'blocked_pending_converter_approval');
+  assert.equal(report.a3XlsQueue.spreadsheetFiles, 372);
+  assert.equal(report.a3XlsQueue.xlsxFiles, 37);
+  assert.equal(report.a3XlsQueue.xlsFiles, 335);
+  assert.deepEqual(report.a3XlsQueue.byYear, {
+    2005: 14,
+    2006: 24,
+    2007: 24,
+    2008: 16,
+    2009: 27,
+    2010: 33,
+    2011: 28,
+    2012: 29,
+    2013: 29,
+    2014: 28,
+    2015: 29,
+    2016: 28,
+    2017: 26,
+  });
+  assert.equal(report.safety.serviceDataMutated, false);
+  assert.equal(report.safety.rawOriginalsTrackedByGit, 0);
+  assertNoPrivateSourcePath(report);
+});
