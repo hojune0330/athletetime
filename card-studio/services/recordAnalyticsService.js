@@ -4,6 +4,7 @@ const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
 const identityResolver = require('./identityResolver');
 const manualTopRecordsService = require('./manualTopRecordsService');
+const divisionHierarchyService = require('./divisionHierarchyService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 const INVALID_MARK = /^(dns|dnf|dq|dsq|nm|nt|nr|-|)$/i;
@@ -88,9 +89,14 @@ function getAthleteSummary(athleteKey) {
 
 function getSeasonRecords({ season, eventKey, divisionKey, athleteKey, limit = 100 } = {}) {
   const idx = getIndex();
-  const safeSeason = Number.parseInt(season, 10) || idx.latestSeason;
-  const safeEventKey = clean(eventKey, 80) || idx.defaultEventKey;
-  const safeDivisionKey = clean(divisionKey, 120) || idx.defaultDivisionKeyByEvent.get(safeEventKey) || '';
+  const defaultSelection = idx.defaultSeasonSelection || {};
+  const safeSeason = Number.parseInt(season, 10) || defaultSelection.season || idx.latestSeason;
+  const safeEventKey = clean(eventKey, 80) || defaultSelection.eventKey || idx.defaultEventKey;
+  const safeDivisionKey =
+    clean(divisionKey, 120) ||
+    defaultSelection.divisionKey ||
+    idx.defaultDivisionKeyByEvent.get(safeEventKey) ||
+    '';
   const safeLimit = clampInt(limit, 100, 10, 300);
 
   const tableKey = seasonTableKey(safeSeason, safeEventKey, safeDivisionKey);
@@ -119,6 +125,9 @@ function getFilters() {
     seasons: idx.seasons,
     events: idx.events,
     divisions: idx.divisions,
+    genderOptions: idx.genderOptions,
+    levelOptions: idx.levelOptions,
+    defaultSeasonSelection: idx.defaultSeasonSelection,
   };
 }
 
@@ -182,6 +191,7 @@ function buildIndex() {
   const seasonBuckets = new Map();
   const eventLabelByKey = new Map();
   const divisionLabelByKey = new Map();
+  const divisionMetaByKey = new Map();
   const defaultDivisionByEventCounts = new Map();
   const manualTopRecordDedupKeys = new Set();
   const manualTopRecordStats = {
@@ -213,10 +223,13 @@ function buildIndex() {
       }
       if (eventMeta.divisionKey) {
         divisionLabelByKey.set(eventMeta.divisionKey, eventMeta.divisionLabel);
+        registerDivisionMeta(divisionMetaByKey, eventMeta);
+        const rollupKey = divisionHierarchyService.rollupKeyForGender(eventMeta.gender);
+        divisionLabelByKey.set(rollupKey, divisionHierarchyService.rollupOptionForGender(eventMeta.gender).label);
         const counterKey = eventMeta.eventKey;
         if (!defaultDivisionByEventCounts.has(counterKey)) defaultDivisionByEventCounts.set(counterKey, new Map());
         const counts = defaultDivisionByEventCounts.get(counterKey);
-        counts.set(eventMeta.divisionKey, (counts.get(eventMeta.divisionKey) || 0) + 1);
+        counts.set(rollupKey, (counts.get(rollupKey) || 0) + 1);
       }
 
       for (const result of event.results || []) {
@@ -292,6 +305,10 @@ function buildIndex() {
           rawEvent: eventLabel,
           divisionKey: eventMeta.divisionKey,
           divisionLabel: eventMeta.divisionLabel,
+          gender: eventMeta.gender,
+          divisionLevel: eventMeta.divisionLevel,
+          divisionDetail: eventMeta.divisionDetail,
+          rawDivision: eventMeta.rawDivision,
           phase: eventMeta.phase,
           recordValue: parsed.value,
           recordDisplay: parsed.display,
@@ -335,9 +352,7 @@ function buildIndex() {
         if (team) athlete.teams.add(team);
 
         if (record.isComparable) {
-          const key = seasonTableKey(season, record.eventKey, record.divisionKey);
-          if (!seasonBuckets.has(key)) seasonBuckets.set(key, []);
-          seasonBuckets.get(key).push(record);
+          addRecordToSeasonBuckets(seasonBuckets, record);
         }
       }
     }
@@ -349,6 +364,7 @@ function buildIndex() {
     seasonBuckets,
     eventLabelByKey,
     divisionLabelByKey,
+    divisionMetaByKey,
     defaultDivisionByEventCounts,
     manualTopRecordDedupKeys,
     manualTopRecordStats,
@@ -388,14 +404,26 @@ function buildIndex() {
   const events = [...eventLabelByKey.entries()]
     .map(([key, label]) => ({ key, label }))
     .sort((a, b) => a.label.localeCompare(b.label));
-  const divisions = [...divisionLabelByKey.entries()]
-    .map(([key, label]) => ({ key, label }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const divisionFilters = divisionHierarchyService.buildDivisionFilters(divisionMetaByKey);
+  const divisions = divisionFilters.divisions;
+  for (const option of divisions) {
+    if (!divisionLabelByKey.has(option.key)) {
+      divisionLabelByKey.set(option.key, option.label);
+    }
+  }
   const defaultEventKey = events[0]?.key || '';
   const defaultDivisionKeyByEvent = new Map();
   for (const [eventKey, counts] of defaultDivisionByEventCounts.entries()) {
     defaultDivisionKeyByEvent.set(eventKey, [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '');
   }
+  const defaultSeasonSelection = pickDefaultSeasonSelection({
+    seasons,
+    events,
+    divisions,
+    seasonTableByKey,
+    eventLabelByKey,
+    divisionLabelByKey,
+  });
 
   return {
     records,
@@ -410,6 +438,10 @@ function buildIndex() {
     defaultDivisionKeyByEvent,
     eventLabelByKey,
     divisionLabelByKey,
+    divisionMetaByKey,
+    genderOptions: divisionFilters.genderOptions,
+    levelOptions: divisionFilters.levelOptions,
+    defaultSeasonSelection,
     manualTopRecordStats,
   };
 }
@@ -493,6 +525,10 @@ function appendManualTopRecordCandidates(context) {
       rawEvent: clean(candidate.event, 160),
       divisionKey: eventMeta.divisionKey,
       divisionLabel: eventMeta.divisionLabel,
+      gender: eventMeta.gender,
+      divisionLevel: eventMeta.divisionLevel,
+      divisionDetail: eventMeta.divisionDetail,
+      rawDivision: eventMeta.rawDivision,
       phase: eventMeta.phase,
       recordValue: parsed.value,
       recordDisplay: parsed.display,
@@ -549,9 +585,7 @@ function appendManualTopRecordCandidates(context) {
     if (team) athlete.teams.add(team);
 
     if (record.isComparable) {
-      const key = seasonTableKey(season, record.eventKey, record.divisionKey);
-      if (!context.seasonBuckets.has(key)) context.seasonBuckets.set(key, []);
-      context.seasonBuckets.get(key).push(record);
+      addRecordToSeasonBuckets(context.seasonBuckets, record);
     }
 
     if (eventMeta.eventKey && !context.eventLabelByKey.has(eventMeta.eventKey)) {
@@ -559,13 +593,111 @@ function appendManualTopRecordCandidates(context) {
     }
     if (eventMeta.divisionKey) {
       context.divisionLabelByKey.set(eventMeta.divisionKey, eventMeta.divisionLabel);
+      registerDivisionMeta(context.divisionMetaByKey, eventMeta);
+      const rollupKey = divisionHierarchyService.rollupKeyForGender(eventMeta.gender);
+      context.divisionLabelByKey.set(rollupKey, divisionHierarchyService.rollupOptionForGender(eventMeta.gender).label);
       if (!context.defaultDivisionByEventCounts.has(eventMeta.eventKey)) {
         context.defaultDivisionByEventCounts.set(eventMeta.eventKey, new Map());
       }
       const counts = context.defaultDivisionByEventCounts.get(eventMeta.eventKey);
-      counts.set(eventMeta.divisionKey, (counts.get(eventMeta.divisionKey) || 0) + 1);
+      counts.set(rollupKey, (counts.get(rollupKey) || 0) + 1);
     }
   }
+}
+
+function registerDivisionMeta(map, eventMeta) {
+  if (!eventMeta.divisionKey || map.has(eventMeta.divisionKey)) return;
+  map.set(eventMeta.divisionKey, {
+    divisionKey: eventMeta.divisionKey,
+    divisionLabel: eventMeta.divisionLabel,
+    gender: eventMeta.gender,
+    divisionLevel: eventMeta.divisionLevel,
+    divisionDetail: eventMeta.divisionDetail,
+    rawDivision: eventMeta.rawDivision,
+  });
+}
+
+function addRecordToSeasonBuckets(seasonBuckets, record) {
+  const actualKey = seasonTableKey(record.season, record.eventKey, record.divisionKey);
+  if (!seasonBuckets.has(actualKey)) seasonBuckets.set(actualKey, []);
+  seasonBuckets.get(actualKey).push(record);
+
+  const rollupDivisionKey = divisionHierarchyService.rollupKeyForGender(record.gender);
+  const rollupKey = seasonTableKey(record.season, record.eventKey, rollupDivisionKey);
+  if (!seasonBuckets.has(rollupKey)) seasonBuckets.set(rollupKey, []);
+  seasonBuckets.get(rollupKey).push(record);
+}
+
+function pickDefaultSeasonSelection({ seasons, events, divisions, seasonTableByKey, eventLabelByKey, divisionLabelByKey }) {
+  const eventOrder = new Map(events.map((event, index) => [event.key, index]));
+  const divisionOrder = new Map(divisions.map((division, index) => [division.key, index]));
+  const eventKeys = new Set(events.map((event) => event.key));
+  const divisionKeys = new Set(divisions.map((division) => division.key));
+  const seasonSet = new Set(seasons);
+  const genderPreference = new Map([
+    ['men', 0],
+    ['women', 1],
+    ['mixed', 2],
+    ['unknown', 3],
+  ]);
+
+  let best = null;
+  for (const [key, rows] of seasonTableByKey.entries()) {
+    const [rawSeason, eventKey, divisionKey] = String(key).split('|');
+    const season = Number.parseInt(rawSeason, 10);
+    if (!seasonSet.has(season) || !eventKeys.has(eventKey) || !divisionKeys.has(divisionKey)) continue;
+    if (!divisionKey.endsWith('-all')) continue;
+    if (!rows.length) continue;
+
+    const [gender = 'unknown'] = divisionKey.split('-');
+    const candidate = {
+      season,
+      eventKey,
+      eventLabel: eventLabelByKey.get(eventKey) || eventKey,
+      divisionKey,
+      divisionLabel: divisionLabelByKey.get(divisionKey) || divisionKey,
+      genderKey: gender,
+      divisionLevel: 'all',
+      rowCount: rows.length,
+      genderRank: genderPreference.get(gender) ?? 99,
+      eventRank: eventOrder.get(eventKey) ?? 9999,
+      divisionRank: divisionOrder.get(divisionKey) ?? 9999,
+    };
+
+    if (
+      !best ||
+      candidate.season > best.season ||
+      (candidate.season === best.season && candidate.rowCount > best.rowCount) ||
+      (candidate.season === best.season && candidate.rowCount === best.rowCount && candidate.genderRank < best.genderRank) ||
+      (candidate.season === best.season &&
+        candidate.rowCount === best.rowCount &&
+        candidate.genderRank === best.genderRank &&
+        candidate.eventRank < best.eventRank) ||
+      (candidate.season === best.season &&
+        candidate.rowCount === best.rowCount &&
+        candidate.genderRank === best.genderRank &&
+        candidate.eventRank === best.eventRank &&
+        candidate.divisionRank < best.divisionRank)
+    ) {
+      best = candidate;
+    }
+  }
+
+  if (!best) {
+    return {
+      season: seasons[0] || new Date().getFullYear(),
+      eventKey: events[0]?.key || '',
+      eventLabel: events[0]?.label || '',
+      divisionKey: divisions[0]?.key || '',
+      divisionLabel: divisions[0]?.label || '',
+      genderKey: divisions[0]?.gender || 'men',
+      divisionLevel: divisions[0]?.level || 'all',
+      rowCount: 0,
+    };
+  }
+
+  const { genderRank, eventRank, divisionRank, ...selection } = best;
+  return selection;
 }
 
 function normalizeCandidateTopEvent(candidate) {
@@ -584,8 +716,6 @@ function normalizeCandidateTopEvent(candidate) {
     ...base,
     eventKey,
     eventLabel: mapped?.label || rawEvent || base.eventLabel,
-    divisionKey: candidate.kindCd ? `kaaf-kind-${clean(candidate.kindCd, 20).toLowerCase()}` : stableSlug(divisionLabel),
-    divisionLabel,
     phase,
     direction: isField ? 'higher' : base.direction,
     isRelay: !!mapped?.isRelay || base.isRelay,
@@ -619,6 +749,10 @@ function rankSeasonBucket(bucket) {
       recordValue: record.recordValue,
       date: record.date,
       competitionName: record.competitionName,
+      divisionKey: record.divisionKey,
+      divisionLabel: record.divisionLabel,
+      divisionLevel: record.divisionLevel,
+      divisionDetail: record.divisionDetail,
       wind: record.wind,
       windLegal: record.windLegal,
       source: record.source,
@@ -629,6 +763,7 @@ function rankSeasonBucket(bucket) {
 function normalizeEvent(eventLabel, divisionLabel) {
   const raw = clean(eventLabel, 160);
   const division = clean(divisionLabel, 120);
+  const divisionMeta = divisionHierarchyService.normalizeDivision(division || inferDivisionLabel(raw));
   const phase = inferPhase(raw);
   const rawWithoutPhase = raw
     .replace(/\b(final|semi-final|semi|heat|prelim|qualifying)\b/gi, ' ')
@@ -679,8 +814,12 @@ function normalizeEvent(eventLabel, divisionLabel) {
   return {
     eventKey,
     eventLabel: canonicalEventLabel(eventName || raw, baseEventKey),
-    divisionKey: stableSlug(division || inferDivisionLabel(raw)),
-    divisionLabel: division || inferDivisionLabel(raw) || '구분 미상',
+    divisionKey: divisionMeta.divisionKey,
+    divisionLabel: divisionMeta.divisionLabel,
+    gender: divisionMeta.gender,
+    divisionLevel: divisionMeta.divisionLevel,
+    divisionDetail: divisionMeta.divisionDetail,
+    rawDivision: divisionMeta.rawDivision,
     phase,
     direction,
     isRelay,
@@ -878,6 +1017,10 @@ function toPublicRecord(record) {
     eventLabel: record.eventLabel,
     divisionKey: record.divisionKey,
     divisionLabel: record.divisionLabel,
+    gender: record.gender,
+    divisionLevel: record.divisionLevel,
+    divisionDetail: record.divisionDetail,
+    rawDivision: record.rawDivision,
     phase: record.phase,
     record: record.recordDisplay,
     recordValue: record.recordValue,

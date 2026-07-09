@@ -18,10 +18,29 @@ export type AnalyticsFilterOption = {
   label: string;
 };
 
+export type DivisionFilterOption = AnalyticsFilterOption & {
+  gender: string;
+  level: string;
+};
+
+export type DefaultSeasonSelection = {
+  season: number;
+  eventKey: string;
+  eventLabel: string;
+  divisionKey: string;
+  divisionLabel: string;
+  genderKey: string;
+  divisionLevel: string;
+  rowCount: number;
+};
+
 export type AnalyticsFilters = {
   seasons: number[];
   events: AnalyticsFilterOption[];
-  divisions: AnalyticsFilterOption[];
+  divisions: DivisionFilterOption[];
+  genderOptions: AnalyticsFilterOption[];
+  levelOptions: AnalyticsFilterOption[];
+  defaultSeasonSelection: DefaultSeasonSelection;
 };
 
 export type AthleteSearchCard = {
@@ -50,6 +69,10 @@ export type PublicRecord = {
   eventLabel: string;
   divisionKey: string;
   divisionLabel: string;
+  gender: string;
+  divisionLevel: string;
+  divisionDetail: string | null;
+  rawDivision: string;
   phase: string;
   record: string;
   recordValue: number;
@@ -118,6 +141,10 @@ export type SeasonRecordRow = {
   recordValue: number;
   date: string;
   competitionName: string;
+  divisionKey: string;
+  divisionLabel: string;
+  divisionLevel: string;
+  divisionDetail: string | null;
   wind: string | null;
   windLegal: boolean;
   highlighted: boolean;

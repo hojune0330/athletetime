@@ -50,6 +50,8 @@ export default function RecordsPage() {
   const [filters, setFilters] = useState<AnalyticsFilters | null>(null);
   const [season, setSeason] = useState<number | undefined>();
   const [eventKey, setEventKey] = useState('');
+  const [genderKey, setGenderKey] = useState('men');
+  const [divisionLevel, setDivisionLevel] = useState('all');
   const [divisionKey, setDivisionKey] = useState('');
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
@@ -71,13 +73,36 @@ export default function RecordsPage() {
     getAnalyticsFilters()
       .then((nextFilters) => {
         if (!active) return;
+        const defaultSelection = nextFilters.defaultSeasonSelection;
         setFilters(nextFilters);
-        setSeason(nextFilters.seasons[0]);
-        setEventKey(nextFilters.events[0]?.key || '');
-        setDivisionKey(nextFilters.divisions[0]?.key || '');
+        setSeason(defaultSelection?.season || nextFilters.seasons[0]);
+        setEventKey(defaultSelection?.eventKey || nextFilters.events[0]?.key || '');
+        const nextGenderKey = defaultSelection?.genderKey || nextFilters.genderOptions[0]?.key || 'men';
+        const nextDivisionLevel = defaultSelection?.divisionLevel || nextFilters.levelOptions[0]?.key || 'all';
+        setGenderKey(nextGenderKey);
+        setDivisionLevel(nextDivisionLevel);
+        setDivisionKey(defaultSelection?.divisionKey || toDivisionKey(nextGenderKey, nextDivisionLevel));
       })
       .catch(() => {
-        if (active) setFilters({ seasons: [], events: [], divisions: [] });
+        if (active) {
+          setFilters({
+            seasons: [],
+            events: [],
+            divisions: [],
+            genderOptions: [],
+            levelOptions: [],
+            defaultSeasonSelection: {
+              season: new Date().getFullYear(),
+              eventKey: '',
+              eventLabel: '',
+              divisionKey: 'men-all',
+              divisionLabel: '',
+              genderKey: 'men',
+              divisionLevel: 'all',
+              rowCount: 0,
+            },
+          });
+        }
       });
     return () => {
       active = false;
@@ -211,7 +236,10 @@ export default function RecordsPage() {
       if (mainRecord) {
         setSeason(mainRecord.season);
         setEventKey(mainRecord.eventKey);
-        setDivisionKey(mainRecord.divisionKey);
+        const parsed = parseDivisionKey(mainRecord.divisionKey);
+        setGenderKey(parsed.genderKey);
+        setDivisionLevel(parsed.divisionLevel);
+        setDivisionKey(toDivisionKey(parsed.genderKey, parsed.divisionLevel));
       }
     } catch {
       setProfileState('error');
@@ -456,13 +484,27 @@ export default function RecordsPage() {
           filters={filters}
           season={season}
           eventKey={eventKey}
-          divisionKey={divisionKey}
+          genderKey={genderKey}
+          divisionLevel={divisionLevel}
           table={seasonTable}
           state={seasonState}
           highlightedRow={highlightedRow}
           onSeasonChange={setSeason}
           onEventChange={setEventKey}
-          onDivisionChange={setDivisionKey}
+          onGenderChange={(nextGenderKey) => {
+            const nextDivisionLevel =
+              divisionLevel === 'unspecified' &&
+              !filters?.divisions.some((division) => division.gender === nextGenderKey && division.level === 'unspecified')
+                ? 'all'
+                : divisionLevel;
+            setGenderKey(nextGenderKey);
+            setDivisionLevel(nextDivisionLevel);
+            setDivisionKey(toDivisionKey(nextGenderKey, nextDivisionLevel));
+          }}
+          onDivisionLevelChange={(nextDivisionLevel) => {
+            setDivisionLevel(nextDivisionLevel);
+            setDivisionKey(toDivisionKey(genderKey, nextDivisionLevel));
+          }}
         />
       )}
 
@@ -767,25 +809,34 @@ function SeasonPanel({
   filters,
   season,
   eventKey,
-  divisionKey,
+  genderKey,
+  divisionLevel,
   table,
   state,
   highlightedRow,
   onSeasonChange,
   onEventChange,
-  onDivisionChange,
+  onGenderChange,
+  onDivisionLevelChange,
 }: {
   filters: AnalyticsFilters | null;
   season?: number;
   eventKey: string;
-  divisionKey: string;
+  genderKey: string;
+  divisionLevel: string;
   table: SeasonRecordTable | null;
   state: LoadState;
   highlightedRow: SeasonRecordTable['rows'][number] | null;
   onSeasonChange: (season: number) => void;
   onEventChange: (eventKey: string) => void;
-  onDivisionChange: (divisionKey: string) => void;
+  onGenderChange: (genderKey: string) => void;
+  onDivisionLevelChange: (divisionLevel: string) => void;
 }) {
+  const visibleLevelOptions = (filters?.levelOptions || []).filter((item) => {
+    if (item.key !== 'unspecified') return true;
+    return (filters?.divisions || []).some((division) => division.gender === genderKey && division.level === 'unspecified');
+  });
+
   return (
     <Card>
       <CardHeader>
@@ -795,7 +846,7 @@ function SeasonPanel({
             <CardTitle className="mt-2">시즌 기록 모음</CardTitle>
             <p className="mt-2 text-sm text-ink-3">모은 기록 기준 정렬이라 실제와 다를 수 있어요.</p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(120px,160px)_minmax(160px,220px)_minmax(160px,220px)]">
             <SelectBox value={String(season || '')} onChange={(value) => onSeasonChange(Number(value))}>
               {(filters?.seasons || []).map((item) => (
                 <option key={item} value={item}>{item}</option>
@@ -806,11 +857,25 @@ function SeasonPanel({
                 <option key={item.key} value={item.key}>{item.label}</option>
               ))}
             </SelectBox>
-            <SelectBox value={divisionKey} onChange={onDivisionChange}>
-              {(filters?.divisions || []).map((item) => (
-                <option key={item.key} value={item.key}>{item.label}</option>
-              ))}
-            </SelectBox>
+            <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
+              <div className="flex border border-line" aria-label="성별 선택">
+                {(filters?.genderOptions || []).map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => onGenderChange(item.key)}
+                    className={`h-10 flex-1 px-3 text-sm font-semibold ${genderKey === item.key ? 'bg-ink text-white' : 'bg-surface text-ink-3'}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <SelectBox value={divisionLevel} onChange={onDivisionLevelChange} ariaLabel="층위 선택: 전체(부 통합)">
+                {visibleLevelOptions.map((item) => (
+                  <option key={item.key} value={item.key}>{item.label}</option>
+                ))}
+              </SelectBox>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -841,6 +906,7 @@ function SeasonPanel({
                     <th className="w-12 p-2.5">순서</th>
                     <th className="p-2.5">선수</th>
                     <th className="w-28 p-2.5">기록</th>
+                    <th className="w-20 p-2.5">층위 배지</th>
                     <th className="p-2.5">대회</th>
                     <th className="w-28 p-2.5">일자</th>
                     <th className="w-16 p-2.5">풍속</th>
@@ -858,6 +924,9 @@ function SeasonPanel({
                         <p className="truncate text-xs text-ink-4">{row.team || '소속 미상'}</p>
                       </td>
                       <td className="w-28 whitespace-nowrap p-2.5 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</td>
+                      <td className="w-20 p-2.5">
+                        <DivisionBadge label={row.divisionLabel} detail={row.divisionDetail} />
+                      </td>
                       <td className="max-w-[220px] truncate p-2.5 text-ink-3">{row.competitionName}</td>
                       <td className="w-28 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.date}</td>
                       <td className="w-16 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.wind || '-'}</td>
@@ -882,7 +951,7 @@ function SeasonPanel({
                     <p className="shrink-0 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</p>
                   </div>
                   <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
-                    <p className="min-w-0 truncate">{row.team || '소속 미상'} · {row.competitionName}</p>
+                    <p className="min-w-0 truncate">{row.team || '소속 미상'} · {row.divisionLabel} · {row.competitionName}</p>
                     <p className="shrink-0 font-mono tabular-nums">{row.date}{row.wind ? ` · ${row.wind}` : ''}</p>
                   </div>
                 </div>
@@ -914,20 +983,46 @@ function SelectBox({
   value,
   onChange,
   children,
+  ariaLabel,
 }: {
   value: string;
   onChange: (value: string) => void;
   children: ReactNode;
+  ariaLabel?: string;
 }) {
   return (
     <select
       value={value}
+      aria-label={ariaLabel}
       onChange={(event) => onChange(event.target.value)}
       className="h-10 border border-line bg-surface px-3 text-sm text-ink"
     >
       {children}
     </select>
   );
+}
+
+function DivisionBadge({ label, detail }: { label: string; detail?: string | null }) {
+  return (
+    <span
+      title={detail || label}
+      className="inline-flex max-w-[5.5rem] items-center border border-line bg-surface-2 px-2 py-1 text-[11px] font-semibold text-ink-3"
+    >
+      <span className="truncate">{label.replace(/^남자 |^여자 |^혼성 /, '')}</span>
+    </span>
+  );
+}
+
+function toDivisionKey(genderKey: string, divisionLevel: string) {
+  return `${genderKey || 'men'}-${divisionLevel || 'all'}`;
+}
+
+function parseDivisionKey(divisionKey: string) {
+  const [genderKey = 'men', ...levelParts] = String(divisionKey || '').split('-');
+  return {
+    genderKey,
+    divisionLevel: levelParts.join('-') || 'all',
+  };
 }
 
 function MetricCard({ label, record }: { label: string; record: PublicRecord | null }) {
