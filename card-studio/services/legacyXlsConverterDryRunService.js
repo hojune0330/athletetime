@@ -8,21 +8,20 @@ const {
 const {
   readLegacyXlsTextWorkbook,
 } = require('./legacyXlsTextExtractor');
+const {
+  buildLegacyXlsLayoutSummary,
+  classifyLegacyXlsWorkbook,
+} = require('./legacyXlsLayoutClassifierService');
+const {
+  FORBIDDEN_REPORT_TEXT,
+  sanitizeReportString,
+  sha256Prefix,
+} = require('./legacyReportSafety');
 
 const ROOT = path.join(__dirname, '..', '..');
-const FORBIDDEN_REPORT_TEXT = /privateStoragePath|sourcePath|data[\\/]sources[\\/]import[\\/]originals|PERSON_NO|birthdate|phone|email|address|secret|010-\d{3,4}-\d{4}/iu;
 
 function normalizeYears(years) {
   return [...new Set(years.map(Number).filter(Number.isInteger))].sort((a, b) => a - b);
-}
-
-function sha256Prefix(value) {
-  return String(value || '').slice(0, 12);
-}
-
-function sanitizeReportString(value) {
-  const text = String(value || '');
-  return FORBIDDEN_REPORT_TEXT.test(text) ? '[redacted]' : text;
 }
 
 function resolveOriginalPath(root, sourcePath) {
@@ -45,7 +44,7 @@ function sanitizeXlsWorkbookSummary(input) {
 
 function summarizeWorkbook({ file, workbook }) {
   const rowCount = workbook.sheets.reduce((sum, sheet) => sum + sheet.rows.length, 0);
-  return sanitizeXlsWorkbookSummary({
+  const summary = sanitizeXlsWorkbookSummary({
     year: file.year,
     originalFilename: file.originalFilename,
     extension: file.extension,
@@ -55,6 +54,10 @@ function summarizeWorkbook({ file, workbook }) {
     rowCount,
     status: 'converted_for_dry_run',
   });
+  return {
+    ...summary,
+    ...classifyLegacyXlsWorkbook(workbook),
+  };
 }
 
 function inspectFile({ file, root }) {
@@ -109,6 +112,7 @@ function buildLegacyXlsDryRunReport({
   const errors = inspections
     .filter((inspection) => inspection.error)
     .map((inspection) => inspection.error);
+  const layoutSummary = buildLegacyXlsLayoutSummary(workbooks);
 
   return {
     title: 'A-3 Legacy XLS Converter Dry Run',
@@ -121,9 +125,20 @@ function buildLegacyXlsDryRunReport({
     serviceDataMutated: false,
     privatePathsExcluded: true,
     rawOriginalsTrackedByGit: plan.totals.rawOriginalsTrackedByGit,
+    servicePromotionAllowed: false,
+    layoutSummary,
+    promotableWorkbooks: layoutSummary.promotableWorkbooks,
+    blockedWorkbooks: layoutSummary.blockedWorkbooks,
+    blockReasonCounts: layoutSummary.blockReasonCounts,
     workbooks,
     errors,
   };
+}
+
+function renderCountMap(counts) {
+  return Object.entries(counts || {})
+    .map(([key, value]) => `  - ${key}: ${value}`)
+    .join('\n') || '  - 없음';
 }
 
 function renderLegacyXlsDryRunMarkdown(report) {
@@ -136,13 +151,36 @@ function renderLegacyXlsDryRunMarkdown(report) {
     `- Failed files: ${report.failedFiles}`,
     `- Total queued .xls files: ${report.totalQueuedFiles}`,
     `- Service data mutated: ${report.serviceDataMutated ? 'yes' : 'no'}`,
+    `- Service promotion allowed: ${report.servicePromotionAllowed ? 'yes' : 'no'}`,
     `- Private paths excluded: ${report.privatePathsExcluded ? 'yes' : 'no'}`,
+    `- Promotable workbooks: ${report.promotableWorkbooks}`,
+    `- Blocked workbooks: ${report.blockedWorkbooks}`,
+    '',
+    '## Layout summary',
+    '',
+    '### Workbook layouts',
+    '',
+    renderCountMap(report.layoutSummary?.workbookLayouts),
+    '',
+    '### Sheet layouts',
+    '',
+    renderCountMap(report.layoutSummary?.sheetLayouts),
+    '',
+    '### Block reasons',
+    '',
+    renderCountMap(report.blockReasonCounts),
+    '',
+    '### By year',
+    '',
+    ...Object.entries(report.layoutSummary?.byYear || {}).map(([year, summary]) => (
+      `- ${year}: total=${summary.total}, promotable=${summary.promotable}`
+    )),
     '',
     '## Workbooks',
     '',
     ...(report.workbooks.length
       ? report.workbooks.map((workbook) => (
-        `- ${workbook.year} ${workbook.originalFilename}: ${workbook.sheetCount} sheets, ${workbook.rowCount} rows, sha=${workbook.sha256Prefix}`
+        `- ${workbook.year} ${workbook.originalFilename}: ${workbook.workbookLayout}, promotable=${workbook.promotable ? 'yes' : 'no'}, ${workbook.sheetCount} sheets, ${workbook.rowCount} rows, sha=${workbook.sha256Prefix}`
       ))
       : ['- Converted workbook 없음']),
     '',
@@ -160,4 +198,5 @@ module.exports = {
   readLegacyXlsTextWorkbook,
   renderLegacyXlsDryRunMarkdown,
   sanitizeXlsWorkbookSummary,
+  FORBIDDEN_REPORT_TEXT,
 };
