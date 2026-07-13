@@ -27,11 +27,15 @@ import { CompareTray } from '../components/record-insights/CompareTray';
 import { CompareView } from '../components/record-insights/CompareView';
 import { ShareCard } from '../components/record-insights/ShareCard';
 import { useCompareTray } from '../components/record-insights/useCompareTray';
+import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
+import { RecordsHub } from '../components/records/RecordsHub';
+import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
 import { RecordSearchResults } from '../components/records/RecordSearchResults';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
 
 type Mode = 'athlete' | 'season';
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+type RecordsFlow = 'mine' | 'browse';
 
 // 카피·신뢰 문구는 중앙 정책(dataPolicy)에서 관리 — 패치 한 곳.
 const DATA_NOTICE = TRUST_NOTICE.collectedPublic;
@@ -58,15 +62,13 @@ export default function RecordsPage() {
   const [compareNotice, setCompareNotice] = useState('');
   // 내 기록 카드는 담긴 게 있으면 버튼 없이 항상 보인다 — 접기만 가능(숨김 아님)
   const [myRecordsCollapsed, setMyRecordsCollapsed] = useState(false);
-  const revealMyRecords = () => {
-    setMyRecordsCollapsed(false);
-    window.setTimeout(() => {
-      document.getElementById('my-records')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 60);
-  };
   const compareTray = useCompareTray();
   const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
+  const activeFlow = normalizeRecordsFlow(searchParams.get('flow'));
+  const mineStep = normalizeMineStep(searchParams.get('step'));
+  const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
+  const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
 
   useEffect(() => {
     let active = true;
@@ -114,6 +116,15 @@ export default function RecordsPage() {
     setQuery(nextQuery);
     setSubmittedQuery(nextQuery);
   }, [searchParams]);
+
+  useEffect(() => {
+    if (activeFlow !== 'browse') return;
+    if (browseChoice === 'season') {
+      setMode('season');
+      return;
+    }
+    if (browseChoice === 'athlete' || browseChoice === 'team') setMode('athlete');
+  }, [activeFlow, browseChoice]);
 
   useEffect(() => {
     if (!selectedAthleteParam) {
@@ -255,48 +266,253 @@ export default function RecordsPage() {
     setProfileState('idle');
   };
 
+  const openHub = () => {
+    setQuery('');
+    setSubmittedQuery('');
+    const next = new URLSearchParams(searchParams);
+    deleteRecordsFlowParams(next);
+    next.delete('q');
+    next.delete('athlete');
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const openMineStart = () => {
+    setQuery('');
+    setSubmittedQuery('');
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', 'name');
+    next.delete('q');
+    next.delete('browse');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const showMyRecordsHome = () => {
+    setMyRecordsCollapsed(false);
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', 'done');
+    next.delete('browse');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const openBrowseGateway = () => {
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'browse');
+    next.delete('step');
+    next.delete('browse');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    next.delete('q');
+    setQuery('');
+    setSubmittedQuery('');
+    setSearchParams(next);
+  };
+
+  const openBrowseChoice = (choice: BrowseChoice) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'browse');
+    next.set('browse', choice);
+    next.delete('step');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    setMode(choice === 'season' ? 'season' : 'athlete');
+    setSearchParams(next);
+  };
+
+  const handleMineNameSubmit = (value: string) => {
+    setQuery(value);
+    setSubmittedQuery(value);
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', 'candidates');
+    next.set('q', value);
+    next.delete('browse');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const goMineStep = (step: MineStep) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', step);
+    next.delete('browse');
+    if (step === 'done' || step === 'name') next.delete('mineDraft');
+    setSearchParams(next);
+  };
+
+  const handleMineBack = () => {
+    if (mineStep === 'done') {
+      openHub();
+      return;
+    }
+    if (mineStep === 'confirm') {
+      goMineStep('candidates');
+      return;
+    }
+    if (mineStep === 'candidates') {
+      goMineStep('name');
+      return;
+    }
+    openHub();
+  };
+
+  const toggleMineDraft = (athlete: AthleteSearchCard) => {
+    const selected = new Set(mineDraftKeys);
+    if (selected.has(athlete.athleteKey)) {
+      selected.delete(athlete.athleteKey);
+    } else if (selected.size < 6) {
+      selected.add(athlete.athleteKey);
+    }
+    const nextKeys = Array.from(selected);
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', 'candidates');
+    if (nextKeys.length > 0) {
+      next.set('mineDraft', serializeKeyList(nextKeys));
+    } else {
+      next.delete('mineDraft');
+    }
+    setSearchParams(next, { replace: true });
+  };
+
+  const confirmMineDraft = (selectedAthletes: readonly AthleteSearchCard[]) => {
+    if (selectedAthletes.length === 0) return;
+    addManyMyAthletes(selectedAthletes.map((athlete) => ({
+      athleteKey: athlete.athleteKey,
+      name: athlete.name,
+      team: athlete.team,
+    })));
+    const next = new URLSearchParams(searchParams);
+    next.set('flow', 'mine');
+    next.set('step', 'done');
+    next.delete('mineDraft');
+    next.delete('athlete');
+    next.delete('compare');
+    setSearchParams(next);
+  };
+
+  const showSeasonForMine = () => {
+    const firstEntry = myEntries[0];
+    if (firstEntry) void handleSelectAthlete(firstEntry.athleteKey, { syncUrl: false });
+    openBrowseChoice('season');
+  };
+
+  const isDirectRecordsLink = Boolean(selectedAthleteParam) || compareKeys.length >= 2;
+  const shouldShowHub = !isDirectRecordsLink && !activeFlow && !submittedQuery.trim();
+  const shouldShowMineFlow = !isDirectRecordsLink && activeFlow === 'mine';
+  const shouldShowBrowseGateway = !isDirectRecordsLink && activeFlow === 'browse' && !browseChoice;
+  const shouldShowRecordsSurface = !shouldShowHub && !shouldShowMineFlow && !shouldShowBrowseGateway;
+
   return (
     <div className="space-y-6">
-      <section className="border border-line bg-surface p-6 sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-              내 기록, 이름만 알면 찾아요.
-            </h1>
-          </div>
-          <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
-              <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
-                기록 한눈에
-              </ModeButton>
-              <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
-                시즌 기록표
-              </ModeButton>
+      {shouldShowHub && (
+        <RecordsHub
+          myEntriesCount={myEntries.length}
+          myEntryName={myEntries[0]?.name || ''}
+          onOpenMyRecords={showMyRecordsHome}
+          onStartMine={openMineStart}
+          onStartBrowse={openBrowseGateway}
+        >
+          <AnonymousInsightCards
+            onPickEvent={(key) => {
+              setEventKey(key);
+              openBrowseChoice('season');
+            }}
+          />
+        </RecordsHub>
+      )}
+
+      {shouldShowMineFlow && (
+        <RecordsMineFlow
+          step={mineStep}
+          query={query}
+          submittedQuery={submittedQuery}
+          searchState={searchState}
+          athletes={athletes}
+          selectedDraftKeys={mineDraftKeys}
+          myEntries={myEntries}
+          onQueryChange={setQuery}
+          onSubmitName={handleMineNameSubmit}
+          onToggleDraft={toggleMineDraft}
+          onBack={handleMineBack}
+          onQuit={openHub}
+          onGoToStep={goMineStep}
+          onConfirm={confirmMineDraft}
+          onRemoveMyAthlete={removeMyAthlete}
+          onSeasonForMine={showSeasonForMine}
+        />
+      )}
+
+      {shouldShowBrowseGateway && (
+        <RecordsBrowseGateway
+          onBackToHub={openHub}
+          onPick={openBrowseChoice}
+        />
+      )}
+
+      {shouldShowRecordsSurface && (
+        <section className="border border-line bg-surface p-6 sm:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
+              <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
+                내 기록, 이름만 알면 찾아요.
+              </h1>
+              {activeFlow === 'browse' && browseChoice && (
+                <p className="mt-2 text-sm text-ink-3">
+                  {browseChoice === 'season' ? '시즌 기록표를 둘러보고 있어요.' : '이름이나 소속으로 공개 기록 후보를 찾아보세요.'}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col items-stretch gap-2 sm:items-end">
+              <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
+                <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
+                  기록 한눈에
+                </ModeButton>
+                <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
+                  시즌 기록표
+                </ModeButton>
+              </div>
             </div>
           </div>
-        </div>
 
-        <form onSubmit={handleSearch} className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
-          <label htmlFor="records-search" className="sr-only">
-            공개 기록 검색
-          </label>
-          <Input
-            id="records-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="이름 또는 소속(예: 홍길동, 서울고)"
-            aria-describedby="records-search-help"
-            className="h-12 border-line bg-white text-base"
-          />
-          <Button type="submit" size="lg" disabled={query.trim().length < 2 || searchState === 'loading'}>
-            {searchState === 'loading' ? '검색 중' : '검색'}
-          </Button>
-        </form>
-        <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
-          두 글자 이상 입력하면 검색할 수 있어요.
-        </p>
-      </section>
+          {mode === 'athlete' && (
+            <>
+              <form onSubmit={handleSearch} className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
+                <label htmlFor="records-search" className="sr-only">
+                  공개 기록 검색
+                </label>
+                <Input
+                  id="records-search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={browseChoice === 'team' ? '소속을 입력하세요(예: 서울고, 청양군청)' : '이름 또는 소속(예: 홍길동, 서울고)'}
+                  aria-describedby="records-search-help"
+                  className="h-12 border-line bg-white text-base"
+                />
+                <Button type="submit" size="lg" disabled={query.trim().length < 2 || searchState === 'loading'}>
+                  {searchState === 'loading' ? '검색 중' : '검색'}
+                </Button>
+              </form>
+              <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
+                두 글자 이상 입력하면 검색할 수 있어요.
+              </p>
+            </>
+          )}
+        </section>
+      )}
 
       {compareKeys.length >= 2 && (
         <CompareView
@@ -309,7 +525,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {searchState === 'error' && (
+      {shouldShowRecordsSurface && searchState === 'error' && (
         <NoticeCard
           role="alert"
           title="검색을 불러오지 못했습니다"
@@ -317,7 +533,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {searchState === 'ready' && submittedQuery.trim().length >= 2 && athletes.length === 0 && (
+      {shouldShowRecordsSurface && searchState === 'ready' && submittedQuery.trim().length >= 2 && athletes.length === 0 && (
         <NoticeCard
           role="status"
           title="찾는 기록이 아직 없어요"
@@ -330,7 +546,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {searchState === 'idle' && athletes.length === 0 && !profile && (
+      {shouldShowRecordsSurface && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && !profile && (
         <div className="space-y-6">
           <StartPanel onSeasonMode={() => setMode('season')} />
           <AnonymousInsightCards
@@ -343,7 +559,7 @@ export default function RecordsPage() {
       )}
 
       {/* 내 기록 — 별도 진입 버튼 없이 항상 보임. 접으면 슬림 바로 남는다. */}
-      {myEntries.length > 0 && (
+      {shouldShowRecordsSurface && myEntries.length > 0 && (
         myRecordsCollapsed ? (
           <button
             type="button"
@@ -369,7 +585,7 @@ export default function RecordsPage() {
         )
       )}
 
-      {shouldPrioritizeAthletePanel && (
+      {shouldShowRecordsSurface && shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
           state={profileState}
@@ -384,7 +600,7 @@ export default function RecordsPage() {
               name: profile.athlete.name,
               team: profile.athlete.team,
             });
-            if (!wasMine) revealMyRecords();
+            if (!wasMine) showMyRecordsHome();
           }}
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
@@ -402,7 +618,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {athletes.length > 0 && (
+      {shouldShowRecordsSurface && athletes.length > 0 && (
         <RecordSearchResults
           athletes={athletes}
           query={submittedQuery}
@@ -411,7 +627,7 @@ export default function RecordsPage() {
           isInCompareTray={compareTray.isInTray}
           isMine={isMine}
           myCount={myEntries.length}
-          onViewMyRecords={revealMyRecords}
+          onViewMyRecords={showMyRecordsHome}
           onToggleMine={(athlete) => {
             // 검색 후보에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 (여러 개 누르면 전부 합산)
             toggleMyAthlete({
@@ -435,7 +651,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {shouldShowAthletePanel && !shouldPrioritizeAthletePanel && (
+      {shouldShowRecordsSurface && shouldShowAthletePanel && !shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
           state={profileState}
@@ -449,7 +665,7 @@ export default function RecordsPage() {
               name: profile.athlete.name,
               team: profile.athlete.team,
             });
-            if (!wasMine) revealMyRecords();
+            if (!wasMine) showMyRecordsHome();
           }}
           onToggleCompare={() => {
             if (!profile) return;
@@ -466,7 +682,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
+      {shouldShowRecordsSurface && shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
         <EstimatedSameAthleteCard
           athleteKey={selectedAthleteKey}
           athleteName={profile?.athlete.name || ''}
@@ -474,12 +690,12 @@ export default function RecordsPage() {
           onCombine={(segments) => {
             // 원탭 합산 — 묶음 전부를 바로 내 기록으로 (확인 절차 없음, 빼기는 나중에)
             addManyMyAthletes(segments);
-            revealMyRecords();
+            showMyRecordsHome();
           }}
         />
       )}
 
-      {mode === 'season' && (
+      {shouldShowRecordsSurface && mode === 'season' && (
         <SeasonPanel
           filters={filters}
           season={season}
@@ -1023,6 +1239,32 @@ function parseDivisionKey(divisionKey: string) {
     genderKey,
     divisionLevel: levelParts.join('-') || 'all',
   };
+}
+
+function normalizeRecordsFlow(value: string | null): RecordsFlow | '' {
+  if (value === 'mine' || value === 'browse') return value;
+  return '';
+}
+
+function normalizeBrowseChoice(value: string | null): BrowseChoice | '' {
+  if (value === 'athlete' || value === 'team' || value === 'season') return value;
+  return '';
+}
+
+function parseKeyList(value: string | null): string[] {
+  if (!value) return [];
+  return Array.from(new Set(value.split(',').map((item) => item.trim()).filter(Boolean))).slice(0, 6);
+}
+
+function serializeKeyList(values: readonly string[]): string {
+  return values.map((value) => value.trim()).filter(Boolean).join(',');
+}
+
+function deleteRecordsFlowParams(params: URLSearchParams) {
+  params.delete('flow');
+  params.delete('step');
+  params.delete('browse');
+  params.delete('mineDraft');
 }
 
 function MetricCard({ label, record }: { label: string; record: PublicRecord | null }) {
