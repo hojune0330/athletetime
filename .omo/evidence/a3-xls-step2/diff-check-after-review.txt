@@ -1,0 +1,1 @@
+warning: in the working copy of 'backend/tests/legacy-xls-step2-candidate-dry-run.test.js', LF will be replaced by CRLF the next time Git touches it

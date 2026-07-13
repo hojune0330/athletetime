@@ -1,0 +1,52 @@
+{
+  "title": "A-3 Legacy XLS Step 2 Candidate Dry Run",
+  "status": "candidate_dry_run_complete",
+  "years": [
+    2015,
+    2016,
+    2017
+  ],
+  "attemptedFiles": 83,
+  "serviceDataMutated": false,
+  "privatePathsExcluded": true,
+  "servicePromotionAllowed": false,
+  "fableApprovedPromotableWorkbooks": 45,
+  "blockedWorkbooks": 38,
+  "partialPromotedWorkbooks": 3,
+  "candidateRows": 21865,
+  "candidateWorkbooksByStatus": {
+    "fully_promotable": 45,
+    "partially_promoted": 3
+  },
+  "blockReasonCounts": {
+    "MIXED_RESULT_LAYOUTS_NEED_REVIEW": 3,
+    "VERTICAL_RESULT_LIST_NEEDS_PARSER": 35
+  },
+  "divisionStats": {
+    "totalRows": 21865,
+    "unspecifiedRows": 3261,
+    "unspecifiedRatio": 0.14914246512691517,
+    "divisionKeys": {
+      "men-high": 3387,
+      "women-high": 3033,
+      "men-university": 891,
+      "women-university": 558,
+      "men-general": 1646,
+      "women-general": 1325,
+      "men-middle": 2803,
+      "women-middle": 2629,
+      "men-elementary": 914,
+      "women-elementary": 986,
+      "men-unspecified": 1474,
+      "women-unspecified": 1065,
+      "unknown-unspecified": 666,
+      "mixed-elementary": 432,
+      "unknown-general": 56
+    }
+  },
+  "manualTopRecordDedup": {
+    "skippedDuplicates": 7321,
+    "appended": 9564,
+    "totalCandidates": 16885
+  }
+}
