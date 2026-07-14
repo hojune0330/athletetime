@@ -102,6 +102,23 @@ test('RIGHTS-IMPORT-002: Given unmatched legacy suppression When planning Then m
   }]), /Unmatched legacy suppression/);
 });
 
+test('RIGHTS-IMPORT-003: Given a legacy suppression without full scope When planning Then migration is blocked', () => {
+  const { buildImportPlan } = require('../../tools/migrate-data-rights-files');
+  process.env.DATA_RIGHTS_LEGACY_TICKET_PEPPER = 'test-only-legacy-ticket-pepper-32-bytes';
+  assert.throws(() => buildImportPlan([{
+    ticketId: 'DR-2026-9100',
+    type: 'deletion',
+    athleteName: '동명이인선수',
+    competition: '범위대회',
+    event: '남자 100m 결승',
+    reason: '소속 없는 과거 요청',
+    status: 'search_hidden',
+  }], [{
+    ticketId: 'DR-2026-9100',
+    mode: 'hide',
+  }]), /Incomplete legacy suppression scope/);
+});
+
 test('RIGHTS-TLS-001: Given production PostgreSQL When configuring TLS Then certificate verification stays enabled', () => {
   const { postgresSslConfig } = require('../database/postgres-ssl');
   assert.deepEqual(postgresSslConfig({ NODE_ENV: 'production' }), { rejectUnauthorized: true });

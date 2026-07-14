@@ -44,6 +44,9 @@ function buildImportPlan(requests, suppressions) {
     const { ticketId, ...requestData } = request;
     const legacySuppression = suppressionByRequest.get(ticketId)
       || (request.id ? suppressionByRequest.get(request.id) : null);
+    if (legacySuppression && !hasCompleteLegacyScope(requestData)) {
+      throw new Error('Incomplete legacy suppression scope');
+    }
     if (legacySuppression) {
       suppressionByRequest.delete(legacySuppression.ticketId || legacySuppression.requestId);
     }
@@ -85,6 +88,9 @@ async function importPlan(pool, plan, checksum) {
     let imported = 0;
     for (const row of plan.rows) {
       const request = row.request;
+      if (row.suppression && !hasCompleteLegacyScope(request)) {
+        throw new Error('Incomplete legacy suppression scope');
+      }
       const encrypted = request.contact ? encryptContact(request.contact) : null;
       const createdAt = request.receivedAt || new Date().toISOString();
       const updatedAt = request.updatedAt || createdAt;
@@ -147,6 +153,10 @@ async function importPlan(pool, plan, checksum) {
   } finally {
     client.release();
   }
+}
+
+function hasCompleteLegacyScope(request) {
+  return Boolean(request?.affiliation && request?.competition && request?.event);
 }
 
 async function main() {
