@@ -21,6 +21,26 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+test('Given an empty data root When building 2005 to 2006 coverage Then both years are not started with zero totals', () => {
+  const root = makeTempDataRoot();
+  try {
+    const matrix = buildCoverageMatrix({
+      dataRoot: root,
+      fromYear: 2005,
+      toYear: 2006,
+      generatedAt: '2026-07-14T00:00:00.000Z',
+    });
+
+    assert.match(matrix.truthStatement.headline, /2005/);
+    assert.equal(matrix.summary.resultBundleCount, 0);
+    assert.equal(matrix.summary.eventCount, 0);
+    assert.equal(matrix.summary.resultRowCount, 0);
+    assert.equal(matrix.summary.notStartedYears, 2);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('Given 2010 to current request When local data starts in 2018 Then missing years and partial current year are explicit', () => {
   const root = makeTempDataRoot();
   try {
@@ -56,6 +76,42 @@ test('Given 2010 to current request When local data starts in 2018 Then missing 
   }
 });
 
+test('Given a requested start year and result rows When building coverage Then headline and summary use the requested evidence', () => {
+  const root = makeTempDataRoot();
+  try {
+    writeJson(path.join(root, 'results', '2015.json'), [
+      {
+        competitionId: 'legacy-a',
+        events: [
+          { event: '100m', results: [{ name: 'A' }, { name: 'B' }] },
+          { event: '200m', results: [{ name: 'C' }] },
+        ],
+      },
+    ]);
+    writeJson(path.join(root, 'results', '2016.json'), [
+      {
+        competitionId: 'legacy-b',
+        events: [{ event: '400m', results: [{ name: 'D' }] }],
+      },
+      { competitionId: 'legacy-c', events: [] },
+    ]);
+
+    const matrix = buildCoverageMatrix({
+      dataRoot: root,
+      fromYear: 2015,
+      toYear: 2016,
+      generatedAt: '2026-07-14T00:00:00.000Z',
+    });
+
+    assert.match(matrix.truthStatement.headline, /2015년부터/);
+    assert.equal(matrix.summary.resultBundleCount, 3);
+    assert.equal(matrix.summary.eventCount, 3);
+    assert.equal(matrix.summary.resultRowCount, 4);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('Given markdown rendering When matrix is incomplete Then it states the service must not claim full coverage', () => {
   const matrix = {
     generatedAt: '2026-06-25T00:00:00.000Z',
@@ -66,6 +122,9 @@ test('Given markdown rendering When matrix is incomplete Then it states the serv
     },
     summary: {
       totalYears: 17,
+      resultBundleCount: 6,
+      eventCount: 120,
+      resultRowCount: 900,
       localCompetitionYears: 1,
       localResultYears: 1,
       locallyAlignedYears: 0,
@@ -92,7 +151,14 @@ test('Given markdown rendering When matrix is incomplete Then it states the serv
 
   const markdown = renderCoverageMatrixMarkdown(matrix);
 
+  assert.equal(
+    markdown.split('\n').slice(0, 4).join('\n'),
+    '# AthleteTime 경기결과 커버리지 매트릭스\n\n> 현재 상태 정본: [`athletetime-current-state.md`](./athletetime-current-state.md)\n',
+  );
   assert.match(markdown, /아직 2010년부터 오늘까지 모든 경기결과가 다 있는 상태가 아닙니다/);
+  assert.match(markdown, /결과묶음 합계: 6/);
+  assert.match(markdown, /종목 합계: 120/);
+  assert.match(markdown, /결과행 합계: 900/);
   assert.match(markdown, /\| 2026 \| 60 \| 6 \| 54 \| partial_local_gap \|/);
   assert.match(markdown, /전체 보유 또는 공식 완전성 표현 금지/);
 });

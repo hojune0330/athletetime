@@ -1,7 +1,8 @@
 # AthleteTime 개발 플로우 (총괄 문서)
 
-> 마지막 갱신: 2026-07-07 · 총괄: Claude (Genspark AI Developer)
+> 마지막 갱신: 2026-07-14 · 총괄: Claude (Genspark AI Developer)
 > 이 문서는 **모든 작업자(Claude/Codex/기타 AI·사람)가 첫 작업 전에 반드시 읽어야 한다.**
+> 현재 상태 정본: [`docs/athletetime-current-state.md`](./docs/athletetime-current-state.md) · 후속 작업 인계: [`docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md`](./docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md)
 
 ---
 
@@ -17,7 +18,7 @@
 
 - `2026-first-item`에서 진행된 핸드오프(신규 레이아웃, card-studio, 커뮤니티 개편,
   대회 볼거리, 신뢰 가드레일 등)는 **전부 athletetime main에 반영 완료**.
-- **2026-07-07부터 Codex는 athletetime에 직접 커밋/푸시한다** (사용자 지시).
+- **2026-07-07부터 Codex는 athletetime 저장소의 기능 브랜치에 커밋·푸시하고 PR을 거쳐 `main`에 반영한다** (사용자 지시).
   `2026-first-item`은 과거 기록 보관용이며, 신규 작업을 여기서 시작하지 않는다.
 
 ## 2. 배포 아키텍처
@@ -26,8 +27,8 @@
 |---|---|---|
 | 프론트 (React SPA) | Netlify `https://athlete-time.netlify.app` | main 푸시 시 자동 빌드 (`frontend/` → `community/`) |
 | 백엔드 (Express+WS) | Render `https://athletetime-backend.onrender.com` | main 푸시 시 자동 배포. `/api/*`는 Netlify가 프록시 |
-| 정규 결과 데이터 | `data/results/<year>.json` (2018–2026) | 230개 대회 / 9,578 종목 / 90,632행 |
-| 원본 결과 파일 | git-ignored 로컬 (`data/sources/import/originals/`) | KAAF 원본 396개(2005–2017) 등 — **repo에 올리지 말 것** |
+| 정규 결과 데이터 | `data/results/<year>.json` (2015–2026) | 239개 결과묶음 / 10,086 종목 / 94,195행 |
+| 원본 결과 파일 | git-ignored 로컬 (`data/sources/import/originals/`) | 수량은 **비공개 inventory 재확인 필요** — **repo에 올리지 말 것** |
 
 ## 3. 작업 규칙 (모든 작업자 공통)
 
@@ -64,7 +65,7 @@
 
 ## 5. 데이터 인프라 로드맵 (합의된 방향)
 
-- **P0**: repo 비공개 전환(사용자 액션), 원본 396파일을 비공개 저장소/스토리지로 백업
+- **P0**: repo 비공개 전환(사용자 액션), 원본 수량은 비공개 inventory에서 재확인한 뒤 비공개 저장소/스토리지로 백업
 - **P1**: 정규 데이터 정적 JSON → Postgres 이전, 공개 검색 API 제한(페이지 20–50건, rate limit)
 - **P2**: Turnstile/CAPTCHA, 등급별 접근량, 감사 로그, 약관 고지
 - 원칙: **"데이터는 서버 안에, 웹은 필요한 만큼만 물어보는 구조"**
