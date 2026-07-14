@@ -35,9 +35,10 @@ async function initialize(options = {}) {
     if (options.repository) {
       repository = options.repository;
     } else if (usesPostgres()) {
-      ownedPool = options.pool || createPool(connectionString());
-      await runMigrations({ pool: ownedPool });
-      repository = new PostgresDataRightsRepository(ownedPool);
+      const pool = options.pool || createPool(connectionString());
+      ownedPool = options.pool ? null : pool;
+      await runMigrations({ pool });
+      repository = new PostgresDataRightsRepository(pool);
     } else {
       if (process.env.NODE_ENV === 'production') {
         throw new Error('PostgreSQL is required for production data-rights requests');
@@ -175,7 +176,7 @@ async function updateStatus(id, nextStatus, note = '', options = {}) {
     return {
       ok: false,
       invalidScope: true,
-      error: '숨김 또는 삭제를 적용하려면 대회와 종목, 기록 식별정보가 필요합니다.',
+      error: '숨김 또는 삭제를 적용하려면 소속·대회·종목 또는 기록 식별정보가 필요합니다.',
     };
   }
 

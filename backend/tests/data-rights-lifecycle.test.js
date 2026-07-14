@@ -121,7 +121,8 @@ test('RIGHTS-SCOPE-002: Given a request without a record scope When activating s
   const service = require(servicePath);
   await service.initialize({ repository: new MemoryDataRightsRepository() });
   const receipt = await service.submitRequest({
-    type: 'deletion', athleteName: '동명이인선수', reason: '범위 없는 요청',
+    type: 'deletion', athleteName: '동명이인선수', competition: '범위대회',
+    event: '남자 100m 결승', reason: '소속 없는 요청',
   });
   const target = (await service.listRequests())
     .find((item) => item.ticketHint === receipt.ticketId.slice(-8));
@@ -160,6 +161,7 @@ test('RIGHTS-CACHE-001: Given two service instances When one hides a record Then
     const receipt = await writer.submitRequest({
       type: 'deletion',
       athleteName: '동기화선수',
+      affiliation: '동기화팀',
       competition: '동기화대회',
       event: '남자 100m 결승',
       reason: '다중 인스턴스 동기화',
@@ -171,11 +173,11 @@ test('RIGHTS-CACHE-001: Given two service instances When one hides a record Then
     });
     assert.equal(updated.ok, true);
     assert.equal(reader.checkSuppression({
-      name: '동기화선수', competition: '동기화대회', event: '남자 100m 결승',
+      name: '동기화선수', affiliation: '동기화팀', competition: '동기화대회', event: '남자 100m 결승',
     }), null);
     await refresh();
     assert.equal(reader.checkSuppression({
-      name: '동기화선수', competition: '동기화대회', event: '남자 100m 결승',
+      name: '동기화선수', affiliation: '동기화팀', competition: '동기화대회', event: '남자 100m 결승',
     }), 'hide');
   } finally {
     await reader.shutdown();

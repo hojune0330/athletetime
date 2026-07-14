@@ -235,7 +235,8 @@ function _signature() {
       item.since,
     ].join(':'))
     .join('|');
-  return `${filenames}::${suppressions}`;
+  const rightsState = dataRequestService.readiness();
+  return `${filenames}::${suppressions}::${rightsState.mode}:${rightsState.ready}`;
 }
 
 function _profileText(profile) {

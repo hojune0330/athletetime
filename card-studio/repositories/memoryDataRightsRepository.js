@@ -62,7 +62,7 @@ class MemoryDataRightsRepository {
     const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
     const hasRecordScope = record.recordKey
       || record.sourceId
-      || (record.competition && record.event);
+      || (record.affiliation && record.competition && record.event);
     if (mode && !hasRecordScope) return { kind: 'invalid_scope' };
 
     const now = new Date().toISOString();

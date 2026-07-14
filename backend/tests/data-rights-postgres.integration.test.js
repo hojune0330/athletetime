@@ -163,6 +163,7 @@ test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then re
     service.submitRequest({
       type: 'correction',
       athleteName: `테스트선수${index}`,
+      affiliation: '통합검증팀',
       competition: '통합 검증 대회',
       event: '남자 100m 결승',
       reason: '통합 검증',

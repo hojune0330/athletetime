@@ -18,7 +18,13 @@ function validateRequest(input, buildRecordKey) {
     reason: sanitize(input.reason, 2000),
     contact: sanitize(input.contact, 200),
   };
-  if (!request.recordKey) request.recordKey = buildRecordKey(request);
+  if (!request.recordKey
+    && request.athleteName
+    && request.affiliation
+    && request.competition
+    && request.event) {
+    request.recordKey = buildRecordKey(request);
+  }
   if (!REQUEST_TYPES.includes(request.type)) {
     return { ok: false, error: '요청 유형이 올바르지 않습니다. (correction|deletion|objection)' };
   }

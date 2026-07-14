@@ -157,3 +157,21 @@ test('RIGHTS-SCOPE-001: Given an event-specific request When suppressed Then ano
   }), null);
   await service.shutdown();
 });
+
+test('RIGHTS-PRECEDENCE-001: Given overlapping suppressions When matching Then the strongest mode wins', () => {
+  const { findSuppressionMode } = require('../../card-studio/services/dataSuppressionMatcher');
+  const scope = {
+    athleteName: '중복선수', affiliation: '중복팀', competition: '중복대회', event: '남자 100m 결승',
+  };
+  const suppressions = [
+    { ...scope, mode: 'mask' },
+    { ...scope, mode: 'remove' },
+    { ...scope, mode: 'hide' },
+  ];
+  assert.equal(findSuppressionMode(suppressions, {
+    name: scope.athleteName,
+    affiliation: scope.affiliation,
+    competition: scope.competition,
+    event: scope.event,
+  }), 'remove');
+});

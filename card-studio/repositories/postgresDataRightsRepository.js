@@ -162,7 +162,7 @@ class PostgresDataRightsRepository {
       const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
       const hasRecordScope = row.record_key
         || row.source_id
-        || (row.competition && row.event);
+        || (row.affiliation && row.competition && row.event);
       if (mode && !hasRecordScope) {
         await client.query('ROLLBACK');
         return { kind: 'invalid_scope' };

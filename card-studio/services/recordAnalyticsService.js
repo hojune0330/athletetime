@@ -1110,7 +1110,8 @@ function buildSignature() {
       item.since,
     ].join(':'))
     .join('|');
-  return `${filenames}::${manualTopRecords}::${suppressions}`;
+  const rightsState = dataRequestService.readiness();
+  return `${filenames}::${manualTopRecords}::${suppressions}::${rightsState.mode}:${rightsState.ready}`;
 }
 
 function isWindRelevant(eventLabel) {
