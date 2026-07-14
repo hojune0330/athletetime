@@ -140,9 +140,18 @@ function compactSourceCandidate(candidate) {
 function summarizeYears(years) {
   const competitionYears = years.filter((year) => year.hasCompetitionFile);
   const resultYears = years.filter((year) => year.hasResultFile);
+  const totals = years.reduce(
+    (summary, year) => ({
+      resultBundleCount: summary.resultBundleCount + year.resultBundleCount,
+      eventCount: summary.eventCount + year.eventCount,
+      resultRowCount: summary.resultRowCount + year.resultRowCount,
+    }),
+    { resultBundleCount: 0, eventCount: 0, resultRowCount: 0 },
+  );
 
   return {
     totalYears: years.length,
+    ...totals,
     localCompetitionYears: competitionYears.length,
     localResultYears: resultYears.length,
     locallyAlignedYears: years.filter((year) => year.status === STATUS.LOCALLY_ALIGNED).length,
@@ -172,7 +181,7 @@ function buildCoverageMatrix(options = {}) {
     requestedRange: { fromYear, toYear },
     truthStatement: {
       hasAllCompetitionResultsFromRequestedRange: false,
-      headline: '아직 2010년부터 오늘까지 모든 경기결과가 다 있는 상태가 아닙니다.',
+      headline: `아직 ${fromYear}년부터 오늘까지 모든 경기결과가 다 있는 상태가 아닙니다.`,
       reason: '로컬 파일 기준의 일치 여부만 확인했으며, 공식 전체 대회 대비 완전성은 별도 출처 대조가 필요합니다.',
     },
     summary: summarizeYears(years),
@@ -189,6 +198,8 @@ function renderCoverageMatrixMarkdown(matrix) {
   const lines = [
     '# AthleteTime 경기결과 커버리지 매트릭스',
     '',
+    '> 현재 상태 정본: [`athletetime-current-state.md`](./athletetime-current-state.md)',
+    '',
     `생성시각: ${matrix.generatedAt}`,
     `범위: ${matrix.requestedRange.fromYear}-${matrix.requestedRange.toYear}`,
     '',
@@ -200,6 +211,9 @@ function renderCoverageMatrixMarkdown(matrix) {
     '',
     `- 로컬 대회목록 보유 연도: ${matrix.summary.localCompetitionYears}/${matrix.summary.totalYears}`,
     `- 로컬 결과묶음 보유 연도: ${matrix.summary.localResultYears}/${matrix.summary.totalYears}`,
+    `- 결과묶음 합계: ${matrix.summary.resultBundleCount}`,
+    `- 종목 합계: ${matrix.summary.eventCount}`,
+    `- 결과행 합계: ${matrix.summary.resultRowCount}`,
     `- 로컬 목록과 결과 수가 맞는 연도: ${matrix.summary.locallyAlignedYears}`,
     `- 로컬 결과가 부족한 연도: ${matrix.summary.partialYears}`,
     `- 시작 전 연도: ${matrix.summary.notStartedYears}`,
