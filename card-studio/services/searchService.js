@@ -21,6 +21,7 @@ const {
   hasResultTextPollution,
   isResultEventOnQualityHold,
 } = require('./relayResultQualityService');
+const { assessPublicIndexRow } = require('./publicIndexQualityService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 // suppression(검토중/삭제) 적용 시 마스킹 표시값
@@ -139,10 +140,7 @@ class SearchService {
 
           const { gender, pureEvent, round } = parsed;
           const division = ev.division || '';
-          const results = (ev.results || []).filter((row) => {
-            if (row.parseStatus === 'unverified') return false;
-            return !hasResultTextPollution(row);
-          });
+          const results = this._selectPublicSearchRows(ev);
 
           // suppression(정정/삭제 요청) 사전 판정: 행별 null | 'mask' | 'hide' | 'remove'
           //   mask   : 검토 중 — 검색 매칭 제외, 단 컨텍스트로는 "비공개 요청 처리 중" 마스킹 노출
@@ -286,6 +284,49 @@ class SearchService {
   }
 
   // ── 내부 헬퍼 ──
+
+  auditPublicIndexEligibility() {
+    const audit = {
+      inspectedEvents: 0,
+      inspectedRows: 0,
+      selectedRows: 0,
+      quarantinedRows: [],
+    };
+
+    for (const target of this._loadTargetData()) {
+      const data = target.data || {};
+      const competition = data.meta?.competition_name || this._extractCompFromEvents(data);
+      for (const event of data.events || []) {
+        audit.inspectedEvents += 1;
+        audit.inspectedRows += (event.results || []).length;
+        const selectedRows = this._selectPublicSearchRows(event);
+        audit.selectedRows += selectedRows.length;
+        for (const row of selectedRows) {
+          const assessment = assessPublicIndexRow({ eventLabel: event.event, row });
+          if (assessment.indexable) continue;
+          audit.quarantinedRows.push({
+            filename: target.filename,
+            competition,
+            event: String(event.event || ''),
+            reason: assessment.reason,
+            ...row,
+          });
+        }
+      }
+    }
+
+    return audit;
+  }
+
+  _selectPublicSearchRows(event) {
+    if (isResultEventOnQualityHold(event)) return [];
+    if (!this._parseEventLabel(event.event)) return [];
+    return (event.results || []).filter((row) => {
+      if (row.parseStatus === 'unverified') return false;
+      if (!assessPublicIndexRow({ eventLabel: event.event, row }).indexable) return false;
+      return !hasResultTextPollution(row);
+    });
+  }
 
   /**
    * 검색 대상 대회를 legacy raw-file 구조로 반환합니다.

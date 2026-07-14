@@ -14,6 +14,7 @@
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+const { assessPublicIndexRow } = require('../../card-studio/services/publicIndexQualityService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 class SearchService {
@@ -76,27 +77,15 @@ class SearchService {
     }
 
     const q = query.trim();
-    const rawDir = config.dirs.raw;
-
-    if (!fs.existsSync(rawDir)) {
-      return { query: q, type, competitions: [], totalMatches: 0, totalEvents: 0, sections: [] };
-    }
-
-    // 대상 파일 결정 (같은 대회 중복 시 최신 파일만 사용)
-    let targetFiles = fs.readdirSync(rawDir).filter(f => f.endsWith('.json'));
-    if (competition) {
-      targetFiles = targetFiles.filter(f => f === competition);
-    } else {
-      targetFiles = this._deduplicateFiles(rawDir, targetFiles);
-    }
+    const targets = this._loadTargetData(competition);
 
     // 전체 매칭 수집
     const allMatches = [];  // { compName, event (full label), pureEvent, gender, round, eventType, wind, rank, results[], matchIndices[] }
 
-    for (const file of targetFiles) {
+    for (const target of targets) {
       try {
-        const filePath = path.join(rawDir, file);
-        const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+        const file = target.filename;
+        const data = target.data;
         const events = data.events || [];
         const compName = (data.meta && data.meta.competition_name) || this._extractCompFromEvents(data);
 
@@ -106,7 +95,7 @@ class SearchService {
 
           const { gender, pureEvent, round } = parsed;
           const division = ev.division || '';
-          const results = ev.results || [];
+          const results = this._selectPublicSearchRows(ev);
 
           // 매칭 인덱스 찾기
           const matchIndices = [];
@@ -227,6 +216,67 @@ class SearchService {
   }
 
   // ── 내부 헬퍼 ──
+
+  auditPublicIndexEligibility() {
+    const audit = {
+      inspectedEvents: 0,
+      inspectedRows: 0,
+      selectedRows: 0,
+      quarantinedRows: [],
+    };
+
+    for (const target of this._loadTargetData()) {
+      const data = target.data || {};
+      const competition = data.meta?.competition_name || this._extractCompFromEvents(data);
+      for (const event of data.events || []) {
+        audit.inspectedEvents += 1;
+        audit.inspectedRows += (event.results || []).length;
+        const selectedRows = this._selectPublicSearchRows(event);
+        audit.selectedRows += selectedRows.length;
+        for (const row of selectedRows) {
+          const assessment = assessPublicIndexRow({ eventLabel: event.event, row });
+          if (assessment.indexable) continue;
+          audit.quarantinedRows.push({
+            filename: target.filename,
+            competition,
+            event: String(event.event || ''),
+            reason: assessment.reason,
+            ...row,
+          });
+        }
+      }
+    }
+
+    return audit;
+  }
+
+  _selectPublicSearchRows(event) {
+    if (!this._parseEventLabel(event.event)) return [];
+    return (event.results || []).filter((row) => (
+      assessPublicIndexRow({ eventLabel: event.event, row }).indexable
+    ));
+  }
+
+  _loadTargetData(competition) {
+    const rawDir = config.dirs.raw;
+    if (!fs.existsSync(rawDir)) return [];
+
+    let files = fs.readdirSync(rawDir).filter(f => f.endsWith('.json'));
+    if (competition) {
+      files = files.filter(f => f === competition);
+    } else {
+      files = this._deduplicateFiles(rawDir, files);
+    }
+
+    const targets = [];
+    for (const filename of files) {
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(rawDir, filename), 'utf-8'));
+        targets.push({ filename, data });
+      } catch (e) {}
+    }
+    return targets;
+  }
 
   /**
    * "남자 100m 결승" 같은 이벤트 라벨을 파싱합니다.
