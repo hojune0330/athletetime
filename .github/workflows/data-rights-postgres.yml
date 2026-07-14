@@ -33,7 +33,6 @@ jobs:
           --health-timeout 5s
           --health-retries 12
     env:
-      TEST_DATABASE_URL: postgresql://athletetime_test:test-job-only-password@127.0.0.1:5432/athletetime_rights_test
       DATA_RIGHTS_ENCRYPTION_KEY: BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=
       NODE_ENV: test
     steps:
@@ -44,6 +43,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:data-rights
+        env:
+          TEST_DATABASE_URL: postgresql://athletetime_test:test-job-only-password@127.0.0.1:5432/athletetime_rights_test
       - run: npm test
       - run: npm ci --prefix frontend
       - run: npm run build:check --prefix frontend
