@@ -153,6 +153,28 @@ Critical path: `T1 -> T2 -> T3 -> T4 -> T7`.
 - `.omo/ulw-loop/evidence/g004-concurrency-privacy.txt`
 - `.omo/ulw-loop/evidence/g004-migration-regression.txt`
 
+### PostgreSQL 통합 테스트 환경
+
+현재 Codex PC에는 Docker, `psql`, PostgreSQL 서비스, `TEST_DATABASE_URL`이 없다.
+운영 `DATABASE_URL`을 테스트에 재사용하지 않는다. 기본 통합 검증 환경은 GitHub Actions의
+작업별 PostgreSQL service container로 고정한다.
+
+다음 작업자가 추가할 workflow의 필수 계약은 아래와 같다.
+
+- PostgreSQL 버전은 운영과 같은 major version으로 고정하고 `latest`를 사용하지 않는다.
+- 서비스 DB·사용자·비밀번호는 해당 CI job에서만 쓰는 임시 값으로 생성한다.
+- 애플리케이션에는 `TEST_DATABASE_URL`만 전달하고 `DATABASE_URL`은 전달하지 않는다.
+- health check가 통과하기 전에는 migration이나 테스트를 시작하지 않는다.
+- migration-004를 두 번 실행해 두 번째 실행이 no-op인지 확인한다.
+- 각 테스트 파일 또는 시나리오마다 스키마를 초기화해 병렬 job 간 상태를 공유하지 않는다.
+- 로그에 연결 문자열이나 비밀번호를 출력하지 않는다.
+- 실패 시에도 컨테이너는 job 종료와 함께 폐기되며 DB dump를 artifact로 올리지 않는다.
+- artifact에는 허용된 SQL 건수·HTTP 상태·금지 문자열 스캔 결과만 포함한다.
+
+로컬 검증이 필요하면 운영과 분리된 임시 PostgreSQL을 설치하거나 제공받아 같은
+`TEST_DATABASE_URL` 계약을 사용한다. 메모리 repository 테스트는 빠른 단위 검증용일 뿐,
+재시작·동시성·트랜잭션 완료 증거로 인정하지 않는다.
+
 ## 7. 배포·롤백
 
 1. 운영 DB 백업과 현재 JSON 체크섬·건수를 기록한다.
