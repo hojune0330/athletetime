@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
+const { validateDataRightsSchemaContract } = require('./data-rights-schema-contract');
 const { postgresSslConfig } = require('./postgres-ssl');
 
 const MIGRATION_PATTERN = /^migration-(\d{3})[^/]*\.sql$/;
@@ -48,10 +49,12 @@ async function runMigrations({ pool, directory = __dirname } = {}) {
         if (existing.rows[0].checksum !== digest) {
           throw new Error(`Applied migration checksum mismatch: ${name}`);
         }
+        await validateDataRightsSchemaContract(client, name);
         continue;
       }
 
       await client.query(sql);
+      await validateDataRightsSchemaContract(client, name);
       await client.query(
         'INSERT INTO athletetime_migrations (name, checksum) VALUES ($1, $2)',
         [name, digest],

@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { decryptContact } = require('../services/dataRightsCrypto');
+const { purgeExpiredData } = require('./postgresRetention');
 
 function requestSummary(row) {
   return {
@@ -243,6 +244,15 @@ class PostgresDataRightsRepository {
       LIMIT $1
     `, [limit]);
     return result.rows;
+  }
+
+  async purgeExpiredData() {
+    return purgeExpiredData(this.pool);
+  }
+
+  async healthCheck() {
+    await this.pool.query('SELECT 1');
+    return true;
   }
 
   async close() {}
