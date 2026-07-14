@@ -193,6 +193,17 @@ test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then re
   assert.equal(serializedRows.includes(withContact.ticketId), false);
   assert.equal(serializedRows.includes(privateContact), false);
 
+  const unscopedReceipt = await service.submitRequest({
+    type: 'deletion', athleteName: '범위없는선수', reason: '범위 검증',
+  });
+  const unscopedTarget = (await service.listRequests())
+    .find((item) => item.ticketHint === unscopedReceipt.ticketId.slice(-8));
+  const rejectedScope = await service.updateStatus(unscopedTarget.id, 'search_hidden', '', {
+    expectedVersion: unscopedTarget.version,
+  });
+  assert.equal(rejectedScope.ok, false);
+  assert.equal(rejectedScope.invalidScope, true);
+
   const contactTarget = (await service.listRequests())
     .find((item) => item.ticketHint === withContact.ticketId.slice(-8));
   assert.ok(contactTarget);

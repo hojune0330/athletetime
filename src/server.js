@@ -28,6 +28,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const { requestLogPath } = require('./requestLogPath');
 
 // 프로젝트 루트 (src/ 의 상위)
 const ROOT = path.join(__dirname, '..');
@@ -73,13 +74,6 @@ const allowedOrigins = [
 const isDevOrSandbox = NODE_ENV === 'development'
   || (process.env.SANDBOX || '').length > 0
   || process.env.E2B_SANDBOX === 'true';
-
-function requestLogPath(req) {
-  if (req.path.startsWith('/api/card-studio/data-requests/')) {
-    return '/api/card-studio/data-requests/[redacted]';
-  }
-  return req.path;
-}
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;

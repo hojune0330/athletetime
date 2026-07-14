@@ -52,7 +52,7 @@ function mapVisibleRow(row, context) {
     event: context.eventName,
   });
 
-  if (suppression === 'remove') return null;
+  if (suppression === 'remove' || suppression === 'hide') return null;
 
   const masked = suppression === 'mask';
   return {

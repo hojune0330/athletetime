@@ -20,7 +20,10 @@ test('RIGHTS-TICKET-001: Given 50 requests When issuing public tickets Then ever
 });
 
 test('RIGHTS-MIGRATION-001: Given managed migrations When listing Then legacy ad-hoc migrations are not replayed', () => {
-  assert.deepEqual(listMigrationFiles(), ['migration-004-data-rights.sql']);
+  assert.deepEqual(listMigrationFiles(), [
+    'migration-004-data-rights.sql',
+    'migration-005-data-rights-retention.sql',
+  ]);
 });
 
 test('RIGHTS-PRIVACY-001: Given the data-rights schema When inspected Then query text and ticket plaintext have no columns', () => {

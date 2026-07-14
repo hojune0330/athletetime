@@ -59,13 +59,18 @@ class MemoryDataRightsRepository {
       return { kind: 'conflict', currentVersion: record.version };
     }
 
+    const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
+    const hasRecordScope = record.recordKey
+      || record.sourceId
+      || (record.competition && record.event);
+    if (mode && !hasRecordScope) return { kind: 'invalid_scope' };
+
     const now = new Date().toISOString();
     record.status = nextStatus;
     record.version += 1;
     record.updatedAt = now;
     record.history.push({ status: nextStatus, at: now, note, version: record.version });
     this.suppressions = this.suppressions.filter((item) => item.requestId !== id);
-    const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
     if (mode) {
       this.suppressions.push({
         id: crypto.randomUUID(),
@@ -106,6 +111,14 @@ class MemoryDataRightsRepository {
 
   async purgeExpiredContacts() {
     return 0;
+  }
+
+  async purgeExpiredData() {
+    return { requests: 0, contacts: 0, metrics: 0, suppressions: 0 };
+  }
+
+  async healthCheck() {
+    return true;
   }
 
   async close() {}

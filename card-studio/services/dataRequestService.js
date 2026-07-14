@@ -1,9 +1,8 @@
-const { Pool } = require('pg');
 const { runMigrations } = require('../../backend/database/run-migrations');
-const { postgresSslConfig } = require('../../backend/database/postgres-ssl');
 const { MemoryDataRightsRepository } = require('../repositories/memoryDataRightsRepository');
 const { PostgresDataRightsRepository } = require('../repositories/postgresDataRightsRepository');
-const { startContactPurgeSchedule } = require('./contactPurgeScheduler');
+const { startDataRightsSchedules } = require('./contactPurgeScheduler');
+const { connectionString, createPool, usesPostgres } = require('./dataRightsDatabase');
 const {
   buildRecordKey,
   createPublicTicket,
@@ -25,27 +24,7 @@ let ownedPool = null;
 let initialized = false;
 let ready = false;
 let activeSuppressions = Object.freeze([]);
-let stopContactPurgeSchedule = null;
-
-function connectionString() {
-  if (process.env.NODE_ENV === 'test' && process.env.TEST_DATABASE_URL) {
-    return process.env.TEST_DATABASE_URL;
-  }
-  return process.env.DATABASE_URL || '';
-}
-
-function usesPostgres() {
-  return connectionString().length > 0;
-}
-
-function createPool(url) {
-  return new Pool({
-    connectionString: url,
-    ssl: postgresSslConfig(),
-    max: 10,
-    connectionTimeoutMillis: 3000,
-  });
-}
+let stopSchedules = null;
 
 async function initialize(options = {}) {
   if (initialized) return { ready, mode: usesPostgres() ? 'postgres' : 'memory-development' };
@@ -66,22 +45,23 @@ async function initialize(options = {}) {
       repository = new MemoryDataRightsRepository();
     }
 
-    if (typeof repository.purgeExpiredContacts === 'function') {
-      await storageCall(() => repository.purgeExpiredContacts());
-    }
+    await purgeExpiredData();
     await refreshSuppressions();
     ready = true;
-    if (typeof repository.purgeExpiredContacts === 'function') {
-      stopContactPurgeSchedule = startContactPurgeSchedule({
-        purge: () => storageCall(() => repository.purgeExpiredContacts()),
-        scheduleInterval: options.scheduleInterval,
-        cancelInterval: options.cancelInterval,
-      });
-    }
+    const supportsPurge = typeof repository.purgeExpiredData === 'function'
+      || typeof repository.purgeExpiredContacts === 'function';
+    stopSchedules = startDataRightsSchedules({
+      purge: supportsPurge ? purgeExpiredData : null,
+      refresh: refreshSuppressions,
+      scheduleInterval: options.scheduleInterval,
+      cancelInterval: options.cancelInterval,
+      scheduleSuppressionInterval: options.scheduleSuppressionInterval,
+      cancelSuppressionInterval: options.cancelSuppressionInterval,
+    });
     return { ready: true, mode: usesPostgres() ? 'postgres' : 'memory-development' };
   } catch (error) {
-    if (stopContactPurgeSchedule) stopContactPurgeSchedule();
-    stopContactPurgeSchedule = null;
+    if (stopSchedules) stopSchedules();
+    stopSchedules = null;
     initialized = false;
     repository = null;
     if (ownedPool) await ownedPool.end().catch(() => {});
@@ -92,8 +72,8 @@ async function initialize(options = {}) {
 
 async function shutdown() {
   ready = false;
-  if (stopContactPurgeSchedule) stopContactPurgeSchedule();
-  stopContactPurgeSchedule = null;
+  if (stopSchedules) stopSchedules();
+  stopSchedules = null;
   if (repository) await repository.close();
   if (ownedPool) await ownedPool.end();
   repository = null;
@@ -104,6 +84,12 @@ async function shutdown() {
 
 async function ensureRepository() {
   if (!initialized) await initialize();
+  if (repository && !ready && typeof repository.healthCheck === 'function') {
+    await storageCall(() => repository.healthCheck());
+    const rows = await storageCall(() => repository.listActiveSuppressions());
+    activeSuppressions = freezeSuppressions(rows);
+    ready = true;
+  }
   if (!repository || !ready) {
     const error = new Error('data-rights storage is unavailable');
     error.code = 'DATA_RIGHTS_UNAVAILABLE';
@@ -185,6 +171,13 @@ async function updateStatus(id, nextStatus, note = '', options = {}) {
       error: '다른 관리자가 먼저 변경했습니다. 새로고침 후 다시 시도해 주세요.',
     };
   }
+  if (result.kind === 'invalid_scope') {
+    return {
+      ok: false,
+      invalidScope: true,
+      error: '숨김 또는 삭제를 적용하려면 대회와 종목, 기록 식별정보가 필요합니다.',
+    };
+  }
 
   if (Array.isArray(result.suppressions)) {
     activeSuppressions = freezeSuppressions(result.suppressions);
@@ -198,6 +191,17 @@ async function refreshSuppressions() {
   if (!repository) return;
   const rows = await storageCall(() => repository.listActiveSuppressions());
   activeSuppressions = freezeSuppressions(rows);
+  if (initialized) ready = true;
+}
+
+async function purgeExpiredData() {
+  if (typeof repository?.purgeExpiredData === 'function') {
+    return storageCall(() => repository.purgeExpiredData());
+  }
+  if (typeof repository?.purgeExpiredContacts === 'function') {
+    return storageCall(() => repository.purgeExpiredContacts());
+  }
+  return null;
 }
 
 function getActiveSuppressions() {

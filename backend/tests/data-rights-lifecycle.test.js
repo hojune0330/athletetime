@@ -45,7 +45,7 @@ test('RIGHTS-RETENTION-001: Given a long-lived process When the purge interval f
   let scheduledCallback;
   let canceled = false;
   const repository = {
-    purgeExpiredContacts: async () => { purgeCalls += 1; },
+    purgeExpiredData: async () => { purgeCalls += 1; },
     listActiveSuppressions: async () => [],
     close: async () => {},
   };
@@ -89,7 +89,7 @@ test('RIGHTS-SURFACE-002: Given a result table row When checking suppression The
     const handler = createResultEventsHandler({
       config: { dirs: { raw: '' } },
       dataRequestService: {
-        checkSuppression: (input) => { observed.push(input); return null; },
+        checkSuppression: (input) => { observed.push(input); return 'hide'; },
       },
       dataRightsPolicy: {
         publicResultProvenance: () => ({
@@ -106,10 +106,80 @@ test('RIGHTS-SURFACE-002: Given a result table row When checking suppression The
 
     assert.equal(payload.success, true);
     assert.equal(observed[0].event, '남자 100m 결승');
+    assert.equal(payload.data.events[0].results.length, 0);
   } finally {
     resultsStore.getRawByFilename = originals.getRawByFilename;
     resultsStore.isPublicResultFilename = originals.isPublicResultFilename;
     resultsStore.listCompetitions = originals.listCompetitions;
+  }
+});
+
+test('RIGHTS-SCOPE-002: Given a request without a record scope When activating suppression Then it is rejected', async () => {
+  const servicePath = '../../card-studio/services/dataRequestService';
+  const { MemoryDataRightsRepository } = require('../../card-studio/repositories/memoryDataRightsRepository');
+  delete require.cache[require.resolve(servicePath)];
+  const service = require(servicePath);
+  await service.initialize({ repository: new MemoryDataRightsRepository() });
+  const receipt = await service.submitRequest({
+    type: 'deletion', athleteName: '동명이인선수', reason: '범위 없는 요청',
+  });
+  const target = (await service.listRequests())
+    .find((item) => item.ticketHint === receipt.ticketId.slice(-8));
+  const result = await service.updateStatus(target.id, 'search_hidden', '', {
+    expectedVersion: target.version,
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.invalidScope, true);
+  assert.equal(service.checkSuppression({
+    name: '동명이인선수', competition: '다른 대회', event: '남자 100m 결승',
+  }), null);
+  await service.shutdown();
+});
+
+test('RIGHTS-CACHE-001: Given two service instances When one hides a record Then the other refreshes it', async () => {
+  const servicePath = '../../card-studio/services/dataRequestService';
+  const { MemoryDataRightsRepository } = require('../../card-studio/repositories/memoryDataRightsRepository');
+  const repository = new MemoryDataRightsRepository();
+  delete require.cache[require.resolve(servicePath)];
+  const writer = require(servicePath);
+  await writer.initialize({ repository });
+
+  let refresh;
+  delete require.cache[require.resolve(servicePath)];
+  const reader = require(servicePath);
+  await reader.initialize({
+    repository,
+    scheduleSuppressionInterval: (callback) => {
+      refresh = callback;
+      return { unref() {} };
+    },
+    cancelSuppressionInterval: () => {},
+  });
+
+  try {
+    const receipt = await writer.submitRequest({
+      type: 'deletion',
+      athleteName: '동기화선수',
+      competition: '동기화대회',
+      event: '남자 100m 결승',
+      reason: '다중 인스턴스 동기화',
+    });
+    const target = (await writer.listRequests())
+      .find((item) => item.ticketHint === receipt.ticketId.slice(-8));
+    const updated = await writer.updateStatus(target.id, 'search_hidden', '', {
+      expectedVersion: target.version,
+    });
+    assert.equal(updated.ok, true);
+    assert.equal(reader.checkSuppression({
+      name: '동기화선수', competition: '동기화대회', event: '남자 100m 결승',
+    }), null);
+    await refresh();
+    assert.equal(reader.checkSuppression({
+      name: '동기화선수', competition: '동기화대회', event: '남자 100m 결승',
+    }), 'hide');
+  } finally {
+    await reader.shutdown();
+    await writer.shutdown();
   }
 });
 

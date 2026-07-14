@@ -159,6 +159,15 @@ class PostgresDataRightsRepository {
         return { kind: 'conflict', currentVersion: row.version };
       }
 
+      const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
+      const hasRecordScope = row.record_key
+        || row.source_id
+        || (row.competition && row.event);
+      if (mode && !hasRecordScope) {
+        await client.query('ROLLBACK');
+        return { kind: 'invalid_scope' };
+      }
+
       const version = row.version + 1;
       await client.query(`
         UPDATE data_requests
@@ -182,7 +191,6 @@ class PostgresDataRightsRepository {
         WHERE request_id = $1 AND active = TRUE
       `, [id]);
 
-      const mode = { under_review: 'mask', search_hidden: 'hide', removed: 'remove' }[nextStatus];
       if (mode) {
         const scopeKind = row.record_key ? 'record_key' : row.source_id ? 'source_id' : 'subject_tuple';
         await client.query(`

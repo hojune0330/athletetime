@@ -10,6 +10,7 @@ on:
       - 'card-studio/repositories/**'
       - 'card-studio/repositories/postgresRetention.js'
       - 'card-studio/services/dataRequestService.js'
+      - 'card-studio/services/dataRightsDatabase.js'
       - 'card-studio/services/dataRequestValidation.js'
       - 'card-studio/services/dataSuppressionMatcher.js'
       - 'card-studio/services/contactPurgeScheduler.js'
