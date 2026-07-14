@@ -3,9 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
 const config = require('../card-studio/config');
-const { postgresSslConfig } = require('../backend/database/postgres-ssl');
 const { encryptContact, hashLegacyTicket } = require('../card-studio/services/dataRightsCrypto');
-const { runMigrations } = require('../backend/database/run-migrations');
+const { migrationPoolOptions, runMigrations } = require('../backend/database/run-migrations');
 
 const REQUESTS_FILE = path.join(config.dirs.data, 'requests', 'requests.json');
 const SUPPRESSIONS_FILE = path.join(config.dirs.data, 'requests', 'suppressions.json');
@@ -161,9 +160,7 @@ async function main() {
     return;
   }
 
-  const connectionString = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
-  if (!connectionString) throw new Error('TEST_DATABASE_URL or DATABASE_URL is required for --write');
-  const pool = new Pool({ connectionString, ssl: postgresSslConfig() });
+  const pool = new Pool(migrationPoolOptions());
   try {
     await runMigrations({ pool });
     const result = await importPlan(pool, plan, checksum);

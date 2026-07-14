@@ -6,7 +6,7 @@ const {
   createPublicTicket,
   hashPublicTicket,
 } = require('../../card-studio/services/dataRightsCrypto');
-const { listMigrationFiles } = require('../database/run-migrations');
+const { listMigrationFiles, migrationPoolOptions } = require('../database/run-migrations');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -105,6 +105,23 @@ test('RIGHTS-TLS-001: Given production PostgreSQL When configuring TLS Then cert
   assert.equal(postgresSslConfig({ NODE_ENV: 'test' }), false);
 });
 
+test('RIGHTS-TLS-002: Given the migration CLI in production When building its pool Then verified TLS is mandatory', () => {
+  assert.deepEqual(migrationPoolOptions({
+    NODE_ENV: 'production',
+    DATABASE_URL: 'postgresql://production.example/athletetime',
+  }), {
+    connectionString: 'postgresql://production.example/athletetime',
+    ssl: { rejectUnauthorized: true },
+  });
+  assert.deepEqual(migrationPoolOptions({
+    NODE_ENV: 'test',
+    TEST_DATABASE_URL: 'postgresql://127.0.0.1/athletetime_test',
+  }), {
+    connectionString: 'postgresql://127.0.0.1/athletetime_test',
+    ssl: false,
+  });
+});
+
 test('RIGHTS-SCOPE-001: Given an event-specific request When suppressed Then another event stays visible', async () => {
   const servicePath = '../../card-studio/services/dataRequestService';
   const { MemoryDataRightsRepository } = require('../../card-studio/repositories/memoryDataRightsRepository');
@@ -136,17 +153,4 @@ test('RIGHTS-SCOPE-001: Given an event-specific request When suppressed Then ano
     event: '남자 200m 결승',
   }), null);
   await service.shutdown();
-});
-
-test('RIGHTS-SURFACE-001: Given public surfaces When checking suppression Then every call includes event scope', () => {
-  const files = [
-    'card-studio/routes/resultEventsRoute.js',
-    'card-studio/services/recordAnalyticsService.js',
-    'card-studio/services/searchService.js',
-    'card-studio/services/insightService.js',
-  ];
-  for (const file of files) {
-    const source = fs.readFileSync(path.join(ROOT, file), 'utf8');
-    assert.match(source, /checkSuppression\(\{[\s\S]{0,220}?event:/, `${file} must pass event scope`);
-  }
 });

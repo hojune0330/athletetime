@@ -4,6 +4,7 @@ const express = require('express');
 const test = require('node:test');
 const { Pool } = require('pg');
 const { runMigrations } = require('../database/run-migrations');
+const { buildImportPlan, importPlan } = require('../../tools/migrate-data-rights-files');
 
 const connectionString = process.env.TEST_DATABASE_URL;
 
@@ -106,6 +107,33 @@ test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then re
   assert.equal(submissions.some((item) => serializedRows.includes(item.ticketId)), false);
   assert.equal(serializedRows.includes(withContact.ticketId), false);
   assert.equal(serializedRows.includes(privateContact), false);
+
+  const contactTarget = (await service.listRequests())
+    .find((item) => item.ticketHint === withContact.ticketId.slice(-8));
+  assert.ok(contactTarget);
+  await service.updateStatus(contactTarget.id, 'corrected', '처리 완료', {
+    expectedVersion: contactTarget.version,
+  });
+  const contactRetention = await firstPool.query(`
+    SELECT contact_purge_at > NOW() AS future,
+           contact_purge_at <= NOW() + INTERVAL '30 days 1 minute' AS bounded
+    FROM data_requests WHERE id = $1
+  `, [contactTarget.id]);
+  assert.deepEqual(contactRetention.rows[0], { future: true, bounded: true });
+
+  process.env.DATA_RIGHTS_LEGACY_TICKET_PEPPER = 'integration-only-legacy-ticket-pepper-32-bytes';
+  const importChecksum = crypto.createHash('sha256').update('integration-import').digest('hex');
+  const importPlanRows = buildImportPlan([{
+    ticketId: 'DR-2026-9001',
+    type: 'correction',
+    athleteName: '이관통합선수',
+    reason: '이관 재실행 검증',
+    status: 'received',
+  }], []);
+  const firstImport = await importPlan(firstPool, importPlanRows, importChecksum);
+  const duplicateImport = await importPlan(firstPool, importPlanRows, importChecksum);
+  assert.deepEqual(firstImport, { imported: 1, duplicateRun: false });
+  assert.deepEqual(duplicateImport, { imported: 0, duplicateRun: true });
 
   const list = await service.listRequests();
   const target = list.find((item) => item.athleteName === '테스트선수0');

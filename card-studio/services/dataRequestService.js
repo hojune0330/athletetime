@@ -3,6 +3,7 @@ const { runMigrations } = require('../../backend/database/run-migrations');
 const { postgresSslConfig } = require('../../backend/database/postgres-ssl');
 const { MemoryDataRightsRepository } = require('../repositories/memoryDataRightsRepository');
 const { PostgresDataRightsRepository } = require('../repositories/postgresDataRightsRepository');
+const { startContactPurgeSchedule } = require('./contactPurgeScheduler');
 const {
   buildRecordKey,
   createPublicTicket,
@@ -11,21 +12,20 @@ const {
   hashPublicTicket,
   ticketHint,
 } = require('./dataRightsCrypto');
-
-const REQUEST_TYPES = ['correction', 'deletion', 'objection'];
-const STATUSES = ['received', 'under_review', 'search_hidden', 'corrected', 'restored', 'removed'];
-const SUPPRESSION_MODES = ['mask', 'hide', 'remove'];
+const {
+  REQUEST_TYPES,
+  STATUSES,
+  sanitize,
+  validateRequest,
+} = require('./dataRequestValidation');
+const { findSuppressionMode, freezeSuppressions } = require('./dataSuppressionMatcher');
 
 let repository = null;
 let ownedPool = null;
 let initialized = false;
 let ready = false;
 let activeSuppressions = Object.freeze([]);
-
-function sanitize(value, max = 500) {
-  if (typeof value !== 'string') return '';
-  return value.trim().slice(0, max);
-}
+let stopContactPurgeSchedule = null;
 
 function connectionString() {
   if (process.env.NODE_ENV === 'test' && process.env.TEST_DATABASE_URL) {
@@ -71,8 +71,17 @@ async function initialize(options = {}) {
     }
     await refreshSuppressions();
     ready = true;
+    if (typeof repository.purgeExpiredContacts === 'function') {
+      stopContactPurgeSchedule = startContactPurgeSchedule({
+        purge: () => storageCall(() => repository.purgeExpiredContacts()),
+        scheduleInterval: options.scheduleInterval,
+        cancelInterval: options.cancelInterval,
+      });
+    }
     return { ready: true, mode: usesPostgres() ? 'postgres' : 'memory-development' };
   } catch (error) {
+    if (stopContactPurgeSchedule) stopContactPurgeSchedule();
+    stopContactPurgeSchedule = null;
     initialized = false;
     repository = null;
     if (ownedPool) await ownedPool.end().catch(() => {});
@@ -83,6 +92,8 @@ async function initialize(options = {}) {
 
 async function shutdown() {
   ready = false;
+  if (stopContactPurgeSchedule) stopContactPurgeSchedule();
+  stopContactPurgeSchedule = null;
   if (repository) await repository.close();
   if (ownedPool) await ownedPool.end();
   repository = null;
@@ -101,31 +112,8 @@ async function ensureRepository() {
   return repository;
 }
 
-function validateRequest(input) {
-  const request = {
-    type: sanitize(input.type, 20),
-    athleteName: sanitize(input.athleteName, 100),
-    affiliation: sanitize(input.affiliation, 100),
-    competition: sanitize(input.competition, 200),
-    event: sanitize(input.event, 120),
-    recordKey: sanitize(input.recordKey, 200),
-    sourceId: sanitize(input.sourceId, 200),
-    reason: sanitize(input.reason, 2000),
-    contact: sanitize(input.contact, 200),
-  };
-  if (!request.recordKey) request.recordKey = buildRecordKey(request);
-  if (!REQUEST_TYPES.includes(request.type)) {
-    return { ok: false, error: '요청 유형이 올바르지 않습니다. (correction|deletion|objection)' };
-  }
-  if (!request.athleteName) {
-    return { ok: false, error: '대상 선수명(또는 식별 정보)을 입력해 주세요.' };
-  }
-  if (!request.reason) return { ok: false, error: '요청 사유를 입력해 주세요.' };
-  return { ok: true, request };
-}
-
 async function submitRequest(input = {}) {
-  const validated = validateRequest(input);
+  const validated = validateRequest(input, buildRecordKey);
   if (!validated.ok) return validated;
 
   const storage = await ensureRepository();
@@ -154,9 +142,10 @@ async function getStatusByTicket(publicTicket) {
   const opaque = /^DR_[A-Za-z0-9_-]{40,}$/.test(value);
   const legacy = /^DR-\d{4}-\d{4,}$/.test(value);
   if (!opaque && !legacy) return null;
+  const publicTicketHash = legacy ? hashLegacyTicket(value) : hashPublicTicket(value);
   const storage = await ensureRepository();
   const status = await storageCall(() => storage.findPublicStatus({
-    publicTicketHash: legacy ? hashLegacyTicket(value) : hashPublicTicket(value),
+    publicTicketHash,
   }));
   return status;
 }
@@ -211,39 +200,12 @@ async function refreshSuppressions() {
   activeSuppressions = freezeSuppressions(rows);
 }
 
-function freezeSuppressions(rows) {
-  return Object.freeze(rows.map((row) => Object.freeze({ ...row })));
-}
-
 function getActiveSuppressions() {
   return activeSuppressions;
 }
 
-function checkSuppression({ recordKey, sourceId, name, affiliation, competition, event } = {}) {
-  const normalized = {
-    recordKey: sanitize(recordKey, 200),
-    sourceId: sanitize(sourceId, 200),
-    name: sanitize(name, 100),
-    affiliation: sanitize(affiliation, 100),
-    competition: sanitize(competition, 200),
-    event: sanitize(event, 120),
-  };
-  const derivedRecordKey = normalized.recordKey || buildRecordKey(normalized);
-
-  for (const suppression of activeSuppressions) {
-    if (suppression.recordKey && suppression.recordKey === derivedRecordKey) return safeMode(suppression.mode);
-    if (suppression.sourceId && suppression.sourceId === normalized.sourceId) return safeMode(suppression.mode);
-    if (!suppression.athleteName || suppression.athleteName !== normalized.name) continue;
-    if (suppression.affiliation && suppression.affiliation !== normalized.affiliation) continue;
-    if (suppression.competition && suppression.competition !== normalized.competition) continue;
-    if (suppression.event && suppression.event !== normalized.event) continue;
-    return safeMode(suppression.mode);
-  }
-  return null;
-}
-
-function safeMode(mode) {
-  return SUPPRESSION_MODES.includes(mode) ? mode : 'mask';
+function checkSuppression(input = {}) {
+  return findSuppressionMode(activeSuppressions, input);
 }
 
 async function recordSearchMetric(metric) {

@@ -162,7 +162,12 @@ class PostgresDataRightsRepository {
       await client.query(`
         UPDATE data_requests
         SET status = $2::varchar(20), version = $3, updated_at = NOW(),
-            closed_at = CASE WHEN $2::varchar(20) IN ('corrected', 'restored', 'removed') THEN NOW() ELSE NULL END
+            closed_at = CASE WHEN $2::varchar(20) IN ('corrected', 'restored', 'removed') THEN NOW() ELSE NULL END,
+            contact_purge_at = CASE
+              WHEN $2::varchar(20) IN ('corrected', 'restored', 'removed') AND contact_ciphertext IS NOT NULL
+                THEN LEAST(COALESCE(contact_purge_at, NOW() + INTERVAL '30 days'), NOW() + INTERVAL '30 days')
+              ELSE contact_purge_at
+            END
         WHERE id = $1
       `, [id, nextStatus, version]);
       await client.query(`

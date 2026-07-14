@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { Pool } = require('pg');
+const { postgresSslConfig } = require('./postgres-ssl');
 
 const MIGRATION_PATTERN = /^migration-(\d{3})[^/]*\.sql$/;
 const FIRST_MANAGED_MIGRATION = 4;
@@ -68,10 +69,16 @@ async function runMigrations({ pool, directory = __dirname } = {}) {
   }
 }
 
+function migrationPoolOptions(environment = process.env) {
+  const connectionString = environment.NODE_ENV === 'test'
+    ? environment.TEST_DATABASE_URL
+    : environment.DATABASE_URL;
+  if (!connectionString) throw new Error('A PostgreSQL connection URL is required');
+  return { connectionString, ssl: postgresSslConfig(environment) };
+}
+
 async function main() {
-  const connectionString = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
-  if (!connectionString) throw new Error('TEST_DATABASE_URL or DATABASE_URL is required');
-  const pool = new Pool({ connectionString, ssl: false });
+  const pool = new Pool(migrationPoolOptions());
   try {
     const result = await runMigrations({ pool });
     process.stdout.write(`${JSON.stringify(result)}\n`);
@@ -87,4 +94,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { checksum, listMigrationFiles, runMigrations };
+module.exports = { checksum, listMigrationFiles, migrationPoolOptions, runMigrations };
