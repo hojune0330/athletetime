@@ -5,6 +5,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
+    "test:data-rights": "node --test backend/tests/data-rights-storage.test.js backend/tests/data-rights-postgres.integration.test.js",
+    "data:rights:migrate:dry-run": "node tools/migrate-data-rights-files.js",
+    "data:rights:migrate": "node tools/migrate-data-rights-files.js --write",
     "server": "node src/server.js",
     "server:dev": "node src/server.js",
     "pipeline": "node card-studio/pipeline.js",

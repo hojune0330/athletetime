@@ -11,16 +11,18 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import { Button } from '../../components/ui/button';
 import {
   adminListDataRequests,
+  adminGetDataRequestDetail,
   adminUpdateDataRequest,
-  STATUS_LABELS,
-  TYPE_LABELS,
   type AdminDataRequest,
+  type AdminDataRequestDetail,
   type DataRequestStatus,
   type Suppression,
 } from '../../api/dataRequests';
+import { AdminDataRequestCard } from './AdminDataRequestCard';
 
 const STATUS_FILTERS: { value: DataRequestStatus | 'all'; label: string }[] = [
   { value: 'all', label: '전체' },
@@ -32,15 +34,6 @@ const STATUS_FILTERS: { value: DataRequestStatus | 'all'; label: string }[] = [
   { value: 'restored', label: '유지' },
 ];
 
-const STATUS_COLOR: Record<DataRequestStatus, string> = {
-  received: 'text-brand-600',
-  under_review: 'text-warn',
-  search_hidden: 'text-brand-500',
-  corrected: 'text-ok',
-  removed: 'text-err',
-  restored: 'text-ok',
-};
-
 export default function AdminDataRequestsPage() {
   const [filter, setFilter] = useState<DataRequestStatus | 'all'>('all');
   const [requests, setRequests] = useState<AdminDataRequest[]>([]);
@@ -48,6 +41,7 @@ export default function AdminDataRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [detail, setDetail] = useState<AdminDataRequestDetail | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,8 +52,9 @@ export default function AdminDataRequestsPage() {
       );
       setRequests(r);
       setSuppressions(s);
-    } catch {
-      setError('요청 목록을 불러오지 못했습니다. (관리자 인증 필요)');
+    } catch (caught: unknown) {
+      if (isAxiosError(caught)) setError('요청 목록을 불러오지 못했습니다. (관리자 인증 필요)');
+      else throw caught;
     } finally {
       setLoading(false);
     }
@@ -69,13 +64,32 @@ export default function AdminDataRequestsPage() {
     load();
   }, [load]);
 
-  async function changeStatus(ticketId: string, status: DataRequestStatus) {
-    setBusy(ticketId);
+  async function changeStatus(request: AdminDataRequest, status: DataRequestStatus) {
+    setBusy(request.id);
     try {
-      await adminUpdateDataRequest(ticketId, status);
+      await adminUpdateDataRequest(request.id, status, request.version);
+      setDetail(null);
       await load();
-    } catch {
-      setError('상태 변경에 실패했습니다.');
+    } catch (caught: unknown) {
+      if (isAxiosError(caught) && caught.response?.status === 409) {
+        setError('다른 관리자가 먼저 변경했습니다. 새로고침 후 다시 확인해 주세요.');
+        await load();
+      } else {
+        setError('상태 변경에 실패했습니다.');
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function openDetail(id: string) {
+    setBusy(id);
+    setError(null);
+    try {
+      setDetail(await adminGetDataRequestDetail(id));
+    } catch (caught: unknown) {
+      if (isAxiosError(caught)) setError('민감 상세 정보를 불러오지 못했습니다.');
+      else throw caught;
     } finally {
       setBusy(null);
     }
@@ -148,102 +162,18 @@ export default function AdminDataRequestsPage() {
       ) : (
         <div className="space-y-3">
           {requests.map((r) => (
-            <article key={r.ticketId} className="border border-hair bg-surface">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hair bg-surface-2 px-4 py-2">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-body-sm text-ink">{r.ticketId}</span>
-                  <span className="border border-hair bg-surface px-2 py-0.5 text-caption text-ink-2">
-                    {TYPE_LABELS[r.type]}
-                  </span>
-                </div>
-                <span
-                  className={`font-mono text-mono-xs uppercase tracking-widest-2 ${STATUS_COLOR[r.status]}`}
-                >
-                  {STATUS_LABELS[r.status]}
-                </span>
-              </div>
-
-              <div className="space-y-3 px-4 py-3">
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-caption sm:grid-cols-4">
-                  <Cell label="선수명" value={r.athleteName} />
-                  <Cell label="소속" value={r.affiliation || '—'} />
-                  <Cell label="대회" value={r.competition || '—'} />
-                  <Cell label="종목" value={r.event || '—'} />
-                </dl>
-                <div>
-                  <p className="text-caption uppercase tracking-wider-2 text-ink-4">사유</p>
-                  <p className="mt-0.5 whitespace-pre-wrap text-body-sm text-ink-2">{r.reason}</p>
-                </div>
-                {r.contact && (
-                  <div>
-                    <p className="text-caption uppercase tracking-wider-2 text-ink-4">연락처</p>
-                    <p className="mt-0.5 text-body-sm text-ink-2">{r.contact}</p>
-                  </div>
-                )}
-                <p className="font-mono text-mono-xs text-ink-4">
-                  접수 {new Date(r.receivedAt).toLocaleString('ko-KR')} · 갱신{' '}
-                  {new Date(r.updatedAt).toLocaleString('ko-KR')}
-                </p>
-
-                {/* 처리 버튼 — 기본 권장은 “검색 비노출”, 삭제는 예외적 조치 */}
-                <div className="flex flex-wrap gap-2 border-t border-hair pt-3">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busy === r.ticketId || r.status === 'search_hidden'}
-                    onClick={() => changeStatus(r.ticketId, 'search_hidden')}
-                    title="결과표에는 남기고 이름·소속 검색·추천 화면에서만 제외"
-                  >
-                    검색 비노출
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busy === r.ticketId || r.status === 'under_review'}
-                    onClick={() => changeStatus(r.ticketId, 'under_review')}
-                  >
-                    검토중(마스킹)
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={busy === r.ticketId || r.status === 'corrected'}
-                    onClick={() => changeStatus(r.ticketId, 'corrected')}
-                  >
-                    정정 완료
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={busy === r.ticketId || r.status === 'removed'}
-                    onClick={() => changeStatus(r.ticketId, 'removed')}
-                    title="예외적 조치: 모든 노출에서 제외"
-                  >
-                    삭제(예외)
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={busy === r.ticketId || r.status === 'restored'}
-                    onClick={() => changeStatus(r.ticketId, 'restored')}
-                  >
-                    유지(원복)
-                  </Button>
-                </div>
-              </div>
-            </article>
+            <AdminDataRequestCard
+              key={r.id}
+              request={r}
+              detail={detail}
+              busy={busy === r.id}
+              onOpenDetail={openDetail}
+              onCloseDetail={() => setDetail(null)}
+              onChangeStatus={changeStatus}
+            />
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function Cell({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-ink-4">{label}</dt>
-      <dd className="text-ink-2">{value}</dd>
     </div>
   );
 }

@@ -270,12 +270,14 @@ function buildIndex() {
             name,
             affiliation: team,
             competition: competitionName,
+            event: eventLabel,
           }) ||
           (normalizedTeam !== team
             ? dataRequestService.checkSuppression({
                 name,
                 affiliation: normalizedTeam,
                 competition: competitionName,
+                event: eventLabel,
               })
             : null);
         if (suppression) continue;
@@ -487,6 +489,7 @@ function appendManualTopRecordCandidates(context) {
       name,
       affiliation: team,
       competition: competitionName,
+      event: candidate.eventLabel || candidate.event || '',
     });
     if (suppression) {
       context.manualTopRecordStats.skippedSuppressed += 1;
@@ -1095,7 +1098,17 @@ function buildSignature() {
   const manualTopRecords = manualTopRecordsService.getSignature();
   const suppressions = dataRequestService
     .getActiveSuppressions()
-    .map((item) => `${item.key}:${item.mode}:${item.since}`)
+    .map((item) => [
+      item.id,
+      item.recordKey,
+      item.sourceId,
+      item.athleteName,
+      item.affiliation,
+      item.competition,
+      item.event,
+      item.mode,
+      item.since,
+    ].join(':'))
     .join('|');
   return `${filenames}::${manualTopRecords}::${suppressions}`;
 }

@@ -24,6 +24,8 @@ export interface DataRequestInput {
   affiliation?: string;
   competition?: string;
   event?: string;
+  recordKey?: string;
+  sourceId?: string;
   reason: string;
   contact?: string;
 }
@@ -36,9 +38,9 @@ export interface DataRequestReceipt {
 }
 
 export interface DataRequestStatusInfo {
-  ticketId: string;
   type: DataRequestType;
   status: DataRequestStatus;
+  version: number;
   receivedAt: string;
   updatedAt: string;
 }
@@ -60,18 +62,29 @@ export async function getDataRequestStatus(ticketId: string): Promise<DataReques
 // ── 관리자 API ──
 
 export interface AdminDataRequest {
-  ticketId: string;
+  id: string;
+  ticketHint: string;
   type: DataRequestType;
   athleteName: string;
   affiliation: string;
   competition: string;
   event: string;
-  reason: string;
-  contact: string;
   status: DataRequestStatus;
+  version: number;
   receivedAt: string;
   updatedAt: string;
-  history?: { status: DataRequestStatus; at: string; note: string }[];
+}
+
+export interface AdminDataRequestDetail extends AdminDataRequest {
+  reason: string;
+  contact: string;
+  history: readonly {
+    fromStatus?: DataRequestStatus;
+    status: DataRequestStatus;
+    at: string;
+    note: string;
+    version?: number;
+  }[];
 }
 
 export interface Suppression {
@@ -98,11 +111,22 @@ export async function adminListDataRequests(status?: DataRequestStatus): Promise
 
 /** (관리자) 요청 상태 변경 */
 export async function adminUpdateDataRequest(
-  ticketId: string,
+  id: string,
   status: DataRequestStatus,
+  expectedVersion: number,
   note?: string,
-): Promise<void> {
-  await apiClient.patch(`${ADMIN_BASE}/${encodeURIComponent(ticketId)}`, { status, note });
+): Promise<{ readonly status: DataRequestStatus; readonly version: number }> {
+  const { data } = await apiClient.patch(`${ADMIN_BASE}/${encodeURIComponent(id)}`, {
+    status,
+    note,
+    expectedVersion,
+  });
+  return data.data;
+}
+
+export async function adminGetDataRequestDetail(id: string): Promise<AdminDataRequestDetail> {
+  const { data } = await apiClient.get(`${ADMIN_BASE}/${encodeURIComponent(id)}`);
+  return data.data as AdminDataRequestDetail;
 }
 
 /** 상태 라벨(한글) */

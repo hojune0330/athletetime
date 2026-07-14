@@ -206,10 +206,11 @@ function _selectPublicProfileRows({ event, eventGroup, activeSuppressions, compe
     if (!assessPublicIndexRow({ eventLabel: event.event, row: result }).indexable) continue;
     const name = _clean(result.name);
     if (!name) continue;
-    if (_checkSuppression(activeSuppressions, {
+    if (dataRequestService.checkSuppression({
       name,
       affiliation: result.affiliation,
       competition: competitionName,
+      event: event.event,
     })) continue;
     const value = _parseValue(result.record, eventGroup);
     if (value == null) continue;
@@ -222,7 +223,17 @@ function _signature() {
   const filenames = resultsStore.listFilenames().join('|');
   const suppressions = dataRequestService
     .getActiveSuppressions()
-    .map(item => `${item.key}:${item.mode}:${item.since}`)
+    .map(item => [
+      item.id,
+      item.recordKey,
+      item.sourceId,
+      item.athleteName,
+      item.affiliation,
+      item.competition,
+      item.event,
+      item.mode,
+      item.since,
+    ].join(':'))
     .join('|');
   return `${filenames}::${suppressions}`;
 }
@@ -323,26 +334,6 @@ function _parseValue(mark, eventGroup = 'sprint') {
   return eventGroup === 'field' ? value : value;
 }
 
-function _checkSuppression(suppressions, { name, affiliation, competition } = {}) {
-  if (!Array.isArray(suppressions) || suppressions.length === 0) return null;
-
-  const nm = _clean(name);
-  const aff = _clean(affiliation);
-  const comp = _clean(competition);
-
-  // mask(검토 중) / hide(검색 비노출) / remove(삭제) 모두 인사이트 후보에서 제외한다.
-  // (호출부 line ~97: `if (suppression) continue;` — non-null 이면 무조건 제외)
-  const KNOWN_MODES = ['mask', 'hide', 'remove'];
-  for (const item of suppressions) {
-    if (!item.athleteName || item.athleteName !== nm) continue;
-    if (item.affiliation && item.affiliation !== aff) continue;
-    if (item.competition && item.competition !== comp) continue;
-    return KNOWN_MODES.includes(item.mode) ? item.mode : 'mask';
-  }
-
-  return null;
-}
-
 function _mostCommonEvent(records) {
   const counts = new Map();
   for (const record of records) {
@@ -360,5 +351,4 @@ module.exports = {
   _parseValue,
   _eventGroup,
   _pureEvent,
-  _checkSuppression,
 };

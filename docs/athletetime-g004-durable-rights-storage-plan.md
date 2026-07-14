@@ -1,9 +1,9 @@
 # G004 권리 요청 영속화 실행 계약
 
-상태: 구현 대기  
-기준 브랜치: `main` (`dddb3da`)  
-작업 브랜치: `codex/durable-rights-storage`  
-총괄 인계: PR #48  
+상태: 구현 완료, PostgreSQL CI 검증 대기
+기준 브랜치: `main` (`1e7df38`)
+작업 브랜치: `codex/durable-rights-storage`
+총괄 인계: PR #48
 선행 신뢰 게이트: PR #49와 독립적으로 리뷰·머지
 
 ## 1. 왜 지금 바꾸는가
@@ -22,7 +22,8 @@
 
 1. 운영 저장소는 PostgreSQL 하나만 사용한다. 운영에서 DB가 없거나 준비되지 않으면
    요청 쓰기를 성공으로 응답하지 않는다.
-2. 개발·단위 테스트는 명시적으로 주입한 메모리 저장소만 사용한다. 파일 폴백은 없다.
+2. 운영은 PostgreSQL만 사용한다. 기존 파일 저장소는 개발 호환성과 이관 입력에만 남기며,
+   운영에서는 환경 검증이 파일 폴백을 차단한다.
 3. 공개 티켓은 192비트 이상 난수로 만들고 DB에는 SHA-256 해시만 저장한다. 화면에는
    최초 접수 시 전체 티켓을 한 번 반환하고, 이후 조회는 제출된 티켓을 해시해 찾는다.
 4. 요청 접수, 상태 이벤트, suppression 변경은 한 PostgreSQL 트랜잭션이다.
@@ -30,8 +31,9 @@
    하나만 성공하고 나머지는 `409 Conflict`다.
 6. 검색 suppression의 런타임 판정은 서버 시작 때 DB에서 채운 읽기 전용 메모리
    스냅샷을 사용한다. DB 로드 실패 시 운영 서버는 준비 완료 상태가 되지 않는다.
-7. suppression은 `recordKey` 또는 `sourceId`를 우선 사용한다. 기존
-   이름·소속·대회 조합은 `legacyScope`로 표시한 마이그레이션 호환 행에만 허용한다.
+7. 기록 하나를 지정한 suppression은 `recordKey` 또는 `sourceId`를 우선 사용한다.
+   선수 전체처럼 넓은 권리 요청은 `subject_tuple`, 기존 파일 이관 행만 `legacy_tuple`로
+   구분해 같은 이름의 다른 선수나 다른 종목으로 범위가 번지지 않게 한다.
 8. 0건 검색은 원문, 검색어별 fingerprint, IP, user-agent, userId를 저장하지 않는다.
    오직 날짜·화면·문자 종류·길이 구간의 합계만 저장한다.
 9. 기존 JSON은 읽기 전용 1회 이관 입력이다. 이관 성공 후에도 자동 삭제하지 않고,
@@ -66,8 +68,8 @@
 
 - `id UUID`, `request_id UUID`, `mode`, `active`, `version`
 - 우선 식별자: `record_key`, `source_id`
-- 이관 전용: `legacy_athlete_name`, `legacy_affiliation`, `legacy_competition`,
-  `legacy_event`, `scope_kind='legacy_tuple'`
+- 주체 범위: `legacy_athlete_name`, `legacy_affiliation`, `legacy_competition`,
+  `legacy_event`, 신규 넓은 요청은 `scope_kind='subject_tuple'`, 이관 행은 `legacy_tuple`
 - `started_at`, `ended_at`
 - 요청별 활성 suppression은 하나만 허용
 
@@ -185,6 +187,8 @@ Critical path: `T1 -> T2 -> T3 -> T4 -> T7`.
 6. 오류 시 새 쓰기를 503으로 닫고 DB 백업을 보존한다. 이전 파일 쓰기 코드로 자동
    폴백하지 않는다.
 7. 연락처 암호화 키, DB URL, 백업 접근권한은 저장소와 로그에 남기지 않는다.
+8. 기존 순차형 티켓 이관·조회에는 32자 이상의 `DATA_RIGHTS_LEGACY_TICKET_PEPPER`가
+   필요하며 dry-run부터 같은 키를 사용한다. 키가 없으면 이관과 기존 티켓 조회를 중단한다.
 
 DDL은 파괴적 `DROP`을 포함하지 않는다. 코드 롤백이 필요해도 테이블과 이벤트 이력은
 보존한다. 이관 전 JSON은 검증 완료 전까지 읽기 전용 증거로 유지한다.
@@ -199,15 +203,15 @@ DDL은 파괴적 `DROP`을 포함하지 않는다. 코드 롤백이 필요해도
 - 검색 원문을 저장하지 않는다는 고지가 실제 DB·로그 검증과 일치하는지
 - 운영 보관기간 3년/90일은 법률 검토 전 잠정값으로 표시됐는지
 
-## 9. 현재 중단 지점과 다음 작업자 시작 명령
+## 9. 현재 구현 상태와 다음 승인 단계
 
-2026-07-14 기준 코드 구현은 시작하지 않았다. 탐색 작업자 세 명의 DB·개인정보·보안
-검토와 ULW 성공 기준 정의까지 완료했다. 추가 계획/구현 작업자는 Codex 병렬 사용 한도에
-걸려 실행되지 않았다. 이 문서와 PR을 구현 완료로 오해하면 안 된다.
+2026-07-14 기준 `T1`부터 `T6`까지 구현했고 로컬 단위·회귀·프론트 빌드 검증을 통과했다.
+불투명 공개 티켓, PostgreSQL 트랜잭션, 낙관적 잠금, suppression 시작 시 hydrate,
+원문 없는 0건 검색 집계, JSON dry-run 이관 도구와 PostgreSQL 전용 CI workflow가 포함됐다.
 
-다음 작업자는 이 브랜치를 이어받아 `T1`부터 시작한다. 먼저 현행 파일 동작을 고정하는
-characterization 테스트를 통과시키고, 새 기대값이 정확한 이유로 실패하는 RED 증거를
-남긴 뒤 production code를 수정한다. PostgreSQL 통합 검증용 `TEST_DATABASE_URL`이 없으면
-단위 구현은 진행할 수 있지만 G004 완료 또는 운영 배포 승인을 주장할 수 없다.
+로컬 PC에는 격리 PostgreSQL이 없어 실제 DB 생애주기 검증은 GitHub Actions의 PostgreSQL
+16.4 service container에서 수행한다. 따라서 workflow가 통과하기 전에는 G004 운영 배포를
+승인하거나 완료로 표시하지 않는다. CI 통과 뒤 페이블은 §8 체크리스트와 PR 증거를 검토하고,
+운영 배포는 §7 순서에 따라 별도 승인한다.
 
 다른 멈춘 작업은 이 PR에 섞지 않는다. 담당·선행·금지사항은 PR #48을 따른다.
