@@ -4,11 +4,11 @@ const test = require('node:test');
 test('RIGHTS-LOG-001: Given either public API mount When logging a ticket lookup Then the ticket is redacted', () => {
   const { requestLogPath } = require('../../src/requestLogPath');
   assert.equal(requestLogPath({
-    originalUrl: '/api/card-studio/data-requests/DR_secret-ticket?lookup=true',
+    originalUrl: '/api/card-studio/data-requests/DR_secret-ticket/?lookup=true',
     path: '/data-requests/DR_secret-ticket',
   }), '/api/card-studio/data-requests/[redacted]');
   assert.equal(requestLogPath({
-    originalUrl: '/api/data-requests/DR_secret-ticket',
+    originalUrl: '/api/data-requests/DR_secret-ticket/',
     path: '/data-requests/DR_secret-ticket',
   }), '/api/data-requests/[redacted]');
 });
@@ -39,9 +39,15 @@ test('RIGHTS-RECOVERY-001: Given one transient storage failure When the next wri
       (error) => error.code === 'DATA_RIGHTS_UNAVAILABLE',
     );
     assert.equal(service.readiness().ready, false);
+    assert.equal(service.checkSuppression({
+      name: '보호대상', competition: '보호대회', event: '남자 100m 결승',
+    }), 'remove');
     const recovered = await service.submitRequest({ type: 'correction', athleteName: '복구선수', reason: '두 번째 시도' });
     assert.equal(recovered.ok, true);
     assert.equal(service.readiness().ready, true);
+    assert.equal(service.checkSuppression({
+      name: '보호대상', competition: '보호대회', event: '남자 100m 결승',
+    }), null);
   } finally {
     await service.shutdown();
     if (previous.nodeEnv === undefined) delete process.env.NODE_ENV;

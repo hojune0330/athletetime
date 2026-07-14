@@ -209,6 +209,7 @@ function getActiveSuppressions() {
 }
 
 function checkSuppression(input = {}) {
+  if (usesPostgres() && !ready) return 'remove';
   return findSuppressionMode(activeSuppressions, input);
 }
 
