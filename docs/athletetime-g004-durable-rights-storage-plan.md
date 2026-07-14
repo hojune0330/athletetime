@@ -215,3 +215,13 @@ DDL은 파괴적 `DROP`을 포함하지 않는다. 코드 롤백이 필요해도
 운영 배포는 §7 순서에 따라 별도 승인한다.
 
 다른 멈춘 작업은 이 PR에 섞지 않는다. 담당·선행·금지사항은 PR #48을 따른다.
+
+## 10. Retention and privacy contract
+
+- Identifiable data-rights request fields and the public lookup key are anonymized 3 years after receipt, regardless of request status.
+- Contact data is retained no later than 90 days after receipt and no later than 30 days after terminal closure; whichever deadline occurs first applies.
+- Inactive suppression records are deleted when the associated request expires. Active suppression records are retained only while needed to honor a hide or removal request.
+- Aggregate zero-result metrics are retained for 24 months and contain no raw query or user/device identifier.
+- Data-rights HTTP responses use `Cache-Control: no-store`, and request details and public lookup responses are never stored in an application cache.
+- Production backups are encrypted, access-controlled, and retained for at most 35 days. Purged or anonymized data ages out no later than the next backup expiry.
+- This contract does not claim legal safety. Fable/privacy approval is still required before launch or production use; an approved stricter limit supersedes these defaults.

@@ -3,10 +3,12 @@ name: Data rights PostgreSQL contract
 on:
   pull_request:
     paths:
-      - 'backend/database/migration-004-data-rights.sql'
+      - 'backend/database/migration-*.sql'
+      - 'backend/database/data-rights-schema-contract.js'
       - 'backend/database/run-migrations.js'
       - 'backend/tests/data-rights-*.test.js'
       - 'card-studio/repositories/**'
+      - 'card-studio/repositories/postgresRetention.js'
       - 'card-studio/services/dataRequestService.js'
       - 'card-studio/services/dataRequestValidation.js'
       - 'card-studio/services/dataSuppressionMatcher.js'
@@ -14,6 +16,8 @@ on:
       - 'card-studio/services/dataRightsCrypto.js'
       - 'card-studio/services/zeroResultSearchService.js'
       - 'tools/migrate-data-rights-files.js'
+      - 'src/requestLogPath.js'
+      - 'src/server.js'
       - '.github/workflows/data-rights-postgres.yml'
   workflow_dispatch:
 

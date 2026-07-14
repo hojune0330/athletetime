@@ -27,6 +27,16 @@
 - 임시 캐시가 필요하면 위치, 접근 권한, 만료 시점, 삭제 절차를 기록하고 최소 기간만 유지합니다.
 - 목적이 사라진 데이터는 재사용하지 않고 삭제 대상으로 표시합니다.
 
+### Concrete data-rights retention schedule
+
+- Identifiable data-rights request fields and the public lookup key are anonymized 3 years after receipt, regardless of request status.
+- Contact data is retained no later than 90 days after receipt and no later than 30 days after terminal closure. The earlier deadline controls.
+- Inactive suppression records are deleted when the associated request expires. Active suppression records are retained only while needed to honor a hide or removal request; they are not retained as general request history.
+- Aggregate zero-result metrics are retained for 24 months. They must not contain raw queries, query fingerprints, IP addresses, user agents, user IDs, or other identifiers.
+- Data-rights HTTP responses use `Cache-Control: no-store`; the application must not cache request details or public lookup responses.
+- Production backups containing data-rights data must be encrypted, access-controlled, and retained for at most 35 days. Data already purged or anonymized in the live system ages out no later than the next backup expiry.
+- These are concrete operational limits, not a claim of legal safety. Fable/privacy approval remains an explicit launch and production gate, and any approved shorter period takes precedence.
+
 ## Correction/Removal
 
 - 선수, 보호자, 소속 단체, 출처 운영자가 정정, 삭제, 비공개 처리를 요청할 수 있는 연락 경로를 제공합니다.
