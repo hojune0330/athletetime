@@ -5,6 +5,10 @@ const dataRequestService = require('./dataRequestService');
 const identityResolver = require('./identityResolver');
 const manualTopRecordsService = require('./manualTopRecordsService');
 const divisionHierarchyService = require('./divisionHierarchyService');
+const {
+  assessPublicIndexEvent,
+  assessPublicIndexRow,
+} = require('./publicIndexQualityService');
 const { classifyEvent, needsWind } = require('../eventClassifier');
 
 const INVALID_MARK = /^(dns|dnf|dq|dsq|nm|nt|nr|-|)$/i;
@@ -216,6 +220,8 @@ function buildIndex() {
 
     for (const event of data.events || []) {
       const eventLabel = clean(event.event, 160);
+      if (!assessPublicIndexEvent(eventLabel).indexable) continue;
+
       const divisionLabel = clean(event.division, 120) || inferDivisionLabel(eventLabel);
       const eventMeta = normalizeEvent(eventLabel, divisionLabel);
       if (eventMeta.eventKey && !eventLabelByKey.has(eventMeta.eventKey)) {
@@ -233,6 +239,24 @@ function buildIndex() {
       }
 
       for (const result of event.results || []) {
+        const rowAssessment = assessPublicIndexRow({ eventLabel, row: result });
+        if (!rowAssessment.indexable) {
+          if (rowAssessment.reason === 'team_event') {
+            const teamResultName = clean(result.name, 100);
+            const teamResultRecord = parseRecord(result.record, eventMeta.direction);
+            if (isIndexableAthleteName(teamResultName) && teamResultRecord) {
+              const dedupKey = buildManualTopRecordDedupKey({
+                name: teamResultName,
+                eventKey: eventMeta.eventKey,
+                date: clean(event.date, 20) || competitionDate,
+                recordDisplay: teamResultRecord.display,
+              });
+              if (dedupKey) manualTopRecordDedupKeys.add(dedupKey);
+            }
+          }
+          continue;
+        }
+
         const name = clean(result.name, 100);
         if (!name) continue;
         if (!isIndexableAthleteName(name)) continue;
@@ -401,7 +425,9 @@ function buildIndex() {
   }
 
   const seasons = [...new Set(records.map((record) => record.season).filter(Boolean))].sort((a, b) => b - a);
+  const indexedEventKeys = new Set(records.map((record) => record.eventKey));
   const events = [...eventLabelByKey.entries()]
+    .filter(([key]) => indexedEventKeys.has(key))
     .map(([key, label]) => ({ key, label }))
     .sort((a, b) => a.label.localeCompare(b.label));
   const divisionFilters = divisionHierarchyService.buildDivisionFilters(divisionMetaByKey);

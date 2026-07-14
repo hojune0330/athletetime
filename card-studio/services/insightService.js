@@ -2,6 +2,7 @@ const crypto = require('crypto');
 
 const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
+const { assessPublicIndexRow } = require('./publicIndexQualityService');
 const { classifyEvent } = require('../eventClassifier');
 
 const TRACK_EVENT_GROUPS = [
@@ -85,20 +86,13 @@ function _buildProfiles() {
       const eventDate = event.date || competitionDate;
       const eventVenue = event.venue || competitionVenue;
 
-      for (const result of event.results || []) {
-        const name = _clean(result.name);
-        if (!name) continue;
-
-        const suppression = _checkSuppression(activeSuppressions, {
-          name,
-          affiliation: result.affiliation,
-          competition: competitionName,
-        });
-        if (suppression) continue;
-
-        const value = _parseValue(result.record, eventGroup);
-        if (value == null) continue;
-
+      const selectedRows = _selectPublicProfileRows({
+        event,
+        eventGroup,
+        activeSuppressions,
+        competitionName,
+      });
+      for (const { result, name, value } of selectedRows) {
         const team = _clean(result.affiliation);
         const profileKey = `${name}|${team}`;
         const profileId = _stableId(profileKey);
@@ -164,6 +158,64 @@ function _buildProfiles() {
         .slice(-12),
     }))
     .filter(profile => profile.records.length > 0);
+}
+
+function auditPublicIndexEligibility() {
+  const audit = {
+    inspectedEvents: 0,
+    inspectedRows: 0,
+    selectedRows: 0,
+    quarantinedRows: [],
+  };
+  const activeSuppressions = dataRequestService.getActiveSuppressions();
+
+  for (const filename of resultsStore.listFilenames()) {
+    const data = resultsStore.getRawByFilename(filename);
+    if (!data) continue;
+    const competitionName = data.meta?.competition_name || '';
+    for (const event of data.events || []) {
+      audit.inspectedEvents += 1;
+      audit.inspectedRows += (event.results || []).length;
+      const selectedRows = _selectPublicProfileRows({
+        event,
+        eventGroup: _eventGroup(_pureEvent(event.event) || event.event),
+        activeSuppressions,
+        competitionName,
+      });
+      audit.selectedRows += selectedRows.length;
+      for (const { result } of selectedRows) {
+        const assessment = assessPublicIndexRow({ eventLabel: event.event, row: result });
+        if (assessment.indexable) continue;
+        audit.quarantinedRows.push({
+          filename,
+          competition: competitionName,
+          event: String(event.event || ''),
+          reason: assessment.reason,
+          ...result,
+        });
+      }
+    }
+  }
+
+  return audit;
+}
+
+function _selectPublicProfileRows({ event, eventGroup, activeSuppressions, competitionName }) {
+  const selectedRows = [];
+  for (const result of event.results || []) {
+    if (!assessPublicIndexRow({ eventLabel: event.event, row: result }).indexable) continue;
+    const name = _clean(result.name);
+    if (!name) continue;
+    if (_checkSuppression(activeSuppressions, {
+      name,
+      affiliation: result.affiliation,
+      competition: competitionName,
+    })) continue;
+    const value = _parseValue(result.record, eventGroup);
+    if (value == null) continue;
+    selectedRows.push({ result, name, value });
+  }
+  return selectedRows;
 }
 
 function _signature() {
@@ -300,6 +352,7 @@ function _mostCommonEvent(records) {
 }
 
 module.exports = {
+  auditPublicIndexEligibility,
   getAthleteProfiles,
   getFeaturedProfiles,
   searchProfiles,

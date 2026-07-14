@@ -4,7 +4,7 @@
 
 > **⚠️ 작업자 필독**: 개발 플로우·저장소 역사·작업 규칙은 [`WORKFLOW.md`](./WORKFLOW.md) 참조.
 > 핸드오프 저장소(`2026-first-item`)의 작업은 완료되어 **현재 프로덕션 repo는 `hojune0330/athletetime`** 이다.
-> 2026-07-07부터 모든 작업자(Codex 포함)는 athletetime에 직접 커밋한다.
+> 현재 상태의 정본은 [`docs/athletetime-current-state.md`](./docs/athletetime-current-state.md), 후속 작업 순서는 [`docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md`](./docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md)를 따른다.
 
 ---
 
@@ -16,10 +16,10 @@
 
 ## 브랜치
 
-| 브랜치 | 용도 |
+| 방식 | 용도 |
 |---|---|
-| `genspark_ai_developer` | 최신 작업 브랜치 (기본) |
-| `main` | 안정 릴리즈 |
+| 기능 브랜치 | 작업별 변경을 격리하고 검증 |
+| PR → `main` | 리뷰와 필수 검증을 거쳐 프로덕션 기준 브랜치에 병합 |
 
 ## 디자인 핸드오프
 
