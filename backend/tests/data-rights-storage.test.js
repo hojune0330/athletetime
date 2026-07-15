@@ -122,10 +122,19 @@ test('RIGHTS-IMPORT-003: Given a legacy suppression without full scope When plan
 test('RIGHTS-TLS-001: Given production PostgreSQL When configuring TLS Then certificate verification stays enabled', () => {
   const { postgresSslConfig } = require('../database/postgres-ssl');
   assert.deepEqual(postgresSslConfig({ NODE_ENV: 'production' }), { rejectUnauthorized: true });
+  assert.deepEqual(postgresSslConfig({
+    NODE_ENV: 'production',
+    DATABASE_TLS_ALLOW_SELF_SIGNED: 'true',
+  }), { rejectUnauthorized: true });
+  assert.deepEqual(postgresSslConfig({
+    NODE_ENV: 'production',
+    RENDER: 'true',
+    DATABASE_TLS_ALLOW_SELF_SIGNED: 'true',
+  }), { rejectUnauthorized: false });
   assert.equal(postgresSslConfig({ NODE_ENV: 'test' }), false);
 });
 
-test('RIGHTS-TLS-002: Given the migration CLI in production When building its pool Then verified TLS is mandatory', () => {
+test('RIGHTS-TLS-002: Given the migration CLI in production When building its pool Then TLS policy is preserved', () => {
   assert.deepEqual(migrationPoolOptions({
     NODE_ENV: 'production',
     DATABASE_URL: 'postgresql://production.example/athletetime',
@@ -139,6 +148,15 @@ test('RIGHTS-TLS-002: Given the migration CLI in production When building its po
   }), {
     connectionString: 'postgresql://127.0.0.1/athletetime_test',
     ssl: false,
+  });
+  assert.deepEqual(migrationPoolOptions({
+    NODE_ENV: 'production',
+    RENDER: 'true',
+    DATABASE_TLS_ALLOW_SELF_SIGNED: 'true',
+    DATABASE_URL: 'postgresql://render-internal/athletetime',
+  }), {
+    connectionString: 'postgresql://render-internal/athletetime',
+    ssl: { rejectUnauthorized: false },
   });
 });
 
