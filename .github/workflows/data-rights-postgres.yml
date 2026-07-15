@@ -1,0 +1,61 @@
+name: Data rights PostgreSQL contract
+
+on:
+  pull_request:
+    paths:
+      - 'backend/database/migration-*.sql'
+      - 'backend/database/data-rights-schema-contract.js'
+      - 'backend/database/run-migrations.js'
+      - 'backend/tests/data-rights-*.test.js'
+      - 'card-studio/repositories/**'
+      - 'card-studio/repositories/postgresRetention.js'
+      - 'card-studio/services/dataRequestService.js'
+      - 'card-studio/services/dataRightsDatabase.js'
+      - 'card-studio/services/dataRequestValidation.js'
+      - 'card-studio/services/dataSuppressionMatcher.js'
+      - 'card-studio/services/contactPurgeScheduler.js'
+      - 'card-studio/services/dataRightsCrypto.js'
+      - 'card-studio/services/zeroResultSearchService.js'
+      - 'tools/migrate-data-rights-files.js'
+      - 'tools/check-data-rights-rollout.js'
+      - 'tools/data-rights-rollout.js'
+      - 'package.json'
+      - 'src/requestLogPath.js'
+      - 'src/server.js'
+      - '.github/workflows/data-rights-postgres.yml'
+  workflow_dispatch:
+
+jobs:
+  postgres-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16.4-alpine
+        env:
+          POSTGRES_DB: athletetime_rights_test
+          POSTGRES_USER: athletetime_test
+          POSTGRES_PASSWORD: test-job-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U athletetime_test -d athletetime_rights_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATA_RIGHTS_ENCRYPTION_KEY: BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:data-rights
+        env:
+          TEST_DATABASE_URL: postgresql://athletetime_test:test-job-only-password@127.0.0.1:5432/athletetime_rights_test
+      - run: npm test
+      - run: npm ci --prefix frontend
+      - run: npm run build:check --prefix frontend

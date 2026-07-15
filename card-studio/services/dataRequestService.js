@@ -1,324 +1,266 @@
-/**
- * 데이터 정정/삭제/이의제기 요청 서비스 (Data Request Service)
- *
- * "Notice & Graduated Takedown" 법적 방어 설계의 3·4층을 담당합니다.
- *
- *  3층 (요청 접수):  POST 로 들어온 요청을 파일 큐(data/requests/requests.json)에
- *                    티켓 ID(DR-YYYY-NNNN)와 함께 저장합니다. (관리자 로그/게시판형)
- *
- *  4층 (단계별 처리): 요청은 received → under_review → (restored | removed)
- *                    상태를 거칩니다. 관리자가 "검토중/삭제"로 전환하면 해당 기록이
- *                    suppression 목록(data/requests/suppressions.json)에 추가되어
- *                    검색/결과에서 자동으로 마스킹/제외됩니다.
- *
- * 설계 의도:
- *  - 즉시 응답 의무를 만들지 않되, 접수 채널과 처리 이력은 실재 → "성실 운영" 입증.
- *  - 직접 연락(이메일) 없이 관리자 화면에서 일괄 검토·처리하는 구조.
- *  - 외부 의존성 없이 파일 기반으로 동작(배포 환경 호환).
- */
+const { runMigrations } = require('../../backend/database/run-migrations');
+const { MemoryDataRightsRepository } = require('../repositories/memoryDataRightsRepository');
+const { PostgresDataRightsRepository } = require('../repositories/postgresDataRightsRepository');
+const { startDataRightsSchedules } = require('./contactPurgeScheduler');
+const { connectionString, createPool, usesPostgres } = require('./dataRightsDatabase');
+const {
+  buildRecordKey,
+  createPublicTicket,
+  encryptContact,
+  hashLegacyTicket,
+  hashPublicTicket,
+  ticketHint,
+} = require('./dataRightsCrypto');
+const {
+  REQUEST_TYPES,
+  STATUSES,
+  sanitize,
+  validateRequest,
+} = require('./dataRequestValidation');
+const { findSuppressionMode, freezeSuppressions } = require('./dataSuppressionMatcher');
 
-const fs = require('fs');
-const path = require('path');
-const config = require('../config');
+let repository = null;
+let ownedPool = null;
+let initialized = false;
+let ready = false;
+let activeSuppressions = Object.freeze([]);
+let stopSchedules = null;
 
-const REQUESTS_DIR = path.join(config.dirs.data, 'requests');
-const REQUESTS_FILE = path.join(REQUESTS_DIR, 'requests.json');
-const SUPPRESSIONS_FILE = path.join(REQUESTS_DIR, 'suppressions.json');
+async function initialize(options = {}) {
+  if (initialized) return { ready, mode: usesPostgres() ? 'postgres' : 'memory-development' };
+  initialized = true;
+  ready = false;
 
-const REQUEST_TYPES = ['correction', 'deletion', 'objection'];
-// 상태 단계 (graduated exposure model):
-//   received      : 접수됨
-//   under_review  : 검토 중 (임시 마스킹 — "비공개 요청 처리 중")
-//   search_hidden : 검색 비노출 (결과표에는 남기되 이름/소속 검색·분석 화면에서 제외) — de-index
-//   corrected     : 정정됨 (잘못된 기록 수정 완료, 노출은 유지)
-//   restored      : 유지(검토 완료, suppression 해제)
-//   removed       : 예외적 삭제 (모든 노출에서 완전 제외)
-const STATUSES = ['received', 'under_review', 'search_hidden', 'corrected', 'restored', 'removed'];
-
-let suppressionsCache = null;
-let suppressionsMtimeMs = -1;
-let suppressionsCheckedAt = 0;
-const SUPPRESSIONS_STAT_TTL_MS = 5000;
-
-// ── 저수준 파일 IO ──
-
-function _ensureDir() {
-  if (!fs.existsSync(REQUESTS_DIR)) {
-    fs.mkdirSync(REQUESTS_DIR, { recursive: true });
-  }
-}
-
-function _readJson(file, fallback) {
   try {
-    if (!fs.existsSync(file)) return fallback;
-    return JSON.parse(fs.readFileSync(file, 'utf-8'));
-  } catch (e) {
-    return fallback;
-  }
-}
+    if (options.repository) {
+      repository = options.repository;
+    } else if (usesPostgres()) {
+      const pool = options.pool || createPool(connectionString());
+      ownedPool = options.pool ? null : pool;
+      await runMigrations({ pool });
+      repository = new PostgresDataRightsRepository(pool);
+    } else {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('PostgreSQL is required for production data-rights requests');
+      }
+      repository = new MemoryDataRightsRepository();
+    }
 
-function _writeJson(file, data) {
-  _ensureDir();
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-function _readRequests() {
-  const value = _readJson(REQUESTS_FILE, []);
-  return Array.isArray(value) ? value : [];
-}
-
-function _writeRequests(list) {
-  _writeJson(REQUESTS_FILE, list);
-}
-
-function _readSuppressions() {
-  const now = Date.now();
-  if (suppressionsCache && now - suppressionsCheckedAt < SUPPRESSIONS_STAT_TTL_MS) {
-    return suppressionsCache;
-  }
-  suppressionsCheckedAt = now;
-
-  let mtimeMs = -1;
-  try {
-    mtimeMs = fs.statSync(SUPPRESSIONS_FILE).mtimeMs;
-  } catch (_) {
-    if (suppressionsCache && suppressionsMtimeMs === -1) return suppressionsCache;
-  }
-
-  if (suppressionsCache && suppressionsMtimeMs === mtimeMs) {
-    return suppressionsCache;
-  }
-
-  const value = _readJson(SUPPRESSIONS_FILE, []);
-  suppressionsCache = Array.isArray(value) ? value : [];
-  suppressionsMtimeMs = mtimeMs;
-  return suppressionsCache;
-}
-
-function _writeSuppressions(list) {
-  _writeJson(SUPPRESSIONS_FILE, list);
-  suppressionsCache = Array.isArray(list) ? list : [];
-  try {
-    suppressionsMtimeMs = fs.statSync(SUPPRESSIONS_FILE).mtimeMs;
-  } catch (_) {
-    suppressionsMtimeMs = -1;
-  }
-  suppressionsCheckedAt = Date.now();
-}
-
-// ── 티켓 ID 발급 ──
-
-function _nextTicketId(list) {
-  const year = new Date().getFullYear();
-  const prefix = `DR-${year}-`;
-  const thisYear = list.filter(r => typeof r.ticketId === 'string' && r.ticketId.startsWith(prefix));
-  let maxSeq = 0;
-  for (const r of thisYear) {
-    const seq = parseInt(r.ticketId.slice(prefix.length), 10);
-    if (!Number.isNaN(seq) && seq > maxSeq) maxSeq = seq;
-  }
-  return `${prefix}${String(maxSeq + 1).padStart(4, '0')}`;
-}
-
-// ── 입력 정규화/검증 ──
-
-function _sanitize(str, max = 500) {
-  if (typeof str !== 'string') return '';
-  return str.trim().slice(0, max);
-}
-
-/**
- * suppression 매칭 키를 만듭니다.
- * 선수명(필수) + 소속(선택) + 대회(선택) 조합으로 식별합니다.
- */
-function _suppressionKey({ athleteName, affiliation, competition }) {
-  return [
-    _sanitize(athleteName, 100),
-    _sanitize(affiliation, 100),
-    _sanitize(competition, 200),
-  ].join('|');
-}
-
-// ── 공개 API ──
-
-/**
- * 새 요청을 접수하고 티켓을 발급합니다.
- * @returns {{ ok: boolean, error?: string, ticketId?: string, status?: string, receivedAt?: string }}
- */
-function submitRequest(input = {}) {
-  const type = _sanitize(input.type, 20);
-  if (!REQUEST_TYPES.includes(type)) {
-    return { ok: false, error: '요청 유형이 올바르지 않습니다. (correction|deletion|objection)' };
-  }
-
-  const athleteName = _sanitize(input.athleteName, 100);
-  const reason = _sanitize(input.reason, 2000);
-
-  if (!athleteName) {
-    return { ok: false, error: '대상 선수명(또는 식별 정보)을 입력해 주세요.' };
-  }
-  if (!reason) {
-    return { ok: false, error: '요청 사유를 입력해 주세요.' };
-  }
-
-  const list = _readRequests();
-  const ticketId = _nextTicketId(list);
-  const now = new Date().toISOString();
-
-  const record = {
-    ticketId,
-    type,
-    athleteName,
-    affiliation: _sanitize(input.affiliation, 100),
-    competition: _sanitize(input.competition, 200),
-    event: _sanitize(input.event, 120),
-    reason,
-    contact: _sanitize(input.contact, 200), // 선택 (없어도 됨)
-    status: 'received',
-    receivedAt: now,
-    updatedAt: now,
-    history: [{ status: 'received', at: now, note: '요청 접수' }],
-  };
-
-  list.push(record);
-  _writeRequests(list);
-
-  return { ok: true, ticketId, status: 'received', receivedAt: now };
-}
-
-/**
- * (공개) 티켓 ID로 처리 상태만 조회합니다. (개인정보 최소 노출)
- */
-function getStatusByTicket(ticketId) {
-  const id = _sanitize(ticketId, 30);
-  const list = _readRequests();
-  const r = list.find(x => x.ticketId === id);
-  if (!r) return null;
-  return {
-    ticketId: r.ticketId,
-    type: r.type,
-    status: r.status,
-    receivedAt: r.receivedAt,
-    updatedAt: r.updatedAt,
-  };
-}
-
-/**
- * (관리자) 전체 요청 목록.
- */
-function listRequests({ status } = {}) {
-  let list = _readRequests();
-  if (status && STATUSES.includes(status)) {
-    list = list.filter(r => r.status === status);
-  }
-  // 최신순
-  return list.slice().sort((a, b) => (a.receivedAt < b.receivedAt ? 1 : -1));
-}
-
-/**
- * (관리자) 요청 상태를 변경합니다.
- *
- * suppression 동기화 규칙:
- *   under_review  → mode 'mask'   (검토 중 마스킹: 결과표/검색 모두 "비공개 요청 처리 중")
- *   search_hidden → mode 'hide'   (검색 비노출: 결과표엔 정상 노출, 이름/소속 검색·분석 화면에서만 제외)
- *   removed       → mode 'remove' (예외적 삭제: 모든 노출에서 완전 제외)
- *   corrected/restored → suppression 해제 (노출 유지)
- */
-function updateStatus(ticketId, nextStatus, note = '') {
-  const id = _sanitize(ticketId, 30);
-  if (!STATUSES.includes(nextStatus)) {
-    return { ok: false, error: '상태 값이 올바르지 않습니다.' };
-  }
-
-  const list = _readRequests();
-  const idx = list.findIndex(r => r.ticketId === id);
-  if (idx === -1) return { ok: false, error: '해당 티켓을 찾을 수 없습니다.' };
-
-  const r = list[idx];
-  const now = new Date().toISOString();
-  r.status = nextStatus;
-  r.updatedAt = now;
-  r.history = r.history || [];
-  r.history.push({ status: nextStatus, at: now, note: _sanitize(note, 500) });
-
-  // suppression 동기화
-  const key = _suppressionKey(r);
-  let sup = _readSuppressions();
-  // suppression 을 만드는 상태: under_review(mask) / search_hidden(hide) / removed(remove)
-  // corrected / restored 는 suppression 을 만들지 않음(노출 유지).
-  const SUPPRESSION_MODE = {
-    under_review: 'mask',   // mask  = 검토 중 마스킹(결과표/검색 모두 "비공개 요청 처리 중")
-    search_hidden: 'hide',  // hide  = 검색 비노출(결과표 정상, 검색/인사이트만 제외) — de-index
-    removed: 'remove',      // remove= 완전 제외
-  };
-  const mode = SUPPRESSION_MODE[nextStatus];
-
-  // 기존 동일 키 제거 후 재구성
-  sup = sup.filter(s => s.key !== key);
-  if (mode) {
-    sup.push({
-      key,
-      ticketId: r.ticketId,
-      athleteName: r.athleteName,
-      affiliation: r.affiliation,
-      competition: r.competition,
-      mode,
-      since: now,
+    await purgeExpiredData();
+    await refreshSuppressions();
+    ready = true;
+    const supportsPurge = typeof repository.purgeExpiredData === 'function'
+      || typeof repository.purgeExpiredContacts === 'function';
+    stopSchedules = startDataRightsSchedules({
+      purge: supportsPurge ? purgeExpiredData : null,
+      refresh: refreshSuppressions,
+      scheduleInterval: options.scheduleInterval,
+      cancelInterval: options.cancelInterval,
+      scheduleSuppressionInterval: options.scheduleSuppressionInterval,
+      cancelSuppressionInterval: options.cancelSuppressionInterval,
     });
+    return { ready: true, mode: usesPostgres() ? 'postgres' : 'memory-development' };
+  } catch (error) {
+    if (stopSchedules) stopSchedules();
+    stopSchedules = null;
+    initialized = false;
+    repository = null;
+    if (ownedPool) await ownedPool.end().catch(() => {});
+    ownedPool = null;
+    throw error;
   }
-  _writeSuppressions(sup);
-  _writeRequests(list);
-
-  return { ok: true, ticketId: r.ticketId, status: r.status };
 }
 
-/**
- * (내부) 현재 활성화된 suppression 목록을 반환합니다.
- * searchService / results 핸들러가 결과 필터링에 사용합니다.
- * @returns {Array<{athleteName, affiliation, competition, mode}>}
- */
-function getActiveSuppressions() {
-  return _readSuppressions();
+async function shutdown() {
+  ready = false;
+  if (stopSchedules) stopSchedules();
+  stopSchedules = null;
+  if (repository) await repository.close();
+  if (ownedPool) await ownedPool.end();
+  repository = null;
+  ownedPool = null;
+  initialized = false;
+  activeSuppressions = Object.freeze([]);
 }
 
-// 유효한 suppression 모드 (저장된 mode 값을 정규화할 때 사용)
-const SUPPRESSION_MODES = ['mask', 'hide', 'remove'];
+async function ensureRepository() {
+  if (!initialized) await initialize();
+  if (repository && !ready && typeof repository.healthCheck === 'function') {
+    await storageCall(() => repository.healthCheck());
+    const rows = await storageCall(() => repository.listActiveSuppressions());
+    activeSuppressions = freezeSuppressions(rows);
+    ready = true;
+  }
+  if (!repository || !ready) {
+    const error = new Error('data-rights storage is unavailable');
+    error.code = 'DATA_RIGHTS_UNAVAILABLE';
+    throw error;
+  }
+  return repository;
+}
 
-/**
- * (내부) 특정 결과 행이 suppression 대상인지 판정합니다.
- *   'mask'   : under_review  — 결과표/검색 모두 "비공개 요청 처리 중"으로 마스킹
- *   'hide'   : search_hidden — 결과표엔 정상 노출, 이름/소속 검색·분석 화면에서만 제외(de-index)
- *   'remove' : removed       — 모든 노출에서 완전 제외
- * @returns {null | 'mask' | 'hide' | 'remove'}
- */
-function checkSuppression({ name, affiliation, competition } = {}) {
-  const sup = _readSuppressions();
-  if (sup.length === 0) return null;
+async function submitRequest(input = {}) {
+  const validated = validateRequest(input, buildRecordKey);
+  if (!validated.ok) return validated;
 
-  const nm = (name || '').trim();
-  const aff = (affiliation || '').trim();
-  const comp = (competition || '').trim();
+  const storage = await ensureRepository();
+  const publicTicket = createPublicTicket();
+  const encryptedContact = usesPostgres() && validated.request.contact
+    ? encryptContact(validated.request.contact)
+    : null;
+  const saved = await storageCall(() => storage.createRequest({
+    publicTicket,
+    publicTicketHash: hashPublicTicket(publicTicket),
+    ticketHint: ticketHint(publicTicket),
+    request: validated.request,
+    encryptedContact,
+  }));
+  return {
+    ok: true,
+    ticketId: publicTicket,
+    status: saved.status,
+    version: saved.version,
+    receivedAt: saved.receivedAt,
+  };
+}
 
-  for (const s of sup) {
-    if (!s.athleteName) continue;
-    if (s.athleteName !== nm) continue;
-    // 소속이 지정돼 있으면 소속도 일치해야 함
-    if (s.affiliation && s.affiliation !== aff) continue;
-    // 대회가 지정돼 있으면 대회도 일치해야 함
-    if (s.competition && s.competition !== comp) continue;
-    // 저장된 mode 가 알 수 없는 값이면 가장 보수적인 'mask' 로 폴백
-    return SUPPRESSION_MODES.includes(s.mode) ? s.mode : 'mask';
+async function getStatusByTicket(publicTicket) {
+  const value = sanitize(publicTicket, 100);
+  const opaque = /^DR_[A-Za-z0-9_-]{40,}$/.test(value);
+  const legacy = /^DR-\d{4}-\d{4,}$/.test(value);
+  if (!opaque && !legacy) return null;
+  const publicTicketHash = legacy ? hashLegacyTicket(value) : hashPublicTicket(value);
+  const storage = await ensureRepository();
+  const status = await storageCall(() => storage.findPublicStatus({
+    publicTicketHash,
+  }));
+  return status;
+}
+
+async function listRequests({ status } = {}) {
+  const selectedStatus = STATUSES.includes(status) ? status : undefined;
+  const storage = await ensureRepository();
+  return storageCall(() => storage.listRequests({ status: selectedStatus }));
+}
+
+async function getRequestDetail(id) {
+  const storage = await ensureRepository();
+  return storageCall(() => storage.getRequestDetail(sanitize(id, 100)));
+}
+
+async function updateStatus(id, nextStatus, note = '', options = {}) {
+  if (!STATUSES.includes(nextStatus)) return { ok: false, error: '상태 값이 올바르지 않습니다.' };
+  const expectedVersion = Number.parseInt(options.expectedVersion, 10);
+  if (!Number.isInteger(expectedVersion) || expectedVersion < 1) {
+    return { ok: false, error: '현재 버전(expectedVersion)이 필요합니다.' };
+  }
+
+  const storage = await ensureRepository();
+  const result = await storageCall(() => storage.updateStatus({
+    id: sanitize(id, 100),
+    nextStatus,
+    note: sanitize(note, 500),
+    expectedVersion,
+    actorUserId: options.actorUserId || null,
+  }));
+  if (result.kind === 'not_found') return { ok: false, notFound: true, error: '해당 요청을 찾을 수 없습니다.' };
+  if (result.kind === 'conflict') {
+    return {
+      ok: false,
+      conflict: true,
+      currentVersion: result.currentVersion,
+      error: '다른 관리자가 먼저 변경했습니다. 새로고침 후 다시 시도해 주세요.',
+    };
+  }
+  if (result.kind === 'invalid_scope') {
+    return {
+      ok: false,
+      invalidScope: true,
+      error: '숨김 또는 삭제를 적용하려면 소속·대회·종목 또는 기록 식별정보가 필요합니다.',
+    };
+  }
+
+  if (Array.isArray(result.suppressions)) {
+    activeSuppressions = freezeSuppressions(result.suppressions);
+  } else {
+    await refreshSuppressions();
+  }
+  return { ok: true, id: result.id, status: result.status, version: result.version };
+}
+
+async function refreshSuppressions() {
+  if (!repository) return;
+  const rows = await storageCall(() => repository.listActiveSuppressions());
+  activeSuppressions = freezeSuppressions(rows);
+  if (initialized) ready = true;
+}
+
+async function purgeExpiredData() {
+  if (typeof repository?.purgeExpiredData === 'function') {
+    return storageCall(() => repository.purgeExpiredData());
+  }
+  if (typeof repository?.purgeExpiredContacts === 'function') {
+    return storageCall(() => repository.purgeExpiredContacts());
   }
   return null;
+}
+
+function getActiveSuppressions() {
+  return activeSuppressions;
+}
+
+function checkSuppression(input = {}) {
+  if (usesPostgres() && !ready) return 'remove';
+  return findSuppressionMode(activeSuppressions, input);
+}
+
+async function recordSearchMetric(metric) {
+  const storage = await ensureRepository();
+  if (typeof storage.recordSearchMetric === 'function') {
+    return storageCall(() => storage.recordSearchMetric(metric));
+  }
+  return null;
+}
+
+async function getSearchMetricSummary(limit) {
+  const storage = await ensureRepository();
+  if (typeof storage.getSearchMetricSummary === 'function') {
+    return storageCall(() => storage.getSearchMetricSummary(limit));
+  }
+  return [];
+}
+
+function readiness() {
+  return { initialized, ready, mode: usesPostgres() ? 'postgres' : 'memory-development' };
+}
+
+async function storageCall(operation) {
+  try {
+    return await operation();
+  } catch (error) {
+    if (error?.code === 'CONTACT_ENCRYPTION_UNAVAILABLE') throw error;
+    if (usesPostgres()) ready = false;
+    const unavailable = new Error('data-rights storage is unavailable');
+    unavailable.code = 'DATA_RIGHTS_UNAVAILABLE';
+    unavailable.cause = error;
+    throw unavailable;
+  }
 }
 
 module.exports = {
   REQUEST_TYPES,
   STATUSES,
-  submitRequest,
-  getStatusByTicket,
-  listRequests,
-  updateStatus,
-  getActiveSuppressions,
   checkSuppression,
+  getActiveSuppressions,
+  getRequestDetail,
+  getSearchMetricSummary,
+  getStatusByTicket,
+  initialize,
+  listRequests,
+  readiness,
+  recordSearchMetric,
+  refreshSuppressions,
+  shutdown,
+  submitRequest,
+  updateStatus,
 };

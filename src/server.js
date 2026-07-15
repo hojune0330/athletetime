@@ -28,6 +28,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const { requestLogPath } = require('./requestLogPath');
 
 // 프로젝트 루트 (src/ 의 상위)
 const ROOT = path.join(__dirname, '..');
@@ -105,7 +106,7 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - start;
     if (req.path !== '/health' && !req.path.startsWith('/fonts')) {
-      console.log(`${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`);
+      console.log(`${req.method} ${requestLogPath(req)} - ${res.statusCode} (${duration}ms)`);
     }
   });
   next();
@@ -173,7 +174,11 @@ app.get(['/health', '/api/health'], async (req, res) => {
     }
   }
 
-  res.json(health);
+  const rights = dataRequestService.readiness();
+  health.services.dataRights = rights.ready ? 'ready' : 'unavailable';
+  if (!rights.ready) health.status = 'degraded';
+
+  res.status(health.status === 'healthy' ? 200 : 503).json(health);
 });
 
 // ============================================
@@ -198,22 +203,12 @@ app.use('/api/auth', authRouter);
 const cardStudioPublic = require(path.join(ROOT, 'card-studio/routes/publicRoutes'));
 const cardStudioAdmin = require(path.join(ROOT, 'card-studio/routes/adminRoutes'));
 const recordAnalyticsService = require(path.join(ROOT, 'card-studio/services/recordAnalyticsService'));
+const dataRequestService = require(path.join(ROOT, 'card-studio/services/dataRequestService'));
 const { authenticateToken, requireAdmin: jwtRequireAdmin } = require(path.join(ROOT, 'backend/middleware/auth'));
 
 // 카드 스튜디오 공개 API (인증 불필요)
 const { searchLimiter, generateLimiter, competitionLimiter, publicLimiter } = require(path.join(ROOT, 'card-studio/middleware/rateLimiter'));
 app.use('/api/card-studio', cardStudioPublic);
-
-setImmediate(() => {
-  try {
-    const stats = recordAnalyticsService.warmup();
-    console.log(
-      `  Record analytics warmup: ${stats.records} records, ${stats.athletes} athletes (${stats.ms}ms)`
-    );
-  } catch (err) {
-    console.warn('  Record analytics warmup skipped:', err.message);
-  }
-});
 
 // 카드 스튜디오 관리자 API (JWT 인증 필요)
 app.use('/api/card-studio/admin', authenticateToken, jwtRequireAdmin, cardStudioAdmin);
@@ -450,44 +445,68 @@ app.use((err, req, res, next) => {
 // 서버 시작
 // ============================================
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log('');
-  console.log('🏃 ═══════════════════════════════════════════');
-  console.log('   AthleTime 통합 서버 v4.0.0');
-  console.log('🏃 ═══════════════════════════════════════════');
-  console.log('');
-  console.log(`  Mode: ${HAS_DATABASE ? 'Production (PostgreSQL)' : 'Standalone (no DB)'}`);
-  console.log(`  Port: ${PORT}`);
-  console.log(`  Env:  ${NODE_ENV}`);
-  console.log('');
-  console.log('  Endpoints:');
-  console.log(`    Dashboard:   http://localhost:${PORT}/`);
-  console.log(`    Auth API:    http://localhost:${PORT}/api/auth/`);
-  console.log(`    Card Studio: http://localhost:${PORT}/api/card-studio/`);
-  console.log(`    Legacy API:  http://localhost:${PORT}/api/ (하위 호환)`);
-  console.log(`    Health:      http://localhost:${PORT}/health`);
-  if (HAS_DATABASE) {
-    console.log(`    Community:   http://localhost:${PORT}/api/posts`);
-    console.log(`    Categories:  http://localhost:${PORT}/api/categories`);
-  }
-  console.log('');
-  console.log('  Auth: JWT (이메일 로그인 + is_admin 관리자 구분)');
-  console.log('  Admin: JWT authenticateToken + requireAdmin');
-  console.log('');
-  console.log('🏃 서버 준비 완료!');
-  console.log('');
-  // analytics 인덱스 예열은 위(앱 초기화 시점) recordAnalyticsService.warmup()에서 수행한다.
-});
+async function startServer() {
+  await dataRequestService.initialize();
+  const stats = recordAnalyticsService.warmup();
+  console.log(`  Record analytics warmup: ${stats.records} records, ${stats.athletes} athletes (${stats.ms}ms)`);
+
+  return new Promise((resolve, reject) => {
+    const onStartupError = (error) => reject(error);
+    server.once('error', onStartupError);
+    server.listen(PORT, '0.0.0.0', () => {
+      server.removeListener('error', onStartupError);
+      console.log('');
+      console.log('🏃 ═══════════════════════════════════════════');
+      console.log('   AthleTime 통합 서버 v4.0.0');
+      console.log('🏃 ═══════════════════════════════════════════');
+      console.log('');
+      console.log(`  Mode: ${HAS_DATABASE ? 'Production (PostgreSQL)' : 'Standalone (no DB)'}`);
+      console.log(`  Port: ${PORT}`);
+      console.log(`  Env:  ${NODE_ENV}`);
+      console.log('');
+      console.log('  Endpoints:');
+      console.log(`    Dashboard:   http://localhost:${PORT}/`);
+      console.log(`    Auth API:    http://localhost:${PORT}/api/auth/`);
+      console.log(`    Card Studio: http://localhost:${PORT}/api/card-studio/`);
+      console.log(`    Legacy API:  http://localhost:${PORT}/api/ (하위 호환)`);
+      console.log(`    Health:      http://localhost:${PORT}/health`);
+      if (HAS_DATABASE) {
+        console.log(`    Community:   http://localhost:${PORT}/api/posts`);
+        console.log(`    Categories:  http://localhost:${PORT}/api/categories`);
+      }
+      console.log('');
+      console.log('  Auth: JWT (이메일 로그인 + is_admin 관리자 구분)');
+      console.log('  Admin: JWT authenticateToken + requireAdmin');
+      console.log('');
+      console.log('🏃 서버 준비 완료!');
+      console.log('');
+      resolve(server);
+    });
+  });
+}
+
+if (require.main === module) {
+  startServer().catch((error) => {
+    console.error('Server startup failed:', { name: error.name, code: error.code, message: error.message });
+    process.exitCode = 1;
+  });
+}
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM 수신, 서버 종료 중...');
+  await dataRequestService.shutdown().catch((error) => {
+    console.error('Data-rights shutdown failed:', error.message);
+  });
   server.close(() => process.exit(0));
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT 수신, 서버 종료 중...');
+  await dataRequestService.shutdown().catch((error) => {
+    console.error('Data-rights shutdown failed:', error.message);
+  });
   server.close(() => process.exit(0));
 });
 
-module.exports = { app, server };
+module.exports = { app, server, startServer };

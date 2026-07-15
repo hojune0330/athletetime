@@ -151,6 +151,7 @@ class SearchService {
               name: r.name,
               affiliation: r.affiliation,
               competition: compName,
+              event: ev.event,
             })
           );
 

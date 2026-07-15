@@ -301,7 +301,7 @@ export default function DataRequestPage() {
             <Input
               value={lookupId}
               onChange={(e) => setLookupId(e.target.value)}
-              placeholder="예) DR-2026-0001"
+              placeholder="접수 번호를 입력하세요"
               className="font-mono"
             />
             <Button type="submit" variant="outline" disabled={lookingUp} className="shrink-0">
@@ -314,7 +314,7 @@ export default function DataRequestPage() {
           {lookupResult && (
             <div className="border border-hair bg-surface-2 px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-body text-ink">{lookupResult.ticketId}</span>
+                <span className="font-mono text-body text-ink">{lookupId}</span>
                 <span className="border border-hair bg-surface px-2 py-0.5 font-mono text-mono-xs uppercase tracking-widest-2 text-brand-600">
                   {STATUS_LABELS[lookupResult.status]}
                 </span>

@@ -97,8 +97,8 @@ test('P1-ZERO-001: Given a /records zero-result query When searched Then only an
     assert.equal(summary.body.success, true);
     assert.equal(summary.body.data.totalEvents, 1);
     assert.equal(summary.body.data.items[0].count, 1);
-    assert.match(summary.body.data.items[0].fingerprint, /^[a-f0-9]{16}$/);
-    assert.match(summary.body.data.items[0].lastSeenDate, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(summary.body.data.privacy.fingerprintStored, false);
+    assert.match(summary.body.data.items[0].metricDate, /^\d{4}-\d{2}-\d{2}$/);
 
     const serialized = JSON.stringify({ stored: fs.readFileSync(storePath, 'utf8'), summary: summary.body });
     assert.equal(serialized.includes(rawQuery), false);
@@ -135,8 +135,7 @@ test('P1-ZERO-002: Given direct aggregate recording When repeated Then counts me
     assert.equal(summary.items.length, 1);
     assert.equal(summary.items[0].count, 2);
     assert.equal(summary.privacy.rawQueryStored, false);
-    assert.equal(summary.items[0].rawQueryStored, false);
-    assert.equal(summary.items[0].distinctSeenDays, 1);
+    assert.equal(summary.privacy.fingerprintStored, false);
     assert.equal(stored.includes('진짜없는이름'), false);
     assert.equal(stored.includes('records'), true);
   } finally {
@@ -145,7 +144,7 @@ test('P1-ZERO-002: Given direct aggregate recording When repeated Then counts me
   }
 });
 
-test('P1-ZERO-005: Given a failed query seen on fewer than 3 days When aggregated Then raw text stays fingerprint-only', () => {
+test('P1-ZERO-005: Given repeated failed queries across days When aggregated Then only coarse daily buckets remain', () => {
   const storePath = path.join(tempDir('athletetime-zero-search-kanon-low-'), 'zero-result-searches.json');
   const rawQuery = '제천고 기록 없음';
   const previous = snapshotZeroResultEnv();
@@ -159,23 +158,22 @@ test('P1-ZERO-005: Given a failed query seen on fewer than 3 days When aggregate
     zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-01' });
     zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-01' });
     zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-02' });
-    const summary = zeroResultSearchService.getZeroResultSearchSummary({ includeRawQuery: true });
+    const summary = zeroResultSearchService.getZeroResultSearchSummary();
     const stored = fs.readFileSync(storePath, 'utf8');
 
     assert.equal(summary.totalEvents, 3);
     assert.equal(summary.privacy.rawQueryStored, false);
-    assert.equal(summary.items[0].count, 3);
-    assert.equal(summary.items[0].distinctSeenDays, 2);
-    assert.equal(summary.items[0].rawQueryStored, false);
-    assert.equal(summary.items[0].rawQuery, undefined);
+    assert.equal(summary.items.reduce((sum, item) => sum + item.count, 0), 3);
+    assert.equal(summary.items.length, 2);
     assert.equal(stored.includes(rawQuery), false);
+    assert.equal(stored.includes('fingerprint'), false);
   } finally {
     restoreZeroResultEnv(previous);
     fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
   }
 });
 
-test('P1-ZERO-006: Given the same failed query on 3 different days When aggregated Then operator raw text is stored but public summary masks it', () => {
+test('P1-ZERO-006: Given the same failed query on 3 different days When aggregated Then raw text is never retained', () => {
   const storePath = path.join(tempDir('athletetime-zero-search-kanon-pass-'), 'zero-result-searches.json');
   const rawQuery = '춘천오픈 여자 1500m 결과';
   const previous = snapshotZeroResultEnv();
@@ -190,15 +188,13 @@ test('P1-ZERO-006: Given the same failed query on 3 different days When aggregat
     zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-02' });
     zeroResultSearchService.recordZeroResultSearch({ query: rawQuery, surface: 'records', observedDate: '2026-07-03' });
     const publicSummary = zeroResultSearchService.getZeroResultSearchSummary();
-    const operatorSummary = zeroResultSearchService.getZeroResultSearchSummary({ includeRawQuery: true });
     const stored = fs.readFileSync(storePath, 'utf8');
 
-    assert.equal(publicSummary.privacy.rawQueryStored, true);
-    assert.equal(publicSummary.items[0].rawQueryStored, true);
-    assert.equal(publicSummary.items[0].distinctSeenDays, 3);
-    assert.equal(publicSummary.items[0].rawQuery, undefined);
-    assert.equal(operatorSummary.items[0].rawQuery, rawQuery);
-    assert.equal(stored.includes(rawQuery), true);
+    assert.equal(publicSummary.privacy.rawQueryStored, false);
+    assert.equal(publicSummary.privacy.fingerprintStored, false);
+    assert.equal(publicSummary.items.length, 3);
+    assert.equal(stored.includes(rawQuery), false);
+    assert.equal(stored.includes('fingerprint'), false);
   } finally {
     restoreZeroResultEnv(previous);
     fs.rmSync(path.dirname(storePath), { recursive: true, force: true });
@@ -240,7 +236,7 @@ test('P1-ZERO-003: Given analytics storage failure When records search has no re
   }
 });
 
-test('P1-ZERO-004: Given production without an aggregation secret When recording Then default salt is not used', () => {
+test('P1-ZERO-004: Given no aggregation secret When recording Then no fingerprint is needed or stored', () => {
   const previous = snapshotZeroResultEnv();
   const storePath = path.join(tempDir('athletetime-zero-search-prod-'), 'zero-result-searches.json');
 
@@ -252,8 +248,11 @@ test('P1-ZERO-004: Given production without an aggregation secret When recording
     delete require.cache[require.resolve('../../card-studio/services/zeroResultSearchService')];
     const zeroResultSearchService = require('../../card-studio/services/zeroResultSearchService');
 
-    assert.equal(zeroResultSearchService.recordZeroResultSearch({ query: '운영비밀없음', surface: 'records' }), null);
-    assert.equal(fs.existsSync(storePath), false);
+    const result = zeroResultSearchService.recordZeroResultSearch({ query: '운영비밀없음', surface: 'records' });
+    const stored = fs.readFileSync(storePath, 'utf8');
+    assert.equal(result.queryScript, 'hangul');
+    assert.equal(stored.includes('운영비밀없음'), false);
+    assert.equal(stored.includes('fingerprint'), false);
   } finally {
     restoreZeroResultEnv(previous);
     fs.rmSync(path.dirname(storePath), { recursive: true, force: true });

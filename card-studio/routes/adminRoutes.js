@@ -900,13 +900,25 @@ autoGenerateQueue.on('itemFailed', (data) => {
  * 요청 목록 (상태 필터 선택)
  * GET /api/card-studio/admin/data-requests?status=received
  */
-router.get('/data-requests', (req, res) => {
+router.get('/data-requests', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
-    const list = dataRequestService.listRequests({ status: req.query.status });
+    const list = await dataRequestService.listRequests({ status: req.query.status });
     const suppressions = dataRequestService.getActiveSuppressions();
     res.json({ success: true, data: list, suppressions, total: list.length });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(err.code === 'DATA_RIGHTS_UNAVAILABLE' ? 503 : 500).json({ success: false, error: '요청 목록을 불러오지 못했습니다.' });
+  }
+});
+
+router.get('/data-requests/:id', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  try {
+    const detail = await dataRequestService.getRequestDetail(req.params.id);
+    if (!detail) return res.status(404).json({ success: false, error: '해당 요청을 찾을 수 없습니다.' });
+    return res.json({ success: true, data: detail });
+  } catch (err) {
+    return res.status(err.code === 'DATA_RIGHTS_UNAVAILABLE' ? 503 : 500).json({ success: false, error: '요청 상세를 불러오지 못했습니다.' });
   }
 });
 
@@ -915,16 +927,21 @@ router.get('/data-requests', (req, res) => {
  * PATCH /api/card-studio/admin/data-requests/:ticketId
  * body: { status: 'under_review'|'search_hidden'|'corrected'|'removed'|'restored', note? }
  */
-router.patch('/data-requests/:ticketId', (req, res) => {
+router.patch('/data-requests/:id', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
-    const { status, note } = req.body || {};
-    const result = dataRequestService.updateStatus(req.params.ticketId, status, note || '');
+    const { status, note, expectedVersion } = req.body || {};
+    const result = await dataRequestService.updateStatus(req.params.id, status, note || '', {
+      expectedVersion,
+      actorUserId: req.user?.id,
+    });
     if (!result.ok) {
-      return res.status(400).json({ success: false, error: result.error });
+      const statusCode = result.notFound ? 404 : result.conflict ? 409 : 400;
+      return res.status(statusCode).json({ success: false, error: result.error, currentVersion: result.currentVersion });
     }
     res.json({ success: true, data: result });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(err.code === 'DATA_RIGHTS_UNAVAILABLE' ? 503 : 500).json({ success: false, error: '상태 변경을 저장하지 못했습니다.' });
   }
 });
 

@@ -56,9 +56,9 @@ const { createResultEventsHandler } = require('./resultEventsRoute');
 // 미들웨어
 const { searchLimiter, generateLimiter, competitionLimiter, publicLimiter } = require('../middleware/rateLimiter');
 
-function tryRecordZeroResultSearch(query) {
+async function tryRecordZeroResultSearch(query) {
   try {
-    return zeroResultSearchService.recordZeroResultSearch({ query, surface: 'records' });
+    return await zeroResultSearchService.recordZeroResultSearch({ query, surface: 'records' });
   } catch {
     return null;
   }
@@ -212,7 +212,7 @@ router.get('/analytics/identity/shadow-cluster', publicLimiter, (req, res) => {
   }
 });
 
-router.get('/analytics/records/search', searchLimiter, (req, res) => {
+router.get('/analytics/records/search', searchLimiter, async (req, res) => {
   try {
     const query = String(req.query.q || '')
       .trim()
@@ -225,7 +225,7 @@ router.get('/analytics/records/search', searchLimiter, (req, res) => {
 
     const athletes = recordAnalyticsService.searchAthletes(query, req.query.limit);
     if (athletes.length === 0) {
-      tryRecordZeroResultSearch(query);
+      await tryRecordZeroResultSearch(query);
     }
     res.json({
       success: true,
@@ -238,11 +238,11 @@ router.get('/analytics/records/search', searchLimiter, (req, res) => {
   }
 });
 
-router.get('/analytics/records/zero-result-summary', publicLimiter, (req, res) => {
+router.get('/analytics/records/zero-result-summary', publicLimiter, async (req, res) => {
   try {
     res.json({
       success: true,
-      data: zeroResultSearchService.getZeroResultSearchSummary({ limit: req.query.limit }),
+      data: await zeroResultSearchService.getZeroResultSearchSummary({ limit: req.query.limit }),
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -623,9 +623,10 @@ router.get('/data-policy', publicLimiter, (req, res) => {
  * POST /data-requests
  * body: { type, athleteName, affiliation?, competition?, event?, reason, contact? }
  */
-router.post('/data-requests', publicLimiter, (req, res) => {
+router.post('/data-requests', publicLimiter, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
-    const result = dataRequestService.submitRequest(req.body || {});
+    const result = await dataRequestService.submitRequest(req.body || {});
     if (!result.ok) {
       return res.status(400).json({ success: false, error: result.error });
     }
@@ -639,7 +640,13 @@ router.post('/data-requests', publicLimiter, (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const unavailable = ['DATA_RIGHTS_UNAVAILABLE', 'CONTACT_ENCRYPTION_UNAVAILABLE'].includes(err.code);
+    res.status(unavailable ? 503 : 500).json({
+      success: false,
+      error: unavailable
+        ? '현재 요청을 안전하게 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.'
+        : '요청 처리 중 오류가 발생했습니다.',
+    });
   }
 });
 
@@ -647,15 +654,20 @@ router.post('/data-requests', publicLimiter, (req, res) => {
  * 티켓 ID로 처리 상태 조회 (개인정보 최소 노출)
  * GET /data-requests/:ticketId
  */
-router.get('/data-requests/:ticketId', publicLimiter, (req, res) => {
+router.get('/data-requests/:ticketId', publicLimiter, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   try {
-    const status = dataRequestService.getStatusByTicket(req.params.ticketId);
+    const status = await dataRequestService.getStatusByTicket(req.params.ticketId);
     if (!status) {
       return res.status(404).json({ success: false, error: '해당 접수 번호를 찾을 수 없습니다.' });
     }
     res.json({ success: true, data: status });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const unavailable = ['DATA_RIGHTS_UNAVAILABLE', 'LEGACY_TICKET_LOOKUP_UNAVAILABLE'].includes(err.code);
+    res.status(unavailable ? 503 : 500).json({
+      success: false,
+      error: '처리 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
+    });
   }
 });
 

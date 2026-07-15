@@ -1,22 +1,20 @@
-const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const dataRequestService = require('./dataRequestService');
 
-const VERSION = 1;
+const VERSION = 2;
 const DEFAULT_STORE = path.join(__dirname, '..', '..', 'data', 'analytics', 'zero-result-searches.json');
-const RAW_QUERY_DISTINCT_DAY_THRESHOLD = 3;
+const SURFACES = ['records', 'competitions', 'insights'];
 
 function storePath() {
   return process.env.ZERO_RESULT_SEARCH_STORE || DEFAULT_STORE;
 }
 
-function currentDateBucket() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function normalizeDateBucket(value) {
-  const bucket = String(value || '').slice(0, 10);
-  return /^\d{4}-\d{2}-\d{2}$/.test(bucket) ? bucket : currentDateBucket();
+function dateBucket(value) {
+  const candidate = String(value || '').slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(candidate)
+    ? candidate
+    : new Date().toISOString().slice(0, 10);
 }
 
 function normalizeQuery(query) {
@@ -24,8 +22,7 @@ function normalizeQuery(query) {
     .trim()
     .replace(/[\x00-\x1f\x7f]/g, '')
     .replace(/\s+/g, ' ')
-    .slice(0, 100)
-    .toLowerCase();
+    .slice(0, 100);
 }
 
 function queryScript(value) {
@@ -35,7 +32,7 @@ function queryScript(value) {
   return 'mixed';
 }
 
-function lengthBucket(value) {
+function queryLengthBucket(value) {
   const length = [...value].length;
   if (length <= 3) return '2-3';
   if (length <= 6) return '4-6';
@@ -43,118 +40,109 @@ function lengthBucket(value) {
   return '11+';
 }
 
-function fingerprint(value) {
-  const secret = process.env.ZERO_RESULT_SEARCH_SECRET || process.env.JWT_SECRET;
-  if (!secret && process.env.NODE_ENV === 'production') return null;
-  const effectiveSecret = secret || 'athletetime-zero-result-dev-salt';
-  return crypto.createHmac('sha256', effectiveSecret).update(value).digest('hex').slice(0, 16);
+function classify({ query, surface = 'records', observedDate } = {}) {
+  const normalized = normalizeQuery(query);
+  if (normalized.length < 2) return null;
+  return {
+    metricDate: dateBucket(observedDate),
+    surface: SURFACES.includes(surface) ? surface : 'records',
+    queryScript: queryScript(normalized),
+    queryLengthBucket: queryLengthBucket(normalized),
+  };
 }
 
 function emptyStore() {
   return { version: VERSION, totalEvents: 0, items: {} };
 }
 
-function mergeDateBuckets(item, dateBucket) {
-  const buckets = Array.isArray(item.seenDateBuckets) ? item.seenDateBuckets : [];
-  const legacyBuckets = [item.firstSeenDate, item.lastSeenDate].filter(Boolean);
-  return [...new Set([...legacyBuckets, ...buckets, dateBucket])].sort();
-}
-
 function readStore() {
-  const filePath = storePath();
-  if (!fs.existsSync(filePath)) return emptyStore();
+  const file = storePath();
+  if (!fs.existsSync(file)) return emptyStore();
   try {
-    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    return parsed && parsed.version === VERSION && parsed.items ? parsed : emptyStore();
+    const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+    return parsed?.version === VERSION && parsed.items ? parsed : emptyStore();
   } catch {
     return emptyStore();
   }
 }
 
 function writeStore(store) {
-  const filePath = storePath();
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify(store, null, 2), 'utf8');
+  const file = storePath();
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(store, null, 2), 'utf8');
 }
 
-function summaryItem(item, { includeRawQuery = false } = {}) {
-  const rawQueryStored = typeof item.rawQuery === 'string' && item.rawQuery.length > 0;
-  const summarized = {
-    fingerprint: item.fingerprint,
-    surface: item.surface,
-    queryLengthBucket: item.queryLengthBucket,
-    queryScript: item.queryScript,
-    count: item.count || 0,
-    firstSeenDate: item.firstSeenDate || '',
-    lastSeenDate: item.lastSeenDate || '',
-    distinctSeenDays: Array.isArray(item.seenDateBuckets) ? item.seenDateBuckets.length : 0,
-    rawQueryStored,
-  };
-
-  if (includeRawQuery && rawQueryStored) {
-    summarized.rawQuery = item.rawQuery;
-  }
-
-  return summarized;
-}
-
-function recordZeroResultSearch({ query, surface = 'records', observedDate } = {}) {
-  const normalized = normalizeQuery(query);
-  if (normalized.length < 2) return null;
-
+function recordFileMetric(metric) {
   const store = readStore();
-  const id = fingerprint(normalized);
-  if (!id) return null;
-  const dateBucket = normalizeDateBucket(observedDate);
-  const current = store.items[id] || {
-    fingerprint: id,
-    surface,
-    queryLengthBucket: lengthBucket(normalized),
-    queryScript: queryScript(normalized),
-    count: 0,
-    firstSeenDate: dateBucket,
-    lastSeenDate: '',
-  };
-
-  current.seenDateBuckets = mergeDateBuckets(current, dateBucket);
-  current.count = (Number(current.count) || 0) + 1;
-  current.firstSeenDate = current.seenDateBuckets[0] || dateBucket;
-  current.lastSeenDate = dateBucket;
-  current.rawQueryStored = current.seenDateBuckets.length >= RAW_QUERY_DISTINCT_DAY_THRESHOLD;
-  if (current.rawQueryStored && !current.rawQuery) {
-    current.rawQuery = normalized;
-  }
+  const id = [metric.metricDate, metric.surface, metric.queryScript, metric.queryLengthBucket].join('|');
+  const current = store.items[id] || { ...metric, count: 0 };
+  current.count += 1;
   store.items[id] = current;
-  store.totalEvents = Object.values(store.items).reduce((sum, item) => sum + item.count, 0);
-  store.updatedDate = dateBucket;
+  store.totalEvents += 1;
+  store.updatedDate = metric.metricDate;
   writeStore(store);
-  return summaryItem(current, { includeRawQuery: true });
+  return current;
 }
 
-function getZeroResultSearchSummary({ limit = 20, includeRawQuery = false } = {}) {
-  const safeLimit = Math.max(1, Math.min(Number.parseInt(limit, 10) || 20, 100));
-  const store = readStore();
-  const allItems = Object.values(store.items);
-  const items = allItems
-    .sort((a, b) => b.count - a.count || String(b.lastSeenDate || '').localeCompare(String(a.lastSeenDate || '')))
-    .slice(0, safeLimit)
-    .map((item) => summaryItem(item, { includeRawQuery }));
+function recordZeroResultSearch(input = {}) {
+  const metric = classify(input);
+  if (!metric) return null;
+  if (process.env.TEST_DATABASE_URL || process.env.DATABASE_URL) {
+    return dataRequestService.recordSearchMetric(metric).then(() => metric);
+  }
+  return recordFileMetric(metric);
+}
 
+function fileSummary(limit) {
+  const store = readStore();
   return {
     version: VERSION,
     totalEvents: store.totalEvents || 0,
     updatedDate: store.updatedDate || '',
     privacy: {
-      rawQueryStored: allItems.some((item) => typeof item.rawQuery === 'string' && item.rawQuery.length > 0),
+      rawQueryStored: false,
+      fingerprintStored: false,
       ipStored: false,
       userAgentStored: false,
       userIdStored: false,
     },
-    items,
+    items: Object.values(store.items)
+      .sort((a, b) => b.count - a.count || String(b.metricDate).localeCompare(String(a.metricDate)))
+      .slice(0, limit),
   };
 }
 
+function getZeroResultSearchSummary({ limit = 20 } = {}) {
+  const safeLimit = Math.max(1, Math.min(Number.parseInt(limit, 10) || 20, 100));
+  if (process.env.TEST_DATABASE_URL || process.env.DATABASE_URL) {
+    return dataRequestService.getSearchMetricSummary(safeLimit).then((rows) => {
+      const items = rows.map((row) => ({
+        metricDate: row.metric_date || row.metricDate,
+        surface: row.surface,
+        queryScript: row.query_script || row.queryScript,
+        queryLengthBucket: row.query_length_bucket || row.queryLengthBucket,
+        count: Number(row.count || 0),
+      }));
+      return {
+        version: VERSION,
+        totalEvents: Number(rows[0]?.total_count || 0),
+        updatedDate: rows[0]?.metric_date || '',
+        privacy: {
+          rawQueryStored: false,
+          fingerprintStored: false,
+          ipStored: false,
+          userAgentStored: false,
+          userIdStored: false,
+        },
+        items,
+      };
+    });
+  }
+  return fileSummary(safeLimit);
+}
+
 module.exports = {
+  classify,
   getZeroResultSearchSummary,
   recordZeroResultSearch,
 };

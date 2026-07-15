@@ -49,9 +49,10 @@ function mapVisibleRow(row, context) {
     name: row.name,
     affiliation: row.affiliation,
     competition: context.competitionName,
+    event: context.eventName,
   });
 
-  if (suppression === 'remove') return null;
+  if (suppression === 'remove' || suppression === 'hide') return null;
 
   const masked = suppression === 'mask';
   return {
@@ -72,7 +73,7 @@ function mapVisibleEvent(event, context) {
   if (isResultEventOnQualityHold(event)) return mapHeldEvent(event);
 
   const results = (event.results || [])
-    .map((row) => mapVisibleRow(row, context))
+    .map((row) => mapVisibleRow(row, { ...context, eventName: event.event }))
     .filter(Boolean);
 
   return {
