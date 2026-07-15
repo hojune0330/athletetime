@@ -136,7 +136,7 @@ export function CompareView({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
+              className="shrink-0 whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
             >
               닫기
             </button>
@@ -344,7 +344,7 @@ function NoticeBox({ title, body, onClose }: { title: string; body?: string; onC
           <button
             type="button"
             onClick={onClose}
-            className="mt-3 rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
+            className="mt-3 whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
           >
             닫기
           </button>
