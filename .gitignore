@@ -50,6 +50,9 @@ frontend/node_modules/
 # 정정/삭제 요청 큐 (런타임 생성, 개인정보 포함 가능 — 추적 제외)
 data/requests/*.json
 
+# Local-only rollout evidence (backup manifests and operator checks)
+.data-rights-rollout/
+
 # 출처 원장/수집 큐 (런타임 생성, 원출처 메타데이터 — 추적 제외)
 data/sources/*.json
 
