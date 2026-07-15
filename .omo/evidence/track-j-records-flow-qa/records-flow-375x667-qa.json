@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-07-13T04:07:49.709Z",
+  "viewport": {
+    "width": 375,
+    "height": 667
+  },
+  "captures": [
+    {
+      "id": "hub",
+      "url": "http://127.0.0.1:4173/records",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\hub-375x667.png",
+      "ctaSelector": "text=내 기록 찾기",
+      "cta": {
+        "x": 62,
+        "y": 275,
+        "width": 251,
+        "height": 28,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "mine-a1-name",
+      "url": "http://127.0.0.1:4173/records?flow=mine&step=name",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\mine-a1-name-375x667.png",
+      "ctaSelector": "[data-records-sticky-cta=\"mine-name\"]",
+      "cta": {
+        "x": 37,
+        "y": 517,
+        "width": 301,
+        "height": 82,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "mine-a2-candidates-selected",
+      "url": "http://127.0.0.1:4173/records?flow=mine&step=candidates&q=%EA%B9%80%EB%AF%BC%EC%A4%80&mineDraft=kim-mj-2016%2Ckim-mj-2020",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\mine-a2-candidates-selected-375x667.png",
+      "ctaSelector": "[data-records-sticky-cta=\"mine-candidates\"]",
+      "cta": {
+        "x": 37,
+        "y": 517,
+        "width": 301,
+        "height": 82,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "mine-a3-confirm",
+      "url": "http://127.0.0.1:4173/records?flow=mine&step=confirm&q=%EA%B9%80%EB%AF%BC%EC%A4%80&mineDraft=kim-mj-2016%2Ckim-mj-2020",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\mine-a3-confirm-375x667.png",
+      "ctaSelector": "[data-records-sticky-cta=\"mine-confirm\"]",
+      "cta": {
+        "x": 37,
+        "y": 390,
+        "width": 301,
+        "height": 138,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "mine-a4-done",
+      "url": "http://127.0.0.1:4173/records?flow=mine&step=done&q=%EA%B9%80%EB%AF%BC%EC%A4%80",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\mine-a4-done-375x667.png",
+      "ctaSelector": "[data-records-sticky-cta=\"mine-done\"]",
+      "cta": {
+        "x": 37,
+        "y": 324,
+        "width": 301,
+        "height": 136,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "browse-b0-gateway",
+      "url": "http://127.0.0.1:4173/records?flow=browse",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\browse-b0-gateway-375x667.png",
+      "ctaSelector": "text=선수 찾기",
+      "cta": {
+        "x": 58,
+        "y": 211,
+        "width": 259,
+        "height": 28,
+        "fullyVisibleInViewport": true,
+        "notCoveredByMobileTabBar": true
+      }
+    },
+    {
+      "id": "deeplink-athlete",
+      "url": "http://127.0.0.1:4173/records?athlete=kim-mj-2016",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\deeplink-athlete-375x667.png",
+      "ctaSelector": null,
+      "cta": null
+    },
+    {
+      "id": "deeplink-compare",
+      "url": "http://127.0.0.1:4173/records?compare=kim-mj-2016,park-js-2016",
+      "screenshot": ".omo\\evidence\\track-j-records-flow-qa\\deeplink-compare-375x667.png",
+      "ctaSelector": null,
+      "cta": null
+    }
+  ],
+  "checks": {
+    "backNavigationReturnedToNameStep": true,
+    "athleteDeepLinkBypassesHub": true,
+    "compareDeepLinkBypassesHub": true,
+    "allMeasuredCtasFullyVisible": true,
+    "consoleErrorCount": 0,
+    "pageErrorCount": 0
+  },
+  "consoleErrors": [],
+  "pageErrors": []
+}
