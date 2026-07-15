@@ -1,0 +1,99 @@
+{
+  "candidateRows": 21865,
+  "blockedWorkbooks": 38,
+  "reportStatus": "candidate_dry_run_complete",
+  "sourceStatuses": [
+    "fully_promotable",
+    "partially_promoted"
+  ],
+  "nonHorizontal": 0,
+  "unsafeSourcePaths": 0,
+  "divisionUnspecifiedRatio": 0.14914246512691517,
+  "top100SkippedDuplicates": 7321,
+  "sample": [
+    {
+      "year": 2015,
+      "competitionName": "2015 대구전국실내육상경기대회",
+      "division": "남자고등학교부",
+      "divisionMeta": {
+        "gender": "men",
+        "divisionLevel": "high",
+        "divisionKey": "men-high",
+        "divisionLabel": "남자 고등부",
+        "divisionDetail": null,
+        "rawDivision": "남자고등학교부"
+      },
+      "event": "남자고등학교부 60m",
+      "rank": 1,
+      "name": "이장호",
+      "affiliation": "충북체육",
+      "record": "7.12",
+      "note": "",
+      "newRecord": "",
+      "source": {
+        "sourceTier": "kaaf_backfill_xls_step2_dry_run",
+        "originalFilename": "001_종합기록20150226(0).xls",
+        "sha256Prefix": "f71ff76f0e45",
+        "sheetName": "종합기록",
+        "sheetLayout": "horizontal_podium",
+        "workbookStatus": "fully_promotable"
+      }
+    },
+    {
+      "year": 2015,
+      "competitionName": "2015 대구전국실내육상경기대회",
+      "division": "남자고등학교부",
+      "divisionMeta": {
+        "gender": "men",
+        "divisionLevel": "high",
+        "divisionKey": "men-high",
+        "divisionLabel": "남자 고등부",
+        "divisionDetail": null,
+        "rawDivision": "남자고등학교부"
+      },
+      "event": "남자고등학교부 60m",
+      "rank": 2,
+      "name": "이용하",
+      "affiliation": "서울체육",
+      "record": "7.13",
+      "note": "",
+      "newRecord": "",
+      "source": {
+        "sourceTier": "kaaf_backfill_xls_step2_dry_run",
+        "originalFilename": "001_종합기록20150226(0).xls",
+        "sha256Prefix": "f71ff76f0e45",
+        "sheetName": "종합기록",
+        "sheetLayout": "horizontal_podium",
+        "workbookStatus": "fully_promotable"
+      }
+    },
+    {
+      "year": 2015,
+      "competitionName": "2015 대구전국실내육상경기대회",
+      "division": "남자고등학교부",
+      "divisionMeta": {
+        "gender": "men",
+        "divisionLevel": "high",
+        "divisionKey": "men-high",
+        "divisionLabel": "남자 고등부",
+        "divisionDetail": null,
+        "rawDivision": "남자고등학교부"
+      },
+      "event": "남자고등학교부 60m",
+      "rank": 3,
+      "name": "이완희",
+      "affiliation": "용남고등",
+      "record": "7.36",
+      "note": "",
+      "newRecord": "",
+      "source": {
+        "sourceTier": "kaaf_backfill_xls_step2_dry_run",
+        "originalFilename": "001_종합기록20150226(0).xls",
+        "sha256Prefix": "f71ff76f0e45",
+        "sheetName": "종합기록",
+        "sheetLayout": "horizontal_podium",
+        "workbookStatus": "fully_promotable"
+      }
+    }
+  ]
+}
