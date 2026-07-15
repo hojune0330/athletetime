@@ -15,6 +15,12 @@ Do not run the write migration, merge the PR, or change production data before F
 
 ## After Fable approval
 
+## 0. Confirm PostgreSQL TLS policy
+
+Production verifies PostgreSQL certificates by default. Prefer setting `DATABASE_CA_CERT_BASE64` to the trusted CA certificate. Render's private PostgreSQL endpoint may instead require its self-signed certificate exception; in that case set `DATABASE_TLS_ALLOW_SELF_SIGNED=true` on the Render service. The exception activates only when Render also supplies `RENDER=true`, and it still encrypts the connection.
+
+Never set the self-signed exception on another hosting provider or for a public PostgreSQL endpoint. If the service reports `DEPTH_ZERO_SELF_SIGNED_CERT`, stop the rollout and confirm that the database URL is Render's private connection before enabling it.
+
 ## 1. Record the encrypted backup
 
 Create the database backup with the hosting provider's protected backup facility. Do not put its URL, password, or contents in GitHub. Then record local evidence:
