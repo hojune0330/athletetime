@@ -39,6 +39,14 @@ PR #41 질문에 대한 확정 답변:
 - 층위는 트랙 I `divisionHierarchyService.normalizeDivision` 경유 필수. 새 원천 라벨이 unspecified로 대량 유입되면(>20%) 중단 후 라벨 샘플 10개와 함께 질문.
 - 서비스 데이터 불변(`data/results` diff 0).
 
+### 2026-07-13 Codex 수행 메모
+
+- Step 2는 `tools/normalize-legacy-xls-candidates-dry-run.js`로 재현한다.
+- 결과: 83개 .xls 중 완전 후보 45개, 차단 38개, 혼합 워크북 3개의 가로형 시트만 부분 후보화.
+- 로컬 full 후보 파일(`normalized-candidates.jsonl`)은 21,865행으로 생성되지만 대용량·서비스 전 후보 데이터이므로 gitignore 처리한다. PR에는 `step2-report.json`, `blocked-workbooks.json`, `normalized-candidates.sample.jsonl`만 추적한다.
+- 부문 미상 비율은 14.91%로 20% 중단선 아래이며, TOP100 dedup skip 7,321은 불변이다.
+- 세로형/구간형 시트는 이번 단계에서 후보 stub도 만들지 않는다. 다음 서비스 승격 PR 전까지 `data/results`는 변경하지 않는다.
+
 ## 3. 단계 3 — 서비스 승격 (별도 PR, 사전 리뷰 필수)
 
 - 단계 2 리뷰 승인 후에만 착수. `data/results/<year>.json` + index + coverage copy + 연도 체크리스트 동일 PR.

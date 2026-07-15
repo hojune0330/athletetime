@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: LEGACY-XLS-STEP2-001 mixed workbooks parse only horizontal sheets and keep blocked sheets as evidence
+ok 1 - LEGACY-XLS-STEP2-001 mixed workbooks parse only horizontal sheets and keep blocked sheets as evidence
+  ---
+  duration_ms: 6264496.9783
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-STEP2-002 real 2015-2017 originals follow Fable candidate and block boundaries
+ok 2 - LEGACY-XLS-STEP2-002 real 2015-2017 originals follow Fable candidate and block boundaries
+  ---
+  duration_ms: 9320.7037
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-STEP2-003 CLI writes sanitized candidate and blocked evidence without touching service data
+ok 3 - LEGACY-XLS-STEP2-003 CLI writes sanitized candidate and blocked evidence without touching service data
+  ---
+  duration_ms: 5966.7089
+  type: 'test'
+  ...
+# Subtest: LEGACY-XLS-STEP2-004 renderer records Fable boundaries and partial promotion rule
+ok 4 - LEGACY-XLS-STEP2-004 renderer records Fable boundaries and partial promotion rule
+  ---
+  duration_ms: 12.9726
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6280554.8575

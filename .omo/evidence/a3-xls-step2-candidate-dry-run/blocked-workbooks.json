@@ -1,0 +1,1138 @@
+[
+  {
+    "year": 2015,
+    "originalFilename": "014_전국체육대회 종합성적20151022.xls",
+    "sha256Prefix": "205c4cd1cf16",
+    "blockReason": "MIXED_RESULT_LAYOUTS_NEED_REVIEW",
+    "status": "partially_promoted",
+    "promotedSheets": [
+      "종합기록"
+    ],
+    "blockedSheets": [
+      {
+        "name": "남일마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 28,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여일마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 22,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남대하프",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 23,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남고10km",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 91,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고10km",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 43,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "015_2015서울동아마라톤 종합성적20150315.xls",
+    "sha256Prefix": "890c22084c05",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "하프코스성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "016_2015코오롱구간마라톤 종합20150328(0).xls",
+    "sha256Prefix": "2625ff5f16c5",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "성적발표",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 24,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "각 구간별 우승",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 20,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 17,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 8,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 20,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 13,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "017_2015인천국제하프마라톤20150329.xls",
+    "sha256Prefix": "c20cec25179b",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "018_2015대구국제마라톤20150405.xls",
+    "sha256Prefix": "19f47bff43f1",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 7,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "019_2015군산새만금마라톤20150412(0).xls",
+    "sha256Prefix": "38b562488d41",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 3,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "020_2015대통령기통일역전종합결과20150913.xls",
+    "sha256Prefix": "f13ca597c66f",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "통일역전성적발표_시도대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "통일역전성적발표_소속대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "021_경주동아201520151011(0).xls",
+    "sha256Prefix": "876893af98b7",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "022_2015조선마라톤1120151025.xls",
+    "sha256Prefix": "944716a29474",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "023_2015중앙일보마라톤종합20151101.xls",
+    "sha256Prefix": "11e52bd69b0f",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "024_제61회 한반도통일대역전경주대회 결과20151121.xls",
+    "sha256Prefix": "e344a03493cb",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "팀성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_17",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_18",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_19",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_20",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_21",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2015,
+    "originalFilename": "036_2015 인천송도국제하프마라톤_기록지20151011.xls",
+    "sha256Prefix": "c9e3255c47f4",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "개인_국제",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 29,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "개인_국내",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 11,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "012_전국체육대회 종합성적 (최종)20161012.xls",
+    "sha256Prefix": "39041a5cdc69",
+    "blockReason": "MIXED_RESULT_LAYOUTS_NEED_REVIEW",
+    "status": "partially_promoted",
+    "promotedSheets": [
+      "종합기록"
+    ],
+    "blockedSheets": [
+      {
+        "name": "남일마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 35,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여일마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 31,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남대하프",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 28,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "015_2016서울동아마라톤 종합성적20160320.xls",
+    "sha256Prefix": "058ae45d5d72",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "하프코스성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "016_2016코오롱구간마라톤 종합20160326.xls",
+    "sha256Prefix": "6aaedaa468b3",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "성적발표",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 24,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "각 구간별 우승",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 21,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 20,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 11,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 17,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 11,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "017_2016인천하프마라톤 종합20160327.xls",
+    "sha256Prefix": "64cb7769c7dc",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "018_2016대구국제마라톤 종합기록20160403.xls",
+    "sha256Prefix": "cb05cc783266",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 20,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 4,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "019_2016군산새만금마라톤20160410.xls",
+    "sha256Prefix": "c20c06e37d1d",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 4,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "020_2016 서울나이키우먼스하프20160522.xls",
+    "sha256Prefix": "179f0929b184",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "종합성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "021_2016대통령기통일역전종합결과20160911.xls",
+    "sha256Prefix": "7edcea12045e",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "통일역전성적발표_시도대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "통일역전성적발표_소속대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "022_경주동아20161016.xls",
+    "sha256Prefix": "f4684109c502",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "023_2016조선마라톤120161023.xls",
+    "sha256Prefix": "e9d98148a486",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "하프마라톤기록",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "024_2016중앙일보마라톤종합20161106.xls",
+    "sha256Prefix": "510a88e3711c",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "025_제62회 부산_서울 종합20161119.xls",
+    "sha256Prefix": "9cca8da7fdc0",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "팀성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_16",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_17",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_18",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "11_19",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "026_2016평창자료 (2)20161201(0).xls",
+    "sha256Prefix": "8619db3f3c68",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "남고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 7,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 5,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2016,
+    "originalFilename": "032_2016평창자료 (2)20161201.xls",
+    "sha256Prefix": "8619db3f3c68",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "남고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 7,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 5,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "016_전국체육대회 종합성적120171027.xls",
+    "sha256Prefix": "e77550128290",
+    "blockReason": "MIXED_RESULT_LAYOUTS_NEED_REVIEW",
+    "status": "partially_promoted",
+    "promotedSheets": [
+      "종합기록"
+    ],
+    "blockedSheets": [
+      {
+        "name": "남고 10km",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 97,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고 10km",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 41,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남대하프",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 34,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남자마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 41,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여자마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 36,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "018_서울동아마라톤 종합성적20170319.xls",
+    "sha256Prefix": "2a9f6fe7f8a6",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "하프코스성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "019_2017코오롱구간마라톤 종합20170325.xls",
+    "sha256Prefix": "7c16ea18e31a",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "종합결과",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 23,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "각 구간별 우승",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 20,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 18,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "남중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여중",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "020_2017인천하프마라톤 종합20170326.xls",
+    "sha256Prefix": "3171b502df02",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "021_2017대구국제마라톤 종합기록320170409.xls",
+    "sha256Prefix": "eec2094fff90",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 16,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 2,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "022_2017군산새만금마라톤결과20170409.xls",
+    "sha256Prefix": "04300b503808",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 4,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프마라톤",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "023_2017 서울나이키우먼스하프마라톤20170529.xls",
+    "sha256Prefix": "167e1bbaeeeb",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "종합성적",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 12,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "024_2017대통령기통일종합결과20170910.xls",
+    "sha256Prefix": "bdd25f5b29d8",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "통일역전성적발표_시도대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "통일역전성적발표_소속대항",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 1,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "025_2017경주동아20171015.xls",
+    "sha256Prefix": "3164ff58293f",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 6,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "026_2017조선마라톤20171029.xls",
+    "sha256Prefix": "d38969462b53",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "하프마라톤기록",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "027_2017중앙일보마라톤종합20171105.xls",
+    "sha256Prefix": "60a12f9a89c3",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "마라톤국제부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "마라톤국내남자,여자,지도자상",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "국내하프부문",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 0,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  },
+  {
+    "year": 2017,
+    "originalFilename": "030_2017평창자료20170820.xls",
+    "sha256Prefix": "b026d0b13569",
+    "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER",
+    "status": "blocked",
+    "promotedSheets": [],
+    "blockedSheets": [
+      {
+        "name": "남고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 9,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      },
+      {
+        "name": "여고단체",
+        "layout": "vertical_result_list",
+        "resultRowEstimate": 5,
+        "blockReason": "VERTICAL_RESULT_LIST_NEEDS_PARSER"
+      }
+    ]
+  }
+]
