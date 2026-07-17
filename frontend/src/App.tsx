@@ -43,6 +43,7 @@ const AdminContentPage = lazy(() => import('./pages/admin/AdminContentPage'))
 const AdminPipelinePage = lazy(() => import('./pages/admin/AdminPipelinePage'))
 const AdminDataRequestsPage = lazy(() => import('./pages/admin/AdminDataRequestsPage'))
 const AdminOperatorGuidePage = lazy(() => import('./pages/admin/AdminOperatorGuidePage'))
+const AdminIssueEditorPage = lazy(() => import('./pages/admin/AdminIssueEditorPage'))
 const PaceRisePage = lazy(() => import('./pages/PaceRisePage'))
 const DataRequestPage = lazy(() => import('./pages/DataRequestPage'))
 
@@ -97,6 +98,7 @@ function App() {
                 <Route path="gallery" element={lazyPage(<AdminGalleryPage />)} />
                 <Route path="card-studio" element={lazyPage(<AdminCardStudioPage />)} />
                 <Route path="content" element={lazyPage(<AdminContentPage />)} />
+                <Route path="content/magazine" element={lazyPage(<AdminIssueEditorPage />)} />
                 <Route path="pipeline" element={lazyPage(<AdminPipelinePage />)} />
                 <Route path="data-requests" element={lazyPage(<AdminDataRequestsPage />)} />
                 <Route path="operator-guide" element={lazyPage(<AdminOperatorGuidePage />)} />

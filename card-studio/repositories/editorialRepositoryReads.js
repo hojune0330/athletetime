@@ -1,6 +1,6 @@
 const { ISSUE_STATES } = require('./editorialStateMachine');
 const { EditorialNotFoundError } = require('./editorialRepositoryErrors');
-const { calendarView, issueView, sourceView } = require('./editorialRepositoryViews');
+const { calendarView, issueView, revisionView, sourceView } = require('./editorialRepositoryViews');
 
 function parseLimit(value, fallback = 50) {
   if (value == null || value === '') return fallback;
@@ -70,6 +70,18 @@ async function listSources(pool, issueId) {
   return result.rows.map(sourceView);
 }
 
+async function listRevisions(pool, issueId) {
+  const issue = await pool.query('SELECT id FROM editorial_issues WHERE id=$1', [issueId]);
+  if (issue.rowCount === 0) throw new EditorialNotFoundError(issueId);
+  const result = await pool.query(`
+    SELECT id, revision_number, title, content, review_note, created_at
+    FROM editorial_revisions
+    WHERE issue_id=$1
+    ORDER BY revision_number DESC
+  `, [issueId]);
+  return result.rows.map(revisionView);
+}
+
 async function listMagazine(pool, query = {}) {
   const limit = parseLimit(query.limit, 20);
   const result = await pool.query(`
@@ -101,4 +113,12 @@ async function getMagazineIssue(pool, slug) {
   return issueView(result.rows[0], sources.get(result.rows[0].id));
 }
 
-module.exports = { getIssue, getMagazineIssue, listCalendar, listIssues, listMagazine, listSources };
+module.exports = {
+  getIssue,
+  getMagazineIssue,
+  listCalendar,
+  listIssues,
+  listMagazine,
+  listRevisions,
+  listSources,
+};

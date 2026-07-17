@@ -84,7 +84,16 @@ test('EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published o
   const created = await request(api.baseUrl, 'POST', '/api/admin/editorial/issues', issueBody(), headers);
   assert.equal(created.status, 201);
   assert.equal(created.body.issue.version, 1);
+  assert.equal(created.body.issue.sectionKey, 'competition-preview');
+  assert.equal(created.body.issue.calendarState, 'drafting');
   const issueId = created.body.issue.id;
+
+  const revisions = await request(
+    api.baseUrl, 'GET', `/api/admin/editorial/issues/${issueId}/revisions`, undefined, headers,
+  );
+  assert.equal(revisions.status, 200);
+  assert.equal(revisions.body.revisions.length, 1);
+  assert.equal(revisions.body.revisions[0].revisionNumber, 1);
 
   const source = await request(api.baseUrl, 'POST', `/api/admin/editorial/issues/${issueId}/sources`, {
     expectedVersion: 1,
@@ -101,6 +110,8 @@ test('EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published o
   }, headers);
   assert.equal(checked.status, 200);
   assert.equal(checked.body.issue.version, 3);
+  assert.equal(checked.body.issue.sectionKey, 'competition-preview');
+  assert.equal(checked.body.issue.calendarState, 'ready');
 
   const approved = await request(api.baseUrl, 'POST', `/api/admin/editorial/issues/${issueId}/approve`, {
     expectedVersion: 3,

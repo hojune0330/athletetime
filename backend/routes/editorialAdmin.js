@@ -44,6 +44,12 @@ function calendarView(entry) {
   ]);
 }
 
+function revisionView(revision) {
+  return pick(revision, [
+    'id', 'revisionNumber', 'title', 'content', 'reviewNote', 'createdAt',
+  ]);
+}
+
 function asyncRoute(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res)).catch(next);
 }
@@ -59,7 +65,18 @@ function errorHandler(error, req, res, next) {
   const status = Number.isInteger(error.status) ? error.status : error instanceof TypeError ? 400 : 500;
   const code = error.code || (status === 400 ? 'INVALID_EDITORIAL_REQUEST' : 'EDITORIAL_REQUEST_FAILED');
   const message = status >= 500 ? '편집 요청을 처리하지 못했습니다.' : error.message;
-  return res.status(status).json({ success: false, code, error: message });
+  const reasons = Array.isArray(error.reasons)
+    ? error.reasons
+      .filter((reason) => reason && typeof reason.code === 'string' && typeof reason.message === 'string')
+      .slice(0, 20)
+      .map((reason) => ({ code: reason.code, message: reason.message }))
+    : undefined;
+  return res.status(status).json({
+    success: false,
+    code,
+    error: message,
+    ...(reasons ? { reasons } : {}),
+  });
 }
 
 function createEditorialAdminRouter({ service }) {
@@ -110,6 +127,10 @@ function createEditorialAdminRouter({ service }) {
   router.get('/issues/:id', asyncRoute(async (req, res) => {
     const issue = await service.getIssue(parseUuidParam(req.params.id));
     res.json({ success: true, issue: issueView(issue) });
+  }));
+  router.get('/issues/:id/revisions', asyncRoute(async (req, res) => {
+    const revisions = await service.listRevisions(parseUuidParam(req.params.id));
+    res.json({ success: true, revisions: revisions.map(revisionView) });
   }));
   router.patch('/issues/:id', asyncRoute(async (req, res) => {
     const issue = await service.reviseIssue({

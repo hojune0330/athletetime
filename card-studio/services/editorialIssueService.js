@@ -59,6 +59,10 @@ class EditorialIssueService {
     return this.repository.listSources(issueId);
   }
 
+  listRevisions(issueId) {
+    return this.repository.listRevisions(issueId);
+  }
+
   async addSource(input) {
     const sourceUrl = await assertResolvableSourceUrl(input.sourceUrl, this.resolveHostname);
     return this.repository.addSource({ ...input, sourceUrl });

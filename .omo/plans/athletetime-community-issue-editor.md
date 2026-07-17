@@ -347,7 +347,7 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
 
   **Commit**: YES | Message: `feat(editorial): generate source-backed issue candidates` | Files: `card-studio/services/editorialCandidateService.js`, `card-studio/services/editorialSourcePolicy.js`, `backend/tests/community-editorial-candidates.test.js`
 
-- [ ] 6. 관리자 `매거진 편집실` 화면 구축
+- [x] 6. 관리자 `매거진 편집실` 화면 구축
 
   **What to do**: `/admin/content/magazine`에 월간 캘린더와 후보, 초안, 검수대기, 예약, 발행, 정정 탭을 만든다. 캘린더는 국내 시즌·국제 메이저·실내·로드/마라톤·아카이브 슬롯과 `발행하지 않음` 결정을 모두 보여준다. source card, `why_now`, 사실 필드, 공개 미리보기, 정책 실패, sensitivity, 관련 링크, 일정(KST), revision diff를 표시한다. 승인 버튼은 모든 blocking check가 green일 때만 활성화한다. MVP에는 AI 제안 UI/provider 호출을 넣지 않고 수동 편집만 제공한다.
   **Must NOT do**: source 없이 승인, 공개 문장과 내부 메모 혼합, 관리자 이외 접근을 허용하지 않는다.
@@ -361,9 +361,9 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
   - `frontend/src/App.tsx:143` - route/lazy loading 패턴
 
   **Acceptance Criteria**:
-  - [ ] 키보드만으로 후보 선택부터 예약까지 완료할 수 있다.
-  - [ ] 실패 check는 원인과 수정 위치를 한 문장으로 표시한다.
-  - [ ] 새로고침 후 draft/version/source/revision이 보존된다.
+  - [x] 키보드만으로 후보 선택부터 예약까지 완료할 수 있다.
+  - [x] 실패 check는 원인과 수정 위치를 한 문장으로 표시한다.
+  - [x] 새로고침 후 draft/version/source/revision이 보존된다.
 
   **QA Scenarios**:
   ```

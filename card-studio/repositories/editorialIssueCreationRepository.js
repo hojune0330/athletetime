@@ -102,7 +102,11 @@ async function createIssue(pool, input) {
       VALUES ($1, 1, $2, $3, $4)
     `, [issueId, issue.title, issue.content, actorUserId]);
     await client.query('COMMIT');
-    return issueView(inserted.rows[0]);
+    return issueView({
+      ...inserted.rows[0],
+      section_key: input.sectionKey,
+      calendar_state: 'drafting',
+    });
   } catch (error) {
     await client.query('ROLLBACK');
     throw error;

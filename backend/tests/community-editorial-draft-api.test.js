@@ -85,3 +85,54 @@ test('EDITORIAL-DRAFT-API-003: malformed issue IDs fail before repository access
   assert.equal(response.status, 400);
   assert.equal(called, false);
 });
+
+test('EDITORIAL-DRAFT-API-004: revision history exposes review fields without actor metadata', async (t) => {
+  const service = {
+    async listRevisions(id) {
+      assert.equal(id, ISSUE_ID);
+      return [{
+        id: 7,
+        issueId: id,
+        revisionNumber: 2,
+        title: 'Revised title',
+        content: 'Revised content',
+        reviewNote: 'Source wording clarified',
+        createdAt: '2026-07-18T00:00:00.000Z',
+        createdBy: ACTOR_ID,
+        auditIp: '127.0.0.1',
+      }];
+    },
+  };
+  const api = await startApi(service);
+  t.after(api.close);
+
+  const response = await request(api.baseUrl, 'GET', `/api/admin/editorial/issues/${ISSUE_ID}/revisions`);
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.revisions[0].revisionNumber, 2);
+  assert.equal(JSON.stringify(response.body).includes('createdBy'), false);
+  assert.equal(JSON.stringify(response.body).includes('auditIp'), false);
+});
+
+test('EDITORIAL-DRAFT-API-005: policy failures return safe edit guidance', async (t) => {
+  const service = {
+    async act() {
+      const error = new Error('Editorial policy blocked this issue');
+      error.code = 'EDITORIAL_POLICY_BLOCKED';
+      error.status = 422;
+      error.reasons = [{ code: 'source_required', message: '확인 가능한 출처가 1개 이상 필요합니다.' }];
+      throw error;
+    },
+  };
+  const api = await startApi(service);
+  t.after(api.close);
+
+  const response = await request(api.baseUrl, 'POST', `/api/admin/editorial/issues/${ISSUE_ID}/check`, {
+    expectedVersion: 1,
+  });
+
+  assert.equal(response.status, 422);
+  assert.deepEqual(response.body.reasons, [
+    { code: 'source_required', message: '확인 가능한 출처가 1개 이상 필요합니다.' },
+  ]);
+});

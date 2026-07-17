@@ -23,6 +23,7 @@ const {
   listCalendar,
   listIssues,
   listMagazine,
+  listRevisions,
   listSources,
 } = require('./editorialRepositoryReads');
 const { issueView } = require('./editorialRepositoryViews');
@@ -155,7 +156,11 @@ class PostgresEditorialRepository {
         `, [row.calendar_id, calendarState, input.scheduledFor || null]);
       }
       await client.query('COMMIT');
-      return issueView(updated.rows[0]);
+      return issueView({
+        ...updated.rows[0],
+        section_key: row.section_key,
+        calendar_state: calendarState || row.calendar_state,
+      });
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
@@ -173,6 +178,8 @@ class PostgresEditorialRepository {
   async deleteSource(input) { return deleteSource(this.pool, input); }
 
   async listSources(issueId) { return listSources(this.pool, issueId); }
+
+  async listRevisions(issueId) { return listRevisions(this.pool, issueId); }
 
   async listCalendar(query) { return listCalendar(this.pool, query); }
 

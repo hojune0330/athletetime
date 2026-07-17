@@ -53,4 +53,15 @@ function calendarView(row) {
   };
 }
 
-module.exports = { calendarView, issueView, sourceView };
+function revisionView(row) {
+  return {
+    id: Number(row.id),
+    revisionNumber: Number(row.revision_number),
+    title: row.title,
+    content: row.content,
+    reviewNote: row.review_note,
+    createdAt: row.created_at,
+  };
+}
+
+module.exports = { calendarView, issueView, revisionView, sourceView };
