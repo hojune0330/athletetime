@@ -1,0 +1,49 @@
+TAP version 13
+# Subtest: EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+not ok 1 - EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+  ---
+  duration_ms: 5.4755
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-editorial-postgres.integration.test.js:79:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /cadence IN \('weekly', 'off'\)/u. Input:
+
+    'CREATE TABLE IF NOT EXISTS magazine_digest_preferences (\n' +
+      '  user_id UUID PRIMARY KEY,\n' +
+      "  cadence VARCHAR(10) NOT NULL DEFAULT 'weekly' CHECK (cadence IN ('daily', 'weekly', 'off')),\n" +
+      "  section_keys JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(section_keys) = 'array'),\n" +
+      '  delivery_hour_utc SMALLINT NOT NULL DEFAULT 0 CHECK (delivery_hour_utc BETWEEN 0 AND 23),\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()\n' +
+      ');'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    CREATE TABLE IF NOT EXISTS magazine_digest_preferences (
+      user_id UUID PRIMARY KEY,
+      cadence VARCHAR(10) NOT NULL DEFAULT 'weekly' CHECK (cadence IN ('daily', 'weekly', 'off')),
+      section_keys JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(section_keys) = 'array'),
+      delivery_hour_utc SMALLINT NOT NULL DEFAULT 0 CHECK (delivery_hour_utc BETWEEN 0 AND 23),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-postgres.integration.test.js:94:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 250.442

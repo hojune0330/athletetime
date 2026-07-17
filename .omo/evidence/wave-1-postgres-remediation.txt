@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: EDITORIAL-PG-008: Given a corrected issue When republished Then its existing post is updated once
+ok 1 - EDITORIAL-PG-008: Given a corrected issue When republished Then its existing post is updated once
+  ---
+  duration_ms: 1051.7659
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-000: Given the current community schema When characterized Then the posts API contract is unchanged
+ok 2 - EDITORIAL-PG-000: Given the current community schema When characterized Then the posts API contract is unchanged
+  ---
+  duration_ms: 4.5689
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-001: Given editorial states When validated Then only plan transitions are accepted
+ok 3 - EDITORIAL-PG-001: Given editorial states When validated Then only plan transitions are accepted
+  ---
+  duration_ms: 8.6691
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-002: Given migration files When discovered Then down migrations are never run upward
+ok 4 - EDITORIAL-PG-002: Given migration files When discovered Then down migrations are never run upward
+  ---
+  duration_ms: 11.3567
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+ok 5 - EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+  ---
+  duration_ms: 4.2069
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-004: Given an empty PostgreSQL schema When migrated up/down twice Then it is repeatable
+ok 6 - EDITORIAL-PG-004: Given an empty PostgreSQL schema When migrated up/down twice Then it is repeatable
+  ---
+  duration_ms: 973.1697
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic
+ok 7 - EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic
+  ---
+  duration_ms: 719.2625
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created
+ok 8 - EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created
+  ---
+  duration_ms: 583.1603
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-007: Given duplicate package roles and stale versions When written Then both are rejected
+ok 9 - EDITORIAL-PG-007: Given duplicate package roles and stale versions When written Then both are rejected
+  ---
+  duration_ms: 637.4372
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-009: Given a draft without sources When checked Then policy blocks review readiness
+ok 10 - EDITORIAL-PG-009: Given a draft without sources When checked Then policy blocks review readiness
+  ---
+  duration_ms: 942.4561
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-011: Given forbidden copy hidden in content When checked Then no post can be published
+ok 11 - EDITORIAL-PG-011: Given forbidden copy hidden in content When checked Then no post can be published
+  ---
+  duration_ms: 736.3202
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-010: Given a direct valid transition When action context is missing Then DB rejects it
+ok 12 - EDITORIAL-PG-010: Given a direct valid transition When action context is missing Then DB rejects it
+  ---
+  duration_ms: 1275.1639
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6727.4508

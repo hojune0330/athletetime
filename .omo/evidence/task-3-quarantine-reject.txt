@@ -1,0 +1,10 @@
+Task 3 invalid/commented approval rejection evidence
+Date: 2026-07-17 UTC
+Approval IDs: 2 (existing post with one comment), 999 (nonexistent)
+Command: node scripts/community-post-quarantine.js --approved .omo/evidence/task-3-reject-approval.json --backup-receipt .omo/evidence/task-3-fixture-backup-receipt.json --write
+Exit: 1
+Stderr: Quarantine command failed: Approved post IDs do not exist: 999
+Before database checksum: 11cfb195fdbcf89d4ed53b421f874dcbfdb52a0fa21b778a90315cbda9de96a5
+After database checksum:  11cfb195fdbcf89d4ed53b421f874dcbfdb52a0fa21b778a90315cbda9de96a5
+Active quarantine rows after rejection: 0
+Result: PASS. The entire transaction was rejected and no partial quarantine was recorded.

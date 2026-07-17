@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS post_quarantines;
+DROP TABLE IF EXISTS issue_engagement_daily;
+DROP TABLE IF EXISTS event_alert_subscriptions;
+DROP TABLE IF EXISTS magazine_digest_preferences;
+DROP TABLE IF EXISTS editorial_events;
+DROP TABLE IF EXISTS editorial_revisions;
+DROP TABLE IF EXISTS editorial_sources;
+DROP TABLE IF EXISTS editorial_issues;
+DROP TABLE IF EXISTS editorial_calendar;
+DROP FUNCTION IF EXISTS enforce_editorial_issue_transition();
+DROP FUNCTION IF EXISTS enforce_editorial_calendar_transition();
+DROP FUNCTION IF EXISTS audit_editorial_issue_transition();

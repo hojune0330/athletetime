@@ -1,0 +1,29 @@
+Task 1 manual QA: happy path
+Date: 2026-07-17 KST
+
+Literal command:
+node -e "const p=require('./card-studio/editorialPolicy'); const r=p.evaluateEditorialIssue({title:'2026 시즌 개막전에서 볼 것',summary:'대회 일정과 출전 종목을 출처에 따라 정리했습니다.',whyNow:'이번 주 대회가 열립니다.',discussionQuestion:'어떤 종목을 보고 싶나요?',relatedUrl:'/competitions',subjectAgeGroup:'adult',sources:[{provider:'대한육상연맹',title:'대회 일정',url:'https://www.kaaf.or.kr/',accessedAt:'2026-07-17T00:00:00Z',type:'primary'}]}); console.log(JSON.stringify(r))"
+
+Exit: 0
+Output:
+{"publishEligible":true,"decision":"ready_for_human_review","reasons":[],"section":"이번 대회","publicCopy":{"brand":"애타 매거진","publisher":"애타 편집팀","sourceBasis":"출처 기반","humanReview":"운영자가 확인해 정리했어요"},"requiresHumanApproval":true,"autoPublish":false}
+
+PASS: publishEligible=true, required public copy is present, human approval remains required, and autoPublish=false.
+
+Adversarial/operational receipt:
+- misleading success: PASS - eligibility is named ready_for_human_review and cannot report published; autoPublish=false.
+- dirty worktree: PASS - concurrent Task 2/3 files were detected and left untouched; only Task 1 scoped files are included.
+- flaky tests: PASS - the focused test completed successfully twice in succession.
+- cancel/resume: N/A - the evaluator is a synchronous pure function with no cancellable or resumable lifecycle.
+- hung command: N/A - no server, watcher, network request, or long-running child process is used by this policy surface.
+- repeated interruptions: N/A - evaluation has no persisted intermediate state and completes atomically in one process call.
+- cleanup: PASS - no ports, processes, temporary files, browser sessions, or external resources were created.
+
+Automated verification receipt:
+- baseline before production change: PASS - 1 test, 0 failures.
+- red gate: PASS - failed with MODULE_NOT_FOUND for card-studio/editorialPolicy.
+- focused green: PASS - 53 tests/subtests, 0 failures; repeated twice successfully.
+- root npm test: PASS - 318 tests, 312 passed, 6 expected private-original skips, 0 failures.
+- node syntax checks: PASS - policy module and test file.
+- static boundary scan: PASS - no AI provider, network, or publish call; public copy contains no forbidden term.
+- diff check: PASS - no whitespace errors; package.json changes only by appending this test to the root test command.
