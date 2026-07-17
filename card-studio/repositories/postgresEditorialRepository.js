@@ -2,45 +2,33 @@ const crypto = require('node:crypto');
 const {
   assertEditorialActor,
   assertEditorialTransition,
-  assertPackageRole,
 } = require('./editorialStateMachine');
 const { publishIssuePost } = require('./editorialPostPublisher');
 const { assertPersistedIssuePolicy } = require('./editorialPolicyGate');
 const { reviseEditorialIssue } = require('./editorialRevisionRepository');
-const { parseEditorialIssueInput, requiredText } = require('./editorialIssueInput');
-
-class EditorialNotFoundError extends Error {
-  constructor(issueId) {
-    super(`Editorial issue not found: ${issueId}`);
-    this.name = 'EditorialNotFoundError';
-    this.code = 'EDITORIAL_ISSUE_NOT_FOUND';
-    this.status = 404;
-  }
-}
-
-class EditorialVersionConflictError extends Error {
-  constructor(expectedVersion, currentVersion) {
-    super(`Editorial issue version conflict: expected ${expectedVersion}, current ${currentVersion}`);
-    this.name = 'EditorialVersionConflictError';
-    this.code = 'EDITORIAL_VERSION_CONFLICT';
-    this.status = 409;
-    this.expectedVersion = expectedVersion;
-    this.currentVersion = currentVersion;
-  }
-}
-
-function issueView(row) {
-  return {
-    id: row.id,
-    calendarId: row.calendar_id,
-    postId: row.post_id == null ? null : Number(row.post_id),
-    status: row.status,
-    version: row.version,
-    title: row.title,
-    content: row.content,
-    author: row.author,
-  };
-}
+const { createIssue } = require('./editorialIssueCreationRepository');
+const { correctIssue } = require('./editorialCorrectionWorkflow');
+const { finishIssue } = require('./editorialFinishRepository');
+const { cancelCalendar, createCalendar, updateCalendar } = require('./editorialCalendarRepository');
+const {
+  EditorialNotFoundError,
+  EditorialVersionConflictError,
+  assertExpectedVersion,
+} = require('./editorialRepositoryErrors');
+const {
+  getIssue,
+  getMagazineIssue,
+  listCalendar,
+  listIssues,
+  listMagazine,
+  listSources,
+} = require('./editorialRepositoryReads');
+const { issueView } = require('./editorialRepositoryViews');
+const {
+  addSource,
+  deleteSource,
+  updateSource,
+} = require('./editorialSourceRepository');
 
 class PostgresEditorialRepository {
   constructor(pool) {
@@ -48,104 +36,17 @@ class PostgresEditorialRepository {
   }
 
   async createIssue(input) {
-    const actorUserId = assertEditorialActor(input.actorUserId);
-    const seasonYear = input.seasonYear;
-    const slot = input.slot;
-    if (!Number.isInteger(seasonYear) || seasonYear < 2000 || seasonYear > 2200) {
-      throw new TypeError('seasonYear must be an integer between 2000 and 2200');
-    }
-    if (!Number.isInteger(slot) || slot <= 0) throw new TypeError('slot must be a positive integer');
-    assertPackageRole(input.packageRole, input.competitionId);
-    const issue = parseEditorialIssueInput(input);
-    const issueId = crypto.randomUUID();
-    const calendarId = crypto.randomUUID();
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      await client.query(`
-        INSERT INTO editorial_calendar (
-          id, season_year, competition_id, package_role, section_key, slot, state
-        ) VALUES ($1, $2, $3, $4, $5, $6, 'drafting')
-      `, [
-        calendarId,
-        seasonYear,
-        input.competitionId || null,
-        input.packageRole || null,
-        issue.sectionKey,
-        slot,
-      ]);
-      const inserted = await client.query(`
-        INSERT INTO editorial_issues (
-          id, calendar_id, title, content, author, summary, why_now,
-          discussion_question, related_url, subject_age_group, created_by,
-          last_actor_user_id, last_action_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11, $12)
-        RETURNING *
-      `, [
-        issueId, calendarId, issue.title, issue.content, issue.author, issue.summary, issue.whyNow,
-        issue.discussionQuestion, issue.relatedUrl, issue.subjectAgeGroup, actorUserId, crypto.randomUUID(),
-      ]);
-      await client.query(`
-        INSERT INTO editorial_revisions (
-          issue_id, revision_number, title, content, created_by
-        ) VALUES ($1, 1, $2, $3, $4)
-      `, [issueId, issue.title, issue.content, actorUserId]);
-      await client.query('COMMIT');
-      return issueView(inserted.rows[0]);
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+    return createIssue(this.pool, input);
   }
 
+  async createCalendar(input) { return createCalendar(this.pool, input); }
+
+  async updateCalendar(input) { return updateCalendar(this.pool, input); }
+
+  async cancelCalendar(input) { return cancelCalendar(this.pool, input); }
+
   async addSource(input) {
-    const actorUserId = assertEditorialActor(input.actorUserId);
-    const sourceUrl = requiredText(input.sourceUrl, 'sourceUrl');
-    const parsedUrl = new URL(sourceUrl);
-    if (parsedUrl.protocol !== 'https:') {
-      throw new TypeError('sourceUrl must use HTTPS');
-    }
-    if (!['official', 'primary', 'secondary', 'internal'].includes(input.sourceKind)) {
-      throw new TypeError('sourceKind is not supported');
-    }
-    const title = requiredText(input.title, 'title');
-    const id = crypto.randomUUID();
-    const client = await this.pool.connect();
-    try {
-      await client.query('BEGIN');
-      const issue = await client.query(
-        'SELECT version FROM editorial_issues WHERE id = $1 FOR UPDATE',
-        [input.issueId],
-      );
-      if (issue.rowCount === 0) throw new EditorialNotFoundError(input.issueId);
-      await client.query(`
-        INSERT INTO editorial_sources (
-          id, issue_id, source_url, source_kind, title, publisher, created_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      `, [
-        id,
-        input.issueId,
-        parsedUrl.toString(),
-        input.sourceKind,
-        title,
-        input.publisher || null,
-        actorUserId,
-      ]);
-      await client.query(`
-        INSERT INTO editorial_events (
-          issue_id, event_type, issue_version, actor_user_id, payload
-        ) VALUES ($1, 'source_added', $2, $3, jsonb_build_object('source_id', $4::text))
-      `, [input.issueId, issue.rows[0].version, actorUserId, id]);
-      await client.query('COMMIT');
-      return { id, issueId: input.issueId, sourceUrl: parsedUrl.toString() };
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
-    }
+    return addSource(this.pool, input);
   }
 
   async transitionIssue(input) {
@@ -156,16 +57,24 @@ class PostgresEditorialRepository {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
-      const current = await client.query(
-        'SELECT * FROM editorial_issues WHERE id = $1 FOR UPDATE',
-        [input.issueId],
-      );
+      const current = await client.query(`
+        SELECT i.*, c.state AS calendar_state, c.section_key
+        FROM editorial_issues i JOIN editorial_calendar c ON c.id=i.calendar_id
+        WHERE i.id=$1 FOR UPDATE OF i, c
+      `, [input.issueId]);
       if (current.rowCount === 0) throw new EditorialNotFoundError(input.issueId);
       const row = current.rows[0];
-      if (row.version !== input.expectedVersion) {
-        throw new EditorialVersionConflictError(input.expectedVersion, row.version);
+      assertExpectedVersion(input.expectedVersion, row.version);
+      if (['skipped', 'cancelled'].includes(row.calendar_state)) {
+        const error = new Error('Editorial calendar entry is already closed');
+        error.code = 'EDITORIAL_CALENDAR_CLOSED';
+        error.status = 409;
+        throw error;
       }
       assertEditorialTransition(row.status, input.nextStatus);
+      if (input.nextStatus === 'scheduled' && Number.isNaN(Date.parse(input.scheduledFor || ''))) {
+        throw new TypeError('scheduledFor must be an ISO timestamp');
+      }
       let policy = null;
       if (input.nextStatus === 'review_ready') {
         const sources = await client.query(
@@ -231,9 +140,15 @@ class PostgresEditorialRepository {
       if (calendarState) {
         await client.query(`
           UPDATE editorial_calendar
-          SET state = $2, version = version + 1, updated_at = NOW()
+          SET state = $2::varchar(20),
+              scheduled_for = CASE
+                WHEN $2::varchar(20) = 'scheduled' THEN $3::timestamptz
+                ELSE scheduled_for
+              END,
+              version = version + 1,
+              updated_at = NOW()
           WHERE id = $1
-        `, [row.calendar_id, calendarState]);
+        `, [row.calendar_id, calendarState, input.scheduledFor || null]);
       }
       await client.query('COMMIT');
       return issueView(updated.rows[0]);
@@ -248,6 +163,26 @@ class PostgresEditorialRepository {
   async reviseIssue(input) {
     return issueView(await reviseEditorialIssue(this.pool, input));
   }
+
+  async updateSource(input) { return updateSource(this.pool, input); }
+
+  async deleteSource(input) { return deleteSource(this.pool, input); }
+
+  async listSources(issueId) { return listSources(this.pool, issueId); }
+
+  async listCalendar(query) { return listCalendar(this.pool, query); }
+
+  async listIssues(query) { return listIssues(this.pool, query); }
+
+  async getIssue(issueId) { return getIssue(this.pool, issueId); }
+
+  async listMagazine(query) { return listMagazine(this.pool, query); }
+
+  async getMagazineIssue(slug) { return getMagazineIssue(this.pool, slug); }
+
+  async finishIssue(input) { return finishIssue(this.pool, input); }
+
+  async correctIssue(input) { return correctIssue(this.pool, input); }
 
   async close() {}
 }

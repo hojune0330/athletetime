@@ -1,6 +1,5 @@
 const crypto = require('node:crypto');
 const { assertEditorialActor } = require('./editorialStateMachine');
-const { assertPersistedIssuePolicy } = require('./editorialPolicyGate');
 
 class EditorialRevisionError extends Error {
   constructor(code, message, status = 409) {
@@ -40,7 +39,11 @@ async function reviseEditorialIssue(pool, input) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const current = await client.query('SELECT * FROM editorial_issues WHERE id = $1 FOR UPDATE', [input.issueId]);
+    const current = await client.query(`
+      SELECT i.*, c.state AS calendar_state
+      FROM editorial_issues i JOIN editorial_calendar c ON c.id=i.calendar_id
+      WHERE i.id=$1 FOR UPDATE OF i, c
+    `, [input.issueId]);
     if (current.rowCount === 0) {
       throw new EditorialRevisionError('EDITORIAL_ISSUE_NOT_FOUND', `Editorial issue not found: ${input.issueId}`, 404);
     }
@@ -48,23 +51,12 @@ async function reviseEditorialIssue(pool, input) {
     if (row.version !== input.expectedVersion) {
       throw new EditorialRevisionError('EDITORIAL_VERSION_CONFLICT', 'Editorial issue version conflict');
     }
-    if (!['draft', 'corrected'].includes(row.status)) {
-      throw new EditorialRevisionError('EDITORIAL_REVISION_NOT_ALLOWED', `Cannot revise issue in ${row.status}`);
+    if (row.status !== 'draft' || row.calendar_state !== 'drafting') {
+      throw new EditorialRevisionError(
+        'EDITORIAL_REVISION_NOT_ALLOWED',
+        `Cannot revise issue in ${row.status}/${row.calendar_state}`,
+      );
     }
-    const sources = await client.query('SELECT * FROM editorial_sources WHERE issue_id = $1 ORDER BY id', [input.issueId]);
-    const candidate = {
-      ...row,
-      title: values.title,
-      content: values.content,
-      summary: values.summary,
-      why_now: values.whyNow,
-      discussion_question: values.discussionQuestion,
-      related_url: values.relatedUrl,
-      subject_age_group: values.subjectAgeGroup,
-    };
-    const policy = row.status === 'corrected'
-      ? assertPersistedIssuePolicy(candidate, sources.rows)
-      : null;
     const version = row.version + 1;
     const updated = await client.query(`
       UPDATE editorial_issues SET
@@ -75,8 +67,7 @@ async function reviseEditorialIssue(pool, input) {
     `, [
       input.issueId, values.title, values.content, values.summary, values.whyNow,
       values.discussionQuestion, values.relatedUrl, values.subjectAgeGroup, version,
-      actorUserId, crypto.randomUUID(), policy ? new Date() : null,
-      policy?.fingerprint || null,
+      actorUserId, crypto.randomUUID(), null, null,
     ]);
     await client.query(`
       INSERT INTO editorial_revisions (

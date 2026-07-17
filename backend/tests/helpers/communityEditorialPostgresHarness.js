@@ -1,9 +1,11 @@
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const path = require('node:path');
 const { Pool } = require('pg');
 
 const root = path.join(__dirname, '..', '..', '..');
 const migrationPath = path.join(root, 'backend', 'database', 'migration-006-community-editorial.sql');
+const apiMigrationPath = path.join(root, 'backend', 'database', 'migration-007-community-editorial-api.sql');
 const downMigrationPath = path.join(
   root,
   'backend',
@@ -12,6 +14,7 @@ const downMigrationPath = path.join(
   '006-community-editorial-down.sql',
 );
 const connectionString = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+const ACTOR_ID = '00000000-0000-4000-8000-000000000001';
 const expectedTables = Object.freeze([
   'editorial_calendar',
   'editorial_issues',
@@ -80,12 +83,34 @@ async function createExistingFixture(pool) {
   `);
 }
 
+async function applyEditorialMigrations(pool) {
+  for (const file of [migrationPath, apiMigrationPath]) {
+    await pool.query(fs.readFileSync(file, 'utf8'));
+  }
+}
+
+function issueFields(overrides = {}) {
+  return {
+    summary: 'Public results summarized with sources.',
+    whyNow: 'The competition results were published this week.',
+    discussionQuestion: 'Which result stood out?',
+    relatedUrl: '/competitions',
+    subjectAgeGroup: 'adult',
+    actorUserId: ACTOR_ID,
+    ...overrides,
+  };
+}
+
 module.exports = {
+  ACTOR_ID,
+  apiMigrationPath,
+  applyEditorialMigrations,
   connectionString,
   createExistingFixture,
   downMigrationPath,
   expectedTables,
   isolatedPool,
+  issueFields,
   migrationPath,
   root,
 };

@@ -265,6 +265,10 @@ if (HAS_DATABASE) {
   const competitionsRouter = require(path.join(ROOT, 'backend/routes/competitions'));
   const matchResultsRouter = require(path.join(ROOT, 'backend/routes/matchResults'));
   const uploadRouter = require(path.join(ROOT, 'backend/routes/upload'));
+  const { createEditorialAdminRouter, createEditorialPublicRouter } = require(path.join(ROOT, 'backend/routes/editorialAdmin'));
+  const { PostgresEditorialRepository } = require(path.join(ROOT, 'card-studio/repositories/postgresEditorialRepository'));
+  const { EditorialIssueService } = require(path.join(ROOT, 'card-studio/services/editorialIssueService'));
+  const editorialService = new EditorialIssueService(new PostgresEditorialRepository(app.locals.pool));
 
   // multer upload middleware
   const { upload, handleUploadError } = require(path.join(ROOT, 'backend/middleware/upload'));
@@ -276,6 +280,13 @@ if (HAS_DATABASE) {
   app.use('/api/competitions', competitionsRouter);
   app.use('/api/match-results', matchResultsRouter);
   app.use('/api/upload', uploadRouter);
+  app.use('/api/editorial', createEditorialPublicRouter({ service: editorialService }));
+  app.use(
+    '/api/admin/editorial',
+    authenticateToken,
+    jwtRequireAdmin,
+    createEditorialAdminRouter({ service: editorialService }),
+  );
 
   console.log('  Community API: active (PostgreSQL)');
 } else {

@@ -1,12 +1,11 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const test = require('node:test');
 
 const {
+  applyEditorialMigrations,
   connectionString,
   createExistingFixture,
   isolatedPool,
-  migrationPath,
 } = require('./helpers/communityEditorialPostgresHarness');
 
 const ACTOR_ID = '00000000-0000-4000-8000-000000000001';
@@ -18,7 +17,7 @@ test('EDITORIAL-PG-008: Given a corrected issue When republished Then its existi
   // Given
   const pool = await isolatedPool(t, 'editorial_correction');
   await createExistingFixture(pool);
-  await pool.query(fs.readFileSync(migrationPath, 'utf8'));
+  await applyEditorialMigrations(pool);
   const { PostgresEditorialRepository } = require('../../card-studio/repositories/postgresEditorialRepository');
   const repository = new PostgresEditorialRepository(pool);
   const draft = await repository.createIssue({
@@ -35,8 +34,9 @@ test('EDITORIAL-PG-008: Given a corrected issue When republished Then its existi
     subjectAgeGroup: 'adult',
     actorUserId: ACTOR_ID,
   });
-  await repository.addSource({
+  const source = await repository.addSource({
     issueId: draft.id,
+    expectedVersion: draft.version,
     sourceUrl: 'https://example.com/result',
     sourceKind: 'primary',
     title: '대회 결과',
@@ -45,7 +45,7 @@ test('EDITORIAL-PG-008: Given a corrected issue When republished Then its existi
   const ready = await repository.transitionIssue({
     issueId: draft.id,
     nextStatus: 'review_ready',
-    expectedVersion: draft.version,
+    expectedVersion: source.issueVersion,
     actorUserId: ACTOR_ID,
   });
   const approved = await repository.transitionIssue({
@@ -60,21 +60,9 @@ test('EDITORIAL-PG-008: Given a corrected issue When republished Then its existi
     expectedVersion: approved.version,
     actorUserId: ACTOR_ID,
   });
-  const corrected = await repository.transitionIssue({
+  const corrected = await repository.correctIssue({
     issueId: draft.id,
-    nextStatus: 'corrected',
     expectedVersion: firstPublish.version,
-    actorUserId: ACTOR_ID,
-  });
-  await assert.rejects(repository.transitionIssue({
-    issueId: draft.id,
-    nextStatus: 'published',
-    expectedVersion: corrected.version,
-    actorUserId: ACTOR_ID,
-  }), (error) => error.code === 'EDITORIAL_POLICY_CHECK_REQUIRED');
-  const revised = await repository.reviseIssue({
-    issueId: draft.id,
-    expectedVersion: corrected.version,
     title: 'Corrected title',
     content: 'Corrected content',
     summary: '정정한 공개 결과를 출처와 함께 정리했습니다.',
@@ -85,13 +73,26 @@ test('EDITORIAL-PG-008: Given a corrected issue When republished Then its existi
     reviewNote: '원출처와 대조해 기록 설명을 정정함',
     actorUserId: ACTOR_ID,
   });
+  await assert.rejects(repository.reviseIssue({
+    issueId: draft.id,
+    expectedVersion: corrected.version,
+    title: 'Out-of-band title',
+    content: 'Out-of-band content',
+    summary: '정정한 공개 결과를 출처와 함께 정리했습니다.',
+    whyNow: '기존 설명에서 오류를 확인해 바로잡았습니다.',
+    discussionQuestion: '정정된 기록을 확인하셨나요?',
+    relatedUrl: '/competitions',
+    subjectAgeGroup: 'adult',
+    reviewNote: 'This must use the atomic correction endpoint',
+    actorUserId: ACTOR_ID,
+  }), (error) => error.code === 'EDITORIAL_REVISION_NOT_ALLOWED');
   const postsBeforeRepublish = await pool.query('SELECT COUNT(*)::int AS count FROM posts');
 
   // When
   const republished = await repository.transitionIssue({
     issueId: draft.id,
     nextStatus: 'published',
-    expectedVersion: revised.version,
+    expectedVersion: corrected.version,
     actorUserId: ACTOR_ID,
   });
 

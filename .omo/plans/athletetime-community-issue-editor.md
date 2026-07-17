@@ -277,7 +277,7 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
 
   **Commit**: YES | Message: `feat(community): add reversible post quarantine` | Files: `scripts/community-post-quarantine.js`, `backend/tests/community-post-quarantine.test.js`, `docs/runbooks/community-post-quarantine.md`
 
-- [ ] 4. 관리자 전용 편집 도메인 API 구현
+- [x] 4. 관리자 전용 편집 도메인 API 구현
 
   **What to do**: `/api/admin/editorial/calendar`, `/api/admin/editorial/issues`, `/api/admin/editorial/issues/:id/{check|approve|reject|schedule|cancel|publish|correct|unpublish}`와 source CRUD를 별도 라우터에 구현한다. 공개 읽기는 `/api/editorial/magazine`, `/api/editorial/magazine/:slug`로 분리한다. 모든 admin write는 `authenticateToken + requireAdmin + CSRF`, 전용 parse 함수의 구조화 검증, 낙관적 version, 감사 actor/event를 사용한다. Source URL은 `https`만 허용하고 사설 IP·credential·redirect SSRF를 차단한다.
   **Must NOT do**: 일반 `/api/posts`의 `optionalAuth` 경로로 편집 권한을 우회하지 않는다.
@@ -291,8 +291,8 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
   - `card-studio/routes/adminRoutes.js:359` - 관리자 preview/generate 라우트 패턴
 
   **Acceptance Criteria**:
-  - [ ] admin happy path와 anonymous/non-admin/CSRF 없음/version 충돌 테스트가 모두 통과한다.
-  - [ ] 응답에 내부 prompt, 원문 전문, 감사 IP, 비밀 설정이 포함되지 않는다.
+  - [x] admin happy path와 anonymous/non-admin/CSRF 없음/version 충돌 테스트가 모두 통과한다.
+  - [x] 응답에 내부 prompt, 원문 전문, 감사 IP, 비밀 설정이 포함되지 않는다.
 
   **QA Scenarios**:
   ```

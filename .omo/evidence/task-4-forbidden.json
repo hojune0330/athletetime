@@ -1,0 +1,39 @@
+{
+  "task": 4,
+  "scenario": "forbidden and adversarial editorial writes",
+  "result": "pass",
+  "observations": [
+    { "attempt": "anonymous create", "status": 401, "mutationCount": 0 },
+    { "attempt": "non-admin create or publish", "status": 403, "mutationCount": 0 },
+    { "attempt": "cookie-auth write without matching CSRF", "status": 403, "code": "CSRF_REQUIRED", "mutationCount": 0 },
+    { "attempt": "stale expectedVersion", "status": 409, "code": "EDITORIAL_VERSION_CONFLICT", "mutationCount": 0 },
+    { "attempt": "draft direct publish", "status": 409, "code": "INVALID_EDITORIAL_TRANSITION", "publicPostCount": 0 },
+    { "attempt": "legacy post update", "status": 409, "code": "EDITORIAL_POST_MANAGED", "mutationCount": 0 },
+    { "attempt": "legacy post delete", "status": 409, "code": "EDITORIAL_POST_MANAGED", "mutationCount": 0 },
+    { "attempt": "legacy separate poll vote", "status": 409, "code": "EDITORIAL_POST_MANAGED", "mutationCount": 0 },
+    { "attempt": "legacy separate poll vote delete", "status": 409, "code": "EDITORIAL_POST_MANAGED", "mutationCount": 0 },
+    { "attempt": "legacy inline poll vote", "status": 409, "code": "EDITORIAL_POST_MANAGED", "mutationCount": 0 },
+    { "attempt": "calendar stale expectedVersion", "status": 409, "code": "EDITORIAL_VERSION_CONFLICT", "mutationCount": 0 },
+    { "attempt": "calendar hard delete", "status": 200, "result": "audited soft cancellation" },
+    { "attempt": "malformed UUID", "status": 400, "mutationCount": 0 }
+  ],
+  "blockedSourceTargets": [
+    "non-HTTPS and credential URLs",
+    "localhost and .local names",
+    "private, loopback, link-local, documentation, multicast, and reserved IPv4",
+    "private, loopback, link-local, deprecated site-local, documentation, multicast, NAT64, 6to4, and IPv4-mapped IPv6",
+    "hostnames whose A or AAAA answers resolve to a blocked address"
+  ],
+  "networkBehavior": "Source validation performs bounded DNS resolution only. It never performs HTTP fetches or follows redirects; any future crawler must re-run target validation after every resolution and redirect.",
+  "responseRedaction": [
+    "internalPrompt",
+    "rawArticle",
+    "auditIp",
+    "secretConfig",
+    "policyFingerprint",
+    "lastActorUserId",
+    "lastActionId",
+    "createdBy",
+    "approvedBy"
+  ]
+}

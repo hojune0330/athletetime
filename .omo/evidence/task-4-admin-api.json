@@ -1,0 +1,49 @@
+{
+  "task": 4,
+  "scenario": "administrator editorial workflow",
+  "result": "pass",
+  "transport": "HTTP Express integration backed by PostgreSQL 18.4",
+  "workflow": [
+    { "action": "create", "status": 201, "issueVersion": 1 },
+    { "action": "read-draft", "status": 200 },
+    { "action": "revise-draft", "status": 200, "issueVersion": 2 },
+    { "action": "add-source", "status": 201 },
+    { "action": "check", "status": 200 },
+    { "action": "approve", "status": 200 },
+    { "action": "publish", "status": 200, "publicPostCount": 1 },
+    { "action": "correct", "status": 200, "publicPostCount": 1 }
+  ],
+  "sourceCrud": {
+    "versioned": true,
+    "events": ["source_added", "source_updated", "source_deleted"]
+  },
+  "calendarCrud": {
+    "actions": ["created", "updated", "cancelled"],
+    "versioned": true,
+    "actorAudited": true,
+    "deletePolicy": "soft cancellation with a required reason",
+    "staleVersionRejected": true,
+    "plannedSlotClaim": "calendarId and expectedCalendarVersion atomically transition one planned slot to drafting"
+  },
+  "migration": {
+    "applied006ChecksumPreserved": true,
+    "forwardMigration": "migration-007-community-editorial-api.sql",
+    "old006To007": "pass",
+    "restartAfter007": "pass"
+  },
+  "commands": [
+    "node C:/Users/SAMSUNG/AppData/Local/Temp/athletetime-embedded-pg-20260717/run-editorial-tests.mjs",
+    "npm.cmd run test:community-editorial",
+    "npm.cmd test",
+    "npm.cmd --prefix frontend run type-check",
+    "npm.cmd --prefix frontend run build"
+  ],
+  "observed": {
+    "postgres": "21 passed, 0 failed, 0 skipped",
+    "editorial": "97 passed, 0 failed, 16 skipped",
+    "root": "356 passed, 0 failed, 22 skipped",
+    "frontendTypeCheck": "pass",
+    "frontendBuild": "pass"
+  },
+  "authBoundary": "The production mount keeps global cookie CSRF before authenticateToken and requireAdmin. Editorial writes receive the authenticated actor UUID and reject stale expectedVersion values."
+}
