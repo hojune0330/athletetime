@@ -83,10 +83,10 @@ async function updateCalendar(pool, input) {
   }
 }
 
-async function cancelCalendar(pool, input) {
+async function closeCalendar(pool, input, targetState, eventType) {
   const actor = assertEditorialActor(input.actorUserId);
   const note = typeof input.note === 'string' ? input.note.trim() : '';
-  if (!note) throw new TypeError('Calendar cancellation reason is required');
+  if (!note) throw new TypeError('Calendar close reason is required');
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -99,14 +99,14 @@ async function cancelCalendar(pool, input) {
     if (linked.rowCount > 0) throw calendarError('EDITORIAL_CALENDAR_LINKED', 'Linked entries must be cancelled through their issue');
     const version = row.version + 1;
     const updated = await client.query(`
-      UPDATE editorial_calendar SET state='cancelled', skip_reason=$2,
-        version=$3, updated_at=NOW() WHERE id=$1 RETURNING *
-    `, [input.calendarId, note, version]);
+      UPDATE editorial_calendar SET state=$2, skip_reason=$3,
+        version=$4, updated_at=NOW() WHERE id=$1 RETURNING *
+    `, [input.calendarId, targetState, note, version]);
     await client.query(`
       INSERT INTO editorial_calendar_events (
         calendar_id, event_type, calendar_version, actor_user_id, note
-      ) VALUES ($1,'cancelled',$2,$3,$4)
-    `, [input.calendarId, version, actor, note]);
+      ) VALUES ($1,$2,$3,$4,$5)
+    `, [input.calendarId, eventType, version, actor, note]);
     await client.query('COMMIT');
     return calendarView(updated.rows[0]);
   } catch (error) {
@@ -117,4 +117,12 @@ async function cancelCalendar(pool, input) {
   }
 }
 
-module.exports = { cancelCalendar, createCalendar, updateCalendar };
+function cancelCalendar(pool, input) {
+  return closeCalendar(pool, input, 'cancelled', 'cancelled');
+}
+
+function skipCalendar(pool, input) {
+  return closeCalendar(pool, input, 'skipped', 'skipped');
+}
+
+module.exports = { cancelCalendar, createCalendar, skipCalendar, updateCalendar };

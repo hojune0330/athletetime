@@ -91,6 +91,7 @@ test('EDITORIAL-CALENDAR-API-002: create, update, and cancel carry actor and ver
     async createCalendar(input) { calls.push(['create', input]); return entry; },
     async updateCalendar(input) { calls.push(['update', input]); return { ...entry, version: 2 }; },
     async cancelCalendar(input) { calls.push(['cancel', input]); return { ...entry, state: 'cancelled', version: 3 }; },
+    async skipCalendar(input) { calls.push(['skip', input]); return { ...entry, state: 'skipped', version: 3 }; },
   };
   const api = await startApi(service);
   t.after(api.close);
@@ -102,7 +103,10 @@ test('EDITORIAL-CALENDAR-API-002: create, update, and cancel carry actor and ver
   assert.equal((await request(api.baseUrl, 'DELETE', `/api/admin/editorial/calendar/${CALENDAR_ID}`, {
     expectedVersion: 2, note: 'No source-backed topic this week',
   })).status, 200);
-  assert.deepEqual(calls.map(([name]) => name), ['create', 'update', 'cancel']);
+  assert.equal((await request(api.baseUrl, 'POST', `/api/admin/editorial/calendar/${CALENDAR_ID}/skip`, {
+    expectedVersion: 2, note: 'Candidate quality below threshold',
+  })).status, 200);
+  assert.deepEqual(calls.map(([name]) => name), ['create', 'update', 'cancel', 'skip']);
   assert.equal(calls.every(([, input]) => input.actorUserId === ACTOR_ID), true);
-  assert.deepEqual(calls.slice(1).map(([, input]) => input.expectedVersion), [1, 2]);
+  assert.deepEqual(calls.slice(1).map(([, input]) => input.expectedVersion), [1, 2, 2]);
 });

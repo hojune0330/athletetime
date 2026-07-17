@@ -14,12 +14,14 @@ const {
 
 const migration006 = path.join(root, 'backend/database/migration-006-community-editorial.sql');
 const migration007 = path.join(root, 'backend/database/migration-007-community-editorial-api.sql');
+const migration008 = path.join(root, 'backend/database/migration-008-editorial-candidate-skip.sql');
 const APPLIED_006_CHECKSUM = '5cd4f8fb07bd62c5f492cd9df5184b39d4029052a49fa444da3ad4580ea0d9d1';
 
 test('EDITORIAL-MIGRATION-001: applied migration 006 remains immutable and 007 is forward-only', () => {
   assert.equal(checksum(fs.readFileSync(migration006, 'utf8')), APPLIED_006_CHECKSUM);
   assert.equal(fs.existsSync(migration007), true);
   assert.equal(listMigrationFiles(path.dirname(migration007)).includes(path.basename(migration007)), true);
+  assert.equal(listMigrationFiles(path.dirname(migration008)).includes(path.basename(migration008)), true);
 });
 
 test('EDITORIAL-MIGRATION-002: an old 006 database upgrades through 007 and restarts cleanly', {
@@ -37,8 +39,11 @@ test('EDITORIAL-MIGRATION-002: an old 006 database upgrades through 007 and rest
   fs.copyFileSync(migration007, path.join(directory, path.basename(migration007)));
 
   const upgraded = await runMigrations({ pool, directory });
-  const restarted = await runMigrations({ pool, directory });
   assert.deepEqual(upgraded.applied, [path.basename(migration007)]);
+  fs.copyFileSync(migration008, path.join(directory, path.basename(migration008)));
+  const candidateUpgrade = await runMigrations({ pool, directory });
+  const restarted = await runMigrations({ pool, directory });
+  assert.deepEqual(candidateUpgrade.applied, [path.basename(migration008)]);
   assert.deepEqual(restarted.applied, []);
   const slug = await pool.query(`
     SELECT is_nullable FROM information_schema.columns
@@ -49,4 +54,9 @@ test('EDITORIAL-MIGRATION-002: an old 006 database upgrades through 007 and rest
     SELECT event_type FROM editorial_calendar_events WHERE false
   `);
   assert.equal(calendarEvents.rowCount, 0);
+  const eventConstraint = await pool.query(`
+    SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+    WHERE conname='editorial_calendar_events_event_type_check'
+  `);
+  assert.match(eventConstraint.rows[0].definition, /skipped/u);
 });

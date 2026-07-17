@@ -14,6 +14,7 @@ const {
   isolatedPool,
   issueFields,
   migrationPath,
+  rollbackEditorialMigrations,
   root,
 } = require('./helpers/communityEditorialPostgresHarness');
 
@@ -80,7 +81,7 @@ test('EDITORIAL-PG-004: empty schema migration is repeatable and rollback is sco
   for (const table of expectedTables) {
     assert.equal((await pool.query('SELECT to_regclass($1) AS name', [table])).rows[0].name, table);
   }
-  await pool.query(fs.readFileSync(downMigrationPath, 'utf8'));
+  await rollbackEditorialMigrations(pool);
   assert.equal((await pool.query("SELECT to_regclass('posts') AS name")).rows[0].name, 'posts');
 });
 

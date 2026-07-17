@@ -1,0 +1,21 @@
+TASK 5 CANDIDATE HAPPY PATH: PASS
+
+- Input: adult 100m final fact with KAAF allowlisted approved source.
+- Output: fact payload, whyNow, source refs, competition/record links, deterministic SHA-256 fingerprint.
+- Decision: ready_for_human_review.
+- Publication behavior: publicCopy=null, autoPublish=false, no post or issue repository dependency.
+- Stored competition schedule adapter: PASS.
+- Planned-slot skip action with version, actor and audit event: PASS on PostgreSQL.
+- Actual PostgreSQL run: 22 passed, 0 failed (serial migration harness).
+- Editorial regression: candidate pretest 14 passed; suite 97 passed, 17 environment-only skips.
+- Full repository regression: candidate pretest 14 passed; suite 356 passed, 23 environment-only skips.
+- Frontend: TypeScript check and production build passed.
+
+Commands:
+- node --test backend/tests/community-editorial-candidates.test.js
+- npm.cmd run test:community-editorial
+- npm.cmd test
+- npm.cmd --prefix frontend run type-check
+- npm.cmd --prefix frontend run build
+
+Cleanup: embedded PostgreSQL child stopped and port 55432 verified free; generated records E2E evidence restored.

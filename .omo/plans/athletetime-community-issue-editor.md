@@ -311,7 +311,7 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
 
   **Commit**: YES | Message: `feat(editorial): add admin issue workflow api` | Files: `backend/routes/editorialAdmin.js`, `card-studio/services/editorialIssueService.js`, `src/server.js`, `backend/tests/community-editorial-api.test.js`
 
-- [ ] 5. 소재 후보 탐색·중복·출처 검사기 구현
+- [x] 5. 소재 후보 탐색·중복·출처 검사기 구현
 
   **What to do**: 기존 대회 일정, 정규화 결과, 기록 통계에서 계절·섹션별 발행 후보를 만들되 공개 문장을 직접 발행하지 않는다. 후보는 `why_now`, fact payload, source refs, 관련 선수/대회 링크, deterministic fingerprint를 가진다. 한 대회에서 프리뷰/결과/기록 후속 상한을 검사하고, 아카이브 후보는 현재 일정·기념일·기록 변화와 연결될 때만 우선한다. MVP는 수동 캘린더 + 규칙 기반 후보만 구현한다. AI는 4주 파일럿 후 별도 승인 전까지 provider/API를 연결하지 않고 인터페이스 문서만 남긴다.
   **Must NOT do**: 웹 차단 우회, 기사 전문 저장, AI 결과를 사실 근거로 사용, 자동 publish를 하지 않는다.
@@ -325,10 +325,10 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
   - `card-studio/services/manualTopRecordReviewPolicy.js:12` - 해외 후보 식별 규칙
 
   **Acceptance Criteria**:
-  - [ ] 동일 사실 fingerprint는 30일 내 중복 후보를 만들지 않고, 대회별 2+1 상한을 적용한다.
-  - [ ] `why_now`가 비어 있거나 품질점수 기준 미만이면 캘린더 슬롯을 skipped로 종료할 수 있다.
-  - [ ] 외부 AI provider 없이 후보 생성·정책 검사·수동 편집이 완전 동작한다.
-  - [ ] source allowlist 밖 URL은 review-only이며 승인 불가다.
+  - [x] 동일 사실 fingerprint는 30일 내 중복 후보를 만들지 않고, 대회별 2+1 상한을 적용한다.
+  - [x] `why_now`가 비어 있거나 품질점수 기준 미만이면 캘린더 슬롯을 skipped로 종료할 수 있다.
+  - [x] 외부 AI provider 없이 후보 생성·정책 검사·수동 편집이 완전 동작한다.
+  - [x] source allowlist 밖 URL은 review-only이며 승인 불가다.
 
   **QA Scenarios**:
   ```

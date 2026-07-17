@@ -6,6 +6,13 @@ const { Pool } = require('pg');
 const root = path.join(__dirname, '..', '..', '..');
 const migrationPath = path.join(root, 'backend', 'database', 'migration-006-community-editorial.sql');
 const apiMigrationPath = path.join(root, 'backend', 'database', 'migration-007-community-editorial-api.sql');
+const candidateMigrationPath = path.join(root, 'backend', 'database', 'migration-008-editorial-candidate-skip.sql');
+const apiDownMigrationPath = path.join(
+  root, 'backend', 'database', 'rollbacks', '007-community-editorial-api-down.sql',
+);
+const candidateDownMigrationPath = path.join(
+  root, 'backend', 'database', 'rollbacks', '008-editorial-candidate-skip-down.sql',
+);
 const downMigrationPath = path.join(
   root,
   'backend',
@@ -84,7 +91,13 @@ async function createExistingFixture(pool) {
 }
 
 async function applyEditorialMigrations(pool) {
-  for (const file of [migrationPath, apiMigrationPath]) {
+  for (const file of [migrationPath, apiMigrationPath, candidateMigrationPath]) {
+    await pool.query(fs.readFileSync(file, 'utf8'));
+  }
+}
+
+async function rollbackEditorialMigrations(pool) {
+  for (const file of [candidateDownMigrationPath, apiDownMigrationPath, downMigrationPath]) {
     await pool.query(fs.readFileSync(file, 'utf8'));
   }
 }
@@ -113,4 +126,5 @@ module.exports = {
   issueFields,
   migrationPath,
   root,
+  rollbackEditorialMigrations,
 };

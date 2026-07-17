@@ -41,6 +41,8 @@ class EditorialIssueService {
 
   cancelCalendar(input) { return this.repository.cancelCalendar(input); }
 
+  skipCalendar(input) { return this.repository.skipCalendar(input); }
+
   listIssues(query = {}) {
     return this.repository.listIssues(query);
   }

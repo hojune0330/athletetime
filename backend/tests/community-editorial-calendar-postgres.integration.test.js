@@ -111,3 +111,33 @@ test('EDITORIAL-CALENDAR-PG-002: a draft claims its planned calendar without dup
     event_type: 'updated', calendar_version: 2, actor_user_id: ACTOR_ID, issue_id: issue.id,
   }]);
 });
+
+test('EDITORIAL-CALENDAR-PG-003: an ineligible candidate closes a planned slot as skipped', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available',
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t, 'editorial_calendar_skip');
+  await createExistingFixture(pool);
+  await applyEditorialMigrations(pool);
+  const service = new EditorialIssueService(new PostgresEditorialRepository(pool));
+  const calendar = await service.createCalendar({
+    seasonYear: 2026, sectionKey: 'archive', slot: 4, actorUserId: ACTOR_ID,
+  });
+
+  const skipped = await service.skipCalendar({
+    calendarId: calendar.id,
+    expectedVersion: calendar.version,
+    note: 'Candidate quality below threshold',
+    actorUserId: ACTOR_ID,
+  });
+
+  assert.equal(skipped.state, 'skipped');
+  assert.equal(skipped.skipReason, 'Candidate quality below threshold');
+  const event = await pool.query(`
+    SELECT event_type, actor_user_id, note FROM editorial_calendar_events
+    WHERE calendar_id=$1 ORDER BY id DESC LIMIT 1
+  `, [calendar.id]);
+  assert.deepEqual(event.rows, [{
+    event_type: 'skipped', actor_user_id: ACTOR_ID, note: 'Candidate quality below threshold',
+  }]);
+});

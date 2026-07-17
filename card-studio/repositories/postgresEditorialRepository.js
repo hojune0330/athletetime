@@ -9,7 +9,9 @@ const { reviseEditorialIssue } = require('./editorialRevisionRepository');
 const { createIssue } = require('./editorialIssueCreationRepository');
 const { correctIssue } = require('./editorialCorrectionWorkflow');
 const { finishIssue } = require('./editorialFinishRepository');
-const { cancelCalendar, createCalendar, updateCalendar } = require('./editorialCalendarRepository');
+const {
+  cancelCalendar, createCalendar, skipCalendar, updateCalendar,
+} = require('./editorialCalendarRepository');
 const {
   EditorialNotFoundError,
   EditorialVersionConflictError,
@@ -44,6 +46,8 @@ class PostgresEditorialRepository {
   async updateCalendar(input) { return updateCalendar(this.pool, input); }
 
   async cancelCalendar(input) { return cancelCalendar(this.pool, input); }
+
+  async skipCalendar(input) { return skipCalendar(this.pool, input); }
 
   async addSource(input) {
     return addSource(this.pool, input);

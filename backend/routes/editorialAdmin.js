@@ -91,6 +91,14 @@ function createEditorialAdminRouter({ service }) {
     });
     res.json({ success: true, calendar: calendarView(calendar) });
   }));
+  router.post('/calendar/:id/skip', asyncRoute(async (req, res) => {
+    const body = parseActionBody(req.body);
+    if (!body.note) throw new TypeError('Calendar skip reason is required');
+    const calendar = await service.skipCalendar({
+      ...body, calendarId: parseUuidParam(req.params.id), actorUserId: req.user.id,
+    });
+    res.json({ success: true, calendar: calendarView(calendar) });
+  }));
   router.get('/issues', asyncRoute(async (req, res) => {
     const issues = await service.listIssues(req.query);
     res.json({ success: true, issues: issues.map((issue) => issueView(issue)) });
