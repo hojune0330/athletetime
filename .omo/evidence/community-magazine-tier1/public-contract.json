@@ -1,0 +1,41 @@
+{
+  "canonicalRoute": "/community/post/:postId",
+  "detailEndpoint": "/api/editorial/magazine/by-post/:postId",
+  "detailCacheControl": "no-store",
+  "voteCountHiddenSeconds": 7200,
+  "publicIssueFields": [
+    "id",
+    "slug",
+    "postId",
+    "status",
+    "title",
+    "content",
+    "summary",
+    "whyNow",
+    "discussionQuestion",
+    "relatedUrl",
+    "sectionKey",
+    "publishedAt",
+    "updatedAt",
+    "commentsCount",
+    "countsVisible",
+    "corrections",
+    "sources"
+  ],
+  "forbiddenPublicFields": [
+    "reviewNote",
+    "actorUserId",
+    "lastActorUserId",
+    "policyFingerprint",
+    "policyCheckedAt",
+    "draftContent",
+    "internalPrompt",
+    "rawArticle",
+    "auditIp",
+    "secretConfig"
+  ],
+  "schedulerEnabledByDefault": false,
+  "schedulerAttempts": 3,
+  "schedulerRetrySeconds": [60, 300],
+  "deferredUntilGateA": ["digest-notifications", "editorial-metrics"]
+}

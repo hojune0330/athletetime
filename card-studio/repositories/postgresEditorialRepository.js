@@ -4,6 +4,11 @@ const {
   assertEditorialTransition,
 } = require('./editorialStateMachine');
 const { publishIssuePost } = require('./editorialPostPublisher');
+const {
+  enqueueEditorialPublishJob,
+  listEditorialPublishJobWarnings,
+  retryEditorialPublishJob,
+} = require('./editorialPublishJobRepository');
 const { assertPersistedIssuePolicy } = require('./editorialPolicyGate');
 const { reviseEditorialIssue } = require('./editorialRevisionRepository');
 const { createIssue } = require('./editorialIssueCreationRepository');
@@ -20,9 +25,11 @@ const {
 const {
   getIssue,
   getMagazineIssue,
+  getMagazineIssueByPostId,
   listCalendar,
   listIssues,
   listMagazine,
+  listPublicCorrections,
   listRevisions,
   listSources,
 } = require('./editorialRepositoryReads');
@@ -155,6 +162,12 @@ class PostgresEditorialRepository {
           WHERE id = $1
         `, [row.calendar_id, calendarState, input.scheduledFor || null]);
       }
+      if (input.nextStatus === 'scheduled') {
+        await enqueueEditorialPublishJob(client, {
+          issueId: input.issueId,
+          scheduledFor: input.scheduledFor,
+        });
+      }
       await client.query('COMMIT');
       return issueView({
         ...updated.rows[0],
@@ -190,6 +203,22 @@ class PostgresEditorialRepository {
   async listMagazine(query) { return listMagazine(this.pool, query); }
 
   async getMagazineIssue(slug) { return getMagazineIssue(this.pool, slug); }
+
+  async getMagazineIssueByPostId(postId) {
+    return getMagazineIssueByPostId(this.pool, postId);
+  }
+
+  async listPublicCorrections(issueId) {
+    return listPublicCorrections(this.pool, issueId);
+  }
+
+  async listPublishJobWarnings(query = {}) {
+    return listEditorialPublishJobWarnings(this.pool, query);
+  }
+
+  async retryPublishJob(input) {
+    return retryEditorialPublishJob(this.pool, input);
+  }
 
   async finishIssue(input) { return finishIssue(this.pool, input); }
 

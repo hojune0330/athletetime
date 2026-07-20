@@ -49,6 +49,12 @@ const app = express();
 const server = http.createServer(app);
 const db = require(path.join(ROOT, 'backend/utils/db'));
 app.locals.pool = db.pool || db;
+const { createEditorialScheduler } = require(path.join(ROOT, 'card-studio/services/editorialScheduler'));
+const editorialScheduler = createEditorialScheduler({
+  pool: HAS_DATABASE ? app.locals.pool : null,
+  environment: process.env,
+});
+app.locals.editorialScheduler = editorialScheduler;
 
 // Trust proxy (Render, Netlify 등 프록시 환경)
 app.set('trust proxy', 1);
@@ -177,6 +183,7 @@ app.get(['/health', '/api/health'], async (req, res) => {
   const rights = dataRequestService.readiness();
   health.services.dataRights = rights.ready ? 'ready' : 'unavailable';
   if (!rights.ready) health.status = 'degraded';
+  health.services.editorialScheduler = editorialScheduler.readiness();
 
   res.status(health.status === 'healthy' ? 200 : 503).json(health);
 });
@@ -458,6 +465,7 @@ app.use((err, req, res, next) => {
 
 async function startServer() {
   await dataRequestService.initialize();
+  await editorialScheduler.start();
   const stats = recordAnalyticsService.warmup();
   console.log(`  Record analytics warmup: ${stats.records} records, ${stats.athletes} athletes (${stats.ms}ms)`);
 
@@ -503,21 +511,34 @@ if (require.main === module) {
   });
 }
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM 수신, 서버 종료 중...');
-  await dataRequestService.shutdown().catch((error) => {
-    console.error('Data-rights shutdown failed:', error.message);
-  });
-  server.close(() => process.exit(0));
-});
+let shutdownPromise = null;
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT 수신, 서버 종료 중...');
-  await dataRequestService.shutdown().catch((error) => {
-    console.error('Data-rights shutdown failed:', error.message);
-  });
-  server.close(() => process.exit(0));
-});
+function shutdownServer() {
+  if (shutdownPromise) return shutdownPromise;
+  shutdownPromise = (async () => {
+    await editorialScheduler.stop();
+    await dataRequestService.shutdown().catch((error) => {
+      console.error('Data-rights shutdown failed:', error.message);
+    });
+    if (!server.listening) return;
+    await new Promise((resolve) => server.close(resolve));
+  })();
+  return shutdownPromise;
+}
 
-module.exports = { app, server, startServer };
+async function handleShutdown(signal) {
+  console.log(`${signal} 수신, 서버 종료 중...`);
+  await shutdownServer();
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => { void handleShutdown('SIGTERM'); });
+process.on('SIGINT', () => { void handleShutdown('SIGINT'); });
+
+module.exports = {
+  app,
+  editorialScheduler,
+  server,
+  shutdownServer,
+  startServer,
+};

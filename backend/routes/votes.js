@@ -10,6 +10,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { broadcastToClients } = require('../utils/websocket');
+const { applyEditorialVoteVisibility, requestTime } = require('./postVoteVisibility');
 
 /**
  * POST /api/posts/:postId/vote
@@ -100,6 +101,7 @@ router.post('/', async (req, res) => {
         p.views,
         p.likes_count,
         p.dislikes_count,
+        editorial_issue.published_at AS editorial_published_at,
         p.comments_count,
         p.is_notice,
         p.is_pinned,
@@ -145,6 +147,12 @@ router.post('/', async (req, res) => {
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
+      LEFT JOIN editorial_issues editorial_issue
+        ON editorial_issue.post_id = p.id
+        AND (
+          editorial_issue.status = 'published'
+          OR (editorial_issue.status = 'corrected' AND editorial_issue.policy_checked_at IS NOT NULL)
+        )
       WHERE p.id = $1 
         AND p.deleted_at IS NULL
     `, [postId]);
@@ -174,12 +182,12 @@ router.post('/', async (req, res) => {
     
     res.json({
       success: true,
-      post: {
+      post: applyEditorialVoteVisibility({
         ...post,
         images: Array.isArray(post.images) ? post.images : [],
         comments: Array.isArray(post.comments) ? post.comments : [],
         myVote, // 현재 사용자의 투표 상태 ('like', 'dislike', null)
-      }
+      }, requestTime(req))
     });
     
   } catch (error) {

@@ -1,0 +1,20 @@
+Tier A final evidence summary
+Date: 2026-07-21 Asia/Seoul
+
+- Public magazine detail contract: PASS
+- Ordinary community post compatibility: PASS
+- Two-hour vote visibility boundary: PASS at 1:59:59 and 2:00:00
+- Public correction summary migration up/down: PASS
+- Scheduler disabled-by-default lifecycle: PASS
+- Scheduler admin actor validation: PASS
+- Two-worker exactly-once PostgreSQL scenario: PASS
+- Transaction rollback and retry ladder: PASS
+- Restart recovery of overdue jobs: PASS
+- Real PostgreSQL suite: 26 passed, 0 failed, 0 skipped
+- Failed-job admin warning and audited retry path: PASS
+- Full repository suite: 383 passed, 0 failed, 27 skipped (410 tests)
+- Editorial suite without a configured DB: 124 passed, 0 failed, 21 explicitly skipped
+- Frontend type check and production build: PASS
+- Desktop and mobile browser QA: PASS
+- Anonymous browser console errors: 0
+- Independent ultrawork review after remediation: UNCONDITIONAL APPROVAL

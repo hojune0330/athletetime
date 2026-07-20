@@ -61,8 +61,23 @@ function revisionView(row) {
     title: row.title,
     content: row.content,
     reviewNote: row.review_note,
+    publicSummary: row.public_summary,
     createdAt: row.created_at,
   };
 }
 
-module.exports = { calendarView, issueView, revisionView, sourceView };
+function publicCorrectionView(row) {
+  return {
+    revisionNumber: Number(row.revision_number),
+    publicSummary: row.public_summary || '내용을 바로잡았어요.',
+    createdAt: row.created_at,
+  };
+}
+
+module.exports = {
+  calendarView,
+  issueView,
+  publicCorrectionView,
+  revisionView,
+  sourceView,
+};

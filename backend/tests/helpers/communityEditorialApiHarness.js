@@ -68,6 +68,30 @@ function createFakeService() {
       calls.push(['deleteSource', input]);
       return { deleted: true, sourceId: SOURCE_ID, issueVersion: input.expectedVersion + 1 };
     },
+    async listPublishJobWarnings() {
+      return [{
+        issueId: ISSUE_ID,
+        title: issue.title,
+        status: 'failed',
+        attemptCount: 3,
+        nextAttemptAt: null,
+        errorCode: 'EDITORIAL_PUBLISH_TRANSACTION_FAILED',
+        scheduledFor: '2026-08-01T00:00:00.000Z',
+        updatedAt: '2026-08-01T00:06:00.000Z',
+        rawError: 'password=hidden',
+      }];
+    },
+    async retryPublish(input) {
+      calls.push(['retryPublish', input]);
+      return {
+        issueId: input.issueId,
+        status: 'queued',
+        attemptCount: 0,
+        nextAttemptAt: input.scheduledFor,
+        errorCode: null,
+        issueVersion: input.expectedVersion + 1,
+      };
+    },
     async act(action, input) {
       calls.push([action, input]);
       if (input.expectedVersion === 99) {
@@ -121,12 +145,23 @@ async function request(baseUrl, method, pathname, options = {}) {
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
-  return { status: response.status, body: await response.json() };
+  return { status: response.status, headers: response.headers, body: await response.json() };
 }
 
 function assertNoPrivateFields(value) {
   const serialized = JSON.stringify(value);
-  for (const field of ['internalPrompt', 'rawArticle', 'auditIp', 'secretConfig']) {
+  for (const field of [
+    'internalPrompt',
+    'rawArticle',
+    'auditIp',
+    'secretConfig',
+    'reviewNote',
+    'actorUserId',
+    'lastActorUserId',
+    'policyFingerprint',
+    'policyCheckedAt',
+    'draftContent',
+  ]) {
     assert.equal(serialized.includes(field), false, `${field} leaked from API response`);
   }
 }

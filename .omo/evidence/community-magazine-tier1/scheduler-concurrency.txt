@@ -1,0 +1,22 @@
+Editorial scheduler concurrency evidence
+Date: 2026-07-21 Asia/Seoul
+
+Command:
+node --test backend/tests/community-editorial-scheduler-contract.test.js backend/tests/community-editorial-scheduler-repository.test.js backend/tests/community-editorial-scheduler-lifecycle.test.js backend/tests/community-editorial-scheduler-postgres.integration.test.js
+
+Binary result: PASS
+- total: 14
+- passed: 11
+- failed: 0
+- skipped: 3
+
+Static/unit concurrency contract: PASS
+- claim SQL contains FOR UPDATE OF j, i, c SKIP LOCKED
+- due selection is limited to queued/retrying rows at or before injected time
+- overlapping wakes on one process start one active run
+
+Real PostgreSQL two-worker scenario: PASS
+- embedded PostgreSQL suite: 26 passed, 0 failed, 0 skipped
+- two workers claimed ten due jobs concurrently
+- posts: 10, completed jobs: 10, duplicate publications: 0
+- full output: postgres-integration.txt

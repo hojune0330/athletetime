@@ -1,11 +1,16 @@
 const express = require('express');
 const {
+  areEditorialVoteCountsVisible,
+  requestTime,
+} = require('./postVoteVisibility');
+const {
   parseActionBody,
   parseCalendarCreateBody,
   parseCalendarUpdateBody,
   parseCorrectionBody,
   parseIssueCreateBody,
   parseMagazineSlug,
+  parsePostIdParam,
   parseScheduleBody,
   parseSourceBody,
   parseUuidParam,
@@ -49,7 +54,21 @@ function calendarView(entry) {
 
 function revisionView(revision) {
   return pick(revision, [
-    'id', 'revisionNumber', 'title', 'content', 'reviewNote', 'createdAt',
+    'id', 'revisionNumber', 'title', 'content', 'reviewNote', 'publicSummary', 'createdAt',
+  ]);
+}
+
+function correctionView(correction) {
+  return {
+    ...pick(correction, ['revisionNumber', 'createdAt']),
+    publicSummary: correction?.publicSummary || '내용을 바로잡았어요.',
+  };
+}
+
+function publishJobView(job) {
+  return pick(job, [
+    'issueId', 'title', 'status', 'attemptCount', 'nextAttemptAt', 'errorCode',
+    'scheduledFor', 'updatedAt', 'issueVersion',
   ]);
 }
 
@@ -123,6 +142,11 @@ function createEditorialAdminRouter({ service }) {
     const issues = await service.listIssues(req.query);
     res.json({ success: true, issues: issues.map((issue) => issueView(issue)) });
   }));
+  router.get('/publish-jobs/warnings', asyncRoute(async (req, res) => {
+    const jobs = await service.listPublishJobWarnings(req.query);
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, jobs: jobs.map(publishJobView) });
+  }));
   router.post('/issues', asyncRoute(async (req, res) => {
     const issue = await service.createIssue({ ...parseIssueCreateBody(req.body), actorUserId: req.user.id });
     res.status(201).json({ success: true, issue: issueView(issue) });
@@ -168,6 +192,14 @@ function createEditorialAdminRouter({ service }) {
     });
     res.json({ success: true, result: pick(result, ['deleted', 'sourceId', 'issueVersion']) });
   }));
+  router.post('/issues/:id/retry-publish', asyncRoute(async (req, res) => {
+    const job = await service.retryPublish({
+      ...parseScheduleBody(req.body),
+      issueId: parseUuidParam(req.params.id),
+      actorUserId: req.user.id,
+    });
+    res.json({ success: true, job: publishJobView(job) });
+  }));
   for (const action of ['check', 'approve', 'reject', 'schedule', 'cancel', 'publish', 'correct', 'unpublish']) {
     router.post(`/issues/:id/${action}`, asyncRoute(async (req, res) => {
       const issue = await service.act(action, {
@@ -189,8 +221,22 @@ function createEditorialPublicRouter({ service }) {
     const issues = await service.listMagazine(req.query);
     res.json({ success: true, issues: issues.map((issue) => issueView(issue, true)) });
   }));
+  router.get('/magazine/by-post/:postId', asyncRoute(async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const issue = await service.getMagazineIssueByPostId(parsePostIdParam(req.params.postId));
+    const corrections = await service.listPublicCorrections(issue.id);
+    res.json({
+      success: true,
+      issue: {
+        ...issueView(issue, true),
+        countsVisible: areEditorialVoteCountsVisible(issue.publishedAt, requestTime(req)),
+        corrections: corrections.map(correctionView),
+      },
+    });
+  }));
   router.get('/magazine/:slug', asyncRoute(async (req, res) => {
     const slug = parseMagazineSlug(req.params.slug);
+    res.set('Cache-Control', 'no-store');
     res.json({ success: true, issue: issueView(await service.getMagazineIssue(slug), true) });
   }));
   router.use(errorHandler);

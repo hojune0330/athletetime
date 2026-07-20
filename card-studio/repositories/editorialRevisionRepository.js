@@ -31,6 +31,9 @@ async function reviseEditorialIssue(pool, input) {
     relatedUrl: requiredText(input.relatedUrl, 'relatedUrl'),
     subjectAgeGroup: requiredText(input.subjectAgeGroup, 'subjectAgeGroup'),
     reviewNote: requiredText(input.reviewNote, 'reviewNote'),
+    publicSummary: input.publicSummary == null
+      ? null
+      : requiredText(input.publicSummary, 'publicSummary'),
   };
   if (!['adult', 'minor', 'unknown'].includes(values.subjectAgeGroup)) {
     throw new TypeError('subjectAgeGroup is not supported');
@@ -71,10 +74,13 @@ async function reviseEditorialIssue(pool, input) {
     ]);
     await client.query(`
       INSERT INTO editorial_revisions (
-        issue_id, revision_number, title, content, review_note, created_by
-      ) SELECT $1, COALESCE(MAX(revision_number), 0) + 1, $2, $3, $4, $5
+        issue_id, revision_number, title, content, review_note, public_summary, created_by
+      ) SELECT $1, COALESCE(MAX(revision_number), 0) + 1, $2, $3, $4, $5, $6
         FROM editorial_revisions WHERE issue_id = $1
-    `, [input.issueId, values.title, values.content, values.reviewNote, actorUserId]);
+    `, [
+      input.issueId, values.title, values.content, values.reviewNote,
+      values.publicSummary, actorUserId,
+    ]);
     await client.query(`
       INSERT INTO editorial_events (
         issue_id, event_type, from_status, to_status, issue_version, actor_user_id, note

@@ -1,0 +1,172 @@
+TAP version 13
+# Subtest: EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published once
+ok 1 - EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published once
+  ---
+  duration_ms: 776.4146
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-PG-003: source create, read, update, and delete each use a fresh version
+ok 2 - EDITORIAL-API-PG-003: source create, read, update, and delete each use a fresh version
+  ---
+  duration_ms: 350.9769
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-PG-002: reject and cancel are calendar outcomes, not invented issue states
+ok 3 - EDITORIAL-API-PG-002: reject and cancel are calendar outcomes, not invented issue states
+  ---
+  duration_ms: 303.68
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-CALENDAR-PG-001: calendar writes are versioned and audited without creating an issue
+ok 4 - EDITORIAL-CALENDAR-PG-001: calendar writes are versioned and audited without creating an issue
+  ---
+  duration_ms: 334.2282
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-CALENDAR-PG-002: a draft claims its planned calendar without duplicating the slot
+ok 5 - EDITORIAL-CALENDAR-PG-002: a draft claims its planned calendar without duplicating the slot
+  ---
+  duration_ms: 465.5272
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-CALENDAR-PG-003: an ineligible candidate closes a planned slot as skipped
+ok 6 - EDITORIAL-CALENDAR-PG-003: an ineligible candidate closes a planned slot as skipped
+  ---
+  duration_ms: 331.1262
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-008: Given a corrected issue When republished Then its existing post is updated once
+ok 7 - EDITORIAL-PG-008: Given a corrected issue When republished Then its existing post is updated once
+  ---
+  duration_ms: 382.3469
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-MIGRATION-001: applied migration 006 remains immutable and 007 is forward-only
+ok 8 - EDITORIAL-MIGRATION-001: applied migration 006 remains immutable and 007 is forward-only
+  ---
+  duration_ms: 2.4663
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-MIGRATION-002: an old 006 database upgrades through 007 and restarts cleanly
+ok 9 - EDITORIAL-MIGRATION-002: an old 006 database upgrades through 007 and restarts cleanly
+  ---
+  duration_ms: 360.2977
+  type: 'test'
+  ...
+# [jwt] JWT_SECRET이 없어 개발용 임시 secret을 생성했습니다. 운영 배포 전 JWT_SECRET을 설정하세요.
+# ⚠️  DATABASE_URL 미설정 → Standalone 모드 (메모리 DB, 개발 전용)
+# ⚠️  [dev] 임시 관리자 비밀번호가 생성되었습니다 (admin@athletetime.com). 콘솔에는 표시하지 않습니다.
+#     운영 배포 전 ADMIN_PASSWORD와 실제 DB를 설정하세요.
+#   [MockDB] 관리자 계정 시드 완료: admin@athletetime.com
+#   [MockDB] 해시 검증: OK
+# Subtest: EDITORIAL-POST-BOUNDARY-PG-001: legacy update and delete cannot alter a magazine post
+ok 10 - EDITORIAL-POST-BOUNDARY-PG-001: legacy update and delete cannot alter a magazine post
+  ---
+  duration_ms: 1124.5469
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-006: skipped state transitions create no posts
+ok 11 - EDITORIAL-PG-006: skipped state transitions create no posts
+  ---
+  duration_ms: 299.2921
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-007: duplicate packages and stale versions are rejected
+ok 12 - EDITORIAL-PG-007: duplicate packages and stale versions are rejected
+  ---
+  duration_ms: 286.6732
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-009: drafts without sources cannot become review-ready
+ok 13 - EDITORIAL-PG-009: drafts without sources cannot become review-ready
+  ---
+  duration_ms: 298.394
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-011: forbidden public copy cannot reach publication
+ok 14 - EDITORIAL-PG-011: forbidden public copy cannot reach publication
+  ---
+  duration_ms: 459.2193
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-010: direct transitions require action context and audit the actor
+ok 15 - EDITORIAL-PG-010: direct transitions require action context and audit the actor
+  ---
+  duration_ms: 412.5947
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-012: cancelled drafts cannot be revised
+ok 16 - EDITORIAL-PG-012: cancelled drafts cannot be revised
+  ---
+  duration_ms: 297.0459
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-000: posts public contract remains unchanged
+ok 17 - EDITORIAL-PG-000: posts public contract remains unchanged
+  ---
+  duration_ms: 1.7
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-001: only declared state transitions and UUID actors are accepted
+ok 18 - EDITORIAL-PG-001: only declared state transitions and UUID actors are accepted
+  ---
+  duration_ms: 2.2622
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-002: down migrations are not discovered as upward migrations
+ok 19 - EDITORIAL-PG-002: down migrations are not discovered as upward migrations
+  ---
+  duration_ms: 6.0515
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-003: base migration contains all editorial contracts
+ok 20 - EDITORIAL-PG-003: base migration contains all editorial contracts
+  ---
+  duration_ms: 1.2819
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-004: empty schema migration is repeatable and rollback is scoped
+ok 21 - EDITORIAL-PG-004: empty schema migration is repeatable and rollback is scoped
+  ---
+  duration_ms: 444.6452
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-005: publishing creates one linked post and an actor audit trail
+ok 22 - EDITORIAL-PG-005: publishing creates one linked post and an actor audit trail
+  ---
+  duration_ms: 333.5668
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-PG-001: Given ten due jobs When two workers compete Then every issue publishes exactly once
+ok 23 - EDITORIAL-SCHEDULER-PG-001: Given ten due jobs When two workers compete Then every issue publishes exactly once
+  ---
+  duration_ms: 628.8162
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-PG-002: Given a transaction fault When all three attempts fail Then partial publication rolls back and safe retry state persists
+ok 24 - EDITORIAL-SCHEDULER-PG-002: Given a transaction fault When all three attempts fail Then partial publication rolls back and safe retry state persists
+  ---
+  duration_ms: 332.555
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-PG-003: Given a retrying job When the process restarts overdue Then a new repository completes it once
+ok 25 - EDITORIAL-SCHEDULER-PG-003: Given a retrying job When the process restarts overdue Then a new repository completes it once
+  ---
+  duration_ms: 330.4388
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-PG-004: Given a failed job When an admin reviews and retries it Then publication resumes once
+ok 26 - EDITORIAL-SCHEDULER-PG-004: Given a failed job When an admin reviews and retries it Then publication resumes once
+  ---
+  duration_ms: 392.6817
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10852.0221
