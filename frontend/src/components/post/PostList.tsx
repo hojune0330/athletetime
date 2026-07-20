@@ -6,7 +6,15 @@
  */
 
 import { Link } from 'react-router-dom';
-import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon, FireIcon } from '@heroicons/react/24/outline';
+import {
+  ChatBubbleLeftIcon,
+  EyeIcon,
+  FireIcon,
+  HandThumbUpIcon,
+  LockClosedIcon,
+  PencilSquareIcon,
+  WrenchScrewdriverIcon,
+} from '@heroicons/react/24/outline';
 import { usePosts } from '../../hooks/usePosts';
 import type { Post } from '../../types';
 
@@ -169,7 +177,7 @@ function ErrorDisplay({ error, onRetry }: { error: Error; onRetry: () => void })
     return (
       <div className="card">
         <div className="empty-state">
-          <div className="empty-state-icon">🔒</div>
+          <LockClosedIcon className="mx-auto h-8 w-8 text-neutral-400" aria-hidden="true" />
           <h3 className="empty-state-title">
             로그인하면 글을 볼 수 있어요
           </h3>
@@ -190,7 +198,7 @@ function ErrorDisplay({ error, onRetry }: { error: Error; onRetry: () => void })
   return (
     <div className="card">
       <div className="empty-state">
-        <div className="empty-state-icon">🛠️</div>
+        <WrenchScrewdriverIcon className="mx-auto h-8 w-8 text-neutral-400" aria-hidden="true" />
         <h3 className="empty-state-title">
           커뮤니티를 준비 중이에요
         </h3>
@@ -216,7 +224,7 @@ function EmptyState() {
   return (
     <div className="card">
       <div className="empty-state">
-        <div className="empty-state-icon">📝</div>
+        <PencilSquareIcon className="mx-auto h-8 w-8 text-neutral-400" aria-hidden="true" />
         <h3 className="empty-state-title">
           아직 올라온 글이 없어요
         </h3>

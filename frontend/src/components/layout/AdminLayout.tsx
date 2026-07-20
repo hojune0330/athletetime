@@ -19,6 +19,7 @@ import {
   ServerIcon,
   ShieldExclamationIcon,
   BookOpenIcon,
+  NewspaperIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -27,7 +28,8 @@ const adminNavItems = [
   { path: '/admin', label: '대시보드', icon: ChartBarIcon, end: true },
   { path: '/admin/gallery', label: '갤러리', icon: PhotoIcon, end: false },
   { path: '/admin/card-studio', label: '카드 스튜디오', icon: PaintBrushIcon, end: false },
-  { path: '/admin/content', label: '콘텐츠 관리', icon: DocumentTextIcon, end: false },
+  { path: '/admin/content', label: '콘텐츠 관리', icon: DocumentTextIcon, end: true },
+  { path: '/admin/content/magazine', label: '매거진 편집실', icon: NewspaperIcon, end: false },
   { path: '/admin/pipeline', label: '파이프라인', icon: CogIcon, end: false },
   { path: '/admin/data-requests', label: '정정·삭제 요청', icon: ShieldExclamationIcon, end: false },
   { path: '/admin/operator-guide', label: '운영 가이드', icon: BookOpenIcon, end: false },

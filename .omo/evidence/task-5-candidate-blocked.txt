@@ -1,0 +1,17 @@
+TASK 5 CANDIDATE BLOCKS: PASS
+
+- Same factual fingerprint inside 30 days: duplicate_within_30_days.
+- Package overflow beyond preview 1 + result 1 + record follow-up 1: competition_package_cap.
+- Missing approved source: source_ineligible.
+- HTTPS source outside explicit host allowlist: review_only and approvalEligible=false.
+- Any mixture containing an outside-allowlist approved source: the whole candidate is review_only and approvalEligible=false.
+- Any mixture containing an unapproved or malformed source: the whole candidate is blocked.
+- result.kaaf.or.kr remains review-only even if a caller tries to add it through allowedSourceHosts.
+- Review-only candidates consume the same 2+1 package cap and 30-day duplicate window.
+- Missing whyNow or quality below threshold: calendarDisposition=skipped.
+- Archive without current schedule, anniversary or record-change hook: archive_current_hook_required.
+- Article body, HTML, source identifier, contact/session fields: stripped and restricted_fact_payload.
+- Malformed row: isolated as invalid_fact; the remaining batch continues.
+- AI provider, auto draft and auto publish: disabled.
+
+Adversarial verification: final review exposed three policy gaps. All were reproduced red before fixes: result.kaaf override, identifier-key variants, and review-only cap bypass. A fourth mixed-unapproved-source bypass was also reproduced and closed.

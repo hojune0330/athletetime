@@ -1,0 +1,330 @@
+TAP version 13
+# Subtest: existing public data-policy contract remains unchanged
+ok 1 - existing public data-policy contract remains unchanged
+  ---
+  duration_ms: 1.7468
+  type: 'test'
+  ...
+# Subtest: editorial identity, public copy, sections, and human-only boundary are fixed
+ok 2 - editorial identity, public copy, sections, and human-only boundary are fixed
+  ---
+  duration_ms: 0.3046
+  type: 'test'
+  ...
+# Subtest: calendar facts dynamically determine cadence while seasonal focus can overlap
+ok 3 - calendar facts dynamically determine cadence while seasonal focus can overlap
+  ---
+  duration_ms: 1.174
+  type: 'test'
+  ...
+# Subtest: at least 20 representative fixtures are eligible for human review
+    # Subtest: adult preview
+    ok 1 - adult preview
+      ---
+      duration_ms: 0.9998
+      type: 'test'
+      ...
+    # Subtest: record story
+    ok 2 - record story
+      ---
+      duration_ms: 0.3293
+      type: 'test'
+      ...
+    # Subtest: international primary
+    ok 3 - international primary
+      ---
+      duration_ms: 0.1177
+      type: 'test'
+      ...
+    # Subtest: road race
+    ok 4 - road race
+      ---
+      duration_ms: 0.1082
+      type: 'test'
+      ...
+    # Subtest: indoor meeting
+    ok 5 - indoor meeting
+      ---
+      duration_ms: 0.2968
+      type: 'test'
+      ...
+    # Subtest: archive
+    ok 6 - archive
+      ---
+      duration_ms: 0.2767
+      type: 'test'
+      ...
+    # Subtest: minor neutral result
+    ok 7 - minor neutral result
+      ---
+      duration_ms: 0.2629
+      type: 'test'
+      ...
+    # Subtest: AthleteTime source
+    ok 8 - AthleteTime source
+      ---
+      duration_ms: 0.0918
+      type: 'test'
+      ...
+    # Subtest: two sources
+    ok 9 - two sources
+      ---
+      duration_ms: 0.1621
+      type: 'test'
+      ...
+    # Subtest: absolute related URL
+    ok 10 - absolute related URL
+      ---
+      duration_ms: 0.0816
+      type: 'test'
+      ...
+    # Subtest: preview package
+    ok 11 - preview package
+      ---
+      duration_ms: 0.0785
+      type: 'test'
+      ...
+    # Subtest: result package
+    ok 12 - result package
+      ---
+      duration_ms: 0.0713
+      type: 'test'
+      ...
+    # Subtest: valuable record package
+    ok 13 - valuable record package
+      ---
+      duration_ms: 0.0622
+      type: 'test'
+      ...
+    # Subtest: empty package counts
+    ok 14 - empty package counts
+      ---
+      duration_ms: 0.7051
+      type: 'test'
+      ...
+    # Subtest: fresh previous-day source
+    ok 15 - fresh previous-day source
+      ---
+      duration_ms: 0.0823
+      type: 'test'
+      ...
+    # Subtest: encoded related path
+    ok 16 - encoded related path
+      ---
+      duration_ms: 0.0576
+      type: 'test'
+      ...
+    # Subtest: neutral question
+    ok 17 - neutral question
+      ---
+      duration_ms: 0.0542
+      type: 'test'
+      ...
+    # Subtest: neutral history
+    ok 18 - neutral history
+      ---
+      duration_ms: 0.0547
+      type: 'test'
+      ...
+    # Subtest: major event
+    ok 19 - major event
+      ---
+      duration_ms: 0.0559
+      type: 'test'
+      ...
+    # Subtest: skip pressure absent
+    ok 20 - skip pressure absent
+      ---
+      duration_ms: 0.0538
+      type: 'test'
+      ...
+    1..20
+ok 4 - at least 20 representative fixtures are eligible for human review
+  ---
+  duration_ms: 5.672
+  type: 'test'
+  ...
+# Subtest: at least 20 unsafe or incomplete fixtures are blocked with specific reasons
+    # Subtest: malformed input
+    ok 1 - malformed input
+      ---
+      duration_ms: 0.1472
+      type: 'test'
+      ...
+    # Subtest: missing title
+    ok 2 - missing title
+      ---
+      duration_ms: 0.0811
+      type: 'test'
+      ...
+    # Subtest: missing summary
+    ok 3 - missing summary
+      ---
+      duration_ms: 0.0642
+      type: 'test'
+      ...
+    # Subtest: missing why-now
+    ok 4 - missing why-now
+      ---
+      duration_ms: 0.0609
+      type: 'test'
+      ...
+    # Subtest: missing discussion
+    ok 5 - missing discussion
+      ---
+      duration_ms: 0.061
+      type: 'test'
+      ...
+    # Subtest: bad related URL
+    ok 6 - bad related URL
+      ---
+      duration_ms: 0.0646
+      type: 'test'
+      ...
+    # Subtest: missing source
+    ok 7 - missing source
+      ---
+      duration_ms: 0.1343
+      type: 'test'
+      ...
+    # Subtest: blocked source tier
+    ok 8 - blocked source tier
+      ---
+      duration_ms: 0.0943
+      type: 'test'
+      ...
+    # Subtest: source provider missing
+    ok 9 - source provider missing
+      ---
+      duration_ms: 0.0636
+      type: 'test'
+      ...
+    # Subtest: invalid source date
+    ok 10 - invalid source date
+      ---
+      duration_ms: 0.0685
+      type: 'test'
+      ...
+    # Subtest: stale source date
+    ok 11 - stale source date
+      ---
+      duration_ms: 0.0591
+      type: 'test'
+      ...
+    # Subtest: official claim
+    ok 12 - official claim
+      ---
+      duration_ms: 0.0557
+      type: 'test'
+      ...
+    # Subtest: AI journalist claim
+    ok 13 - AI journalist claim
+      ---
+      duration_ms: 0.0561
+      type: 'test'
+      ...
+    # Subtest: ranking claim
+    ok 14 - ranking claim
+      ---
+      duration_ms: 0.0666
+      type: 'test'
+      ...
+    # Subtest: athlete evaluation
+    ok 15 - athlete evaluation
+      ---
+      duration_ms: 0.0579
+      type: 'test'
+      ...
+    # Subtest: athlete prediction
+    ok 16 - athlete prediction
+      ---
+      duration_ms: 0.0646
+      type: 'test'
+      ...
+    # Subtest: injury inference
+    ok 17 - injury inference
+      ---
+      duration_ms: 0.0542
+      type: 'test'
+      ...
+    # Subtest: minor slump
+    ok 18 - minor slump
+      ---
+      duration_ms: 0.1151
+      type: 'test'
+      ...
+    # Subtest: minor appearance
+    ok 19 - minor appearance
+      ---
+      duration_ms: 0.057
+      type: 'test'
+      ...
+    # Subtest: prompt injection
+    ok 20 - prompt injection
+      ---
+      duration_ms: 0.0575
+      type: 'test'
+      ...
+    # Subtest: article copy
+    ok 21 - article copy
+      ---
+      duration_ms: 0.0683
+      type: 'test'
+      ...
+    # Subtest: unlicensed image
+    ok 22 - unlicensed image
+      ---
+      duration_ms: 0.5907
+      type: 'test'
+      ...
+    # Subtest: identity ambiguity
+    ok 23 - identity ambiguity
+      ---
+      duration_ms: 0.0885
+      type: 'test'
+      ...
+    # Subtest: preview cap
+    ok 24 - preview cap
+      ---
+      duration_ms: 0.0634
+      type: 'test'
+      ...
+    # Subtest: result cap
+    ok 25 - result cap
+      ---
+      duration_ms: 0.0583
+      type: 'test'
+      ...
+    # Subtest: record story lacks value
+    ok 26 - record story lacks value
+      ---
+      duration_ms: 0.0568
+      type: 'test'
+      ...
+    # Subtest: record story cap
+    ok 27 - record story cap
+      ---
+      duration_ms: 0.0538
+      type: 'test'
+      ...
+    # Subtest: public AI copy
+    ok 28 - public AI copy
+      ---
+      duration_ms: 0.0598
+      type: 'test'
+      ...
+    1..28
+ok 5 - at least 20 unsafe or incomplete fixtures are blocked with specific reasons
+  ---
+  duration_ms: 3.5727
+  type: 'test'
+  ...
+1..5
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 148.9632

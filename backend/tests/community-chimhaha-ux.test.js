@@ -129,8 +129,9 @@ test('COMM-TONE-001: community surfaces avoid forbidden trust words and emoji ic
   // 새 컴포넌트의 UI 아이콘은 SVG(heroicons)만 사용
   const strip = readSource('frontend/src/components/community/CommunityBestStrip.tsx');
   const tabs = readSource('frontend/src/components/community/CommunityBoardTabs.tsx');
+  const list = readSource('frontend/src/components/post/PostList.tsx');
   assert.match(strip, /@heroicons\/react/);
-  for (const source of [strip, tabs]) {
+  for (const source of [strip, tabs, list]) {
     // 이모지 문자가 UI 크롬에 없어야 함 (기본 다국어 이모지 범위 검사)
     assert.doesNotMatch(source, /[\u{1F300}-\u{1FAFF}]/u, 'no emoji as UI icons');
   }

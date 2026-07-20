@@ -15,6 +15,7 @@ const bcrypt = require('bcryptjs');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const { rejectEditorialPostMutation } = require('../middleware/editorialPostBoundary');
 
 /**
  * GET /api/posts
@@ -585,7 +586,7 @@ router.post('/:id/verify-password', async (req, res) => {
  * 
  * Body: { title, content, category, password }
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, category, password } = req.body;
@@ -758,7 +759,7 @@ router.put('/:id', async (req, res) => {
  * 일반 사용자: { password: string }
  * 관리자: { deleteReason: string } (비밀번호 불필요)
  */
-router.delete('/:id', optionalAuth, async (req, res) => {
+router.delete('/:id', optionalAuth, rejectEditorialPostMutation, async (req, res) => {
   try {
     const { id } = req.params;
     const { password, deleteReason } = req.body;
@@ -858,7 +859,7 @@ router.delete('/:id', optionalAuth, async (req, res) => {
  * 
  * Body: { optionId: number, visitorId: string }
  */
-router.post('/:id/poll/vote', async (req, res) => {
+router.post('/:id/poll/vote', rejectEditorialPostMutation, async (req, res) => {
   try {
     const { id } = req.params;
     const { optionId, visitorId } = req.body;

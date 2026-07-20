@@ -1,0 +1,28 @@
+TASK 3 ACTOR VALIDATION
+Command: node scripts/community-post-quarantine.js --write --approved x --backup-receipt y
+Quarantine command failed: --write requires --actor to be a valid user UUID
+Exit: 1
+
+Command: node scripts/community-post-quarantine.js --write --actor not-a-uuid --approved x --backup-receipt y
+Quarantine command failed: --write requires --actor to be a valid user UUID
+Exit: 1
+
+Valid UUID boundary:
+Quarantine command failed: --write requires --approved and --backup-receipt
+Exit: 1
+
+Focused tests:
+  duration_ms: 0.9787
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 113.187
+
+Valid UUID end-to-end reference: .omo/evidence/task-3-quarantine-dry-run.md quarantine/restore rehearsal.

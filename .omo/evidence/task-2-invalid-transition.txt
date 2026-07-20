@@ -1,0 +1,20 @@
+COMMAND
+node run-editorial-tests.mjs
+
+ENVIRONMENT
+PostgreSQL 18.4 via embedded-postgres 18.4.0-beta.17
+TEST_DATABASE_URL=postgresql://postgres:[redacted]@127.0.0.1:55432/athletetime_test
+
+LITERAL RELEVANT OUTPUT
+# Subtest: EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created
+ok 7 - EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created
+  duration_ms: 403.9885
+1..8
+# tests 8
+# pass 8
+# fail 0
+# skipped 0
+# duration_ms 2133.2116
+
+RESULT
+PASS: repository returned INVALID_EDITORIAL_TRANSITION with status 409, the direct DB transition was rejected, and posts delta remained 0.

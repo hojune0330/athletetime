@@ -1,0 +1,63 @@
+{
+  "mode": "dry-run",
+  "generatedAt": "2026-07-17T11:13:32.248Z",
+  "databaseChecksum": "11cfb195fdbcf89d4ed53b421f874dcbfdb52a0fa21b778a90315cbda9de96a5",
+  "candidates": [
+    {
+      "postId": 1,
+      "seedId": "qa-seed-1",
+      "author": "QA Bot",
+      "createdAt": "2026-07-01T00:00:00.000Z",
+      "title": "QA fixture one",
+      "bodySummary": "First disposable candidate.",
+      "views": 11,
+      "comments": 0,
+      "stateChecksum": "5aa5f3a7b44a5f19afba35c18bb92c9cae03352b10db8758b70180535e1f6204"
+    },
+    {
+      "postId": 2,
+      "seedId": "test-seed-2",
+      "author": "Test Bot",
+      "createdAt": "2026-07-02T00:00:00.000Z",
+      "title": "Test post with discussion",
+      "bodySummary": "Candidate with a real comment row.",
+      "views": 12,
+      "comments": 1,
+      "stateChecksum": "ecff5cbe651e766f9c875465464c8c4a93ceec6dc555f58895bab33dec34f620"
+    },
+    {
+      "postId": 3,
+      "seedId": "qa-seed-3",
+      "author": "QA Bot",
+      "createdAt": "2026-07-03T00:00:00.000Z",
+      "title": "QA fixture three",
+      "bodySummary": "Third disposable candidate.",
+      "views": 13,
+      "comments": 0,
+      "stateChecksum": "3e36a7aa15c9c67d07b4a20106e1c5a36bfb97762e14b38a1d24b0b4b28c2e6c"
+    },
+    {
+      "postId": 4,
+      "seedId": "fixture-seed-4",
+      "author": "Fixture Bot",
+      "createdAt": "2026-07-04T00:00:00.000Z",
+      "title": "Fixture post four",
+      "bodySummary": "Fourth disposable candidate.",
+      "views": 14,
+      "comments": 0,
+      "stateChecksum": "38ff1ff456a7d3ff3cd4dd9f999f7c8f173a15e66c32174a08dd1b3402405f74"
+    },
+    {
+      "postId": 5,
+      "seedId": "qa-seed-5",
+      "author": "QA Bot",
+      "createdAt": "2026-07-05T00:00:00.000Z",
+      "title": "QA fixture five",
+      "bodySummary": "Fifth disposable candidate.",
+      "views": 15,
+      "comments": 0,
+      "stateChecksum": "e9abe09f23f662b4874721df0e7c88e8f8d82559ad4e89fe1bcfdd0eec93fb05"
+    }
+  ],
+  "reportChecksum": "eee11c0f7b98e3f4cfe52300393adfd401aec2c984a89ff919bc8dbbf5b78e1d"
+}

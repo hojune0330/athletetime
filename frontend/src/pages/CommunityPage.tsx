@@ -10,6 +10,7 @@ import { useSearchParams } from 'react-router-dom'
 import { PencilSquareIcon } from '@heroicons/react/24/outline'
 import Pagination from '../components/common/Pagination'
 import { CommunityBestStrip } from '../components/community/CommunityBestStrip'
+import { CommunityMagazineShelf } from '../components/community/CommunityMagazineShelf'
 import { CommunityBoardTabs, type BoardTab } from '../components/community/CommunityBoardTabs'
 import { CommunityQuickPostForm } from '../components/community/CommunityQuickPostForm'
 import { RecordContextPrompt } from '../components/community/RecordContextPrompt'
@@ -94,6 +95,8 @@ export default function CommunityPage() {
       {recordContext ? (
         <RecordContextPrompt recordContext={recordContext} onStart={handleStartRecordDiscussion} />
       ) : null}
+
+      <CommunityMagazineShelf />
 
       {/* 인기글 스트립 (전체 인기글 | 주간 | 월간 | 명예의 전당) */}
       <CommunityBestStrip />

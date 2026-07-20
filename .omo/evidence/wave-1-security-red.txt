@@ -1,0 +1,618 @@
+TAP version 13
+# Subtest: EDITORIAL-PG-000: Given the current community schema When characterized Then the posts API contract is unchanged
+ok 1 - EDITORIAL-PG-000: Given the current community schema When characterized Then the posts API contract is unchanged
+  ---
+  duration_ms: 4.7012
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-001: Given editorial states When validated Then only plan transitions are accepted
+not ok 2 - EDITORIAL-PG-001: Given editorial states When validated Then only plan transitions are accepted
+  ---
+  duration_ms: 4.6343
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-editorial-postgres.integration.test.js:40:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /valid actor UUID/u. Input:
+
+    'TypeError: assertEditorialActor is not a function'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'assertEditorialActor is not a function'
+  name: 'TypeError'
+  stack: |-
+    C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-postgres.integration.test.js:63:25
+    getActual (node:assert:530:5)
+    Function.throws (node:assert:676:24)
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-postgres.integration.test.js:63:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-postgres.integration.test.js:63:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: EDITORIAL-PG-002: Given migration files When discovered Then down migrations are never run upward
+ok 3 - EDITORIAL-PG-002: Given migration files When discovered Then down migrations are never run upward
+  ---
+  duration_ms: 12.8172
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+not ok 4 - EDITORIAL-PG-003: Given migration SQL When inspected Then all editorial contracts are present
+  ---
+  duration_ms: 3.368
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-editorial-postgres.integration.test.js:86:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /created_by UUID NOT NULL/u. Input:
+
+    'CREATE TABLE IF NOT EXISTS editorial_calendar (\n' +
+      '  id UUID PRIMARY KEY,\n' +
+      '  season_year INTEGER NOT NULL CHECK (season_year BETWEEN 2000 AND 2200),\n' +
+      '  competition_id BIGINT,\n' +
+      "  package_role VARCHAR(20) CHECK (package_role IN ('preview', 'result_context', 'record_story')),\n" +
+      '  section_key VARCHAR(80) NOT NULL,\n' +
+      '  slot INTEGER NOT NULL CHECK (slot > 0),\n' +
+      "  state VARCHAR(20) NOT NULL DEFAULT 'planned'\n" +
+      "    CHECK (state IN ('planned', 'candidate_linked', 'drafting', 'ready', 'scheduled', 'published', 'skipped', 'cancelled')),\n" +
+      '  scheduled_for TIMESTAMPTZ,\n' +
+      '  skip_reason TEXT,\n' +
+      '  version INTEGER NOT NULL DEFAULT 1 CHECK (version > 0),\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  CHECK (package_role IS NULL OR competition_id IS NOT NULL),\n' +
+      "  CHECK (state <> 'skipped' OR NULLIF(BTRIM(skip_reason), '') IS NOT NULL),\n" +
+      '  UNIQUE (season_year, section_key, slot)\n' +
+      ');\n' +
+      '\n' +
+      'CREATE UNIQUE INDEX IF NOT EXISTS editorial_calendar_competition_package_role_uidx\n' +
+      '  ON editorial_calendar (competition_id, package_role)\n' +
+      '  WHERE competition_id IS NOT NULL AND package_role IS NOT NULL;\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS editorial_issues (\n' +
+      '  id UUID PRIMARY KEY,\n' +
+      '  calendar_id UUID NOT NULL UNIQUE REFERENCES editorial_calendar(id) ON DELETE RESTRICT,\n' +
+      '  post_id BIGINT UNIQUE,\n' +
+      "  status VARCHAR(20) NOT NULL DEFAULT 'draft'\n" +
+      "    CHECK (status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),\n" +
+      '  version INTEGER NOT NULL DEFAULT 1 CHECK (version > 0),\n' +
+      "  title VARCHAR(200) NOT NULL CHECK (NULLIF(BTRIM(title), '') IS NOT NULL),\n" +
+      "  content TEXT NOT NULL CHECK (NULLIF(BTRIM(content), '') IS NOT NULL),\n" +
+      "  author VARCHAR(50) NOT NULL CHECK (NULLIF(BTRIM(author), '') IS NOT NULL),\n" +
+      '  created_by UUID,\n' +
+      '  approved_by UUID,\n' +
+      '  approved_at TIMESTAMPTZ,\n' +
+      '  scheduled_for TIMESTAMPTZ,\n' +
+      '  published_at TIMESTAMPTZ,\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  CHECK (\n' +
+      "    (status IN ('draft', 'review_ready', 'approved', 'scheduled') AND post_id IS NULL)\n" +
+      "    OR (status IN ('published', 'corrected', 'unpublished') AND post_id IS NOT NULL)\n" +
+      '  )\n' +
+      ');\n' +
+      '\n' +
+      'CREATE INDEX IF NOT EXISTS editorial_issues_status_updated_idx\n' +
+      '  ON editorial_issues (status, updated_at DESC);\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS editorial_sources (\n' +
+      '  id UUID PRIMARY KEY,\n' +
+      '  issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,\n' +
+      "  source_url TEXT NOT NULL CHECK (source_url ~ '^https?://'),\n" +
+      "  source_kind VARCHAR(20) NOT NULL CHECK (source_kind IN ('official', 'primary', 'secondary', 'internal')),\n" +
+      "  title VARCHAR(300) NOT NULL CHECK (NULLIF(BTRIM(title), '') IS NOT NULL),\n" +
+      '  publisher VARCHAR(200),\n' +
+      '  captured_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      "  metadata JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata) = 'object'),\n" +
+      '  created_by UUID,\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  UNIQUE (issue_id, source_url)\n' +
+      ');\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS editorial_revisions (\n' +
+      '  id BIGSERIAL PRIMARY KEY,\n' +
+      '  issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,\n' +
+      '  revision_number INTEGER NOT NULL CHECK (revision_number > 0),\n' +
+      '  title VARCHAR(200) NOT NULL,\n' +
+      '  content TEXT NOT NULL,\n' +
+      "  review_note TEXT NOT NULL DEFAULT '',\n" +
+      '  created_by UUID,\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  UNIQUE (issue_id, revision_number)\n' +
+      ');\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS editorial_events (\n' +
+      '  id BIGSERIAL PRIMARY KEY,\n' +
+      '  issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,\n' +
+      '  event_type VARCHAR(30) NOT NULL\n' +
+      "    CHECK (event_type IN ('created', 'source_added', 'revised', 'status_changed', 'published', 'quarantined')),\n" +
+      '  from_status VARCHAR(20)\n' +
+      "    CHECK (from_status IS NULL OR from_status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),\n" +
+      '  to_status VARCHAR(20)\n' +
+      "    CHECK (to_status IS NULL OR to_status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),\n" +
+      '  issue_version INTEGER NOT NULL CHECK (issue_version > 0),\n' +
+      '  actor_user_id UUID,\n' +
+      "  note TEXT NOT NULL DEFAULT '',\n" +
+      "  payload JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(payload) = 'object'),\n" +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()\n' +
+      ');\n' +
+      '\n' +
+      'CREATE INDEX IF NOT EXISTS editorial_events_issue_id_idx\n' +
+      '  ON editorial_events (issue_id, id);\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS magazine_digest_preferences (\n' +
+      '  user_id UUID PRIMARY KEY,\n' +
+      "  cadence VARCHAR(10) NOT NULL DEFAULT 'weekly' CHECK (cadence IN ('weekly', 'off')),\n" +
+      "  section_keys JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(section_keys) = 'array'),\n" +
+      '  delivery_hour_utc SMALLINT NOT NULL DEFAULT 0 CHECK (delivery_hour_utc BETWEEN 0 AND 23),\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()\n' +
+      ');\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS event_alert_subscriptions (\n' +
+      '  id UUID PRIMARY KEY,\n' +
+      '  user_id UUID NOT NULL,\n' +
+      '  competition_id BIGINT,\n' +
+      '  section_key VARCHAR(80) NOT NULL,\n' +
+      "  channel VARCHAR(10) NOT NULL DEFAULT 'in_app' CHECK (channel IN ('in_app', 'email')),\n" +
+      '  lead_minutes INTEGER NOT NULL DEFAULT 60 CHECK (lead_minutes BETWEEN 0 AND 10080),\n' +
+      '  active BOOLEAN NOT NULL DEFAULT TRUE,\n' +
+      '  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  UNIQUE (user_id, section_key, channel)\n' +
+      ');\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS issue_engagement_daily (\n' +
+      '  issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,\n' +
+      '  metric_date DATE NOT NULL,\n' +
+      '  views BIGINT NOT NULL DEFAULT 0 CHECK (views >= 0),\n' +
+      '  likes BIGINT NOT NULL DEFAULT 0 CHECK (likes >= 0),\n' +
+      '  comments BIGINT NOT NULL DEFAULT 0 CHECK (comments >= 0),\n' +
+      '  shares BIGINT NOT NULL DEFAULT 0 CHECK (shares >= 0),\n' +
+      '  PRIMARY KEY (issue_id, metric_date)\n' +
+      ');\n' +
+      '\n' +
+      'CREATE TABLE IF NOT EXISTS post_quarantines (\n' +
+      '  id UUID PRIMARY KEY,\n' +
+      '  post_id BIGINT NOT NULL,\n' +
+      '  issue_id UUID REFERENCES editorial_issues(id) ON DELETE SET NULL,\n' +
+      "  status VARCHAR(10) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'released')),\n" +
+      '  reason_code VARCHAR(40) NOT NULL,\n' +
+      "  reason_detail TEXT NOT NULL DEFAULT '',\n" +
+      '  quarantined_by UUID,\n' +
+      '  quarantined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),\n' +
+      '  released_by UUID,\n' +
+      '  released_at TIMESTAMPTZ,\n' +
+      '  CHECK (\n' +
+      "    (status = 'active' AND released_at IS NULL)\n" +
+      "    OR (status = 'released' AND released_at IS NOT NULL)\n" +
+      '  )\n' +
+      ');\n' +
+      '\n' +
+      'CREATE UNIQUE INDEX IF NOT EXISTS post_quarantines_one_active_post_uidx\n' +
+      "  ON post_quarantines (post_id) WHERE status = 'active';\n" +
+      '\n' +
+      'CREATE OR REPLACE FUNCTION enforce_editorial_issue_transition() RETURNS TRIGGER AS $$\n' +
+      'BEGIN\n' +
+      "  IF TG_OP = 'INSERT' AND NEW.status <> 'draft' THEN\n" +
+      "    RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_TRANSITION', ERRCODE = 'P0001';\n" +
+      '  END IF;\n' +
+      "  IF TG_OP = 'UPDATE' AND NEW.status IS DISTINCT FROM OLD.status AND NOT (\n" +
+      "    (OLD.status = 'draft' AND NEW.status = 'review_ready')\n" +
+      "    OR (OLD.status = 'review_ready' AND NEW.status = 'approved')\n" +
+      "    OR (OLD.status = 'approved' AND NEW.status IN ('scheduled', 'published'))\n" +
+      "    OR (OLD.status = 'scheduled' AND NEW.status = 'published')\n" +
+      "    OR (OLD.status = 'published' AND NEW.status IN ('corrected', 'unpublished'))\n" +
+      "    OR (OLD.status = 'corrected' AND NEW.status IN ('published', 'unpublished'))\n" +
+      '  ) THEN\n' +
+      "    RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_TRANSITION', ERRCODE = 'P0001';\n" +
+      '  END IF;\n' +
+      '  RETURN NEW;\n' +
+      'END;\n' +
+      '$$ LANGUAGE plpgsql;\n' +
+      '\n' +
+      'DROP TRIGGER IF EXISTS editorial_issues_transition_guard ON editorial_issues;\n' +
+      'CREATE TRIGGER editorial_issues_transition_guard\n' +
+      '  BEFORE INSERT OR UPDATE ON editorial_issues\n' +
+      '  FOR EACH ROW EXECUTE FUNCTION enforce_editorial_issue_transition();\n' +
+      '\n' +
+      'CREATE OR REPLACE FUNCTION enforce_editorial_calendar_transition() RETURNS TRIGGER AS $$\n' +
+      'BEGIN\n' +
+      '  IF NEW.state IS DISTINCT FROM OLD.state AND NOT (\n' +
+      "    (OLD.state = 'planned' AND NEW.state IN ('candidate_linked', 'drafting', 'skipped', 'cancelled'))\n" +
+      "    OR (OLD.state = 'candidate_linked' AND NEW.state IN ('drafting', 'skipped', 'cancelled'))\n" +
+      "    OR (OLD.state = 'drafting' AND NEW.state IN ('ready', 'skipped', 'cancelled'))\n" +
+      "    OR (OLD.state = 'ready' AND NEW.state IN ('scheduled', 'published', 'skipped', 'cancelled'))\n" +
+      "    OR (OLD.state = 'scheduled' AND NEW.state IN ('published', 'cancelled'))\n" +
+      '  ) THEN\n' +
+      "    RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_CALENDAR_TRANSITION', ERRCODE = 'P0001';\n" +
+      '  END IF;\n' +
+      '  RETURN NEW;\n' +
+      'END;\n' +
+      '$$ LANGUAGE plpgsql;\n' +
+      '\n' +
+      'DROP TRIGGER IF EXISTS editorial_calendar_transition_guard ON editorial_calendar;\n' +
+      'CREATE TRIGGER editorial_calendar_transition_guard\n' +
+      '  BEFORE UPDATE ON editorial_calendar\n' +
+      '  FOR EACH ROW EXECUTE FUNCTION enforce_editorial_calendar_transition();\n'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    CREATE TABLE IF NOT EXISTS editorial_calendar (
+      id UUID PRIMARY KEY,
+      season_year INTEGER NOT NULL CHECK (season_year BETWEEN 2000 AND 2200),
+      competition_id BIGINT,
+      package_role VARCHAR(20) CHECK (package_role IN ('preview', 'result_context', 'record_story')),
+      section_key VARCHAR(80) NOT NULL,
+      slot INTEGER NOT NULL CHECK (slot > 0),
+      state VARCHAR(20) NOT NULL DEFAULT 'planned'
+        CHECK (state IN ('planned', 'candidate_linked', 'drafting', 'ready', 'scheduled', 'published', 'skipped', 'cancelled')),
+      scheduled_for TIMESTAMPTZ,
+      skip_reason TEXT,
+      version INTEGER NOT NULL DEFAULT 1 CHECK (version > 0),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CHECK (package_role IS NULL OR competition_id IS NOT NULL),
+      CHECK (state <> 'skipped' OR NULLIF(BTRIM(skip_reason), '') IS NOT NULL),
+      UNIQUE (season_year, section_key, slot)
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS editorial_calendar_competition_package_role_uidx
+      ON editorial_calendar (competition_id, package_role)
+      WHERE competition_id IS NOT NULL AND package_role IS NOT NULL;
+
+    CREATE TABLE IF NOT EXISTS editorial_issues (
+      id UUID PRIMARY KEY,
+      calendar_id UUID NOT NULL UNIQUE REFERENCES editorial_calendar(id) ON DELETE RESTRICT,
+      post_id BIGINT UNIQUE,
+      status VARCHAR(20) NOT NULL DEFAULT 'draft'
+        CHECK (status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),
+      version INTEGER NOT NULL DEFAULT 1 CHECK (version > 0),
+      title VARCHAR(200) NOT NULL CHECK (NULLIF(BTRIM(title), '') IS NOT NULL),
+      content TEXT NOT NULL CHECK (NULLIF(BTRIM(content), '') IS NOT NULL),
+      author VARCHAR(50) NOT NULL CHECK (NULLIF(BTRIM(author), '') IS NOT NULL),
+      created_by UUID,
+      approved_by UUID,
+      approved_at TIMESTAMPTZ,
+      scheduled_for TIMESTAMPTZ,
+      published_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CHECK (
+        (status IN ('draft', 'review_ready', 'approved', 'scheduled') AND post_id IS NULL)
+        OR (status IN ('published', 'corrected', 'unpublished') AND post_id IS NOT NULL)
+      )
+    );
+
+    CREATE INDEX IF NOT EXISTS editorial_issues_status_updated_idx
+      ON editorial_issues (status, updated_at DESC);
+
+    CREATE TABLE IF NOT EXISTS editorial_sources (
+      id UUID PRIMARY KEY,
+      issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,
+      source_url TEXT NOT NULL CHECK (source_url ~ '^https?://'),
+      source_kind VARCHAR(20) NOT NULL CHECK (source_kind IN ('official', 'primary', 'secondary', 'internal')),
+      title VARCHAR(300) NOT NULL CHECK (NULLIF(BTRIM(title), '') IS NOT NULL),
+      publisher VARCHAR(200),
+      captured_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      metadata JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata) = 'object'),
+      created_by UUID,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (issue_id, source_url)
+    );
+
+    CREATE TABLE IF NOT EXISTS editorial_revisions (
+      id BIGSERIAL PRIMARY KEY,
+      issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,
+      revision_number INTEGER NOT NULL CHECK (revision_number > 0),
+      title VARCHAR(200) NOT NULL,
+      content TEXT NOT NULL,
+      review_note TEXT NOT NULL DEFAULT '',
+      created_by UUID,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (issue_id, revision_number)
+    );
+
+    CREATE TABLE IF NOT EXISTS editorial_events (
+      id BIGSERIAL PRIMARY KEY,
+      issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,
+      event_type VARCHAR(30) NOT NULL
+        CHECK (event_type IN ('created', 'source_added', 'revised', 'status_changed', 'published', 'quarantined')),
+      from_status VARCHAR(20)
+        CHECK (from_status IS NULL OR from_status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),
+      to_status VARCHAR(20)
+        CHECK (to_status IS NULL OR to_status IN ('draft', 'review_ready', 'approved', 'scheduled', 'published', 'corrected', 'unpublished')),
+      issue_version INTEGER NOT NULL CHECK (issue_version > 0),
+      actor_user_id UUID,
+      note TEXT NOT NULL DEFAULT '',
+      payload JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(payload) = 'object'),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS editorial_events_issue_id_idx
+      ON editorial_events (issue_id, id);
+
+    CREATE TABLE IF NOT EXISTS magazine_digest_preferences (
+      user_id UUID PRIMARY KEY,
+      cadence VARCHAR(10) NOT NULL DEFAULT 'weekly' CHECK (cadence IN ('weekly', 'off')),
+      section_keys JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(section_keys) = 'array'),
+      delivery_hour_utc SMALLINT NOT NULL DEFAULT 0 CHECK (delivery_hour_utc BETWEEN 0 AND 23),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS event_alert_subscriptions (
+      id UUID PRIMARY KEY,
+      user_id UUID NOT NULL,
+      competition_id BIGINT,
+      section_key VARCHAR(80) NOT NULL,
+      channel VARCHAR(10) NOT NULL DEFAULT 'in_app' CHECK (channel IN ('in_app', 'email')),
+      lead_minutes INTEGER NOT NULL DEFAULT 60 CHECK (lead_minutes BETWEEN 0 AND 10080),
+      active BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (user_id, section_key, channel)
+    );
+
+    CREATE TABLE IF NOT EXISTS issue_engagement_daily (
+      issue_id UUID NOT NULL REFERENCES editorial_issues(id) ON DELETE CASCADE,
+      metric_date DATE NOT NULL,
+      views BIGINT NOT NULL DEFAULT 0 CHECK (views >= 0),
+      likes BIGINT NOT NULL DEFAULT 0 CHECK (likes >= 0),
+      comments BIGINT NOT NULL DEFAULT 0 CHECK (comments >= 0),
+      shares BIGINT NOT NULL DEFAULT 0 CHECK (shares >= 0),
+      PRIMARY KEY (issue_id, metric_date)
+    );
+
+    CREATE TABLE IF NOT EXISTS post_quarantines (
+      id UUID PRIMARY KEY,
+      post_id BIGINT NOT NULL,
+      issue_id UUID REFERENCES editorial_issues(id) ON DELETE SET NULL,
+      status VARCHAR(10) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'released')),
+      reason_code VARCHAR(40) NOT NULL,
+      reason_detail TEXT NOT NULL DEFAULT '',
+      quarantined_by UUID,
+      quarantined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      released_by UUID,
+      released_at TIMESTAMPTZ,
+      CHECK (
+        (status = 'active' AND released_at IS NULL)
+        OR (status = 'released' AND released_at IS NOT NULL)
+      )
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS post_quarantines_one_active_post_uidx
+      ON post_quarantines (post_id) WHERE status = 'active';
+
+    CREATE OR REPLACE FUNCTION enforce_editorial_issue_transition() RETURNS TRIGGER AS $$
+    BEGIN
+      IF TG_OP = 'INSERT' AND NEW.status <> 'draft' THEN
+        RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_TRANSITION', ERRCODE = 'P0001';
+      END IF;
+      IF TG_OP = 'UPDATE' AND NEW.status IS DISTINCT FROM OLD.status AND NOT (
+        (OLD.status = 'draft' AND NEW.status = 'review_ready')
+        OR (OLD.status = 'review_ready' AND NEW.status = 'approved')
+        OR (OLD.status = 'approved' AND NEW.status IN ('scheduled', 'published'))
+        OR (OLD.status = 'scheduled' AND NEW.status = 'published')
+        OR (OLD.status = 'published' AND NEW.status IN ('corrected', 'unpublished'))
+        OR (OLD.status = 'corrected' AND NEW.status IN ('published', 'unpublished'))
+      ) THEN
+        RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_TRANSITION', ERRCODE = 'P0001';
+      END IF;
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    DROP TRIGGER IF EXISTS editorial_issues_transition_guard ON editorial_issues;
+    CREATE TRIGGER editorial_issues_transition_guard
+      BEFORE INSERT OR UPDATE ON editorial_issues
+      FOR EACH ROW EXECUTE FUNCTION enforce_editorial_issue_transition();
+
+    CREATE OR REPLACE FUNCTION enforce_editorial_calendar_transition() RETURNS TRIGGER AS $$
+    BEGIN
+      IF NEW.state IS DISTINCT FROM OLD.state AND NOT (
+        (OLD.state = 'planned' AND NEW.state IN ('candidate_linked', 'drafting', 'skipped', 'cancelled'))
+        OR (OLD.state = 'candidate_linked' AND NEW.state IN ('drafting', 'skipped', 'cancelled'))
+        OR (OLD.state = 'drafting' AND NEW.state IN ('ready', 'skipped', 'cancelled'))
+        OR (OLD.state = 'ready' AND NEW.state IN ('scheduled', 'published', 'skipped', 'cancelled'))
+        OR (OLD.state = 'scheduled' AND NEW.state IN ('published', 'cancelled'))
+      ) THEN
+        RAISE EXCEPTION USING MESSAGE = 'INVALID_EDITORIAL_CALENDAR_TRANSITION', ERRCODE = 'P0001';
+      END IF;
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    DROP TRIGGER IF EXISTS editorial_calendar_transition_guard ON editorial_calendar;
+    CREATE TRIGGER editorial_calendar_transition_guard
+      BEFORE UPDATE ON editorial_calendar
+      FOR EACH ROW EXECUTE FUNCTION enforce_editorial_calendar_transition();
+
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-postgres.integration.test.js:100:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: EDITORIAL-PG-004: Given an empty PostgreSQL schema When migrated up/down twice Then it is repeatable
+ok 5 - EDITORIAL-PG-004: Given an empty PostgreSQL schema When migrated up/down twice Then it is repeatable # SKIP TEST_DATABASE_URL/DATABASE_URL is not available
+  ---
+  duration_ms: 0.4184
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic
+ok 6 - EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic # SKIP TEST_DATABASE_URL/DATABASE_URL is not available
+  ---
+  duration_ms: 0.1985
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created
+ok 7 - EDITORIAL-PG-006: Given a draft When publish is skipped ahead Then no post is created # SKIP TEST_DATABASE_URL/DATABASE_URL is not available
+  ---
+  duration_ms: 0.3094
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-PG-007: Given duplicate package roles and stale versions When written Then both are rejected
+ok 8 - EDITORIAL-PG-007: Given duplicate package roles and stale versions When written Then both are rejected # SKIP TEST_DATABASE_URL/DATABASE_URL is not available
+  ---
+  duration_ms: 0.4142
+  type: 'test'
+  ...
+# Subtest: baseline: candidate reporting is deterministic and report-only
+ok 9 - baseline: candidate reporting is deterministic and report-only
+  ---
+  duration_ms: 3.1508
+  type: 'test'
+  ...
+# Subtest: default CLI mode is a report-only dry run
+ok 10 - default CLI mode is a report-only dry run
+  ---
+  duration_ms: 0.3249
+  type: 'test'
+  ...
+# Subtest: write CLI requires an explicit valid actor UUID before database work
+ok 11 - write CLI requires an explicit valid actor UUID before database work
+  ---
+  duration_ms: 1.1216
+  type: 'test'
+  ...
+# Subtest: executeMutation rejects an invalid actor before opening a transaction
+ok 12 - executeMutation rejects an invalid actor before opening a transaction
+  ---
+  duration_ms: 4.876
+  type: 'test'
+  ...
+# Subtest: workspace path policy rejects symlink and junction escapes for every CLI file role
+not ok 13 - workspace path policy rejects symlink and junction escapes for every CLI file role
+  ---
+  duration_ms: 8.5662
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-post-quarantine.test.js:128:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /real path must stay inside workspace/u. Input:
+
+    'TypeError: workspacePath is not a function'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'workspacePath is not a function'
+  name: 'TypeError'
+  stack: |-
+    C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-post-quarantine.test.js:150:25
+    getActual (node:assert:530:5)
+    Function.throws (node:assert:676:24)
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-post-quarantine.test.js:150:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-post-quarantine.test.js:150:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: quarantine mutates only explicitly approved candidate IDs
+ok 14 - quarantine mutates only explicitly approved candidate IDs
+  ---
+  duration_ms: 2.436
+  type: 'test'
+  ...
+# Subtest: one missing approved ID rejects the entire transaction
+ok 15 - one missing approved ID rejects the entire transaction
+  ---
+  duration_ms: 0.7505
+  type: 'test'
+  ...
+# Subtest: a commented post is rejected without separate human approval
+ok 16 - a commented post is rejected without separate human approval
+  ---
+  duration_ms: 0.761
+  type: 'test'
+  ...
+# Subtest: a separately documented human approval permits a commented post
+ok 17 - a separately documented human approval permits a commented post
+  ---
+  duration_ms: 1.0969
+  type: 'test'
+  ...
+# Subtest: restore roundtrip preserves post content, comments, counters, and checksum
+ok 18 - restore roundtrip preserves post content, comments, counters, and checksum
+  ---
+  duration_ms: 1.5557
+  type: 'test'
+  ...
+# Subtest: duplicate approved IDs reject before mutation
+ok 19 - duplicate approved IDs reject before mutation
+  ---
+  duration_ms: 0.4315
+  type: 'test'
+  ...
+# Subtest: state changed after reporting rejects the entire transaction
+ok 20 - state changed after reporting rejects the entire transaction
+  ---
+  duration_ms: 0.6838
+  type: 'test'
+  ...
+# Subtest: repeated interruption rolls back without a success result
+ok 21 - repeated interruption rolls back without a success result
+  ---
+  duration_ms: 1.1472
+  type: 'test'
+  ...
+# Subtest: rerun is idempotent and cannot create a second active quarantine
+ok 22 - rerun is idempotent and cannot create a second active quarantine
+  ---
+  duration_ms: 1.0837
+  type: 'test'
+  ...
+# Subtest: hung PostgreSQL work is cancelled by destroying the checked-out client
+ok 23 - hung PostgreSQL work is cancelled by destroying the checked-out client
+  ---
+  duration_ms: 21.4057
+  type: 'test'
+  ...
+# Subtest: PostgreSQL writes match Task 2 active/released quarantine columns
+ok 24 - PostgreSQL writes match Task 2 active/released quarantine columns
+  ---
+  duration_ms: 1.884
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 17
+# fail 3
+# cancelled 0
+# skipped 4
+# todo 0
+# duration_ms 301.637

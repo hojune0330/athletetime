@@ -1,0 +1,20 @@
+COMMAND
+node run-editorial-tests.mjs
+
+ENVIRONMENT
+PostgreSQL 18.4 via embedded-postgres 18.4.0-beta.17
+TEST_DATABASE_URL=postgresql://postgres:[redacted]@127.0.0.1:55432/athletetime_test
+
+LITERAL RELEVANT OUTPUT
+# Subtest: EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic
+ok 6 - EDITORIAL-PG-005: Given an existing fixture When publishing once Then posts and events are atomic
+  duration_ms: 414.6809
+1..8
+# tests 8
+# pass 8
+# fail 0
+# skipped 0
+# duration_ms 2133.2116
+
+RESULT
+PASS: draft plus source transitioned review_ready -> approved -> published, created one linked post, and retained the ordered editorial event chain.

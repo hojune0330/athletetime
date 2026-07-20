@@ -14,6 +14,7 @@
  */
 
 const express = require('express');
+const { rejectEditorialPostMutation } = require('../middleware/editorialPostBoundary');
 const router = express.Router({ mergeParams: true }); // postId를 상위 라우터에서 받음
 
 /**
@@ -26,7 +27,7 @@ const router = express.Router({ mergeParams: true }); // postId를 상위 라우
  *   "option_ids": [1, 2]  // 다중 선택 가능
  * }
  */
-router.post('/vote', async (req, res) => {
+router.post('/vote', rejectEditorialPostMutation, async (req, res) => {
   try {
     const { postId } = req.params;
     const { user_id, option_ids } = req.body;
@@ -144,7 +145,7 @@ router.post('/vote', async (req, res) => {
  *   "user_id": "uuid"
  * }
  */
-router.delete('/vote', async (req, res) => {
+router.delete('/vote', rejectEditorialPostMutation, async (req, res) => {
   const client = await req.app.locals.pool.connect();
 
   try {

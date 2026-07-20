@@ -20,10 +20,35 @@ test('RIGHTS-TICKET-001: Given 50 requests When issuing public tickets Then ever
 });
 
 test('RIGHTS-MIGRATION-001: Given managed migrations When listing Then legacy ad-hoc migrations are not replayed', () => {
-  assert.deepEqual(listMigrationFiles(), [
+  const migrations = listMigrationFiles();
+
+  for (const required of [
     'migration-004-data-rights.sql',
     'migration-005-data-rights-retention.sql',
-  ]);
+  ]) {
+    assert.equal(migrations.includes(required), true);
+  }
+  for (const legacy of [
+    'migration-001-add-auth.sql',
+    'migration-002-competitions.sql',
+    'migration-003-marketplace.sql',
+  ]) {
+    assert.equal(migrations.includes(legacy), false);
+  }
+  assert.deepEqual(migrations, [...migrations].sort());
+});
+
+test('RIGHTS-CI-001: Given the full browser suite When CI runs Then frontend tools are installed first', () => {
+  const workflow = fs.readFileSync(
+    path.join(ROOT, '.github', 'workflows', 'data-rights-postgres.yml'),
+    'utf8',
+  );
+  const frontendInstall = workflow.indexOf('- run: npm ci --prefix frontend');
+  const fullSuite = workflow.indexOf('- run: npm test');
+
+  assert.notEqual(frontendInstall, -1);
+  assert.notEqual(fullSuite, -1);
+  assert.equal(frontendInstall < fullSuite, true);
 });
 
 test('RIGHTS-PRIVACY-001: Given the data-rights schema When inspected Then query text and ticket plaintext have no columns', () => {
