@@ -1,6 +1,12 @@
 const { ISSUE_STATES } = require('./editorialStateMachine');
 const { EditorialNotFoundError } = require('./editorialRepositoryErrors');
-const { calendarView, issueView, revisionView, sourceView } = require('./editorialRepositoryViews');
+const {
+  calendarView,
+  issueView,
+  publicCorrectionView,
+  revisionView,
+  sourceView,
+} = require('./editorialRepositoryViews');
 
 function parseLimit(value, fallback = 50) {
   if (value == null || value === '') return fallback;
@@ -74,7 +80,7 @@ async function listRevisions(pool, issueId) {
   const issue = await pool.query('SELECT id FROM editorial_issues WHERE id=$1', [issueId]);
   if (issue.rowCount === 0) throw new EditorialNotFoundError(issueId);
   const result = await pool.query(`
-    SELECT id, revision_number, title, content, review_note, created_at
+    SELECT id, revision_number, title, content, review_note, public_summary, created_at
     FROM editorial_revisions
     WHERE issue_id=$1
     ORDER BY revision_number DESC
@@ -113,12 +119,49 @@ async function getMagazineIssue(pool, slug) {
   return issueView(result.rows[0], sources.get(result.rows[0].id));
 }
 
+async function getMagazineIssueByPostId(pool, postId) {
+  const result = await pool.query(`
+    SELECT i.*, c.section_key, p.comments_count
+    FROM editorial_issues i
+    JOIN editorial_calendar c ON c.id = i.calendar_id
+    JOIN posts p ON p.id = i.post_id
+    WHERE i.post_id=$1
+      AND (i.status = 'published' OR (i.status = 'corrected' AND i.policy_checked_at IS NOT NULL))
+      AND p.deleted_at IS NULL AND p.is_blinded = FALSE
+  `, [postId]);
+  if (result.rowCount === 0) throw new EditorialNotFoundError(postId);
+  const sources = await sourcesByIssue(pool, [result.rows[0].id]);
+  return issueView(result.rows[0], sources.get(result.rows[0].id));
+}
+
+async function listPublicCorrections(pool, issueId) {
+  const result = await pool.query(`
+    SELECT revision.revision_number, revision.public_summary, event.created_at
+    FROM editorial_events event
+    JOIN LATERAL (
+      SELECT revision_number, public_summary
+      FROM editorial_revisions
+      WHERE issue_id=event.issue_id AND created_at <= event.created_at
+      ORDER BY created_at DESC, id DESC
+      LIMIT 1
+    ) revision ON TRUE
+    WHERE event.issue_id=$1
+      AND event.event_type='revised'
+      AND event.from_status='published'
+      AND event.to_status='corrected'
+    ORDER BY event.created_at DESC, event.id DESC
+  `, [issueId]);
+  return result.rows.map(publicCorrectionView);
+}
+
 module.exports = {
   getIssue,
   getMagazineIssue,
+  getMagazineIssueByPostId,
   listCalendar,
   listIssues,
   listMagazine,
+  listPublicCorrections,
   listRevisions,
   listSources,
 };

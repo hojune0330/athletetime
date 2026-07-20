@@ -1,0 +1,30 @@
+Editorial scheduler restart and lifecycle evidence
+Date: 2026-07-21 Asia/Seoul
+
+Lifecycle binary result: PASS
+- flag unset/default: disabled, ready, zero timers, zero actor lookups, zero writes
+- malformed flag/actor and missing actor: fail closed with safe readiness code
+- non-admin actor: fail closed, zero job processing
+- overlapping wake: one active run
+- graceful stop: timer cancelled, new claims disabled, active run awaited
+- restarted instance: next timer wake processes the persistent repository queue
+
+Manual local QA with literal curl.exe: PASS
+
+Flag off response:
+HTTP 200
+editorialScheduler={"enabled":false,"ready":true,"state":"disabled","errorCode":null}
+
+Malformed actor response:
+HTTP 200
+editorialScheduler={"enabled":true,"ready":false,"state":"unavailable","errorCode":"EDITORIAL_SCHEDULER_ACTOR_INVALID"}
+
+Cleanup:
+- SIGINT graceful shutdown completed for both local servers
+- ports 3198 and 3199 had no remaining listeners
+
+Real PostgreSQL overdue restart scenario: PASS
+- embedded PostgreSQL suite: 26 passed, 0 failed, 0 skipped
+- a new repository instance claimed the overdue retrying job after restart
+- the job completed once and produced exactly one publication
+- full output: postgres-integration.txt

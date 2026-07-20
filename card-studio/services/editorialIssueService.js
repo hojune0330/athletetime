@@ -89,6 +89,25 @@ class EditorialIssueService {
     return this.repository.getMagazineIssue(slug);
   }
 
+  getMagazineIssueByPostId(postId) {
+    return this.repository.getMagazineIssueByPostId(postId);
+  }
+
+  listPublicCorrections(issueId) {
+    return this.repository.listPublicCorrections(issueId);
+  }
+
+  listPublishJobWarnings(query = {}) {
+    return this.repository.listPublishJobWarnings(query);
+  }
+
+  retryPublish(input) {
+    return this.repository.retryPublishJob({
+      ...input,
+      note: requiredReason(input, 'retry publication'),
+    });
+  }
+
   act(action, input) {
     if (action === 'correct') return this.repository.correctIssue(input);
     if (action === 'reject' || action === 'cancel') {

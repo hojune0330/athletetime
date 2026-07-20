@@ -204,9 +204,12 @@ function parseSourceBody(value) {
 
 function parseCorrectionBody(value) {
   const input = assertPlainObject(value);
-  const allowed = ['expectedVersion', 'reviewNote', ...Object.keys(ISSUE_LIMITS).filter((key) => !['sectionKey', 'author'].includes(key))];
+  const allowed = [
+    'expectedVersion', 'reviewNote', 'publicSummary',
+    ...Object.keys(ISSUE_LIMITS).filter((key) => !['sectionKey', 'author'].includes(key)),
+  ];
   assertExactKeys(input, allowed);
-  return {
+  const parsed = {
     expectedVersion: positiveInteger(input, 'expectedVersion'),
     title: textField(input, 'title', ISSUE_LIMITS.title),
     content: textField(input, 'content', ISSUE_LIMITS.content),
@@ -217,6 +220,23 @@ function parseCorrectionBody(value) {
     subjectAgeGroup: textField(input, 'subjectAgeGroup', ISSUE_LIMITS.subjectAgeGroup),
     reviewNote: textField(input, 'reviewNote', 2000),
   };
+  const publicSummary = textField(input, 'publicSummary', 300, true);
+  if (publicSummary !== undefined) {
+    if (/[\u0000-\u001f\u007f]/u.test(publicSummary)) {
+      throw new TypeError('publicSummary must be plain text');
+    }
+    parsed.publicSummary = publicSummary;
+  }
+  return parsed;
+}
+
+function parsePostIdParam(value) {
+  if (typeof value !== 'string' || !/^[1-9]\d*$/u.test(value)) {
+    throw new TypeError('postId must be a positive integer');
+  }
+  const postId = Number(value);
+  if (!Number.isSafeInteger(postId)) throw new TypeError('postId must be a safe integer');
+  return postId;
 }
 
 function parseUuidParam(value) {
@@ -241,6 +261,7 @@ module.exports = {
   parseCorrectionBody,
   parseIssueCreateBody,
   parseMagazineSlug,
+  parsePostIdParam,
   parseScheduleBody,
   parseSourceBody,
   parseUuidParam,

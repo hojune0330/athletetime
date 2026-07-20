@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { isAxiosError } from 'axios';
 
 export const MAGAZINE_SECTION_KEYS = [
   'competition-preview',
@@ -18,6 +19,12 @@ export type MagazineSource = {
   readonly publisher: string | null;
 };
 
+export type MagazineCorrection = {
+  readonly revisionNumber: number;
+  readonly publicSummary: string;
+  readonly createdAt: string;
+};
+
 export type MagazineIssue = {
   readonly id: string;
   readonly slug: string;
@@ -26,10 +33,13 @@ export type MagazineIssue = {
   readonly content: string;
   readonly summary: string;
   readonly discussionQuestion: string;
+  readonly relatedUrl: string;
   readonly sectionKey: MagazineSectionKey;
   readonly publishedAt: string;
   readonly commentsCount: number;
   readonly sources: readonly MagazineSource[];
+  readonly corrections: readonly MagazineCorrection[];
+  readonly countsVisible: boolean;
 };
 
 function isObject(value: unknown): value is Readonly<Record<string, unknown>> {
@@ -72,9 +82,19 @@ function parseSource(value: unknown): MagazineSource {
   };
 }
 
+function parseCorrection(value: unknown): MagazineCorrection {
+  if (!isObject(value)) throw new TypeError('Magazine correction is invalid');
+  return {
+    revisionNumber: requiredNumber(value.revisionNumber, 'correction revision'),
+    publicSummary: requiredString(value.publicSummary, 'correction summary'),
+    createdAt: requiredString(value.createdAt, 'correction date'),
+  };
+}
+
 function parseIssue(value: unknown): MagazineIssue {
   if (!isObject(value)) throw new TypeError('Magazine issue is invalid');
   const sources = Array.isArray(value.sources) ? value.sources.map(parseSource) : [];
+  const corrections = Array.isArray(value.corrections) ? value.corrections.map(parseCorrection) : [];
   return {
     id: requiredString(value.id, 'id'),
     slug: requiredString(value.slug, 'slug'),
@@ -83,11 +103,27 @@ function parseIssue(value: unknown): MagazineIssue {
     content: requiredString(value.content, 'content'),
     summary: requiredString(value.summary, 'summary'),
     discussionQuestion: requiredString(value.discussionQuestion, 'discussion question'),
+    relatedUrl: requiredString(value.relatedUrl, 'related URL'),
     sectionKey: sectionKey(value.sectionKey),
     publishedAt: requiredString(value.publishedAt, 'published date'),
     commentsCount: Math.max(0, requiredNumber(value.commentsCount, 'comment count')),
     sources,
+    corrections,
+    countsVisible: typeof value.countsVisible === 'boolean' ? value.countsVisible : true,
   };
+}
+
+export async function getMagazineIssueByPostId(postId: number): Promise<MagazineIssue | null> {
+  try {
+    const response = await apiClient.get<unknown>(`/api/editorial/magazine/by-post/${postId}`);
+    if (!isObject(response.data) || !isObject(response.data.issue)) {
+      throw new TypeError('Magazine detail response is invalid');
+    }
+    return parseIssue(response.data.issue);
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
+  }
 }
 
 export async function getMagazineIssues(limit = 20): Promise<readonly MagazineIssue[]> {

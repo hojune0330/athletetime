@@ -1,0 +1,23 @@
+Editorial scheduler fault-injection evidence
+Date: 2026-07-21 Asia/Seoul
+
+Binary result: PASS (unit/static and real PostgreSQL)
+
+Verified without sleeps using an injected clock:
+- publication runs after SAVEPOINT editorial_publish_attempt
+- a fault after the post insert executes ROLLBACK TO SAVEPOINT
+- retry state is then committed while the claimed job remains locked
+- first failure schedules exactly +1 minute
+- second failure schedules exactly +5 minutes
+- third failure stores failed with attempt_count=3 and no next attempt
+- unknown/raw errors store EDITORIAL_PUBLISH_TRANSACTION_FAILED only
+- secret-bearing exception text is absent from persisted update parameters
+
+Real PostgreSQL partial-write and three-attempt scenario: PASS
+- embedded PostgreSQL suite: 26 passed, 0 failed, 0 skipped
+- a failed job appeared in the admin warning read model with a safe error code only
+- an explicit admin retry required a reason and reset only the failed job
+- each injected post-insert failure rolled back its partial publication
+- attempts 1 and 2 persisted safe retry state; attempt 3 ended failed
+- issue remained scheduled and no raw exception text was stored
+- full output: postgres-integration.txt

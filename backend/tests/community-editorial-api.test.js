@@ -130,3 +130,61 @@ test('EDITORIAL-API-006: service maps actions without fetching source URLs', asy
   }
   assert.deepEqual(calls.map(([name]) => name), ['addSource', 'transitionIssue', 'finishIssue']);
 });
+
+test('EDITORIAL-SCHEDULER-ADMIN-001: failed publication is visible and retry is an explicit admin action', async (t) => {
+  const service = createFakeService();
+  const api = await startApi(service);
+  t.after(api.close);
+
+  const warnings = await request(api.baseUrl, 'GET', '/api/admin/editorial/publish-jobs/warnings', {
+    headers: { 'X-Test-Role': 'admin' },
+  });
+  assert.equal(warnings.status, 200);
+  assert.equal(warnings.headers.get('cache-control'), 'no-store');
+  assert.deepEqual(warnings.body.jobs, [{
+    issueId: ISSUE_ID,
+    title: issueBody().title,
+    status: 'failed',
+    attemptCount: 3,
+    nextAttemptAt: null,
+    errorCode: 'EDITORIAL_PUBLISH_TRANSACTION_FAILED',
+    scheduledFor: '2026-08-01T00:00:00.000Z',
+    updatedAt: '2026-08-01T00:06:00.000Z',
+  }]);
+  assert.doesNotMatch(JSON.stringify(warnings.body), /password|rawError/iu);
+
+  const retried = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${ISSUE_ID}/retry-publish`,
+    {
+      headers: { 'X-Test-Role': 'admin' },
+      body: {
+        expectedVersion: 1,
+        scheduledFor: '2026-08-01T00:10:00.000Z',
+        note: 'Source outage resolved',
+      },
+    },
+  );
+  assert.equal(retried.status, 200);
+  assert.equal(retried.body.job.status, 'queued');
+  assert.equal(service.calls.at(-1)[0], 'retryPublish');
+  assert.equal(service.calls.at(-1)[1].actorUserId, ACTOR_ID);
+});
+
+test('EDITORIAL-SCHEDULER-ADMIN-002: retry requires a reason before repository access', () => {
+  let calls = 0;
+  const service = new EditorialIssueService({
+    retryPublishJob: async () => { calls += 1; },
+  });
+  assert.throws(
+    () => service.retryPublish({
+      issueId: ISSUE_ID,
+      expectedVersion: 1,
+      scheduledFor: '2026-08-01T00:10:00.000Z',
+      actorUserId: ACTOR_ID,
+    }),
+    (error) => error.code === 'EDITORIAL_REASON_REQUIRED',
+  );
+  assert.equal(calls, 0);
+});

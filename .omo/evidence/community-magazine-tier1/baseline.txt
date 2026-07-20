@@ -1,0 +1,12 @@
+# Tier A baseline
+
+- Baseline commit: `af0276f26ea59894014bd3d55d0339681505ab9a`
+- Branch: `codex/community-magazine`
+- `npm.cmd run test:community-editorial`: 99 pass, 0 fail, 17 skipped because no `TEST_DATABASE_URL`/`DATABASE_URL`
+- `npm.cmd --prefix frontend run type-check`: exit 0
+- `npm.cmd --prefix frontend run build`: build completed successfully; browser mapping freshness warnings only
+- Public contract targeted tests: 11 pass, 0 fail
+- Production data writes: 0
+- Feature flags changed: 0
+
+The first logged PowerShell build transcript returned exit 1 after a successful Vite build because PowerShell promoted stderr freshness warnings to `NativeCommandError`. The original direct build exited 0. This is recorded as a misleading-success-output adversarial case, not a product failure.

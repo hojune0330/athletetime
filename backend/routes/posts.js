@@ -16,6 +16,7 @@ const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { rejectEditorialPostMutation } = require('../middleware/editorialPostBoundary');
+const { applyEditorialVoteVisibility, requestTime } = require('./postVoteVisibility');
 
 /**
  * GET /api/posts
@@ -216,6 +217,7 @@ router.get('/:id', async (req, res) => {
         p.is_pinned,
         p.is_blinded,
         p.poll,
+        editorial_issue.published_at AS editorial_published_at,
         p.created_at,
         p.updated_at,
         c.id as category_id,
@@ -260,6 +262,12 @@ router.get('/:id', async (req, res) => {
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
+      LEFT JOIN editorial_issues editorial_issue
+        ON editorial_issue.post_id = p.id
+        AND (
+          editorial_issue.status = 'published'
+          OR (editorial_issue.status = 'corrected' AND editorial_issue.policy_checked_at IS NOT NULL)
+        )
       WHERE p.id = $1 
         AND p.deleted_at IS NULL
     `, [id]);
@@ -275,11 +283,11 @@ router.get('/:id', async (req, res) => {
     
     res.json({
       success: true,
-      post: {
+      post: applyEditorialVoteVisibility({
         ...post,
         images: Array.isArray(post.images) ? post.images : [],
         comments: Array.isArray(post.comments) ? post.comments : []
-      }
+      }, requestTime(req))
     });
     
   } catch (error) {

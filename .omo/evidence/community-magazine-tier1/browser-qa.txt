@@ -1,0 +1,21 @@
+Community magazine detail browser QA
+Date: 2026-07-21 Asia/Seoul
+
+Environment:
+- Vite frontend connected to an embedded PostgreSQL backend
+- editorial fixture post and ordinary community post seeded separately
+
+Desktop, 1440x900: PASS
+- editorial post kept the canonical /community/post/:postId route
+- sources, one related record, discussion prompt, and public correction rendered
+- likes and dislikes showed the counting state during the first two hours
+- editorial-managed edit and delete actions were hidden
+- ordinary post kept its existing reactions, edit/delete, and comment flow
+
+Mobile, 390x844: PASS
+- no horizontal overflow (viewport 390, document width 382)
+- magazine context and discussion controls remained readable and usable
+
+Clean anonymous origin: PASS
+- zero console errors on 127.0.0.1:4318
+- ordinary-post magazine lookup returned the expected 404 fallback without breaking the page
