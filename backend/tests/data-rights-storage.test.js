@@ -38,6 +38,19 @@ test('RIGHTS-MIGRATION-001: Given managed migrations When listing Then legacy ad
   assert.deepEqual(migrations, [...migrations].sort());
 });
 
+test('RIGHTS-CI-001: Given the full browser suite When CI runs Then frontend tools are installed first', () => {
+  const workflow = fs.readFileSync(
+    path.join(ROOT, '.github', 'workflows', 'data-rights-postgres.yml'),
+    'utf8',
+  );
+  const frontendInstall = workflow.indexOf('- run: npm ci --prefix frontend');
+  const fullSuite = workflow.indexOf('- run: npm test');
+
+  assert.notEqual(frontendInstall, -1);
+  assert.notEqual(fullSuite, -1);
+  assert.equal(frontendInstall < fullSuite, true);
+});
+
 test('RIGHTS-PRIVACY-001: Given the data-rights schema When inspected Then query text and ticket plaintext have no columns', () => {
   const sql = fs.readFileSync(
     path.join(ROOT, 'backend', 'database', 'migration-004-data-rights.sql'),
