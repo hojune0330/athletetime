@@ -16,6 +16,7 @@ function issueView(row, sources = row.sources || []) {
     slug: row.slug,
     calendarId: row.calendar_id,
     postId: row.post_id == null ? null : Number(row.post_id),
+    commentsCount: row.comments_count == null ? 0 : Number(row.comments_count),
     status: row.status,
     version: row.version,
     title: row.title,

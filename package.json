@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "pretest": "node --test backend/tests/community-editorial-candidates.test.js backend/tests/community-editorial-admin-ui.test.js",
-    "pretest:community-editorial": "node --test backend/tests/community-editorial-candidates.test.js backend/tests/community-editorial-admin-ui.test.js",
+    "pretest": "node --test backend/tests/community-editorial-candidates.test.js backend/tests/community-editorial-admin-ui.test.js backend/tests/community-editorial-public-surface.test.js",
+    "pretest:community-editorial": "node --test backend/tests/community-editorial-candidates.test.js backend/tests/community-editorial-admin-ui.test.js backend/tests/community-editorial-public-surface.test.js",
     "test:data-rights": "node --test backend/tests/data-rights-storage.test.js backend/tests/data-rights-lifecycle.test.js backend/tests/data-rights-boundaries.test.js backend/tests/data-rights-postgres.integration.test.js backend/tests/data-rights-rollout.test.js",
     "data:rights:migrate:dry-run": "node tools/migrate-data-rights-files.js",
     "data:rights:migrate": "node tools/migrate-data-rights-files.js --write",

@@ -139,11 +139,13 @@ test('EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published o
   assert.equal(published.body.issue.version, 5);
   const posts = await pool.query('SELECT COUNT(*)::int AS count FROM posts WHERE id=$1', [published.body.issue.postId]);
   assert.equal(posts.rows[0].count, 1);
+  await pool.query('UPDATE posts SET comments_count=7 WHERE id=$1', [published.body.issue.postId]);
 
   const magazine = await request(api.baseUrl, 'GET', '/api/editorial/magazine');
   assert.equal(magazine.status, 200);
   assert.equal(magazine.body.issues.length, 1);
   assert.equal(magazine.body.issues[0].title, issueBody().title);
+  assert.equal(magazine.body.issues[0].commentsCount, 7);
   for (const privateField of ['lastActorUserId', 'policyFingerprint', 'internalPrompt', 'auditIp']) {
     assert.equal(JSON.stringify(magazine.body).includes(privateField), false);
   }

@@ -85,7 +85,7 @@ async function listRevisions(pool, issueId) {
 async function listMagazine(pool, query = {}) {
   const limit = parseLimit(query.limit, 20);
   const result = await pool.query(`
-    SELECT i.*, c.section_key
+    SELECT i.*, c.section_key, p.comments_count
     FROM editorial_issues i
     JOIN editorial_calendar c ON c.id = i.calendar_id
     JOIN posts p ON p.id = i.post_id
@@ -100,7 +100,7 @@ async function listMagazine(pool, query = {}) {
 
 async function getMagazineIssue(pool, slug) {
   const result = await pool.query(`
-    SELECT i.*, c.section_key
+    SELECT i.*, c.section_key, p.comments_count
     FROM editorial_issues i
     JOIN editorial_calendar c ON c.id = i.calendar_id
     JOIN posts p ON p.id = i.post_id

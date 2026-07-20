@@ -27,7 +27,10 @@ function issueView(issue, publicView = false) {
     'id', 'slug', 'postId', 'status', 'version', 'title', 'content', 'summary', 'whyNow',
     'discussionQuestion', 'relatedUrl', 'sectionKey', 'publishedAt', 'updatedAt',
   ];
-  if (publicView) fields.splice(fields.indexOf('version'), 1);
+  if (publicView) {
+    fields.splice(fields.indexOf('version'), 1);
+    fields.push('commentsCount');
+  }
   if (!publicView) fields.push(
     'calendarId', 'calendarState', 'author', 'subjectAgeGroup', 'scheduledFor', 'createdAt',
   );

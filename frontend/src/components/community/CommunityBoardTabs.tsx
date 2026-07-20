@@ -6,16 +6,19 @@
  * 기본 게시판 목록으로 동작한다.
  */
 
+import { Link } from 'react-router-dom'
 import { useCategories } from '../../hooks/usePosts'
 
 export type BoardTab = {
   readonly key: string
   readonly label: string
   readonly category?: string
+  readonly href?: string
 }
 
 export const DEFAULT_BOARDS: readonly BoardTab[] = [
   { key: 'all', label: '전체글' },
+  { key: 'magazine', label: '매거진', href: '/community/magazine' },
   { key: 'free', label: '자유', category: '자유' },
   { key: 'training', label: '훈련', category: '훈련' },
   { key: 'competition', label: '대회', category: '대회' },
@@ -51,6 +54,22 @@ export function CommunityBoardTabs({ activeKey, onSelect }: CommunityBoardTabsPr
     >
       {boards.map((board) => {
         const isActive = board.key === activeKey
+        if (board.href) {
+          return (
+            <Link
+              key={board.key}
+              to={board.href}
+              aria-current={isActive ? 'page' : undefined}
+              className={`shrink-0 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors duration-200 ${
+                isActive
+                  ? 'border-neutral-900 text-neutral-900'
+                  : 'border-transparent text-neutral-500 hover:border-neutral-300 hover:text-neutral-800'
+              }`}
+            >
+              {board.label}
+            </Link>
+          )
+        }
         return (
           <button
             key={board.key}

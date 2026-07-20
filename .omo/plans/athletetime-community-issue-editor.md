@@ -382,7 +382,7 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
 
   **Commit**: YES | Message: `feat(admin): add athletics issue editor room` | Files: `frontend/src/pages/admin/AdminIssueEditorPage.tsx`, `frontend/src/components/admin/editorial/*`, `frontend/src/api/editorialAdmin.ts`, `frontend/src/App.tsx`
 
-- [ ] 7. 커뮤니티 정보구조를 `매거진 + 사람 글` 이중 표면으로 개편
+- [x] 7. 커뮤니티 정보구조를 `매거진 + 사람 글` 이중 표면으로 개편
 
   **What to do**: `/community` 상단을 `이번 주에 읽을 것` 1건 + `최근 발행` 4건 + 기존 인기글/게시판으로 구성하고 `/community/magazine` 전용 목록을 추가한다. 탭에는 `매거진`을 `전체글` 다음에 배치하고 섹션 필터(`이번 대회`, `기록 이야기`, `국제`, `로드·마라톤`, `실내`, `아카이브`)를 둔다. 카드는 제목, 2줄 요약, section, source provider, 발행일, 예상 읽기 시간, 댓글 수만 보여준다. 새 글이 없는 주에는 마지막 좋은 글을 유지하되 `새 소식`처럼 가장하지 않는다. 데이터가 없으면 기존 커뮤니티가 그대로 첫 화면이 된다.
   **Must NOT do**: 일반 사용자 글을 숨기거나 보조 기능 1차 네비를 늘리지 않는다.
@@ -396,10 +396,10 @@ Gate B: F1-F4를 전체 범위로 재실행한 뒤 retention 기능 활성화
   - `frontend/src/components/post/PostList.tsx:248` - 기존 밀도 높은 행
 
   **Acceptance Criteria**:
-  - [ ] 매거진 글 존재 시 390px 첫 viewport 안에 `이번 주에 읽을 것`과 댓글 CTA가 보인다.
-  - [ ] 14일 이상 새 글이 없어도 오래된 글을 `오늘/방금`으로 표시하지 않는다.
-  - [ ] 이슈 0건/API 실패 시 기존 게시판과 글쓰기가 정상 작동한다.
-  - [ ] 공개 화면에 `공식`, `AI 검증`, `랭킹` 표현이 없다.
+  - [x] 매거진 글 존재 시 390px 첫 viewport 안에 `이번 주에 읽을 것`과 댓글 CTA가 보인다.
+  - [x] 14일 이상 새 글이 없어도 오래된 글을 `오늘/방금`으로 표시하지 않는다.
+  - [x] 이슈 0건/API 실패 시 기존 게시판과 글쓰기가 정상 작동한다.
+  - [x] 공개 화면에 `공식`, `AI 검증`, `랭킹` 표현이 없다.
 
   **QA Scenarios**:
   ```

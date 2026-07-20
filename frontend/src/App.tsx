@@ -11,6 +11,7 @@ import ScrollToTop from './components/ScrollToTop'
 
 const MainPage = lazy(() => import('./pages/MainPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
+const CommunityMagazinePage = lazy(() => import('./pages/CommunityMagazinePage'))
 const PaceCalculatorPage = lazy(() => import('./pages/PaceCalculatorPage'))
 const TrainingCalculatorPage = lazy(() => import('./pages/TrainingCalculatorPage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
@@ -144,6 +145,7 @@ function App() {
             {/* 커뮤니티 페이지 */}
             <Route path="/community" element={<Layout />}>
               <Route index element={lazyPage(<CommunityPage />)} />
+              <Route path="magazine" element={lazyPage(<CommunityMagazinePage />)} />
               <Route path="best" element={lazyPage(<CommunityPage />)} />
               <Route path="board/:boardId" element={lazyPage(<BoardPage />)} />
               <Route path="post/:postId" element={lazyPage(<PostDetailPage />)} />

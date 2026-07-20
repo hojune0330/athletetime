@@ -1,0 +1,13 @@
+Task 7 community magazine evidence
+
+- Focused public-surface contract: 5 passed, 0 failed.
+- Community editorial suite: 99 passed, 17 environment-only skips, 0 failed.
+- Embedded PostgreSQL suite: 22 passed, 0 failed.
+- Full repository suite: 358 passed, 23 environment/private-original skips, 0 failed.
+- Frontend type-check and production build: passed.
+- Browser /community: shelf, featured story, four recent stories, source labels, and comment CTA visible.
+- Browser /community/magazine: section filters visible; international filter reduced five stories to one.
+- Browser console warnings/errors: 0.
+- Empty and failed magazine responses return null from the shelf, preserving best posts, boards, writing, and pagination.
+- Published dates always use an absolute Asia/Seoul date; no old story is relabeled as today or just now.
+- Dependency audit found 4 high and 8 moderate advisories in pre-existing packages. This task added no dependency; upgrades are isolated as a follow-up security PR.
