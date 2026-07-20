@@ -126,7 +126,18 @@ async function request(baseUrl, method, pathname, options = {}) {
 
 function assertNoPrivateFields(value) {
   const serialized = JSON.stringify(value);
-  for (const field of ['internalPrompt', 'rawArticle', 'auditIp', 'secretConfig']) {
+  for (const field of [
+    'internalPrompt',
+    'rawArticle',
+    'auditIp',
+    'secretConfig',
+    'reviewNote',
+    'actorUserId',
+    'lastActorUserId',
+    'policyFingerprint',
+    'policyCheckedAt',
+    'draftContent',
+  ]) {
     assert.equal(serialized.includes(field), false, `${field} leaked from API response`);
   }
 }
