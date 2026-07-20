@@ -135,10 +135,13 @@ function optionalNumber(value: unknown): number | null {
 }
 
 function parseSection(value: unknown): EditorialSectionKey {
-  if (typeof value !== 'string' || !EDITORIAL_SECTIONS.some((section) => section === value)) {
+  const section = typeof value === 'string'
+    ? EDITORIAL_SECTIONS.find((candidate) => candidate === value)
+    : undefined;
+  if (!section) {
     throw new EditorialApiError('편집 섹션 값이 올바르지 않습니다.');
   }
-  return value;
+  return section;
 }
 
 function parseSource(value: unknown): EditorialSource {
