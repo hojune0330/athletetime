@@ -4,6 +4,21 @@
 
 브랜치: `codex/editorial-ops-verification`
 
+검증 대상 코드 커밋:
+`b2d4a272262bdb615e21217d308e3d478c70ffc3`
+
+이 문서를 고정하는 다음 커밋은 증거만 변경하며 위 코드 커밋의 제품 파일을
+바꾸지 않는다.
+
+## 검증 증거 SHA-256
+
+| 증거 | SHA-256 |
+|---|---|
+| `embedded-postgres-tests.txt` | `7cb9a142b4a321341360677c44167ba4ef539fca3d42c28c50b2131419d1155b` |
+| `clone-rehearsal-agent.md` | `5ec0b97e3528c9f28a01005a25803b9f123616d2724e60f6721c1140282327f1` |
+| `verification-receipt.md` | `dbc48b05fd5c48348c8baca17dc87cd35534bfba896aa3a8c5387eee23f0b4d9` |
+| `independent-reviews.md` | `e309f7240d7a0af1c9bd0e00bec66f38764bd5e6b37bb551f3222cfc5cbec2e7` |
+
 ## 한눈에 보는 결론
 
 - 공개 매거진 정보와 일반 게시글의 경계: 승인 가능
