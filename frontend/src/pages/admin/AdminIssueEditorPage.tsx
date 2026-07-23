@@ -13,7 +13,7 @@ import {
   getEditorialIssue,
   listEditorialCalendar,
   listEditorialIssues,
-  listEditorialPublishJobWarnings,
+  listEditorialPublishJobs,
   listEditorialRevisions,
   retryEditorialPublish,
   reviseEditorialIssue,
@@ -24,7 +24,7 @@ import {
   type EditorialCalendarInput,
   type EditorialDraftInput,
   type EditorialIssue,
-  type EditorialPublishJobWarning,
+  type EditorialPublishJob,
   type EditorialRevision,
   type EditorialSourceInput,
 } from '../../api/editorialAdmin';
@@ -33,7 +33,7 @@ import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { CalendarComposer } from '../../components/admin/editorial/CalendarComposer';
 import { EditorialQueue } from '../../components/admin/editorial/EditorialQueue';
 import { IssueEditorPanel } from '../../components/admin/editorial/IssueEditorPanel';
-import { PublishJobWarningsPanel } from '../../components/admin/editorial/PublishJobWarningsPanel';
+import { PublishJobStatusPanel } from '../../components/admin/editorial/PublishJobStatusPanel';
 import { RevisionHistory } from '../../components/admin/editorial/RevisionHistory';
 import { SourceChecklist } from '../../components/admin/editorial/SourceChecklist';
 import {
@@ -55,7 +55,7 @@ export default function AdminIssueEditorPage() {
   const [activeTab, setActiveTab] = useState<WorkflowTab>('candidate');
   const [calendar, setCalendar] = useState<readonly EditorialCalendarEntry[]>([]);
   const [issues, setIssues] = useState<readonly EditorialIssue[]>([]);
-  const [publishJobWarnings, setPublishJobWarnings] = useState<readonly EditorialPublishJobWarning[]>([]);
+  const [publishJobs, setPublishJobs] = useState<readonly EditorialPublishJob[]>([]);
   const [revisions, setRevisions] = useState<readonly EditorialRevision[]>([]);
   const [selectedCalendar, setSelectedCalendar] = useState<EditorialCalendarEntry | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<EditorialIssue | null>(null);
@@ -68,14 +68,14 @@ export default function AdminIssueEditorPage() {
     setLoading(true);
     setError('');
     try {
-      const [nextCalendar, nextIssues, nextPublishJobWarnings] = await Promise.all([
+      const [nextCalendar, nextIssues, nextPublishJobs] = await Promise.all([
         listEditorialCalendar(),
         listEditorialIssues(),
-        listEditorialPublishJobWarnings(),
+        listEditorialPublishJobs(),
       ]);
       setCalendar(nextCalendar);
       setIssues(nextIssues);
-      setPublishJobWarnings(nextPublishJobWarnings);
+      setPublishJobs(nextPublishJobs);
       if (selectedIssue) {
         const refreshed = nextIssues.find((issue) => issue.id === selectedIssue.id) ?? null;
         setSelectedIssue(refreshed);
@@ -121,19 +121,19 @@ export default function AdminIssueEditorPage() {
   }
 
   async function refreshSelected(issueId: string, message: string): Promise<void> {
-    const [detail, nextCalendar, nextIssues, nextRevisions, nextPublishJobWarnings] = await Promise.all([
+    const [detail, nextCalendar, nextIssues, nextRevisions, nextPublishJobs] = await Promise.all([
       getEditorialIssue(issueId),
       listEditorialCalendar(),
       listEditorialIssues(),
       listEditorialRevisions(issueId),
-      listEditorialPublishJobWarnings(),
+      listEditorialPublishJobs(),
     ]);
     setSelectedIssue(detail);
     setSelectedCalendar(null);
     setCalendar(nextCalendar);
     setIssues(nextIssues);
     setRevisions(nextRevisions);
-    setPublishJobWarnings(nextPublishJobWarnings);
+    setPublishJobs(nextPublishJobs);
     setNotice(message);
   }
 
@@ -242,8 +242,8 @@ export default function AdminIssueEditorPage() {
     ? calendar.filter((entry) => entry.state === 'planned' || entry.state === 'skipped')
     : [];
   const issueItems = issues.filter((issue) => issueMatchesTab(issue, activeTab));
-  const selectedPublishJobWarning = selectedIssue
-    ? publishJobWarnings.find((warning) => warning.issueId === selectedIssue.id) ?? null
+  const selectedPublishJob = selectedIssue
+    ? publishJobs.find((job) => job.issueId === selectedIssue.id) ?? null
     : null;
 
   return (
@@ -337,9 +337,9 @@ export default function AdminIssueEditorPage() {
           {selectedIssue ? (
             <>
               <SourceChecklist issue={selectedIssue} busy={busy} onAdd={handleSourceAdd} onDelete={handleSourceDelete} />
-              <PublishJobWarningsPanel
+              <PublishJobStatusPanel
                 issue={selectedIssue}
-                warning={selectedPublishJobWarning}
+                job={selectedPublishJob}
                 busy={busy}
                 onRetry={handleRetryPublish}
               />

@@ -2,11 +2,16 @@
 
 ## Safe deployment order
 
-1. Deploy with `EDITORIAL_SCHEDULER_ENABLED=false` or unset. This is the default.
+1. Confirm `EDITORIAL_SCHEDULER_ENABLED=false` or unset without deploying new
+   application code. This is the default.
 2. Apply and verify `migration-010-editorial-publish-jobs.sql` while the flag remains off.
 3. Configure `EDITORIAL_SCHEDULER_ACTOR_ID` with the UUID of an existing administrator.
 4. Check `/health`. The `services.editorialScheduler` object must contain only safe state and error-code fields.
-5. Enable one instance first with `EDITORIAL_SCHEDULER_ENABLED=true` and observe job state before enabling more instances.
+5. Deploy and verify the Render backend while the flag remains off.
+6. Deploy the Netlify frontend after the full job-ledger endpoint returns 200. During
+   a short frontend-first rollout window the client falls back to the warnings endpoint,
+   but queued/completed history appears only after the backend is ready.
+7. Enable one instance first with `EDITORIAL_SCHEDULER_ENABLED=true` and observe job state before enabling more instances.
 
 The in-process interval only wakes the worker. `editorial_publish_jobs` is the source of truth, so queued and retrying work survives restarts.
 
@@ -40,12 +45,13 @@ Readiness never includes the configured actor UUID or a raw database/publication
 
 Job error storage is a fixed safe code, never an exception message, token, SQL text, or request data.
 
-## Administrator warning surface
+## Administrator job surface
 
-- The warning endpoint returns only `retrying` and `failed` jobs.
-- The screen shows status, attempt count, next attempt time, and a safe error code only. It never shows raw errors, account identifiers, or tokens.
+- `GET /api/admin/editorial/publish-jobs` returns the bounded, safe job ledger for `queued`, `retrying`, `failed`, and `completed` jobs.
+- `GET /api/admin/editorial/publish-jobs/warnings` remains available for incident tooling that needs only `retrying` and `failed` jobs.
+- The selected issue's screen shows status, attempt count, next attempt time, and a safe error code only. It never shows raw errors, account identifiers, or tokens.
 - A failed job is re-scheduled only while its issue is open. The screen sends the current issue version as `expectedVersion`, so a concurrent edit receives 409 instead of overwriting work.
-- Queued and completed job history is deliberately absent from this endpoint. Showing it requires a Step 3 backend-contract decision; the screen must not infer it.
+- Both endpoints are administrator-only, return `Cache-Control: no-store`, and cap results at 100 jobs.
 
 ## Repeatable verification fixtures
 
@@ -63,7 +69,9 @@ For each run, compare issue-level publish audit counts with duplicate and lost p
 2. Allow shutdown to finish; it waits for the currently claimed transaction.
 3. Inspect counts grouped by `status`, `attempt_count`, and `last_error_code`. Do not copy raw application logs into job rows.
 4. Correct the underlying problem before an administrator re-schedules a failed issue.
-   - Read `GET /api/admin/editorial/publish-jobs/warnings` and use only its safe error code.
+   - Read `GET /api/admin/editorial/publish-jobs` for the complete safe state or
+     `GET /api/admin/editorial/publish-jobs/warnings` for attention-only tooling.
+     Use only the returned safe error code.
    - Retry with `POST /api/admin/editorial/issues/:issueId/retry-publish` using the current
      issue version, a new ISO schedule, and a required reason.
 5. Re-enable a single instance and verify completed jobs and one publish audit per issue before scaling out.

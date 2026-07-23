@@ -1,0 +1,130 @@
+﻿TAP version 13
+# Subtest: EDITORIAL-ROOM-001: magazine editor stays inside the protected admin route
+ok 1 - EDITORIAL-ROOM-001: magazine editor stays inside the protected admin route
+  ---
+  duration_ms: 3.3296
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-ROOM-002: editor exposes the full human review workflow
+ok 2 - EDITORIAL-ROOM-002: editor exposes the full human review workflow
+  ---
+  duration_ms: 4.2026
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-ROOM-003: API client persists versions, sources, checks, and KST schedules
+ok 3 - EDITORIAL-ROOM-003: API client persists versions, sources, checks, and KST schedules
+  ---
+  duration_ms: 0.7097
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-ROOM-004: editor has no fake story, provider control, or automatic publish control
+ok 4 - EDITORIAL-ROOM-004: editor has no fake story, provider control, or automatic publish control
+  ---
+  duration_ms: 1.5554
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-UI-001: Given scheduler warnings When an administrator opens an issue Then only safe retry details are shown
+ok 5 - EDITORIAL-SCHEDULER-UI-001: Given scheduler warnings When an administrator opens an issue Then only safe retry details are shown
+  ---
+  duration_ms: 3.7623
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-UI-002: the selected issue shows queued, retrying, failed, and completed publication states
+not ok 6 - EDITORIAL-SCHEDULER-UI-002: the selected issue shows queued, retrying, failed, and completed publication states
+  ---
+  duration_ms: 2.9779
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-editorial-admin-ui.test.js:93:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\frontend\\src\\components\\admin\\editorial\\PublishJobStatusPanel.tsx'"
+  code: 'ENOENT'
+  stack: |-
+    Object.readFileSync (node:fs:441:20)
+    read (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-admin-ui.test.js:9:13)
+    TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-admin-ui.test.js:96:17)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: EDITORIAL-API-001: request parsers accept exact payloads and reject extra fields
+ok 7 - EDITORIAL-API-001: request parsers accept exact payloads and reject extra fields
+  ---
+  duration_ms: 4.0001
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-000: production mount uses CSRF before JWT admin guards
+ok 8 - EDITORIAL-API-000: production mount uses CSRF before JWT admin guards
+  ---
+  duration_ms: 1.3415
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-002: source URLs are HTTPS and reject obvious private targets
+ok 9 - EDITORIAL-API-002: source URLs are HTTPS and reject obvious private targets
+  ---
+  duration_ms: 7.6607
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-003: admin writes enforce role, CSRF, actor, and version
+ok 10 - EDITORIAL-API-003: admin writes enforce role, CSRF, actor, and version
+  ---
+  duration_ms: 153.4773
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-005: public magazine exposes only allowlisted fields
+ok 11 - EDITORIAL-API-005: public magazine exposes only allowlisted fields
+  ---
+  duration_ms: 22.459
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-API-006: service maps actions without fetching source URLs
+ok 12 - EDITORIAL-API-006: service maps actions without fetching source URLs
+  ---
+  duration_ms: 0.9965
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-ADMIN-001: failed publication is visible and retry is an explicit admin action
+ok 13 - EDITORIAL-SCHEDULER-ADMIN-001: failed publication is visible and retry is an explicit admin action
+  ---
+  duration_ms: 22.6583
+  type: 'test'
+  ...
+# Subtest: EDITORIAL-SCHEDULER-ADMIN-003: admin ledger exposes every safe publish state without private fields
+not ok 14 - EDITORIAL-SCHEDULER-ADMIN-003: admin ledger exposes every safe publish state without private fields
+  ---
+  duration_ms: 13.5444
+  type: 'test'
+  location: 'C:\\Users\\SAMSUNG\\Documents\\2026 첫프젝\\athletetime-pr50\\backend\\tests\\community-editorial-api.test.js:175:1'
+  failureType: 'testCodeFailure'
+  error: `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`
+  code: 'ERR_TEST_FAILURE'
+  name: 'SyntaxError'
+  stack: |-
+    JSON.parse (<anonymous>)
+    parseJSONFromBytes (node:internal/deps/undici/undici:5738:19)
+    successSteps (node:internal/deps/undici/undici:5719:27)
+    fullyReadBody (node:internal/deps/undici/undici:4609:9)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async consumeBody (node:internal/deps/undici/undici:5728:7)
+    async request (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\helpers\communityEditorialApiHarness.js:164:70)
+    async TestContext.<anonymous> (C:\Users\SAMSUNG\Documents\2026 첫프젝\athletetime-pr50\backend\tests\community-editorial-api.test.js:179:20)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: EDITORIAL-SCHEDULER-ADMIN-002: retry requires a reason before repository access
+ok 15 - EDITORIAL-SCHEDULER-ADMIN-002: retry requires a reason before repository access
+  ---
+  duration_ms: 1.5561
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 13
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1012.3034

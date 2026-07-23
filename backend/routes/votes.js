@@ -11,6 +11,12 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { broadcastToClients } = require('../utils/websocket');
 const { applyEditorialVoteVisibility, requestTime } = require('./postVoteVisibility');
+const {
+  checkoutRequestClient,
+  rejectQuarantinedPostAccess,
+} = require('../middleware/quarantinedPostBoundary');
+
+router.use(rejectQuarantinedPostAccess);
 
 /**
  * POST /api/posts/:postId/vote
@@ -21,7 +27,7 @@ const { applyEditorialVoteVisibility, requestTime } = require('./postVoteVisibil
  * - anonymousId: string
  */
 router.post('/', async (req, res) => {
-  const client = await req.app.locals.pool.connect();
+  const { client, release } = await checkoutRequestClient(req);
   
   try {
     await client.query('BEGIN');
@@ -167,7 +173,7 @@ router.post('/', async (req, res) => {
     const post = postResult.rows[0];
     
     // 현재 사용자의 투표 상태 조회
-    const myVoteResult = await req.app.locals.pool.query(
+    const myVoteResult = await client.query(
       'SELECT vote_type FROM votes WHERE post_id = $1 AND user_id = $2',
       [postId, userId]
     );
@@ -198,7 +204,7 @@ router.post('/', async (req, res) => {
       error: error.message || '투표에 실패했습니다.' 
     });
   } finally {
-    client.release();
+    release();
   }
 });
 

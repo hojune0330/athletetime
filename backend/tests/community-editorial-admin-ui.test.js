@@ -69,21 +69,39 @@ test('EDITORIAL-ROOM-004: editor has no fake story, provider control, or automat
   }
 });
 
-test('EDITORIAL-SCHEDULER-UI-001: Given scheduler warnings When an administrator opens an issue Then only safe retry details are shown', () => {
+test('EDITORIAL-SCHEDULER-UI-001: Given scheduler jobs When an administrator opens an issue Then only safe retry details are shown', () => {
   // Given
   const page = read('frontend/src/pages/admin/AdminIssueEditorPage.tsx');
   const api = read('frontend/src/api/editorialAdmin.ts');
-  const panel = read('frontend/src/components/admin/editorial/PublishJobWarningsPanel.tsx');
+  const panel = read('frontend/src/components/admin/editorial/PublishJobStatusPanel.tsx');
 
   // When
   const surface = [page, api, panel].join(String.fromCharCode(10));
 
   // Then
-  for (const value of ['publish-jobs/warnings', 'retry-publish', 'expectedVersion: issue.version']) {
+  for (const value of ['publish-jobs', 'retry-publish', 'expectedVersion: issue.version']) {
     assert.ok(api.includes(value));
   }
   for (const label of ['재시도 중', '실패', '시도 횟수', '다음 시도', '문제 코드', '다시 예약']) {
     assert.ok(panel.includes(label));
+  }
+  for (const forbidden of ['rawError', 'actorUserId', 'accessToken', 'refreshToken']) {
+    assert.equal(surface.includes(forbidden), false, forbidden);
+  }
+});
+
+test('EDITORIAL-SCHEDULER-UI-002: the selected issue shows queued, retrying, failed, and completed publication states', () => {
+  const page = read('frontend/src/pages/admin/AdminIssueEditorPage.tsx');
+  const api = read('frontend/src/api/editorialAdmin.ts');
+  const panel = read('frontend/src/components/admin/editorial/PublishJobStatusPanel.tsx');
+  const surface = [page, api, panel].join(String.fromCharCode(10));
+
+  assert.ok(api.includes('listEditorialPublishJobs'));
+  assert.ok(api.includes('`${EDITORIAL_ADMIN_BASE}/publish-jobs`'));
+  assert.ok(api.includes('`${EDITORIAL_ADMIN_BASE}/publish-jobs/warnings`'));
+  assert.ok(api.includes("error.response?.status !== 404"));
+  for (const status of ['queued', 'retrying', 'failed', 'completed']) {
+    assert.ok(surface.includes(`'${status}'`), status);
   }
   for (const forbidden of ['rawError', 'actorUserId', 'accessToken', 'refreshToken']) {
     assert.equal(surface.includes(forbidden), false, forbidden);

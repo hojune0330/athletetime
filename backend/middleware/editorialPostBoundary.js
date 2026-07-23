@@ -1,7 +1,8 @@
 async function rejectEditorialPostMutation(req, res, next) {
   const postId = req.params.id || req.params.postId;
   try {
-    const linked = await req.app.locals.pool.query(
+    const database = req.quarantineDatabase || req.app.locals.pool;
+    const linked = await database.query(
       'SELECT id FROM editorial_issues WHERE post_id = $1 LIMIT 1',
       [postId],
     );

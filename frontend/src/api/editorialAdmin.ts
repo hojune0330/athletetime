@@ -89,7 +89,7 @@ const PUBLISH_JOB_STATUSES = ['queued', 'retrying', 'failed', 'completed'] as co
 
 export type EditorialPublishJobStatus = (typeof PUBLISH_JOB_STATUSES)[number];
 
-export type EditorialPublishJobWarning = {
+export type EditorialPublishJob = {
   readonly issueId: string;
   readonly title: string;
   readonly status: EditorialPublishJobStatus;
@@ -167,7 +167,7 @@ function parsePublishJobStatus(value: unknown): EditorialPublishJobStatus {
   return status;
 }
 
-function parsePublishJobWarning(value: unknown): EditorialPublishJobWarning {
+function parsePublishJob(value: unknown): EditorialPublishJob {
   const job = requiredRecord(value, '발행 작업');
   return {
     issueId: requiredString(job.issueId, '원고 ID'),
@@ -423,12 +423,20 @@ export async function scheduleEditorialIssue(issue: EditorialIssue, localKstDate
   }
 }
 
-export async function listEditorialPublishJobWarnings(): Promise<readonly EditorialPublishJobWarning[]> {
+export async function listEditorialPublishJobs(): Promise<readonly EditorialPublishJob[]> {
   try {
-    const response = await apiClient.get<unknown>(`${EDITORIAL_ADMIN_BASE}/publish-jobs/warnings`);
-    return responseList(response.data, 'jobs').map(parsePublishJobWarning);
+    const response = await apiClient.get<unknown>(`${EDITORIAL_ADMIN_BASE}/publish-jobs`);
+    return responseList(response.data, 'jobs').map(parsePublishJob);
   } catch (error: unknown) {
-    normalizeError(error);
+    if (!axios.isAxiosError(error) || error.response?.status !== 404) {
+      normalizeError(error);
+    }
+    try {
+      const fallback = await apiClient.get<unknown>(`${EDITORIAL_ADMIN_BASE}/publish-jobs/warnings`);
+      return responseList(fallback.data, 'jobs').map(parsePublishJob);
+    } catch (fallbackError: unknown) {
+      normalizeError(fallbackError);
+    }
   }
 }
 

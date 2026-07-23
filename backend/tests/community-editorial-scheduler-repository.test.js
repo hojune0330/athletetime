@@ -7,6 +7,9 @@ const {
   retryOutcome,
   safePublishErrorCode,
 } = require('../../card-studio/repositories/editorialSchedulerRepository');
+const {
+  listEditorialPublishJobs,
+} = require('../../card-studio/repositories/editorialPublishJobRepository');
 
 const ACTOR_ID = '00000000-0000-4000-8000-000000000001';
 const NOW = new Date('2026-08-01T00:00:00.000Z');
@@ -91,4 +94,37 @@ test('EDITORIAL-SCHEDULER-REPOSITORY-004: Given a post insert fault When process
   assert.equal(commands[6], 'COMMIT');
   assert.equal(commands[7], 'RELEASE');
   assert.doesNotMatch(JSON.stringify(queries[5].values), /must-not-persist/u);
+});
+
+test('EDITORIAL-SCHEDULER-REPOSITORY-005: the admin ledger reads every publish state with a bounded safe view', async () => {
+  const statuses = ['queued', 'retrying', 'failed', 'completed'];
+  let capturedSql = '';
+  let capturedValues = [];
+  const pool = {
+    async query(sql, values) {
+      capturedSql = sql;
+      capturedValues = values;
+      return {
+        rows: statuses.map((status, index) => ({
+          issue_id: `${index + 3}0000000-0000-4000-8000-000000000001`,
+          title: `${status} issue`,
+          status,
+          attempt_count: index,
+          next_attempt_at: null,
+          last_error_code: null,
+          scheduled_for: null,
+          updated_at: '2026-08-01T00:00:00.000Z',
+          raw_error: 'password=hidden',
+          actor_user_id: ACTOR_ID,
+        })),
+      };
+    },
+  };
+
+  const jobs = await listEditorialPublishJobs(pool, { limit: '500' });
+
+  assert.deepEqual(jobs.map((job) => job.status), statuses);
+  assert.deepEqual(capturedValues, [100]);
+  assert.doesNotMatch(capturedSql, /WHERE\s+j\.status/iu);
+  assert.doesNotMatch(JSON.stringify(jobs), /password|raw_error|actor_user_id/iu);
 });

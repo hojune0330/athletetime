@@ -32,9 +32,15 @@ async function startApi({ editorialPublishedAt, withVotes = false }) {
   const client = {
     async query(sql) {
       if (['BEGIN', 'COMMIT', 'ROLLBACK'].includes(sql)) return { rows: [], rowCount: 0 };
+      if (sql.includes('pg_advisory_')) return { rows: [{}], rowCount: 1 };
+      if (sql.includes('SELECT id FROM posts') && sql.includes('deleted_at IS NULL')) {
+        return { rows: [{ id: row.id }], rowCount: 1 };
+      }
+      if (sql.includes('FROM post_quarantines')) return { rows: [], rowCount: 0 };
       if (sql.includes('SELECT id FROM users')) return { rows: [{ id: 'user-1' }], rowCount: 1 };
       if (sql.includes('SELECT vote_type FROM votes')) return { rows: [], rowCount: 0 };
       if (sql.includes('INSERT INTO votes')) return { rows: [], rowCount: 1 };
+      if (sql.includes('UPDATE posts SET views = views + 1')) return { rows: [], rowCount: 1 };
       if (sql.includes('FROM posts p')) return { rows: [row], rowCount: 1 };
       throw new Error(`Unexpected client query: ${sql}`);
     },
@@ -42,6 +48,7 @@ async function startApi({ editorialPublishedAt, withVotes = false }) {
   };
   const pool = {
     async query(sql) {
+      if (sql.includes('FROM post_quarantines')) return { rows: [], rowCount: 0 };
       if (sql.includes('UPDATE posts SET views = views + 1')) return { rows: [], rowCount: 1 };
       if (sql.includes('FROM posts p')) return { rows: [row], rowCount: 1 };
       if (sql.includes('SELECT vote_type FROM votes')) {

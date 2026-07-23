@@ -35,6 +35,7 @@ async function startPostApi() {
   const pool = {
     async query(sql, values) {
       queries.push({ sql, values });
+      if (sql.includes('FROM post_quarantines')) return { rows: [], rowCount: 0 };
       if (sql.includes('UPDATE posts SET views = views + 1')) return { rows: [], rowCount: 1 };
       if (sql.includes('FROM posts p') && sql.includes('p.poll')) {
         return { rows: [{ ...ORDINARY_POST }], rowCount: 1 };

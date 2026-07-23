@@ -46,6 +46,12 @@ test('EDITORIAL-POST-BOUNDARY-002: ordinary posts continue through legacy routes
 
 test('EDITORIAL-POST-BOUNDARY-003: legacy update and delete routes install the guard', () => {
   const route = fs.readFileSync(path.join(root, 'backend/routes/posts.js'), 'utf8');
-  assert.match(route, /router\.put\('\/:id',\s*rejectEditorialPostMutation/u);
-  assert.match(route, /router\.delete\('\/:id',\s*optionalAuth,\s*rejectEditorialPostMutation/u);
+  assert.match(
+    route,
+    /router\.put\('\/:id',\s*rejectQuarantinedPostAccess,\s*rejectEditorialPostMutation/u,
+  );
+  assert.match(
+    route,
+    /router\.delete\('\/:id',\s*optionalAuth,\s*rejectQuarantinedPostAccess,\s*rejectEditorialPostMutation/u,
+  );
 });

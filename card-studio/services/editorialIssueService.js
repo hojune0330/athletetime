@@ -101,6 +101,10 @@ class EditorialIssueService {
     return this.repository.listPublishJobWarnings(query);
   }
 
+  listPublishJobs(query = {}) {
+    return this.repository.listPublishJobs(query);
+  }
+
   retryPublish(input) {
     return this.repository.retryPublishJob({
       ...input,

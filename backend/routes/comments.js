@@ -9,6 +9,12 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { broadcastToClients } = require('../utils/websocket');
+const {
+  rejectQuarantinedPostAccess,
+  requestDatabase,
+} = require('../middleware/quarantinedPostBoundary');
+
+router.use(rejectQuarantinedPostAccess);
 
 /**
  * POST /api/posts/:postId/comments
@@ -46,13 +52,13 @@ router.post('/', async (req, res) => {
     }
     
     // 사용자 확인/생성
-    let userResult = await req.app.locals.pool.query(
+    let userResult = await requestDatabase(req).query(
       'SELECT id FROM users WHERE anonymous_id = $1',
       [anonymousId]
     );
     
     if (userResult.rows.length === 0) {
-      userResult = await req.app.locals.pool.query(
+      userResult = await requestDatabase(req).query(
         'INSERT INTO users (anonymous_id, username) VALUES ($1, $2) RETURNING id',
         [anonymousId, author]
       );
@@ -61,7 +67,7 @@ router.post('/', async (req, res) => {
     const userId = userResult.rows[0].id;
     
     // 댓글 작성
-    await req.app.locals.pool.query(`
+    await requestDatabase(req).query(`
       INSERT INTO comments (
         post_id, 
         user_id, 
@@ -74,7 +80,7 @@ router.post('/', async (req, res) => {
     // DB 트리거(posts_comments_count_trigger)가 자동으로 comments_count 증가 처리
     
     // 전체 게시글 정보 조회 (댓글 포함)
-    const postResult = await req.app.locals.pool.query(`
+    const postResult = await requestDatabase(req).query(`
       SELECT 
         p.id,
         p.title,

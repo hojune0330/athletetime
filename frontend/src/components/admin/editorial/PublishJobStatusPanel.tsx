@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import type { EditorialIssue, EditorialPublishJobWarning } from '../../../api/editorialAdmin';
+import type { EditorialIssue, EditorialPublishJob } from '../../../api/editorialAdmin';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { formatKst } from './editorialLabels';
 
-type PublishJobWarningsPanelProps = {
+type PublishJobStatusPanelProps = {
   readonly issue: EditorialIssue | null;
-  readonly warning: EditorialPublishJobWarning | null;
+  readonly job: EditorialPublishJob | null;
   readonly busy: boolean;
   readonly onRetry: (localKstDateTime: string, note: string) => Promise<void>;
 };
 
-function statusLabel(status: EditorialPublishJobWarning['status']): string {
+function statusLabel(status: EditorialPublishJob['status']): string {
   switch (status) {
     case 'retrying':
       return '재시도 중';
@@ -26,31 +26,38 @@ function statusLabel(status: EditorialPublishJobWarning['status']): string {
   }
 }
 
-export function PublishJobWarningsPanel({
+export function PublishJobStatusPanel({
   issue,
-  warning,
+  job,
   busy,
   onRetry,
-}: PublishJobWarningsPanelProps) {
+}: PublishJobStatusPanelProps) {
   const [scheduledFor, setScheduledFor] = useState('');
   const [note, setNote] = useState('');
 
-  if (!issue || !warning) return null;
+  if (!issue || !job) return null;
 
-  const retryAvailable = warning.status === 'failed';
+  const retryAvailable = job.status === 'failed';
+  const needsAttention = job.status === 'failed' || job.status === 'retrying';
   return (
-    <section className="border border-warn/30 bg-warn/5 p-4">
-      <p className="t-mono-xs text-warn">PUBLISH WARNING</p>
-      <h2 className="mt-1 text-body font-semibold text-ink">발행 작업 확인</h2>
-      <dl className="mt-3 grid gap-2 text-body-sm">
-        <JobRow label="상태" value={statusLabel(warning.status)} />
-        <JobRow label="시도 횟수" value={String(warning.attemptCount)} />
-        <JobRow label="다음 시도" value={formatKst(warning.nextAttemptAt)} />
-        <JobRow label="문제 코드" value={warning.errorCode ?? '확인할 코드 없음'} />
-      </dl>
-      <p className="mt-3 text-caption leading-5 text-ink-3">
-        상세 오류와 시스템 식별값은 이 화면에 표시하지 않습니다.
+    <section className={needsAttention
+      ? 'border border-warn/30 bg-warn/5 p-4'
+      : 'border border-line bg-surface p-4'}>
+      <p className={needsAttention ? 't-mono-xs text-warn' : 't-mono-xs text-ink-4'}>
+        PUBLISH STATUS
       </p>
+      <h2 className="mt-1 text-body font-semibold text-ink">발행 작업 상태</h2>
+      <dl className="mt-3 grid gap-2 text-body-sm">
+        <JobRow label="상태" value={statusLabel(job.status)} />
+        <JobRow label="시도 횟수" value={String(job.attemptCount)} />
+        <JobRow label="다음 시도" value={formatKst(job.nextAttemptAt)} />
+        <JobRow label="문제 코드" value={job.errorCode ?? '확인할 코드 없음'} />
+      </dl>
+      {needsAttention && (
+        <p className="mt-3 text-caption leading-5 text-ink-3">
+          상세 오류와 시스템 식별값은 이 화면에 표시하지 않습니다.
+        </p>
+      )}
       {retryAvailable && (
         <div className="mt-4 border-t border-warn/25 pt-4">
           <label className="block text-caption font-semibold text-ink-2">

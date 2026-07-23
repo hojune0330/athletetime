@@ -64,7 +64,7 @@ async function request(baseUrl, method, pathname, body, headers = {}) {
     headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...headers },
     body: body ? JSON.stringify(body) : undefined,
   });
-  return { status: response.status, body: await response.json() };
+  return { status: response.status, headers: response.headers, body: await response.json() };
 }
 
 test('EDITORIAL-API-PG-001: HTTP workflow is versioned, audited, and published once', {
@@ -258,4 +258,84 @@ test('EDITORIAL-API-PG-002: reject and cancel are calendar outcomes, not invente
     [second.id],
   );
   assert.deepEqual(events.rows, [{ event_type: 'rejected', note: '출처 보완 필요' }]);
+});
+
+test('EDITORIAL-API-PG-004: unpublishing removes an issue from every public read path without stale cache', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available',
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t, 'editorial_unpublish');
+  await createExistingFixture(pool);
+  await applyEditorialMigrations(pool);
+  const service = new EditorialIssueService(new PostgresEditorialRepository(pool), {
+    resolveHostname: TEST_RESOLVER,
+  });
+  const api = await startApi(service);
+  t.after(api.close);
+  const headers = { 'X-Test-Role': 'admin' };
+
+  const created = await request(
+    api.baseUrl, 'POST', '/api/admin/editorial/issues', issueBody(9), headers,
+  );
+  const issueId = created.body.issue.id;
+  const slug = created.body.issue.slug;
+  const source = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${issueId}/sources`,
+    {
+      expectedVersion: 1,
+      sourceUrl: 'https://example.com/unpublish-source',
+      sourceKind: 'official',
+      title: 'Official result',
+    },
+    headers,
+  );
+  const checked = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${issueId}/check`,
+    { expectedVersion: source.body.source.issueVersion },
+    headers,
+  );
+  const approved = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${issueId}/approve`,
+    { expectedVersion: checked.body.issue.version },
+    headers,
+  );
+  const published = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${issueId}/publish`,
+    { expectedVersion: approved.body.issue.version },
+    headers,
+  );
+  const postId = published.body.issue.postId;
+
+  assert.equal((await request(api.baseUrl, 'GET', `/api/editorial/magazine/${slug}`)).status, 200);
+  assert.equal(
+    (await request(api.baseUrl, 'GET', `/api/editorial/magazine/by-post/${postId}`)).status,
+    200,
+  );
+
+  const unpublished = await request(
+    api.baseUrl,
+    'POST',
+    `/api/admin/editorial/issues/${issueId}/unpublish`,
+    { expectedVersion: published.body.issue.version },
+    headers,
+  );
+  assert.equal(unpublished.status, 200);
+  assert.equal(unpublished.body.issue.status, 'unpublished');
+
+  const list = await request(api.baseUrl, 'GET', '/api/editorial/magazine');
+  const detail = await request(api.baseUrl, 'GET', `/api/editorial/magazine/${slug}`);
+  const byPost = await request(api.baseUrl, 'GET', `/api/editorial/magazine/by-post/${postId}`);
+  assert.equal(list.body.issues.length, 0);
+  assert.equal(detail.status, 404);
+  assert.equal(byPost.status, 404);
+  assert.equal(detail.headers.get('cache-control'), 'no-store');
+  assert.equal(byPost.headers.get('cache-control'), 'no-store');
 });
