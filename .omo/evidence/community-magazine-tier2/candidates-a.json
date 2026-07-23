@@ -1,0 +1,19 @@
+{
+  "mode": "dry-run",
+  "generatedAt": "2026-07-22T13:42:21.649Z",
+  "databaseChecksum": "07ce90108b9d8206d1135ff86e9262cfc514872dad8cceb4c8f6094ae0569607",
+  "candidates": [
+    {
+      "postId": 101,
+      "seedId": "qa-editorial-fixture",
+      "author": "QA Bot",
+      "createdAt": "2026-07-21T00:00:00.000Z",
+      "title": "QA fixture post",
+      "bodySummary": "Disposable candidate used only for the Tier B dry-run check.",
+      "views": 3,
+      "comments": 0,
+      "stateChecksum": "11e832636325c68bae83e084bcbc1a04fe901a1ff77ab2910daab8d580806935"
+    }
+  ],
+  "reportChecksum": "f89e38924353bd081126f85b78253b165ae7e2c3b8cf98a2751dac382ef06d87"
+}

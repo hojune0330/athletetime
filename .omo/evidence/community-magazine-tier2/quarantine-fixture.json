@@ -1,0 +1,39 @@
+{
+  "posts": [
+    {
+      "id": 101,
+      "seedId": "qa-editorial-fixture",
+      "author": "QA Bot",
+      "createdAt": "2026-07-21T00:00:00.000Z",
+      "title": "QA fixture post",
+      "content": "Disposable candidate used only for the Tier B dry-run check.",
+      "views": 3,
+      "commentsCount": 0,
+      "likesCount": 0,
+      "dislikesCount": 0,
+      "reportsCount": 0,
+      "comments": []
+    },
+    {
+      "id": 102,
+      "seedId": "runner-recap",
+      "author": "Runner",
+      "createdAt": "2026-07-21T00:05:00.000Z",
+      "title": "대회 후기",
+      "content": "Ordinary post that must never be selected by the dry run.",
+      "views": 8,
+      "commentsCount": 1,
+      "likesCount": 2,
+      "dislikesCount": 0,
+      "reportsCount": 0,
+      "comments": [
+        {
+          "id": 1001,
+          "author": "Teammate",
+          "content": "Keep this ordinary discussion unchanged."
+        }
+      ]
+    }
+  ],
+  "quarantines": []
+}

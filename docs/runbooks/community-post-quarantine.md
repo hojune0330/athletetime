@@ -67,13 +67,28 @@ For a commented post, create a separate approval such as `.omo/evidence/communit
 ```json
 {
   "approvedPostIds": [104],
-  "actor": "release-manager@example.com",
+  "actor": "00000000-0000-4000-8000-000000000002",
   "approvedAt": "2026-07-17T10:05:00.000Z",
   "reason": "Comment reviewed and explicitly approved for reversible quarantine"
 }
 ```
 
 The normal approval cannot substitute for this separate decision record.
+
+## Evidence checklist for a dry run
+
+Before requesting a production write, keep one reviewable record with the following fields. It is a decision record, not permission to mutate production data.
+
+| Field | Required evidence |
+|---|---|
+| Run mode | `dry-run` and the command exit code |
+| Candidate allowlist | Exact candidate IDs from the unchanged report |
+| Scope | Candidate count and comment count for every selected ID |
+| Integrity | `databaseChecksum` and `reportChecksum` from two identical reports |
+| Operator trail | Generated timestamp and the future operator UUID (only for a later write approval) |
+| Negative checks | Missing approval, missing backup receipt, stale checksum, and commented-post rejection all return nonzero with no mutation |
+
+The committed Tier B fixture is a disposable local-only rehearsal. It contains one QA candidate and one ordinary post with one comment. It is never a production backup, approval, or target list.
 
 ## 4. Quarantine approved IDs
 

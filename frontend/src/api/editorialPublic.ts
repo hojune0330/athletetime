@@ -113,6 +113,13 @@ function parseIssue(value: unknown): MagazineIssue {
   };
 }
 
+function parseIssues(value: unknown): readonly MagazineIssue[] {
+  if (!Array.isArray(value)) {
+    throw new TypeError('Magazine issues are invalid');
+  }
+  return value.map(parseIssue);
+}
+
 export async function getMagazineIssueByPostId(postId: number): Promise<MagazineIssue | null> {
   try {
     const response = await apiClient.get<unknown>(`/api/editorial/magazine/by-post/${postId}`);
@@ -128,8 +135,8 @@ export async function getMagazineIssueByPostId(postId: number): Promise<Magazine
 
 export async function getMagazineIssues(limit = 20): Promise<readonly MagazineIssue[]> {
   const response = await apiClient.get<unknown>('/api/editorial/magazine', { params: { limit } });
-  if (!isObject(response.data) || !Array.isArray(response.data.issues)) {
+  if (!isObject(response.data)) {
     throw new TypeError('Magazine response is invalid');
   }
-  return response.data.issues.map(parseIssue);
+  return parseIssues(response.data.issues);
 }

@@ -254,7 +254,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
 
 ### 2단계: Terra 중간 추론으로 규격화·반복 구현
 
-- [ ] 4. 확정된 공개 타입과 작은 UI를 채운다
+- [x] 4. 확정된 공개 타입과 작은 UI를 채운다
 
   **담당**: GPT-5.6 Terra medium
 
@@ -294,6 +294,8 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
 
 - [ ] 5. scheduler 운영 표면과 반복 테스트를 채운다
 
+  > 2026-07-22 상태: 안전한 `retrying`/`failed` 경고·재예약 표면, 권한/CSRF/버전 충돌 검증, runbook과 반복 fixture는 완료했다. 기존 경고 API가 의도적으로 `queued`/`completed` 이력을 제공하지 않으므로, 전체 작업 원장 조회는 3단계 백엔드 계약 결정 전까지 이 항목에서 분리한다.
+
   **담당**: GPT-5.6 Terra medium
 
   **선행 조건**: 1단계 Task 3의 job schema와 상태 계약이 고정되어 있어야 한다.
@@ -328,7 +330,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
   - `backend/tests/community-editorial-admin-ui.test.js:1`
   - `docs/runbooks/`
 
-- [ ] 6. 격리 dry-run과 페이블 증거 묶음을 만든다
+- [x] 6. 격리 dry-run과 페이블 증거 묶음을 만든다
 
   **담당**: GPT-5.6 Terra medium
 

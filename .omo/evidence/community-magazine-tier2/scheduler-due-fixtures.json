@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Isolated scheduler verification inputs. Never apply to a production database.",
+  "retryBackoff": [
+    { "attempt": 1, "status": "retrying", "delayMinutes": 1 },
+    { "attempt": 2, "status": "retrying", "delayMinutes": 5 },
+    { "attempt": 3, "status": "failed", "delayMinutes": null }
+  ],
+  "dueJobScenarios": [
+    { "name": "due-10", "workerCount": 2, "jobCount": 10, "expectedDuplicatePosts": 0, "expectedLostJobs": 0 },
+    { "name": "due-100", "workerCount": 10, "jobCount": 100, "expectedDuplicatePosts": 0, "expectedLostJobs": 0 }
+  ]
+}

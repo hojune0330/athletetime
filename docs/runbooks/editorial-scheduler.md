@@ -40,6 +40,23 @@ Readiness never includes the configured actor UUID or a raw database/publication
 
 Job error storage is a fixed safe code, never an exception message, token, SQL text, or request data.
 
+## Administrator warning surface
+
+- The warning endpoint returns only `retrying` and `failed` jobs.
+- The screen shows status, attempt count, next attempt time, and a safe error code only. It never shows raw errors, account identifiers, or tokens.
+- A failed job is re-scheduled only while its issue is open. The screen sends the current issue version as `expectedVersion`, so a concurrent edit receives 409 instead of overwriting work.
+- Queued and completed job history is deliberately absent from this endpoint. Showing it requires a Step 3 backend-contract decision; the screen must not infer it.
+
+## Repeatable verification fixtures
+
+`.omo/evidence/community-magazine-tier2/scheduler-due-fixtures.json` is for isolated checks, never a production database.
+
+- `retryBackoff` records the fixed 1-minute, 5-minute, then failed sequence.
+- `due-10` checks 10 due jobs with 2 workers.
+- `due-100` checks 100 due jobs with 10 workers.
+
+For each run, compare issue-level publish audit counts with duplicate and lost post counts before accepting the result.
+
 ## Incident response
 
 1. Set `EDITORIAL_SCHEDULER_ENABLED=false` and restart instances to stop new claims.

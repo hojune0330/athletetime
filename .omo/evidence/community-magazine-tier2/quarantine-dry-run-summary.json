@@ -1,0 +1,15 @@
+{
+  "candidateIds": [
+    101
+  ],
+  "candidateCount": 1,
+  "candidateComments": [
+    {
+      "postId": 101,
+      "comments": 0
+    }
+  ],
+  "databaseChecksum": "07ce90108b9d8206d1135ff86e9262cfc514872dad8cceb4c8f6094ae0569607",
+  "deterministicCandidateIds": true,
+  "deterministicDatabaseChecksum": true
+}
