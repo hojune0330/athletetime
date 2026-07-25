@@ -254,7 +254,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
 
 ### 2단계: Terra 중간 추론으로 규격화·반복 구현
 
-- [ ] 4. 확정된 공개 타입과 작은 UI를 채운다
+- [x] 4. 확정된 공개 타입과 작은 UI를 채운다
 
   **담당**: GPT-5.6 Terra medium
 
@@ -292,7 +292,9 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
   - `frontend/src/pages/PostDetailPage.tsx:686`
   - `frontend/src/components/editorial/` - 이 작업에서 신규 생성하는 표현 전용 디렉터리
 
-- [ ] 5. scheduler 운영 표면과 반복 테스트를 채운다
+- [x] 5. scheduler 운영 표면과 반복 테스트를 채운다
+
+  > 2026-07-23 완료: 관리자 전용 안전 원장 API와 UI를 추가해 `queued`/`retrying`/`failed`/`completed`를 모두 표시한다. raw error, actor UUID, 토큰은 응답과 화면에서 제외했고 기존 경고·재예약 계약도 유지했다.
 
   **담당**: GPT-5.6 Terra medium
 
@@ -328,7 +330,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
   - `backend/tests/community-editorial-admin-ui.test.js:1`
   - `docs/runbooks/`
 
-- [ ] 6. 격리 dry-run과 페이블 증거 묶음을 만든다
+- [x] 6. 격리 dry-run과 페이블 증거 묶음을 만든다
 
   **담당**: GPT-5.6 Terra medium
 
@@ -370,7 +372,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
 
 ### 3단계: 예외 사항 최고 추론·독립 검증
 
-- [ ] 7. 공개 정보와 일반 게시글 회귀를 독립 검증한다
+- [x] 7. 공개 정보와 일반 게시글 회귀를 독립 검증한다
 
   **담당**: GPT-5.6 Sol max + 별도 보안/QA 리뷰어
 
@@ -392,7 +394,7 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
   - 독립 리뷰 finding이 0이거나 모든 finding이 해결되고 재검증된다.
   - 공개 응답 snapshot에 금지 필드가 하나도 없다.
 
-- [ ] 8. scheduler 경쟁·장애·복구를 독립 검증한다
+- [x] 8. scheduler 경쟁·장애·복구를 독립 검증한다
 
   **담당**: GPT-5.6 Sol max + 독립 ultrawork reviewer
 
@@ -423,6 +425,8 @@ Terra 작업 중 아래 중 하나가 나오면 즉시 중단하고 3단계로 �
   ```
 
 - [ ] 9. 운영 clone 복원 리허설 후 페이블 승인 패키지를 닫는다
+
+  > 2026-07-23 상태: disposable clone의 격리·복원, 공개 차단, checksum 왕복, 실패 시 무변경은 완료했다. 승인된 운영 백업·receipt·ID allowlist가 없어 운영 백업 clone 실행만 fail-closed 상태로 남겼다. 운영 DB write와 scheduler 활성화는 각각 0건이다.
 
   **담당**: GPT-5.6 Sol max, 최종 판단은 페이블
 

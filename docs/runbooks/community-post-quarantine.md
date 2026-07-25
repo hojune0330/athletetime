@@ -1,6 +1,6 @@
 # Community post quarantine runbook
 
-This tool reports possible QA/test community posts and records only human-approved IDs in `post_quarantines`. It never deletes posts, rewrites post or comment data, or mutates from a regular-expression match. Public-route filtering is intentionally outside this task.
+This tool reports possible QA/test community posts and records only human-approved IDs in `post_quarantines`. It never deletes posts, rewrites post or comment data, or mutates from a regular-expression match. An active quarantine is also a public visibility boundary: the post is excluded from the list and count, while direct detail, comment, vote, and poll routes return 404. Releasing the quarantine restores normal public access.
 
 ## Safety contract
 
@@ -13,6 +13,45 @@ This tool reports possible QA/test community posts and records only human-approv
 - Every CLI path must remain below the repository root. The command times out after 15 seconds by default and rolls back when interrupted before commit.
 
 Task 2's migration must be applied first. The tool writes its exact contract: UUID `id`, `post_id`, `status`, `reason_code`, `reason_detail`, `quarantined_by`, `quarantined_at`, `released_by`, and `released_at`. Post/comment state remains in the original tables and is protected by the report checksum; quarantine never copies then rewrites that state.
+
+## Deployment order
+
+The public posts routes query `post_quarantines` directly. Deploying the application
+before the migration can make the public posts API fail.
+
+1. Create an operating database backup and its SHA-256 receipt.
+2. Restore and verify that backup in an isolated clone.
+3. Apply and verify database migrations 006 through 010.
+4. Confirm the `post_quarantines` table and its indexes exist.
+5. Deploy the application.
+6. Smoke-test the post list, count, detail, comments, votes, and polls.
+7. Keep the editorial scheduler flag off unless it has a separate approval.
+
+Stop the rollout if restore fails, the checksum changes unexpectedly, the migration is
+missing, an ordinary post disappears, or a quarantined post remains publicly reachable.
+
+## Public visibility contract
+
+- The public post list and its total count exclude rows with an active quarantine.
+- List responses use `Cache-Control: no-store` so a released or newly quarantined row
+  cannot remain in an intermediary cache.
+- Direct detail access returns the same 404 shape as a missing post.
+- Comment, vote, and poll routes return 404 before they can mutate state.
+- Reversible 404 responses use `Cache-Control: no-store`.
+- A rejected detail request does not increment the view count.
+- A released or never-quarantined post continues through the existing routes.
+- Quarantine metadata, operator identifiers, and reasons are never exposed by public
+  post responses.
+- Public requests take a shared session advisory lock while CLI quarantine/restore takes
+  the matching transaction-scoped exclusive lock. The list uses a global quarantine
+  lock; detail, comment, vote, and poll requests use that global lock plus the canonical
+  post lock. A quarantine commit therefore cannot slip between either a list query or a
+  post boundary check and its downstream read or mutation.
+- A guarded handler reuses the same checked-out database client that owns its shared
+  locks. It must not borrow a second pool connection; the 20-request saturation
+  regression matches the production pool size and prevents connection-pool deadlock.
+- Route IDs are canonicalized as positive bigint strings before lock acquisition, so
+  paths such as `01` cannot use a different lock key from database post `1`.
 
 ## 1. Produce a candidate report
 
@@ -67,13 +106,28 @@ For a commented post, create a separate approval such as `.omo/evidence/communit
 ```json
 {
   "approvedPostIds": [104],
-  "actor": "release-manager@example.com",
+  "actor": "00000000-0000-4000-8000-000000000002",
   "approvedAt": "2026-07-17T10:05:00.000Z",
   "reason": "Comment reviewed and explicitly approved for reversible quarantine"
 }
 ```
 
 The normal approval cannot substitute for this separate decision record.
+
+## Evidence checklist for a dry run
+
+Before requesting a production write, keep one reviewable record with the following fields. It is a decision record, not permission to mutate production data.
+
+| Field | Required evidence |
+|---|---|
+| Run mode | `dry-run` and the command exit code |
+| Candidate allowlist | Exact candidate IDs from the unchanged report |
+| Scope | Candidate count and comment count for every selected ID |
+| Integrity | `databaseChecksum` and `reportChecksum` from two identical reports |
+| Operator trail | Generated timestamp and the future operator UUID (only for a later write approval) |
+| Negative checks | Missing approval, missing backup receipt, stale checksum, and commented-post rejection all return nonzero with no mutation |
+
+The committed Tier B fixture is a disposable local-only rehearsal. It contains one QA candidate and one ordinary post with one comment. It is never a production backup, approval, or target list.
 
 ## 4. Quarantine approved IDs
 

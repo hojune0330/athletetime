@@ -15,7 +15,14 @@
 
 const express = require('express');
 const { rejectEditorialPostMutation } = require('../middleware/editorialPostBoundary');
+const {
+  checkoutRequestClient,
+  rejectQuarantinedPostAccess,
+  requestDatabase,
+} = require('../middleware/quarantinedPostBoundary');
 const router = express.Router({ mergeParams: true }); // postId를 상위 라우터에서 받음
+
+router.use(rejectQuarantinedPostAccess);
 
 /**
  * POST /api/posts/:postId/poll/vote
@@ -50,7 +57,7 @@ router.post('/vote', rejectEditorialPostMutation, async (req, res) => {
     }
 
     // 게시글 및 Poll 존재 확인
-    const postCheck = await req.app.locals.pool.query(
+    const postCheck = await requestDatabase(req).query(
       'SELECT poll FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [postId]
     );
@@ -103,7 +110,7 @@ router.post('/vote', rejectEditorialPostMutation, async (req, res) => {
     }
 
     // PostgreSQL 함수 호출: vote_poll()
-    const result = await req.app.locals.pool.query(
+    const result = await requestDatabase(req).query(
       'SELECT vote_poll($1, $2, $3) as updated_poll',
       [postId, user_id, option_ids]
     );
@@ -146,7 +153,7 @@ router.post('/vote', rejectEditorialPostMutation, async (req, res) => {
  * }
  */
 router.delete('/vote', rejectEditorialPostMutation, async (req, res) => {
-  const client = await req.app.locals.pool.connect();
+  const { client, release } = await checkoutRequestClient(req);
 
   try {
     const { postId } = req.params;
@@ -259,7 +266,7 @@ router.delete('/vote', rejectEditorialPostMutation, async (req, res) => {
       error: '투표 취소 중 오류가 발생했습니다.'
     });
   } finally {
-    client.release();
+    release();
   }
 });
 
@@ -288,7 +295,7 @@ router.get('/results', async (req, res) => {
     const { postId } = req.params;
 
     // 게시글 및 Poll 존재 확인
-    const postCheck = await req.app.locals.pool.query(
+    const postCheck = await requestDatabase(req).query(
       'SELECT poll FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [postId]
     );
@@ -310,7 +317,7 @@ router.get('/results', async (req, res) => {
     }
 
     // PostgreSQL 함수 호출: get_poll_results()
-    const result = await req.app.locals.pool.query(
+    const result = await requestDatabase(req).query(
       'SELECT * FROM get_poll_results($1)',
       [postId]
     );
@@ -349,7 +356,7 @@ router.get('/', async (req, res) => {
   try {
     const { postId } = req.params;
 
-    const result = await req.app.locals.pool.query(
+    const result = await requestDatabase(req).query(
       'SELECT poll FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [postId]
     );

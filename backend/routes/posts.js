@@ -16,13 +16,18 @@ const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { rejectEditorialPostMutation } = require('../middleware/editorialPostBoundary');
+const {
+  holdPostListQuarantineBoundary,
+  rejectQuarantinedPostAccess,
+  requestDatabase,
+} = require('../middleware/quarantinedPostBoundary');
 const { applyEditorialVoteVisibility, requestTime } = require('./postVoteVisibility');
 
 /**
  * GET /api/posts
  * 게시글 목록 조회
  */
-router.get('/', async (req, res) => {
+router.get('/', holdPostListQuarantineBoundary, async (req, res) => {
   try {
     const { 
       category, 
@@ -95,6 +100,10 @@ router.get('/', async (req, res) => {
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.deleted_at IS NULL 
         AND p.is_blinded = FALSE
+        AND NOT EXISTS (
+          SELECT 1 FROM post_quarantines q
+          WHERE q.post_id = p.id AND q.status = 'active'
+        )
     `;
     
     const params = [];
@@ -152,6 +161,10 @@ router.get('/', async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.deleted_at IS NULL 
         AND p.is_blinded = FALSE
+        AND NOT EXISTS (
+          SELECT 1 FROM post_quarantines q
+          WHERE q.post_id = p.id AND q.status = 'active'
+        )
     `;
     const countParams = [];
     if (category) {
@@ -161,8 +174,8 @@ router.get('/', async (req, res) => {
     
     // 실행
     const [postsResult, countResult] = await Promise.all([
-      req.app.locals.pool.query(query, params),
-      req.app.locals.pool.query(countQuery, countParams)
+      requestDatabase(req).query(query, params),
+      requestDatabase(req).query(countQuery, countParams)
     ]);
     
     res.json({
@@ -190,19 +203,19 @@ router.get('/', async (req, res) => {
  * GET /api/posts/:id
  * 게시글 상세 조회 (조회수 자동 증가)
  */
-router.get('/:id', async (req, res) => {
+router.get('/:id', rejectQuarantinedPostAccess, async (req, res) => {
   try {
     const { id } = req.params;
     
     // 조회수 증가
-    await req.app.locals.pool.query(
+    await requestDatabase(req).query(
       'UPDATE posts SET views = views + 1 WHERE id = $1',
       [id]
     );
     
     // 게시글 상세 조회 (이미지, 댓글 포함)
     // '자유' 카테고리는 null로 반환
-    const result = await req.app.locals.pool.query(`
+    const result = await requestDatabase(req).query(`
       SELECT 
         p.id,
         p.title,
@@ -528,7 +541,7 @@ router.post('/', optionalAuth, async (req, res) => {
  * 
  * Body: { password: string }
  */
-router.post('/:id/verify-password', async (req, res) => {
+router.post('/:id/verify-password', rejectQuarantinedPostAccess, async (req, res) => {
   try {
     const { id } = req.params;
     const { password } = req.body;
@@ -542,7 +555,7 @@ router.post('/:id/verify-password', async (req, res) => {
     }
     
     // 게시글 조회
-    const result = await req.app.locals.pool.query(
+    const result = await requestDatabase(req).query(
       'SELECT password_hash FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
@@ -594,7 +607,7 @@ router.post('/:id/verify-password', async (req, res) => {
  * 
  * Body: { title, content, category, password }
  */
-router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
+router.put('/:id', rejectQuarantinedPostAccess, rejectEditorialPostMutation, async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, category, password } = req.body;
@@ -630,7 +643,7 @@ router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
     }
     
     // 게시글 조회
-    const postResult = await req.app.locals.pool.query(
+    const postResult = await requestDatabase(req).query(
       'SELECT password_hash, category_id FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
@@ -663,7 +676,7 @@ router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
     // 카테고리 ID 조회 (변경된 경우)
     let categoryId = postResult.rows[0].category_id;
     if (category) {
-      const categoryResult = await req.app.locals.pool.query(
+      const categoryResult = await requestDatabase(req).query(
         'SELECT id FROM categories WHERE name = $1',
         [category]
       );
@@ -674,7 +687,7 @@ router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
     }
     
     // 게시글 수정
-    const updateResult = await req.app.locals.pool.query(`
+    const updateResult = await requestDatabase(req).query(`
       UPDATE posts 
       SET title = $1, content = $2, category_id = $3, updated_at = NOW()
       WHERE id = $4
@@ -682,7 +695,7 @@ router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
     `, [title, content, categoryId, id]);
     
     // 수정된 게시글 상세 조회 (이미지, 댓글 포함)
-    const result = await req.app.locals.pool.query(`
+    const result = await requestDatabase(req).query(`
       SELECT 
         p.id,
         p.title,
@@ -767,14 +780,14 @@ router.put('/:id', rejectEditorialPostMutation, async (req, res) => {
  * 일반 사용자: { password: string }
  * 관리자: { deleteReason: string } (비밀번호 불필요)
  */
-router.delete('/:id', optionalAuth, rejectEditorialPostMutation, async (req, res) => {
+router.delete('/:id', optionalAuth, rejectQuarantinedPostAccess, rejectEditorialPostMutation, async (req, res) => {
   try {
     const { id } = req.params;
     const { password, deleteReason } = req.body;
     const isAdmin = req.user && req.user.isAdmin;
     
     // 게시글 조회
-    const result = await req.app.locals.pool.query(
+    const result = await requestDatabase(req).query(
       'SELECT password_hash, title, author FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
@@ -797,7 +810,7 @@ router.delete('/:id', optionalAuth, rejectEditorialPostMutation, async (req, res
       }
       
       // Soft delete + 삭제 사유 기록
-      await req.app.locals.pool.query(
+      await requestDatabase(req).query(
         'UPDATE posts SET deleted_at = NOW(), blind_reason = $1 WHERE id = $2',
         [deleteReason.trim(), id]
       );
@@ -840,7 +853,7 @@ router.delete('/:id', optionalAuth, rejectEditorialPostMutation, async (req, res
     }
     
     // Soft delete
-    await req.app.locals.pool.query(
+    await requestDatabase(req).query(
       'UPDATE posts SET deleted_at = NOW() WHERE id = $1',
       [id]
     );
@@ -867,7 +880,11 @@ router.delete('/:id', optionalAuth, rejectEditorialPostMutation, async (req, res
  * 
  * Body: { optionId: number, visitorId: string }
  */
-router.post('/:id/poll/vote', rejectEditorialPostMutation, async (req, res) => {
+router.post(
+  '/:id/poll/vote',
+  rejectQuarantinedPostAccess,
+  rejectEditorialPostMutation,
+  async (req, res) => {
   try {
     const { id } = req.params;
     const { optionId, visitorId } = req.body;
@@ -880,7 +897,7 @@ router.post('/:id/poll/vote', rejectEditorialPostMutation, async (req, res) => {
     }
     
     // 게시글 및 투표 조회
-    const postResult = await req.app.locals.pool.query(
+    const postResult = await requestDatabase(req).query(
       'SELECT poll FROM posts WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
@@ -926,7 +943,7 @@ router.post('/:id/poll/vote', rejectEditorialPostMutation, async (req, res) => {
     poll.voters.push(visitorId);
     
     // DB 업데이트
-    await req.app.locals.pool.query(
+    await requestDatabase(req).query(
       'UPDATE posts SET poll = $1 WHERE id = $2',
       [JSON.stringify(poll), id]
     );
@@ -946,6 +963,7 @@ router.post('/:id/poll/vote', rejectEditorialPostMutation, async (req, res) => {
       error: '투표 처리 중 오류가 발생했습니다.'
     });
   }
-});
+  },
+);
 
 module.exports = router;

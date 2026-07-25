@@ -13,7 +13,9 @@ import {
   getEditorialIssue,
   listEditorialCalendar,
   listEditorialIssues,
+  listEditorialPublishJobs,
   listEditorialRevisions,
+  retryEditorialPublish,
   reviseEditorialIssue,
   runEditorialAction,
   scheduleEditorialIssue,
@@ -22,6 +24,7 @@ import {
   type EditorialCalendarInput,
   type EditorialDraftInput,
   type EditorialIssue,
+  type EditorialPublishJob,
   type EditorialRevision,
   type EditorialSourceInput,
 } from '../../api/editorialAdmin';
@@ -30,6 +33,7 @@ import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { CalendarComposer } from '../../components/admin/editorial/CalendarComposer';
 import { EditorialQueue } from '../../components/admin/editorial/EditorialQueue';
 import { IssueEditorPanel } from '../../components/admin/editorial/IssueEditorPanel';
+import { PublishJobStatusPanel } from '../../components/admin/editorial/PublishJobStatusPanel';
 import { RevisionHistory } from '../../components/admin/editorial/RevisionHistory';
 import { SourceChecklist } from '../../components/admin/editorial/SourceChecklist';
 import {
@@ -51,6 +55,7 @@ export default function AdminIssueEditorPage() {
   const [activeTab, setActiveTab] = useState<WorkflowTab>('candidate');
   const [calendar, setCalendar] = useState<readonly EditorialCalendarEntry[]>([]);
   const [issues, setIssues] = useState<readonly EditorialIssue[]>([]);
+  const [publishJobs, setPublishJobs] = useState<readonly EditorialPublishJob[]>([]);
   const [revisions, setRevisions] = useState<readonly EditorialRevision[]>([]);
   const [selectedCalendar, setSelectedCalendar] = useState<EditorialCalendarEntry | null>(null);
   const [selectedIssue, setSelectedIssue] = useState<EditorialIssue | null>(null);
@@ -63,12 +68,14 @@ export default function AdminIssueEditorPage() {
     setLoading(true);
     setError('');
     try {
-      const [nextCalendar, nextIssues] = await Promise.all([
+      const [nextCalendar, nextIssues, nextPublishJobs] = await Promise.all([
         listEditorialCalendar(),
         listEditorialIssues(),
+        listEditorialPublishJobs(),
       ]);
       setCalendar(nextCalendar);
       setIssues(nextIssues);
+      setPublishJobs(nextPublishJobs);
       if (selectedIssue) {
         const refreshed = nextIssues.find((issue) => issue.id === selectedIssue.id) ?? null;
         setSelectedIssue(refreshed);
@@ -114,17 +121,19 @@ export default function AdminIssueEditorPage() {
   }
 
   async function refreshSelected(issueId: string, message: string): Promise<void> {
-    const [detail, nextCalendar, nextIssues, nextRevisions] = await Promise.all([
+    const [detail, nextCalendar, nextIssues, nextRevisions, nextPublishJobs] = await Promise.all([
       getEditorialIssue(issueId),
       listEditorialCalendar(),
       listEditorialIssues(),
       listEditorialRevisions(issueId),
+      listEditorialPublishJobs(),
     ]);
     setSelectedIssue(detail);
     setSelectedCalendar(null);
     setCalendar(nextCalendar);
     setIssues(nextIssues);
     setRevisions(nextRevisions);
+    setPublishJobs(nextPublishJobs);
     setNotice(message);
   }
 
@@ -221,10 +230,21 @@ export default function AdminIssueEditorPage() {
     });
   }
 
+  async function handleRetryPublish(localKstDateTime: string, note: string): Promise<void> {
+    if (!selectedIssue) return;
+    await perform('발행 재예약', async () => {
+      await retryEditorialPublish(selectedIssue, localKstDateTime, note);
+      await refreshSelected(selectedIssue.id, '발행 작업을 다시 예약했습니다.');
+    });
+  }
+
   const candidateItems = activeTab === 'candidate'
     ? calendar.filter((entry) => entry.state === 'planned' || entry.state === 'skipped')
     : [];
   const issueItems = issues.filter((issue) => issueMatchesTab(issue, activeTab));
+  const selectedPublishJob = selectedIssue
+    ? publishJobs.find((job) => job.issueId === selectedIssue.id) ?? null
+    : null;
 
   return (
     <div className="mx-auto max-w-[1600px] space-y-5">
@@ -317,6 +337,12 @@ export default function AdminIssueEditorPage() {
           {selectedIssue ? (
             <>
               <SourceChecklist issue={selectedIssue} busy={busy} onAdd={handleSourceAdd} onDelete={handleSourceDelete} />
+              <PublishJobStatusPanel
+                issue={selectedIssue}
+                job={selectedPublishJob}
+                busy={busy}
+                onRetry={handleRetryPublish}
+              />
               <RevisionHistory revisions={revisions} />
             </>
           ) : (

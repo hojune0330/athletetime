@@ -32,16 +32,32 @@ export function PostActions({
 }: PostActionsProps) {
   const handleShare = async () => {
     const url = window.location.href;
+
+    const copyLink = async () => {
+      if (!navigator.clipboard?.writeText) {
+        showPostToast('링크를 복사하지 못했어요. 주소창에서 직접 복사해 주세요.');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        showPostToast('링크가 복사되었어요.');
+      } catch {
+        showPostToast('링크를 복사하지 못했어요. 주소창에서 직접 복사해 주세요.');
+      }
+    };
+
     if (navigator.share) {
       try {
-        await navigator.share({ url });
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === 'AbortError')) throw error;
+        await navigator.share({ title: document.title, url });
+        showPostToast('공유할 앱을 열었어요.');
+        return;
+      } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
       }
-      return;
     }
-    await navigator.clipboard.writeText(url);
-    showPostToast('링크가 복사되었습니다!');
+
+    await copyLink();
   };
 
   const isLiked = myVote === 'like';

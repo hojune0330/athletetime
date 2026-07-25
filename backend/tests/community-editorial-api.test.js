@@ -172,6 +172,22 @@ test('EDITORIAL-SCHEDULER-ADMIN-001: failed publication is visible and retry is 
   assert.equal(service.calls.at(-1)[1].actorUserId, ACTOR_ID);
 });
 
+test('EDITORIAL-SCHEDULER-ADMIN-003: admin ledger exposes every safe publish state without private fields', async (t) => {
+  const api = await startApi(createFakeService());
+  t.after(api.close);
+
+  const response = await request(api.baseUrl, 'GET', '/api/admin/editorial/publish-jobs', {
+    headers: { 'X-Test-Role': 'admin' },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.deepEqual(response.body.jobs.map((job) => job.status), [
+    'queued', 'retrying', 'failed', 'completed',
+  ]);
+  assert.doesNotMatch(JSON.stringify(response.body), /password|rawError|actorUserId/iu);
+});
+
 test('EDITORIAL-SCHEDULER-ADMIN-002: retry requires a reason before repository access', () => {
   let calls = 0;
   const service = new EditorialIssueService({

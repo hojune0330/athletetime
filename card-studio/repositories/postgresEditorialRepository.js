@@ -6,6 +6,7 @@ const {
 const { publishIssuePost } = require('./editorialPostPublisher');
 const {
   enqueueEditorialPublishJob,
+  listEditorialPublishJobs,
   listEditorialPublishJobWarnings,
   retryEditorialPublishJob,
 } = require('./editorialPublishJobRepository');
@@ -214,6 +215,10 @@ class PostgresEditorialRepository {
 
   async listPublishJobWarnings(query = {}) {
     return listEditorialPublishJobWarnings(this.pool, query);
+  }
+
+  async listPublishJobs(query = {}) {
+    return listEditorialPublishJobs(this.pool, query);
   }
 
   async retryPublishJob(input) {

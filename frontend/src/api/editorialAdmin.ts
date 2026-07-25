@@ -85,6 +85,21 @@ export type EditorialSourceInput = {
   readonly publisher?: string;
 };
 
+const PUBLISH_JOB_STATUSES = ['queued', 'retrying', 'failed', 'completed'] as const;
+
+export type EditorialPublishJobStatus = (typeof PUBLISH_JOB_STATUSES)[number];
+
+export type EditorialPublishJob = {
+  readonly issueId: string;
+  readonly title: string;
+  readonly status: EditorialPublishJobStatus;
+  readonly attemptCount: number;
+  readonly nextAttemptAt: string | null;
+  readonly errorCode: string | null;
+  readonly scheduledFor: string | null;
+  readonly updatedAt: string | null;
+};
+
 export type EditorialCalendarInput = {
   readonly seasonYear: number;
   readonly sectionKey: EditorialSectionKey;
@@ -142,6 +157,28 @@ function parseSection(value: unknown): EditorialSectionKey {
     throw new EditorialApiError('편집 섹션 값이 올바르지 않습니다.');
   }
   return section;
+}
+
+function parsePublishJobStatus(value: unknown): EditorialPublishJobStatus {
+  const status = typeof value === 'string'
+    ? PUBLISH_JOB_STATUSES.find((candidate) => candidate === value)
+    : undefined;
+  if (!status) throw new EditorialApiError('발행 작업 상태 값이 올바르지 않습니다.');
+  return status;
+}
+
+function parsePublishJob(value: unknown): EditorialPublishJob {
+  const job = requiredRecord(value, '발행 작업');
+  return {
+    issueId: requiredString(job.issueId, '원고 ID'),
+    title: requiredString(job.title, '원고 제목'),
+    status: parsePublishJobStatus(job.status),
+    attemptCount: requiredNumber(job.attemptCount, '시도 횟수'),
+    nextAttemptAt: optionalString(job.nextAttemptAt),
+    errorCode: optionalString(job.errorCode),
+    scheduledFor: optionalString(job.scheduledFor),
+    updatedAt: optionalString(job.updatedAt),
+  };
 }
 
 function parseSource(value: unknown): EditorialSource {
@@ -381,6 +418,39 @@ export async function scheduleEditorialIssue(issue: EditorialIssue, localKstDate
       scheduledFor: kstDateTimeToIso(localKstDateTime),
     });
     return parseIssue(responseField(response.data, 'issue'));
+  } catch (error: unknown) {
+    normalizeError(error);
+  }
+}
+
+export async function listEditorialPublishJobs(): Promise<readonly EditorialPublishJob[]> {
+  try {
+    const response = await apiClient.get<unknown>(`${EDITORIAL_ADMIN_BASE}/publish-jobs`);
+    return responseList(response.data, 'jobs').map(parsePublishJob);
+  } catch (error: unknown) {
+    if (!axios.isAxiosError(error) || error.response?.status !== 404) {
+      normalizeError(error);
+    }
+    try {
+      const fallback = await apiClient.get<unknown>(`${EDITORIAL_ADMIN_BASE}/publish-jobs/warnings`);
+      return responseList(fallback.data, 'jobs').map(parsePublishJob);
+    } catch (fallbackError: unknown) {
+      normalizeError(fallbackError);
+    }
+  }
+}
+
+export async function retryEditorialPublish(
+  issue: EditorialIssue,
+  localKstDateTime: string,
+  note: string,
+): Promise<void> {
+  try {
+    await apiClient.post<unknown>(`${EDITORIAL_ADMIN_BASE}/issues/${issue.id}/retry-publish`, {
+      expectedVersion: issue.version,
+      scheduledFor: kstDateTimeToIso(localKstDateTime),
+      note,
+    });
   } catch (error: unknown) {
     normalizeError(error);
   }

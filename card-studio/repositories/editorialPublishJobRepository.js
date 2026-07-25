@@ -29,7 +29,7 @@ async function enqueueEditorialPublishJob(client, input) {
   return result.rows[0];
 }
 
-function publishJobWarningView(row) {
+function publishJobView(row) {
   return {
     issueId: row.issue_id,
     title: row.title,
@@ -54,7 +54,21 @@ async function listEditorialPublishJobWarnings(pool, query = {}) {
     ORDER BY (j.status = 'failed') DESC, j.updated_at DESC, j.id
     LIMIT $1
   `, [limit]);
-  return result.rows.map(publishJobWarningView);
+  return result.rows.map(publishJobView);
+}
+
+async function listEditorialPublishJobs(pool, query = {}) {
+  const requested = Number(query.limit);
+  const limit = Number.isInteger(requested) && requested > 0 ? Math.min(requested, 100) : 100;
+  const result = await pool.query(`
+    SELECT j.issue_id, i.title, j.status, j.attempt_count, j.next_attempt_at,
+           j.last_error_code, i.scheduled_for, j.updated_at
+    FROM editorial_publish_jobs j
+    JOIN editorial_issues i ON i.id = j.issue_id
+    ORDER BY j.updated_at DESC, j.id
+    LIMIT $1
+  `, [limit]);
+  return result.rows.map(publishJobView);
 }
 
 class EditorialPublishJobError extends Error {
@@ -163,6 +177,7 @@ async function retryEditorialPublishJob(pool, input) {
 module.exports = {
   EditorialPublishJobError,
   enqueueEditorialPublishJob,
+  listEditorialPublishJobs,
   listEditorialPublishJobWarnings,
   retryEditorialPublishJob,
 };

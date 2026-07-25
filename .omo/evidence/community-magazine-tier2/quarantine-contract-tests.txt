@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: baseline: candidate reporting is deterministic and report-only
+ok 1 - baseline: candidate reporting is deterministic and report-only
+  ---
+  duration_ms: 4.1775
+  type: 'test'
+  ...
+# Subtest: empty and placeholder posts are reported without treating ordinary posts as candidates
+ok 2 - empty and placeholder posts are reported without treating ordinary posts as candidates
+  ---
+  duration_ms: 3.188
+  type: 'test'
+  ...
+# Subtest: default CLI mode is a report-only dry run
+ok 3 - default CLI mode is a report-only dry run
+  ---
+  duration_ms: 0.2723
+  type: 'test'
+  ...
+# Subtest: write CLI requires an explicit valid actor UUID before database work
+ok 4 - write CLI requires an explicit valid actor UUID before database work
+  ---
+  duration_ms: 0.72
+  type: 'test'
+  ...
+# Subtest: executeMutation rejects an invalid actor before opening a transaction
+ok 5 - executeMutation rejects an invalid actor before opening a transaction
+  ---
+  duration_ms: 1.4477
+  type: 'test'
+  ...
+# Subtest: workspace path policy rejects symlink and junction escapes for every CLI file role
+ok 6 - workspace path policy rejects symlink and junction escapes for every CLI file role
+  ---
+  duration_ms: 7.1766
+  type: 'test'
+  ...
+# Subtest: quarantine mutates only explicitly approved candidate IDs
+ok 7 - quarantine mutates only explicitly approved candidate IDs
+  ---
+  duration_ms: 2.4808
+  type: 'test'
+  ...
+# Subtest: one missing approved ID rejects the entire transaction
+ok 8 - one missing approved ID rejects the entire transaction
+  ---
+  duration_ms: 0.9918
+  type: 'test'
+  ...
+# Subtest: a commented post is rejected without separate human approval
+ok 9 - a commented post is rejected without separate human approval
+  ---
+  duration_ms: 1.0263
+  type: 'test'
+  ...
+# Subtest: a separately documented human approval permits a commented post
+ok 10 - a separately documented human approval permits a commented post
+  ---
+  duration_ms: 0.7017
+  type: 'test'
+  ...
+# Subtest: restore roundtrip preserves post content, comments, counters, and checksum
+ok 11 - restore roundtrip preserves post content, comments, counters, and checksum
+  ---
+  duration_ms: 0.7319
+  type: 'test'
+  ...
+# Subtest: duplicate approved IDs reject before mutation
+ok 12 - duplicate approved IDs reject before mutation
+  ---
+  duration_ms: 0.2917
+  type: 'test'
+  ...
+# Subtest: state changed after reporting rejects the entire transaction
+ok 13 - state changed after reporting rejects the entire transaction
+  ---
+  duration_ms: 0.4047
+  type: 'test'
+  ...
+# Subtest: visibility changed after reporting rejects the entire transaction
+ok 14 - visibility changed after reporting rejects the entire transaction
+  ---
+  duration_ms: 0.3475
+  type: 'test'
+  ...
+# Subtest: repeated interruption rolls back without a success result
+ok 15 - repeated interruption rolls back without a success result
+  ---
+  duration_ms: 0.7902
+  type: 'test'
+  ...
+# Subtest: rerun is idempotent and cannot create a second active quarantine
+ok 16 - rerun is idempotent and cannot create a second active quarantine
+  ---
+  duration_ms: 0.5239
+  type: 'test'
+  ...
+# Subtest: hung PostgreSQL work is cancelled by destroying the checked-out client
+ok 17 - hung PostgreSQL work is cancelled by destroying the checked-out client
+  ---
+  duration_ms: 10.1138
+  type: 'test'
+  ...
+# Subtest: PostgreSQL writes match Task 2 active/released quarantine columns
+ok 18 - PostgreSQL writes match Task 2 active/released quarantine columns
+  ---
+  duration_ms: 2.4708
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 150.4735

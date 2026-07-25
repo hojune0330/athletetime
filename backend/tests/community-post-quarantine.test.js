@@ -10,6 +10,9 @@ const {
   parseArgs,
   workspacePath,
 } = require('../../scripts/community-post-quarantine');
+const {
+  rejectQuarantinedPostAccess,
+} = require('../middleware/quarantinedPostBoundary');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 class MemoryRepository {
@@ -293,11 +296,93 @@ test('PostgreSQL writes match Task 2 active/released quarantine columns', async 
   });
   const actor = '00000000-0000-4000-8000-000000000001';
   await repository.transaction(async (tx) => {
+    await tx.lockPosts([1]);
     await tx.quarantine(fixturePosts().slice(0, 1), { actor, at: '2026-07-17T00:00:00.000Z', reason: 'approved' });
     await tx.restore([1], { actor, at: '2026-07-17T00:01:00.000Z' });
   });
 
+  assert.ok(queries.some((query) => query.text.includes('pg_advisory_xact_lock')));
   assert.match(queries.find((query) => query.text.includes('INSERT INTO')).text, /reason_code/);
   assert.match(queries.find((query) => query.text.startsWith('UPDATE')).text, /status='released'.*released_at/);
   assert.equal(queries.find((query) => query.text.includes('INSERT INTO')).params[3], actor);
+});
+
+test('an active quarantine returns a public 404 before the route can read or mutate a post', async () => {
+  let nextCalls = 0;
+  const req = {
+    params: { postId: '101' },
+    app: { locals: { pool: { query: async () => ({ rowCount: 1 }) } } },
+  };
+  const response = {
+    statusCode: null,
+    body: null,
+    headers: {},
+    set(name, value) { this.headers[name.toLowerCase()] = value; return this; },
+    status(code) { this.statusCode = code; return this; },
+    json(body) { this.body = body; return this; },
+  };
+
+  await rejectQuarantinedPostAccess(req, response, () => { nextCalls += 1; });
+
+  assert.equal(response.statusCode, 404);
+  assert.equal(response.body.success, false);
+  assert.equal(response.headers['cache-control'], 'no-store');
+  assert.equal(nextCalls, 0);
+});
+
+test('a released or never-quarantined post continues through the public route', async () => {
+  let nextCalls = 0;
+  const req = {
+    params: { id: '102' },
+    app: { locals: { pool: { query: async () => ({ rowCount: 0 }) } } },
+  };
+
+  await rejectQuarantinedPostAccess(req, {}, () => { nextCalls += 1; });
+
+  assert.equal(nextCalls, 1);
+});
+
+test('a non-canonical post path uses the same quarantine lock key as its bigint post ID', async () => {
+  const values = [];
+  const client = {
+    async query(sql, params = []) {
+      if (params.length > 0) values.push(params[0]);
+      if (sql.includes('SELECT id FROM posts')) return { rows: [{ id: 1 }], rowCount: 1 };
+      return { rows: [], rowCount: 0 };
+    },
+    release() {},
+  };
+  const req = {
+    params: { id: '0001' },
+    app: { locals: { pool: { connect: async () => client } } },
+  };
+  const response = {
+    set() { return this; },
+    once() {},
+  };
+
+  await rejectQuarantinedPostAccess(req, response, () => {});
+
+  assert.deepEqual(values, ['community-post-quarantine-list', '1', '1', '1']);
+});
+
+test('public list, detail, comment, vote, and poll routes all enforce active quarantine visibility', () => {
+  const posts = fs.readFileSync(path.join(ROOT, 'backend/routes/posts.js'), 'utf8');
+  const comments = fs.readFileSync(path.join(ROOT, 'backend/routes/comments.js'), 'utf8');
+  const votes = fs.readFileSync(path.join(ROOT, 'backend/routes/votes.js'), 'utf8');
+  const polls = fs.readFileSync(path.join(ROOT, 'backend/routes/polls.js'), 'utf8');
+
+  assert.ok(posts.split('post_quarantines').length - 1 >= 2);
+  assert.ok(posts.includes("router.get('/', holdPostListQuarantineBoundary"));
+  for (const route of [
+    "router.get('/:id', rejectQuarantinedPostAccess",
+    "router.post('/:id/verify-password', rejectQuarantinedPostAccess",
+    "router.put('/:id', rejectQuarantinedPostAccess",
+    "rejectQuarantinedPostAccess,\n  rejectEditorialPostMutation",
+  ]) {
+    assert.ok(posts.includes(route), route);
+  }
+  for (const source of [comments, votes, polls]) {
+    assert.ok(source.includes('router.use(rejectQuarantinedPostAccess)'));
+  }
 });

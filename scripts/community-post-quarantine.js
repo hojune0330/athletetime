@@ -176,7 +176,18 @@ function postgresRepository(pool) {
           const result = await client.query("UPDATE post_quarantines SET status='released', released_at=$1, released_by=$2 WHERE post_id=ANY($3::bigint[]) AND status='active'", [metadata.at, metadata.actor, ids]);
           if (result.rowCount !== ids.length) throw new Error('Every approved post must have exactly one active quarantine');
         };
-        const result = await work({ lockPosts: (ids) => select(client, ids, true), quarantine: insert, restore });
+        const lockPosts = async (ids) => {
+          await client.query(
+            "SELECT pg_advisory_xact_lock(hashtextextended('community-post-quarantine-list', 7319))",
+          );
+          await client.query(`
+            SELECT pg_advisory_xact_lock(hashtextextended(id::text, 7319))
+            FROM unnest($1::bigint[]) AS id
+            ORDER BY id
+          `, [ids]);
+          return select(client, ids, true);
+        };
+        const result = await work({ lockPosts, quarantine: insert, restore });
         await client.query('COMMIT');
         return result;
       } catch (error) { if (!released) await client.query('ROLLBACK');

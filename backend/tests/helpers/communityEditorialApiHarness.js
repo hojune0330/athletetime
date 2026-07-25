@@ -81,6 +81,22 @@ function createFakeService() {
         rawError: 'password=hidden',
       }];
     },
+    async listPublishJobs() {
+      return ['queued', 'retrying', 'failed', 'completed'].map((status, index) => ({
+        issueId: `${index + 3}0000000-0000-4000-8000-000000000001`,
+        title: `${status} issue`,
+        status,
+        attemptCount: status === 'retrying' ? 1 : status === 'failed' ? 3 : 0,
+        nextAttemptAt: status === 'queued' || status === 'retrying'
+          ? '2026-08-01T00:10:00.000Z'
+          : null,
+        errorCode: status === 'failed' ? 'EDITORIAL_PUBLISH_TRANSACTION_FAILED' : null,
+        scheduledFor: '2026-08-01T00:00:00.000Z',
+        updatedAt: '2026-08-01T00:06:00.000Z',
+        rawError: 'password=hidden',
+        actorUserId: ACTOR_ID,
+      }));
+    },
     async retryPublish(input) {
       calls.push(['retryPublish', input]);
       return {

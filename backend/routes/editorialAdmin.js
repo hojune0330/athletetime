@@ -142,6 +142,11 @@ function createEditorialAdminRouter({ service }) {
     const issues = await service.listIssues(req.query);
     res.json({ success: true, issues: issues.map((issue) => issueView(issue)) });
   }));
+  router.get('/publish-jobs', asyncRoute(async (req, res) => {
+    const jobs = await service.listPublishJobs(req.query);
+    res.set('Cache-Control', 'no-store');
+    res.json({ success: true, jobs: jobs.map(publishJobView) });
+  }));
   router.get('/publish-jobs/warnings', asyncRoute(async (req, res) => {
     const jobs = await service.listPublishJobWarnings(req.query);
     res.set('Cache-Control', 'no-store');
