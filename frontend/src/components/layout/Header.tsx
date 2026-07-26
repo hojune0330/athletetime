@@ -877,7 +877,7 @@ export default function Header() {
                     </div>
                     <p className="text-neutral-600 text-sm">
                       <strong>{forgotEmail}</strong>으로<br />
-                      발송된 6자리 인증 코드를 입력해주세요.
+                      등록된 이메일이라면 받은 6자리 인증 코드를 입력해주세요.
                     </p>
                   </div>
 
