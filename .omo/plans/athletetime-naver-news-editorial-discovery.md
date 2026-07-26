@@ -263,7 +263,7 @@
 
 ## TODOs
 
-- [ ] 1. Sol: 계약·DB·보안 경계를 먼저 고정
+- [x] 1. Sol: 계약·DB·보안 경계를 먼저 고정
 - [ ] 2. Terra: NAVER API HUB client와 정규화기를 fixture-first로 구현
 - [ ] 3. Terra: repository, 수동 run, 관리자 상태 전이 구현
 - [ ] 4. Terra: 원출처 확인과 편성 연결
