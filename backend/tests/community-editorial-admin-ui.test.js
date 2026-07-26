@@ -207,3 +207,11 @@ test('NEWS-INBOX-UI-006: Given a youth or sensational headline When reviewing Th
   assert.ok(inbox.includes('선정적 표현 가능성이 있어'));
   assert.equal(inbox.includes('자동 승인'), false);
 });
+
+test('NEWS-INBOX-UI-007: Given a narrow admin viewport When content is wide Then the main flex item can shrink', () => {
+  // Given
+  const layout = read('frontend/src/components/layout/AdminLayout.tsx');
+
+  // When / Then
+  assert.match(layout, /<main className="[^"]*\bmin-w-0\b[^"]*">/u);
+});
