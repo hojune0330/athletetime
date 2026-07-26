@@ -27,6 +27,40 @@ async function isolatedPool(t) {
   return pool;
 }
 
+async function createPreMigrationUsersTable(pool) {
+  const userId = crypto.randomUUID();
+  await pool.query(`
+    CREATE TABLE users (
+      id UUID PRIMARY KEY,
+      email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+      verification_code VARCHAR(6),
+      verification_expires_at TIMESTAMPTZ
+    )
+  `);
+  await pool.query(`
+    INSERT INTO users (id, email_verified, verification_code, verification_expires_at)
+    VALUES ($1, FALSE, '123456', NOW() + INTERVAL '10 minutes')
+  `, [userId]);
+  return userId;
+}
+
+async function assertLegacyVerificationWasRetired(pool, userId) {
+  const migrated = await pool.query(`
+    SELECT verification_code, verification_expires_at, verification_code_hash,
+           verification_attempt_count, verification_locked_at, email_verified
+    FROM users
+    WHERE id = $1
+  `, [userId]);
+  assert.deepEqual(migrated.rows, [{
+    verification_code: null,
+    verification_expires_at: null,
+    verification_code_hash: null,
+    verification_attempt_count: 0,
+    verification_locked_at: null,
+    email_verified: false,
+  }]);
+}
+
 function listen(app) {
   return new Promise((resolve) => {
     const server = app.listen(0, '127.0.0.1', () => resolve(server));
@@ -94,7 +128,10 @@ test('RIGHTS-PG-003: Given an applied migration that later drifts When restartin
   timeout: 30000,
 }, async (t) => {
   const pool = await isolatedPool(t);
-  await runMigrations({ pool });
+  const legacyUserId = await createPreMigrationUsersTable(pool);
+  const firstMigration = await runMigrations({ pool });
+  assert.equal(firstMigration.applied.includes('migration-006-auth-recovery-security.sql'), true);
+  await assertLegacyVerificationWasRetired(pool, legacyUserId);
   const beforeDrift = await pool.query(`
     SELECT COUNT(*)::int AS count FROM athletetime_migrations
   `);
@@ -117,9 +154,12 @@ test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then re
 }, async (t) => {
   process.env.DATA_RIGHTS_ENCRYPTION_KEY = Buffer.alloc(32, 7).toString('base64');
   const firstPool = await isolatedPool(t);
+  const legacyUserId = await createPreMigrationUsersTable(firstPool);
   const firstMigration = await runMigrations({ pool: firstPool });
   const secondMigration = await runMigrations({ pool: firstPool });
   assert.equal(firstMigration.applied.includes('migration-004-data-rights.sql'), true);
+  assert.equal(firstMigration.applied.includes('migration-006-auth-recovery-security.sql'), true);
+  await assertLegacyVerificationWasRetired(firstPool, legacyUserId);
   assert.deepEqual(secondMigration.applied, []);
 
   await firstPool.query(`
