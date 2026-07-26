@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS editorial_news_runs (
   duplicate_count INTEGER NOT NULL DEFAULT 0 CHECK (duplicate_count >= 0),
   irrelevant_count INTEGER NOT NULL DEFAULT 0 CHECK (irrelevant_count >= 0),
   safe_error_code VARCHAR(60),
-  actor_user_id UUID REFERENCES users(id) ON DELETE RESTRICT,
+  actor_user_id UUID,
   UNIQUE (run_date_kst, profile_version),
   CHECK (profile_version ~ '^[a-z0-9][a-z0-9._-]{0,39}$'),
   CHECK (
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS editorial_news_discoveries (
     CHECK (subject_age_group IN ('adult', 'minor', 'unknown')),
   status VARCHAR(20) NOT NULL DEFAULT 'discovered'
     CHECK (status IN ('discovered', 'reviewing', 'source_confirmed', 'calendar_linked', 'dismissed', 'expired')),
-  reviewed_by UUID REFERENCES users(id) ON DELETE RESTRICT,
+  reviewed_by UUID,
   reviewed_at TIMESTAMPTZ,
   review_note VARCHAR(1000),
   confirmed_source_url TEXT,

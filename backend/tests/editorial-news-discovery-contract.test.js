@@ -102,3 +102,13 @@ test('NEWS-DISCOVERY-CONTRACT-006: migration runner discovers migration 011 but 
   assert.equal(migrations.includes('migration-011-editorial-news-discovery.sql'), true);
   assert.equal(migrations.some((name) => name.includes('down')), false);
 });
+
+test('NEWS-DISCOVERY-CONTRACT-007: managed migration does not depend on unmanaged auth tables', () => {
+  // Given / When
+  const sql = read(UP_PATH);
+
+  // Then
+  assert.doesNotMatch(sql, /REFERENCES users/u);
+  assert.match(sql, /actor_user_id UUID/u);
+  assert.match(sql, /reviewed_by UUID/u);
+});

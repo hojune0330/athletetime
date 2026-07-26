@@ -9,6 +9,7 @@
 - Public router manual check: discovery routes and private review fields both absent.
 - Real PostgreSQL up/down/up gate: `.github/workflows/editorial-news-postgres.yml`; Task 1 remains open until the PR check passes.
 - P0 dependency audit: 5 high, 7 moderate production vulnerabilities; tracked as a separate public-deployment blocker.
+- First PR run: the new migration contract passed, while the existing data-rights job exposed an unmanaged `users` table dependency. A failing regression test was added and the two actor columns were aligned with the existing managed editorial migrations by keeping UUID audit values without an auth-table foreign key.
 
 ## Adversarial coverage
 
