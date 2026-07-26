@@ -6,6 +6,11 @@ on:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
+      - 'backend/tests/editorial-news-normalizer.test.js'
+      - 'backend/tests/editorial-news-client-boundary.test.js'
+      - 'backend/tests/naver-news-api-client.test.js'
+      - 'card-studio/services/editorialNews*.js'
+      - 'card-studio/services/naverNewsApiClient.js'
       - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
       - '.github/workflows/editorial-news-postgres.yml'
   push:
@@ -15,6 +20,11 @@ on:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
+      - 'backend/tests/editorial-news-normalizer.test.js'
+      - 'backend/tests/editorial-news-client-boundary.test.js'
+      - 'backend/tests/naver-news-api-client.test.js'
+      - 'card-studio/services/editorialNews*.js'
+      - 'card-studio/services/naverNewsApiClient.js'
       - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
       - '.github/workflows/editorial-news-postgres.yml'
 
@@ -54,3 +64,6 @@ jobs:
           node --test
           backend/tests/editorial-news-discovery-contract.test.js
           backend/tests/editorial-news-discovery-migration-postgres.integration.test.js
+          backend/tests/naver-news-api-client.test.js
+          backend/tests/editorial-news-normalizer.test.js
+          backend/tests/editorial-news-client-boundary.test.js

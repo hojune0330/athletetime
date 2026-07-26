@@ -1,0 +1,5 @@
+2026-07-26 TDD red phase
+Command: node --test backend/tests/naver-news-api-client.test.js
+Result: FAIL (expected)
+Reason: Cannot find module '../../card-studio/services/naverNewsApiClient'.
+The test file existed before the client modules and did not send network requests.

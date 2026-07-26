@@ -1,0 +1,21 @@
+﻿{
+  "url": "https://naverapihub.apigw.ntruss.com/search/v1/news?query=%EC%9C%A1%EC%83%81+%EC%84%A0%EC%88%98&sort=date&display=100&start=1",
+  "headerNames": [
+    "X-NCP-APIGW-API-KEY",
+    "X-NCP-APIGW-API-KEY-ID"
+  ],
+  "resultFields": [
+    "total",
+    "start",
+    "display",
+    "items"
+  ],
+  "itemFields": [
+    "title",
+    "originallink",
+    "link",
+    "pubDate"
+  ],
+  "retryCount": 1,
+  "serializedResult": "{\"total\":1,\"start\":1,\"display\":100,\"items\":[{\"title\":\"Manual fake result\",\"originallink\":\"https://origin.test/manual\",\"link\":\"https://news.test/manual\",\"pubDate\":\"Tue\"}]}"
+}

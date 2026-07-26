@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: NEWS-NORMALIZER-001: prefers a safe originallink and emits only the persistence allowlist
+ok 1 - NEWS-NORMALIZER-001: prefers a safe originallink and emits only the persistence allowlist
+  ---
+  duration_ms: 45.9604
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-002: falls back to link when originallink is absent
+ok 2 - NEWS-NORMALIZER-002: falls back to link when originallink is absent
+  ---
+  duration_ms: 1.1072
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-003: normalizes URL variants but never merges distinct canonical URLs
+ok 3 - NEWS-NORMALIZER-003: normalizes URL variants but never merges distinct canonical URLs
+  ---
+  duration_ms: 0.9902
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-004: rejects unsafe or missing source URLs
+ok 4 - NEWS-NORMALIZER-004: rejects unsafe or missing source URLs
+  ---
+  duration_ms: 2.1588
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-005: strips markup, decodes entities, normalizes controls, and bounds titles
+ok 5 - NEWS-NORMALIZER-005: strips markup, decodes entities, normalizes controls, and bounds titles
+  ---
+  duration_ms: 1.2178
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-006: rejects invalid or missing publication dates and ignores injection-like fields
+ok 6 - NEWS-NORMALIZER-006: rejects invalid or missing publication dates and ignores injection-like fields
+  ---
+  duration_ms: 1.5683
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-007: relevance classification is deterministic and uses only query keys plus title
+ok 7 - NEWS-NORMALIZER-007: relevance classification is deterministic and uses only query keys plus title
+  ---
+  duration_ms: 0.9919
+  type: 'test'
+  ...
+# Subtest: NEWS-NORMALIZER-008: relevance tags are constrained to the fixed allowlist
+ok 8 - NEWS-NORMALIZER-008: relevance tags are constrained to the fixed allowlist
+  ---
+  duration_ms: 0.4585
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 324.4803

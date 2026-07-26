@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: Given the korean-athletics profile, when fetching page one, then it sends fixed endpoint headers and query
+ok 1 - Given the korean-athletics profile, when fetching page one, then it sends fixed endpoint headers and query
+  ---
+  duration_ms: 11.9706
+  type: 'test'
+  ...
+# Subtest: Given invalid profiles or paging, when resolving requests, then arbitrary queries are rejected
+ok 2 - Given invalid profiles or paging, when resolving requests, then arbitrary queries are rejected
+  ---
+  duration_ms: 2.0838
+  type: 'test'
+  ...
+# Subtest: Given missing credentials, when searching, then it fails without transport call or secret disclosure
+ok 3 - Given missing credentials, when searching, then it fails without transport call or secret disclosure
+  ---
+  duration_ms: 0.7484
+  type: 'test'
+  ...
+# Subtest: Given HTTP 401, when searching, then it does not retry
+ok 4 - Given HTTP 401, when searching, then it does not retry
+  ---
+  duration_ms: 0.758
+  type: 'test'
+  ...
+# Subtest: Given HTTP 403, when searching, then it does not retry
+ok 5 - Given HTTP 403, when searching, then it does not retry
+  ---
+  duration_ms: 0.5643
+  type: 'test'
+  ...
+# Subtest: Given HTTP 429, when searching, then it does not retry
+ok 6 - Given HTTP 429, when searching, then it does not retry
+  ---
+  duration_ms: 0.2655
+  type: 'test'
+  ...
+# Subtest: Given a 500 then a success, when searching, then it retries exactly once
+ok 7 - Given a 500 then a success, when searching, then it retries exactly once
+  ---
+  duration_ms: 0.756
+  type: 'test'
+  ...
+# Subtest: Given a timeout then a success, when searching, then it retries exactly once
+ok 8 - Given a timeout then a success, when searching, then it retries exactly once
+  ---
+  duration_ms: 0.6969
+  type: 'test'
+  ...
+# Subtest: Given two retryable failures, when searching, then it fails after two calls
+ok 9 - Given two retryable failures, when searching, then it fails after two calls
+  ---
+  duration_ms: 1.4534
+  type: 'test'
+  ...
+# Subtest: Given a hung injected transport, when the client timeout elapses, then it is bounded and retries once
+ok 10 - Given a hung injected transport, when the client timeout elapses, then it is bounded and retries once
+  ---
+  duration_ms: 42.1543
+  type: 'test'
+  ...
+# Subtest: Given malformed, malformed-shape, or oversized responses, when searching, then it safely rejects
+ok 11 - Given malformed, malformed-shape, or oversized responses, when searching, then it safely rejects
+  ---
+  duration_ms: 2.9589
+  type: 'test'
+  ...
+# Subtest: Given descriptions and unknown fields including key-like strings, when parsing, then only allowlisted fields remain
+ok 12 - Given descriptions and unknown fields including key-like strings, when parsing, then only allowlisted fields remain
+  ---
+  duration_ms: 0.797
+  type: 'test'
+  ...
+# Subtest: Given a result without originallink, when parsing, then it exposes an empty fallback-safe field
+ok 13 - Given a result without originallink, when parsing, then it exposes an empty fallback-safe field
+  ---
+  duration_ms: 0.8516
+  type: 'test'
+  ...
+# Subtest: Given daily and monthly budget boundaries, when exhausted, then the request fails closed before transport
+ok 14 - Given daily and monthly budget boundaries, when exhausted, then the request fails closed before transport
+  ---
+  duration_ms: 2.5104
+  type: 'test'
+  ...
+# Subtest: Given stale quota keys, when reserving a new period, then prior exhaustion is reset
+ok 15 - Given stale quota keys, when reserving a new period, then prior exhaustion is reset
+  ---
+  duration_ms: 0.315
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 275.8711
