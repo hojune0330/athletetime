@@ -11,7 +11,7 @@ const {
 
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await page.goto(`${baseUrl}/records`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/records`, { waitUntil: 'domcontentloaded' });
     visited.push(page.url());
     await expectVisible(page.locator('[data-records-flow="hub"]'));
     assert.equal(await page.locator('#records-search').count(), 0, 'hub renders before the search surface');
@@ -56,20 +56,20 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?flow=browse`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/records?flow=browse`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
     await expectVisible(page.getByRole('button', { name: /팀\(소속\)으로 찾기/ }));
     await expectVisible(page.getByRole('button', { name: /시즌 기록표/ }));
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?athlete=alpha-2016`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/records?athlete=alpha-2016`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('text=Alpha Kim'));
     await expectVisible(page.locator('text=기록 한눈에'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?compare=alpha-2016,beta-2016`, { waitUntil: 'networkidle' });
+    await page.goto(`${baseUrl}/records?compare=alpha-2016,beta-2016`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
     visited.push(page.url());
