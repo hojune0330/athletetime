@@ -13,6 +13,14 @@ class NaverNewsApiError extends Error {
   }
 }
 
+function withApiCallCount(error, apiCallCount) {
+  const safeError = error instanceof NaverNewsApiError
+    ? error
+    : new NaverNewsApiError('TRANSPORT_FAILURE');
+  safeError.apiCallCount = apiCallCount;
+  return safeError;
+}
+
 function defaultTransport({ url, headers, timeoutMs }) {
   return new Promise((resolve, reject) => {
     const request = https.request(url, { method: 'GET', headers }, (response) => {
@@ -70,16 +78,23 @@ class NaverNewsApiClient {
     url.search = new URLSearchParams({ query: requestProfile.query, sort: 'date', display: '100', start: String(requestProfile.start) }).toString();
     const request = { url: url.toString(), headers: { 'X-NCP-APIGW-API-KEY-ID': keyId, 'X-NCP-APIGW-API-KEY': key }, timeoutMs: this.timeoutMs };
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      this.budget.reserve();
+      try {
+        this.budget.reserve();
+      } catch (error) {
+        error.apiCallCount = 0;
+        throw error;
+      }
       try {
         const response = await this.callWithTimeout(request);
         if (!response || !Number.isInteger(response.statusCode)) throw new NaverNewsApiError('MALFORMED_RESPONSE');
-        if (response.statusCode >= 200 && response.statusCode < 300) return parseResponse(response.body);
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          return { ...parseResponse(response.body), apiCallCount: attempt + 1 };
+        }
         const error = new NaverNewsApiError(`HTTP_${response.statusCode}`);
         if (response.statusCode < 500 || attempt === 1) throw error;
       } catch (error) {
         const retryable = error && (error.code === 'ETIMEDOUT' || error.code === 'TIMEOUT' || /^HTTP_5\d\d$/.test(error.code));
-        if (!retryable || attempt === 1) throw error instanceof NaverNewsApiError ? error : new NaverNewsApiError('TRANSPORT_FAILURE');
+        if (!retryable || attempt === 1) throw withApiCallCount(error, attempt + 1);
       }
       await this.sleep(200 + this.jitter());
     }

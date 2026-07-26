@@ -19,7 +19,7 @@ test('Given the korean-athletics profile, when fetching page one, then it sends 
   assert.equal(calls.length, 1);
   assert.equal(calls[0].url, 'https://naverapihub.apigw.ntruss.com/search/v1/news?query=%EC%9C%A1%EC%83%81+%EC%84%A0%EC%88%98&sort=date&display=100&start=1');
   assert.deepEqual(Object.keys(calls[0].headers).sort(), ['X-NCP-APIGW-API-KEY', 'X-NCP-APIGW-API-KEY-ID']);
-  assert.deepEqual(result, { total: 1, start: 1, display: 100, items: [{ title: 'safe title', originallink: 'https://origin.test/a', link: 'https://news.test/a', pubDate: 'Tue' }] });
+  assert.deepEqual(result, { total: 1, start: 1, display: 100, apiCallCount: 1, items: [{ title: 'safe title', originallink: 'https://origin.test/a', link: 'https://news.test/a', pubDate: 'Tue' }] });
 });
 
 test('Given invalid profiles or paging, when resolving requests, then arbitrary queries are rejected', () => {
@@ -38,7 +38,10 @@ test('Given missing credentials, when searching, then it fails without transport
 for (const statusCode of [401, 403, 429]) {
   test(`Given HTTP ${statusCode}, when searching, then it does not retry`, async () => {
     let calls = 0;
-    await assert.rejects(() => client(async () => { calls += 1; return response(statusCode); }).search({ profile: 'korean-athletics' }), (error) => error.code === `HTTP_${statusCode}`);
+    await assert.rejects(
+      () => client(async () => { calls += 1; return response(statusCode); }).search({ profile: 'korean-athletics' }),
+      (error) => error.code === `HTTP_${statusCode}` && error.apiCallCount === 1,
+    );
     assert.equal(calls, 1);
   });
 }
@@ -46,18 +49,21 @@ for (const statusCode of [401, 403, 429]) {
 test('Given a 500 then a success, when searching, then it retries exactly once', async () => {
   let calls = 0; let sleeps = 0;
   const result = await client(async () => { calls += 1; return calls === 1 ? response(500) : response(200); }, { sleep: async () => { sleeps += 1; } }).search({ profile: 'korean-athletics' });
-  assert.equal(result.items.length, 1); assert.equal(calls, 2); assert.equal(sleeps, 1);
+  assert.equal(result.items.length, 1); assert.equal(result.apiCallCount, 2); assert.equal(calls, 2); assert.equal(sleeps, 1);
 });
 
 test('Given a timeout then a success, when searching, then it retries exactly once', async () => {
   let calls = 0;
   const result = await client(async () => { calls += 1; if (calls === 1) { const error = new Error('timed out'); error.code = 'ETIMEDOUT'; throw error; } return response(200); }).search({ profile: 'korean-athletics' });
-  assert.equal(result.items.length, 1); assert.equal(calls, 2);
+  assert.equal(result.items.length, 1); assert.equal(result.apiCallCount, 2); assert.equal(calls, 2);
 });
 
 test('Given two retryable failures, when searching, then it fails after two calls', async () => {
   let calls = 0;
-  await assert.rejects(() => client(async () => { calls += 1; return response(503); }).search({ profile: 'korean-athletics' }), (error) => error.code === 'HTTP_503');
+  await assert.rejects(
+    () => client(async () => { calls += 1; return response(503); }).search({ profile: 'korean-athletics' }),
+    (error) => error.code === 'HTTP_503' && error.apiCallCount === 2,
+  );
   assert.equal(calls, 2);
 });
 

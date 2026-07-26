@@ -12,6 +12,7 @@ const schedulerMigrationPath = path.join(root, 'backend', 'database', 'migration
 const newsDiscoveryMigrationPath = path.join(
   root, 'backend', 'database', 'migration-011-editorial-news-discovery.sql',
 );
+const newsEventMigrationPath = path.join(root, 'backend', 'database', 'migration-012-editorial-news-discovery-events.sql');
 const apiDownMigrationPath = path.join(
   root, 'backend', 'database', 'rollbacks', '007-community-editorial-api-down.sql',
 );
@@ -27,6 +28,7 @@ const schedulerDownMigrationPath = path.join(
 const newsDiscoveryDownMigrationPath = path.join(
   root, 'backend', 'database', 'rollbacks', '011-editorial-news-discovery-down.sql',
 );
+const newsEventDownMigrationPath = path.join(root, 'backend', 'database', 'rollbacks', '012-editorial-news-discovery-events-down.sql');
 const downMigrationPath = path.join(
   root,
   'backend',
@@ -107,7 +109,7 @@ async function createExistingFixture(pool) {
 async function applyEditorialMigrations(pool) {
   for (const file of [
     migrationPath, apiMigrationPath, candidateMigrationPath, detailMigrationPath,
-    schedulerMigrationPath, newsDiscoveryMigrationPath,
+    schedulerMigrationPath, newsDiscoveryMigrationPath, newsEventMigrationPath,
   ]) {
     await pool.query(fs.readFileSync(file, 'utf8'));
   }
@@ -115,7 +117,7 @@ async function applyEditorialMigrations(pool) {
 
 async function rollbackEditorialMigrations(pool) {
   for (const file of [
-    newsDiscoveryDownMigrationPath, schedulerDownMigrationPath,
+    newsEventDownMigrationPath, newsDiscoveryDownMigrationPath, schedulerDownMigrationPath,
     detailDownMigrationPath, candidateDownMigrationPath,
     apiDownMigrationPath, downMigrationPath,
   ]) {
@@ -148,6 +150,8 @@ module.exports = {
   migrationPath,
   newsDiscoveryDownMigrationPath,
   newsDiscoveryMigrationPath,
+  newsEventDownMigrationPath,
+  newsEventMigrationPath,
   root,
   rollbackEditorialMigrations,
 };

@@ -100,6 +100,7 @@ test('NEWS-DISCOVERY-CONTRACT-006: migration runner discovers migration 011 but 
 
   // Then
   assert.equal(migrations.includes('migration-011-editorial-news-discovery.sql'), true);
+  assert.equal(migrations.includes('migration-012-editorial-news-discovery-events.sql'), true);
   assert.equal(migrations.some((name) => name.includes('down')), false);
 });
 

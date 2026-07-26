@@ -4,13 +4,18 @@ on:
   pull_request:
     paths:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
+      - 'backend/database/migration-012-editorial-news-discovery-events.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
+      - 'backend/database/rollbacks/012-editorial-news-discovery-events-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
       - 'backend/tests/editorial-news-normalizer.test.js'
       - 'backend/tests/editorial-news-client-boundary.test.js'
       - 'backend/tests/naver-news-api-client.test.js'
       - 'card-studio/services/editorialNews*.js'
       - 'card-studio/services/naverNewsApiClient.js'
+      - 'card-studio/repositories/editorialNewsDiscovery*.js'
+      - 'card-studio/services/editorialNewsDiscovery*.js'
+      - 'backend/routes/editorialAdmin.js'
       - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
       - '.github/workflows/editorial-news-postgres.yml'
   push:
@@ -18,13 +23,18 @@ on:
       - main
     paths:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
+      - 'backend/database/migration-012-editorial-news-discovery-events.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
+      - 'backend/database/rollbacks/012-editorial-news-discovery-events-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
       - 'backend/tests/editorial-news-normalizer.test.js'
       - 'backend/tests/editorial-news-client-boundary.test.js'
       - 'backend/tests/naver-news-api-client.test.js'
       - 'card-studio/services/editorialNews*.js'
       - 'card-studio/services/naverNewsApiClient.js'
+      - 'card-studio/repositories/editorialNewsDiscovery*.js'
+      - 'card-studio/services/editorialNewsDiscovery*.js'
+      - 'backend/routes/editorialAdmin.js'
       - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
       - '.github/workflows/editorial-news-postgres.yml'
 
@@ -67,3 +77,6 @@ jobs:
           backend/tests/naver-news-api-client.test.js
           backend/tests/editorial-news-normalizer.test.js
           backend/tests/editorial-news-client-boundary.test.js
+          backend/tests/editorial-news-discovery-api.test.js
+          backend/tests/editorial-news-discovery-runtime.test.js
+          backend/tests/editorial-news-discovery-runtime-postgres.integration.test.js

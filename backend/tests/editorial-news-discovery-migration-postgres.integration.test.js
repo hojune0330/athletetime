@@ -8,6 +8,8 @@ const {
   connectionString,
   createExistingFixture,
   isolatedPool,
+  newsEventDownMigrationPath,
+  newsEventMigrationPath,
   newsDiscoveryDownMigrationPath,
   newsDiscoveryMigrationPath,
 } = require('./helpers/communityEditorialPostgresHarness');
@@ -60,6 +62,7 @@ test('NEWS-DISCOVERY-MIGRATION-001: migration applies, rolls back, and reapplies
     /editorial_news_discoveries_check/u,
   );
 
+  await pool.query(fs.readFileSync(newsEventDownMigrationPath, 'utf8'));
   await pool.query(fs.readFileSync(newsDiscoveryDownMigrationPath, 'utf8'));
   const retained = await pool.query(`SELECT to_regclass('editorial_calendar') AS table_name`);
   assert.equal(retained.rows[0].table_name, 'editorial_calendar');
@@ -67,6 +70,7 @@ test('NEWS-DISCOVERY-MIGRATION-001: migration applies, rolls back, and reapplies
   assert.equal(removed.rows[0].table_name, null);
 
   await pool.query(fs.readFileSync(newsDiscoveryMigrationPath, 'utf8'));
+  await pool.query(fs.readFileSync(newsEventMigrationPath, 'utf8'));
   const reapplied = await pool.query(`SELECT to_regclass('editorial_news_runs') AS table_name`);
   assert.equal(reapplied.rows[0].table_name, 'editorial_news_runs');
 });
