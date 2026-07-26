@@ -31,7 +31,12 @@ Date: 2026-07-26
 
 ## CI gate
 
-The local machine has no PostgreSQL runtime. The PR workflow starts PostgreSQL 16 and must pass the four non-skipped migration/concurrency/retention cases before Task 3 is marked complete.
+The local machine has no PostgreSQL runtime. PR #55 started PostgreSQL 16 and passed both required checks after fixing the lock lifetime:
+
+- `migration-contract`: passed in 36 seconds.
+- `postgres-contract`: passed in 1 minute 44 seconds.
+- Two-worker execution made one provider call and one run.
+- Migration apply/rollback/reapply, state guards, retention, and audit checks passed without skips.
 
 ## Residual release blockers
 
