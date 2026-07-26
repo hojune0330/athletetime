@@ -45,6 +45,7 @@ For each remediation pull request, use a current advisory source that can inspec
 | Vite and React plugin | Upgrade together; verify build, development startup, HMR, aliases, and Vite environment behavior. |
 | ESLint and related tools | Fix in a lint-toolchain PR. Existing lint failures are product debt, not proof that a dependency update broke code. |
 | Tailwind/tooling tree | Plan separately because Tailwind configuration and plugin compatibility can change. |
+| Frontend test runner | The current `frontend` manifest exposes `npm test` but does not install Vitest. Repair the test-runner contract in its own tooling PR before using frontend tests as a release gate. |
 
 ### P3 - Owner decision required
 
@@ -72,6 +73,8 @@ npm --prefix frontend run build:check
 ```
 
 Run frontend lint only as an informational baseline until the existing lint-debt PR is scheduled. A pre-existing lint failure must be reported, not silently fixed inside an unrelated dependency PR.
+
+At the baseline date, the frontend lint command reports existing code-quality debt. It is not a passing release gate yet and must be repaired in a dedicated lint-debt PR.
 
 Then perform the package-specific user scenario from section 3 in a real browser or staging environment. Build success is necessary but not sufficient for a security upgrade.
 
