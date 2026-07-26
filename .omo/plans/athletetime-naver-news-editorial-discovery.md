@@ -617,22 +617,22 @@ Scenario: STOP 복구 가능성
 
 아래 네 검수는 구현 Task 1~7 뒤 모두 승인되어야 한다. 14일 pilot 이후 Task 8에서 최종 운영 모드를 결정한다.
 
-- [ ] **F1. 계획 준수 검수 — Sol xhigh**
+- [x] **F1. 계획 준수 검수 — Sol xhigh**
   - Task 1~7의 커밋·파일·증거를 이 계획과 대조한다.
   - 자동 초안·자동 승인·자동 발행, Task 9/12, 기사 본문 저장이 0인지 확인한다.
   - 증거: `.omo/evidence/final-news-discovery-plan-compliance.md`
 
-- [ ] **F2. 코드 품질·보안 검수 — Sol xhigh**
+- [x] **F2. 코드 품질·보안 검수 — Sol xhigh**
   - migration, repository transaction, advisory lock, URL·HTML 정규화, credential redaction, SSRF/XSS를 검토한다.
   - `npm test`, 프론트 type-check/build, migration up/down/up, 2-worker 테스트를 재실행한다.
   - 증거: `.omo/evidence/final-news-discovery-security.txt`
 
-- [ ] **F3. 실제 관리자 QA — Terra medium, 독립 세션**
+- [x] **F3. 실제 관리자 QA — Terra medium, 독립 세션**
   - 390x844와 1440x900에서 오늘 수집 → 검토 → 원출처 확인 → 편성 → 제외를 실제 조작한다.
   - 키 없음, 예산 소진, 공급자 장애, 긴 제목, 빈 결과를 함께 확인한다.
   - 증거: `.omo/evidence/final-news-discovery-browser/`
 
-- [ ] **F4. 범위·공개 경계 검수 — Sol max**
+- [x] **F4. 범위·공개 경계 검수 — Sol max**
   - 공개 route/API/bundle과 기존 일반·매거진 글 회귀를 검사한다.
   - discovery 내부값, review_note, actor ID, credential, NAVER 제휴 오인 문구가 0인지 확인한다.
   - 증거: `.omo/evidence/final-news-discovery-scope-fidelity.md`
@@ -644,9 +644,9 @@ Scenario: STOP 복구 가능성
 ```powershell
 node --test backend/tests/naver-news-api-client.test.js
 node --test backend/tests/editorial-news-normalizer.test.js
-node --test backend/tests/editorial-news-discovery.test.js
+node --test backend/tests/editorial-news-discovery-runtime.test.js
 node --test backend/tests/editorial-news-discovery-api.test.js
-node --test backend/tests/editorial-news-discovery-postgres.integration.test.js
+node --test backend/tests/editorial-news-discovery-runtime-postgres.integration.test.js
 npm test
 npm --prefix frontend run type-check
 npm --prefix frontend run build

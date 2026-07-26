@@ -1,0 +1,34 @@
+F2 FINAL CODE QUALITY AND SECURITY
+Date: 2026-07-26
+Verdict: PASS
+Critical: 0
+High: 0
+Medium: 0
+
+INDEPENDENT REVIEW
+- Migration separation, rollback scope, repository transactions, advisory locks,
+  quota persistence, retry accounting, cursor parsing, API redaction, CSRF,
+  admin authorization, SSRF, and stored-XSS boundaries were reviewed.
+- One Medium finding was found: trailing DNS root dots allowed localhost. and
+  *.local. through the first syntactic source URL guard.
+- Red tests reproduced the bypass in the shared policy and NAVER normalizer.
+- Commit 11d67e9 strips trailing root dots before local/private-host comparison.
+- Independent re-review result after the fix: PASS, no remaining
+  Critical/High/Medium findings.
+
+VERIFICATION
+- Trailing-dot red-to-green security and regression group: 39 passed, 0 failed.
+- Focused news/security/boundary verification: 109 passed, 0 failed.
+- Latest full service suite: 447 passed, 0 failed, 43 local PostgreSQL-only skips.
+- Frontend type-check: PASS.
+- Production build (tsc -b && vite build): PASS.
+- Public initial bundle secret/discovery-internal scan: 0 matches.
+- PostgreSQL migration-contract CI: PASS.
+- PostgreSQL runtime-contract CI: PASS on the pre-final-fix head; final head must
+  remain green before merge.
+
+RESIDUAL GATES
+- Production dependency audit remains a separate P0 security PR. Do not use
+  npm audit fix --force.
+- No live provider key, live PostgreSQL pilot, or scheduled collector was used.
+- GO-MANUAL only until the documented P0 gates and 14-day pilot are complete.
