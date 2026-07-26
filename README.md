@@ -13,6 +13,7 @@
 - **Frontend**: React 19 + Vite + TypeScript + Tailwind CSS
 - **Backend**: Express + PostgreSQL + WebSocket
 - **Card Studio**: Puppeteer 기반 카드뉴스 자동 생성
+- **Runtime**: Node.js 22.12 이상 (Netlify 빌드는 22.17.1 고정)
 
 ## 브랜치
 

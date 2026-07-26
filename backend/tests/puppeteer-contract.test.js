@@ -5,6 +5,7 @@ const test = require('node:test');
 
 const dependencyManifest = require('../../package.json');
 const rootDirectory = path.resolve(__dirname, '..', '..');
+const netlifyConfiguration = fs.readFileSync(path.join(rootDirectory, 'netlify.toml'), 'utf8');
 const launchFiles = [
   'src/scraper.js',
   'src/screenshot.js',
@@ -18,6 +19,8 @@ const launchFiles = [
 
 test('Puppeteer uses the supported v25 dependency line', () => {
   assert.equal(dependencyManifest.dependencies.puppeteer, '^25.3.0');
+  assert.equal(dependencyManifest.engines.node, '>=22.12.0');
+  assert.match(netlifyConfiguration, /NODE_VERSION = "22\.17\.1"/);
 });
 
 test('browser rendering uses the current supported headless option everywhere', () => {

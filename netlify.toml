@@ -14,7 +14,7 @@
   publish = "community"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22.17.1"
   # API는 Netlify 프록시(/api/*)를 타므로 같은 origin (빈 값)
   VITE_API_BASE_URL = ""
   # WebSocket 은 프록시 불가 → Render 직접 연결
