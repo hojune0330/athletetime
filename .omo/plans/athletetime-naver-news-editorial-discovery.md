@@ -268,9 +268,9 @@
 - [x] 3. Terra: repository, 수동 run, 관리자 상태 전이 구현
 - [x] 4. Terra: 원출처 확인과 편성 연결
 - [x] 5. Terra: 관리자 `소식 발견함` UI 구현
-- [ ] 6. Sol: 독립 보안·정책·동시성 검수
-- [ ] 7. Terra: 운영 runbook과 2주 수동 pilot 패키지
-- [ ] 8. Sol: 최종 go/no-go와 다음 단계 결정
+- [x] 6. Sol: 독립 보안·정책·동시성 검수
+- [x] 7. Terra: 운영 runbook과 2주 수동 pilot 패키지
+- [x] 8. Sol: 최종 go/no-go와 다음 단계 결정
 
 ## 실행 순서
 

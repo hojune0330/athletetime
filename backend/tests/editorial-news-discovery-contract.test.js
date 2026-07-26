@@ -119,10 +119,11 @@ test('NEWS-DISCOVERY-CONTRACT-008: manual pilot runbook keeps collection disable
   // Given
   const runbook = read('docs/runbooks/editorial-news-discovery.md');
   const pilot = read('docs/templates/editorial-news-discovery-pilot.md');
+  const decision = read('docs/athletetime-naver-news-go-no-go.md');
   const workflow = read('WORKFLOW.md');
 
   // When
-  const combined = `${runbook}\n${pilot}`;
+  const combined = `${runbook}\n${pilot}\n${decision}`;
 
   // Then
   assert.match(runbook, /NAVER_NEWS_COLLECTOR_ENABLED/);
@@ -133,5 +134,7 @@ test('NEWS-DISCOVERY-CONTRACT-008: manual pilot runbook keeps collection disable
   assert.match(combined, /14일/);
   assert.match(combined, /기사 본문 저장/);
   assert.match(combined, /자동 글 생성·발행/);
+  assert.match(decision, /자동 실행 NO-GO/);
+  assert.match(decision, /현재 선택은 `GO-MANUAL`/);
   assert.match(workflow, /editorial-news-discovery\.md/);
 });
