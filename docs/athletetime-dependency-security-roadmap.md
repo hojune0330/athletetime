@@ -28,6 +28,14 @@ For each remediation pull request, use a current advisory source that can inspec
 | ws patch | backend chat transport | Update only `ws` to a current compatible patch; verify `/ws` and `/ws/chat`, malformed frames, disconnects, and room isolation. |
 | Axios, React Router, PostCSS | frontend network, navigation, build | Keep one small runtime-refresh PR; verify auth cookie flow, 401/400 handling, upload/error handling, protected redirects, 404, and browser back/forward. |
 
+Completed on the baseline date:
+
+- `jsPDF` 4.2.1: PR #56.
+- `ws` 8.21.1: PR #60.
+- `axios` 1.18.1, `react-router-dom` 7.18.1, and `postcss` 8.5.23: PR #62.
+
+These merged P0 changes still require ongoing production observation; completion here does not mean the dependency tree is clean.
+
 ### P1 - Major runtime upgrades
 
 | Work item | Why separate | Minimum regression checks |
