@@ -197,3 +197,13 @@ test('NEWS-INBOX-UI-005: Given more discovery pages When filters change Then cur
   assert.ok(hook.includes('discoveries: [], nextCursor: null'));
   assert.ok(hook.includes('discoveries: [...current.discoveries, ...page.discoveries]'));
 });
+
+test('NEWS-INBOX-UI-006: Given a youth or sensational headline When reviewing Then the inbox displays a human-check warning', () => {
+  // Given
+  const inbox = read('frontend/src/components/admin/editorial/NewsDiscoveryInbox.tsx');
+
+  // When / Then
+  assert.ok(inbox.includes('미성년자 관련 가능성이 있어'));
+  assert.ok(inbox.includes('선정적 표현 가능성이 있어'));
+  assert.equal(inbox.includes('자동 승인'), false);
+});

@@ -123,7 +123,8 @@ function parseNewsDiscoveryListQuery(query) {
   if (query.cursor !== undefined) {
     try {
       const value = JSON.parse(Buffer.from(query.cursor, 'base64url').toString('utf8'));
-      if (!value || typeof value.publishedAt !== 'string' || Number.isNaN(Date.parse(value.publishedAt)) || typeof value.id !== 'string' || !/^[0-9a-f-]{36}$/iu.test(value.id)) throw new TypeError('Invalid discovery cursor');
+      if (!value || typeof value.publishedAt !== 'string' || Number.isNaN(Date.parse(value.publishedAt)) || typeof value.id !== 'string') throw new TypeError('Invalid discovery cursor');
+      parseUuidParam(value.id);
     } catch { throw new TypeError('Invalid discovery cursor'); }
   }
   return query;

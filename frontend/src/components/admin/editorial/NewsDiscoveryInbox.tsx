@@ -10,15 +10,21 @@ import { useNewsDiscoveries } from '../../../hooks/useNewsDiscoveries';
 type NewsDiscoveryInboxProps = { readonly calendar: readonly EditorialCalendarEntry[]; };
 type OpenForm = { readonly kind: 'source' | 'calendar' | 'dismiss'; readonly id: string } | null;
 const STATUS_LABELS: Record<NewsDiscoveryStatus, string> = { discovered: '발견됨', reviewing: '검토 중', source_confirmed: '원문 확인', calendar_linked: '일정 연결됨', dismissed: '제외됨' };
+const SENSATIONAL_TITLE_PATTERN = /(?:충격|논란|폭로|의혹|파문)/u;
 
 function hostname(url: string): string { try { return new URL(url).hostname; } catch { return '알 수 없는 원문 도메인'; } }
 function timestamp(value: string | null): string { return value ? new Intl.DateTimeFormat('ko-KR', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Asia/Seoul' }).format(new Date(value)) : '기록 없음'; }
 function isBusy(id: string, busyId: string | null): boolean { return busyId === id || busyId === 'run'; }
+function reviewWarning(discovery: NewsDiscovery): string | null {
+  if (discovery.subjectAgeGroup === 'minor') return '미성년자 관련 가능성이 있어 이름과 맥락을 특히 확인하세요.';
+  if (SENSATIONAL_TITLE_PATTERN.test(discovery.title)) return '선정적 표현 가능성이 있어 사실과 원문 표현을 확인하세요.';
+  return null;
+}
 function runStatus(run: ReturnType<typeof useNewsDiscoveries>['lastRun']): string {
   if (!run) return '기록 없음';
   if (run.status === 'running') return '수집 중';
   if (run.status === 'completed') return '완료';
-  const messages: Record<string, string> = { credentials_missing: '연결 설정 확인 필요', quota_exceeded: '사용량 한도 초과', credentials_rejected: '연결 인증 확인 필요', provider_quota: '제공처 한도 초과', partial_failure: '일부 주제 수집 실패' };
+  const messages: Record<string, string> = { disabled: '수집 기능 꺼짐', credentials_missing: '연결 설정 확인 필요', quota_exceeded: '사용량 한도 초과', credentials_rejected: '연결 인증 확인 필요', provider_quota: '제공처 한도 초과', partial_failure: '일부 주제 수집 실패', storage_failure: '저장소 확인 필요' };
   return messages[run.safeErrorCode ?? 'partial_failure'] ?? '수집 처리 실패';
 }
 
@@ -66,6 +72,7 @@ export function NewsDiscoveryInbox({ calendar }: NewsDiscoveryInboxProps) {
           <p className="mt-2 text-xs text-ink-3">원문 도메인: <a className="underline underline-offset-2" href={discovery.originalUrl} target="_blank" rel="noopener noreferrer">{hostname(discovery.originalUrl)}</a> · {timestamp(discovery.publishedAt)}</p>
           <div className="mt-2 flex flex-wrap gap-1">{discovery.relevanceTags.map((tag) => <span key={tag} className="border border-line px-1.5 py-0.5 text-[10px] text-ink-3">{tag}</span>)}</div>
           <p className="mt-2 text-xs text-ink-3">관련 가능성이 있는 후보입니다. 제목과 원문을 직접 확인하세요.</p>
+          {reviewWarning(discovery) && <p role="note" className="mt-2 border-l-2 border-warn bg-amber-50 px-2 py-1.5 text-xs text-ink-2">{reviewWarning(discovery)}</p>}
           {discovery.confirmedSourceUrl && <p className="mt-2 text-xs text-ok">확인한 원문: {hostname(discovery.confirmedSourceUrl)}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {discovery.status === 'discovered' && <Button type="button" size="sm" variant="outline" disabled={isBusy(discovery.id, busyId)} onClick={() => { void startReview(discovery.id); }}>검토 시작</Button>}

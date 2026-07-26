@@ -173,3 +173,121 @@ test('NEWS-RUNTIME-007: advisory lock stays held until asynchronous collection f
   // Then
   assert.deepEqual(order, ['locked', 'callback-start', 'callback-end', 'unlocked', 'released']);
 });
+
+test('NEWS-RUNTIME-008: every provider attempt uses the repository-backed budget reservation', async () => {
+  // Given
+  let reservations = 0;
+  const client = { name: 'db-client' };
+  const repository = {
+    async withRunLock(_input, callback) {
+      return callback({ client, id: 'run-1', status: 'running', apiCallCount: 0 });
+    },
+    async reserveProviderCall(lockedClient, input) {
+      assert.equal(lockedClient, client);
+      assert.equal(input.runId, 'run-1');
+      reservations += 1;
+    },
+    async finishRun(_client, input) { return input; },
+  };
+  const provider = {
+    async search({ reserveCall }) {
+      await reserveCall();
+      return { items: [], apiCallCount: 1 };
+    },
+  };
+  const service = new EditorialNewsDiscoveryService({
+    repository,
+    provider,
+    profiles: ['korean-athletics'],
+  });
+
+  // When
+  const run = await service.runManual({
+    actorUserId: '00000000-0000-4000-8000-000000000001',
+    runDateKst: '2026-07-26',
+  });
+
+  // Then
+  assert.equal(reservations, 1);
+  assert.equal(run.apiCallCount, 1);
+});
+
+test('NEWS-RUNTIME-009: persistence failures fail the run instead of becoming irrelevant news', async () => {
+  // Given
+  const repository = {
+    async withRunLock(_input, callback) {
+      return callback({ client: {}, id: 'run-1', status: 'running', apiCallCount: 0 });
+    },
+    async upsertDiscovery() { throw new Error('database unavailable'); },
+    async finishRun(_client, input) { return input; },
+  };
+  const provider = {
+    async search() {
+      return {
+        items: [{
+          title: '중학생 육상 대회 결과',
+          originallink: 'https://example.com/result',
+          link: 'https://naver.example/result',
+          pubDate: '2026-07-26T00:00:00Z',
+        }],
+        apiCallCount: 1,
+      };
+    },
+  };
+  const service = new EditorialNewsDiscoveryService({
+    repository,
+    provider,
+    profiles: ['korean-athletics'],
+  });
+
+  // When
+  const run = await service.runManual({
+    actorUserId: '00000000-0000-4000-8000-000000000001',
+    runDateKst: '2026-07-26',
+  });
+
+  // Then
+  assert.equal(run.status, 'failed');
+  assert.equal(run.safeErrorCode, 'storage_failure');
+  assert.equal(run.irrelevantCount, 0);
+  assert.equal(run.resultCount, 1);
+});
+
+test('NEWS-RUNTIME-010: youth wording is persisted as a conservative minor-review warning', async () => {
+  // Given
+  let saved;
+  const repository = {
+    async withRunLock(_input, callback) {
+      return callback({ client: {}, id: 'run-1', status: 'running', apiCallCount: 0 });
+    },
+    async upsertDiscovery(_client, input) { saved = input; return { inserted: true }; },
+    async finishRun(_client, input) { return input; },
+  };
+  const provider = {
+    async search() {
+      return {
+        items: [{
+          title: 'U18 육상 선수권대회 결과',
+          originallink: 'https://example.com/u18',
+          link: 'https://naver.example/u18',
+          pubDate: '2026-07-26T00:00:00Z',
+        }],
+        apiCallCount: 1,
+      };
+    },
+  };
+  const service = new EditorialNewsDiscoveryService({
+    repository,
+    provider,
+    profiles: ['korean-athletics'],
+  });
+
+  // When
+  await service.runManual({
+    actorUserId: '00000000-0000-4000-8000-000000000001',
+    runDateKst: '2026-07-26',
+  });
+
+  // Then
+  assert.equal(saved.subjectAgeGroup, 'minor');
+});

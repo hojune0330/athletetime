@@ -69,17 +69,26 @@ class NaverNewsApiClient {
     this.timeoutMs = timeoutMs;
   }
 
-  async search({ profile, start = 1 } = {}) {
+  async search({ profile, start = 1, reserveCall } = {}) {
     const requestProfile = resolveEditorialNewsQuery(profile, start);
-    const keyId = this.env.NAVER_NEWS_API_KEY_ID;
-    const key = this.env.NAVER_NEWS_API_KEY;
-    if (typeof keyId !== 'string' || !keyId || typeof key !== 'string' || !key) throw new NaverNewsApiError('CREDENTIALS_MISSING');
+    if (this.env.NAVER_NEWS_COLLECTOR_ENABLED !== 'true') {
+      throw withApiCallCount(new NaverNewsApiError('COLLECTOR_DISABLED'), 0);
+    }
+    const keyId = this.env.NAVER_API_HUB_KEY_ID;
+    const key = this.env.NAVER_API_HUB_KEY;
+    if (typeof keyId !== 'string' || !keyId || typeof key !== 'string' || !key) {
+      throw withApiCallCount(new NaverNewsApiError('CREDENTIALS_MISSING'), 0);
+    }
+    if (reserveCall !== undefined && typeof reserveCall !== 'function') {
+      throw new TypeError('reserveCall must be a function');
+    }
+    const reserve = reserveCall || (() => this.budget.reserve());
     const url = new URL(API_ENDPOINT);
     url.search = new URLSearchParams({ query: requestProfile.query, sort: 'date', display: '100', start: String(requestProfile.start) }).toString();
     const request = { url: url.toString(), headers: { 'X-NCP-APIGW-API-KEY-ID': keyId, 'X-NCP-APIGW-API-KEY': key }, timeoutMs: this.timeoutMs };
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        this.budget.reserve();
+        await reserve();
       } catch (error) {
         error.apiCallCount = 0;
         throw error;

@@ -75,7 +75,6 @@ export default defineConfig({
           if (id.includes('/src/pages/RecordsPage') || id.includes('/src/components/record-insights') || id.includes('/src/components/records')) return 'page-records'
           if (id.includes('/src/pages/CompetitionsPage') || id.includes('/src/components/competitions') || id.includes('/src/api/competitions')) return 'page-competitions'
           if (id.includes('/src/pages/CommunityPage') || id.includes('/src/components/community') || id.includes('/src/components/post')) return 'page-community'
-          if (id.includes('/src/pages/admin')) return 'page-admin'
           if (id.includes('/src/pages/PaceCalculatorPage') || id.includes('/src/pages/TrainingCalculatorPage') || id.includes('/src/pages/PaceRisePage') || id.includes('/src/pages/ChatPage')) return 'page-tools'
           if (id.includes('/src/pages/Marketplace')) return 'page-marketplace'
         },

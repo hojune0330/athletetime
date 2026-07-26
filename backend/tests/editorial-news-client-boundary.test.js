@@ -34,7 +34,11 @@ test('NEWS-CLIENT-BOUNDARY-001: raw search results become persistence-safe disco
     }],
   });
   const client = new NaverNewsApiClient({
-    env: { NAVER_NEWS_API_KEY_ID: 'test-id', NAVER_NEWS_API_KEY: secret },
+    env: {
+      NAVER_NEWS_COLLECTOR_ENABLED: 'true',
+      NAVER_API_HUB_KEY_ID: 'test-id',
+      NAVER_API_HUB_KEY: secret,
+    },
     transport: async () => ({ statusCode: 200, body: rawResponse }),
   });
 
@@ -61,6 +65,6 @@ test('NEWS-CLIENT-BOUNDARY-001: raw search results become persistence-safe disco
 test('NEWS-CLIENT-BOUNDARY-002: frontend source cannot contain server credential names', () => {
   const frontendSource = readTree(path.join(ROOT, 'frontend', 'src'));
 
-  assert.doesNotMatch(frontendSource, /NAVER_NEWS_API_KEY(?:_ID)?/u);
+  assert.doesNotMatch(frontendSource, /NAVER_API_HUB_KEY(?:_ID)?/u);
   assert.doesNotMatch(frontendSource, /X-NCP-APIGW-API-KEY(?:-ID)?/u);
 });

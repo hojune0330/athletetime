@@ -74,17 +74,17 @@ function decodeEntity(_whole, entity) {
   }
 }
 
-function sanitizeTitle(value) {
-  if (typeof value !== 'string') throw new TypeError('NAVER news item title must be a string');
+function sanitizePlainText(value, { label = 'text', maximum = 300 } = {}) {
+  if (typeof value !== 'string') throw new TypeError(`${label} must be a string`);
   const plainText = value
+    .replace(/&(#x[\da-f]+|#\d+|[a-z]+);/giu, decodeEntity)
     .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/giu, '')
     .replace(/<[^>]*>/gu, '')
-    .replace(/&(#x[\da-f]+|#\d+|[a-z]+);/giu, decodeEntity)
     .replace(/[\u0000-\u001f\u007f-\u009f]+/gu, ' ')
     .replace(/\s+/gu, ' ')
     .trim();
-  if (plainText === '') throw new TypeError('NAVER news item title must not be empty');
-  return plainText.slice(0, 300);
+  if (plainText === '') throw new TypeError(`${label} must not be empty`);
+  return plainText.slice(0, maximum);
 }
 
 function parsePublishedAt(value) {
@@ -138,7 +138,7 @@ function normalizeNaverNewsItem(item) {
   const originalUrl = firstSafeUrl([item.originallink, item.link]);
   const candidateNaverUrl = optionalSafeUrl(item.link);
   const naverUrl = candidateNaverUrl === originalUrl ? null : candidateNaverUrl;
-  const title = sanitizeTitle(item.title);
+  const title = sanitizePlainText(item.title, { label: 'NAVER news item title' });
   const publishedAt = parsePublishedAt(item.pubDate);
 
   return {
@@ -150,4 +150,4 @@ function normalizeNaverNewsItem(item) {
   };
 }
 
-module.exports = { classifyEditorialNewsRelevance, normalizeNaverNewsItem };
+module.exports = { classifyEditorialNewsRelevance, normalizeNaverNewsItem, sanitizePlainText };

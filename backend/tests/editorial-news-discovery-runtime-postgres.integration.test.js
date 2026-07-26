@@ -127,3 +127,123 @@ test('NEWS-SOURCE-LINK-PG-001: confirmed source links one planned calendar witho
   assert.equal(secondState.rows[0].status, 'source_confirmed');
   assert.equal(audit.rows[0].count, 1);
 });
+
+test('NEWS-RUNTIME-PG-004: failed-run restarts keep a persistent daily provider budget', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available', timeout: 30000,
+}, async (t) => {
+  // Given
+  const pool = await isolatedPool(t, 'news_persistent_budget');
+  await createExistingFixture(pool);
+  await applyEditorialMigrations(pool);
+  let networkCalls = 0;
+  const provider = {
+    async search({ reserveCall }) {
+      await reserveCall();
+      networkCalls += 1;
+      const error = Object.assign(new Error('provider unavailable'), { code: 'HTTP_500', apiCallCount: 1 });
+      throw error;
+    },
+  };
+
+  // When
+  let finalRun;
+  for (let attempt = 0; attempt < 41; attempt += 1) {
+    const service = new EditorialNewsDiscoveryService({
+      repository: new EditorialNewsDiscoveryRepository(pool),
+      provider,
+      profiles: ['korean-athletics'],
+    });
+    finalRun = await service.runManual({ actorUserId: ACTOR_ID, runDateKst: '2026-07-26' });
+  }
+
+  // Then
+  assert.equal(networkCalls, 40);
+  assert.equal(finalRun.safeErrorCode, 'quota_exceeded');
+  assert.equal(finalRun.apiCallCount, 40);
+  const persisted = await pool.query(
+    "SELECT api_call_count FROM editorial_news_runs WHERE run_date_kst='2026-07-26'",
+  );
+  assert.equal(persisted.rows[0].api_call_count, 40);
+});
+
+test('NEWS-RUNTIME-PG-005: monthly provider budget survives later-day process restarts', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available', timeout: 30000,
+}, async (t) => {
+  // Given
+  const pool = await isolatedPool(t, 'news_monthly_budget');
+  await createExistingFixture(pool);
+  await applyEditorialMigrations(pool);
+  await pool.query(`INSERT INTO editorial_news_runs (
+    id, run_date_kst, profile_version, trigger, status, completed_at,
+    api_call_count, safe_error_code, actor_user_id
+  ) VALUES (
+    '40000000-0000-4000-8000-000000000001','2026-07-01','prior-budget',
+    'manual','failed',NOW(),800,'partial_failure',$1
+  )`, [ACTOR_ID]);
+  let networkCalls = 0;
+  const provider = {
+    async search({ reserveCall }) {
+      await reserveCall();
+      networkCalls += 1;
+      return { items: [], apiCallCount: 1 };
+    },
+  };
+  const service = new EditorialNewsDiscoveryService({
+    repository: new EditorialNewsDiscoveryRepository(pool),
+    provider,
+    profiles: ['korean-athletics'],
+    env: {},
+  });
+
+  // When
+  const run = await service.runManual({
+    actorUserId: ACTOR_ID,
+    runDateKst: '2026-07-26',
+  });
+
+  // Then
+  assert.equal(networkCalls, 0);
+  assert.equal(run.status, 'failed');
+  assert.equal(run.safeErrorCode, 'quota_exceeded');
+  assert.equal(run.apiCallCount, 0);
+});
+
+test('NEWS-RUNTIME-PG-006: concurrent waiters share one failed provider attempt but a later retry is explicit', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available', timeout: 30000,
+}, async (t) => {
+  // Given
+  const pool = await isolatedPool(t, 'news_failed_waiters');
+  await createExistingFixture(pool);
+  await applyEditorialMigrations(pool);
+  const repository = new EditorialNewsDiscoveryRepository(pool);
+  let calls = 0;
+  const provider = {
+    async search() {
+      calls += 1;
+      await new Promise((resolve) => setTimeout(resolve, 40));
+      throw Object.assign(new Error('provider unavailable'), { code: 'HTTP_500', apiCallCount: 1 });
+    },
+  };
+  const service = new EditorialNewsDiscoveryService({
+    repository,
+    provider,
+    profiles: ['korean-athletics'],
+  });
+
+  // When
+  const [left, right] = await Promise.all([
+    service.runManual({ actorUserId: ACTOR_ID, runDateKst: '2026-07-26' }),
+    service.runManual({ actorUserId: ACTOR_ID, runDateKst: '2026-07-26' }),
+  ]);
+  const retry = await service.runManual({
+    actorUserId: ACTOR_ID,
+    runDateKst: '2026-07-26',
+  });
+
+  // Then
+  assert.equal(left.id, right.id);
+  assert.equal(left.status, 'failed');
+  assert.equal(right.status, 'failed');
+  assert.equal(retry.id, left.id);
+  assert.equal(calls, 2);
+});

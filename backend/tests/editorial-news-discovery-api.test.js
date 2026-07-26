@@ -64,6 +64,17 @@ test('NEWS-API-002: malformed pagination is rejected before the service boundary
 
   // When
   const response = await request(api, 'GET', '/api/admin/editorial/news-discoveries?cursor=not-base64', undefined, { 'X-Test-Role': 'admin' });
+  const invalidUuidCursor = Buffer.from(JSON.stringify({
+    publishedAt: '2026-07-26T00:00:00Z',
+    id: '------------------------------------',
+  })).toString('base64url');
+  const invalidUuid = await request(
+    api,
+    'GET',
+    `/api/admin/editorial/news-discoveries?cursor=${invalidUuidCursor}`,
+    undefined,
+    { 'X-Test-Role': 'admin' },
+  );
   const status = await request(api, 'GET', '/api/admin/editorial/news-discoveries?status=published', undefined, { 'X-Test-Role': 'admin' });
   const limit = await request(api, 'GET', '/api/admin/editorial/news-discoveries?limit=101', undefined, { 'X-Test-Role': 'admin' });
   const range = await request(api, 'GET', '/api/admin/editorial/news-discoveries?range=year', undefined, { 'X-Test-Role': 'admin' });
@@ -71,6 +82,7 @@ test('NEWS-API-002: malformed pagination is rejected before the service boundary
 
   // Then
   assert.equal(response.response.status, 400);
+  assert.equal(invalidUuid.response.status, 400);
   assert.equal(status.response.status, 400);
   assert.equal(limit.response.status, 400);
   assert.equal(range.response.status, 400);

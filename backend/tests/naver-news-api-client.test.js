@@ -8,7 +8,11 @@ const {
 const { resolveEditorialNewsQuery } = require('../../card-studio/services/editorialNewsQueryProfile');
 const { EditorialNewsBudget } = require('../../card-studio/services/editorialNewsBudget');
 
-const env = { NAVER_NEWS_API_KEY_ID: 'test-id', NAVER_NEWS_API_KEY: 'test-secret' };
+const env = {
+  NAVER_NEWS_COLLECTOR_ENABLED: 'true',
+  NAVER_API_HUB_KEY_ID: 'test-id',
+  NAVER_API_HUB_KEY: 'test-secret',
+};
 const payload = (items = [{ title: 'safe title', originallink: 'https://origin.test/a', link: 'https://news.test/a', pubDate: 'Tue' }]) => JSON.stringify({ total: 1, start: 1, display: 100, items });
 const response = (statusCode, body = payload()) => ({ statusCode, body });
 const client = (transport, extra = {}) => new NaverNewsApiClient({ env, transport, sleep: async () => {}, jitter: () => 0, ...extra });
@@ -30,8 +34,27 @@ test('Given invalid profiles or paging, when resolving requests, then arbitrary 
 
 test('Given missing credentials, when searching, then it fails without transport call or secret disclosure', async () => {
   let calls = 0;
-  const missing = new NaverNewsApiClient({ env: {}, transport: async () => { calls += 1; } });
+  const missing = new NaverNewsApiClient({
+    env: { NAVER_NEWS_COLLECTOR_ENABLED: 'true' },
+    transport: async () => { calls += 1; },
+  });
   await assert.rejects(() => missing.search({ profile: 'korean-athletics' }), (error) => error instanceof NaverNewsApiError && error.code === 'CREDENTIALS_MISSING' && !String(error).includes('secret'));
+  assert.equal(calls, 0);
+});
+
+test('Given the collector flag is not enabled, when searching, then it fails before credentials or transport', async () => {
+  // Given
+  let calls = 0;
+  const disabled = new NaverNewsApiClient({
+    env: { NAVER_API_HUB_KEY_ID: 'test-id', NAVER_API_HUB_KEY: 'test-secret' },
+    transport: async () => { calls += 1; },
+  });
+
+  // When / Then
+  await assert.rejects(
+    () => disabled.search({ profile: 'korean-athletics' }),
+    (error) => error.code === 'COLLECTOR_DISABLED' && error.apiCallCount === 0,
+  );
   assert.equal(calls, 0);
 });
 
@@ -105,4 +128,45 @@ test('Given stale quota keys, when reserving a new period, then prior exhaustion
   const budget = new EditorialNewsBudget({ state: { day: 40, month: 800, dayKey: '2026-07-25', monthKey: '2026-06' }, now: () => new Date('2026-07-26T00:00:00Z') });
   budget.reserve();
   assert.deepEqual(budget.snapshot(), { day: 1, month: 1, dayKey: '2026-07-26', monthKey: '2026-07' });
+});
+
+test('Given a persistent reservation callback, when retrying, then every network attempt reserves before transport', async () => {
+  // Given
+  let calls = 0;
+  let reservations = 0;
+  const instance = client(async () => {
+    calls += 1;
+    return calls === 1 ? response(500) : response(200);
+  });
+
+  // When
+  const result = await instance.search({
+    profile: 'korean-athletics',
+    reserveCall: async () => { reservations += 1; },
+  });
+
+  // Then
+  assert.equal(result.apiCallCount, 2);
+  assert.equal(calls, 2);
+  assert.equal(reservations, 2);
+});
+
+test('Given a persistent quota rejection, when reserving, then transport is never called', async () => {
+  // Given
+  let calls = 0;
+  const instance = client(async () => {
+    calls += 1;
+    return response(200);
+  });
+  const quotaError = Object.assign(new Error('quota'), { code: 'QUOTA_EXCEEDED' });
+
+  // When / Then
+  await assert.rejects(
+    () => instance.search({
+      profile: 'korean-athletics',
+      reserveCall: async () => { throw quotaError; },
+    }),
+    (error) => error.code === 'QUOTA_EXCEEDED' && error.apiCallCount === 0,
+  );
+  assert.equal(calls, 0);
 });

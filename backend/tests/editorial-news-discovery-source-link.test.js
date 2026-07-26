@@ -41,3 +41,21 @@ test('NEWS-SOURCE-LINK-002: calendar linking requires an exact UUID and optimist
   assert.throws(() => parseCalendarLinkBody({ calendarId: 'bad', expectedCalendarVersion: 1 }), /calendarId/u);
   assert.throws(() => parseCalendarLinkBody({ calendarId: '10000000-0000-4000-8000-000000000001', expectedCalendarVersion: 1, note: 'x' }), /Invalid/u);
 });
+
+test('NEWS-SOURCE-LINK-004: confirmed source labels are stored as bounded plain text', () => {
+  // Given
+  const body = {
+    sourceUrl: 'https://example.com/source',
+    title: '&lt;img src=x onerror=alert(1)&gt;<script>ignored()</script><b>Original &amp; result</b>',
+    publisher: '&lt;i&gt;Example&nbsp;News&lt;/i&gt;',
+    sourceKind: 'secondary',
+  };
+
+  // When
+  const parsed = parseConfirmedSourceBody(body);
+
+  // Then
+  assert.equal(parsed.title, 'Original & result');
+  assert.equal(parsed.publisher, 'Example News');
+  assert.doesNotMatch(JSON.stringify(parsed), /<|>|script/iu);
+});

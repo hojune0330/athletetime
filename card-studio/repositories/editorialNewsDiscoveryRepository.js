@@ -27,25 +27,52 @@ async function appendEvent(client, { runId = null, discoveryId = null, eventType
     VALUES ($1,$2,$3,$4,$5::jsonb)`, [runId, discoveryId, eventType, actorUserId, JSON.stringify(metadata)]);
 }
 
+async function inTransaction(client, callback) {
+  await client.query('BEGIN');
+  try {
+    const result = await callback();
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK').catch(() => undefined);
+    throw error;
+  }
+}
+
 class EditorialNewsDiscoveryRepository {
   constructor(pool) { this.pool = pool; }
 
   async withRunLock(input, callback) {
     const client = await this.pool.connect();
     try {
+      const requestClock = await client.query('SELECT clock_timestamp() AS requested_at');
+      const requestedAt = requestClock.rows[0]?.requested_at;
       await client.query('SELECT pg_advisory_lock(hashtextextended($1, 0))', [`editorial-news:${input.runDateKst}:${input.profileVersion}`]);
       const existing = await client.query('SELECT * FROM editorial_news_runs WHERE run_date_kst=$1 AND profile_version=$2', [input.runDateKst, input.profileVersion]);
-      if (existing.rowCount && existing.rows[0].status === 'completed') return await callback({ client, existing: runView(existing.rows[0]) });
+      const existingRun = existing.rowCount ? runView(existing.rows[0]) : null;
+      const completedForWaitingRequest = existingRun?.status === 'failed'
+        && existingRun.completedAt
+        && requestedAt
+        && new Date(existingRun.completedAt).getTime() >= new Date(requestedAt).getTime();
+      if (existingRun && (existingRun.status === 'completed' || completedForWaitingRequest)) {
+        return await callback({ client, existing: existingRun });
+      }
       if (existing.rowCount) {
-        const restarted = await client.query(`UPDATE editorial_news_runs SET status='running', started_at=NOW(), completed_at=NULL,
-          api_call_count=0, result_count=0, inserted_count=0, duplicate_count=0, irrelevant_count=0, safe_error_code=NULL, actor_user_id=$2
-          WHERE id=$1 RETURNING *`, [existing.rows[0].id, input.actorUserId]);
-        await appendEvent(client, { runId: restarted.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId, metadata: { restarted: true } });
+        const restarted = await inTransaction(client, async () => {
+          const result = await client.query(`UPDATE editorial_news_runs SET status='running', started_at=NOW(), completed_at=NULL,
+            result_count=0, inserted_count=0, duplicate_count=0, irrelevant_count=0, safe_error_code=NULL, actor_user_id=$2
+            WHERE id=$1 RETURNING *`, [existing.rows[0].id, input.actorUserId]);
+          await appendEvent(client, { runId: result.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId, metadata: { restarted: true } });
+          return result;
+        });
         return await callback({ client, ...runView(restarted.rows[0]) });
       }
-      const created = await client.query(`INSERT INTO editorial_news_runs (id, run_date_kst, profile_version, trigger, status, actor_user_id)
-        VALUES ($1,$2,$3,'manual','running',$4) RETURNING *`, [crypto.randomUUID(), input.runDateKst, input.profileVersion, input.actorUserId]);
-      await appendEvent(client, { runId: created.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId });
+      const created = await inTransaction(client, async () => {
+        const result = await client.query(`INSERT INTO editorial_news_runs (id, run_date_kst, profile_version, trigger, status, actor_user_id)
+          VALUES ($1,$2,$3,'manual','running',$4) RETURNING *`, [crypto.randomUUID(), input.runDateKst, input.profileVersion, input.actorUserId]);
+        await appendEvent(client, { runId: result.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId });
+        return result;
+      });
       return await callback({ client, ...runView(created.rows[0]) });
     } finally {
       await client.query('SELECT pg_advisory_unlock(hashtextextended($1, 0))', [`editorial-news:${input.runDateKst}:${input.profileVersion}`]).catch(() => {});
@@ -62,16 +89,61 @@ class EditorialNewsDiscoveryRepository {
       last_seen_at=NOW(), query_keys=(SELECT jsonb_agg(DISTINCT value) FROM jsonb_array_elements_text(editorial_news_discoveries.query_keys || EXCLUDED.query_keys) value),
       relevance_score=GREATEST(editorial_news_discoveries.relevance_score, EXCLUDED.relevance_score),
       relevance_tags=EXCLUDED.relevance_tags
-    RETURNING (xmax = 0) AS inserted`, [crypto.randomUUID(), input.canonicalUrlHash, input.originalUrl, input.naverUrl, input.title, input.publishedAt, input.runId, JSON.stringify(input.queryKeys), input.relevanceScore, JSON.stringify(input.relevanceTags), 'unknown']);
+    RETURNING (xmax = 0) AS inserted`, [crypto.randomUUID(), input.canonicalUrlHash, input.originalUrl, input.naverUrl, input.title, input.publishedAt, input.runId, JSON.stringify(input.queryKeys), input.relevanceScore, JSON.stringify(input.relevanceTags), input.subjectAgeGroup]);
     return { inserted: result.rows[0].inserted };
   }
 
+  async reserveProviderCall(client, input) {
+    await client.query("SELECT pg_advisory_lock(hashtextextended('editorial-news-budget', 0))");
+    try {
+      const usage = await client.query(`SELECT
+        COALESCE(SUM(api_call_count) FILTER (WHERE run_date_kst=$1::date),0)::int AS day_calls,
+        COALESCE(SUM(api_call_count) FILTER (
+          WHERE run_date_kst >= date_trunc('month',$1::date)::date
+            AND run_date_kst < (date_trunc('month',$1::date) + INTERVAL '1 month')::date
+        ),0)::int AS month_calls
+        FROM editorial_news_runs`, [input.runDateKst]);
+      const { day_calls: dayCalls, month_calls: monthCalls } = usage.rows[0];
+      if (dayCalls >= input.dailyLimit || monthCalls >= input.monthlyLimit) {
+        const error = new Error('Editorial news call budget exceeded');
+        error.code = 'QUOTA_EXCEEDED';
+        error.apiCallCount = 0;
+        throw error;
+      }
+      const updated = await client.query(
+        'UPDATE editorial_news_runs SET api_call_count=api_call_count+1 WHERE id=$1 RETURNING api_call_count',
+        [input.runId],
+      );
+      if (!updated.rowCount) throw newsError('NEWS_RUN_NOT_FOUND', 'News run not found', 404);
+      return Number(updated.rows[0].api_call_count);
+    } finally {
+      await client.query("SELECT pg_advisory_unlock(hashtextextended('editorial-news-budget', 0))").catch(() => {});
+    }
+  }
+
   async finishRun(client, input) {
-    const result = await client.query(`UPDATE editorial_news_runs SET status=$2, completed_at=NOW(), api_call_count=$3,
-      result_count=$4, inserted_count=$5, duplicate_count=$6, irrelevant_count=$7, safe_error_code=$8 WHERE id=$1 RETURNING *`,
-    [input.id, input.status, input.apiCallCount, input.resultCount, input.insertedCount, input.duplicateCount, input.irrelevantCount, input.safeErrorCode]);
-    await appendEvent(client, { runId: input.id, eventType: 'run_completed', actorUserId: result.rows[0].actor_user_id, metadata: { status: input.status, apiCallCount: input.apiCallCount, resultCount: input.resultCount, insertedCount: input.insertedCount, duplicateCount: input.duplicateCount, irrelevantCount: input.irrelevantCount, safeErrorCode: input.safeErrorCode } });
-    return runView(result.rows[0]);
+    return inTransaction(client, async () => {
+      const result = await client.query(`UPDATE editorial_news_runs SET status=$2, completed_at=NOW(),
+        result_count=$3, inserted_count=$4, duplicate_count=$5, irrelevant_count=$6, safe_error_code=$7 WHERE id=$1 RETURNING *`,
+      [input.id, input.status, input.resultCount, input.insertedCount, input.duplicateCount, input.irrelevantCount, input.safeErrorCode]);
+      if (!result.rowCount) throw newsError('NEWS_RUN_NOT_FOUND', 'News run not found', 404);
+      const row = result.rows[0];
+      await appendEvent(client, {
+        runId: input.id,
+        eventType: 'run_completed',
+        actorUserId: row.actor_user_id,
+        metadata: {
+          status: input.status,
+          apiCallCount: Number(row.api_call_count),
+          resultCount: input.resultCount,
+          insertedCount: input.insertedCount,
+          duplicateCount: input.duplicateCount,
+          irrelevantCount: input.irrelevantCount,
+          safeErrorCode: input.safeErrorCode,
+        },
+      });
+      return runView(row);
+    });
   }
 
   async listRuns({ limit = 30 } = {}) {
