@@ -20,7 +20,26 @@ function redactEmail(email) {
 }
 
 function getSafeErrorMessage(error) {
+  if (error && typeof error === 'object' && typeof error.message === 'string') {
+    return error.message;
+  }
+
   return error instanceof Error ? error.message : String(error);
+}
+
+async function sendResendEmail(message) {
+  const result = await resend.emails.send(message);
+
+  if (result && result.error) {
+    throw new Error(getSafeErrorMessage(result.error));
+  }
+
+  const messageId = result && (result.data?.id || result.id);
+  if (typeof messageId !== 'string' || messageId.length === 0) {
+    throw new Error('Email provider did not return a message ID');
+  }
+
+  return messageId;
 }
 
 // API 키 경고
@@ -377,15 +396,15 @@ async function sendVerificationEmail(email, code, nickname) {
   try {
     console.log('📧 이메일 발송 시도:', { to: redactEmail(email), from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
     
-    const result = await resend.emails.send({
+    const messageId = await sendResendEmail({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: email,
       subject: `[애슬리트 타임] 이메일 인증 코드: ${code}`,
       html: getVerificationEmailHtml(code, nickname)
     });
 
-    console.log('✅ 인증 이메일 발송 성공:', JSON.stringify(result, null, 2));
-    return { success: true, messageId: result.id };
+    console.log('✅ 인증 이메일 발송 성공:', messageId);
+    return { success: true, messageId };
   } catch (error) {
     console.error('❌ 인증 이메일 발송 실패:', getSafeErrorMessage(error));
     throw new Error('이메일 발송에 실패했습니다');
@@ -404,17 +423,17 @@ async function sendResetPasswordEmail(email, resetToken, nickname) {
   const resetUrl = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
   
   try {
-    const result = await resend.emails.send({
+    const messageId = await sendResendEmail({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: email,
       subject: '[애슬리트 타임] 비밀번호 재설정',
       html: getResetPasswordEmailHtml(resetUrl, nickname)
     });
 
-    console.log('✅ 비밀번호 재설정 이메일 발송 성공:', result.id);
-    return { success: true, messageId: result.id };
+    console.log('✅ 비밀번호 재설정 이메일 발송 성공:', messageId);
+    return { success: true, messageId };
   } catch (error) {
-    console.error('❌ 비밀번호 재설정 이메일 발송 실패:', error);
+    console.error('❌ 비밀번호 재설정 이메일 발송 실패:', getSafeErrorMessage(error));
     throw new Error('이메일 발송에 실패했습니다');
   }
 }
@@ -431,15 +450,15 @@ async function sendResetPasswordCodeEmail(email, code, nickname) {
   try {
     console.log('📧 비밀번호 재설정 인증 코드 이메일 발송 시도:', { to: redactEmail(email), from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>` });
     
-    const result = await resend.emails.send({
+    const messageId = await sendResendEmail({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: email,
       subject: `[애슬리트 타임] 비밀번호 재설정 인증 코드: ${code}`,
       html: getResetPasswordCodeEmailHtml(code, nickname)
     });
 
-    console.log('✅ 비밀번호 재설정 인증 코드 이메일 발송 성공:', JSON.stringify(result, null, 2));
-    return { success: true, messageId: result.id };
+    console.log('✅ 비밀번호 재설정 인증 코드 이메일 발송 성공:', messageId);
+    return { success: true, messageId };
   } catch (error) {
     console.error('❌ 비밀번호 재설정 인증 코드 이메일 발송 실패:', getSafeErrorMessage(error));
     throw new Error('이메일 발송에 실패했습니다');
@@ -456,7 +475,7 @@ async function sendWelcomeEmail(email, nickname) {
   }
   
   try {
-    const result = await resend.emails.send({
+    const messageId = await sendResendEmail({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: email,
       subject: '[애슬리트 타임] 가입을 환영합니다! 🏃',
@@ -469,10 +488,10 @@ async function sendWelcomeEmail(email, nickname) {
       `
     });
 
-    console.log('✅ 환영 이메일 발송 성공:', result.id);
-    return { success: true, messageId: result.id };
+    console.log('✅ 환영 이메일 발송 성공:', messageId);
+    return { success: true, messageId };
   } catch (error) {
-    console.error('❌ 환영 이메일 발송 실패:', error);
+    console.error('❌ 환영 이메일 발송 실패:', getSafeErrorMessage(error));
     // 환영 이메일은 실패해도 무시
     return { success: false };
   }
