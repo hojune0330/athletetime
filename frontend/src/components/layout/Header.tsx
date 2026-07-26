@@ -190,7 +190,7 @@ export default function Header() {
       const response = await authApi.forgotPassword(forgotEmail)
       
       if (response.success) {
-        setForgotSuccess('인증 코드가 발송되었습니다. 이메일을 확인해주세요.')
+        setForgotSuccess('등록된 이메일이라면 인증 코드를 보냈어요. 이메일을 확인해 주세요.')
         setModalMode('verifyCode')
       } else {
         setForgotError(response.error || '인증 코드 발송에 실패했습니다.')

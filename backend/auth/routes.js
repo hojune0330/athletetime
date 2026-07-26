@@ -39,7 +39,7 @@ const router = express.Router();
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const AUTH_CODE_SENT_RESPONSE = {
   success: true,
-  message: '인증 코드가 발송되었습니다',
+  message: '등록된 이메일이라면 인증 코드를 보냈습니다.',
 };
 
 /**

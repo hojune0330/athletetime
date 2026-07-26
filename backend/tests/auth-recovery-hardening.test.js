@@ -112,3 +112,19 @@ test('recovery flow persists only hashes, limits guesses, and keeps production a
   assert.match(migrationSource, /verification_code_hash CHAR\(64\)/);
   assert.match(migrationSource, /UPDATE password_reset_codes/);
 });
+
+test('Given a legacy active reset row When the recovery migration runs Then it makes code nullable before clearing plaintext codes', () => {
+  const migrationSource = fs.readFileSync(
+    path.join(ROOT, 'backend/database/migration-006-auth-recovery-security.sql'),
+    'utf8',
+  );
+  const dropNotNull = migrationSource.indexOf('ALTER COLUMN code DROP NOT NULL');
+  const retireLegacyCodes = migrationSource.indexOf('UPDATE password_reset_codes');
+
+  assert.ok(dropNotNull >= 0, 'migration must make the legacy code column nullable');
+  assert.ok(retireLegacyCodes >= 0, 'migration must retire legacy plaintext reset codes');
+  assert.ok(
+    dropNotNull < retireLegacyCodes,
+    'migration must drop the legacy NOT NULL constraint before setting code to NULL',
+  );
+});

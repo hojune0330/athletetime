@@ -66,3 +66,12 @@ test('frontend treats an anonymous me response as a quiet unauthenticated state'
   assert.match(client, /function isGuestSessionCheck/);
   assert.match(client, /return status === 401 && url\.includes\('\/api\/auth\/me'\)/);
 });
+
+test('password recovery keeps its account-existence response truthful and non-enumerating', () => {
+  const header = read('frontend/src/components/layout/Header.tsx');
+  const routes = read('backend/auth/routes.js');
+
+  assert.match(header, /등록된 이메일이라면 인증 코드를 보냈어요/);
+  assert.doesNotMatch(header, /인증 코드가 발송되었습니다\. 이메일을 확인해주세요\./);
+  assert.match(routes, /등록된 이메일이라면 인증 코드를 보냈습니다\./);
+});
