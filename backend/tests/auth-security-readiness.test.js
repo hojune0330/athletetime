@@ -10,7 +10,7 @@ const PORT = String(5200 + Math.floor(Math.random() * 500));
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 const RESET_SENT_BODY = {
   success: true,
-  message: '인증 코드가 발송되었습니다',
+  message: '등록된 이메일이라면 인증 코드를 보냈습니다.',
 };
 
 let serverProcess;
