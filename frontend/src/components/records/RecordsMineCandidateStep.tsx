@@ -23,9 +23,9 @@ export function CandidateStep({
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-candidates">
       <div>
         <p className="text-sm font-semibold text-brand">2단계</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">후보에서 내 기록을 고르세요.</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">화면에 모아 볼 기록을 고르세요.</h1>
         <p className="mt-3 text-sm leading-6 text-ink-3">
-          같은 이름이 여러 명일 수 있어요. 소속·연도를 보고 내 것만 고르세요.
+          같은 이름이 여러 명일 수 있어요. 소속·연도·종목을 확인한 뒤 원하는 기록만 고르세요.
         </p>
         <p className="mt-1 text-xs text-ink-4">선택해도 목록 위치는 바뀌지 않아요.</p>
       </div>
@@ -70,6 +70,7 @@ function CandidateRow({
     <button
       type="button"
       aria-pressed={selected}
+      aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : '선택 안 됨'}`}
       onClick={onToggle}
       className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition ${
         selected ? 'border-brand bg-brand/10' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
@@ -85,14 +86,16 @@ function CandidateRow({
           ))}
         </span>
       </span>
-      <span
-        className={`mt-1 flex h-7 w-7 shrink-0 items-center justify-center border text-sm font-bold ${
-          selected ? 'border-brand bg-brand text-white' : 'border-line bg-white text-transparent'
-        }`}
-        aria-hidden
-      >
-        ✓
-      </span>
+      {selected ? (
+        <span
+          className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center border border-brand bg-brand text-sm font-bold text-white"
+          aria-hidden
+        >
+          ✓
+        </span>
+      ) : (
+        <span className="mt-1 h-7 w-7 shrink-0 border border-line bg-white" aria-hidden />
+      )}
     </button>
   );
 }

@@ -8,34 +8,26 @@ import AdminLayout from './components/layout/AdminLayout'
 import AdminRoute from './components/layout/AdminRoute'
 import RequireAuth from './components/layout/RequireAuth'
 import ScrollToTop from './components/ScrollToTop'
+import FeaturePreparingPage from './components/common/FeaturePreparingPage'
 
 const MainPage = lazy(() => import('./pages/MainPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
 const PaceCalculatorPage = lazy(() => import('./pages/PaceCalculatorPage'))
 const TrainingCalculatorPage = lazy(() => import('./pages/TrainingCalculatorPage'))
 const ChatPage = lazy(() => import('./pages/ChatPage'))
-const PostDetailPage = lazy(() => import('./pages/PostDetailPage'))
-const EditPostPage = lazy(() => import('./pages/EditPostPage'))
-const WritePage = lazy(() => import('./pages/WritePage'))
-const BoardPage = lazy(() => import('./pages/BoardPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const CompetitionsPage = lazy(() => import('./pages/CompetitionsPage'))
-const CompetitionFormPage = lazy(() => import('./pages/CompetitionFormPage'))
 const MatchResultListPage = lazy(() => import('./pages/MatchResultListPage'))
 const MatchResultDetailPage = lazy(() => import('./pages/MatchResultDetailPage'))
-const MatchResultFormPage = lazy(() => import('./pages/MatchResultFormPage'))
 const ProfileCardPage = lazy(() => import('./pages/ProfileCardStudio'))
 const AthleteDetailPage = lazy(() => import('./pages/AthleteDetailPage'))
 const RecordsPage = lazy(() => import('./pages/RecordsPage'))
 const AboutDataPage = lazy(() => import('./pages/AboutDataPage'))
 const ScheduleCardPage = lazy(() => import('./pages/ScheduleCardPage'))
-const MarketplacePage = lazy(() => import('./pages/MarketplacePage'))
-const MarketplaceDetailPage = lazy(() => import('./pages/MarketplaceDetailPage'))
-const MarketplaceFormPage = lazy(() => import('./pages/MarketplaceFormPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminGalleryPage = lazy(() => import('./pages/admin/AdminGalleryPage'))
 const AdminCardStudioPage = lazy(() => import('./pages/admin/AdminCardStudioPage'))
@@ -143,41 +135,30 @@ function App() {
             <Route path="/community" element={<Layout />}>
               <Route index element={lazyPage(<CommunityPage />)} />
               <Route path="best" element={lazyPage(<CommunityPage />)} />
-              <Route path="board/:boardId" element={lazyPage(<BoardPage />)} />
-              <Route path="post/:postId" element={lazyPage(<PostDetailPage />)} />
+              <Route path="board/:boardId" element={lazyPage(<CommunityPage />)} />
+              <Route path="post/:postId" element={lazyPage(<CommunityPage />)} />
             </Route>
 
-            {/* 글쓰기 (로그인 필요) */}
-            <Route element={<RequireAuth />}>
-              <Route path="/write" element={<Layout />}>
-                <Route index element={lazyPage(<WritePage />)} />
-              </Route>
+            <Route path="/write" element={<Layout />}>
+              <Route index element={lazyPage(<CommunityPage />)} />
             </Route>
-
-            {/* 게시글 수정 (로그인 필요) */}
-            <Route element={<RequireAuth />}>
-              <Route path="/edit/:postId" element={<Layout />}>
-                <Route index element={lazyPage(<EditPostPage />)} />
-              </Route>
+            <Route path="/edit/:postId" element={<Layout />}>
+              <Route index element={lazyPage(<CommunityPage />)} />
             </Route>
 
             {/* 대회 목록 (목록·조회는 공개, 작성·수정만 로그인 필요) */}
             <Route path="/competitions" element={<Layout />}>
               <Route index element={lazyPage(<CompetitionsPage />)} />
-              <Route element={<RequireAuth />}>
-                <Route path="new" element={lazyPage(<CompetitionFormPage />)} />
-                <Route path=":id/edit" element={lazyPage(<CompetitionFormPage />)} />
-              </Route>
+              <Route path="new" element={<FeaturePreparingPage title="대회 제보는 준비 중이에요" description="공개 결과를 정확하게 확인하는 흐름부터 운영하고 있어요." />} />
+              <Route path=":id/edit" element={<FeaturePreparingPage title="대회 수정은 준비 중이에요" description="공개 결과를 정확하게 확인하는 흐름부터 운영하고 있어요." />} />
             </Route>
 
             {/* 경기 결과 (목록·조회는 공개, 작성·수정만 로그인 필요) */}
             <Route path="/matchResult/:competitionId" element={<Layout />}>
               <Route index element={lazyPage(<MatchResultListPage />)} />
               <Route path=":resultId" element={lazyPage(<MatchResultDetailPage />)} />
-              <Route element={<RequireAuth />}>
-                <Route path="new" element={lazyPage(<MatchResultFormPage />)} />
-                <Route path=":resultId/edit" element={lazyPage(<MatchResultFormPage />)} />
-              </Route>
+              <Route path="new" element={<FeaturePreparingPage title="결과 제보는 준비 중이에요" description="공개 결과를 정확하게 확인하는 흐름부터 운영하고 있어요." />} />
+              <Route path=":resultId/edit" element={<FeaturePreparingPage title="결과 수정은 준비 중이에요" description="공개 결과를 정확하게 확인하는 흐름부터 운영하고 있어요." />} />
             </Route>
 
             {/* 실업 LIVE (PaceRise) */}
@@ -192,12 +173,8 @@ function App() {
 
             {/* 중고거래 (목록·상세는 공개, 작성·수정만 로그인 필요) */}
             <Route path="/marketplace" element={<Layout />}>
-              <Route index element={lazyPage(<MarketplacePage />)} />
-              <Route path=":id" element={lazyPage(<MarketplaceDetailPage />)} />
-              <Route element={<RequireAuth />}>
-                <Route path="new" element={lazyPage(<MarketplaceFormPage />)} />
-                <Route path=":id/edit" element={lazyPage(<MarketplaceFormPage />)} />
-              </Route>
+              <Route index element={<FeaturePreparingPage title="중고 마켓은 준비 중이에요" description="개인 간 거래를 안전하게 운영할 기준을 먼저 갖추고 있어요." />} />
+              <Route path="*" element={<FeaturePreparingPage title="중고 마켓은 준비 중이에요" description="개인 간 거래를 안전하게 운영할 기준을 먼저 갖추고 있어요." />} />
             </Route>
 
             {/* 데이터 정정/삭제/이의제기 요청 */}

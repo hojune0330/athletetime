@@ -126,7 +126,10 @@ const TrainingCalculatorPage: React.FC = () => {
             훈련 계획 생성
           </button>
           <p className="mt-2 text-center text-caption text-ink-4">
-            입력값은 저장되지 않아요. 계산 결과는 참고용이에요.
+            계산에 넣은 값은 저장되지 않아요. 아래 훈련 일지는 직접 기록할 때만 이 기기에 저장돼요.
+          </p>
+          <p className="mt-1 text-center text-body-sm text-ink-3">
+            통증이나 건강 상태가 걱정되면 의료·재활 전문가와 상담하세요. 계산 결과는 의료 조언이 아니에요.
           </p>
         </div>
 
@@ -154,7 +157,7 @@ const TrainingCalculatorPage: React.FC = () => {
             <WorkoutDetailsView workouts={results.workouts} />
 
             {/* Recommendations */}
-            <RecommendationsView recommendations={results.recommendations} />
+            <RecommendationsView />
           </div>
         )}
 

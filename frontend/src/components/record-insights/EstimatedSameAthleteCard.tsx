@@ -4,31 +4,12 @@ import { getShadowCluster, type ShadowCluster, type ShadowClusterSegment } from 
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
-export type CombineEntry = { athleteKey: string; name: string; team: string };
-
 type Props = {
-  /** 현재 보고 있는 선수의 athleteKey. 이 화면에서만 추정 제안을 띄운다. */
   athleteKey: string;
-  /** 현재 보고 있는 선수 이름 — 묶음 합산 시 표시명으로 쓴다 */
-  athleteName?: string;
-  /** 추정 묶음 안의 다른 기록(athleteKey)을 눌렀을 때 이동 콜백 (선택) */
   onSelectAthlete?: (athleteKey: string) => void;
-  /** 원탭 합산 — 누르면 묶음 전체가 바로 내 기록이 된다 */
-  onCombine?: (entries: CombineEntry[]) => void;
 };
 
-/**
- * "이 기록도 내 것 같아요?" 제안 카드 — 심플 버전.
- *
- * 소속 변화(예: 진학)로 나뉜 기록 묶음을 보여주고, 버튼 한 번으로 바로 합친다.
- * 확인 절차 없음 — 잘못 합쳤으면 내 기록 화면에서 빼면 된다.
- *
- * 신뢰 원칙 (유지):
- * - 이것은 추정이다. 서버 데이터를 자동으로 합치지 않는다 (화면 합산만).
- * - 동명이인 가능성 고지는 하단 한 줄로 유지한다.
- * - 응답에 cluster가 없거나 실패하면 조용히 숨긴다.
- */
-export function EstimatedSameAthleteCard({ athleteKey, athleteName = '', onSelectAthlete, onCombine }: Props) {
+export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete }: Props) {
   const [state, setState] = useState<LoadState>('idle');
   const [cluster, setCluster] = useState<ShadowCluster | null>(null);
 
@@ -67,17 +48,6 @@ export function EstimatedSameAthleteCard({ athleteKey, athleteName = '', onSelec
     return null;
   }
 
-  const handleCombine = () => {
-    if (!onCombine) return;
-    onCombine(
-      cluster.segments.map((seg) => ({
-        athleteKey: seg.athleteKey,
-        name: athleteName,
-        team: seg.teamLabel || '소속 미상',
-      })),
-    );
-  };
-
   return (
     <Card className="border-dashed border-amber-300 bg-amber-50/40">
       <CardContent className="p-5">
@@ -92,18 +62,9 @@ export function EstimatedSameAthleteCard({ athleteKey, athleteName = '', onSelec
               ))}
             </div>
           </div>
-          {onCombine && (
-            <button
-              type="button"
-              onClick={handleCombine}
-              className="shrink-0 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700"
-            >
-              모두 내 기록으로 합치기
-            </button>
-          )}
         </div>
         <p className="mt-3 text-[11px] leading-4 text-amber-800/60">
-          소속·연도 흐름으로 추정한 묶음이에요 (원본 데이터는 그대로예요). 동명이인이면 내 기록 화면에서 빼면 돼요.
+          같은 선수라고 단정하지 않아요. 각 기록을 열어 소속·연도·종목을 확인한 뒤, 원하는 카드만 "이 기록 담기"로 이 기기에서 모아 보세요.
         </p>
       </CardContent>
     </Card>

@@ -51,18 +51,18 @@ test('frontend auth client uses cookie credentials and CSRF instead of auth loca
   assert.doesNotMatch(authApi, /\b(?:accessToken|refreshToken)\?:/);
 });
 
-test('frontend does not probe protected me endpoint for anonymous public visitors', () => {
-  // Given: public pages mount the auth provider before a user has logged in.
+test('frontend treats an anonymous me response as a quiet unauthenticated state', () => {
   const authContext = read('frontend/src/context/AuthContext.tsx');
+  const client = read('frontend/src/api/client.ts');
 
-  // When: the initial user fetch path is inspected.
   const fetchUserBlock = authContext.slice(
     authContext.indexOf('const fetchUser = async () => {'),
     authContext.indexOf('// 초기 로드'),
   );
 
-  // Then: it requires a cookie session hint and suppresses expected 401 noise.
-  assert.match(authContext, /athletetime_csrf/);
-  assert.match(fetchUserBlock, /hasCookie\(SESSION_HINT_COOKIE_NAME\)/);
-  assert.match(fetchUserBlock, /if \(!isHttpStatus\(error, 401\)\) \{/);
+  assert.doesNotMatch(authContext, /SESSION_HINT_COOKIE_NAME|hasCookie\(/);
+  assert.match(fetchUserBlock, /authApi\.getMe\(\)/);
+  assert.match(fetchUserBlock, /!isHttpStatus\(error, 401\) && !isHttpStatus\(error, 403\)/);
+  assert.match(client, /function isGuestSessionCheck/);
+  assert.match(client, /return status === 401 && url\.includes\('\/api\/auth\/me'\)/);
 });

@@ -20,18 +20,18 @@ export function DoneStep({
     <div className="space-y-4" data-records-step="mine-done">
       <div className="border border-brand bg-brand/5 p-5">
         <p className="text-sm font-semibold text-brand">4단계</p>
-        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">내 기록 홈이 준비됐어요.</h1>
+        <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">모아 보는 기록이 준비됐어요.</h1>
         <p className="mt-3 text-sm leading-6 text-ink-3">
-          {firstEntry?.name || '선수'} 기준 {entries.length}개 묶음을 모았어요.
+          선택한 {entries.length}개 묶음을 이 기기에서 모아 보고 있어요.
         </p>
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3" data-records-sticky-cta="mine-done">
-        <Button type="button" variant="outline" onClick={onAddMore}>기록 더 추가하기</Button>
-        <Button type="button" variant="outline" onClick={onSeasonForMine}>시즌표에서 내 위치 보기</Button>
+        <Button type="button" variant="outline" onClick={onAddMore}>기록 더 담기</Button>
+        <Button type="button" variant="outline" onClick={onSeasonForMine}>시즌 기록표 보기</Button>
         <Button asChild variant="outline">
           <Link to={firstEntry ? `/records?athlete=${encodeURIComponent(firstEntry.athleteKey)}` : '/records'}>
-            기록 카드 공유
+            선수 기록 자세히 보기
           </Link>
         </Button>
       </div>
@@ -44,7 +44,7 @@ export function DoneStep({
         />
       ) : (
         <div role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
-          아직 담긴 기록이 없어요. 기록 더 추가하기로 후보를 골라주세요.
+          아직 담긴 기록이 없어요. 기록 더 담기로 후보를 골라주세요.
         </div>
       )}
     </div>

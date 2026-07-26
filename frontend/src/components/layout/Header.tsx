@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import type { FormEvent } from 'react'
+import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { 
   Bars3Icon,
   XMarkIcon,
@@ -7,7 +7,8 @@ import {
   UserIcon,
   ArrowLeftIcon,
   EnvelopeIcon,
-  KeyIcon
+  KeyIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline'
 import { useState, useEffect, useRef } from 'react'
 import * as authApi from '../../api/auth'
@@ -26,6 +27,7 @@ export default function Header() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null)
+  const recordSearchInputRef = useRef<HTMLInputElement>(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [recordSearchQuery, setRecordSearchQuery] = useState('')
   const [modalMode, setModalMode] = useState<ModalMode>('login')
@@ -111,12 +113,23 @@ export default function Header() {
 
   const submitRecordSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
     const trimmed = recordSearchQuery.trim()
-    if (trimmed.length < 2) {
+    if (!trimmed) {
+      recordSearchInputRef.current?.focus()
       return
     }
+
     navigate(`/records?q=${encodeURIComponent(trimmed)}`)
     setRecordSearchQuery('')
+  }
+
+  const handleRecordSearchKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return
+
+    event.preventDefault()
+    if (event.nativeEvent.isComposing) return
+    event.currentTarget.form?.requestSubmit()
   }
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -289,7 +302,6 @@ export default function Header() {
     { path: '/records', label: '기록', mobileLabel: '기록' },
     { path: '/competitions', label: '대회', mobileLabel: '대회' },
     { path: '/profile-card', label: '기록카드', mobileLabel: '기록카드' },
-    { path: '/community', label: '커뮤니티', mobileLabel: '커뮤니티' },
   ]
 
   // 보조 도구·부가 기능 — 핵심 루프 밖 화면은 '더보기'로 묶는다.
@@ -297,8 +309,9 @@ export default function Header() {
     { path: '/pacerise', label: '실업 대회 결과', note: 'PaceRise 연동' },
     { path: '/pace-calculator', label: '페이스 계산기', note: '훈련 보조' },
     { path: '/training-calculator', label: '훈련 계산기', note: '훈련 보조' },
-    { path: '/marketplace', label: '중고 마켓', note: '사용자 거래' },
-    { path: '/chat', label: '오픈 채팅', note: '익명 대화' },
+    { path: '/marketplace', label: '중고 마켓', note: '준비 중' },
+    { path: '/community', label: '커뮤니티', note: '준비 중' },
+    { path: '/chat', label: '오픈 채팅', note: '준비 중' },
   ]
 
   // 모바일 드로어용 전체 목록(그룹 라벨로 구분 렌더)
@@ -390,16 +403,26 @@ export default function Header() {
                 </div>
               </nav>
 
-              <form onSubmit={submitRecordSearch} className="hidden lg:block w-56">
+              <form role="search" onSubmit={submitRecordSearch} className="hidden lg:flex w-56 items-center gap-1">
                 <label className="sr-only" htmlFor="header-record-search">기록 검색</label>
                 <input
                   id="header-record-search"
+                  ref={recordSearchInputRef}
+                  name="record-search"
                   type="search"
                   value={recordSearchQuery}
                   onChange={(event) => setRecordSearchQuery(event.target.value)}
+                  onKeyDown={handleRecordSearchKeyDown}
                   placeholder="기록 검색"
-                  className="h-9 w-full rounded-sm border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-4 focus:border-brand focus:outline-none"
+                  className="h-9 min-w-0 flex-1 rounded-sm border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-4 focus:border-brand focus:outline-none"
                 />
+                <button
+                  type="submit"
+                  aria-label="기록 검색"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink focus:outline-none focus:ring-2 focus:ring-brand"
+                >
+                  <MagnifyingGlassIcon className="h-4 w-4" />
+                </button>
               </form>
 
               {/* 관리자 드롭다운 (데스크톱) + 로그인/회원가입 */}

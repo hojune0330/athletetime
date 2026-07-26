@@ -34,7 +34,7 @@ export const WorkoutDetailsView: React.FC<WorkoutDetailsViewProps> = ({ workouts
 
             <div className="mt-4 flex items-baseline justify-between border-t border-dashed border-line pt-3">
               <span className="font-mono text-[9.5px] font-medium uppercase tracking-widest-2 text-ink-3">
-                Target pace
+                목표 페이스
               </span>
               <span className="font-mono text-[14px] font-medium text-ink [font-variant-numeric:tabular-nums]">
                 {workout.pace}

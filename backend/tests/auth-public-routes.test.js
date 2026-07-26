@@ -137,6 +137,13 @@ test('register keeps normal users non-admin', async () => {
   assertNoSessionTokensInBody(response);
 });
 
+test('anonymous session checks return a successful empty session instead of a browser-visible 401', async () => {
+  const response = await request('GET', '/api/auth/me');
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { success: true, user: null });
+});
+
 test('refresh rotates valid tokens and rejects malformed tokens', async () => {
   const registered = await registerUser('ref');
 

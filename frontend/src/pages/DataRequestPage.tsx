@@ -231,7 +231,7 @@ export default function DataRequestPage() {
             <Input
               value={athleteName}
               onChange={(e) => setAthleteName(e.target.value)}
-              placeholder="예) 홍길동"
+              placeholder="이름을 입력하세요"
             />
           </Field>
 
@@ -240,14 +240,14 @@ export default function DataRequestPage() {
               <Input
                 value={affiliation}
                 onChange={(e) => setAffiliation(e.target.value)}
-                placeholder="예) ○○실업팀"
+                placeholder="소속을 입력하세요"
               />
             </Field>
             <Field label="종목 (선택)">
               <Input
                 value={event}
                 onChange={(e) => setEvent(e.target.value)}
-                placeholder="예) 남자 1500m"
+                placeholder="종목을 입력하세요"
               />
             </Field>
           </div>
@@ -256,7 +256,7 @@ export default function DataRequestPage() {
             <Input
               value={competition}
               onChange={(e) => setCompetition(e.target.value)}
-              placeholder="예) 2024 ○○대회"
+              placeholder="대회명을 입력하세요"
             />
           </Field>
 

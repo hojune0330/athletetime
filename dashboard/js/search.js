@@ -32,7 +32,7 @@ const search = {
 
   async loadCompetitions() {
     try {
-      const result = await api.get('/api/search/competitions');
+      const result = await api.get('/api/card-studio/search/competitions');
       if (!result.success) return;
 
       const sel = document.getElementById('search-comp');
@@ -78,7 +78,7 @@ const search = {
       const qs = new URLSearchParams({ q, type });
       if (comp) qs.set('comp', comp);
 
-      const result = await api.get(`/api/search?${qs.toString()}`);
+      const result = await api.get(`/api/card-studio/search?${qs.toString()}`);
       if (!result.success) {
         this.renderEmpty(result.error || '검색 실패');
         return;

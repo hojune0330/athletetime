@@ -1,17 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-/**
- * 훈련 일지 라이트 — TRAINORACLE 맛보기
- *
- * 계산기에서 훈련 계획을 만든 김에, 오늘 훈련을 한 줄로 남기게 한다.
- * - localStorage 저장 (기기 단위, 가입 없이 바로 씀)
- * - 최근 기록으로 이번 주 요약(횟수/거리/컨디션 흐름)을 보여줘 "쌓이는 재미"를 준다
- * - TRAINORACLE(훈련 분석·코칭 도구)로 발전 예정임을 알리는 기대감 카드 포함
- *
- * 디자인: TRAINORACLE Scientific Minimalism — 각진 모서리, hairline,
- * 모노 숫자, 색은 정보 전달용으로만.
- */
-
 const STORAGE_KEY = 'athletetime.training-log.v1';
 const MAX_ENTRIES = 60;
 
@@ -112,7 +100,7 @@ export const TrainingLogLite: React.FC = () => {
           </p>
           <h2 className="mt-1 text-h3 font-semibold tracking-tight text-ink">오늘 훈련, 한 줄로 남겨두세요</h2>
           <p className="mt-1 text-body-sm text-ink-3">
-            이 기기에만 저장돼요. 꾸준히 쌓이면 내 훈련 흐름이 보여요.
+            이 기기에만 저장돼요. 서버나 분석 기능으로 보내지 않아요.
           </p>
         </div>
         {entries.length > 0 && (
@@ -225,16 +213,13 @@ export const TrainingLogLite: React.FC = () => {
         </div>
       )}
 
-      {/* TRAINORACLE 기대감 카드 */}
       <div className="mt-6 border-l-2 border-brand bg-surface-2 p-4">
         <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-brand">
-          TRAINORACLE · COMING
+          TRAINORACLE · LOCAL ONLY
         </p>
-        <p className="mt-1.5 text-body-sm font-semibold text-ink">이 일지가 나중에 코치가 됩니다</p>
+        <p className="mt-1.5 text-body-sm font-semibold text-ink">현재는 이 기기 안에서만</p>
         <p className="mt-1 text-body-sm leading-relaxed text-ink-2">
-          지금 쌓는 훈련 일지와 계산기 데이터는 앞으로 나올 <strong className="text-ink">트레인오라클(TRAINORACLE)</strong>에서
-          훈련 부하 흐름, 회복 리듬, 다음 목표 페이스 제안까지 이어질 준비 과정이에요.
-          꾸준히 남길수록 내 몸에 맞는 분석이 가능해져요.
+          훈련 일지는 서버, 계정, 분석 기능과 연결되지 않아요. 저장한 기록은 이 기기에서만 보고 삭제할 수 있어요.
         </p>
       </div>
     </section>

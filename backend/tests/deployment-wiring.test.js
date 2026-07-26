@@ -1,19 +1,7 @@
-/**
- * 배포 배선 계약 테스트
- *
- * athletetime 프로덕션 이관(PR #9)을 위한 배포 필수 배선을 잠근다:
- *  1. 채팅 WebSocket이 통합 서버(src/server.js)에 배선되어 있는가 (/ws/chat)
- *  2. /api/chat/check-nickname 라우트가 존재하는가 (레거시 계약)
- *  3. 카드 스튜디오 WSS(/ws)와 채팅 WSS(/ws/chat)가 경로 충돌 없이 공존하는가
- *     (ws 라이브러리는 { server, path } 방식으로 WSS 2개를 붙이면 서로의
- *      업그레이드를 400으로 파괴한다 → noServer + 수동 upgrade 라우팅 필수)
- *  4. 프론트 채팅 훅이 같은 origin /ws/chat 기본값 + VITE_WS_URL 오버라이드를 갖는가
- *  5. netlify.toml이 신규 빌드 레이아웃(community publish)과 일치하는가
- */
-
 const test = require('node:test');
-const assert = require('node:assert');
+const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const http = require('node:http');
 const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -22,96 +10,99 @@ function readSource(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
 }
 
-test('DEPLOY-WS-001: src/server.js wires chat WebSocket via noServer upgrade routing at /ws/chat', () => {
+test('DEPLOY-WS-001: chat upgrades are denied until the service has moderation controls', () => {
   const server = readSource('src/server.js');
-  assert.ok(server.includes("require(path.join(ROOT, 'backend/utils/websocket'))"), 'chat websocket util must be required');
-  assert.ok(server.includes('setupWebSocket(chatWss)'), 'setupWebSocket must be called with the chat WSS');
-  assert.ok(server.includes("'/ws/chat'"), 'chat WSS must be scoped to /ws/chat');
-  assert.ok(server.includes('noServer: true'), 'chat WSS must use noServer mode to avoid upgrade collisions');
+
+  assert.match(server, /rejectPreparingWebSocket\(socket\)/);
+  assert.doesNotMatch(server, /chatWss\.handleUpgrade\(/);
+  assert.doesNotMatch(server, /setupWebSocket\(chatWss\)/);
 });
 
-test('DEPLOY-WS-002: card-studio wsManager must NOT use { server, path } (destroys other WSS upgrades)', () => {
+test('DEPLOY-WS-002: card-studio websocket keeps its scoped no-server attachment', () => {
   const wsManager = readSource('card-studio/websocket/wsManager.js');
-  assert.ok(!wsManager.includes('WebSocket.Server({ server, path'), 'wsManager must not bind upgrade globally with path option');
-  assert.ok(wsManager.includes('noServer: true'), 'wsManager must use noServer mode');
-  assert.ok(wsManager.includes("!== '/ws'"), 'wsManager must pass through non-/ws upgrades');
+
+  assert.doesNotMatch(wsManager, /WebSocket\.Server\(\{ server, path/);
+  assert.match(wsManager, /noServer: true/);
+  assert.match(wsManager, /!== '\/ws'/);
 });
 
-test('DEPLOY-WS-003: /api/chat/check-nickname route exists with legacy contract (2-10 chars)', () => {
+test('DEPLOY-WS-003: chat nickname API returns the same prepared state as the websocket route', () => {
   const server = readSource('src/server.js');
-  assert.ok(server.includes("app.get('/api/chat/check-nickname'"), 'check-nickname route must exist');
-  assert.ok(server.includes('nickname.length < 2 || nickname.length > 10'), 'legacy 2-10 char validation must be preserved');
+
+  assert.match(server, /app\.get\('\/api\/chat\/check-nickname', rejectPreparingFeature\)/);
 });
 
-test('DEPLOY-WS-004: chat rooms preserved (main/training/race/injury) in backend/utils/websocket.js', () => {
-  const wsUtil = readSource('backend/utils/websocket.js');
-  for (const room of ['main', 'training', 'race', 'injury']) {
-    assert.ok(new RegExp(`${room}: new Set\\(\\)`).test(wsUtil), `room "${room}" must exist`);
-  }
+test('DEPLOY-WS-004: the chat page does not initiate a websocket connection before launch', () => {
+  const page = readSource('frontend/src/pages/ChatPage/index.tsx');
+
+  assert.match(page, /FeaturePreparingPage/);
+  assert.doesNotMatch(page, /useChat/);
+  assert.doesNotMatch(page, /useWebSocket/);
 });
 
-test('DEPLOY-WS-005: frontend chat hook defaults to same-origin /ws/chat with VITE_WS_URL override', () => {
-  const hook = readSource('frontend/src/pages/ChatPage/hooks/useWebSocket.ts');
-  assert.ok(hook.includes('import.meta.env.VITE_WS_URL'), 'VITE_WS_URL override must be honored');
-  assert.ok(hook.includes('/ws/chat'), 'default must target /ws/chat path');
-  assert.ok(hook.includes('window.location.host'), 'default must be same-origin');
-});
-
-test('DEPLOY-NETLIFY-001: netlify.toml matches new build layout (publish=community, frontend build)', () => {
+test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build and no retired chat websocket endpoint', () => {
   const toml = readSource('netlify.toml');
-  assert.ok(toml.includes('publish = "community"'), 'publish must be community (vite outDir ../community)');
-  assert.ok(toml.includes('cd frontend && npm ci && npm run build'), 'build must run inside frontend/');
-  assert.ok(!toml.includes('base = "frontend"'), 'legacy base=frontend layout must not be used (breaks publish path)');
-  assert.ok(toml.includes('/api/*'), 'API proxy redirect must exist');
-  assert.ok(toml.includes('VITE_WS_URL'), 'WS URL must be injected at build time (Netlify cannot proxy WebSocket)');
-  assert.ok(toml.includes('wss://athletetime-backend.onrender.com/ws/chat'), 'WS must point at Render /ws/chat');
+
+  assert.match(toml, /publish = "community"/);
+  assert.match(toml, /cd frontend && npm ci && npm run build:check/);
+  assert.doesNotMatch(toml, /VITE_WS_URL/);
+  assert.doesNotMatch(toml, /\/ws\/chat/);
+  assert.match(toml, /\/api\/\*/);
 });
 
-test('DEPLOY-RUNTIME-001: two path-scoped WSS coexist on one HTTP server (handshake integration)', async () => {
-  const http = require('node:http');
+test('DEPLOY-HTTP-001: production CORS never reflects arbitrary origins with credentialed cookies', () => {
+  const server = readSource('src/server.js');
+
+  assert.match(server, /FRONTEND_ORIGINS/);
+  assert.match(server, /const originAllowed = typeof origin === 'string'/);
+  assert.match(server, /if \(origin && !originAllowed\) return res\.sendStatus\(403\)/);
+  assert.doesNotMatch(server, /Access-Control-Allow-Origin', origin \|\| '\*'/);
+});
+
+test('DEPLOY-HTTP-002: production does not serve the obsolete dashboard or its localStorage admin page', () => {
+  const server = readSource('src/server.js');
+
+  assert.match(server, /if \(NODE_ENV !== 'production'\) \{\s*app\.use\('\/legacy-dashboard'/);
+  assert.match(server, /if \(NODE_ENV === 'production'\) return res\.sendStatus\(404\)/);
+  assert.match(server, /res\.status\(503\)\.send\('서비스 화면을 준비하지 못했습니다\.'/);
+});
+
+test('DEPLOY-RUNBOOK-001: data-rights readiness uses the direct backend URL required by the CLI', () => {
+  const runbook = readSource('docs/athletetime-deployment-target.md');
+
+  assert.match(runbook, /npm run data:rights:readiness -- --base-url https:\/\/athletetime-backend\.onrender\.com/);
+});
+
+test('DEPLOY-RUNTIME-001: a direct chat handshake receives a 503 response', async () => {
   const WebSocket = require(path.join(ROOT, 'node_modules', 'ws'));
+  const { rejectPreparingWebSocket } = require(path.join(ROOT, 'backend/middleware/launchFeatureGate'));
+  const server = http.createServer((_req, res) => res.end('ok'));
 
-  const httpServer = http.createServer((req, res) => res.end('ok'));
-  const wssA = new WebSocket.Server({ noServer: true });
-  const wssB = new WebSocket.Server({ noServer: true });
-  httpServer.on('upgrade', (req, socket, head) => {
-    const pathname = (req.url || '').split('?')[0];
-    if (pathname === '/ws') {
-      wssA.handleUpgrade(req, socket, head, (ws) => wssA.emit('connection', ws, req));
-    } else if (pathname === '/ws/chat') {
-      wssB.handleUpgrade(req, socket, head, (ws) => wssB.emit('connection', ws, req));
-    } else {
-      socket.destroy();
-    }
+  server.on('upgrade', (_req, socket) => rejectPreparingWebSocket(socket));
+
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
   });
-  wssA.on('connection', (ws) => ws.send('A'));
-  wssB.on('connection', (ws) => ws.send('B'));
 
-  await new Promise((resolve) => httpServer.listen(0, resolve));
-  const port = httpServer.address().port;
-
-  const connectAndRead = (p) =>
-    new Promise((resolve, reject) => {
-      const c = new WebSocket(`ws://127.0.0.1:${port}${p}`);
-      const timer = setTimeout(() => reject(new Error(`${p} timeout`)), 3000);
-      c.on('message', (m) => {
-        clearTimeout(timer);
-        c.close();
-        resolve(m.toString());
-      });
-      c.on('error', (e) => {
-        clearTimeout(timer);
-        reject(new Error(`${p} handshake failed: ${e.message}`));
-      });
-    });
+  const address = server.address();
+  assert.ok(address && typeof address !== 'string');
 
   try {
-    const [a, b] = await Promise.all([connectAndRead('/ws'), connectAndRead('/ws/chat')]);
-    assert.equal(a, 'A');
-    assert.equal(b, 'B');
+    await new Promise((resolve, reject) => {
+      const client = new WebSocket(`ws://127.0.0.1:${address.port}/ws/chat`);
+      const timer = setTimeout(() => reject(new Error('chat handshake timeout')), 3000);
+      client.on('unexpected-response', (_request, response) => {
+        clearTimeout(timer);
+        assert.equal(response.statusCode, 503);
+        response.resume();
+        resolve();
+      });
+      client.on('error', reject);
+    });
   } finally {
-    wssA.close();
-    wssB.close();
-    httpServer.close();
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
   }
 });

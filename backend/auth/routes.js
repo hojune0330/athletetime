@@ -4,11 +4,28 @@
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 const db = require('../utils/db');
 const { generateAccessToken, generateRefreshToken, verifyToken } = require('../utils/jwt');
 const { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordCodeEmail } = require('../utils/email');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, extractAccessToken } = require('../middleware/auth');
+const {
+  forgotPasswordLimiter,
+  forgotPasswordIpLimiter,
+  loginAttemptLimiter,
+  loginAttemptIpLimiter,
+  resetCodeAttemptLimiter,
+  resetCodeAttemptIpLimiter,
+  verificationCodeAttemptIpLimiter,
+  verificationCodeAttemptLimiter,
+  verificationDeliveryIpLimiter,
+  verificationDeliveryLimiter,
+} = require('../middleware/authRateLimit');
+const {
+  createRecoveryCode,
+  hashRecoveryCode,
+  isRecoveryCode,
+  recoveryCodeMatches,
+} = require('./recoveryCodes');
 const {
   REFRESH_COOKIE,
   clearAuthCookies,
@@ -19,6 +36,7 @@ const {
 } = require('../utils/authCookies');
 
 const router = express.Router();
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const AUTH_CODE_SENT_RESPONSE = {
   success: true,
   message: '인증 코드가 발송되었습니다',
@@ -28,7 +46,7 @@ const AUTH_CODE_SENT_RESPONSE = {
  * 6자리 랜덤 인증 코드 생성
  */
 function generateVerificationCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return createRecoveryCode();
 }
 
 function sendAuthCodeAccepted(res) {
@@ -37,6 +55,67 @@ function sendAuthCodeAccepted(res) {
 
 function getErrorMessage(error) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function normalizeEmail(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+const RESET_CODE_MAX_ATTEMPTS = 5;
+const VERIFICATION_CODE_MAX_ATTEMPTS = 5;
+
+function sendResetCodeFailure(res) {
+  return res.status(400).json({
+    success: false,
+    error: '인증 코드를 확인할 수 없습니다. 새로운 코드를 요청해주세요.',
+  });
+}
+
+function resetCodeIsUsable(resetCode) {
+  return Boolean(
+    resetCode
+    && !resetCode.used
+    && !resetCode.locked_at
+    && Number(resetCode.attempt_count || 0) < RESET_CODE_MAX_ATTEMPTS
+    && new Date(resetCode.expires_at) > new Date(),
+  );
+}
+
+async function recordInvalidResetCodeAttempt(client, email) {
+  await client.query(
+    `UPDATE password_reset_codes
+     SET attempt_count = attempt_count + 1,
+         locked_at = CASE WHEN attempt_count + 1 >= $2 THEN NOW() ELSE locked_at END
+     WHERE email = $1`,
+    [email, RESET_CODE_MAX_ATTEMPTS],
+  );
+}
+
+function verificationCodeIsUsable(verification) {
+  return Boolean(
+    verification
+    && !verification.verified
+    && !verification.locked_at
+    && Number(verification.attempt_count || 0) < VERIFICATION_CODE_MAX_ATTEMPTS
+    && new Date(verification.expires_at) > new Date(),
+  );
+}
+
+async function recordInvalidVerificationCodeAttempt(client, email) {
+  await client.query(
+    `UPDATE email_verifications
+     SET attempt_count = attempt_count + 1,
+         locked_at = CASE WHEN attempt_count + 1 >= $2 THEN NOW() ELSE locked_at END
+     WHERE email = $1`,
+    [email, VERIFICATION_CODE_MAX_ATTEMPTS],
+  );
+}
+
+function sendVerificationCodeFailure(res) {
+  return res.status(400).json({
+    success: false,
+    error: '인증 코드를 확인할 수 없습니다. 새로운 코드를 요청해주세요.',
+  });
 }
 
 function extractRefreshToken(req) {
@@ -78,9 +157,10 @@ router.get('/csrf-token', (req, res) => {
  * POST /api/auth/send-verification
  * 이메일 인증 코드 발송 (회원가입 전)
  */
-router.post('/send-verification', async (req, res) => {
+router.post('/send-verification', verificationDeliveryIpLimiter, verificationDeliveryLimiter, async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email: rawEmail } = req.body;
+    const email = normalizeEmail(rawEmail);
 
     if (!email) {
       return res.status(400).json({
@@ -111,39 +191,23 @@ router.post('/send-verification', async (req, res) => {
       });
     }
 
-    // 기존 인증 코드가 있는지 확인 (email_verifications 테이블 또는 임시 저장)
-    // 여기서는 간단하게 메모리에 저장하거나, 임시 테이블 사용
-    
-    // 인증 코드 생성
     const verificationCode = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // 인증 코드를 임시 저장 (email_verifications 테이블이 있다면 사용)
-    // 여기서는 간단하게 처리
-    try {
-      await db.query(
-        `INSERT INTO email_verifications (email, code, expires_at) 
-         VALUES ($1, $2, $3)
-         ON CONFLICT (email) 
-         DO UPDATE SET code = $2, expires_at = $3, created_at = NOW()`,
-        [email, verificationCode, expiresAt]
-      );
-    } catch (tableError) {
-      // 테이블이 없으면 생성
-      await db.query(`
-        CREATE TABLE IF NOT EXISTS email_verifications (
-          email VARCHAR(255) PRIMARY KEY,
-          code VARCHAR(6) NOT NULL,
-          expires_at TIMESTAMP NOT NULL,
-          verified BOOLEAN DEFAULT FALSE,
-          created_at TIMESTAMP DEFAULT NOW()
-        )
-      `);
-      await db.query(
-        `INSERT INTO email_verifications (email, code, expires_at) VALUES ($1, $2, $3)`,
-        [email, verificationCode, expiresAt]
-      );
-    }
+    await db.query(
+      `INSERT INTO email_verifications (
+        email, code, code_hash, expires_at, verified, attempt_count, locked_at
+      ) VALUES ($1, NULL, $2, $3, FALSE, 0, NULL)
+      ON CONFLICT (email)
+      DO UPDATE SET code = NULL,
+                    code_hash = EXCLUDED.code_hash,
+                    expires_at = EXCLUDED.expires_at,
+                    verified = FALSE,
+                    attempt_count = 0,
+                    locked_at = NULL,
+                    created_at = NOW()`,
+      [email, hashRecoveryCode(verificationCode), expiresAt],
+    );
 
     // 인증 이메일 발송
     try {
@@ -168,63 +232,47 @@ router.post('/send-verification', async (req, res) => {
  * POST /api/auth/verify-code
  * 이메일 인증 코드 확인 (회원가입 전)
  */
-router.post('/verify-code', async (req, res) => {
+router.post('/verify-code', verificationCodeAttemptIpLimiter, verificationCodeAttemptLimiter, async (req, res) => {
+  const client = await db.getClient();
+  let transactionOpen = false;
   try {
-    const { email, code } = req.body;
+    const { email: rawEmail, code } = req.body;
+    const email = normalizeEmail(rawEmail);
 
-    if (!email || !code) {
+    if (!email || !isRecoveryCode(code)) {
       return res.status(400).json({
         success: false,
         error: '이메일과 인증 코드가 필요합니다'
       });
     }
 
-    // 인증 코드 확인
-    const result = await db.query(
-      'SELECT code, expires_at FROM email_verifications WHERE email = $1',
-      [email]
+    await client.query('BEGIN');
+    transactionOpen = true;
+    const result = await client.query(
+      `SELECT code_hash, expires_at, verified, attempt_count, locked_at
+       FROM email_verifications
+       WHERE email = $1
+       FOR UPDATE`,
+      [email],
     );
-
-    if (result.rows.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드를 먼저 요청해주세요'
-      });
-    }
-
     const verification = result.rows[0];
-
-    // 만료 확인
-    if (new Date() > new Date(verification.expires_at)) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
-      });
+    if (!verificationCodeIsUsable(verification) || !recoveryCodeMatches(code, verification.code_hash)) {
+      if (verification && verificationCodeIsUsable(verification)) {
+        await recordInvalidVerificationCodeAttempt(client, email);
+      }
+      await client.query('COMMIT');
+      transactionOpen = false;
+      return sendVerificationCodeFailure(res);
     }
 
-    // 코드 확인
-    if (verification.code !== code) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 일치하지 않습니다'
-      });
-    }
-
-    // 인증 성공 - verified 표시 (컬럼이 없으면 추가)
-    try {
-      await db.query(
-        `UPDATE email_verifications SET verified = TRUE WHERE email = $1`,
-        [email]
-      );
-    } catch (updateError) {
-      // verified 컬럼이 없으면 추가 후 재시도
-      console.log('verified 컬럼 추가 시도...');
-      await db.query(`ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT FALSE`);
-      await db.query(
-        `UPDATE email_verifications SET verified = TRUE WHERE email = $1`,
-        [email]
-      );
-    }
+    await client.query(
+      `UPDATE email_verifications
+       SET verified = TRUE, code = NULL, code_hash = NULL
+       WHERE email = $1`,
+      [email],
+    );
+    await client.query('COMMIT');
+    transactionOpen = false;
 
     res.json({
       success: true,
@@ -232,11 +280,14 @@ router.post('/verify-code', async (req, res) => {
     });
 
   } catch (error) {
+    if (transactionOpen) await client.query('ROLLBACK');
     console.error('❌ 인증 코드 확인 오류:', error);
     res.status(500).json({
       success: false,
       error: '인증 코드 확인 중 오류가 발생했습니다'
     });
+  } finally {
+    client.release();
   }
 });
 
@@ -295,9 +346,10 @@ router.post('/check-nickname', async (req, res) => {
  */
 router.post('/register', async (req, res) => {
   const client = await db.getClient();
-  
+  let transactionOpen = false;
   try {
-    const { email, password, nickname, specialty, region } = req.body;
+    const { email: rawEmail, password, nickname, specialty, region } = req.body;
+    const email = normalizeEmail(rawEmail);
 
     // 입력 검증
     if (!email || !password || !nickname) {
@@ -341,6 +393,26 @@ router.post('/register', async (req, res) => {
     }
 
     await client.query('BEGIN');
+    transactionOpen = true;
+
+    if (IS_PRODUCTION) {
+      const verification = await client.query(
+        `SELECT verified, expires_at
+         FROM email_verifications
+         WHERE email = $1
+         FOR UPDATE`,
+        [email],
+      );
+      const verifiedEmail = verification.rows[0];
+      if (!verifiedEmail?.verified || new Date(verifiedEmail.expires_at) <= new Date()) {
+        await client.query('ROLLBACK');
+        transactionOpen = false;
+        return res.status(400).json({
+          success: false,
+          error: '이메일 인증을 완료해주세요',
+        });
+      }
+    }
 
     // 이메일 중복 체크
     const emailCheck = await client.query(
@@ -350,6 +422,7 @@ router.post('/register', async (req, res) => {
 
     if (emailCheck.rows.length > 0) {
       await client.query('ROLLBACK');
+      transactionOpen = false;
       return res.status(400).json({
         success: false,
         error: '이미 사용 중인 이메일입니다'
@@ -364,6 +437,7 @@ router.post('/register', async (req, res) => {
 
     if (nicknameCheck.rows.length > 0) {
       await client.query('ROLLBACK');
+      transactionOpen = false;
       return res.status(400).json({
         success: false,
         error: '이미 사용 중인 닉네임입니다'
@@ -374,8 +448,9 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);
 
     // 인증 코드 생성
-    const verificationCode = generateVerificationCode();
-    const verificationExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후
+    const verificationCode = IS_PRODUCTION ? null : generateVerificationCode();
+    const verificationCodeHash = verificationCode ? hashRecoveryCode(verificationCode) : null;
+    const verificationExpiresAt = IS_PRODUCTION ? null : new Date(Date.now() + 10 * 60 * 1000);
 
     // 사용자 생성
     const result = await client.query(
@@ -387,10 +462,11 @@ router.post('/register', async (req, res) => {
         specialty, 
         region,
         verification_code,
+        verification_code_hash,
         verification_expires_at,
         auth_provider,
         email_verified
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING id, email, nickname, specialty, region, created_at`,
       [
         email,
@@ -399,26 +475,30 @@ router.post('/register', async (req, res) => {
         nickname, // username도 nickname으로 설정
         specialty || null,
         region || null,
-        verificationCode,
+        null,
+        verificationCodeHash,
         verificationExpiresAt,
         'email',
-        false
+        IS_PRODUCTION
       ]
     );
 
     const user = result.rows[0];
 
-    // 이메일 발송 로그 기록
-    await client.query(
-      `INSERT INTO email_logs (user_id, email_type, recipient_email, subject, status)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [user.id, 'verification', email, '이메일 인증 코드', 'pending']
-    );
+    if (IS_PRODUCTION) {
+      await client.query('DELETE FROM email_verifications WHERE email = $1', [email]);
+    } else {
+      await client.query(
+        `INSERT INTO email_logs (user_id, email_type, recipient_email, subject, status)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [user.id, 'verification', email, '이메일 인증 코드', 'pending']
+      );
+    }
 
     await client.query('COMMIT');
+    transactionOpen = false;
 
-    // 인증 이메일 발송 (비동기)
-    sendVerificationEmail(email, verificationCode, nickname)
+    if (!IS_PRODUCTION) sendVerificationEmail(email, verificationCode, nickname)
       .then(async () => {
         // 발송 성공 로그 업데이트
         await db.query(
@@ -461,13 +541,13 @@ router.post('/register', async (req, res) => {
         email: user.email,
         nickname: user.nickname,
         username: user.nickname,
-        emailVerified: user.email_verified || false,
+        emailVerified: IS_PRODUCTION || user.email_verified || false,
         isAdmin: user.is_admin || false
       }
     });
 
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (transactionOpen) await client.query('ROLLBACK');
     console.error('❌ 회원가입 오류:', error);
     res.status(500).json({
       success: false,
@@ -482,26 +562,34 @@ router.post('/register', async (req, res) => {
  * POST /api/auth/verify-email
  * 이메일 인증
  */
-router.post('/verify-email', async (req, res) => {
+router.post('/verify-email', verificationCodeAttemptIpLimiter, verificationCodeAttemptLimiter, async (req, res) => {
+  const client = await db.getClient();
+  let transactionOpen = false;
   try {
-    const { email, code } = req.body;
+    const { email: rawEmail, code } = req.body;
+    const email = normalizeEmail(rawEmail);
 
-    if (!email || !code) {
+    if (!email || !isRecoveryCode(code)) {
       return res.status(400).json({
         success: false,
         error: '이메일과 인증 코드가 필요합니다'
       });
     }
 
-    // 사용자 조회
-    const result = await db.query(
-      `SELECT id, nickname, verification_code, verification_expires_at, email_verified
+    await client.query('BEGIN');
+    transactionOpen = true;
+    const result = await client.query(
+      `SELECT id, nickname, verification_code_hash, verification_expires_at,
+              verification_attempt_count, verification_locked_at, email_verified
        FROM users 
-       WHERE email = $1`,
-      [email]
+       WHERE email = $1
+       FOR UPDATE`,
+      [email],
     );
 
     if (result.rows.length === 0) {
+      await client.query('COMMIT');
+      transactionOpen = false;
       return res.status(404).json({
         success: false,
         error: '사용자를 찾을 수 없습니다'
@@ -512,37 +600,52 @@ router.post('/verify-email', async (req, res) => {
 
     // 이미 인증됨
     if (user.email_verified) {
+      await client.query('COMMIT');
+      transactionOpen = false;
       return res.status(400).json({
         success: false,
         error: '이미 인증된 이메일입니다'
       });
     }
 
-    // 인증 코드 확인
-    if (user.verification_code !== code) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 일치하지 않습니다'
-      });
+    const verification = {
+      code_hash: user.verification_code_hash,
+      expires_at: user.verification_expires_at,
+      verified: user.email_verified,
+      attempt_count: user.verification_attempt_count,
+      locked_at: user.verification_locked_at,
+    };
+    if (!verificationCodeIsUsable(verification) || !recoveryCodeMatches(code, verification.code_hash)) {
+      if (verificationCodeIsUsable(verification)) {
+        await client.query(
+          `UPDATE users
+           SET verification_attempt_count = verification_attempt_count + 1,
+               verification_locked_at = CASE
+                 WHEN verification_attempt_count + 1 >= $2 THEN NOW()
+                 ELSE verification_locked_at
+               END
+           WHERE id = $1`,
+          [user.id, VERIFICATION_CODE_MAX_ATTEMPTS],
+        );
+      }
+      await client.query('COMMIT');
+      transactionOpen = false;
+      return sendVerificationCodeFailure(res);
     }
 
-    // 만료 확인
-    if (new Date() > new Date(user.verification_expires_at)) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
-      });
-    }
-
-    // 인증 완료
-    await db.query(
+    await client.query(
       `UPDATE users 
        SET email_verified = TRUE, 
            verification_code = NULL, 
-           verification_expires_at = NULL
+           verification_code_hash = NULL,
+           verification_expires_at = NULL,
+           verification_attempt_count = 0,
+           verification_locked_at = NULL
        WHERE id = $1`,
-      [user.id]
+      [user.id],
     );
+    await client.query('COMMIT');
+    transactionOpen = false;
 
     // JWT 토큰 생성
     const accessToken = generateAccessToken(user.id, email);
@@ -572,11 +675,14 @@ router.post('/verify-email', async (req, res) => {
     });
 
   } catch (error) {
+    if (transactionOpen) await client.query('ROLLBACK');
     console.error('❌ 이메일 인증 오류:', error);
     res.status(500).json({
       success: false,
       error: '인증 처리 중 오류가 발생했습니다'
     });
+  } finally {
+    client.release();
   }
 });
 
@@ -584,9 +690,10 @@ router.post('/verify-email', async (req, res) => {
  * POST /api/auth/resend-code
  * 인증 코드 재발송
  */
-router.post('/resend-code', async (req, res) => {
+router.post('/resend-code', verificationDeliveryIpLimiter, verificationDeliveryLimiter, async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email: rawEmail } = req.body;
+    const email = normalizeEmail(rawEmail);
 
     if (!email) {
       return res.status(400).json({
@@ -623,9 +730,13 @@ router.post('/resend-code', async (req, res) => {
 
     await db.query(
       `UPDATE users 
-       SET verification_code = $1, verification_expires_at = $2
+       SET verification_code = NULL,
+           verification_code_hash = $1,
+           verification_expires_at = $2,
+           verification_attempt_count = 0,
+           verification_locked_at = NULL
        WHERE id = $3`,
-      [verificationCode, verificationExpiresAt, user.id]
+      [hashRecoveryCode(verificationCode), verificationExpiresAt, user.id]
     );
 
     // 인증 이메일 재발송
@@ -649,9 +760,10 @@ router.post('/resend-code', async (req, res) => {
  * POST /api/auth/login
  * 로그인
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginAttemptIpLimiter, loginAttemptLimiter, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email: rawEmail, password } = req.body;
+    const email = normalizeEmail(rawEmail);
 
     if (!email || !password) {
       return res.status(400).json({
@@ -705,6 +817,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({
         success: false,
         error: '이메일 또는 비밀번호가 일치하지 않습니다'
+      });
+    }
+
+    if (IS_PRODUCTION && !user.email_verified) {
+      return res.status(403).json({
+        success: false,
+        error: '이메일 인증을 완료한 후 로그인할 수 있습니다',
       });
     }
 
@@ -880,7 +999,12 @@ router.post('/logout', requireCsrfForCookieAuth, authenticateToken, async (req, 
  * GET /api/auth/me
  * 내 정보 조회
  */
-router.get('/me', authenticateToken, async (req, res) => {
+router.get('/me', (req, res, next) => {
+  if (!extractAccessToken(req)) {
+    return res.json({ success: true, user: null });
+  }
+  return authenticateToken(req, res, next);
+}, async (req, res) => {
   try {
     const result = await db.query(
       `SELECT 
@@ -941,9 +1065,10 @@ router.get('/me', authenticateToken, async (req, res) => {
  * POST /api/auth/forgot-password
  * 비밀번호 찾기 - 이메일 인증 코드 발송
  */
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordIpLimiter, forgotPasswordLimiter, async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email: rawEmail } = req.body;
+    const email = normalizeEmail(rawEmail);
 
     if (!email) {
       return res.status(400).json({
@@ -974,34 +1099,22 @@ router.post('/forgot-password', async (req, res) => {
     const user = userResult.rows[0];
 
     // 인증 코드 생성
-    const verificationCode = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10분 후
+    const verificationCode = createRecoveryCode();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    // password_reset_codes 테이블에 저장 (테이블이 없으면 생성)
-    try {
-      await db.query(
-        `INSERT INTO password_reset_codes (email, code, expires_at) 
-         VALUES ($1, $2, $3)
-         ON CONFLICT (email) 
-         DO UPDATE SET code = $2, expires_at = $3, created_at = NOW(), used = FALSE`,
-        [email, verificationCode, expiresAt]
-      );
-    } catch (tableError) {
-      // 테이블이 없으면 생성
-      await db.query(`
-        CREATE TABLE IF NOT EXISTS password_reset_codes (
-          email VARCHAR(255) PRIMARY KEY,
-          code VARCHAR(6) NOT NULL,
-          expires_at TIMESTAMP NOT NULL,
-          used BOOLEAN DEFAULT FALSE,
-          created_at TIMESTAMP DEFAULT NOW()
-        )
-      `);
-      await db.query(
-        `INSERT INTO password_reset_codes (email, code, expires_at) VALUES ($1, $2, $3)`,
-        [email, verificationCode, expiresAt]
-      );
-    }
+    await db.query(
+      `INSERT INTO password_reset_codes (email, code_hash, expires_at, used, attempt_count, locked_at)
+       VALUES ($1, $2, $3, FALSE, 0, NULL)
+       ON CONFLICT (email)
+       DO UPDATE SET code = NULL,
+                     code_hash = EXCLUDED.code_hash,
+                     expires_at = EXCLUDED.expires_at,
+                     created_at = NOW(),
+                     used = FALSE,
+                     attempt_count = 0,
+                     locked_at = NULL`,
+      [email, hashRecoveryCode(verificationCode), expiresAt],
+    );
 
     // 인증 이메일 발송
     try {
@@ -1026,11 +1139,12 @@ router.post('/forgot-password', async (req, res) => {
  * POST /api/auth/verify-reset-code
  * 비밀번호 재설정 인증 코드 확인
  */
-router.post('/verify-reset-code', async (req, res) => {
+router.post('/verify-reset-code', resetCodeAttemptIpLimiter, resetCodeAttemptLimiter, async (req, res) => {
   try {
-    const { email, code } = req.body;
+    const { email: rawEmail, code } = req.body;
+    const email = normalizeEmail(rawEmail);
 
-    if (!email || !code) {
+    if (!email || !isRecoveryCode(code)) {
       return res.status(400).json({
         success: false,
         error: '이메일과 인증 코드가 필요합니다'
@@ -1039,41 +1153,16 @@ router.post('/verify-reset-code', async (req, res) => {
 
     // 인증 코드 확인
     const result = await db.query(
-      'SELECT code, expires_at, used FROM password_reset_codes WHERE email = $1',
+      'SELECT code_hash, expires_at, used, attempt_count, locked_at FROM password_reset_codes WHERE email = $1',
       [email]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드를 먼저 요청해주세요'
-      });
-    }
-
     const resetCode = result.rows[0];
-
-    // 이미 사용된 코드인지 확인
-    if (resetCode.used) {
-      return res.status(400).json({
-        success: false,
-        error: '이미 사용된 인증 코드입니다. 새로운 코드를 요청해주세요.'
-      });
-    }
-
-    // 만료 확인
-    if (new Date() > new Date(resetCode.expires_at)) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
-      });
-    }
-
-    // 코드 확인
-    if (resetCode.code !== code) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 일치하지 않습니다'
-      });
+    if (!resetCodeIsUsable(resetCode) || !recoveryCodeMatches(code, resetCode.code_hash)) {
+      if (resetCode && resetCodeIsUsable(resetCode)) {
+        await recordInvalidResetCodeAttempt(db, email);
+      }
+      return sendResetCodeFailure(res);
     }
 
     res.json({
@@ -1094,11 +1183,14 @@ router.post('/verify-reset-code', async (req, res) => {
  * POST /api/auth/reset-password
  * 새 비밀번호 설정
  */
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', resetCodeAttemptIpLimiter, resetCodeAttemptLimiter, async (req, res) => {
+  const client = await db.getClient();
+  let transactionOpen = false;
   try {
-    const { email, code, newPassword } = req.body;
+    const { email: rawEmail, code, newPassword } = req.body;
+    const email = normalizeEmail(rawEmail);
 
-    if (!email || !code || !newPassword) {
+    if (!email || !isRecoveryCode(code) || !newPassword) {
       return res.status(400).json({
         success: false,
         error: '이메일, 인증 코드, 새 비밀번호가 필요합니다'
@@ -1121,58 +1213,46 @@ router.post('/reset-password', async (req, res) => {
       });
     }
 
-    // 인증 코드 확인
-    const codeResult = await db.query(
-      'SELECT code, expires_at, used FROM password_reset_codes WHERE email = $1',
+    await client.query('BEGIN');
+    transactionOpen = true;
+
+    const codeResult = await client.query(
+      'SELECT code_hash, expires_at, used, attempt_count, locked_at FROM password_reset_codes WHERE email = $1 FOR UPDATE',
       [email]
     );
 
-    if (codeResult.rows.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드를 먼저 요청해주세요'
-      });
-    }
-
     const resetCode = codeResult.rows[0];
-
-    // 이미 사용된 코드인지 확인
-    if (resetCode.used) {
-      return res.status(400).json({
-        success: false,
-        error: '이미 사용된 인증 코드입니다. 새로운 코드를 요청해주세요.'
-      });
-    }
-
-    // 만료 확인
-    if (new Date() > new Date(resetCode.expires_at)) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 만료되었습니다. 새로운 코드를 요청해주세요.'
-      });
-    }
-
-    // 코드 확인
-    if (resetCode.code !== code) {
-      return res.status(400).json({
-        success: false,
-        error: '인증 코드가 일치하지 않습니다'
-      });
+    if (!resetCodeIsUsable(resetCode) || !recoveryCodeMatches(code, resetCode.code_hash)) {
+      if (resetCode && resetCodeIsUsable(resetCode)) {
+        await recordInvalidResetCodeAttempt(client, email);
+      }
+      await client.query('COMMIT');
+      transactionOpen = false;
+      return sendResetCodeFailure(res);
     }
 
     // 비밀번호 해싱 및 업데이트
     const passwordHash = await bcrypt.hash(newPassword, 10);
     
-    await db.query(
+    await client.query(
       'UPDATE users SET password_hash = $1 WHERE email = $2',
       [passwordHash, email]
     );
 
-    // 인증 코드 사용 처리
-    await db.query(
+    await client.query(
       'UPDATE password_reset_codes SET used = TRUE WHERE email = $1',
       [email]
     );
+
+    await client.query(
+      `UPDATE refresh_tokens
+       SET is_revoked = TRUE, revoked_at = NOW()
+       WHERE user_id = (SELECT id FROM users WHERE email = $1)`,
+      [email],
+    );
+
+    await client.query('COMMIT');
+    transactionOpen = false;
 
     console.log('✅ 비밀번호 재설정 완료');
 
@@ -1182,11 +1262,16 @@ router.post('/reset-password', async (req, res) => {
     });
 
   } catch (error) {
+    if (transactionOpen) {
+      await client.query('ROLLBACK');
+    }
     console.error('❌ 비밀번호 재설정 오류:', error);
     res.status(500).json({
       success: false,
       error: '비밀번호 재설정 중 오류가 발생했습니다'
     });
+  } finally {
+    client.release();
   }
 });
 
@@ -1263,66 +1348,68 @@ router.put('/profile', requireCsrfForCookieAuth, authenticateToken, async (req, 
 
 /**
  * POST /api/auth/set-admin
- * 관리자 권한 설정 (특정 이메일에 대해)
- * 내부용 API - 보안을 위해 특정 조건에서만 사용
+ * 개발 환경에서만 쓰는 관리자 권한 설정 도구.
+ * 운영에서는 라우트 자체를 등록하지 않아 공개 승격 경로가 존재하지 않는다.
  */
-router.post('/set-admin', async (req, res) => {
-  try {
-    const { email, secretKey } = req.body;
+if (!IS_PRODUCTION) {
+  router.post('/set-admin', async (req, res) => {
+    try {
+      const { email: rawEmail, secretKey } = req.body;
+      const email = normalizeEmail(rawEmail);
 
-    // 비밀 키 검증: 예측 가능한 하드코딩 기본값을 제거한다.
-    // ADMIN_SECRET_KEY가 설정되지 않으면 이 엔드포인트는 비활성화(차단)한다.
-    const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
+      // 비밀 키 검증: 예측 가능한 하드코딩 기본값을 제거한다.
+      // ADMIN_SECRET_KEY가 설정되지 않으면 이 엔드포인트는 비활성화(차단)한다.
+      const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
 
-    if (!ADMIN_SECRET_KEY || ADMIN_SECRET_KEY.trim().length === 0) {
-      return res.status(403).json({
+      if (!ADMIN_SECRET_KEY || ADMIN_SECRET_KEY.trim().length === 0) {
+        return res.status(403).json({
+          success: false,
+          error: '관리자 설정 기능이 비활성화되어 있습니다.'
+        });
+      }
+
+      if (typeof secretKey !== 'string' || secretKey !== ADMIN_SECRET_KEY) {
+        return res.status(403).json({
+          success: false,
+          error: '권한이 없습니다.'
+        });
+      }
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: '이메일이 필요합니다.'
+        });
+      }
+
+      // 사용자 찾기 및 관리자 권한 부여
+      const result = await db.query(
+        'UPDATE users SET is_admin = TRUE WHERE email = $1 RETURNING id, email, nickname, is_admin',
+        [email]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          success: false,
+          error: '해당 이메일로 가입된 사용자가 없습니다.'
+        });
+      }
+
+      console.log('✅ 관리자 권한 부여 완료');
+
+      res.json({
+        success: true,
+        message: '관리자 권한이 부여되었습니다.',
+        user: result.rows[0]
+      });
+    } catch (error) {
+      console.error('❌ 관리자 설정 오류:', error);
+      res.status(500).json({
         success: false,
-        error: '관리자 설정 기능이 비활성화되어 있습니다.'
+        error: '관리자 설정 중 오류가 발생했습니다.'
       });
     }
-
-    if (typeof secretKey !== 'string' || secretKey !== ADMIN_SECRET_KEY) {
-      return res.status(403).json({
-        success: false,
-        error: '권한이 없습니다.'
-      });
-    }
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        error: '이메일이 필요합니다.'
-      });
-    }
-
-    // 사용자 찾기 및 관리자 권한 부여
-    const result = await db.query(
-      'UPDATE users SET is_admin = TRUE WHERE email = $1 RETURNING id, email, nickname, is_admin',
-      [email]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: '해당 이메일로 가입된 사용자가 없습니다.'
-      });
-    }
-
-    console.log(`✅ 관리자 권한 부여: ${email}`);
-
-    res.json({
-      success: true,
-      message: '관리자 권한이 부여되었습니다.',
-      user: result.rows[0]
-    });
-
-  } catch (error) {
-    console.error('❌ 관리자 설정 오류:', error);
-    res.status(500).json({
-      success: false,
-      error: '관리자 설정 중 오류가 발생했습니다.'
-    });
-  }
-});
+  });
+}
 
 module.exports = router;

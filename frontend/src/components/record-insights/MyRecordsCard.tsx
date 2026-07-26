@@ -9,7 +9,6 @@ import { useRecordDetailPref, detailToggleLabel } from './useRecordDetailPref';
 type LoadState = 'loading' | 'ready' | 'error';
 
 type Props = {
-  /** 내가 직접 지정한 기록 묶음들 — 누르는 즉시 여기로 합산된다 */
   entries: MyAthleteEntry[];
   onClose: () => void;
   onRemove: (athleteKey: string) => void;
@@ -47,14 +46,6 @@ function pickBetter(a: MergedRecord | null, b: MergedRecord): MergedRecord | nul
   return bv < av ? b : a;
 }
 
-/**
- * "내 기록" 합산 카드.
- *
- * - 사용자가 "나로 지정"을 누른 묶음 전부를 한 명의 기록처럼 합산해 보여준다.
- * - 요약(기록 수/종목/연도/최근)도 전부 합산.
- * - 지정은 사용자가 직접 누른 것만 (자동 병합 아님) — 화면 표시용이며 서버 데이터는 바꾸지 않는다.
- * - 잘못 합쳤으면 아래에서 빼면 된다. 설명은 최소로, 전부 하단에.
- */
 export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
   const keys = useMemo(() => entries.map((entry) => entry.athleteKey), [entries]);
   const [state, setState] = useState<LoadState>('loading');
@@ -96,7 +87,6 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
           years.add(record.season);
           if (record.season > latestSeason) latestSeason = record.season;
         }
-        // 종목별 베스트 — 묶음 전체를 합쳐서 계산 (시즌 베스트도 같은 방식으로 합산)
         const bucket = eventMap.get(record.eventKey) || {
           eventKey: record.eventKey,
           eventLabel: record.eventLabel,
@@ -109,7 +99,6 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
       }
     }
     rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-    // 이번(최근) 시즌 베스트 — 묶음 전체 합산 기준
     let seasonBest: MergedRecord | null = null;
     for (const row of rows) {
       if (row.season === latestSeason) seasonBest = pickBetter(seasonBest, row);
@@ -138,20 +127,18 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
 
   return (
     <Card className="overflow-hidden border-brand border-l-4 shadow-sm">
-      {/* 내 기록만의 특별한 느낌 — brand 틴트 헤더로 다른 카드와 확실히 구분 */}
       <CardHeader className="bg-brand/5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand">MY RECORDS · 내 기록</p>
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand">MY COLLECTION · 내가 모아 보는 기록</p>
             <CardTitle className="mt-1.5 text-2xl">{name}</CardTitle>
-            <p className="mt-1 text-xs text-ink-4">{entries.length}개 묶음 합산 중 · 항상 여기 뜨 있어요</p>
+            <p className="mt-1 text-xs text-ink-4">{entries.length}개 묶음을 이 기기에서 모아 보고 있어요</p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={onClose}>
             접기
           </Button>
         </div>
 
-        {/* 합산 요약 — 모든 묶음 합쳐서 (대시보드 상단) */}
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
           <SumStat label="모은 기록" value={state === 'ready' ? `${merged.totalCount}개` : '…'} />
           <SumStat label="종목" value={state === 'ready' ? `${merged.eventCount}개` : '…'} />
@@ -162,7 +149,6 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
           />
         </div>
 
-        {/* 종목별 베스트 — 묶음 전체 합산 */}
         {state === 'ready' && merged.eventBests.length > 0 && (
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {merged.eventBests.slice(0, 4).map((event) => (
@@ -182,7 +168,7 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
 
       <CardContent className="space-y-2">
         {state === 'loading' && (
-          <p role="status" className="py-3 text-sm text-ink-3">기록을 합치는 중이에요.</p>
+          <p role="status" className="py-3 text-sm text-ink-3">기록을 불러오는 중이에요.</p>
         )}
         {state === 'error' && (
           <p role="alert" className="py-3 text-sm text-ink-3">기록을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</p>
@@ -234,7 +220,6 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
           </button>
         )}
 
-        {/* 관리·설명은 전부 아래로 */}
         <div className="mt-4 border-t border-hair pt-3">
           <div className="flex flex-wrap items-center gap-1.5">
             {entries.map((entry) => (
@@ -246,7 +231,7 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
                 <button
                   type="button"
                   onClick={() => onRemove(entry.athleteKey)}
-                  aria-label={`${entry.team || '소속 미상'} 묶음을 내 기록에서 빼기`}
+                  aria-label={`${entry.team || '소속 미상'} 묶음을 이 목록에서 빼기`}
                   className="font-semibold text-ink-4 transition hover:text-err"
                 >
                   ×
@@ -255,8 +240,8 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
             ))}
           </div>
           <p className="mt-2 text-[11px] leading-4 text-ink-4">
-            직접 지정한 묶음만 화면에서 합쳐 보여줘요 (원본 데이터는 그대로예요).
-            동명이인이 섞였다면 위에서 ×로 빼면 돼요.
+            직접 담은 기록만 이 화면에서 함께 보여줘요 (원본 데이터는 그대로예요).
+            이 기기에만 저장돼요. 다른 사람 기록이 섞였다면 위에서 ×로 빼면 돼요.
           </p>
         </div>
       </CardContent>

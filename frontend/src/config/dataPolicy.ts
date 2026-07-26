@@ -220,7 +220,7 @@ export const COMPARE_POLICY = {
  * ============================================================ */
 export const SHARE_POLICY = {
   /** 현재 구현 상태 — 'preparing' | 'enabled' | 'disabled' */
-  status: 'enabled' as 'preparing' | 'enabled' | 'disabled',
+  status: 'disabled' as 'preparing' | 'enabled' | 'disabled',
   /** 준비 중 라벨 (미래약속 금지어 회피 — "준비 중") */
   preparingLabel: '준비 중',
   preparingTitle: '공유 카드는 준비하고 있어요',

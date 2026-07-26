@@ -32,6 +32,7 @@ const stores = {};
  * @param {string} options.keyPrefix - 저장소 키 접두사 (엔드포인트별 분리)
  * @param {string} options.message - 제한 초과 시 메시지
  * @param {boolean} options.skipAdmin - 관리자 인증 시 건너뛰기 (기본 true)
+ * @param {boolean} options.noStore - 응답을 저장하지 않음 (기본 false)
  */
 function createRateLimiter({
   windowMs = 60 * 1000,
@@ -39,6 +40,7 @@ function createRateLimiter({
   keyPrefix = 'global',
   message = '요청 한도를 초과했습니다. 잠시 후 다시 시도해 주세요.',
   skipAdmin = true,
+  noStore = false,
 } = {}) {
   // 저장소 초기화
   if (!stores[keyPrefix]) {
@@ -57,6 +59,10 @@ function createRateLimiter({
   }
   
   return function rateLimiter(req, res, next) {
+    if (noStore) {
+      res.setHeader('Cache-Control', 'no-store');
+    }
+
     // 관리자 인증 시 건너뛰기
     if (skipAdmin && req.isAdmin) {
       return next();
@@ -131,10 +137,20 @@ const publicLimiter = createRateLimiter({
   message: '요청 한도를 초과했습니다.',
 });
 
+const dataRequestLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  keyPrefix: 'data-request',
+  message: '정정·숨김 요청은 한 시간에 5번까지 접수할 수 있습니다. 잠시 후 다시 시도해 주세요.',
+  skipAdmin: false,
+  noStore: true,
+});
+
 module.exports = {
   createRateLimiter,
   searchLimiter,
   generateLimiter,
   competitionLimiter,
   publicLimiter,
+  dataRequestLimiter,
 };

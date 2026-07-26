@@ -59,11 +59,14 @@ test('PACE-SC-001: track events 800m/1500m/3000mSC with water-jump placement are
 
 test('PACE-DS-003: pace page copy is direct and not a training-plan duplicate', () => {
   const index = readSource(`${PACE_DIR}/index.tsx`);
+  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
 
   assert.match(index, /페이스 계산기/);
   assert.match(index, /목표 기록으로 km·400m·100m 페이스를 바로 확인해요/);
   assert.doesNotMatch(index, /훈련 계획 도구/);
   assert.doesNotMatch(index, /페이스 계산기 & 차트/);
+  assert.match(target, /페이스 계산하기/);
+  assert.doesNotMatch(target, /Calculate pace/);
 });
 
 test('PACE-DS-004: track event splits expose steeplechase water-jump variants', () => {

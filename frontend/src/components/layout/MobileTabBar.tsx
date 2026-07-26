@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, BarChart3, CalendarDays, MessageSquare, Menu } from 'lucide-react'
+import { Home, BarChart3, CalendarDays, Menu } from 'lucide-react'
 import type { ComponentType } from 'react'
 
 /**
@@ -25,7 +25,6 @@ const TAB_ITEMS: TabItem[] = [
   { path: '/', label: '홈', Icon: Home },
   { path: '/records', label: '기록', Icon: BarChart3, matchPrefix: true },
   { path: '/competitions', label: '대회', Icon: CalendarDays, matchPrefix: true },
-  { path: '/community', label: '커뮤니티', Icon: MessageSquare, matchPrefix: true },
 ]
 
 /** 헤더 드로어를 여는 커스텀 이벤트 이름(Header가 listen) */

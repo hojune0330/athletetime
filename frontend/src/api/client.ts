@@ -119,6 +119,10 @@ function isAuthEndpoint(url: string): boolean {
   )
 }
 
+function isGuestSessionCheck(url: string, status: number | undefined): boolean {
+  return status === 401 && url.includes('/api/auth/me')
+}
+
 async function handleUnauthorized(original: InternalAxiosRequestConfig): Promise<boolean> {
   retriedAuthRequests.add(original)
 
@@ -143,12 +147,17 @@ apiClient.interceptors.response.use(
       status === 401 &&
       original &&
       !retriedAuthRequests.has(original) &&
-      !isAuthEndpoint(url)
+      !isAuthEndpoint(url) &&
+      !isGuestSessionCheck(url, status)
     ) {
       const refreshed = await handleUnauthorized(original)
       if (refreshed) {
         return apiClient(original)
       }
+    }
+
+    if (isGuestSessionCheck(url, status)) {
+      return Promise.reject(error)
     }
 
     if (error.response) {

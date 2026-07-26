@@ -192,9 +192,9 @@ test('operator guide admin API enforces 401, 403, and admin-only 200', async () 
   const unauthenticated = await request('GET', '/api/card-studio/admin/operator-guide');
   assert.equal(unauthenticated.status, 401);
 
-  const legacyAliasUnauthenticated = await request('GET', '/api/operator-guide');
-  assert.equal(legacyAliasUnauthenticated.status, 401);
-  assert.equal(legacyAliasUnauthenticated.raw.includes('internal_operator'), false);
+  const removedLegacyAlias = await request('GET', '/api/operator-guide');
+  assert.equal(removedLegacyAlias.status, 404);
+  assert.equal(removedLegacyAlias.raw.includes('internal_operator'), false);
 
   const normalUserCookieHeader = await registerUser('opuser');
   const forbidden = await request('GET', '/api/card-studio/admin/operator-guide', {

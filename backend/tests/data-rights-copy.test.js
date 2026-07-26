@@ -26,6 +26,22 @@ test('frontend trust surfaces use public-record indexing copy instead of workaro
   assert.equal(sources.includes('창작 콘텐츠 제작 도구'), false);
 });
 
+test('public record search and data request inputs use neutral placeholders', () => {
+  const recordsNameStep = readSource('frontend/src/components/records/RecordsMineNameStep.tsx');
+  const dataRequestPage = readSource('frontend/src/pages/DataRequestPage.tsx');
+
+  for (const cannedExample of ['홍길동', '김민준', '서울고', '○○실업팀']) {
+    assert.equal(recordsNameStep.includes(cannedExample), false);
+    assert.equal(dataRequestPage.includes(cannedExample), false);
+  }
+
+  assert.match(recordsNameStep, /placeholder="이름 또는 소속을 입력하세요"/);
+  assert.match(dataRequestPage, /placeholder="이름을 입력하세요"/);
+  assert.match(dataRequestPage, /placeholder="소속을 입력하세요"/);
+  assert.match(dataRequestPage, /placeholder="종목을 입력하세요"/);
+  assert.match(dataRequestPage, /placeholder="대회명을 입력하세요"/);
+});
+
 test('active docs point to data-request and avoid legal loophole positioning', () => {
   const sources = [
     'docs/athletetime-data-strategy-master.md',

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import  { calculateAdjustments } from '../utils/adjustments';
 import { calculateVDOT, calculateTrainingPaces, getPerformanceLevel, calculateVO2max } from '../utils/vdotCalculations';
-import { generateWeeklyPlan, generateMesocycle, generateWorkoutDetails, generateRecommendations } from '../utils/trainingPlans';
+import { generateWeeklyPlan, generateMesocycle, generateWorkoutDetails } from '../utils/trainingPlans';
 import type {
   TrainingPaces
 } from '../utils/vdotCalculations';
@@ -14,7 +14,6 @@ import type {
   DayPlan,
   WeekPlan,
   Workout,
-  Recommendation,
 } from '../utils/trainingPlans';
 
 export interface TimeInput {
@@ -32,7 +31,6 @@ export interface TrainingResults {
   weeklyPlan: DayPlan[];
   mesocycle: WeekPlan[];
   workouts: Workout[];
-  recommendations: Recommendation[];
   adjustmentNote: string;
 }
 
@@ -46,12 +44,8 @@ const DEFAULT_PROFILE: UserProfile = {
 };
 
 const DEFAULT_CONDITIONS: Conditions = {
-  injuryRecovery: false,
-  highFatigue: false,
   altitude: false,
   hotWeather: false,
-  weightLoss: false,
-  morningOnly: false,
 };
 
 export function useTrainingCalculator() {
@@ -115,7 +109,6 @@ export function useTrainingCalculator() {
     const weeklyPlan = generateWeeklyPlan(profile.frequency, profile.trainingPhase);
     const mesocycle = generateMesocycle(profile.trainingPhase);
     const workouts = generateWorkoutDetails(profile.experience, paces);
-    const recommendations = generateRecommendations(profile, conditions);
     
     setResults({
       vdot,
@@ -126,7 +119,6 @@ export function useTrainingCalculator() {
       weeklyPlan,
       mesocycle,
       workouts,
-      recommendations,
       adjustmentNote: profile.gender === 'female' ? '여성 보정 적용됨' : '',
     });
 

@@ -9,7 +9,6 @@ type Props = {
   isInCompareTray: (athleteKey: string) => boolean;
   onSelectAthlete: (athleteKey: string) => void;
   onToggleCompare: (athlete: AthleteSearchCard) => void;
-  /** 후보 카드에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 */
   isMine: (athleteKey: string) => boolean;
   onToggleMine: (athlete: AthleteSearchCard) => void;
   myCount: number;
@@ -63,7 +62,7 @@ export function RecordSearchResults({
             <p className="text-sm font-semibold text-ink">후보를 좁혀보세요</p>
             <p className="mt-1 text-xs leading-5 text-ink-4">
               {sameNameCount >= 2
-                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 내 기록인 카드마다 "내 기록이에요"를 누르면 전부 하나로 합쳐져요.`
+                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 소속·연도·종목을 확인한 뒤 원하는 카드만 "이 기록 담기"로 모아 보세요.`
                 : '이름이 같은 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'}
             </p>
           </div>
@@ -109,19 +108,18 @@ export function RecordSearchResults({
 
       {compareNotice && <p role="status" className="text-xs text-warn">{compareNotice}</p>}
 
-      {/* 장바구니 패턴: 담긴 게 있으면 화면 하단에 항상 떠 있는 합치기 바 */}
       {myCount > 0 && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-brand bg-surface px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
             <p className="min-w-0 truncate text-sm text-ink">
-              <span className="font-semibold text-brand">내 기록</span>에 {myCount}개 묶음 담김 — 누른 기록은 전부 하나로 합쳐져요
+              <span className="font-semibold text-brand">내가 모아 보는 기록</span>에 {myCount}개 묶음 담김 — 이 기기에서만 모아 봐요
             </p>
             <button
               type="button"
               onClick={onViewMyRecords}
               className="shrink-0 border border-brand bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              합친 기록 보기
+              모아 보는 기록 보기
             </button>
           </div>
         </div>
@@ -203,7 +201,7 @@ function AthleteResultCard({
     >
       {mine && (
         <span className="absolute right-3 top-3 border border-brand bg-brand px-2 py-0.5 text-[11px] font-semibold text-white">
-          ✓ 내 기록에 담김
+          ✓ 내가 모아 보는 기록에 담김
         </span>
       )}
       <button type="button" onClick={onSelect} className="block w-full text-left">
@@ -236,7 +234,6 @@ function AthleteResultCard({
         <span className="mt-4 inline-flex text-sm font-semibold text-brand">이 기록 보기</span>
       </button>
 
-      {/* 주 액션: 내 기록 담기 — 크고 모호함 없는 한 줄 버튼 */}
       <button
         type="button"
         onClick={onToggleMine}
@@ -247,7 +244,7 @@ function AthleteResultCard({
             : 'border-brand-500 bg-surface text-brand hover:bg-brand-50'
         }`}
       >
-        {mine ? '✓ 내 기록에 담김 — 누르면 빼요' : '내 기록이에요'}
+        {mine ? '✓ 내가 모아 보는 기록에 담김 — 누르면 빼요' : '이 기록 담기'}
       </button>
       <button
         type="button"

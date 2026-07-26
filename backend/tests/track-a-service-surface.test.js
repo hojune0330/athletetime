@@ -39,10 +39,12 @@ test('TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as p
   assert.equal(yecheon.source.sourceType, 'public_result');
 });
 
-test('TRACK-A-SERVICE-003 records page copy states partial 2015-2017 coverage without claiming full history', () => {
+test('TRACK-A-SERVICE-003 records page states that the collection has gaps without implying a continuous date range', () => {
   const page = fs.readFileSync(path.join(ROOT, 'frontend', 'src', 'pages', 'RecordsPage.tsx'), 'utf8');
+  const policy = fs.readFileSync(path.join(ROOT, 'frontend', 'src', 'config', 'dataPolicy.ts'), 'utf8');
 
-  assert.match(page, /2015-2017 일부 기록/);
-  assert.doesNotMatch(page, /지금은 2018년 이후 기록/);
-  assert.doesNotMatch(page, /2005년부터 오늘까지 모든 경기결과/);
+  assert.match(page, /TRUST_NOTICE\.partial/);
+  assert.match(policy, /partial:\s*'\uBAA8\uB4E0 \uB300\uD68C\uB97C \uB2F4\uACE0 \uC788\uC9C0 \uC54A\uC544\uC694\. \uBE60\uC9C4 \uAE30\uB85D\uC774 \uC788\uC744 \uC218 \uC788\uC5B4\uC694\.'/);
+  assert.doesNotMatch(page, /2015-2017|2018/);
+  assert.doesNotMatch(page, /2005\uB144\uBD80\uD130 \uC624\uB298\uAE4C\uC9C0 \uBAA8\uB4E0 \uACBD\uAE30\uACB0\uACFC/);
 });
