@@ -114,3 +114,24 @@ test('NEWS-DISCOVERY-CONTRACT-007: managed migration does not depend on unmanage
   assert.match(sql, /actor_user_id UUID/u);
   assert.match(sql, /reviewed_by UUID/u);
 });
+
+test('NEWS-DISCOVERY-CONTRACT-008: manual pilot runbook keeps collection disabled and secrets server-only', () => {
+  // Given
+  const runbook = read('docs/runbooks/editorial-news-discovery.md');
+  const pilot = read('docs/templates/editorial-news-discovery-pilot.md');
+  const workflow = read('WORKFLOW.md');
+
+  // When
+  const combined = `${runbook}\n${pilot}`;
+
+  // Then
+  assert.match(runbook, /NAVER_NEWS_COLLECTOR_ENABLED/);
+  assert.match(runbook, /NAVER_API_HUB_KEY_ID/);
+  assert.match(runbook, /NAVER_API_HUB_KEY/);
+  assert.match(runbook, /Netlify에는 위 변수를 하나도 설정하지 않는다/);
+  assert.match(runbook, /GO-MANUAL/);
+  assert.match(combined, /14일/);
+  assert.match(combined, /기사 본문 저장/);
+  assert.match(combined, /자동 글 생성·발행/);
+  assert.match(workflow, /editorial-news-discovery\.md/);
+});

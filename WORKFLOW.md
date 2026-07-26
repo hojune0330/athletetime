@@ -49,6 +49,7 @@
 
 - 프로덕션 mainline 정책은 [`docs/athletetime-production-mainline-policy.md`](./docs/athletetime-production-mainline-policy.md)를 따른다.
 - `2026-first-item`에서 가져올 작업은 반드시 [`docs/athletetime-2026-first-item-port-map.md`](./docs/athletetime-2026-first-item-port-map.md)의 분류를 먼저 확인한다.
+- 네이버 소식 발견함은 [`docs/runbooks/editorial-news-discovery.md`](./docs/runbooks/editorial-news-discovery.md)의 수동 운영·중지·롤백 순서를 따른다.
 - 인증/보안, 원본 데이터, 공개 검색, 운영자 기능은 서로 섞어 커밋하지 않는다.
 - 기존 작업트리에 dirty 변경이 있으면 clean worktree를 만들어 작업한다.
 
