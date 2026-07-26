@@ -9,6 +9,7 @@ const {
   recoveryCodeMatches,
 } = require('../auth/recoveryCodes');
 const { createEmailRateLimiter, createIpRateLimiter } = require('../middleware/authRateLimit');
+const { listMigrationFiles } = require('../database/run-migrations');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -113,18 +114,22 @@ test('recovery flow persists only hashes, limits guesses, and keeps production a
   assert.match(migrationSource, /UPDATE password_reset_codes/);
 });
 
-test('Given a legacy active reset row When the recovery migration runs Then it makes code nullable before clearing plaintext codes', () => {
-  const migrationSource = fs.readFileSync(
-    path.join(ROOT, 'backend/database/migration-006-auth-recovery-security.sql'),
+test('Given a legacy active reset row When recovery migrations run Then compatibility clears its NOT NULL constraint before migration 006 retires plaintext codes', () => {
+  const migrationDirectory = path.join(ROOT, 'backend/database');
+  const migrationFiles = listMigrationFiles(migrationDirectory);
+  const compatibilityName = 'migration-005a-auth-recovery-compat.sql';
+  const recoveryName = 'migration-006-auth-recovery-security.sql';
+  const compatibilitySource = fs.readFileSync(
+    path.join(migrationDirectory, compatibilityName),
     'utf8',
   );
-  const dropNotNull = migrationSource.indexOf('ALTER COLUMN code DROP NOT NULL');
-  const retireLegacyCodes = migrationSource.indexOf('UPDATE password_reset_codes');
 
-  assert.ok(dropNotNull >= 0, 'migration must make the legacy code column nullable');
-  assert.ok(retireLegacyCodes >= 0, 'migration must retire legacy plaintext reset codes');
+  assert.ok(migrationFiles.includes(compatibilityName));
+  assert.ok(migrationFiles.includes(recoveryName));
   assert.ok(
-    dropNotNull < retireLegacyCodes,
-    'migration must drop the legacy NOT NULL constraint before setting code to NULL',
+    migrationFiles.indexOf(compatibilityName) < migrationFiles.indexOf(recoveryName),
+    'legacy compatibility must run before recovery migration 006',
   );
+  assert.match(compatibilitySource, /ALTER COLUMN code DROP NOT NULL/);
+  assert.match(compatibilitySource, /information_schema\.columns/);
 });
