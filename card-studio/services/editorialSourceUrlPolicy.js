@@ -20,7 +20,7 @@ for (const [network, prefix] of [
 ]) blockedIpv6.addSubnet(network, prefix, 'ipv6');
 
 function normalizedHostname(hostname) {
-  return hostname.replace(/^\[|\]$/gu, '').toLowerCase();
+  return hostname.replace(/^\[|\]$/gu, '').replace(/\.+$/u, '').toLowerCase();
 }
 
 function assertPublicAddress(address) {

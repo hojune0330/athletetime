@@ -22,6 +22,16 @@ test('EDITORIAL-SOURCE-SEC-001: private and reserved IP literals are rejected', 
   }
 });
 
+test('EDITORIAL-SOURCE-SEC-004: trailing DNS root dots cannot bypass local-host rejection', () => {
+  for (const url of [
+    'https://localhost./result',
+    'https://service.local./result',
+    'https://nested.localhost./result',
+  ]) {
+    assert.throws(() => sourcePolicy.assertSafeSourceUrl(url), /sourceUrl/u, url);
+  }
+});
+
 test('EDITORIAL-SOURCE-SEC-002: hostnames resolving to private addresses are rejected', async () => {
   assert.equal(typeof sourcePolicy.assertResolvableSourceUrl, 'function');
   const privateResolver = async () => [{ address: '169.254.169.254', family: 4 }];

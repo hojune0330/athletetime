@@ -74,6 +74,8 @@ test('NEWS-NORMALIZER-004: rejects unsafe or missing source URLs', () => {
     'http://example.com/article',
     'https://user:password@example.com/article',
     'https://127.0.0.1/article',
+    'https://localhost./article',
+    'https://foo.local./article',
   ]) {
     assert.throws(() => normalizeNaverNewsItem({ ...base, originallink }), TypeError);
   }
