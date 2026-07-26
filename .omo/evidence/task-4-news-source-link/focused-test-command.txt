@@ -1,0 +1,10 @@
+node --test backend/tests/community-editorial-policy.test.js backend/tests/community-editorial-source-security.test.js backend/tests/editorial-news-discovery-source-link.test.js backend/tests/editorial-news-discovery-api.test.js
+
+Result: exit 0, 66 passing tests.
+
+Focused package command:
+npm.cmd run test:editorial-news-discovery
+
+Result: exit 0, 22 passing tests and 5 PostgreSQL tests skipped locally.
+
+Local result: skipped because TEST_DATABASE_URL and DATABASE_URL are not configured.
