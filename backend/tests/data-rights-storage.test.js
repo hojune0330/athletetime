@@ -23,6 +23,7 @@ test('RIGHTS-MIGRATION-001: Given managed migrations When listing Then legacy ad
   assert.deepEqual(listMigrationFiles(), [
     'migration-004-data-rights.sql',
     'migration-005-data-rights-retention.sql',
+    'migration-005a-auth-recovery-compat.sql',
     'migration-006-auth-recovery-security.sql',
   ]);
 });

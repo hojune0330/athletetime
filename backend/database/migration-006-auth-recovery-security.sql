@@ -14,14 +14,14 @@ ALTER TABLE password_reset_codes
   ADD COLUMN IF NOT EXISTS attempt_count INTEGER NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS locked_at TIMESTAMPTZ;
 
-ALTER TABLE password_reset_codes
-  ALTER COLUMN code DROP NOT NULL;
-
 UPDATE password_reset_codes
 SET used = TRUE,
     code = NULL
 WHERE used = FALSE
   AND code_hash IS NULL;
+
+ALTER TABLE password_reset_codes
+  ALTER COLUMN code DROP NOT NULL;
 
 CREATE INDEX IF NOT EXISTS password_reset_codes_active_expiry_idx
   ON password_reset_codes (expires_at)

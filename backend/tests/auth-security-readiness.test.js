@@ -88,8 +88,8 @@ async function waitForHealth() {
         return;
       }
     } catch (error) {
-      if (error.code !== 'ECONNREFUSED') {
-        throw error;
+      if (serverProcess?.exitCode !== null || serverProcess?.signalCode) {
+        throw new Error(`server exited before becoming healthy: ${allServerLogs()}`, { cause: error });
       }
     }
     await new Promise((resolve) => setTimeout(resolve, 250));
