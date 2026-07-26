@@ -55,7 +55,9 @@ test('NEWS-RUNTIME-PG-002: transitions are forward-only and retained dismissed r
     service.transitionDiscovery({ id: page.discoveries[0].id, actorUserId: ACTOR_ID, status: 'reviewing' }),
     { code: 'NEWS_DISCOVERY_TRANSITION_INVALID' },
   );
-  await pool.query("UPDATE editorial_news_discoveries SET last_seen_at=NOW()-INTERVAL '91 days' WHERE id=$1", [page.discoveries[0].id]);
+  await pool.query(`UPDATE editorial_news_discoveries
+    SET first_seen_at=NOW()-INTERVAL '92 days', last_seen_at=NOW()-INTERVAL '91 days'
+    WHERE id=$1`, [page.discoveries[0].id]);
   const removed = await service.purgeExpired();
 
   // Then

@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { EditorialNewsDiscoveryRepository } = require('../../card-studio/repositories/editorialNewsDiscoveryRepository');
 const { EditorialNewsDiscoveryService } = require('../../card-studio/services/editorialNewsDiscoveryService');
 
 test('NEWS-RUNTIME-001: completed manual run is idempotent', async () => {
@@ -122,4 +123,53 @@ test('NEWS-RUNTIME-006: missing provider credentials get a specific safe error c
 
   assert.equal(run.safeErrorCode, 'credentials_missing');
   assert.doesNotMatch(JSON.stringify(run), /must not be returned/u);
+});
+
+test('NEWS-RUNTIME-007: advisory lock stays held until asynchronous collection finishes', async () => {
+  // Given
+  const order = [];
+  const client = {
+    async query(sql) {
+      if (sql.includes('pg_advisory_lock')) order.push('locked');
+      if (sql.includes('pg_advisory_unlock')) order.push('unlocked');
+      if (sql.includes('SELECT * FROM editorial_news_runs')) return { rowCount: 0, rows: [] };
+      if (sql.includes('INSERT INTO editorial_news_runs')) {
+        return {
+          rowCount: 1,
+          rows: [{
+            id: '10000000-0000-4000-8000-000000000001',
+            run_date_kst: '2026-07-26',
+            profile_version: 'v1',
+            trigger: 'manual',
+            status: 'running',
+            started_at: '2026-07-26T00:00:00Z',
+            completed_at: null,
+            api_call_count: 0,
+            result_count: 0,
+            inserted_count: 0,
+            duplicate_count: 0,
+            irrelevant_count: 0,
+            safe_error_code: null,
+          }],
+        };
+      }
+      return { rowCount: 1, rows: [] };
+    },
+    release() { order.push('released'); },
+  };
+  const repository = new EditorialNewsDiscoveryRepository({ async connect() { return client; } });
+
+  // When
+  await repository.withRunLock({
+    actorUserId: '00000000-0000-4000-8000-000000000001',
+    runDateKst: '2026-07-26',
+    profileVersion: 'v1',
+  }, async () => {
+    order.push('callback-start');
+    await Promise.resolve();
+    order.push('callback-end');
+  });
+
+  // Then
+  assert.deepEqual(order, ['locked', 'callback-start', 'callback-end', 'unlocked', 'released']);
 });

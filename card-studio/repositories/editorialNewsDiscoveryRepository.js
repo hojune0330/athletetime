@@ -33,18 +33,18 @@ class EditorialNewsDiscoveryRepository {
     try {
       await client.query('SELECT pg_advisory_lock(hashtextextended($1, 0))', [`editorial-news:${input.runDateKst}:${input.profileVersion}`]);
       const existing = await client.query('SELECT * FROM editorial_news_runs WHERE run_date_kst=$1 AND profile_version=$2', [input.runDateKst, input.profileVersion]);
-      if (existing.rowCount && existing.rows[0].status === 'completed') return callback({ client, existing: runView(existing.rows[0]) });
+      if (existing.rowCount && existing.rows[0].status === 'completed') return await callback({ client, existing: runView(existing.rows[0]) });
       if (existing.rowCount) {
         const restarted = await client.query(`UPDATE editorial_news_runs SET status='running', started_at=NOW(), completed_at=NULL,
           api_call_count=0, result_count=0, inserted_count=0, duplicate_count=0, irrelevant_count=0, safe_error_code=NULL, actor_user_id=$2
           WHERE id=$1 RETURNING *`, [existing.rows[0].id, input.actorUserId]);
         await appendEvent(client, { runId: restarted.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId, metadata: { restarted: true } });
-        return callback({ client, ...runView(restarted.rows[0]) });
+        return await callback({ client, ...runView(restarted.rows[0]) });
       }
       const created = await client.query(`INSERT INTO editorial_news_runs (id, run_date_kst, profile_version, trigger, status, actor_user_id)
         VALUES ($1,$2,$3,'manual','running',$4) RETURNING *`, [crypto.randomUUID(), input.runDateKst, input.profileVersion, input.actorUserId]);
       await appendEvent(client, { runId: created.rows[0].id, eventType: 'run_started', actorUserId: input.actorUserId });
-      return callback({ client, ...runView(created.rows[0]) });
+      return await callback({ client, ...runView(created.rows[0]) });
     } finally {
       await client.query('SELECT pg_advisory_unlock(hashtextextended($1, 0))', [`editorial-news:${input.runDateKst}:${input.profileVersion}`]).catch(() => {});
       client.release();
