@@ -8,8 +8,10 @@ import { NEWS_DISCOVERY_STATUSES, type ConfirmNewsSourceInput, type NewsDiscover
 import { useNewsDiscoveries } from '../../../hooks/useNewsDiscoveries';
 
 type NewsDiscoveryInboxProps = { readonly calendar: readonly EditorialCalendarEntry[]; };
-type OpenForm = { readonly kind: 'source' | 'calendar' | 'dismiss'; readonly id: string } | null;
+type OpenFormKind = 'source' | 'calendar' | 'dismiss';
+type OpenForm = { readonly kind: OpenFormKind; readonly id: string } | null;
 const STATUS_LABELS: Record<NewsDiscoveryStatus, string> = { discovered: '발견됨', reviewing: '검토 중', source_confirmed: '원문 확인', calendar_linked: '일정 연결됨', dismissed: '제외됨' };
+const SOURCE_KINDS = ['official', 'primary', 'secondary'] as const;
 const SENSATIONAL_TITLE_PATTERN = /(?:충격|논란|폭로|의혹|파문)/u;
 
 function hostname(url: string): string { try { return new URL(url).hostname; } catch { return '알 수 없는 원문 도메인'; } }
@@ -37,7 +39,7 @@ export function NewsDiscoveryInbox({ calendar }: NewsDiscoveryInboxProps) {
   const { discoveries, nextCursor, lastRun, loading, loadingMore, busyId, error, refresh, loadMore, run, startReview, dismiss, confirmSource, linkCalendar } = useNewsDiscoveries(range, selectedStatus);
   const planned = calendar.filter((entry) => entry.state === 'planned');
 
-  function open(kind: OpenForm['kind'], discovery: NewsDiscovery): void {
+  function open(kind: OpenFormKind, discovery: NewsDiscovery): void {
     setOpenForm({ kind, id: discovery.id }); setDismissReason('');
     if (kind === 'source') setSource({ sourceUrl: discovery.confirmedSourceUrl ?? discovery.originalUrl, title: discovery.confirmedSourceTitle ?? discovery.title, publisher: discovery.confirmedSourcePublisher ?? '', sourceKind: 'official' });
   }
@@ -81,7 +83,7 @@ export function NewsDiscoveryInbox({ calendar }: NewsDiscoveryInboxProps) {
             {(discovery.status === 'discovered' || discovery.status === 'reviewing') && <Button type="button" size="sm" variant="ghost" disabled={isBusy(discovery.id, busyId)} onClick={() => open('dismiss', discovery)}>제외</Button>}
           </div>
           {openForm?.id === discovery.id && openForm.kind === 'dismiss' && <form className="mt-3 flex flex-wrap gap-2" onSubmit={(event) => { void submitDismiss(event, discovery.id); }}><Input aria-label="제외 사유" value={dismissReason} onChange={(event) => setDismissReason(event.target.value)} required placeholder="제외 사유를 입력하세요" /><Button type="submit" size="sm" disabled={isBusy(discovery.id, busyId)}>제외 확정</Button></form>}
-          {openForm?.id === discovery.id && openForm.kind === 'source' && <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={(event) => { void submitSource(event, discovery.id); }}><Input aria-label="원문 URL" type="url" value={source.sourceUrl} onChange={(event) => setSource({ ...source, sourceUrl: event.target.value })} required /><Input aria-label="원문 제목" value={source.title} onChange={(event) => setSource({ ...source, title: event.target.value })} required /><Input aria-label="발행처" value={source.publisher} onChange={(event) => setSource({ ...source, publisher: event.target.value })} required /><select aria-label="출처 종류" className="h-10 border border-line bg-surface px-3 text-sm" value={source.sourceKind} onChange={(event) => { const kind = ['official', 'primary', 'secondary'].find((item) => item === event.target.value); if (kind) setSource({ ...source, sourceKind: kind }); }}><option value="official">공식</option><option value="primary">1차</option><option value="secondary">2차</option></select><Button type="submit" size="sm" disabled={isBusy(discovery.id, busyId)}>원문 확인 저장</Button></form>}
+          {openForm?.id === discovery.id && openForm.kind === 'source' && <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={(event) => { void submitSource(event, discovery.id); }}><Input aria-label="원문 URL" type="url" value={source.sourceUrl} onChange={(event) => setSource({ ...source, sourceUrl: event.target.value })} required /><Input aria-label="원문 제목" value={source.title} onChange={(event) => setSource({ ...source, title: event.target.value })} required /><Input aria-label="발행처" value={source.publisher} onChange={(event) => setSource({ ...source, publisher: event.target.value })} required /><select aria-label="출처 종류" className="h-10 border border-line bg-surface px-3 text-sm" value={source.sourceKind} onChange={(event) => { const kind = SOURCE_KINDS.find((item) => item === event.target.value); if (kind) setSource({ ...source, sourceKind: kind }); }}><option value="official">공식</option><option value="primary">1차</option><option value="secondary">2차</option></select><Button type="submit" size="sm" disabled={isBusy(discovery.id, busyId)}>원문 확인 저장</Button></form>}
           {openForm?.id === discovery.id && openForm.kind === 'calendar' && <form className="mt-3 flex flex-wrap gap-2" onSubmit={(event) => { void submitCalendar(event, discovery.id); }}><select name="calendarId" aria-label="예정 일정" className="h-10 min-w-52 border border-line bg-surface px-3 text-sm" required defaultValue=""> <option value="" disabled>연결할 예정 일정을 선택하세요</option>{planned.map((entry) => <option key={entry.id} value={entry.id}>{entry.seasonYear} · {entry.sectionKey} · #{entry.slot}</option>)}</select><Button type="submit" size="sm" disabled={isBusy(discovery.id, busyId) || planned.length === 0}>일정 연결 저장</Button>{planned.length === 0 && <span className="self-center text-xs text-ink-3">연결할 예정 일정이 없습니다.</span>}</form>}
         </article>)}
       </div>

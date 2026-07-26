@@ -34,7 +34,7 @@ export class NewsDiscoveryApiError extends Error {
 
 function record(value: unknown): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new NewsDiscoveryApiError('소식 응답 형식이 올바르지 않습니다.');
-  return value;
+  return Object.fromEntries(Object.entries(value));
 }
 function string(value: unknown, label: string): string {
   if (typeof value !== 'string') throw new NewsDiscoveryApiError(`${label} 값이 올바르지 않습니다.`);
@@ -50,7 +50,10 @@ function number(value: unknown, label: string): number {
   return value;
 }
 function status(value: unknown): NewsDiscoveryStatus {
-  if (typeof value === 'string' && NEWS_DISCOVERY_STATUSES.includes(value as NewsDiscoveryStatus)) return value as NewsDiscoveryStatus;
+  if (typeof value === 'string') {
+    const matched = NEWS_DISCOVERY_STATUSES.find((candidate) => candidate === value);
+    if (matched) return matched;
+  }
   throw new NewsDiscoveryApiError('소식 상태 값이 올바르지 않습니다.');
 }
 function discovery(value: unknown): NewsDiscovery {
