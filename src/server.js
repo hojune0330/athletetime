@@ -393,7 +393,7 @@ app.get('/admin.html', (req, res) => {
 });
 
 // SPA catch-all: API와 정적 파일이 아닌 모든 GET → React SPA
-app.get('*', (req, res, next) => {
+app.get('/{*splat}', (req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   if (req.path.startsWith('/legacy-dashboard')) return next();
   // 파일 확장자가 있는 요청은 정적 파일로 넘김
