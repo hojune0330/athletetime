@@ -1,0 +1,14 @@
+2026-07-26 adversarial review
+
+Ruled out by implementation and test coverage:
+- Raw/arbitrary queries and unsupported page offsets: fixed allowlist plus starts 1 or 101.
+- Credential leakage: credentials remain request headers only; typed errors are safe codes; DTO parser drops unknown fields.
+- Prompt-injection-like title and description: title remains inert data; description and key-like unknown fields are dropped.
+- 401, 403, and 429 retries: zero retries.
+- Retry storms: timeout and 5xx receive one deterministic retry only.
+- Hung responses: default HTTPS request and injected transports are bounded by timeout.
+- Oversized/malformed/misleading success responses: 1 MiB cap and strict JSON shape parser.
+- Stale quota state: UTC day/month keys reset counts for a new period; exhaustion fails before a transport call.
+- Repeated invocation: quota reservation is shared through injected local state and counts each outbound attempt.
+
+Cleanup: manual QA uses an in-process fake transport only. No server, port, temporary file, or background process was created.

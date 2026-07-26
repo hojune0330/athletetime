@@ -275,7 +275,13 @@ if (HAS_DATABASE) {
   const { createEditorialAdminRouter, createEditorialPublicRouter } = require(path.join(ROOT, 'backend/routes/editorialAdmin'));
   const { PostgresEditorialRepository } = require(path.join(ROOT, 'card-studio/repositories/postgresEditorialRepository'));
   const { EditorialIssueService } = require(path.join(ROOT, 'card-studio/services/editorialIssueService'));
+  const { EditorialNewsDiscoveryRepository } = require(path.join(ROOT, 'card-studio/repositories/editorialNewsDiscoveryRepository'));
+  const { EditorialNewsDiscoveryService } = require(path.join(ROOT, 'card-studio/services/editorialNewsDiscoveryService'));
+  const { NaverNewsApiClient } = require(path.join(ROOT, 'card-studio/services/naverNewsApiClient'));
   const editorialService = new EditorialIssueService(new PostgresEditorialRepository(app.locals.pool));
+  const newsDiscoveryService = new EditorialNewsDiscoveryService({
+    repository: new EditorialNewsDiscoveryRepository(app.locals.pool), provider: new NaverNewsApiClient(),
+  });
 
   // multer upload middleware
   const { upload, handleUploadError } = require(path.join(ROOT, 'backend/middleware/upload'));
@@ -292,7 +298,7 @@ if (HAS_DATABASE) {
     '/api/admin/editorial',
     authenticateToken,
     jwtRequireAdmin,
-    createEditorialAdminRouter({ service: editorialService }),
+    createEditorialAdminRouter({ service: editorialService, newsDiscoveryService }),
   );
 
   console.log('  Community API: active (PostgreSQL)');

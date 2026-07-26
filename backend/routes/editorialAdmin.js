@@ -15,6 +15,10 @@ const {
   parseSourceBody,
   parseUuidParam,
 } = require('../../card-studio/services/editorialRequestParsers');
+const {
+  parseCalendarLinkBody,
+  parseConfirmedSourceBody,
+} = require('../../card-studio/services/editorialNewsDiscoveryRequestParser');
 
 function pick(value, fields) {
   return Object.fromEntries(fields.filter((field) => value?.[field] !== undefined)
@@ -72,6 +76,60 @@ function publishJobView(job) {
   ]);
 }
 
+function newsDiscoveryView(discovery) {
+  return pick(discovery, [
+    'id', 'originalUrl', 'naverUrl', 'title', 'publishedAt', 'firstSeenAt', 'lastSeenAt',
+    'queryKeys', 'relevanceScore', 'relevanceTags', 'subjectAgeGroup', 'status', 'reviewedAt',
+    'confirmedSourceUrl', 'confirmedSourceTitle', 'confirmedSourcePublisher', 'confirmedSourceKind', 'linkedCalendarId',
+  ]);
+}
+
+function newsRunView(run) {
+  return pick(run, [
+    'id', 'runDateKst', 'profileVersion', 'trigger', 'status', 'startedAt', 'completedAt',
+    'apiCallCount', 'resultCount', 'insertedCount', 'duplicateCount', 'irrelevantCount', 'safeErrorCode',
+  ]);
+}
+
+function parseNewsActionBody(action, body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) throw new TypeError('Invalid discovery request');
+  const allowed = action === 'dismissed' ? new Set(['reviewNote']) : new Set();
+  if (Object.keys(body).some((key) => !allowed.has(key))) throw new TypeError('Invalid discovery request');
+  if (body.reviewNote !== undefined && (typeof body.reviewNote !== 'string' || body.reviewNote.length > 1000)) throw new TypeError('Invalid review note');
+  if (action === 'dismissed' && (!body.reviewNote || !body.reviewNote.trim())) throw new TypeError('Dismissal reason is required');
+  return { status: action, reviewNote: body.reviewNote };
+}
+
+function parseEmptyNewsRunBody(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length > 0) {
+    throw new TypeError('News run does not accept input');
+  }
+}
+
+function parseNewsRunListQuery(query) {
+  if (Object.keys(query).some((key) => key !== 'limit')) throw new TypeError('Invalid news run query');
+  if (query.limit !== undefined && (!/^\d+$/u.test(query.limit) || Number(query.limit) < 1 || Number(query.limit) > 100)) {
+    throw new TypeError('Invalid news run limit');
+  }
+  return query;
+}
+
+function parseNewsDiscoveryListQuery(query) {
+  const allowed = new Set(['range', 'status', 'limit', 'cursor']);
+  if (Object.keys(query).some((key) => !allowed.has(key))) throw new TypeError('Invalid discovery query');
+  if (query.range !== undefined && !['today', 'month'].includes(query.range)) throw new TypeError('Invalid discovery range');
+  if (query.status !== undefined && !['discovered', 'reviewing', 'source_confirmed', 'calendar_linked', 'dismissed', 'expired'].includes(query.status)) throw new TypeError('Invalid discovery status');
+  if (query.limit !== undefined && (!/^\d+$/u.test(query.limit) || Number(query.limit) < 1 || Number(query.limit) > 100)) throw new TypeError('Invalid discovery limit');
+  if (query.cursor !== undefined) {
+    try {
+      const value = JSON.parse(Buffer.from(query.cursor, 'base64url').toString('utf8'));
+      if (!value || typeof value.publishedAt !== 'string' || Number.isNaN(Date.parse(value.publishedAt)) || typeof value.id !== 'string') throw new TypeError('Invalid discovery cursor');
+      parseUuidParam(value.id);
+    } catch { throw new TypeError('Invalid discovery cursor'); }
+  }
+  return query;
+}
+
 function asyncRoute(handler) {
   return (req, res, next) => Promise.resolve(handler(req, res)).catch(next);
 }
@@ -101,9 +159,55 @@ function errorHandler(error, req, res, next) {
   });
 }
 
-function createEditorialAdminRouter({ service }) {
+function createEditorialAdminRouter({ service, newsDiscoveryService }) {
   if (!service) throw new TypeError('editorial service is required');
   const router = express.Router();
+  if (newsDiscoveryService) {
+    router.post('/news-discoveries/run', asyncRoute(async (req, res) => {
+      parseEmptyNewsRunBody(req.body);
+      const run = await newsDiscoveryService.runManual({ actorUserId: req.user.id });
+      res.set('Cache-Control', 'no-store');
+      res.status(run.status === 'running' ? 202 : 200).json({ success: true, run: newsRunView(run) });
+    }));
+    router.get('/news-discoveries/runs', asyncRoute(async (req, res) => {
+      const runs = await newsDiscoveryService.listRuns(parseNewsRunListQuery(req.query));
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, runs: runs.map(newsRunView) });
+    }));
+    router.get('/news-discoveries', asyncRoute(async (req, res) => {
+      const page = await newsDiscoveryService.listDiscoveries(parseNewsDiscoveryListQuery(req.query));
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discoveries: page.discoveries.map(newsDiscoveryView), nextCursor: page.nextCursor });
+    }));
+    router.post('/news-discoveries/:id/start-review', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.transitionDiscovery({
+        ...parseNewsActionBody('reviewing', req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+    router.post('/news-discoveries/:id/dismiss', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.transitionDiscovery({
+        ...parseNewsActionBody('dismissed', req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+    router.post('/news-discoveries/:id/confirm-source', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.confirmSource({
+        ...parseConfirmedSourceBody(req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+    router.post('/news-discoveries/:id/link-calendar', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.linkCalendar({
+        ...parseCalendarLinkBody(req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+  }
   router.get('/calendar', asyncRoute(async (req, res) => {
     const calendar = await service.listCalendar(req.query);
     res.json({ success: true, calendar: calendar.map(calendarView) });

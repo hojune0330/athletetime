@@ -65,3 +65,14 @@ test('MAGAZINE-SURFACE-005: public magazine copy avoids authority claims', () =>
     assert.doesNotMatch(source, /공식|AI 검증|랭킹/, `${file} contains a forbidden public claim`);
   }
 });
+
+test('NEWS-PUBLIC-BUNDLE-001: protected admin pages are not forced into the public entry graph', () => {
+  // Given
+  const viteConfig = read('frontend/vite.config.ts');
+
+  // When
+  const adminManualChunk = /return ['"]page-admin['"]/u.test(viteConfig);
+
+  // Then
+  assert.equal(adminManualChunk, false);
+});

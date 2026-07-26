@@ -1,0 +1,3 @@
+node --test backend/tests/naver-news-api-client.test.js backend/tests/editorial-news-normalizer.test.js backend/tests/editorial-news-client-boundary.test.js backend/tests/editorial-news-discovery-contract.test.js backend/tests/editorial-news-discovery-api.test.js backend/tests/editorial-news-discovery-runtime.test.js backend/tests/editorial-news-discovery-migration-postgres.integration.test.js backend/tests/editorial-news-discovery-runtime-postgres.integration.test.js
+
+Result: 45 passed, 0 failed, 4 skipped. PostgreSQL integration tests were skipped because TEST_DATABASE_URL and DATABASE_URL were not configured.

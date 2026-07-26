@@ -36,6 +36,7 @@ import { IssueEditorPanel } from '../../components/admin/editorial/IssueEditorPa
 import { PublishJobStatusPanel } from '../../components/admin/editorial/PublishJobStatusPanel';
 import { RevisionHistory } from '../../components/admin/editorial/RevisionHistory';
 import { SourceChecklist } from '../../components/admin/editorial/SourceChecklist';
+import { NewsDiscoveryInbox } from '../../components/admin/editorial/NewsDiscoveryInbox';
 import {
   WORKFLOW_TABS,
   issueMatchesTab,
@@ -269,6 +270,8 @@ export default function AdminIssueEditorPage() {
         {error && <p role="alert" className="border-l-2 border-err bg-red-50 px-3 py-2 text-sm text-err">{error}</p>}
         {!error && notice && <p className="border-l-2 border-ok bg-green-50 px-3 py-2 text-sm text-ok">{notice}</p>}
       </div>
+
+      <NewsDiscoveryInbox calendar={calendar} />
 
       <Tabs value={activeTab} onValueChange={(value) => {
         const next = WORKFLOW_TABS.find((tab) => tab.key === value);
