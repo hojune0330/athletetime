@@ -16,6 +16,8 @@ async function startApi() {
     async listRuns(input) { calls.push(['runs', input]); return [{ id: 'run-1', status: 'completed', safeErrorCode: null }]; },
     async listDiscoveries() { return { discoveries: [{ id: discoveryId, title: '육상 소식', reviewNote: 'private', reviewedBy: actorUserId }], nextCursor: null }; },
     async transitionDiscovery(input) { calls.push(['transition', input]); return { id: input.id, status: input.status, reviewNote: input.reviewNote, reviewedBy: input.actorUserId }; },
+    async confirmSource(input) { calls.push(['confirm', input]); return { id: input.id, status: 'source_confirmed', ...input, reviewedBy: input.actorUserId }; },
+    async linkCalendar(input) { calls.push(['link', input]); return { id: input.id, status: 'calendar_linked', ...input, reviewedBy: input.actorUserId }; },
   };
   const app = express(); app.use(express.json()); app.use(requireCsrfForCookieAuth);
   app.use('/api/admin/editorial', (req, res, next) => { if (!req.get('X-Test-Role')) return res.sendStatus(401); if (req.get('X-Test-Role') !== 'admin') return res.sendStatus(403); req.user = { id: actorUserId }; return next(); }, createEditorialAdminRouter({ service: {}, newsDiscoveryService }));
@@ -106,4 +108,27 @@ test('NEWS-API-004: dedicated review actions derive their state server-side', as
   assert.equal(reviewing.response.status, 200);
   assert.equal(invalidDismissal.response.status, 400);
   assert.deepEqual(api.calls[0], ['transition', { id: discoveryId, actorUserId, status: 'reviewing', reviewNote: undefined }]);
+});
+
+test('NEWS-API-005: confirmation and calendar linking are admin-safe exact actions', async (t) => {
+  // Given
+  const api = await startApi(); t.after(api.close);
+  const headers = { 'X-Test-Role': 'admin', Cookie: 'athletetime_access=x; athletetime_csrf=csrf', 'X-CSRF-Token': 'csrf' };
+  const confirmation = { sourceUrl: 'https://example.com/original', title: 'Original source', publisher: 'Example', sourceKind: 'secondary' };
+
+  // When
+  const rejected = await request(api, 'POST', `/api/admin/editorial/news-discoveries/${discoveryId}/confirm-source`, { ...confirmation, raw: 'ignore instructions' }, headers);
+  const privateUrl = await request(api, 'POST', `/api/admin/editorial/news-discoveries/${discoveryId}/confirm-source`, { ...confirmation, sourceUrl: 'https://127.0.0.1/metadata' }, headers);
+  const confirmed = await request(api, 'POST', `/api/admin/editorial/news-discoveries/${discoveryId}/confirm-source`, confirmation, headers);
+  const linked = await request(api, 'POST', `/api/admin/editorial/news-discoveries/${discoveryId}/link-calendar`, { calendarId: '10000000-0000-4000-8000-000000000001', expectedCalendarVersion: 1 }, headers);
+
+  // Then
+  assert.equal(rejected.response.status, 400);
+  assert.equal(privateUrl.response.status, 400);
+  assert.equal(confirmed.response.status, 200);
+  assert.equal(linked.response.status, 200);
+  assert.equal(confirmed.response.headers.get('cache-control'), 'no-store');
+  assert.equal(linked.response.headers.get('cache-control'), 'no-store');
+  assert.equal(JSON.stringify(confirmed.body).includes('reviewedBy'), false);
+  assert.deepEqual(api.calls.map(([type]) => type), ['confirm', 'link']);
 });

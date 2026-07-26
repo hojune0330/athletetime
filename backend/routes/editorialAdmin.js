@@ -15,6 +15,10 @@ const {
   parseSourceBody,
   parseUuidParam,
 } = require('../../card-studio/services/editorialRequestParsers');
+const {
+  parseCalendarLinkBody,
+  parseConfirmedSourceBody,
+} = require('../../card-studio/services/editorialNewsDiscoveryRequestParser');
 
 function pick(value, fields) {
   return Object.fromEntries(fields.filter((field) => value?.[field] !== undefined)
@@ -76,7 +80,7 @@ function newsDiscoveryView(discovery) {
   return pick(discovery, [
     'id', 'originalUrl', 'naverUrl', 'title', 'publishedAt', 'firstSeenAt', 'lastSeenAt',
     'queryKeys', 'relevanceScore', 'relevanceTags', 'subjectAgeGroup', 'status', 'reviewedAt',
-    'confirmedSourceUrl', 'linkedCalendarId',
+    'confirmedSourceUrl', 'confirmedSourceTitle', 'confirmedSourcePublisher', 'confirmedSourceKind', 'linkedCalendarId',
   ]);
 }
 
@@ -184,6 +188,20 @@ function createEditorialAdminRouter({ service, newsDiscoveryService }) {
     router.post('/news-discoveries/:id/dismiss', asyncRoute(async (req, res) => {
       const discovery = await newsDiscoveryService.transitionDiscovery({
         ...parseNewsActionBody('dismissed', req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+    router.post('/news-discoveries/:id/confirm-source', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.confirmSource({
+        ...parseConfirmedSourceBody(req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
+      });
+      res.set('Cache-Control', 'no-store');
+      res.json({ success: true, discovery: newsDiscoveryView(discovery) });
+    }));
+    router.post('/news-discoveries/:id/link-calendar', asyncRoute(async (req, res) => {
+      const discovery = await newsDiscoveryService.linkCalendar({
+        ...parseCalendarLinkBody(req.body), id: parseUuidParam(req.params.id), actorUserId: req.user.id,
       });
       res.set('Cache-Control', 'no-store');
       res.json({ success: true, discovery: newsDiscoveryView(discovery) });

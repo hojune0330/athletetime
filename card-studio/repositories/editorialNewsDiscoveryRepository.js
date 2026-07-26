@@ -16,7 +16,9 @@ function discoveryView(row) {
     publishedAt: row.published_at, firstSeenAt: row.first_seen_at, lastSeenAt: row.last_seen_at,
     queryKeys: row.query_keys, relevanceScore: Number(row.relevance_score), relevanceTags: row.relevance_tags,
     subjectAgeGroup: row.subject_age_group, status: row.status, reviewedAt: row.reviewed_at,
-    confirmedSourceUrl: row.confirmed_source_url || null, linkedCalendarId: row.linked_calendar_id || null,
+    confirmedSourceUrl: row.confirmed_source_url || null, confirmedSourceTitle: row.confirmed_source_title || null,
+    confirmedSourcePublisher: row.confirmed_source_publisher || null, confirmedSourceKind: row.confirmed_source_kind || null,
+    linkedCalendarId: row.linked_calendar_id || null,
   };
 }
 
@@ -112,6 +114,43 @@ class EditorialNewsDiscoveryRepository {
     } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
   }
 
+  async confirmSource(input) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query('SELECT status FROM editorial_news_discoveries WHERE id=$1 FOR UPDATE', [input.id]);
+      if (!current.rowCount) throw newsError('NEWS_DISCOVERY_NOT_FOUND', 'Discovery not found', 404);
+      if (current.rows[0].status !== 'reviewing') throw newsError('NEWS_DISCOVERY_TRANSITION_INVALID', 'Discovery must be under review');
+      const updated = await client.query(`UPDATE editorial_news_discoveries SET status='source_confirmed', confirmed_source_url=$2,
+        confirmed_source_title=$3, confirmed_source_publisher=$4, confirmed_source_kind=$5 WHERE id=$1 RETURNING *`,
+      [input.id, input.sourceUrl, input.title, input.publisher, input.sourceKind]);
+      await appendEvent(client, { discoveryId: input.id, eventType: 'status_changed', actorUserId: input.actorUserId, metadata: { from: 'reviewing', to: 'source_confirmed', sourceKind: input.sourceKind } });
+      await client.query('COMMIT');
+      return discoveryView(updated.rows[0]);
+    } catch (error) { await client.query('ROLLBACK'); throw error; } finally { client.release(); }
+  }
+
+  async linkCalendar(input) {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query('SELECT status, linked_calendar_id FROM editorial_news_discoveries WHERE id=$1 FOR UPDATE', [input.id]);
+      if (!current.rowCount) throw newsError('NEWS_DISCOVERY_NOT_FOUND', 'Discovery not found', 404);
+      if (current.rows[0].status !== 'source_confirmed') throw newsError('NEWS_DISCOVERY_TRANSITION_INVALID', 'Confirmed source is required before calendar linking');
+      const calendar = await client.query('SELECT state, version FROM editorial_calendar WHERE id=$1 FOR UPDATE', [input.calendarId]);
+      if (!calendar.rowCount) throw newsError('EDITORIAL_CALENDAR_NOT_FOUND', 'Calendar entry not found', 404);
+      if (calendar.rows[0].state !== 'planned' || Number(calendar.rows[0].version) !== input.expectedCalendarVersion) throw newsError('EDITORIAL_CALENDAR_CLAIMED', 'Calendar entry is not available');
+      const updated = await client.query(`UPDATE editorial_news_discoveries SET status='calendar_linked', linked_calendar_id=$2 WHERE id=$1 RETURNING *`, [input.id, input.calendarId]);
+      await appendEvent(client, { discoveryId: input.id, eventType: 'status_changed', actorUserId: input.actorUserId, metadata: { from: 'source_confirmed', to: 'calendar_linked' } });
+      await client.query('COMMIT');
+      return discoveryView(updated.rows[0]);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      if (error?.code === '23505') throw newsError('NEWS_DISCOVERY_CALENDAR_LINKED', 'Calendar entry is already linked');
+      throw error;
+    } finally { client.release(); }
+  }
+
   async purgeExpired() {
     const client = await this.pool.connect();
     try {
@@ -128,6 +167,10 @@ class EditorialNewsDiscoveryRepository {
       WHERE status IN ('completed', 'failed') AND completed_at < NOW() - INTERVAL '13 months'`);
     return result.rowCount;
   }
+}
+
+function newsError(code, message, status = 409) {
+  const error = new Error(message); error.code = code; error.status = status; return error;
 }
 
 module.exports = { EditorialNewsDiscoveryRepository, discoveryView, runView };

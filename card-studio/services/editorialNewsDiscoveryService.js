@@ -1,5 +1,6 @@
 const { QUERY_PROFILE_VERSION, QUERY_PROFILES } = require('./editorialNewsQueryProfile');
 const { classifyEditorialNewsRelevance, normalizeNaverNewsItem } = require('./editorialNewsNormalizer');
+const { assertResolvableSourceUrl } = require('./editorialSourceUrlPolicy');
 
 const SAFE_PROVIDER_ERROR_CODES = new Map([
   ['CREDENTIALS_MISSING', 'credentials_missing'],
@@ -22,9 +23,9 @@ function safeProviderErrorCode(error) {
 }
 
 class EditorialNewsDiscoveryService {
-  constructor({ repository, provider, profiles = Object.keys(QUERY_PROFILES), now = () => new Date() }) {
+  constructor({ repository, provider, profiles = Object.keys(QUERY_PROFILES), now = () => new Date(), resolveHostname } = {}) {
     if (!repository || !provider) throw new TypeError('news discovery repository and provider are required');
-    this.repository = repository; this.provider = provider; this.profiles = profiles; this.now = now;
+    this.repository = repository; this.provider = provider; this.profiles = profiles; this.now = now; this.resolveHostname = resolveHostname;
   }
 
   async runManual({ actorUserId, runDateKst = kstDate(this.now()) }) {
@@ -70,6 +71,12 @@ class EditorialNewsDiscoveryService {
   listRuns(query) { return this.repository.listRuns(query); }
   listDiscoveries(query) { return this.repository.listDiscoveries(query); }
   transitionDiscovery(input) { assertActor(input.actorUserId); return this.repository.transitionDiscovery(input); }
+  async confirmSource(input) {
+    assertActor(input.actorUserId);
+    const sourceUrl = await assertResolvableSourceUrl(input.sourceUrl, this.resolveHostname);
+    return this.repository.confirmSource({ ...input, sourceUrl });
+  }
+  linkCalendar(input) { assertActor(input.actorUserId); return this.repository.linkCalendar(input); }
   purgeExpired() { return this.repository.purgeExpired(); }
   purgeRuns() { return this.repository.purgeRuns(); }
 }

@@ -88,3 +88,42 @@ test('NEWS-RUNTIME-PG-003: completed run history purges after 13 months without 
   assert.equal(discovery.rows[0].first_seen_run_id, null);
   assert.equal(events.rows[0].count, 0);
 });
+
+test('NEWS-SOURCE-LINK-PG-001: confirmed source links one planned calendar without creating publication sources', {
+  skip: !connectionString && 'TEST_DATABASE_URL/DATABASE_URL is not available', timeout: 30000,
+}, async (t) => {
+  // Given
+  const pool = await isolatedPool(t, 'news_source_link'); await createExistingFixture(pool); await applyEditorialMigrations(pool);
+  const repository = new EditorialNewsDiscoveryRepository(pool);
+  const provider = { async search() { return { items: [
+    { title: '육상 원출처 하나', originallink: 'https://example.com/one', link: 'https://naver.example/one', pubDate: '2026-07-26T00:00:00Z' },
+    { title: '육상 원출처 둘', originallink: 'https://example.com/two', link: 'https://naver.example/two', pubDate: '2026-07-26T00:00:00Z' },
+  ] }; } };
+  const service = new EditorialNewsDiscoveryService({ repository, provider, profiles: ['korean-athletics'], resolveHostname: async () => [{ address: '93.184.216.34', family: 4 }] });
+  await service.runManual({ actorUserId: ACTOR_ID, runDateKst: '2026-07-26' });
+  const discoveries = (await service.listDiscoveries()).discoveries;
+  for (const discovery of discoveries) {
+    await service.transitionDiscovery({ id: discovery.id, actorUserId: ACTOR_ID, status: 'reviewing' });
+    await service.confirmSource({ id: discovery.id, actorUserId: ACTOR_ID, sourceUrl: 'https://example.com/original', title: 'Editor confirmed source', publisher: 'Example', sourceKind: 'secondary' });
+  }
+  const calendarId = '30000000-0000-4000-8000-000000000001';
+  await pool.query(`INSERT INTO editorial_calendar (id, season_year, section_key, slot, state) VALUES ($1,2026,'competition-preview',1,'planned')`, [calendarId]);
+
+  // When
+  const first = await service.linkCalendar({ id: discoveries[0].id, actorUserId: ACTOR_ID, calendarId, expectedCalendarVersion: 1 });
+  const second = service.linkCalendar({ id: discoveries[1].id, actorUserId: ACTOR_ID, calendarId, expectedCalendarVersion: 1 });
+
+  // Then
+  assert.equal(first.status, 'calendar_linked');
+  await assert.rejects(second, { code: 'NEWS_DISCOVERY_CALENDAR_LINKED' });
+  const persisted = await pool.query('SELECT status, confirmed_source_title, confirmed_source_publisher, confirmed_source_kind FROM editorial_news_discoveries WHERE id=$1', [discoveries[0].id]);
+  const calendar = await pool.query('SELECT state, version FROM editorial_calendar WHERE id=$1', [calendarId]);
+  const sources = await pool.query('SELECT count(*)::int AS count FROM editorial_sources');
+  const secondState = await pool.query('SELECT status FROM editorial_news_discoveries WHERE id=$1', [discoveries[1].id]);
+  const audit = await pool.query("SELECT count(*)::int AS count FROM editorial_news_events WHERE metadata->>'to'='calendar_linked'");
+  assert.deepEqual(persisted.rows[0], { status: 'calendar_linked', confirmed_source_title: 'Editor confirmed source', confirmed_source_publisher: 'Example', confirmed_source_kind: 'secondary' });
+  assert.deepEqual(calendar.rows[0], { state: 'planned', version: 1 });
+  assert.equal(sources.rows[0].count, 0);
+  assert.equal(secondState.rows[0].status, 'source_confirmed');
+  assert.equal(audit.rows[0].count, 1);
+});

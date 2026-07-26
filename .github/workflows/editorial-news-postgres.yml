@@ -5,8 +5,10 @@ on:
     paths:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
       - 'backend/database/migration-012-editorial-news-discovery-events.sql'
+      - 'backend/database/migration-013-editorial-news-confirmed-source.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
       - 'backend/database/rollbacks/012-editorial-news-discovery-events-down.sql'
+      - 'backend/database/rollbacks/013-editorial-news-confirmed-source-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
       - 'backend/tests/editorial-news-normalizer.test.js'
       - 'backend/tests/editorial-news-client-boundary.test.js'
@@ -24,8 +26,10 @@ on:
     paths:
       - 'backend/database/migration-011-editorial-news-discovery.sql'
       - 'backend/database/migration-012-editorial-news-discovery-events.sql'
+      - 'backend/database/migration-013-editorial-news-confirmed-source.sql'
       - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
       - 'backend/database/rollbacks/012-editorial-news-discovery-events-down.sql'
+      - 'backend/database/rollbacks/013-editorial-news-confirmed-source-down.sql'
       - 'backend/tests/editorial-news-discovery-*.test.js'
       - 'backend/tests/editorial-news-normalizer.test.js'
       - 'backend/tests/editorial-news-client-boundary.test.js'
@@ -80,3 +84,4 @@ jobs:
           backend/tests/editorial-news-discovery-api.test.js
           backend/tests/editorial-news-discovery-runtime.test.js
           backend/tests/editorial-news-discovery-runtime-postgres.integration.test.js
+          backend/tests/editorial-news-discovery-source-link.test.js
