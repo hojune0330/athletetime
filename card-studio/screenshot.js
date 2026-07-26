@@ -87,7 +87,7 @@ async function getSharedBrowser() {
     checkKoreanFonts();
     console.log('🚀 브라우저를 시작합니다...');
     _sharedBrowser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

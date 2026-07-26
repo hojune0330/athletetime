@@ -432,7 +432,7 @@ async function scrapeResults(url, options = {}) {
     console.log(`   URL: ${url}`);
 
     browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',

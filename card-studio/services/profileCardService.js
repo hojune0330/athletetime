@@ -459,7 +459,7 @@ class ProfileCardService {
     if (!puppeteer) puppeteer = require('puppeteer');
     if (!_browser || !_browser.connected) {
       _browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
