@@ -30,13 +30,13 @@ export function NameStep({
           autoFocus
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="예: 김민준, 서울고"
+          placeholder="이름 또는 소속을 입력하세요"
           className="mt-8 h-14 w-full border border-line bg-white px-4 text-lg font-semibold text-ink outline-none transition focus:border-brand"
         />
       </div>
       <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto border-t border-hair bg-surface py-4 md:bottom-0" data-records-sticky-cta="mine-name">
         <Button type="submit" size="lg" className="w-full" disabled={trimmed.length < 2}>
-          내 기록 찾기
+          기록 모아보기
         </Button>
       </div>
     </form>

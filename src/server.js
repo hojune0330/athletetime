@@ -29,9 +29,16 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const { requestLogPath } = require('./requestLogPath');
+const { assertRecoveryCodeEnvironment } = require('../backend/auth/recoveryCodes');
 
 // 프로젝트 루트 (src/ 의 상위)
 const ROOT = path.join(__dirname, '..');
+const {
+  rejectPreparingFeature,
+  rejectUnavailableInteractionWrite,
+  rejectPreparingWebSocket,
+  requireReadOnlyLaunchFeature,
+} = require(path.join(ROOT, 'backend/middleware/launchFeatureGate'));
 
 // ============================================
 // 환경 설정
@@ -40,6 +47,8 @@ const ROOT = path.join(__dirname, '..');
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const HAS_DATABASE = !!process.env.DATABASE_URL;
+
+assertRecoveryCodeEnvironment();
 
 // ============================================
 // Express 앱 생성
@@ -53,22 +62,19 @@ app.locals.pool = db.pool || db;
 // Trust proxy (Render, Netlify 등 프록시 환경)
 app.set('trust proxy', 1);
 
-// Body 파싱
-app.use(express.json({ limit: '15mb' }));
-app.use(express.urlencoded({ extended: true, limit: '15mb' }));
-
 // ============================================
 // CORS 설정
 // ============================================
 
-const allowedOrigins = [
+const allowedOrigins = new Set([
   'https://athlete-time.netlify.app',
   'https://athletetime.netlify.app',
   'https://community.athletetime.com',
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:3001',
-];
+  ...(process.env.FRONTEND_ORIGINS || '').split(',').map((origin) => origin.trim()).filter(Boolean),
+]);
 
 // Sandbox / dev 환경에서 들어오는 모든 origin 허용
 const isDevOrSandbox = NODE_ENV === 'development'
@@ -77,14 +83,22 @@ const isDevOrSandbox = NODE_ENV === 'development'
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin) || isDevOrSandbox) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
+  const originAllowed = typeof origin === 'string' && (allowedOrigins.has(origin) || isDevOrSandbox);
+
+  if (originAllowed) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Vary', 'Origin');
   }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-Token');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
-  if (req.method === 'OPTIONS') return res.sendStatus(204);
+
+  if (req.method === 'OPTIONS') {
+    if (origin && !originAllowed) return res.sendStatus(403);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, X-CSRF-Token');
+    res.header('Access-Control-Max-Age', '86400');
+    return res.sendStatus(204);
+  }
+
   next();
 });
 
@@ -95,7 +109,37 @@ app.use((req, res, next) => {
 const { securityHeaders } = require(path.join(ROOT, 'card-studio/middleware/security'));
 const { requireCsrfForCookieAuth } = require(path.join(ROOT, 'backend/utils/authCookies'));
 app.use(securityHeaders);
+app.use(rejectUnavailableInteractionWrite);
+
+const blockedLegacyCardRendererPaths = new Set([
+  '/api/card-studio/profile-card/generate',
+  '/api/card-studio/profile-card/generate-modular',
+  '/api/card-studio/profile-card/preview-html',
+  '/api/profile-card/generate',
+  '/api/profile-card/generate-modular',
+  '/api/profile-card/preview-html',
+]);
+
+function normalizeRendererPath(requestPath) {
+  let normalizedPath = requestPath;
+  try {
+    normalizedPath = decodeURIComponent(requestPath);
+  } catch {
+    normalizedPath = requestPath;
+  }
+  return normalizedPath.toLowerCase().replace(/\/+$/, '');
+}
+
+app.use((req, res, next) => {
+  if (blockedLegacyCardRendererPaths.has(normalizeRendererPath(req.path))) {
+    return rejectPreparingFeature(req, res);
+  }
+  return next();
+});
+
 app.use(requireCsrfForCookieAuth);
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
 // ============================================
 // 로깅
@@ -127,12 +171,11 @@ app.get('/favicon.svg', (req, res) => {
   res.sendFile(path.join(ROOT, 'dashboard', 'favicon.svg'));
 });
 
-// 레거시 대시보드 (바닐라 HTML — /legacy-dashboard/ 에서 접근)
-app.use('/legacy-dashboard', express.static(path.join(ROOT, 'dashboard')));
-
-// 대시보드 CSS/JS 리소스
-app.use('/css', express.static(path.join(ROOT, 'dashboard/css')));
-app.use('/js', express.static(path.join(ROOT, 'dashboard/js')));
+if (NODE_ENV !== 'production') {
+  app.use('/legacy-dashboard', express.static(path.join(ROOT, 'dashboard')));
+  app.use('/css', express.static(path.join(ROOT, 'dashboard/css')));
+  app.use('/js', express.static(path.join(ROOT, 'dashboard/js')));
+}
 
 // ============================================
 // React SPA 정적 파일 (통합 프론트엔드)
@@ -226,36 +269,9 @@ const categoriesRouter = require(path.join(ROOT, 'backend/routes/categories'));
 const marketplaceRouter = require(path.join(ROOT, 'backend/routes/marketplace'));
 
 app.use('/api/categories', categoriesRouter);
-app.use('/api/marketplace', marketplaceRouter);
+app.use('/api/marketplace', requireReadOnlyLaunchFeature(), marketplaceRouter);
 
-// 채팅 닉네임 중복 체크 API (레거시 계약 유지 — DB 불필요, 메모리 기반)
-const { isNicknameAvailable: chatNicknameAvailable } = require(path.join(ROOT, 'backend/utils/websocket'));
-app.get('/api/chat/check-nickname', (req, res) => {
-  const { nickname } = req.query;
-
-  if (!nickname) {
-    return res.status(400).json({
-      success: false,
-      error: '닉네임을 입력해주세요.',
-    });
-  }
-
-  if (nickname.length < 2 || nickname.length > 10) {
-    return res.status(400).json({
-      success: false,
-      available: false,
-      error: '닉네임은 2~10자 사이여야 합니다.',
-    });
-  }
-
-  const available = chatNicknameAvailable(nickname);
-
-  res.json({
-    success: true,
-    available,
-    message: available ? '사용 가능한 닉네임입니다.' : '이미 사용 중인 닉네임입니다.',
-  });
-});
+app.get('/api/chat/check-nickname', rejectPreparingFeature);
 
 if (HAS_DATABASE) {
   const postsRouter = require(path.join(ROOT, 'backend/routes/posts'));
@@ -266,16 +282,13 @@ if (HAS_DATABASE) {
   const matchResultsRouter = require(path.join(ROOT, 'backend/routes/matchResults'));
   const uploadRouter = require(path.join(ROOT, 'backend/routes/upload'));
 
-  // multer upload middleware
-  const { upload, handleUploadError } = require(path.join(ROOT, 'backend/middleware/upload'));
-
-  app.use('/api/posts', upload.array('images', 5), handleUploadError, postsRouter);
-  app.use('/api/posts/:postId/comments', commentsRouter);
-  app.use('/api/posts/:postId/vote', votesRouter);
-  app.use('/api/posts/:postId/poll', pollsRouter);
-  app.use('/api/competitions', competitionsRouter);
-  app.use('/api/match-results', matchResultsRouter);
-  app.use('/api/upload', uploadRouter);
+  app.use('/api/posts', requireReadOnlyLaunchFeature(), postsRouter);
+  app.use('/api/posts/:postId/comments', requireReadOnlyLaunchFeature(), commentsRouter);
+  app.use('/api/posts/:postId/vote', requireReadOnlyLaunchFeature(), votesRouter);
+  app.use('/api/posts/:postId/poll', requireReadOnlyLaunchFeature(), pollsRouter);
+  app.use('/api/competitions', requireReadOnlyLaunchFeature(), competitionsRouter);
+  app.use('/api/match-results', requireReadOnlyLaunchFeature(), matchResultsRouter);
+  app.use('/api/upload', rejectPreparingFeature);
 
   console.log('  Community API: active (PostgreSQL)');
 } else {
@@ -315,9 +328,7 @@ app.get('/api/trending/hot-records', (req, res) => {
   res.json({ records: [], total: 0 });
 });
 
-app.post('/api/reactions', (req, res) => {
-  res.json({ reactions: {} });
-});
+app.post('/api/reactions', rejectPreparingFeature);
 
 app.get('/api/reactions/:targetType/:targetId', (req, res) => {
   res.json({ reactions: {} });
@@ -327,20 +338,11 @@ app.get('/api/flash-polls', (req, res) => {
   res.json({ polls: [] });
 });
 
-app.post('/api/flash-polls/:pollId/vote', (req, res) => {
-  res.json({ poll: null });
-});
+app.post('/api/flash-polls/:pollId/vote', rejectPreparingFeature);
 
 app.get('/api/feed/shortform', (req, res) => {
   res.json({ items: [], total: 0, updatedAt: new Date(0).toISOString() });
 });
-
-// ============================================
-// 레거시 /api/* 라우트 (카드 스튜디오 하위 호환)
-// 커뮤니티 API 라우트 이후에 등록 (우선순위: 커뮤니티 > 레거시)
-// ============================================
-app.use('/api', cardStudioPublic);
-app.use('/api', authenticateToken, jwtRequireAdmin, cardStudioAdmin);
 
 // ============================================
 // WebSocket 설정
@@ -355,30 +357,14 @@ try {
   console.log('  WebSocket (Card Studio): skipped -', e.message);
 }
 
-// 커뮤니티 실시간 채팅 WebSocket (경로: /ws/chat — 레거시 rooms: main/training/race/injury)
-try {
-  const WebSocket = require('ws');
-  const { setupWebSocket } = require(path.join(ROOT, 'backend/utils/websocket'));
-
-  const chatWss = new WebSocket.Server({ noServer: true });
-  server.on('upgrade', (req, socket, head) => {
-    const pathname = (req.url || '').split('?')[0];
-    if (pathname !== '/ws/chat') return; // 다른 WSS(/ws 등)의 몫
-    chatWss.handleUpgrade(req, socket, head, (ws) => {
-      chatWss.emit('connection', ws, req);
-    });
-  });
-  setupWebSocket(chatWss);
-
-  console.log('  WebSocket (Chat): active (/ws/chat)');
-} catch (e) {
-  console.log('  WebSocket (Chat): skipped -', e.message);
-}
-
 // 정의되지 않은 경로의 업그레이드 요청 정리 (소켓 hang 방지)
 server.on('upgrade', (req, socket) => {
   const pathname = (req.url || '').split('?')[0];
-  if (pathname === '/ws' || pathname === '/ws/chat') return;
+  if (pathname === '/ws/chat') {
+    rejectPreparingWebSocket(socket);
+    return;
+  }
+  if (pathname === '/ws') return;
   socket.write('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n');
   socket.destroy();
 });
@@ -387,8 +373,8 @@ server.on('upgrade', (req, socket) => {
 // SPA Fallback (React Router — HTML5 History API)
 // ============================================
 
-// 프로필 카드 빌더 HTML 파일 직접 서빙
 app.get('/admin.html', (req, res) => {
+  if (NODE_ENV === 'production') return res.sendStatus(404);
   res.sendFile(path.join(ROOT, 'dashboard', 'admin.html'));
 });
 
@@ -402,11 +388,9 @@ app.get('/{*splat}', (req, res, next) => {
   const spaIndex = path.join(ROOT, 'community', 'index.html');
   const fs = require('fs');
   if (fs.existsSync(spaIndex)) {
-    res.sendFile(spaIndex);
-  } else {
-    // SPA 빌드 안 된 경우 레거시 대시보드로 폴백
-    res.sendFile(path.join(ROOT, 'dashboard', 'index.html'));
+    return res.sendFile(spaIndex);
   }
+  res.status(503).send('서비스 화면을 준비하지 못했습니다.');
 });
 
 // ============================================
@@ -468,7 +452,6 @@ async function startServer() {
       console.log(`    Dashboard:   http://localhost:${PORT}/`);
       console.log(`    Auth API:    http://localhost:${PORT}/api/auth/`);
       console.log(`    Card Studio: http://localhost:${PORT}/api/card-studio/`);
-      console.log(`    Legacy API:  http://localhost:${PORT}/api/ (하위 호환)`);
       console.log(`    Health:      http://localhost:${PORT}/health`);
       if (HAS_DATABASE) {
         console.log(`    Community:   http://localhost:${PORT}/api/posts`);

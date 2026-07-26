@@ -19,7 +19,7 @@ const launchFiles = [
 
 test('Puppeteer uses the supported v25 dependency line', () => {
   assert.equal(dependencyManifest.dependencies.puppeteer, '^25.3.0');
-  assert.equal(dependencyManifest.engines.node, '>=22.12.0');
+  assert.equal(dependencyManifest.engines.node, '22.17.x');
   assert.match(netlifyConfiguration, /NODE_VERSION = "22\.17\.1"/);
 });
 

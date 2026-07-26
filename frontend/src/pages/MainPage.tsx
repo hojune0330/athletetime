@@ -5,7 +5,6 @@ import {
   ArrowRightIcon,
   CalendarDaysIcon,
   ChartBarIcon,
-  ChatBubbleLeftRightIcon,
   ClockIcon,
   MagnifyingGlassIcon,
   PlusIcon,
@@ -65,10 +64,10 @@ const utilityCards = [
     icon: SparklesIcon,
   },
   {
-    title: '커뮤니티',
-    description: '대회와 기록 이야기를 자유롭게 나누는 공간이에요.',
-    to: '/community',
-    icon: ChatBubbleLeftRightIcon,
+    title: '자료 수집 방식',
+    description: '기록을 어떻게 모아 정리했는지 확인합니다.',
+    to: '/about-data',
+    icon: ShieldCheckIcon,
   },
 ];
 
@@ -85,8 +84,8 @@ const visitModes = [
   },
   {
     title: '평소',
-    summary: '기록 탐색과 이야기',
-    points: ['선수 기록 비교', '흥미로운 기록 질문', '커뮤니티 토론'],
+    summary: '기록 탐색과 확인',
+    points: ['선수 기록 살펴보기', '기록 카드 만들기', '자료 수집 방식 확인'],
   },
 ];
 
@@ -99,14 +98,14 @@ const todayBoard: Array<[string, string]> = [
 const recordFlowSteps: Array<[string, string]> = [
   ['자기 이름을 입력합니다', '지금 확인하고 싶은 이름으로 바로 시작합니다.'],
   ['후보를 직접 고릅니다', '동명이인이 있으면 소속·연도·종목을 보고 나에게 맞는 기록을 고릅니다.'],
-  ['기록의 흐름을 봅니다', 'PB, 이번 시즌 최고, 최근 기록, 시즌 기록표로 바로 이어집니다.'],
+  ['기록의 흐름을 봅니다', '최고 기록(PB), 이번 시즌 기록, 최근 기록, 시즌 기록표로 바로 이어집니다.'],
 ];
 
 const shortcutOptions: HomeShortcut[] = [
   { id: 'today', label: '오늘 경기', description: '결과와 대회 흐름', to: '/competitions?tab=results' },
   { id: 'records', label: '선수 기록', description: '이름과 소속 검색', to: '/records' },
   { id: 'calendar', label: '연간 일정', description: '다가오는 대회', to: '/competitions' },
-  { id: 'community', label: '커뮤니티', description: '기록 이야기', to: '/community' },
+  { id: 'data-source', label: '자료 수집 방식', description: '기록을 모은 방법', to: '/about-data' },
   { id: 'card', label: '기록 카드', description: '내 기록 공유', to: '/profile-card' },
 ];
 
@@ -476,13 +475,13 @@ export default function MainPage() {
         <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_1fr]">
           <Card className="border-ink">
             <CardContent className="p-6">
-              <SectionHeader title="커뮤니티" />
-              <h2 className="text-h3 font-semibold tracking-tight text-ink">기록 이야기를 나눠보세요.</h2>
+              <SectionHeader title="자료 수집 방식" />
+              <h2 className="text-h3 font-semibold tracking-tight text-ink">기록을 어떻게 모았는지 확인하세요.</h2>
               <p className="mt-2 text-body-sm text-ink-3">
-                대회 후기, 훈련 이야기, 궁금한 점을 자유롭게 올릴 수 있어요.
+                공개된 경기 결과를 어떤 기준으로 정리했는지와 출처를 함께 보여드려요.
               </p>
-              <Link to="/community" className={cn(buttonVariants(), 'mt-5')}>
-                커뮤니티 보기
+              <Link to="/about-data" className={cn(buttonVariants(), 'mt-5')}>
+                자료 수집 방식 보기
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
             </CardContent>

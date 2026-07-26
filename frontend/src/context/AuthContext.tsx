@@ -49,7 +49,6 @@ interface AuthContextType {
 
 /** A: 로그인 후 복귀 경로 저장 키 (새로고침/모달 전환에도 살아남도록 sessionStorage) */
 const REDIRECT_KEY = 'redirectAfterLogin';
-const SESSION_HINT_COOKIE_NAME = 'athletetime_csrf';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -59,13 +58,6 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 function isHttpStatus(error: unknown, status: number): boolean {
   return axios.isAxiosError(error) && error.response?.status === status;
-}
-
-function hasCookie(name: string): boolean {
-  if (typeof document === 'undefined') {
-    return false;
-  }
-  return document.cookie.split('; ').some((entry) => entry.startsWith(`${name}=`));
 }
 
 function toContextUser(apiUser: NonNullable<authApi.LoginResponse['user']>): User {
@@ -103,17 +95,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 사용자 정보 불러오기
   const fetchUser = async () => {
-    if (!hasCookie(SESSION_HINT_COOKIE_NAME)) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await authApi.getMe();
-      setUser(toContextUser(response.user));
+      setUser(response.user ? toContextUser(response.user) : null);
     } catch (error) {
-      if (!isHttpStatus(error, 401)) {
+      if (!isHttpStatus(error, 401) && !isHttpStatus(error, 403)) {
         console.error('사용자 정보 조회 실패:', error);
       }
       setUser(null);

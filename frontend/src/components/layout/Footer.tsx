@@ -9,7 +9,6 @@ import { DataNoticeBlock } from '../common/DataNotice';
 const NAV_LINKS = [
   { to: '/competitions', label: '대회·기록' },
   { to: '/profile-card', label: '프로필 카드' },
-  { to: '/community', label: '커뮤니티' },
   { to: '/pace-calculator', label: '페이스 계산기' },
   { to: '/about-data', label: '자료 수집 방식' },
   { to: '/data-request', label: '정정·삭제 요청' },

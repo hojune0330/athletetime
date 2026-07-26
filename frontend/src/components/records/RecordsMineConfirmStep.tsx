@@ -16,16 +16,16 @@ export function ConfirmStep({
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-confirm">
       <div>
         <p className="text-sm font-semibold text-brand">3단계</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">같은 사람 묶음을 확인하세요.</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">선택한 기록을 확인하세요.</h1>
         <p className="mt-3 text-sm leading-6 text-ink-3">
-          이 기록들도 회원님 것 같아요. 기본으로 모두 합치되, 아니면 이 화면에서 빼세요.
+          선택한 기록만 이 기기에서 함께 보여줘요. 다른 사람 기록이면 지금 빼세요.
         </p>
       </div>
 
       <div className="mt-6 space-y-2">
         {selectedAthletes.length === 0 ? (
           <div role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
-            선택한 후보가 없어요. 후보 화면으로 돌아가서 내 기록을 골라주세요.
+            선택한 후보가 없어요. 후보 화면으로 돌아가서 기록을 골라주세요.
           </div>
         ) : (
           selectedAthletes.map((athlete) => (
@@ -53,7 +53,7 @@ export function ConfirmStep({
           다시 고르기
         </Button>
         <Button type="button" size="lg" disabled={selectedAthletes.length === 0} onClick={onConfirm}>
-          이대로 합치기
+          선택한 기록 담기
         </Button>
       </div>
     </div>

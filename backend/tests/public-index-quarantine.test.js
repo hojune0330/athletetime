@@ -7,7 +7,6 @@ const test = require('node:test');
 const ROOT = path.join(__dirname, '..', '..');
 const recordAnalyticsService = require('../../card-studio/services/recordAnalyticsService');
 const searchService = require('../../card-studio/services/searchService');
-const compatibilitySearchService = require('../../src/services/searchService');
 const insightService = require('../../card-studio/services/insightService');
 
 function readResults(year) {
@@ -95,25 +94,23 @@ test('G003 search audits traverse every loaded row through the public selection 
     },
   };
 
-  for (const service of [searchService, compatibilitySearchService]) {
-    const originalLoad = service._loadTargetData;
-    const originalSelect = service._selectPublicSearchRows;
-    service._loadTargetData = () => [target];
-    service._selectPublicSearchRows = (event) => event.results || [];
-    try {
-      const audit = service.auditPublicIndexEligibility();
-      assert.equal(audit.inspectedEvents, 2);
-      assert.equal(audit.inspectedRows, 3);
-      assert.equal(audit.selectedRows, 3);
-      assert.equal(audit.quarantinedRows.length, 2);
-      assert.deepEqual(audit.quarantinedRows.map((row) => row.name), [
-        'Relay Team One',
-        'Relay Team Two',
-      ]);
-    } finally {
-      service._loadTargetData = originalLoad;
-      service._selectPublicSearchRows = originalSelect;
-    }
+  const originalLoad = searchService._loadTargetData;
+  const originalSelect = searchService._selectPublicSearchRows;
+  searchService._loadTargetData = () => [target];
+  searchService._selectPublicSearchRows = (event) => event.results || [];
+  try {
+    const audit = searchService.auditPublicIndexEligibility();
+    assert.equal(audit.inspectedEvents, 2);
+    assert.equal(audit.inspectedRows, 3);
+    assert.equal(audit.selectedRows, 3);
+    assert.equal(audit.quarantinedRows.length, 2);
+    assert.deepEqual(audit.quarantinedRows.map((row) => row.name), [
+      'Relay Team One',
+      'Relay Team Two',
+    ]);
+  } finally {
+    searchService._loadTargetData = originalLoad;
+    searchService._selectPublicSearchRows = originalSelect;
   }
 });
 
@@ -138,12 +135,22 @@ test('G003 report detects recognized relay and zero-record analytics filters', (
         ],
       }),
     },
-    currentSearchService: { auditPublicIndexEligibility: emptyAudit },
-    compatibilitySearchService: { auditPublicIndexEligibility: emptyAudit },
+    searchService: { auditPublicIndexEligibility: emptyAudit },
     profileService: { auditPublicIndexEligibility: emptyAudit },
   });
 
   assert.equal(exposures.filters, 2);
+});
+
+test('G003 reports only canonical card-studio search exposure', () => {
+  const dashboardSearch = fs.readFileSync(path.join(ROOT, 'dashboard', 'js', 'search.js'), 'utf8');
+  const quarantineReport = fs.readFileSync(path.join(ROOT, 'scripts', 'report-public-index-quarantine.js'), 'utf8');
+
+  assert.match(dashboardSearch, /\/api\/card-studio\/search\/competitions/);
+  assert.match(dashboardSearch, /\/api\/card-studio\/search/);
+  assert.doesNotMatch(dashboardSearch, /\/api\/search(?:[/?`'\"]|$)/);
+  assert.doesNotMatch(quarantineReport, /src\/services\/searchService/);
+  assert.doesNotMatch(quarantineReport, /compatibilitySearchService/);
 });
 
 test('G003 recognizes athletics events conservatively and preserves legitimate identities', () => {
@@ -211,11 +218,9 @@ test('G003 report is deterministic, reasoned, read-only, and enforceable', () =>
   assert.ok(report.reasons.team_event > 0);
   assert.ok(report.samples.events.some((sample) => sample.event === '남자 박지현 결승'));
   assert.ok(report.samples.rows.some((sample) => sample.name === '정현석 김국영'));
-  assert.ok(report.exposures.search.current);
-  assert.ok(report.exposures.search.compatibility);
+  assert.ok(report.exposures.search);
   assert.ok(report.exposures.insights);
-  assert.equal(report.exposures.search.current.quarantinedRowCount, 0);
-  assert.equal(report.exposures.search.compatibility.quarantinedRowCount, 0);
+  assert.equal(report.exposures.search.quarantinedRowCount, 0);
   assert.equal(report.exposures.insights.quarantinedRowCount, 0);
   assert.deepEqual(fs.readFileSync(path.join(ROOT, 'data', 'results', '2015.json')), before2015);
   assert.deepEqual(fs.readFileSync(path.join(ROOT, 'data', 'results', '2016.json')), before2016);

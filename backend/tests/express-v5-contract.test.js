@@ -1,8 +1,42 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const http = require('node:http');
+const path = require('node:path');
 const test = require('node:test');
 
 const dependencyManifest = require('../../package.json');
+const serverSource = fs.readFileSync(
+  path.join(__dirname, '..', '..', 'src/server.js'),
+  'utf8',
+);
+const spaDir = path.join(__dirname, '..', '..', 'community');
+const spaIndexPath = path.join(spaDir, 'index.html');
+const spaFixture = Buffer.from('<!doctype html><title>Express v5 SPA fallback fixture</title>');
+
+function installSpaFallbackFixture() {
+  const indexExisted = fs.existsSync(spaIndexPath);
+  const directoryExisted = fs.existsSync(spaDir);
+  const originalContents = indexExisted ? fs.readFileSync(spaIndexPath) : null;
+
+  if (!indexExisted) {
+    fs.mkdirSync(spaDir, { recursive: true });
+    fs.writeFileSync(spaIndexPath, spaFixture);
+  }
+
+  return () => {
+    if (indexExisted) {
+      assert.deepEqual(fs.readFileSync(spaIndexPath), originalContents);
+      return;
+    }
+
+    if (fs.existsSync(spaIndexPath) && fs.readFileSync(spaIndexPath).equals(spaFixture)) {
+      fs.unlinkSync(spaIndexPath);
+    }
+    if (!directoryExisted && fs.existsSync(spaDir) && fs.readdirSync(spaDir).length === 0) {
+      fs.rmdirSync(spaDir);
+    }
+  };
+}
 
 function request(server, requestPath) {
   const address = server.address();
@@ -25,19 +59,40 @@ function request(server, requestPath) {
 
 test('Express v5 preserves the SPA fallback while unknown API paths stay non-SPA JSON errors', async () => {
   assert.equal(dependencyManifest.dependencies.express, '^5.2.1');
+  assert.equal(serverSource.includes('Legacy API:'), false);
+  assert.match(serverSource, /Card Studio: http:\/\/localhost:\$\{PORT\}\/api\/card-studio\//);
 
-  const { server } = require('../../src/server');
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const removeSpaFallbackFixture = installSpaFallbackFixture();
+  let server;
 
   try {
+    ({ server } = require('../../src/server'));
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
     const spaResponse = await request(server, '/records/shared-link-check');
     assert.equal(spaResponse.statusCode, 200);
     assert.match(spaResponse.contentType, /text\/html/);
 
     const apiResponse = await request(server, '/api/does-not-exist');
-    assert.equal(apiResponse.statusCode, 401);
+    assert.equal(apiResponse.statusCode, 404);
     assert.match(apiResponse.contentType, /application\/json/);
+    assert.deepEqual(JSON.parse(apiResponse.body), {
+      success: false,
+      error: '존재하지 않는 엔드포인트입니다.',
+      path: '/api/does-not-exist',
+    });
+
+    const canonicalResponse = await request(server, '/api/card-studio/search?q=%EA%B9%80%EB%AF%BC%EC%A4%80');
+    assert.equal(canonicalResponse.statusCode, 200);
+    assert.match(canonicalResponse.contentType, /application\/json/);
+    assert.equal(JSON.parse(canonicalResponse.body).success, true);
   } finally {
-    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    try {
+      if (server?.listening) {
+        await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+      }
+    } finally {
+      removeSpaFallbackFixture();
+    }
   }
 });

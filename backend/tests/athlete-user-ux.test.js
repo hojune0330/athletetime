@@ -97,6 +97,25 @@ test('home page sends users to their own record search instead of a sample showc
   assert.match(source, /내 이름으로 기록 찾기[\s\S]*자기 이름/);
 });
 
+test('home only advertises destinations that are available at launch', () => {
+  const source = readSource('frontend/src/pages/MainPage.tsx');
+
+  assert.doesNotMatch(source, /자유롭게 올릴 수 있어요|커뮤니티 보기/);
+  assert.doesNotMatch(source, /to: '\/community'|to="\/community"/);
+  assert.match(source, /자료 수집 방식/);
+  assert.match(source, /to: '\/about-data'|to="\/about-data"/);
+});
+
+test('home and footer keep launch navigation and record language truthful', () => {
+  const home = readSource('frontend/src/pages/MainPage.tsx');
+  const footer = readSource('frontend/src/components/layout/Footer.tsx');
+
+  assert.match(home, /최고 기록\(PB\), 이번 시즌 기록/);
+  assert.doesNotMatch(home, /PB, 이번 시즌 최고/);
+  assert.doesNotMatch(footer, /to: '\/community'|label: '커뮤니티'/);
+  assert.match(footer, /자료 수집 방식/);
+});
+
 test('fake card-news sample data is not kept as a default user path', () => {
   assert.equal(fs.existsSync(path.join(ROOT, 'data', 'sample.json')), false);
 
@@ -138,6 +157,31 @@ test('records candidate count is written for Korean athletes instead of debug En
   assert.doesNotMatch(source, /shown/);
 });
 
+test('records collection candidates expose an unselected control and reveal a check only after explicit selection', () => {
+  const source = readSource('frontend/src/components/records/RecordsMineCandidateStep.tsx');
+
+  assert.match(source, /selected=\{selectedKeys\.includes\(athlete\.athleteKey\)\}/);
+  assert.match(source, /aria-pressed=\{selected\}/);
+  const indicators = source.match(
+    /\{selected \? \(\s*([\s\S]*?)\s*\) : \(\s*([\s\S]*?)\s*\)\s*\}\s*<\/button>/,
+  );
+  assert.ok(indicators, 'candidate control must render distinct selected and unselected indicators');
+  const [, selectedIndicator, unselectedIndicator] = indicators;
+  assert.match(selectedIndicator, /✓/);
+  assert.match(selectedIndicator, /aria-hidden/);
+  assert.match(unselectedIndicator, /aria-hidden/);
+  assert.doesNotMatch(unselectedIndicator, /✓|aria-label=|aria-pressed=|role=/);
+  assert.doesNotMatch(source, /text-transparent/);
+});
+
+test('records collection completion labels the existing athlete detail destination honestly', () => {
+  const source = readSource('frontend/src/components/records/RecordsMineDoneStep.tsx');
+
+  assert.match(source, /선수 기록 자세히 보기/);
+  assert.match(source, /\/records\?athlete=/);
+  assert.doesNotMatch(source, /기록 카드 공유/);
+});
+
 test('records athlete selection creates a shareable records URL instead of state-only detail', () => {
   const source = readSource('frontend/src/pages/RecordsPage.tsx');
 
@@ -161,11 +205,12 @@ test('records athlete detail exposes a plain link share action without official 
   assert.doesNotMatch(source, /내 기록 인증|공식 기록 인증|공식 기록 링크/);
 });
 
-test('record share card gives a community follow-up without pretending it writes a post', () => {
+test('record share card is not exposed while the sharing policy is disabled', () => {
   const source = readSource('frontend/src/components/record-insights/ShareCard.tsx');
+  const policy = readSource('frontend/src/config/dataPolicy.ts');
 
+  assert.match(policy, /status: 'disabled'/);
   assert.match(source, /커뮤니티에서 이야기하기/);
-  assert.match(source, /to=\{`\/community\?record=\$\{encodeURIComponent\(athlete\.name\)\}`\}/);
   assert.doesNotMatch(source, /자동 작성|게시글 작성 완료|공식 인증/);
 });
 
@@ -182,6 +227,14 @@ test('records shared athlete detail keeps identity and coverage safeguards visib
   assert.match(source, /정정·비노출을 요청할 수 있어요/);
   assert.equal(source.includes('to={`/data-request?athlete=${encodeURIComponent(athlete.name)}`}'), true);
   assert.doesNotMatch(source, /확정된 선수|공식 인증|전국 모든 기록|완벽한 기록/);
+});
+
+test('records coverage notice does not imply continuous year coverage', () => {
+  const source = readSource('frontend/src/pages/RecordsPage.tsx');
+
+  assert.match(source, /자료가 있는 대회 기록만 보여드려요/);
+  assert.match(source, /연도와 대회별로 빠진 기록이 있을 수 있어요/);
+  assert.doesNotMatch(source, /2015-2017 일부 기록과 2018년 이후 기록/);
 });
 
 test('records shared athlete detail does not use non-exposure jargon as a standalone action label', () => {
@@ -310,12 +363,12 @@ test('profile card studio carries selected athlete name into the editor prefill'
   assert.match(source, /createEmptyCard\(initialName\)/);
 });
 
-test('community page avoids unimplemented optional widgets in the main anonymous journey', () => {
+test('community page gives a clear prepared state instead of offering anonymous publishing', () => {
   const source = readSource('frontend/src/pages/CommunityPage.tsx');
 
-  assert.equal(source.includes('TrendPulse'), false);
-  assert.equal(source.includes('FlashPollSection'), false);
-  assert.match(source, /기록 이야기부터 가볍게/);
+  assert.match(source, /FeaturePreparingPage/);
+  assert.match(source, /커뮤니티는 준비 중이에요/);
+  assert.doesNotMatch(source, /CommunityQuickPostForm|usePosts|글쓰기/);
 });
 
 test('marketplace and pace calculator have real first-use empty states', () => {

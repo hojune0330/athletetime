@@ -13,7 +13,7 @@ export const SpecialConditions: React.FC<SpecialConditionsProps> = ({
   onConditionChange,
 }) => {
   return (
-    <CalcSection step="03" title="특별 고려사항" hint="해당하는 항목만 선택 (선택)">
+    <CalcSection step="03" title="훈련 환경" hint="현재 환경만 선택 (선택)">
       <div className="grid gap-2 md:grid-cols-3">
         {CONDITION_OPTIONS.map(option => {
           const checked = conditions[option.id as keyof Conditions];

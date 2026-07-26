@@ -175,6 +175,29 @@ test('forgot password does not reveal whether an email is registered', async () 
   assert.deepEqual(unknown.body, RESET_SENT_BODY);
 });
 
+test('email addresses are normalized so case variants cannot create separate accounts', async () => {
+  const unique = `case${Date.now()}${Math.floor(Math.random() * 10000)}`;
+  const lowerEmail = `${unique}@example.com`;
+  const register = await request('POST', '/api/auth/register', {
+    email: lowerEmail.toUpperCase(),
+    password: 'Password123!',
+    nickname: unique.slice(0, 10),
+  });
+  const duplicate = await request('POST', '/api/auth/register', {
+    email: lowerEmail,
+    password: 'Password123!',
+    nickname: `${unique}x`.slice(0, 10),
+  });
+  const login = await request('POST', '/api/auth/login', {
+    email: lowerEmail,
+    password: 'Password123!',
+  });
+
+  assert.equal(register.status, 201);
+  assert.equal(duplicate.status, 400);
+  assert.equal(login.status, 200);
+});
+
 test('verification and reset requests do not print one-time codes to server logs', async () => {
   const verificationEmail = `verify${Date.now()}${Math.floor(Math.random() * 10000)}@example.com`;
   const { email: resetEmail } = await registerUser('code');

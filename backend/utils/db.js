@@ -8,6 +8,7 @@
 const DATABASE_URL = process.env.DATABASE_URL;
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const { postgresSslConfig } = require('../database/postgres-ssl');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -126,9 +127,12 @@ if (!DATABASE_URL) {
         specialty: params[4] || null,
         region: params[5] || null,
         verification_code: params[6] || null,
-        verification_expires_at: params[7] || null,
-        auth_provider: params[8] || 'email',
-        email_verified: params[9] !== undefined ? params[9] : false,
+        verification_code_hash: params[7] || null,
+        verification_expires_at: params[8] || null,
+        verification_attempt_count: 0,
+        verification_locked_at: null,
+        auth_provider: params[9] || 'email',
+        email_verified: params[10] !== undefined ? params[10] : false,
         is_active: true,
         is_admin: false,
         is_banned: false,
@@ -175,6 +179,11 @@ if (!DATABASE_URL) {
         // Parse SET clauses loosely
         if (/email_verified\s*=\s*TRUE/i.test(sql)) user.email_verified = true;
         if (/verification_code\s*=\s*NULL/i.test(sql)) user.verification_code = null;
+        if (/verification_code_hash\s*=\s*NULL/i.test(sql)) user.verification_code_hash = null;
+        if (/verification_code_hash\s*=\s*\$1/i.test(sql)) user.verification_code_hash = params[0];
+        if (/verification_expires_at\s*=\s*\$2/i.test(sql)) user.verification_expires_at = params[1];
+        if (/verification_attempt_count\s*=\s*0/i.test(sql)) user.verification_attempt_count = 0;
+        if (/verification_locked_at\s*=\s*NULL/i.test(sql)) user.verification_locked_at = null;
         if (/is_admin\s*=\s*TRUE/i.test(sql)) user.is_admin = true;
         if (/last_login_at/i.test(sql)) user.last_login_at = new Date().toISOString();
         if (/nickname\s*=\s*COALESCE/i.test(sql)) {
@@ -200,6 +209,15 @@ if (!DATABASE_URL) {
       const user = store.users.find(u => u.email === email);
       if (user) {
         user.is_admin = true;
+        return { rows: [user], rowCount: 1 };
+      }
+      return { rows: [], rowCount: 0 };
+    }
+
+    if (/UPDATE users SET password_hash.*WHERE email/i.test(sql)) {
+      const user = store.users.find(u => u.email === params[1]);
+      if (user) {
+        user.password_hash = params[0];
         return { rows: [user], rowCount: 1 };
       }
       return { rows: [], rowCount: 0 };
@@ -269,7 +287,15 @@ if (!DATABASE_URL) {
     // email_verifications
     if (/INSERT INTO email_verifications/i.test(sql) || /ON CONFLICT.*email_verifications/i.test(sql)) {
       const existing = store.email_verifications.findIndex(e => e.email === params[0]);
-      const record = { email: params[0], code: params[1], expires_at: params[2], verified: false };
+      const record = {
+        email: params[0],
+        code: null,
+        code_hash: params[1],
+        expires_at: params[2],
+        verified: false,
+        attempt_count: 0,
+        locked_at: null,
+      };
       if (existing >= 0) store.email_verifications[existing] = record;
       else store.email_verifications.push(record);
       return { rows: [], rowCount: 1 };
@@ -282,14 +308,34 @@ if (!DATABASE_URL) {
 
     if (/UPDATE email_verifications/i.test(sql)) {
       const ev = store.email_verifications.find(e => e.email === params[0]);
-      if (ev) ev.verified = true;
+      if (ev && /attempt_count\s*=\s*attempt_count\s*\+\s*1/i.test(sql)) {
+        ev.attempt_count += 1;
+        if (ev.attempt_count >= Number(params[1])) ev.locked_at = new Date().toISOString();
+      } else if (ev && /verified\s*=\s*TRUE/i.test(sql)) {
+        ev.verified = true;
+        ev.code = null;
+        ev.code_hash = null;
+      }
       return { rows: [], rowCount: ev ? 1 : 0 };
+    }
+
+    if (/DELETE FROM email_verifications/i.test(sql)) {
+      const existing = store.email_verifications.findIndex(e => e.email === params[0]);
+      if (existing >= 0) store.email_verifications.splice(existing, 1);
+      return { rows: [], rowCount: existing >= 0 ? 1 : 0 };
     }
 
     // password_reset_codes
     if (/INSERT INTO password_reset_codes/i.test(sql) || /ON CONFLICT.*password_reset_codes/i.test(sql)) {
       const existing = store.password_reset_codes.findIndex(e => e.email === params[0]);
-      const record = { email: params[0], code: params[1], expires_at: params[2], used: false };
+      const record = {
+        email: params[0],
+        code_hash: params[1],
+        expires_at: params[2],
+        used: false,
+        attempt_count: 0,
+        locked_at: null,
+      };
       if (existing >= 0) store.password_reset_codes[existing] = record;
       else store.password_reset_codes.push(record);
       return { rows: [], rowCount: 1 };
@@ -302,7 +348,11 @@ if (!DATABASE_URL) {
 
     if (/UPDATE password_reset_codes/i.test(sql)) {
       const pc = store.password_reset_codes.find(e => e.email === params[0]);
-      if (pc) pc.used = true;
+      if (pc && /attempt_count\s*=\s*attempt_count\s*\+\s*1/i.test(sql)) {
+        pc.attempt_count += 1;
+        if (pc.attempt_count >= Number(params[1])) pc.locked_at = new Date().toISOString();
+      }
+      if (pc && /used\s*=\s*TRUE/i.test(sql)) pc.used = true;
       return { rows: [], rowCount: pc ? 1 : 0 };
     }
 
@@ -364,7 +414,7 @@ if (!DATABASE_URL) {
 
   const pool = new Pool({
     connectionString: DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: postgresSslConfig(),
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,

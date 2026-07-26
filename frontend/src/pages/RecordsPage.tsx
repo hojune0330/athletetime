@@ -60,7 +60,6 @@ export default function RecordsPage() {
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
   const [compareNotice, setCompareNotice] = useState('');
-  // 내 기록 카드는 담긴 게 있으면 버튼 없이 항상 보인다 — 접기만 가능(숨김 아님)
   const [myRecordsCollapsed, setMyRecordsCollapsed] = useState(false);
   const compareTray = useCompareTray();
   const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
@@ -468,7 +467,7 @@ export default function RecordsPage() {
             <div className="max-w-2xl">
               <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
               <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-                내 기록, 이름만 알면 찾아요.
+                공개 기록, 이름만 알면 찾아요.
               </h1>
               {activeFlow === 'browse' && browseChoice && (
                 <p className="mt-2 text-sm text-ink-3">
@@ -558,7 +557,6 @@ export default function RecordsPage() {
         </div>
       )}
 
-      {/* 내 기록 — 별도 진입 버튼 없이 항상 보임. 접으면 슬림 바로 남는다. */}
       {shouldShowRecordsSurface && myEntries.length > 0 && (
         myRecordsCollapsed ? (
           <button
@@ -568,9 +566,9 @@ export default function RecordsPage() {
             className="flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
           >
             <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">내 기록</span>
+              <span className="font-bold text-brand">내가 모아 보는 기록</span>
               <span className="ml-2 font-semibold">{myEntries[0].name}</span>
-              <span className="ml-2 text-ink-4">{myEntries.length}개 묶음 합산 중</span>
+              <span className="ml-2 text-ink-4">{myEntries.length}개 묶음 모아 보는 중</span>
             </span>
             <span className="shrink-0 text-sm font-semibold text-brand">펼치기</span>
           </button>
@@ -629,7 +627,6 @@ export default function RecordsPage() {
           myCount={myEntries.length}
           onViewMyRecords={showMyRecordsHome}
           onToggleMine={(athlete) => {
-            // 검색 후보에서 바로 "나" 지정 — 누르는 즉시 내 기록으로 합산 (여러 개 누르면 전부 합산)
             toggleMyAthlete({
               athleteKey: athlete.athleteKey,
               name: athlete.name,
@@ -685,13 +682,7 @@ export default function RecordsPage() {
       {shouldShowRecordsSurface && shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
         <EstimatedSameAthleteCard
           athleteKey={selectedAthleteKey}
-          athleteName={profile?.athlete.name || ''}
           onSelectAthlete={handleSelectAthlete}
-          onCombine={(segments) => {
-            // 원탭 합산 — 묶음 전부를 바로 내 기록으로 (확인 절차 없음, 빼기는 나중에)
-            addManyMyAthletes(segments);
-            showMyRecordsHome();
-          }}
         />
       )}
 
@@ -726,7 +717,7 @@ export default function RecordsPage() {
 
       {/* 안내·신뢰 문구는 페이지 맨 아래 한 줄로 */}
       <p className="text-[11px] leading-4 text-ink-4">
-        2015-2017 일부 기록과 2018년 이후 기록을 먼저 보여드려요. 2005년 이후 자료는 계속 보강 중이에요. {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
+        자료가 있는 대회 기록만 보여드려요. 연도와 대회별로 빠진 기록이 있을 수 있어요. {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
         <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
           데이터 안내 보기
         </Link>
@@ -750,7 +741,7 @@ function StartPanel({ onSeasonMode }: { onSeasonMode: () => void }) {
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-ink">위 검색창에 이름을 적어보세요.</h2>
           <p className="mt-1 text-sm text-ink-3">
-            같은 이름이 여러 명이면 소속을 보고, "내 기록이에요"를 누르면(=나로 지정) 바로 내 기록이 돼요.
+            같은 이름이 여러 명이면 소속을 확인한 뒤, 원하는 카드만 "이 기록 담기"로 이 기기에서 모아 보세요.
           </p>
         </div>
         <Button type="button" variant="outline" onClick={onSeasonMode} className="shrink-0">
@@ -863,7 +854,7 @@ function AthletePanel({
                       : 'border-brand-500 bg-white text-brand hover:bg-brand-50'
                   }`}
                 >
-                  {isMyAthlete ? '✓ 내 기록에 담김' : '내 기록이에요'}
+                  {isMyAthlete ? '✓ 내가 모아 보는 기록에 담김 — 누르면 빼요' : '이 기록 담기'}
                 </button>
               )}
               <button

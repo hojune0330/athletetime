@@ -17,12 +17,8 @@ export interface UserProfile {
 }
 
 export interface Conditions {
-  injuryRecovery: boolean;
-  highFatigue: boolean;
   altitude: boolean;
   hotWeather: boolean;
-  weightLoss: boolean;
-  morningOnly: boolean;
 }
 
 export interface Adjustments {
@@ -103,17 +99,6 @@ export function calculateAdjustments(profile: UserProfile, conditions: Condition
   }
   
   // 특별 조건 조정
-  if (conditions.injuryRecovery) {
-    adjustments.volume *= 0.6;
-    adjustments.intensity *= 0.7;
-    adjustments.pace *= 1.1;
-  }
-  
-  if (conditions.highFatigue) {
-    adjustments.volume *= 0.8;
-    adjustments.intensity *= 0.85;
-  }
-  
   if (conditions.altitude) {
     adjustments.pace *= 1.03;
     adjustments.intensity *= 0.9;
@@ -165,10 +150,6 @@ export const TRAINING_PHASE_OPTIONS = [
 ];
 
 export const CONDITION_OPTIONS = [
-  { id: 'injuryRecovery', label: '부상 회복중', description: '훈련 강도 40% 감소' },
-  { id: 'highFatigue', label: '피로 누적', description: '회복 위주 프로그램' },
   { id: 'altitude', label: '고지대 훈련', description: '강도 조절 필요' },
   { id: 'hotWeather', label: '고온다습 환경', description: '페이스 5-10초 조절' },
-  { id: 'weightLoss', label: '체중 감량 목표', description: '유산소 비중 증가' },
-  { id: 'morningOnly', label: '아침 훈련만 가능', description: '워밍업 시간 증가' },
 ];

@@ -235,7 +235,7 @@ export const TargetPaceCalculator: React.FC = () => {
           onClick={calculate}
           className="mt-6 h-12 w-full bg-ink font-mono text-[12px] font-semibold uppercase tracking-widest-2 text-bg transition-colors hover:bg-brand-ink"
         >
-          Calculate pace
+          페이스 계산하기
         </button>
       </section>
 

@@ -31,7 +31,7 @@ export function WizardFrame({
         >
           뒤로
         </button>
-        <div className="flex items-center gap-1.5" aria-label={`내 기록 찾기 ${currentIndex + 1}/4 단계`}>
+        <div className="flex items-center gap-1.5" aria-label={`기록 모아보기 ${currentIndex + 1}/4 단계`}>
           {STEP_META.map((item, index) => (
             <span
               key={item.key}

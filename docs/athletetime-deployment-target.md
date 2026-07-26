@@ -1,43 +1,93 @@
-# AthleteTime 배포 대상 확정 (오너 결정 기록)
+# AthleteTime 운영 배포 기준
 
-> 결정일: 2026-07-06 · 결정자: 오너(hojune0330) · 기록: Claude (GenSpark AI Developer)
-> 이 문서는 오너의 명시적 결정을 기록한 것으로, 변경하려면 오너 승인이 필요하다.
+> 상태: 2026-07-26 기준. 이 문서는 운영 반영 전의 필수 조건을 기록한다. 조건 하나라도 빠지면 배포하지 않는다.
 
----
+## 배포 대상
 
-## 1. 저장소 지형도
+| 영역 | 운영 대상 | 역할 |
+| --- | --- | --- |
+| 저장소 | `hojune0330/athletetime` | 유일한 운영 소스 |
+| 프론트 | Netlify | React 정적 화면 |
+| API | Render | Express API와 PostgreSQL 연결 |
+| 데이터베이스 | Render PostgreSQL 또는 승인된 PostgreSQL | 계정·권리 요청·운영 데이터 |
 
-| 저장소 | 역할 | 상태 |
-|---|---|---|
-| `hojune0330/2026-first-item` | **신규 개발 저장소** (현재 작업 중인 이 repo) | 개발 진행 중 |
-| `hojune0330/athletetime` | **최종 이식·호스팅·운영 저장소** | 현재 프로덕션 운영 중 |
+`2026-first-item`은 과거 개발 이력이다. 운영 반영은 `athletetime`의 검토된 커밋에서만 한다.
 
-> (참고) 현재 프로덕션 도메인 `athlete-time.netlify.app`은 도메인 이름에만 하이픈이 있을 뿐,
-> 배포 소스는 `athletetime` repo다.
+## 이번 공개 범위
 
----
+공개한다.
 
-## 2. 현재 프로덕션 (`athletetime` repo 기준)
+- 이름 또는 소속으로 공개 경기기록 찾기
+- 대회 결과 확인
+- 기록카드와 훈련 계산기처럼 서버에 개인 활동을 남기지 않는 보조 도구
+- 데이터 정정·숨김 요청 접수
 
-- **프론트**: Netlify — https://athlete-time.netlify.app (정적 배포)
-- **백엔드**: Render — https://athletetime-backend.onrender.com
-  - Express + `ws`(WebSocket) + PostgreSQL + Cloudinary
-  - `/health` 확인됨 (v4.0.0, database connected)
-  - 익명 채팅 WebSocket 정상 동작 (rooms: main/training/race/injury) — HTTP/1.1 101 핸드셰이크 확인
-  - `/api/posts`, `/api/marketplace` 등 실데이터 보유 (커뮤니티 글, 마켓 물품)
+공개하지 않는다.
 
-## 3. 이식 방향 (확정된 것)
+- 커뮤니티 글·댓글·투표·투표함 쓰기
+- 오픈채팅과 채팅 웹소켓
+- 중고거래 등록·수정·이미지 업로드
+- 사용자 대회·경기결과 제보와 수정
+- 공개 기록의 공유 카드 발행
 
-- `2026-first-item`에서 개발한 신규 서비스(React SPA + 통합 Express 서버)를
-  `athletetime` repo로 이식하여 실서비스를 호스팅·관리한다.
-- 신규 개발물은 "단일 Express 서버가 프론트+API를 같은 origin에서 서빙"하는 구조
-  (`VITE_API_BASE_URL=""`)로, 레거시와 같은 Render 배포 방식과 호환된다.
+준비되지 않은 항목은 화면, HTTP API, 웹소켓 모두 `503` 또는 준비 화면으로 닫는다. 숨긴 화면만으로는 충분하지 않다.
 
-## 4. 이식 시 반드시 다뤄야 할 것 (마이그레이션 체크리스트 초안)
+## 배포 전 필수 환경값
 
-1. **데이터 연속성**: 레거시 PostgreSQL의 커뮤니티 글·댓글·마켓 물품을 유실 없이 승계
-2. **URL 호환**: 기존에 공유된 링크(`athlete-time.netlify.app/...`)가 새 구조에서 깨지지 않도록 리다이렉트 계획
-3. **채팅 통합**: 레거시 `backend/utils/websocket.js`의 ws 채팅을 신규 통합 서버에 흡수
-   (신규 프론트 `useWebSocket.ts`의 `VITE_WS_URL`이 이 서버를 가리키도록)
-4. **배포 전환 순서**: 신규 배포 검증 → 도메인 전환 → 레거시 백엔드 종료 (동시 전환 금지)
-5. **환경 변수**: JWT_SECRET, ZERO_RESULT_SEARCH_SECRET, DATABASE_URL, Cloudinary 키 등 프로덕션 시크릿 이관
+| 이름 | 기준 |
+| --- | --- |
+| `NODE_ENV` | `production` |
+| `DATABASE_URL` | 운영 PostgreSQL 주소. 없으면 서버가 시작되면 안 된다. |
+| `JWT_SECRET` | 새로 생성한 충분히 긴 비밀값. 개발값 재사용 금지. |
+| `AUTH_CODE_PEPPER` | 32자 이상 새 비밀값. 이메일·비밀번호 재설정 인증번호 해시에 사용한다. |
+| `DATABASE_CA_CERT_BASE64` | 가능하면 운영 DB의 CA 인증서. |
+| `RENDER=true` + `DATABASE_TLS_ALLOW_SELF_SIGNED=true` | Render 내부 DB의 자체 서명 인증서를 쓸 때만 함께 설정한다. 다른 환경에서 TLS 검증을 약화하면 안 된다. |
+| 메일 발송 키 | 실제 발송 계정과 발신 도메인 검증을 마친 값. |
+
+비밀값은 저장소, 브라우저 번들, 로그, PR 본문에 적지 않는다.
+
+## 데이터베이스 원칙
+
+운영 DB는 기존 AthleteTime 기본 스키마를 가진 상태여야 한다. `backend/database/run-migrations.js`는 데이터 권리·보존·인증 보강용 `migration-004`부터 실행한다. 빈 DB에 운영 마이그레이션만 실행하면 기본 `users` 스키마가 없어 실패해야 정상이다.
+
+삭제된 `backend/database/run-migration.js`와 `backend/database/seed.js`는 사용하지 않는다. 첫 파일은 오래된 단일 마이그레이션 실행기였고, 두 번째 파일은 가짜 커뮤니티 공지를 넣었다. 둘 다 운영 배포 경로가 아니다.
+
+빈 검증 DB는 아래 순서로만 만든다.
+
+1. 폐기 가능한 새 PostgreSQL 데이터베이스를 만든다.
+2. `backend/database/schema-fixed.sql`로 기본 스키마를 만든다. 이 파일은 기존 테이블을 지우므로 운영 DB에는 실행하지 않는다.
+3. `migration-001`부터 `migration-003`을 검증 DB에서만 순서대로 적용한다.
+4. `npm run data:rights:schema:migrate`로 `migration-004`부터 현재 마이그레이션을 적용한다.
+5. 계정 가입·로그인·비밀번호 재설정·기록 검색·권리 요청을 실제로 점검한다.
+
+## 운영 반영 게이트
+
+1. 배포할 커밋 SHA를 먼저 고정한다.
+2. 운영 DB 백업을 만들고, 별도 위치에서 복원 가능한지 확인한다.
+3. 위의 빈 검증 DB 절차와 `npm run verify`를 같은 SHA에서 통과시킨다.
+4. 운영 DB에서 스키마 마이그레이션을 실행하고, 운영 API의 직접 HTTPS 주소로 `npm run data:rights:readiness -- --base-url https://athletetime-backend.onrender.com`를 실행한다. 이 확인은 Netlify 경유 주소가 아니라 Render API 원본 주소를 사용한다. 실패하면 배포하지 않는다.
+5. Render와 Netlify에 같은 SHA를 배포한다.
+6. 공개 주소에서 `/health`, `/records`, `/competitions`, `/data-request`, 가입·로그인·비밀번호 재설정을 확인한다.
+7. 직접 요청으로 커뮤니티·채팅·거래·업로드 쓰기가 거절되는지 확인한다.
+8. 배포 SHA, 시각, 백업 식별자, 스모크 결과, 롤백 담당자를 릴리스 기록에 남긴다.
+
+## 롤백 기준
+
+다음 하나라도 생기면 기능 추가가 아니라 즉시 롤백 또는 읽기 전용 전환을 먼저 검토한다.
+
+- 로그인·비밀번호 재설정 실패 또는 인증번호 반복 발송
+- 기록 검색에서 다른 선수 기록이 한 사람으로 합쳐져 보임
+- 숨김 요청 이후 검색·상세·카드에서 계속 노출됨
+- 준비 중 기능이 쓰기 성공처럼 응답함
+- 배포 SHA가 Netlify와 Render에서 다름
+- 운영 DB 백업 또는 복원이 확인되지 않음
+
+## 남은 보안 관찰
+
+프론트 의존성 검사에는 React Router의 RSC 모드 관련 고등급 경고가 남아 있다. 현재 앱은 `BrowserRouter` 기반 SPA이고 React Server Components나 서버 액션을 사용하지 않아 해당 공격 경로는 사용하지 않는다. 다만 경고를 해결한 것은 아니므로, 배포 직전 현재 권고 버전을 다시 확인하고 RSC·서버 액션을 도입할 때는 반드시 먼저 업데이트한다.
+
+### Release exception: React Router audit
+
+- `npm audit --omit=dev`는 React Router 관련 high 2건으로 여전히 red다. 이 예외는 경고를 해소했다는 의미가 아니다.
+- 근거: `GHSA-qwww-vcr4-c8h2`는 unstable RSC API에만 적용된다. 현재 프론트는 `BrowserRouter`와 Vite 기반 SPA이며 unstable RSC, React Server Components, 서버 액션을 사용하지 않는다.
+- 금지 조건: unstable RSC를 도입하거나 React Router 메이저 마이그레이션을 시작하기 전에는 이 예외를 사용할 수 없다. 먼저 공식 수정 경로인 React Router v8+로 해소하고, `npm audit --omit=dev`를 다시 실행해 결과를 릴리스 기록에 남긴다.

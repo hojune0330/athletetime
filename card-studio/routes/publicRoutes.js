@@ -54,7 +54,7 @@ const dataRightsPolicy = require('../dataRightsPolicy');
 const { createResultEventsHandler } = require('./resultEventsRoute');
 
 // 미들웨어
-const { searchLimiter, generateLimiter, competitionLimiter, publicLimiter } = require('../middleware/rateLimiter');
+const { searchLimiter, generateLimiter, competitionLimiter, publicLimiter, dataRequestLimiter } = require('../middleware/rateLimiter');
 
 async function tryRecordZeroResultSearch(query) {
   try {
@@ -623,7 +623,7 @@ router.get('/data-policy', publicLimiter, (req, res) => {
  * POST /data-requests
  * body: { type, athleteName, affiliation?, competition?, event?, reason, contact? }
  */
-router.post('/data-requests', publicLimiter, async (req, res) => {
+router.post('/data-requests', dataRequestLimiter, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
     const result = await dataRequestService.submitRequest(req.body || {});

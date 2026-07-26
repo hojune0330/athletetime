@@ -38,13 +38,14 @@ export default function ProfilePage() {
     const loadUser = async () => {
       try {
         const response = await authApi.getMe();
-        if (response.success && response.user) {
+        const user = response.user;
+        if (response.success && user) {
           setFormData(prev => ({
             ...prev,
-            email: response.user.email,
-            nickname: response.user.nickname
+            email: user.email,
+            nickname: user.nickname
           }));
-          setOriginalNickname(response.user.nickname);
+          setOriginalNickname(user.nickname);
           setNicknameChecked(true);
           setNicknameAvailable(true);
         } else {

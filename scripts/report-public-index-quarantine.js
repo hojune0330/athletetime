@@ -4,8 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const recordAnalyticsService = require('../card-studio/services/recordAnalyticsService');
-const currentSearchService = require('../card-studio/services/searchService');
-const compatibilitySearchService = require('../src/services/searchService');
+const searchService = require('../card-studio/services/searchService');
 const insightService = require('../card-studio/services/insightService');
 const {
   assessPublicIndexEvent,
@@ -99,8 +98,7 @@ function summarizeServiceAudit(audit) {
 
 function auditExposure({
   analyticsService = recordAnalyticsService,
-  currentSearchService: currentSearch = currentSearchService,
-  compatibilitySearchService: compatibilitySearch = compatibilitySearchService,
+  searchService: publicSearchService = searchService,
   profileService = insightService,
 } = {}) {
   const index = analyticsService.getIndex();
@@ -114,20 +112,16 @@ function auditExposure({
     || isRelayEvent(event.label)
     || !indexedEventKeys.has(event.key)
   )).length;
-  const currentAudit = summarizeServiceAudit(currentSearch.auditPublicIndexEligibility());
-  const compatibilityAudit = summarizeServiceAudit(compatibilitySearch.auditPublicIndexEligibility());
+  const searchAudit = summarizeServiceAudit(publicSearchService.auditPublicIndexEligibility());
   const insightAudit = summarizeServiceAudit(profileService.auditPublicIndexEligibility());
-  const searchRows = currentAudit.quarantinedRowCount + compatibilityAudit.quarantinedRowCount;
+  const searchRows = searchAudit.quarantinedRowCount;
 
   return {
     analyticsRecords,
     filters,
     searchRows,
     insightRows: insightAudit.quarantinedRowCount,
-    search: {
-      current: currentAudit,
-      compatibility: compatibilityAudit,
-    },
+    search: searchAudit,
     insights: insightAudit,
   };
 }

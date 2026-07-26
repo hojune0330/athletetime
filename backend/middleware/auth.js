@@ -65,13 +65,12 @@ async function authenticateToken(req, res, next) {
       });
     }
 
-    // 이메일 인증 체크 (선택적)
-    // if (!user.email_verified) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     error: '이메일 인증이 필요합니다'
-    //   });
-    // }
+    if (process.env.NODE_ENV === 'production' && !user.email_verified) {
+      return res.status(403).json({
+        success: false,
+        error: '이메일 인증이 필요합니다'
+      });
+    }
 
     // 사용자 정보를 req에 추가
     req.user = {
@@ -176,6 +175,7 @@ async function optionalAuth(req, res, next) {
 
 module.exports = {
   authenticateToken,
+  extractAccessToken,
   requireAdmin,
   requireEmailVerified,
   optionalAuth

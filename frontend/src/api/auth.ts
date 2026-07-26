@@ -234,7 +234,7 @@ export interface GetMeResponse {
     username: string;
     emailVerified: boolean;
     isAdmin: boolean;
-  };
+  } | null;
   error?: string;
 }
 

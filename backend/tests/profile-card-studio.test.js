@@ -66,6 +66,14 @@ test('CARD-INPUT-001: records are manual entry — today/PB/season kinds with ad
   assert.ok(index.includes('MAX_RECORDS'), 'record rows are capped');
 });
 
+test('CARD-INPUT-002: the manual card starts without canned athlete, team, meet, or record examples', () => {
+  const index = readSource(`${STUDIO}/index.tsx`);
+
+  for (const sample of ['홍길동', '서울고 / OO러닝크루', '10.52 / 2:08.31 / 6m72', '전국체전 예선', '2026.07.06', '오늘도 0.1초 줄였다']) {
+    assert.equal(index.includes(sample), false, `manual card must not preload ${sample}`);
+  }
+});
+
 test('CARD-A11Y-001: accessibility contract — labels, aria-pressed, inputmode, no emoji icons', () => {
   const index = readSource(`${STUDIO}/index.tsx`);
   assert.ok(index.includes('aria-pressed'), 'toggles expose pressed state');

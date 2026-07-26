@@ -634,7 +634,6 @@ export default function ProfileCardStudio() {
                 type="text"
                 value={card.name}
                 onChange={(e) => patch({ name: e.target.value })}
-                placeholder="홍길동"
                 maxLength={12}
                 className={inputCls}
               />
@@ -644,7 +643,6 @@ export default function ProfileCardStudio() {
                 type="text"
                 value={card.team}
                 onChange={(e) => patch({ team: e.target.value })}
-                placeholder="서울고 / OO러닝크루"
                 maxLength={20}
                 className={inputCls}
               />
@@ -655,7 +653,6 @@ export default function ProfileCardStudio() {
                 list="event-presets"
                 value={card.event}
                 onChange={(e) => patch({ event: e.target.value })}
-                placeholder="100m"
                 maxLength={16}
                 className={inputCls}
               />
@@ -692,7 +689,6 @@ export default function ProfileCardStudio() {
                   aria-label={`기록 ${i + 1} 값`}
                   value={r.value}
                   onChange={(e) => setRecord(i, { value: e.target.value })}
-                  placeholder="10.52 / 2:08.31 / 6m72"
                   maxLength={12}
                   className={`${inputCls} flex-1 font-bold`}
                 />
@@ -729,7 +725,6 @@ export default function ProfileCardStudio() {
                 type="text"
                 value={card.competition}
                 onChange={(e) => patch({ competition: e.target.value })}
-                placeholder="전국체전 예선"
                 maxLength={30}
                 className={inputCls}
               />
@@ -740,7 +735,6 @@ export default function ProfileCardStudio() {
                 inputMode="numeric"
                 value={card.date}
                 onChange={(e) => patch({ date: e.target.value })}
-                placeholder="2026.07.06"
                 maxLength={12}
                 className={inputCls}
               />
@@ -750,7 +744,6 @@ export default function ProfileCardStudio() {
                 type="text"
                 value={card.message}
                 onChange={(e) => patch({ message: e.target.value })}
-                placeholder="오늘도 0.1초 줄였다"
                 maxLength={30}
                 className={inputCls}
               />

@@ -1,5 +1,5 @@
 // 훈련 계획 생성 유틸리티
-import type { TrainingFrequency, TrainingPhase, Experience, UserProfile, Conditions } from './adjustments';
+import type { TrainingFrequency, TrainingPhase, Experience } from './adjustments';
 import type { TrainingPaces } from './vdotCalculations';
 import { formatPace } from './vdotCalculations';
 
@@ -12,7 +12,6 @@ export interface DayPlan {
   duration: string;
   description: string;
 }
-
 export interface WeekPlan {
   week: string;
   focus: string;
@@ -27,11 +26,6 @@ export interface Workout {
   cooldown: string;
   tips: string;
   pace: string;
-}
-
-export interface Recommendation {
-  title: string;
-  items: string[];
 }
 
 /**
@@ -195,90 +189,4 @@ export function generateWorkoutDetails(experience: Experience, paces: TrainingPa
   };
   
   return [intervalWorkout, thresholdWorkout, longRunWorkout, repetitionWorkout];
-}
-
-/**
- * 전문가 권장사항 생성
- */
-export function generateRecommendations(profile: UserProfile, conditions: Conditions): Recommendation[] {
-  const recommendations: Recommendation[] = [];
-  
-  // 성별 특화
-  if (profile.gender === 'female') {
-    recommendations.push({
-      title: '여성 러너 권장사항',
-      items: [
-        '철분 수치 정기 체크 (페리틴 50ng/ml 이상 유지)',
-        '월경 주기 고려한 훈련 강도 조절',
-        '칼슘과 비타민 D 충분히 섭취',
-        '골밀도 검사 연 1회',
-      ],
-    });
-  }
-  
-  // 연령대 특화
-  if (profile.ageGroup.includes('master')) {
-    recommendations.push({
-      title: '마스터즈 러너 권장사항',
-      items: [
-        '회복 시간 1.5-2배 확보',
-        '주 2회 이상 근력 운동 필수',
-        '고강도 훈련 전 충분한 워밍업 (20분 이상)',
-        '유연성 운동 매일 15분',
-        '정기 건강검진 (심혈관계 포함)',
-      ],
-    });
-  }
-  
-  // 훈련 단계 특화
-  if (profile.trainingPhase === 'base') {
-    recommendations.push({
-      title: '기초 체력기 권장사항',
-      items: [
-        '주간 마일리지 10% 이내 증가',
-        '속도보다 시간/거리에 집중',
-        '주 1-2회 크로스트레이닝',
-        '코어 강화 운동 주 3회',
-      ],
-    });
-  } else if (profile.trainingPhase === 'peak' || profile.trainingPhase === 'taper') {
-    recommendations.push({
-      title: '대회 준비 권장사항',
-      items: [
-        '새로운 장비나 음식 시도 금지',
-        '충분한 수면 (8시간 이상)',
-        '탄수화물 비중 60-70%로 증가',
-        '대회 3일 전부터 카페인 섭취 제한',
-        '레이스 페이스 시뮬레이션',
-      ],
-    });
-  }
-  
-  // 조건 특화
-  if (conditions.injuryRecovery) {
-    recommendations.push({
-      title: '부상 회복 프로토콜',
-      items: [
-        'Pain Scale 3/10 이하에서만 훈련',
-        '아이싱과 압박 매일 실시',
-        '항염증 음식 섭취 (오메가-3, 강황)',
-        '대체 운동으로 유산소 유지 (수영, 자전거)',
-        '물리치료사 상담 권장',
-      ],
-    });
-  }
-  
-  // 일반 영양 가이드 (항상 포함)
-  recommendations.push({
-    title: '영양 섭취 가이드',
-    items: [
-      '훈련 전: 탄수화물 30-50g (1-2시간 전)',
-      '훈련 중: 60분 이상 시 시간당 30-60g 탄수화물',
-      '훈련 후 30분 내: 탄수화물:단백질 = 3:1 비율',
-      '일일 수분 섭취: 체중(kg) x 35ml + 훈련 손실량',
-      '전해질 보충: 나트륨 300-700mg/시간',
-    ],
-  });
-  
-  return recommendations;
 }
