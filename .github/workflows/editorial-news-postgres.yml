@@ -1,0 +1,56 @@
+name: Editorial news PostgreSQL contract
+
+on:
+  pull_request:
+    paths:
+      - 'backend/database/migration-011-editorial-news-discovery.sql'
+      - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
+      - 'backend/tests/editorial-news-discovery-*.test.js'
+      - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
+      - '.github/workflows/editorial-news-postgres.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/database/migration-011-editorial-news-discovery.sql'
+      - 'backend/database/rollbacks/011-editorial-news-discovery-down.sql'
+      - 'backend/tests/editorial-news-discovery-*.test.js'
+      - 'backend/tests/helpers/communityEditorialPostgresHarness.js'
+      - '.github/workflows/editorial-news-postgres.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  migration-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16.4-alpine
+        env:
+          POSTGRES_USER: athletetime_test
+          POSTGRES_PASSWORD: test-job-only-password
+          POSTGRES_DB: athletetime_news_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U athletetime_test -d athletetime_news_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify news discovery contract and real PostgreSQL migration
+        env:
+          TEST_DATABASE_URL: postgresql://athletetime_test:test-job-only-password@127.0.0.1:5432/athletetime_news_test
+        run: >-
+          node --test
+          backend/tests/editorial-news-discovery-contract.test.js
+          backend/tests/editorial-news-discovery-migration-postgres.integration.test.js
