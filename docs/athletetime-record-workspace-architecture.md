@@ -20,8 +20,8 @@
 3. 모든 기록을 다 가진 것처럼 말하지 않는다. 확인된 수, 실제 관찰 연도,
    출처 범위를 함께 보여준다.
 4. 기록 숨김, 되돌리기, 비교, 정정 요청은 서로 다른 동작이다.
-5. 기록의 원본 행, 전체 출처, 원시 식별자, `person_no`, 생년월일은 새
-   브라우저 저장소에 넣지 않는다.
+5. 기록의 원본 행, 전체 출처, 이름·소속 자동 스냅샷, 원시 식별자,
+   `person_no`, 생년월일은 새 브라우저 저장소에 넣지 않는다.
 
 ## 2. 네 가지 문맥
 
@@ -40,10 +40,29 @@
 
 ### 3.1 athleteKey
 
-- 공개 분석 API가 제공하는 `athleteKey`만 저장한다.
+- 공개 분석 API가 제공하는 `athleteKey`만 저장한다. 현재 기본 키는
+  정규화한 이름·소속을 SHA-1로 만든 16자리 안정 키다.
+- 이 키는 공개용 가명 키일 뿐 익명 정보, 비밀값, 본인 확인 수단,
+  역추적 불가능한 식별자가 아니다.
 - 내부 원시 식별 조각, `person_no`, 생년월일, 새 동일인 ID를 만들거나 저장하지 않는다.
 - 서로 다른 정규화 이름은 하나의 기록 작업공간으로 확정할 수 없다. 비교 흐름으로 보낸다.
 - 같은 이름이어도 자동 병합하지 않는다.
+- 작업공간 기능은 새 canonical 매핑을 만들지 않으며, 한 `athleteKey`가
+  한 사람임을 보증하지 않는다.
+
+현재 `data/identity/athlete-map.json`은 빈 매핑이다. 이를 비우지 않은 상태로
+운영하려면 먼저 다음 가드를 구현하고 검증해야 한다. 허용되는 엔트리는
+0.85 이상 1 이하의 유한한 `matchConfidence` 숫자값,
+`decisionBasis: "manual_verified"`,
+비어 있지 않은 `sourceRefs`, 검토된 `matchedAthleteKeys`를 모두 가져야 한다.
+
+- `matchConfidence`가 빠졌거나 유한한 0.85~1 범위를 벗어나면 사용하지 않는다.
+- `decisionBasis`가 `manual_verified`가 아니거나 `sourceRefs`가 비어 있으면 사용하지 않는다.
+- 이름·소속 문자열인 `matchKeys`만으로 여러 키를 합치지 않는다.
+- 명시적으로 검토한 `matchedAthleteKeys`만 canonical 그룹의 입력으로 허용한다.
+- 하나의 `athleteKey`가 둘 이상의 canonical 그룹에 속하거나 `canonicalId`가
+  중복 선언되면 관련 엔트리를 모두 사용하지 않는다.
+- canonical 그룹도 화면에서 공식 신원이나 본인 인증 결과로 표현하지 않는다.
 
 ### 3.2 소속 문구
 
@@ -70,8 +89,9 @@
 - `공식 이력`
 - `공식 랭킹`
 
-기본 표현은 `AthleteTime에서 확인된 N개`다. API가 아는 공개 결과 수와 지금
-화면에 보여 준 수를 분리한다.
+단일 공개 프로필의 기본 표현은 `AthleteTime에서 확인된 N개`다. 여러 키를
+고른 화면은 `선택한 공개 기록 N묶음에서 확인된 N개`라고 표시한다. API가 아는
+공개 결과 수와 지금 화면에 보여 준 수를 분리한다.
 
 | 상황 | 사용자 문구 |
 |---|---|
@@ -82,6 +102,8 @@
 | 출처 보류 | `원본을 다시 확인하고 있어요` |
 
 - 연도 범위는 연속된 기간이 아니라 실제 확인된 연도만 쓴다.
+- `totalMatched`는 선택한 공개 그룹 키에서 현재 공개 가능한 기록 수다.
+  한 사람의 전체 경기 이력이나 공식 실적 수가 아니다.
 - 억제·검토중 기록은 공개 결과, 총계, 오류 문구 어느 곳에서도 존재나 수를
   추론할 수 없어야 한다.
 - `qualityState`는 공개 출처 메타데이터의 완성도만 뜻한다. 숨김 상태나
@@ -110,8 +132,9 @@
 | 기록 상세 Sheet | `&record=:publicRecordId` |
 | 비교 설정 또는 결과 | `?stage=setup` 또는 `?stage=result` |
 
-쿼리에는 공개 색인의 불투명 키만 쓴다. 이름, 생년월일, 새 개인정보를 주소에
-넣지 않는다. 종목, 상세 Sheet, 비교 단계 전환은 history `PUSH`를 사용한다.
+쿼리에는 공개 색인의 가명 키만 쓴다. 이 키를 익명 또는 비밀값으로 취급하지
+않는다. 이름, 생년월일, 새 개인정보를 주소에 직접 넣지 않는다. 종목, 상세
+Sheet, 비교 단계 전환은 history `PUSH`를 사용한다.
 
 ### 5.3 구 주소 호환
 
@@ -133,31 +156,28 @@
 | 키 | 매체 | 최대 | 저장 내용 |
 |---|---|---:|---|
 | `athletetime.recordWorkspaceDraft.v1` | sessionStorage | 후보 6개 | 선택 중인 공개 키 |
-| `athletetime.recordWorkspaces.v1` | localStorage | 모음 20개 | 공개 키, 공개 라벨 스냅샷, 제외 ID, 필터, 시각 |
+| `athletetime.recordWorkspaces.v1` | localStorage | 모음 20개 | 공개 키, 사용자가 정한 제목, 제외 ID, 필터, 시각 |
 | `athletetime.selfClaimDraft.v1` | localStorage | 후보 6개 | 이 기기 self 초안 키 |
-| `athletetime.recordComparisons.v1` | sessionStorage | 대상 4명 | setup/ready 상태, 공개 키, 종목, 복귀 주소·초점 |
+| `athletetime.recordComparisons.v1` | sessionStorage | 대상 4명 | setup/ready 상태, 공개 키, 종목, 제한된 복귀 문맥 |
 | `athletetime.recordMigration.v1` | localStorage | 1개 | 이관 상태와 시각 |
 
 ### 6.1 저장 규칙
 
-- 작업공간에는 마지막 공개 응답의 표시용 정보만 아래처럼 저장할 수 있다.
-
-```ts
-subjectSnapshots: Array<{
-  athleteKey: string;
-  displayName: string;
-  teamLabel: string;
-  observedSeasons: number[];
-}>;
-```
-
-- 이 스냅샷은 이용 불가한 대상을 사용자에게 설명하기 위한 표시용 정보이며,
-  신원을 확정하는 정보가 아니다.
+- 이름, 소속, 관찰 연도는 API 응답을 받은 현재 화면 메모리에서만 사용하고
+  localStorage에 자동 복제하지 않는다.
+- 사용자가 직접 바꾼 모음 제목만 최대 40자까지 저장할 수 있다. 기본 제목은
+  `기록 모음`이며 이름·소속으로 자동 채우지 않는다.
+- 비교 복귀 정보는 전체 URL 문자열이 아니라
+  `{ kind: 'athlete' | 'workspace', id, focusToken }` 형태로 저장한다.
+  `id`는 공개 가명 키 또는 로컬 UUID만 허용하고 `focusToken`은 이름·소속을
+  포함하지 않는 임시 UI 토큰이어야 한다.
 - 원본 기록 행, 출처 전체, 비공개 요청 정보는 복제하지 않는다.
 - 모든 저장값은 런타임 검증 후 사용한다.
 - 손상된 값은 앱 전체를 멈추지 않고 해당 모음의 복구 화면만 연다.
 - 20개 한도에서는 오래된 모음을 자동 삭제하지 않는다. 관리 화면에서 정리하도록 안내한다.
 - 저장이 막히면 현재 탭의 메모리 상태로 계속 보되 `지금은 이 탭에서만 볼 수 있어요`를 표시한다.
+- API가 어떤 키를 이용 불가로 반환하면 과거 이름·소속을 화면에 대신 보여 주지
+  않는다. 구 버전에 자동 저장된 라벨이 있다면 다음 저장 때 제거한다.
 
 ### 6.2 기존 my-athlete 저장소 이관
 
@@ -179,28 +199,26 @@ not_seen
 ## 7. 공개 작업공간 미리보기 API
 
 ```http
-GET /api/card-studio/analytics/record-workspaces/preview
-  ?subjectKey=<opaque-key>
-  &subjectKey=<opaque-key>
-  &cursor=<opaque-cursor>
-  &limit=50
+POST /api/card-studio/analytics/record-workspaces/preview
+Content-Type: application/json
+
+{
+  "subjectKeys": ["<public-pseudonymous-key>", "<public-pseudonymous-key>"],
+  "cursor": "<opaque-cursor>",
+  "limit": 50
+}
 ```
 
 ### 7.1 입력과 정렬
 
-- `subjectKey`: 1~6개, 키 하나 최대 120자
+- `subjectKeys`: 1~6개, 키 하나 최대 120자
 - 중복 키: 첫 항목만 사용
 - `limit`: 기본 50, 최대 100
 - `cursor`: 마지막 `(date, id)`를 담은 불투명 base64url 값
 - 정렬: 날짜 내림차순, 같은 날짜면 안정적 기록 `id` 오름차순
 
-프런트는 반복 쿼리로 키를 보낸다.
-
-```ts
-for (const key of subjectKeys) {
-  params.append('subjectKey', key);
-}
-```
+여러 가명 키와 커서를 주소·브라우저 기록·기본 액세스 로그에 남기지 않도록
+GET 쿼리 대신 JSON POST 본문을 사용한다. 요청 본문은 4KB를 넘기지 않는다.
 
 응답은 공개 가능한 `subjects`, 다중 키 신원 경고, 관찰 소속, 범위 정보,
 종목 색인, 현재 페이지 기록만 포함한다. 범위 정보는 `totalMatched`, `returned`,
@@ -213,14 +231,16 @@ for (const key of subjectKeys) {
 - `skipAdmin: false`, `noStore: true`
 - 기존 억제·삭제 필터와 데이터 권리 고지를 재사용
 - 서버에는 작업공간, 비교 대상, 사용자 선택을 영구 저장하지 않음
+- 원시 `subjectKeys` 목록, 요청 본문, 커서를 애플리케이션 로그·분석 이벤트에 추가하지 않음
 
 | 상황 | 응답 |
 |---|---|
 | 키 없음·형식 오류·7개 이상 | 400 `INVALID_SUBJECT_KEYS` |
 | 커서 오류 | 400 `INVALID_CURSOR` |
 | limit 오류 | 400 `LIMIT_OUT_OF_RANGE` |
+| 4KB 초과 본문 | 413 `REQUEST_TOO_LARGE` |
 | 모든 키 이용 불가 | 404 `WORKSPACE_NOT_AVAILABLE` |
-| 일부 키 이용 불가 | 200과 `unavailableSubjectKeys` |
+| 일부 키 이용 불가 | 200과 `unavailableSubjectKeys`; 이유·과거 라벨 비노출 |
 | 속도 제한 | 429 `RATE_LIMITED` |
 | 내부 오류 | 500, 내부 경로·원본 내용 비노출 |
 
@@ -249,7 +269,7 @@ for (const key of subjectKeys) {
 | 첫 불러오기 실패 | `다시 불러오기`, `검색으로 돌아가기` |
 | 다음 페이지 실패 | 이미 본 기록 유지, `더 불러오지 못했어요 · 다시 시도` |
 | 429 | 이미 본 기록·선택 유지, `잠시 후 다시 불러와 주세요` |
-| 일부 프로필 이용 불가 | `{이름 · 소속} 기록을 불러오지 못했어요`, `다시 시도`, `이 모음에서 빼기` |
+| 일부 프로필 이용 불가 | `선택한 기록 하나를 불러오지 못했어요`, `다시 시도`, `이 모음에서 빼기` |
 | 저장 차단·용량 부족 | `지금은 이 탭에서만 볼 수 있어요` |
 | 손상된 모음 | `복구할 수 없는 모음이에요`, 삭제 또는 검색 재시작 |
 
@@ -266,6 +286,12 @@ for (const key of subjectKeys) {
 - [ ] 다중 키 작업공간의 동일인 미확인 경고가 정의되어 있다.
 - [ ] 억제·검토중 기록의 수를 공개하지 않는다고 명시되어 있다.
 - [ ] 원시 식별자, `person_no`, 생년월일, 자동 동일인 병합을 요구하지 않는다.
+- [ ] `athleteKey`와 기록 ID를 익명·비밀·역추적 불가 값으로 설명하지 않는다.
+- [ ] 이름·소속·관찰 연도를 localStorage에 자동 스냅샷으로 남기지 않는다.
+- [ ] 이용 불가 키에 저장된 과거 이름·소속을 대신 표시하지 않는다.
+- [ ] 비교 복귀 문맥이 허용된 기록 주소와 비식별 초점 토큰으로 제한된다.
+- [ ] identityResolver 비어 있지 않은 매핑은 명시적 신뢰도, `manual_verified`
+  판단 근거, 비어 있지 않은 `sourceRefs`, 검토 키 가드 전에는 사용하지 않는다.
 - [ ] `공식 이력`, `공식 랭킹`, `전체 기록`, `완전한 이력`, `현 소속`을
   사용자 문구로 사용하지 않는다.
 
