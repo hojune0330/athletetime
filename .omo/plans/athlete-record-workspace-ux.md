@@ -720,7 +720,7 @@ type RecordWorkspacePreview = {
 
   **Commit**: `feat(records): add bounded workspace preview api`
 
-- [ ] 3. 분리 저장소와 구 저장소 격리
+- [x] 3. 분리 저장소와 구 저장소 격리
 
   **모델**: Terra, 중간 이상
   **병렬**: YES, 파동 2 | Blocks: 6~11 | Blocked by: 1
@@ -756,14 +756,14 @@ type RecordWorkspacePreview = {
   - 구 저장소 자동 본인 이관
 
   **완료 조건**:
-  - [ ] 일반 작업공간 생성 전후 self key가 변하지 않는다.
-  - [ ] 비교 생성 전후 workspace와 self key가 변하지 않는다.
-  - [ ] 손상·용량 초과·storage 차단 시 메모리 모드로 동작한다.
-  - [ ] 구 저장 실패 시 v1/v2가 남는다.
-  - [ ] 작업공간 20개, 본인 후보 6개, 비교 4명 상한이 강제된다.
-  - [ ] localStorage 작업공간에 이름·소속·관찰 연도 자동 스냅샷이 없다.
-  - [ ] 이용 불가 키는 저장된 과거 라벨 없이 일반 문구로 표시된다.
-  - [ ] 복귀 문맥은 허용된 kind, 공개 가명 키 또는 로컬 UUID, 비식별 초점 토큰만 가진다.
+  - [x] 일반 작업공간 생성 전후 self key가 변하지 않는다.
+  - [x] 비교 생성 전후 workspace와 self key가 변하지 않는다.
+  - [x] 손상·용량 초과·storage 차단 시 메모리 모드로 동작한다.
+  - [x] 구 저장 실패 시 v1/v2가 남는다.
+  - [x] 작업공간 20개, 본인 후보 6개, 비교 4명 상한이 강제된다.
+  - [x] localStorage 작업공간에 이름·소속·관찰 연도 자동 스냅샷이 없다.
+  - [x] 이용 불가 키는 저장된 과거 라벨 없이 일반 문구로 표시된다.
+  - [x] 복귀 문맥은 허용된 kind, 공개 가명 키 또는 로컬 UUID, 비식별 초점 토큰만 가진다.
 
   **검증**:
   - `node --test backend/tests/record-workspace-storage.test.js`
