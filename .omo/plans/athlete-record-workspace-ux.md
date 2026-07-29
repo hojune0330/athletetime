@@ -659,17 +659,22 @@ type RecordWorkspacePreview = {
 
   **Commit**: `fix(records): require explicit identity mapping evidence`
 
-- [ ] 2. 공개 작업공간 미리보기 API
+- [x] 2. 공개 작업공간 미리보기 API
 
   **모델**: Terra, 중간 이상
   **병렬**: YES, 파동 2 | Blocks: 5, 7, 8, 10 | Blocked by: 1A
 
   **파일 소유권**:
-  - `card-studio/services/recordAnalyticsService.js`
+  - 신규 `card-studio/services/recordWorkspacePreviewInput.js`
+  - 신규 `card-studio/services/recordWorkspacePreviewService.js`
+  - 신규 `card-studio/routes/recordAnalyticsRoutes.js`
+  - 신규 `card-studio/routes/recordWorkspaceRoutes.js`
   - `card-studio/routes/publicRoutes.js`
+  - 신규 `card-studio/middleware/requestBodyParser.js`
   - `card-studio/middleware/rateLimiter.js`
-  - `frontend/src/api/recordAnalytics.ts`
+  - 신규 `frontend/src/api/recordWorkspace.ts`
   - 신규 `backend/tests/record-workspace-api.test.js`
+  - 신규 `backend/tests/record-workspace-preview-service.test.js`
 
   **구현**:
   - `getRecordWorkspacePreview({ subjectKeys, cursor, limit })`를 추가한다.
@@ -689,16 +694,16 @@ type RecordWorkspacePreview = {
   - 새 대량 덤프 엔드포인트
 
   **완료 조건**:
-  - [ ] 키 1~6개가 동작하고 중복 키는 한 번만 처리된다.
-  - [ ] GET 쿼리 호출은 지원하지 않고 4KB 초과 JSON 본문은 거부된다.
-  - [ ] `limit` 50/100과 다음 커서가 안정적으로 동작한다.
-  - [ ] 같은 날짜의 결과 순서가 재호출에도 동일하다.
-  - [ ] 마지막 시즌 복수 소속은 `needs_review`.
-  - [ ] 일부 키 이용 불가는 200, 전부 불가는 404.
-  - [ ] 억제 대상은 기록·총계·별도 카운트에 나타나지 않는다.
-  - [ ] 일부 이용 불가 키의 이유와 과거 이름·소속은 응답에 나타나지 않는다.
-  - [ ] 31번째 요청은 429.
-  - [ ] 요청 본문·키·커서가 애플리케이션 로그와 분석 이벤트에 남지 않는다.
+  - [x] 키 1~6개가 동작하고 중복 키는 한 번만 처리된다.
+  - [x] GET 쿼리 호출은 지원하지 않고 4KB 초과 JSON 본문은 거부된다.
+  - [x] `limit` 50/100과 다음 커서가 안정적으로 동작한다.
+  - [x] 같은 날짜의 결과 순서가 재호출에도 동일하다.
+  - [x] 마지막 시즌 복수 소속은 `needs_review`.
+  - [x] 일부 키 이용 불가는 200, 전부 불가는 404.
+  - [x] 억제 대상은 기록·총계·별도 카운트에 나타나지 않는다.
+  - [x] 일부 이용 불가 키의 이유와 과거 이름·소속은 응답에 나타나지 않는다.
+  - [x] 31번째 요청은 429.
+  - [x] 요청 본문·키·커서가 애플리케이션 로그와 분석 이벤트에 남지 않는다.
 
   **QA**:
   ```text
@@ -709,8 +714,9 @@ type RecordWorkspacePreview = {
   ```
 
   **검증**:
-  - `node --test backend/tests/record-workspace-api.test.js`
-  - `npm --prefix frontend run type-check`
+  - `node --test backend/tests/record-workspace-preview-service.test.js backend/tests/record-workspace-api.test.js`
+  - `npm --prefix frontend run build:check`
+  - 실제 서버에서 공개 검색 키 1개로 POST 200·출처 보존·4KB 초과 413 확인
 
   **Commit**: `feat(records): add bounded workspace preview api`
 
