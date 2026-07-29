@@ -54,10 +54,13 @@
 운영하려면 먼저 다음 가드를 구현하고 검증해야 한다. 허용되는 엔트리는
 0.85 이상 1 이하의 유한한 `matchConfidence` 숫자값,
 `decisionBasis: "manual_verified"`,
-비어 있지 않은 `sourceRefs`, 검토된 `matchedAthleteKeys`를 모두 가져야 한다.
+내부 원장을 가리키는 `ledger:` 형식 `sourceRefs`, 검토된 16자리 공개
+`matchedAthleteKeys`를 모두 가져야 한다. 엔트리는 이 다섯 필드와
+`canonicalId` 외 이름·소속·생년·외부 식별자 필드를 가질 수 없다.
 
 - `matchConfidence`가 빠졌거나 유한한 0.85~1 범위를 벗어나면 사용하지 않는다.
-- `decisionBasis`가 `manual_verified`가 아니거나 `sourceRefs`가 비어 있으면 사용하지 않는다.
+- `decisionBasis`가 `manual_verified`가 아니거나 `sourceRefs`가 내부 원장
+  형식이 아니면 사용하지 않는다.
 - 이름·소속 문자열인 `matchKeys`만으로 여러 키를 합치지 않는다.
 - 명시적으로 검토한 `matchedAthleteKeys`만 canonical 그룹의 입력으로 허용한다.
 - 하나의 `athleteKey`가 둘 이상의 canonical 그룹에 속하거나 `canonicalId`가

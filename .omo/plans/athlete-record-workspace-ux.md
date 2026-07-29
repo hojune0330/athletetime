@@ -91,7 +91,8 @@
 - 작업공간은 새 canonical 매핑을 만들지 않으며, 한 키가 한 사람임을 보증하지 않는다.
 - 현재 빈 `data/identity/athlete-map.json`을 활성화하기 전에는
   0.85~1 범위의 유한한 `matchConfidence`, `decisionBasis: "manual_verified"`,
-  비어 있지 않은 `sourceRefs`, 검토된 `matchedAthleteKeys`를 요구하고
+  내부 원장을 가리키는 `ledger:` 형식 `sourceRefs`, 검토된 16자리
+  `matchedAthleteKeys`를 요구하고
   `matchKeys` 단독 병합과 키·canonicalId 충돌을 금지한다.
 
 ### 2.3 소속 표현
@@ -607,7 +608,7 @@ type RecordWorkspacePreview = {
 
   **Commit**: `docs(records): lock record workspace trust contract`
 
-- [ ] 1A. 기존 identityResolver 안전 게이트
+- [x] 1A. 기존 identityResolver 안전 게이트
 
   **모델**: Sol, 높은 추론
   **병렬**: NO, 파동 1A | Blocks: 2 | Blocked by: 1
@@ -615,14 +616,18 @@ type RecordWorkspacePreview = {
   **파일 소유권**:
   - `card-studio/services/identityResolver.js`
   - 신규 `backend/tests/identity-resolver-safety.test.js`
+  - `data/identity/athlete-map.json`
   - `docs/athletetime-athlete-identity-architecture.md`
+  - `package.json`
 
   **구현**:
   - 현재 빈 identity map의 fallback 동작을 보존한다.
   - `matchConfidence`가 없거나 유한한 숫자가 아니면 엔트리를 거부한다.
   - `matchConfidence`가 0.85 미만 또는 1 초과면 엔트리를 거부한다.
   - `decisionBasis !== "manual_verified"`인 엔트리를 거부한다.
-  - 비어 있지 않은 문자열 배열 `sourceRefs`가 없는 엔트리를 거부한다.
+  - 1~10개의 내부 `ledger:` 참조 형식 `sourceRefs`가 없는 엔트리를 거부한다.
+  - `matchedAthleteKeys`는 1~100개의 16자리 16진수 공개 키만 허용한다.
+  - 허용된 다섯 필드 외 이름·소속·생년·외부 식별자·직접 URL 필드가 있으면 거부한다.
   - `matchKeys`만 있는 엔트리의 런타임 canonical 병합을 금지한다.
   - 명시적으로 검토한 `matchedAthleteKeys`만 canonical 그룹 입력으로 허용한다.
   - 하나의 `athleteKey`가 둘 이상의 그룹에 있거나 `canonicalId`가 중복 선언되면
@@ -636,20 +641,20 @@ type RecordWorkspacePreview = {
   - 빈 매핑에서 기존 athleteKey 결과 변경
 
   **완료 조건**:
-  - [ ] 빈 map은 모든 입력에 `null`을 반환한다.
-  - [ ] 신뢰도 누락·비유한값·범위 밖·수동 검증 근거 누락·출처 누락·
+  - [x] 빈 map은 모든 입력에 `null`을 반환한다.
+  - [x] 신뢰도 누락·비유한값·범위 밖·수동 검증 근거 누락·출처 누락·
     matchKeys-only·키 충돌·canonicalId 충돌 엔트리는 모두 무시된다.
-  - [ ] 명시적 신뢰도, `manual_verified`, 비어 있지 않은 `sourceRefs`,
-    검토 키를 가진 엔트리만 canonicalId를 반환한다.
-  - [ ] map 파일과 상태 API에 원시 외부 식별자가 없다.
-  - [ ] 기존 공개 검색 결과 수와 athleteKey가 빈 map에서 불변이다.
+  - [x] 명시적 신뢰도, `manual_verified`, 내부 원장 참조, 검토 공개 키만 가진
+    엔트리만 canonicalId를 반환한다.
+  - [x] map 파일과 상태 API에 원시 외부 식별자가 없다.
+  - [x] 기존 공개 검색 결과 수와 athleteKey가 빈 map에서 불변이다.
 
   **검증**:
   - `node --test backend/tests/identity-resolver-safety.test.js`
   - `node --test backend/tests/public-index-quarantine.test.js`
   - `node --test backend/tests/manual-top-records-ingest.test.js`
   - 테스트는 임시 map을 주입하고 원본 `data/identity/athlete-map.json`을 수정하지 않는다.
-  - 기대 결과: 거부 케이스 8종 0개 병합, 승인 fixture 1개만 병합,
+  - 기대 결과: 안전 테스트 12개 통과, 거부 케이스 0개 병합, 승인 fixture 1개만 병합,
     빈 map 공개 인덱스 불변, person_no·생년월일 출력 0.
 
   **Commit**: `fix(records): require explicit identity mapping evidence`
