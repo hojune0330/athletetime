@@ -20,6 +20,18 @@ export {
   DialogDescription,
 } from './dialog';
 export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetPortal,
+  SheetOverlay,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from './sheet';
+export {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,

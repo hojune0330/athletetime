@@ -784,7 +784,7 @@ type RecordWorkspacePreview = {
 
   **Commit**: `feat(records): separate personal browse and compare storage`
 
-- [ ] 4. 작업공간 공통 UI 원자
+- [x] 4. 작업공간 공통 UI 원자
 
   **모델**: Terra, 중간
   **병렬**: YES, 파동 2 | Blocks: 5, 7~10 | Blocked by: 1
@@ -804,12 +804,12 @@ type RecordWorkspacePreview = {
 
   **완료 조건**:
   - [ ] 360px에서 가로 스크롤이 없다.
-  - [ ] Sheet는 제목·설명·닫기·Escape·포커스 트랩을 제공한다.
-  - [ ] 모든 인터랙션이 44x44px 이상이다.
-  - [ ] `현 소속`, `전체 기록` 문구가 없다.
-  - [ ] 새 패키지와 그라데이션·이모지·과한 radius가 없다.
-  - [ ] 경고·오류 텍스트는 13px 이상, 4.5:1 대비이며 색 외 텍스트 상태가 있다.
-  - [ ] 눌림, 로딩, reduced-motion, safe-area 상태가 각각 정의된다.
+  - [x] Sheet는 제목·설명·닫기·Escape·포커스 트랩을 제공한다.
+  - [x] 모든 인터랙션이 44x44px 이상이다.
+  - [x] `현 소속`, `전체 기록` 문구가 없다.
+  - [x] 새 패키지와 그라데이션·이모지·과한 radius가 없다.
+  - [x] 경고·오류 텍스트는 13px 이상, 4.5:1 대비이며 색 외 텍스트 상태가 있다.
+  - [x] 눌림, 로딩, reduced-motion, safe-area 상태가 각각 정의된다.
 
   **검증**:
   - `npm --prefix frontend run type-check`
@@ -820,6 +820,11 @@ type RecordWorkspacePreview = {
     닫은 버튼으로 초점 복귀를 확인한다.
   - `prefers-reduced-motion: reduce`에서 전환 시간이 0이고,
     하단 Sheet와 버튼이 safe-area 위에 있으며 수평 스크롤이 없어야 한다.
+
+  **검증 기록 (2026-07-30)**:
+  - 컴포넌트 계약 3/3, 프론트 typecheck·production build, 금지 스타일 스캔을 통과했다.
+  - 브라우저 제어기가 내장 브라우저와 Chrome 모두 새 탭 연결에 실패해
+    360x800 실기기 초점 순환·가로 스크롤 확인은 다음 브라우저 QA에서 다시 수행한다.
 
   **Commit**: `feat(records): add workspace trust ui primitives`
 
