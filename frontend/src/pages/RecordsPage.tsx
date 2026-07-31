@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getAnalyticsFilters,
   getAthleteAnalytics,
@@ -20,7 +20,6 @@ import { Input } from '../components/ui/input';
 import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
-import { MyRecordsCard } from '../components/record-insights/MyRecordsCard';
 import { useRecordDetailPref, detailToggleLabel } from '../components/record-insights/useRecordDetailPref';
 import { useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
@@ -32,8 +31,9 @@ import { useCompareTray } from '../components/record-insights/useCompareTray';
 import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
 import { RecordsHub } from '../components/records/RecordsHub';
 import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
-import { RecordSearchResults } from '../components/records/RecordSearchResults';
 import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
+import { RecordCandidateList } from '../features/record-workspace/components/RecordCandidateList';
+import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
 
 type Mode = 'athlete' | 'season';
@@ -46,6 +46,7 @@ const TRUST_POINTS = POLICY_TRUST_POINTS;
 
 export default function RecordsPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<Mode>('athlete');
@@ -65,9 +66,10 @@ export default function RecordsPage() {
   const [divisionKey, setDivisionKey] = useState('');
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
+  const [workspaceSelectionMode, setWorkspaceSelectionMode] = useState(false);
   const [compareNotice, setCompareNotice] = useState('');
-  const [myRecordsCollapsed, setMyRecordsCollapsed] = useState(false);
   const compareTray = useCompareTray();
+  const workspaceStore = useRecordWorkspaceStore();
   const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
   const activeFlow = normalizeRecordsFlow(searchParams.get('flow'));
@@ -75,6 +77,16 @@ export default function RecordsPage() {
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
+  const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
+
+  const toggleProfileComparison = (currentProfile: AthleteAnalyticsProfile) => {
+    const result = compareTray.toggle({
+      athleteKey: currentProfile.athlete.athleteKey,
+      name: currentProfile.athlete.name,
+      team: currentProfile.athlete.team,
+    });
+    setCompareNotice(result.reason === 'full' ? '선수 비교는 4명까지 가능해요.' : '');
+  };
 
   useEffect(() => {
     const state = location.state as { focusSearch?: boolean } | null;
@@ -318,7 +330,6 @@ export default function RecordsPage() {
   };
 
   const showMyRecordsHome = () => {
-    setMyRecordsCollapsed(false);
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'mine');
     next.set('step', 'done');
@@ -592,32 +603,6 @@ export default function RecordsPage() {
         </div>
       )}
 
-      {shouldShowRecordsSurface && !isTeamBrowse && myEntries.length > 0 && (
-        myRecordsCollapsed ? (
-          <button
-            type="button"
-            id="my-records"
-            onClick={() => setMyRecordsCollapsed(false)}
-            className="flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
-          >
-            <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">내가 모아 보는 기록</span>
-              <span className="ml-2 font-semibold">{myEntries[0].name}</span>
-              <span className="ml-2 text-ink-4">{myEntries.length}개 묶음 모아 보는 중</span>
-            </span>
-            <span className="shrink-0 text-sm font-semibold text-brand">펼치기</span>
-          </button>
-        ) : (
-          <div id="my-records">
-            <MyRecordsCard
-              entries={myEntries}
-              onClose={() => setMyRecordsCollapsed(true)}
-              onRemove={removeMyAthlete}
-            />
-          </div>
-        )
-      )}
-
       {shouldShowRecordsSurface && !isTeamBrowse && shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
@@ -638,48 +623,26 @@ export default function RecordsPage() {
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
             if (!profile) return;
-            const res = compareTray.toggle({
-              athleteKey: profile.athlete.athleteKey,
-              name: profile.athlete.name,
-              team: profile.athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+            toggleProfileComparison(profile);
           }}
         />
       )}
 
-      {shouldShowRecordsSurface && !isTeamBrowse && athletes.length > 0 && (
-        <RecordSearchResults
+      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes.length > 0 && !selectedAthleteParam && (
+        <RecordCandidateList
           athletes={athletes}
-          query={submittedQuery}
-          selectedAthleteKey={selectedAthleteKey}
-          compareNotice={compareNotice}
-          isInCompareTray={compareTray.isInTray}
-          isMine={isMine}
-          myCount={myEntries.length}
-          onViewMyRecords={showMyRecordsHome}
-          onToggleMine={(athlete) => {
-            toggleMyAthlete({
-              athleteKey: athlete.athleteKey,
-              name: athlete.name,
-              team: athlete.team,
-            });
+          draftSubjectKeys={workspaceDraftKeys}
+          selectionMode={workspaceSelectionMode}
+          onDraftChange={(subjectKeys) => {
+            workspaceStore.saveWorkspaceDraft(subjectKeys);
           }}
-          onSelectAthlete={handleSelectAthlete}
-          onToggleCompare={(athlete) => {
-            const res = compareTray.toggle({
-              athleteKey: athlete.athleteKey,
-              name: athlete.name,
-              team: athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+          onEnterSelectionMode={() => setWorkspaceSelectionMode(true)}
+          onExitSelectionMode={() => {
+            workspaceStore.clearWorkspaceDraft();
+            setWorkspaceSelectionMode(false);
           }}
+          onOpenAthlete={(athleteKey) => navigate(`/records/athletes/${athleteKey}`)}
+          onReviewDraft={() => navigate('/records/workspaces/new')}
         />
       )}
 
@@ -705,15 +668,7 @@ export default function RecordsPage() {
           }}
           onToggleCompare={() => {
             if (!profile) return;
-            const res = compareTray.toggle({
-              athleteKey: profile.athlete.athleteKey,
-              name: profile.athlete.name,
-              team: profile.athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+            toggleProfileComparison(profile);
           }}
         />
       )}
@@ -763,6 +718,7 @@ export default function RecordsPage() {
       </p>
 
       {/* 비교 트레이 분량만큼 하단 여백 (담은 게 있을 때만) */}
+      {compareNotice && <p role="status" className="text-sm font-medium text-warn">{compareNotice}</p>}
       {compareTray.count > 0 && <div aria-hidden className="h-28 sm:h-24" />}
       <CompareTray
         onCompare={(athleteKeys) => {

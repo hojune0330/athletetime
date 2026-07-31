@@ -27,6 +27,9 @@ const ProfileCardPage = lazy(() => import('./pages/ProfileCardStudio'))
 const AthleteDetailPage = lazy(() => import('./pages/AthleteDetailPage'))
 const RecordsPage = lazy(() => import('./pages/RecordsPage'))
 const RecordAthletePage = lazy(() => import('./features/record-workspace/pages/RecordAthletePage'))
+const RecordWorkspaceManagerPage = lazy(() => import('./features/record-workspace/pages/RecordWorkspaceManagerPage'))
+const RecordWorkspacePage = lazy(() => import('./features/record-workspace/pages/RecordWorkspacePage'))
+const RecordWorkspaceReviewPage = lazy(() => import('./features/record-workspace/pages/RecordWorkspaceReviewPage'))
 const AboutDataPage = lazy(() => import('./pages/AboutDataPage'))
 const ScheduleCardPage = lazy(() => import('./pages/ScheduleCardPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
@@ -110,6 +113,9 @@ function App() {
             <Route path="/records" element={<Layout />}>
               <Route index element={lazyPage(<RecordsPage />)} />
               <Route path="athletes/:athleteKey" element={lazyPage(<RecordAthletePage />)} />
+              <Route path="workspaces" element={lazyPage(<RecordWorkspaceManagerPage />)} />
+              <Route path="workspaces/new" element={lazyPage(<RecordWorkspaceReviewPage />)} />
+              <Route path="workspaces/:workspaceId" element={lazyPage(<RecordWorkspacePage />)} />
             </Route>
 
             {/* 데이터 출처·원칙 안내 (#9) */}

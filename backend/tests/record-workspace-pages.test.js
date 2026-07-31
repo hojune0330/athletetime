@@ -1,0 +1,60 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+const test = require('node:test');
+
+const ROOT = path.resolve(__dirname, '../..');
+const FRONTEND = path.join(ROOT, 'frontend');
+const VITEST_PACKAGE = require.resolve('vitest/package.json', { paths: [FRONTEND] });
+const VITEST_CLI = path.join(path.dirname(VITEST_PACKAGE), 'vitest.mjs');
+
+test('Given workspace page contracts When focused Vitest runs Then review and reversible editing remain safe', () => {
+  // Given review, persistence, and local editing behavior suites.
+  // When Vitest executes them through the frontend transform boundary.
+  const result = spawnSync(
+    process.execPath,
+    [
+      VITEST_CLI,
+      '--run',
+      'src/features/record-workspace/pages/workspacePages.test.tsx',
+      'src/features/record-workspace/workspaceMutations.test.ts',
+      'src/features/record-workspace/workspaceEditor.test.ts',
+    ],
+    { cwd: FRONTEND, encoding: 'utf8' },
+  );
+
+  // Then mixed names, unavailable subjects, limits, hide, and undo all pass.
+  assert.ifError(result.error);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
+});
+
+test('Given public workspace routes When source contracts are scanned Then identity and recovery boundaries remain explicit', () => {
+  // Given app, review, manager, and workspace sources.
+  const app = fs.readFileSync(path.join(FRONTEND, 'src/App.tsx'), 'utf8');
+  const review = fs.readFileSync(
+    path.join(FRONTEND, 'src/features/record-workspace/pages/RecordWorkspaceReviewPage.tsx'),
+    'utf8',
+  );
+  const page = fs.readFileSync(
+    path.join(FRONTEND, 'src/features/record-workspace/pages/RecordWorkspacePage.tsx'),
+    'utf8',
+  );
+  const manager = fs.readFileSync(
+    path.join(FRONTEND, 'src/features/record-workspace/pages/RecordWorkspaceManagerPage.tsx'),
+    'utf8',
+  );
+
+  // When the route and destructive-action boundaries are inspected.
+  // Then direct recovery works, comparison never truncates silently, and identity is not overstated.
+  assert.match(app, /path="workspaces\/new"/);
+  assert.match(app, /path="workspaces\/:workspaceId"/);
+  assert.match(review, /subjectKeys\.length > 4/);
+  assert.match(review, /subjectKeys\.length - 4/);
+  assert.doesNotMatch(review, /subjectKeys\.slice\(0, 4\)/);
+  assert.doesNotMatch(review, /window\.history\.back/);
+  assert.doesNotMatch(page, /현 소속/);
+  assert.match(page, /visibleCoverage/);
+  assert.match(manager, /다음 삭제 전까지 되돌릴 수 있어요/);
+  assert.doesNotMatch(`${review}\n${page}\n${manager}`, /<main/);
+});

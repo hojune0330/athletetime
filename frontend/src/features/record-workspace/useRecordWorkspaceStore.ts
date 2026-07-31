@@ -8,6 +8,7 @@ import {
   type SelfClaimDraft,
   type StorageLike,
   type StorageStatus,
+  type WorkspaceUpdate,
 } from './storage'
 
 type StoreSnapshot = {
@@ -47,6 +48,13 @@ function createBrowserStore() {
   })
 }
 
+let sharedBrowserStore: ReturnType<typeof createBrowserStore> | null = null
+
+function getBrowserStore() {
+  sharedBrowserStore ??= createBrowserStore()
+  return sharedBrowserStore
+}
+
 function readSnapshot(store: ReturnType<typeof createBrowserStore>): StoreSnapshot {
   return {
     comparison: store.getComparison(),
@@ -58,7 +66,7 @@ function readSnapshot(store: ReturnType<typeof createBrowserStore>): StoreSnapsh
 }
 
 export function useRecordWorkspaceStore() {
-  const [store] = useState(createBrowserStore)
+  const [store] = useState(getBrowserStore)
   const [snapshot, setSnapshot] = useState(() => readSnapshot(store))
   const refresh = useCallback(() => setSnapshot(readSnapshot(store)), [store])
 
@@ -92,13 +100,44 @@ export function useRecordWorkspaceStore() {
     return result
   }, [refresh, store])
 
+  const clearWorkspaceDraft = useCallback(() => {
+    const persistence = store.clearWorkspaceDraft()
+    refresh()
+    return persistence
+  }, [refresh, store])
+
+  const updateWorkspace = useCallback((
+    workspaceId: string,
+    changes: WorkspaceUpdate,
+  ): SaveResult<RecordWorkspace> => {
+    const result = store.updateWorkspace(workspaceId, changes)
+    refresh()
+    return result
+  }, [refresh, store])
+
+  const deleteWorkspace = useCallback((workspaceId: string): SaveResult<RecordWorkspace> => {
+    const result = store.deleteWorkspace(workspaceId)
+    refresh()
+    return result
+  }, [refresh, store])
+
+  const restoreWorkspace = useCallback((workspace: RecordWorkspace): SaveResult<RecordWorkspace> => {
+    const result = store.restoreWorkspace(workspace)
+    refresh()
+    return result
+  }, [refresh, store])
+
   return {
     ...snapshot,
+    clearWorkspaceDraft,
     createWorkspace,
+    deleteWorkspace,
     refresh,
+    restoreWorkspace,
     saveComparison,
     saveSelfClaimDraft,
     saveWorkspaceDraft,
     storage: store,
+    updateWorkspace,
   }
 }

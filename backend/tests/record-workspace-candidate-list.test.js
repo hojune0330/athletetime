@@ -31,6 +31,7 @@ test('Given candidate component sources When ownership language is scanned Then 
     'RecordCandidateList.tsx',
     'WorkspaceDraftTray.tsx',
   ].map((file) => fs.readFileSync(path.join(COMPONENTS, file), 'utf8')).join('\n');
+  const recordsPage = fs.readFileSync(path.join(FRONTEND, 'src/pages/RecordsPage.tsx'), 'utf8');
 
   // When old mixed-purpose ownership and decorative patterns are scanned.
   // Then the new surface remains a general browse or explicit workspace draft flow.
@@ -38,4 +39,9 @@ test('Given candidate component sources When ownership language is scanned Then 
   assert.doesNotMatch(source, /비교에 담기|내 기록 지정/);
   assert.match(source, /min-h-11/);
   assert.match(source, /safe-area-inset-bottom/);
+  assert.match(recordsPage, /<RecordCandidateList/);
+  assert.match(recordsPage, /saveWorkspaceDraft/);
+  assert.doesNotMatch(recordsPage, /<RecordSearchResults|<MyRecordsCard/);
+  assert.match(recordsPage, /result\.reason === 'full'/);
+  assert.match(recordsPage, /compareNotice/);
 });

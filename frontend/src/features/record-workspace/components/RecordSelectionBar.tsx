@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 type RecordSelectionBarProps = {
   readonly busy?: boolean
   readonly className?: string
+  readonly confirmLabel?: string
   readonly onCancel: () => void
   readonly onConfirm: () => void
   readonly selectedCount: number
@@ -12,6 +13,7 @@ type RecordSelectionBarProps = {
 export function RecordSelectionBar({
   busy = false,
   className,
+  confirmLabel = '선택 적용',
   onCancel,
   onConfirm,
   selectedCount,
@@ -44,7 +46,7 @@ export function RecordSelectionBar({
             disabled={busy || selectedCount === 0}
             onClick={onConfirm}
           >
-            {busy ? '처리 중' : '선택 적용'}
+            {busy ? '처리 중' : confirmLabel}
           </Button>
         </div>
       </div>

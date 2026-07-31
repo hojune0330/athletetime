@@ -56,6 +56,18 @@ export class StorageBoundary {
     }
   }
 
+  remove(area: StorageLike, key: string): StorageMode {
+    this.#memory.delete(key)
+    try {
+      area.removeItem(key)
+      this.#volatileKeys.delete(key)
+      return 'persistent'
+    } catch {
+      this.#degrade(key, 'blocked')
+      return 'volatile'
+    }
+  }
+
   #readRaw(area: StorageLike, key: string): string | null {
     if (this.#volatileKeys.has(key)) return this.#memory.get(key) ?? null
     try {

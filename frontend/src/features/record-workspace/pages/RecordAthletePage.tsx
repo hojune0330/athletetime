@@ -21,6 +21,7 @@ export default function RecordAthletePage() {
   const store = useRecordWorkspaceStore()
   const athlete = useRecordAthletePreview(athleteKey || null)
   const preview = athlete.preview
+  const draftCount = store.workspaceDraft?.subjectKeys.length ?? 0
   const activeTab = normalizeTab(pageParams.get('tab'))
   const selectedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
@@ -85,7 +86,7 @@ export default function RecordAthletePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-4 pb-24">
+    <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <button
         type="button"
         className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand"
@@ -106,6 +107,14 @@ export default function RecordAthletePage() {
         <div className="mt-5 flex flex-wrap gap-2">
           <Button type="button" onClick={addToDraft}>기록 모음에 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
+          {draftCount > 0 && (
+            <Button asChild type="button" variant="outline">
+              <Link to="/records/workspaces/new">선택 검토하기 · {draftCount}개</Link>
+            </Button>
+          )}
+          <Button asChild type="button" variant="ghost">
+            <Link to="/records/workspaces">저장한 모음</Link>
+          </Button>
         </div>
         {actionNotice && <p className="mt-3 text-body-sm text-ink-3" role="status">{actionNotice}</p>}
       </section>
@@ -134,7 +143,7 @@ export default function RecordAthletePage() {
       )}
       {activeTab === 'affiliations' && <AffiliationHistory context="athlete" items={preview.affiliations} />}
       {activeTab === 'sources' && <RecordSourceList records={preview.records} />}
-    </main>
+    </div>
   )
 }
 
@@ -169,7 +178,7 @@ function PageNotice({
   title: string
 }) {
   return (
-    <main className="mx-auto max-w-3xl border border-line bg-surface p-6 sm:p-8">
+    <div className="mx-auto max-w-3xl border border-line bg-surface p-6 sm:p-8">
       <h1 className="text-h2 font-semibold text-ink">{title}</h1>
       <p className="mt-2 text-body-sm leading-6 text-ink-3">{description}</p>
       {actionLabel && onAction && (
@@ -178,6 +187,6 @@ function PageNotice({
       <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
         기록 검색으로 이동
       </Link>
-    </main>
+    </div>
   )
 }

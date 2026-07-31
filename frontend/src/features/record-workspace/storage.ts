@@ -1,15 +1,12 @@
-import { z, type ZodType } from 'zod'
+import type { z, ZodType } from 'zod'
 import {
   ComparisonEnvelopeSchema,
   MigrationStateSchema,
   RecordComparisonSchema,
-  RecordWorkspaceSchema,
   SelfClaimDraftSchema,
   STORAGE_KEYS,
   WORKSPACE_LIMITS,
-  WorkspaceIdSchema,
   WorkspaceDraftSchema,
-  WorkspacesEnvelopeSchema,
   type MigrationState,
   type RecordComparison,
   type RecordWorkspace,
@@ -22,48 +19,21 @@ import {
   type StorageMode,
   type StorageStatus,
 } from './storageBoundary'
+import {
+  BYTE_LIMITS,
+  ComparisonReadyProbeSchema,
+  ComparisonSubjectProbeSchema,
+  type RecordWorkspaceStorageOptions,
+  type SaveResult,
+  type WorkspaceInput,
+  type WorkspaceUpdate,
+} from './storageContracts'
+import { WorkspaceRepository } from './workspaceRepository'
 
 export { STORAGE_KEYS }
 export type { RecordComparison, RecordWorkspace, RecordWorkspaceDraft, SelfClaimDraft }
 export type { StorageLike, StorageStatus }
-
-type SaveSuccess<T> = {
-  readonly ok: true
-  readonly value: T
-  readonly persistence: StorageMode
-}
-
-type SaveFailure = {
-  readonly ok: false
-  readonly reason:
-    | 'comparison_not_ready'
-    | 'invalid_data'
-    | 'subject_limit'
-    | 'uuid_collision'
-    | 'workspace_limit'
-}
-
-export type SaveResult<T> = SaveSuccess<T> | SaveFailure
-
-type RecordWorkspaceStorageOptions = {
-  readonly local: StorageLike
-  readonly session: StorageLike
-  readonly createUuid?: () => string
-  readonly now?: () => string
-}
-
-type WorkspaceInput = {
-  readonly subjectKeys: readonly string[]
-  readonly title?: string
-}
-
-const BYTE_LIMITS = {
-  comparison: 8_192,
-  migration: 1_024,
-  selfClaimDraft: 4_096,
-  workspaceDraft: 4_096,
-  workspaces: 65_536,
-} as const
+export type { SaveResult, WorkspaceUpdate } from './storageContracts'
 
 export class RecordWorkspaceStorage {
   readonly #local: StorageLike
@@ -71,12 +41,20 @@ export class RecordWorkspaceStorage {
   readonly #createUuid: () => string
   readonly #now: () => string
   readonly #boundary = new StorageBoundary()
+  readonly #workspaces: WorkspaceRepository
 
   constructor(options: RecordWorkspaceStorageOptions) {
     this.#local = options.local
     this.#session = options.session
     this.#createUuid = options.createUuid ?? (() => globalThis.crypto.randomUUID())
     this.#now = options.now ?? (() => new Date().toISOString())
+    this.#workspaces = new WorkspaceRepository({
+      area: this.#local,
+      boundary: this.#boundary,
+      createUuid: this.#createUuid,
+      now: this.#now,
+      storageKey: STORAGE_KEYS.workspaces,
+    })
   }
 
   getStatus(): StorageStatus {
@@ -100,6 +78,10 @@ export class RecordWorkspaceStorage {
     )
   }
 
+  clearWorkspaceDraft(): StorageMode {
+    return this.#boundary.remove(this.#session, STORAGE_KEYS.workspaceDraft)
+  }
+
   getSelfClaimDraft(): SelfClaimDraft | null {
     return this.#read(this.#local, STORAGE_KEYS.selfClaimDraft, SelfClaimDraftSchema, BYTE_LIMITS.selfClaimDraft)
   }
@@ -118,40 +100,23 @@ export class RecordWorkspaceStorage {
   }
 
   listWorkspaces(): readonly RecordWorkspace[] {
-    return this.#read(
-      this.#local,
-      STORAGE_KEYS.workspaces,
-      WorkspacesEnvelopeSchema,
-      BYTE_LIMITS.workspaces,
-    )?.items ?? []
+    return this.#workspaces.list()
   }
 
   createWorkspace(input: WorkspaceInput): SaveResult<RecordWorkspace> {
-    if (new Set(input.subjectKeys).size > WORKSPACE_LIMITS.workspaceDraftSubjects) {
-      return { ok: false, reason: 'subject_limit' }
-    }
-    const workspaces = this.listWorkspaces()
-    if (workspaces.length >= WORKSPACE_LIMITS.workspaces) return { ok: false, reason: 'workspace_limit' }
-    const id = this.#newWorkspaceId(new Set(workspaces.map((item) => item.id)))
-    if (!id) return { ok: false, reason: 'uuid_collision' }
-    const timestamp = this.#now()
-    const parsed = RecordWorkspaceSchema.safeParse({
-      id,
-      title: input.title ?? '기록 모음',
-      subjectKeys: input.subjectKeys,
-      excludedRecordIds: [],
-      filter: {},
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    })
-    if (!parsed.success) return { ok: false, reason: 'invalid_data' }
-    const persistence = this.#write(
-      this.#local,
-      STORAGE_KEYS.workspaces,
-      JSON.stringify({ version: 1, items: [...workspaces, parsed.data] }),
-      BYTE_LIMITS.workspaces,
-    )
-    return { ok: true, value: parsed.data, persistence }
+    return this.#workspaces.create(input)
+  }
+
+  updateWorkspace(workspaceId: string, changes: WorkspaceUpdate): SaveResult<RecordWorkspace> {
+    return this.#workspaces.update(workspaceId, changes)
+  }
+
+  deleteWorkspace(workspaceId: string): SaveResult<RecordWorkspace> {
+    return this.#workspaces.delete(workspaceId)
+  }
+
+  restoreWorkspace(workspace: RecordWorkspace): SaveResult<RecordWorkspace> {
+    return this.#workspaces.restore(workspace)
   }
 
   getComparison(): RecordComparison | null {
@@ -207,14 +172,6 @@ export class RecordWorkspaceStorage {
     )
   }
 
-  #newWorkspaceId(existing: ReadonlySet<string>): string | null {
-    for (let attempt = 0; attempt < 5; attempt += 1) {
-      const parsed = WorkspaceIdSchema.safeParse(this.#createUuid())
-      if (parsed.success && !existing.has(parsed.data)) return parsed.data
-    }
-    return null
-  }
-
   #saveParsed<T>(
     area: StorageLike,
     key: string,
@@ -237,16 +194,6 @@ export class RecordWorkspaceStorage {
     return this.#boundary.write(area, key, raw, maximumBytes)
   }
 }
-
-const ComparisonSubjectProbeSchema = z.object({
-  subjectKeys: z.array(z.unknown()),
-})
-
-const ComparisonReadyProbeSchema = z.object({
-  state: z.literal('ready'),
-  subjectKeys: z.array(z.unknown()),
-  eventKey: z.string().catch(''),
-})
 
 export function createRecordWorkspaceStorage(options: RecordWorkspaceStorageOptions): RecordWorkspaceStorage {
   return new RecordWorkspaceStorage(options)
