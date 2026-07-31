@@ -29,8 +29,8 @@ export function RecordsBrowseGateway({ onBackToHub, onPick }: RecordsBrowseGatew
           onClick={() => onPick('athlete')}
         />
         <BrowseCard
-          title="팀(소속)으로 찾기"
-          description="소속별 선수 후보를 확인해요."
+          title="소속 통계 보기"
+          description="팀·학교의 시즌 흐름과 종목 구성을 숫자로 살펴봐요."
           onClick={() => onPick('team')}
         />
         <BrowseCard

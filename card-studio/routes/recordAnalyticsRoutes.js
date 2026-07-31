@@ -92,6 +92,27 @@ router.get('/records/search', searchLimiter, async (req, res) => {
   }
 });
 
+router.get('/teams/search', searchLimiter, (req, res) => {
+  try {
+    const query = String(req.query.q || '')
+      .trim()
+      .replace(/[\x00-\x1f\x7f]/g, '')
+      .slice(0, 100);
+    if (query.length < 2) {
+      return res.status(400).json({ success: false, error: 'Search query must be at least 2 characters.' });
+    }
+    const teams = recordAnalyticsService.searchTeamStatistics(query, req.query.limit);
+    return res.json({
+      success: true,
+      data: teams,
+      total: teams.length,
+      dataRights: dataRightsPolicy.RESPONSE_NOTICE,
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 router.get('/records/zero-result-summary', publicLimiter, async (req, res) => {
   try {
     return res.json({

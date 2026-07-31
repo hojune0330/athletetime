@@ -4,6 +4,7 @@ const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
 const identityResolver = require('./identityResolver');
 const manualTopRecordsService = require('./manualTopRecordsService');
+const teamStatisticsService = require('./teamStatisticsService');
 const divisionHierarchyService = require('./divisionHierarchyService');
 const {
   assessPublicIndexEvent,
@@ -56,6 +57,10 @@ function searchAthletes(query, limit = 12) {
     .sort((a, b) => b.recordCount - a.recordCount || a.name.localeCompare(b.name))
     .slice(0, safeLimit)
     .map(toSearchCard);
+}
+
+function searchTeamStatistics(query, limit = 12) {
+  return teamStatisticsService.search({ records: getIndex().records, normalizeTeam }, query, limit);
 }
 
 function getAthleteSummary(athleteKey) {
@@ -1215,6 +1220,7 @@ module.exports = {
   getFilters,
   getPopularEvents,
   searchAthletes,
+  searchTeamStatistics,
   getAthleteSummary,
   getSeasonRecords,
   warmup,
