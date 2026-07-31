@@ -26,6 +26,7 @@ const MatchResultDetailPage = lazy(() => import('./pages/MatchResultDetailPage')
 const ProfileCardPage = lazy(() => import('./pages/ProfileCardStudio'))
 const AthleteDetailPage = lazy(() => import('./pages/AthleteDetailPage'))
 const RecordsPage = lazy(() => import('./pages/RecordsPage'))
+const RecordAthletePage = lazy(() => import('./features/record-workspace/pages/RecordAthletePage'))
 const AboutDataPage = lazy(() => import('./pages/AboutDataPage'))
 const ScheduleCardPage = lazy(() => import('./pages/ScheduleCardPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
@@ -108,6 +109,7 @@ function App() {
 
             <Route path="/records" element={<Layout />}>
               <Route index element={lazyPage(<RecordsPage />)} />
+              <Route path="athletes/:athleteKey" element={lazyPage(<RecordAthletePage />)} />
             </Route>
 
             {/* 데이터 출처·원칙 안내 (#9) */}

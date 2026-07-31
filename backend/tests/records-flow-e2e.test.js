@@ -59,7 +59,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.goto(`${baseUrl}/records?flow=browse`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
-    await expectVisible(page.getByRole('button', { name: /팀\(소속\)으로 찾기/ }));
+    await expectVisible(page.getByRole('button', { name: /소속 통계 보기/ }));
     await expectVisible(page.getByRole('button', { name: /시즌 기록표/ }));
     visited.push(page.url());
 

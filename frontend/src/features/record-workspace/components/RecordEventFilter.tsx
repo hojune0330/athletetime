@@ -19,7 +19,7 @@ export function RecordEventFilter({
     <section className={cn('border border-line bg-surface', className)}>
       <div className="border-b border-line px-4 py-3">
         <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">EVENT INDEX</p>
-        <h2 className="mt-1 text-body font-semibold text-ink">종목별 기록</h2>
+        <h2 className="mt-1 text-body font-semibold text-ink">종목 목록</h2>
         <p className="mt-1 text-body-sm leading-5 text-ink-3">
           종목을 고르면 시즌별 기록을 짧게 나눠서 보여드려요.
         </p>

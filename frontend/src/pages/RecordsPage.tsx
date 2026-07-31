@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import {
   getAnalyticsFilters,
   getAthleteAnalytics,
@@ -45,7 +45,9 @@ const DATA_NOTICE = TRUST_NOTICE.collectedPublic;
 const TRUST_POINTS = POLICY_TRUST_POINTS;
 
 export default function RecordsPage() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<Mode>('athlete');
   const [query, setQuery] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
@@ -73,6 +75,11 @@ export default function RecordsPage() {
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
+
+  useEffect(() => {
+    const state = location.state as { focusSearch?: boolean } | null;
+    if (state?.focusSearch) searchInputRef.current?.focus();
+  }, [location.key, location.state]);
 
   useEffect(() => {
     let active = true;
@@ -519,6 +526,7 @@ export default function RecordsPage() {
                 </label>
                 <Input
                   id="records-search"
+                  ref={searchInputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={isTeamBrowse ? '찾을 소속을 입력하세요' : '이름 또는 소속(예: 홍길동, 서울고)'}

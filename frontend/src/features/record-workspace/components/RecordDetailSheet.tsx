@@ -10,6 +10,7 @@ import { resolveProviderLabel } from '@/config/dataPolicy'
 import { resolveRecordDisplay } from '@/lib/recordStatus'
 
 type RecordDetailSheetProps = {
+  readonly dataRequestHref?: string
   readonly onOpenChange: (open: boolean) => void
   readonly open: boolean
   readonly record: PublicRecord | null
@@ -39,6 +40,7 @@ function DetailItem({ label, value }: DetailItemProps) {
 }
 
 export function RecordDetailSheet({
+  dataRequestHref,
   onOpenChange,
   open,
   record,
@@ -89,6 +91,15 @@ export function RecordDetailSheet({
               rel="noreferrer"
             >
               원출처 열기
+            </a>
+          )}
+
+          {dataRequestHref && (
+            <a
+              className="mt-3 inline-flex min-h-11 items-center border border-line px-4 text-body-sm font-semibold text-ink hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              href={dataRequestHref}
+            >
+              기록이 틀렸어요
             </a>
           )}
         </SheetContent>

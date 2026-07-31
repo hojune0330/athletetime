@@ -24,8 +24,8 @@ test('COMM-LAUNCH-002: all former community writing and reading routes resolve t
     assert.ok(source.includes(`<Route path="${route}" element={lazyPage(<CommunityPage />)} />`));
   }
 
-  assert.ok(source.includes('<Route path="/write" element={<Layout />}>\n              <Route index element={lazyPage(<CommunityPage />)} />'));
-  assert.ok(source.includes('<Route path="/edit/:postId" element={<Layout />}>\n              <Route index element={lazyPage(<CommunityPage />)} />'));
+  assert.match(source, /<Route path="\/write" element={<Layout \/>}>\r?\n\s+<Route index element={lazyPage\(<CommunityPage \/>\)} \/>/);
+  assert.match(source, /<Route path="\/edit\/:postId" element={<Layout \/>}>\r?\n\s+<Route index element={lazyPage\(<CommunityPage \/>\)} \/>/);
 });
 
 test('COMM-LAUNCH-003: prepared-state copy stays factual and avoids false opening promises', () => {
