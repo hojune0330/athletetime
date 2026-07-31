@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const teamCategoryService = require('./teamCategoryService');
+const teamPerformanceService = require('./teamPerformanceService');
 
 function search({ records, normalizeTeam }, query, limit = 12) {
   const q = normalizeTeam(clean(query)).toLowerCase();
@@ -77,6 +79,12 @@ function addRecord(bucket, record) {
 }
 
 function toPublicStatistic(bucket) {
+  const categorySummary = teamCategoryService.summarizeRecordCategories(
+    bucket.records,
+    undefined,
+    bucket.teamLabel,
+  );
+  const performance = teamPerformanceService.summarize(bucket.records);
   const dates = bucket.records.map((record) => record.date).filter(Boolean).sort();
   const seasonStats = [...bucket.seasons.values()]
     .filter((season) => season.season > 0)
@@ -107,6 +115,8 @@ function toPublicStatistic(bucket) {
     firstSeason: seasonStats.at(-1)?.season || null,
     latestSeason: seasonStats[0]?.season || null,
     latestDate: dates.at(-1) || null,
+    ...categorySummary,
+    performance,
     rankCounts: {
       ...bucket.rankCounts,
       topThree: bucket.rankCounts.first + bucket.rankCounts.second + bucket.rankCounts.third,
@@ -132,4 +142,3 @@ function clampInt(value, fallback, min, max) {
 }
 
 module.exports = { search };
-

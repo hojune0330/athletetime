@@ -1,6 +1,6 @@
 # AthleteTime 팀 성과 대시보드 구현 계획
 
-> 상태: 구현 대기
+> 상태: 작업 1-2 완료 · 작업 3 대기
 > 기준일: 2026-07-31
 > 상위 계획: `.omo/plans/athlete-record-workspace-ux.md`의 6B
 
@@ -48,11 +48,13 @@
 
 1. 운영자가 검토한 `data/config/team-category-overrides.json`이 있으면 우선한다.
 2. `divisionLevel`이 `university · high · middle · elementary`이면 그대로 매핑한다.
-3. `divisionLevel=general`이고 아래 강한 근거가 하나 이상이면 `corporate`로 본다.
+3. 일반·미상 부문에서도 소속명에 `대학교 · 고등학교 · 중학교 · 초등학교`가
+   명시되면 해당 학교급으로 매핑한다.
+4. `divisionLevel=general`이고 아래 강한 근거가 하나 이상이면 `corporate`로 본다.
    - 원문 부문 또는 대회명에 `실업`이 있음
    - 소속이 `시청 · 군청 · 구청 · 도청 · 공사 · 공단 · 은행 · 체육회`
      또는 검토된 실업팀 이름 규칙과 일치함
-4. 위 조건으로 설명할 수 없으면 `unclassified`로 둔다.
+5. 위 조건으로 설명할 수 없으면 `unclassified`로 둔다.
 
 한 팀이 여러 부문에 실제로 나타나면 강제로 하나로 합치지 않는다.
 검색 필터에서는 선택한 부문에 해당하는 기록만 집계하고, 상세 화면에는
@@ -194,7 +196,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 
 ## 6. 구현 순서
 
-### 작업 1. 팀 부문 판정기
+### 작업 1. 팀 부문 판정기 (완료)
 
 **소유 파일**
 - 신규 `card-studio/services/teamCategoryService.js`
@@ -211,7 +213,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 근거 없는 일반부 소속은 `corporate`로 강제되지 않는다.
 - 같은 팀의 혼합 부문 기록은 원본 부문을 잃지 않는다.
 
-### 작업 2. 입상·참가·최고 갱신 계산기
+### 작업 2. 입상·참가·최고 갱신 계산기 (완료)
 
 **소유 파일**
 - 신규 `card-studio/services/teamPerformanceService.js`
@@ -336,7 +338,30 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 팀 페이지에 개인 기록 목록 노출
 - 모바일 가로 스크롤 또는 하단 탭바 중첩
 
-## 7. PR 파동과 모델 배정
+## 7. 작업 1-2 검증 기록
+
+2026-07-31 실제 보유 데이터와 HTTP 응답으로 다음을 확인했다.
+
+- 진도군청: `corporate`, 결과 138건, 참가 대회 36개, 확인된 입상 43건,
+  모은 기록 기준 최고 갱신 37건
+- 전남진도초등학교: `elementary`, 결과 7건, 참가 대회 5개, 최고 갱신 1건
+- 강진도암중학교: `middle`
+- 건국대학교(A): `university`, 결과 420건, 참가 대회 63개,
+  확인된 입상 120건, 최고 갱신 98건
+- 검색 API는 위 집계를 반환하면서 선수별 원본 기록 행은 반환하지 않는다.
+
+자동 검증 결과:
+
+- 사전 계약 테스트 12/12 통과
+- 전체 테스트 322 통과, 5개 의도적 skip, 실패 0
+- 프론트 타입 검사와 프로덕션 빌드 통과
+- `GET /api/card-studio/analytics/teams/search?q=진도&limit=20` 실측 통과
+
+다음 작업자는 작업 3부터 시작한다. 작업 1-2의 집계 의미를 변경할 때는
+`team-category.test.js`와 `team-performance.test.js`를 먼저 갱신하고, 예선·단계 미상·
+계주 중복·첫 관찰 기록 방어 조건을 약화하지 않는다.
+
+## 8. PR 파동과 모델 배정
 
 1. **Sol 높은 추론**: 작업 1·2 의미 검증과 예외 데이터 승인
 2. **Terra 높은 추론**: 작업 3·4 API·타입 구현
@@ -346,7 +371,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 각 파동은 직전 테스트가 녹색일 때만 다음으로 이동한다. 첫 구현 PR은 분류와
 계산기까지만 포함하고, 데이터 의미가 승인된 뒤 API와 UI를 연결한다.
 
-## 8. 완료 정의
+## 9. 완료 정의
 
 다음 문장이 실제 모바일 브라우저에서 성립해야 한다.
 

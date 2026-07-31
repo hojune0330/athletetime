@@ -348,6 +348,7 @@ function buildIndex() {
           wind: wind || null,
           windLegal,
           isComparable,
+          personalBest: clean(result.personal_best, 120),
           note: clean(result.note || result.newRecord, 120),
           source: {
             provider: 'KAAF',
