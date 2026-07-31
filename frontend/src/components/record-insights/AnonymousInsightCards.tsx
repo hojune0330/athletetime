@@ -69,9 +69,9 @@ export function AnonymousInsightCards({ onPickEvent }: Props) {
         {TRUST_NOTICE_COMBO.anonymousFooter}
       </p>
 
-      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {events.length > 0 && (
-          <Card className="md:col-span-2 lg:col-span-1">
+          <Card className="min-w-0 md:col-span-2 lg:col-span-1">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">기록이 많은 종목</CardTitle>
             </CardHeader>
@@ -96,7 +96,7 @@ export function AnonymousInsightCards({ onPickEvent }: Props) {
         )}
 
         {showPulse && (
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">최근 기록이 모인 주</CardTitle>
             </CardHeader>
@@ -112,7 +112,7 @@ export function AnonymousInsightCards({ onPickEvent }: Props) {
         )}
 
         {showRegions && (
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">기록이 모인 지역</CardTitle>
             </CardHeader>

@@ -31,6 +31,22 @@ test('UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections', ()
   assert.match(page, /\{open && <CardContent/);
 });
 
+test('UX-MOBILE-001: anonymous insight cards do not widen the records page on narrow screens', () => {
+  const insights = readSource('frontend/src/components/record-insights/AnonymousInsightCards.tsx');
+  assert.match(
+    insights,
+    /className="grid min-w-0 gap-3 md:grid-cols-2 lg:grid-cols-3"/,
+    'the insight grid must allow its intrinsic width to shrink',
+  );
+
+  const cardClassNames = [...insights.matchAll(/<Card className="([^"]*)">/g)]
+    .map((match) => match[1]);
+  assert.equal(cardClassNames.length, 3, 'all three insight cards must declare a shrinkable width');
+  for (const className of cardClassNames) {
+    assert.match(className, /\bmin-w-0\b/, 'each insight card must shrink within the mobile grid');
+  }
+});
+
 test('UX-MYREC-001: a user-selected local collection stays visible without claiming identity', () => {
   const hook = readSource('frontend/src/components/record-insights/useMyAthlete.ts');
   assert.match(hook, /athletetime\.my-athlete\.v1/, 'stable storage key');
