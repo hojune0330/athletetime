@@ -85,7 +85,7 @@ export default function RecordsPage() {
       name: currentProfile.athlete.name,
       team: currentProfile.athlete.team,
     });
-    setCompareNotice(result.reason === 'full' ? '선수 비교는 4명까지 가능해요.' : '');
+    setCompareNotice(!result.removed && result.reason === 'full' ? '선수 비교는 4명까지 가능해요.' : '');
   };
 
   useEffect(() => {
