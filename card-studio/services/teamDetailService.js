@@ -54,6 +54,7 @@ function getDetail({ records, normalizeTeam }, teamKey, options = {}) {
       appliedSeason,
       firstSeason: oldestSeason(categoryRecords),
       latestSeason,
+      availableSeasons: seasonsFrom(categoryRecords),
       latestDate: latestValue(categoryRecords.map((record) => record.date)),
       sourceCount: countSources(categoryRecords),
       lastCapturedAt: latestValue(categoryRecords.map((record) => record.source?.capturedAt)),
@@ -205,6 +206,11 @@ function newestSeason(records) {
 function oldestSeason(records) {
   const seasons = records.map((record) => Number(record.season) || 0).filter(Boolean);
   return seasons.length > 0 ? Math.min(...seasons) : null;
+}
+
+function seasonsFrom(records) {
+  return [...new Set(records.map((record) => Number(record.season) || 0).filter(Boolean))]
+    .sort((left, right) => right - left);
 }
 
 function latestValue(values) {

@@ -80,7 +80,7 @@ export default function TeamPerformancePage() {
           </div>
           <PeriodFilter
             period={query.value.period}
-            seasons={detail.seasonTrend.map((row) => row.season)}
+            seasons={detail.coverage.availableSeasons}
             onChange={(nextPeriod) => setSearchParams(updatePeriod(searchParams, nextPeriod))}
           />
         </div>

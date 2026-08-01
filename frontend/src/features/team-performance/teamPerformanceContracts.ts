@@ -104,6 +104,7 @@ const TeamDetailSchema = z.object({
     appliedSeason: NullableSeasonSchema,
     firstSeason: NullableSeasonSchema,
     latestSeason: NullableSeasonSchema,
+    availableSeasons: z.array(z.number().int().min(1900).max(2100)).max(200).readonly(),
     latestDate: NullableTextSchema,
     sourceCount: z.number().int().nonnegative(),
     lastCapturedAt: NullableTextSchema,

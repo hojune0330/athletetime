@@ -40,6 +40,8 @@ test('Given a team with several seasons When latest scope is opened Then only it
   assert.equal(latest.identity.teamKey, all.identity.teamKey);
   assert.equal(latest.coverage.appliedScope, 'latest');
   assert.equal(latest.coverage.appliedSeason, all.coverage.latestSeason);
+  assert.deepEqual(latest.coverage.availableSeasons, all.coverage.availableSeasons);
+  assert.ok(latest.coverage.availableSeasons.length > 1);
   assert.ok(latest.summary.resultCount <= all.summary.resultCount);
   assert.deepEqual(latest.seasonTrend.map((item) => item.season), [all.coverage.latestSeason]);
 });

@@ -50,6 +50,7 @@ describe('team performance API boundary', () => {
     expect(parsed.identity.teamLabel).toBe('진도군청')
     expect(parsed.summary.confirmedPodiumCount).toBe(43)
     expect(parsed.coverage.appliedScope).toBe('all')
+    expect(parsed.coverage.availableSeasons).toEqual([2026, 2025, 2024])
     expect(parsed).not.toHaveProperty('records')
   })
 
@@ -148,6 +149,7 @@ function detailEnvelope(overrides: Readonly<Record<string, unknown>> = {}) {
         appliedSeason: null,
         firstSeason: 2019,
         latestSeason: 2026,
+        availableSeasons: [2026, 2025, 2024],
         latestDate: '2026-06-01',
         sourceCount: 36,
         lastCapturedAt: '2026-07-31T00:00:00.000Z',

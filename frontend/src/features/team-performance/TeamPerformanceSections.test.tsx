@@ -64,6 +64,7 @@ function detailEnvelope() {
         appliedSeason: null,
         firstSeason: 2019,
         latestSeason: 2026,
+        availableSeasons: [2026, 2025, 2024],
         latestDate: '2026-06-01',
         sourceCount: 36,
         lastCapturedAt: '2026-07-31T00:00:00.000Z',
