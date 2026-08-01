@@ -44,6 +44,34 @@ test('Given a team with several seasons When latest scope is opened Then only it
   assert.deepEqual(latest.seasonTrend.map((item) => item.season), [all.coverage.latestSeason]);
 });
 
+test('Given standard and manual steeplechase records When team events are grouped Then 3000mSC appears once', () => {
+  // Given one team whose public records contain both ingestion paths.
+  const team = analytics.searchTeamStatistics('진도군청', 5, { category: 'corporate' })[0];
+
+  // When the full team event breakdown is built.
+  const detail = analytics.getTeamStatistics(team.teamKey, { category: 'corporate', scope: 'all' });
+  const steeplechase = detail.eventBreakdown.filter((item) => item.eventLabel === '3000mSC');
+
+  // Then the same physical event has one canonical key and one aggregate row.
+  assert.deepEqual(
+    steeplechase.map((item) => item.eventKey),
+    ['3000m-steeplechase'],
+  );
+});
+
+test('Given manual top records from different competitions When participation is grouped Then dates stay with their competition', () => {
+  // Given a team with manual top records collected from several overseas and domestic meets.
+  const team = analytics.searchTeamStatistics('진도군청', 5, { category: 'corporate' })[0];
+
+  // When its full participation list is built.
+  const detail = analytics.getTeamStatistics(team.teamKey, { category: 'corporate', scope: 'all' });
+  const distanceChallenge = detail.participation.find((item) => item.competitionName.includes('디스턴스'));
+
+  // Then the 2025 meet keeps its own 2025 date instead of the batch's latest date.
+  assert.ok(distanceChallenge);
+  assert.equal(distanceChallenge.latestDate, '2025-07-19');
+});
+
 test('Given invalid team API inputs When they reach the route Then they fail closed with stable codes', async (t) => {
   const server = await startServer();
   t.after(server.close);

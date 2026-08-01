@@ -158,10 +158,17 @@ function seasonGroup(record) {
 }
 
 function eventGroup(record) {
-  const eventKey = clean(record.eventKey || record.eventLabel);
+  const rawEvent = clean(record.rawEvent || record.eventLabel);
+  const isSteeplechase = /3000m(?:sc|steeple|장애물)/iu.test(rawEvent);
+  const eventKey = isSteeplechase
+    ? '3000m-steeplechase'
+    : clean(record.eventKey || record.eventLabel);
   return eventKey ? {
     key: eventKey,
-    output: { eventKey, eventLabel: clean(record.eventLabel || eventKey) },
+    output: {
+      eventKey,
+      eventLabel: isSteeplechase ? '3000mSC' : clean(record.eventLabel || eventKey),
+    },
   } : null;
 }
 

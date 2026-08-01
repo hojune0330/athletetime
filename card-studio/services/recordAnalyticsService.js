@@ -524,6 +524,9 @@ function appendManualTopRecordCandidates(context) {
 
     const season = Number.parseInt(String(candidate.date || '').slice(0, 4), 10) || 0;
     const date = clean(candidate.date, 20);
+    const manualCompetitionIdentity = competitionName
+      ? `${season}|${competitionName}`
+      : `${candidate.batch}|${candidate.sourceRowId}`;
     const wind = clean(candidate.wind, 20);
     const windLegal = isWindLegal(wind);
     const needsWindCheck = eventMeta.windRelevant || isWindRelevant(eventMeta.eventLabel);
@@ -564,7 +567,7 @@ function appendManualTopRecordCandidates(context) {
       name,
       team,
       season,
-      competitionId: `manual-top100-${candidate.batch}`,
+      competitionId: `manual-top100-${stableId(manualCompetitionIdentity)}`,
       competitionName,
       date,
       venue: '',
@@ -882,6 +885,7 @@ function canonicalEventKey(value) {
     ['marathon', /마라톤|marathon/],
     ['10000m', /10000m/],
     ['5000m', /5000m/],
+    ['3000m-steeplechase', /3000m(?:sc|steeple|장애물)/],
     ['3000m', /3000m/],
     ['1500m', /1500m/],
     ['800m', /800m/],
@@ -910,6 +914,7 @@ function canonicalEventLabel(value, eventKey) {
     '400m-hurdles': '400m 허들',
     '110m-hurdles': '110m 허들',
     '100m-hurdles': '100m 허들',
+    '3000m-steeplechase': '3000mSC',
     'high-jump': '높이뛰기',
     'long-jump': '멀리뛰기',
     'triple-jump': '세단뛰기',
