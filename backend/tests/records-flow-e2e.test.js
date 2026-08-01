@@ -59,7 +59,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.goto(`${baseUrl}/records?flow=browse`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
-    await expectVisible(page.getByRole('button', { name: /팀\(소속\)으로 찾기/ }));
+    await expectVisible(page.getByRole('button', { name: /소속 통계 보기/ }));
     await expectVisible(page.getByRole('button', { name: /시즌 기록표/ }));
     visited.push(page.url());
 
@@ -73,5 +73,46 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
     visited.push(page.url());
+  });
+});
+
+test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team Then real local aggregates preserve URL state', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    // Given team browse starts without silently selecting a team category.
+    await page.goto(`${baseUrl}/records?flow=browse&browse=team`, { waitUntil: 'domcontentloaded' });
+    await expectVisible(page.getByRole('heading', { name: '소속의 기록을 숫자로 살펴봐요.' }));
+    await expectVisible(page.locator('#records-search'));
+    assert.equal(new URL(page.url()).searchParams.get('category'), null);
+    assert.equal(await page.getByRole('button', { name: '전체', exact: true }).getAttribute('aria-pressed'), 'true');
+
+    // When a real indexed affiliation query is submitted through the browser.
+    await page.locator('#records-search').fill('진도');
+    await page.getByRole('button', { name: '검색', exact: true }).click();
+
+    // Then teams from different inferred categories remain visible in the neutral result set.
+    await expectVisible(page.getByRole('link', { name: '진도군청 팀 통계 보기' }));
+    await expectVisible(page.getByRole('link', { name: '전남진도초등학교 팀 통계 보기' }));
+    assert.equal(new URL(page.url()).searchParams.get('category'), null);
+    visited.push(page.url());
+
+    // When one result is opened, the branch backend supplies its aggregate detail.
+    await page.getByRole('link', { name: '진도군청 팀 통계 보기' }).click();
+    await page.waitForURL(/\/records\/teams\/[a-f0-9]{16}/u);
+    await expectVisible(page.locator('[data-team-performance-page]'));
+    await expectVisible(page.getByRole('heading', { name: '진도군청' }));
+    await expectVisible(page.getByText('개인 기록을 나열하지 않고', { exact: false }));
+    assert.equal(new URL(page.url()).searchParams.get('category'), null);
+
+    // Then period and section changes stay encoded in the shareable URL.
+    await page.getByRole('button', { name: '최근', exact: true }).click();
+    await expectUrlParam(page, 'scope', 'latest');
+    await page.getByRole('button', { name: '종목', exact: true }).click();
+    await expectUrlParam(page, 'view', 'events');
+    assert.equal(new URL(page.url()).searchParams.get('category'), null);
+    visited.push(page.url());
+  }, {
+    fileName: 'team-flow-e2e-results.json',
+    scenario: 'team browse and aggregate detail flow e2e',
+    invocation: 'node --test backend/tests/records-flow-e2e.test.js',
   });
 });

@@ -4,6 +4,7 @@ const resultsStore = require('./resultsStore');
 const dataRequestService = require('./dataRequestService');
 const identityResolver = require('./identityResolver');
 const manualTopRecordsService = require('./manualTopRecordsService');
+const teamStatisticsService = require('./teamStatisticsService');
 const divisionHierarchyService = require('./divisionHierarchyService');
 const {
   assessPublicIndexEvent,
@@ -56,6 +57,23 @@ function searchAthletes(query, limit = 12) {
     .sort((a, b) => b.recordCount - a.recordCount || a.name.localeCompare(b.name))
     .slice(0, safeLimit)
     .map(toSearchCard);
+}
+
+function searchTeamStatistics(query, limit = 12, options = {}) {
+  return teamStatisticsService.search(
+    { records: getIndex().records, normalizeTeam },
+    query,
+    limit,
+    options,
+  );
+}
+
+function getTeamStatistics(teamKey, options = {}) {
+  return teamStatisticsService.getDetail(
+    { records: getIndex().records, normalizeTeam },
+    clean(teamKey, 16),
+    options,
+  );
 }
 
 function getAthleteSummary(athleteKey) {
@@ -343,6 +361,7 @@ function buildIndex() {
           wind: wind || null,
           windLegal,
           isComparable,
+          personalBest: clean(result.personal_best, 120),
           note: clean(result.note || result.newRecord, 120),
           source: {
             provider: 'KAAF',
@@ -505,6 +524,9 @@ function appendManualTopRecordCandidates(context) {
 
     const season = Number.parseInt(String(candidate.date || '').slice(0, 4), 10) || 0;
     const date = clean(candidate.date, 20);
+    const manualCompetitionIdentity = competitionName
+      ? `${season}|${competitionName}`
+      : `${candidate.batch}|${candidate.sourceRowId}`;
     const wind = clean(candidate.wind, 20);
     const windLegal = isWindLegal(wind);
     const needsWindCheck = eventMeta.windRelevant || isWindRelevant(eventMeta.eventLabel);
@@ -545,7 +567,7 @@ function appendManualTopRecordCandidates(context) {
       name,
       team,
       season,
-      competitionId: `manual-top100-${candidate.batch}`,
+      competitionId: `manual-top100-${stableId(manualCompetitionIdentity)}`,
       competitionName,
       date,
       venue: '',
@@ -739,7 +761,7 @@ function normalizeCandidateTopEvent(candidate) {
   const detailClassCd = clean(candidate.detailClassCd, 20).toLowerCase();
   const eventKey = mapped?.key || stableSlug(rawEvent || detailClassCd);
   const isField = !!field;
-  const phase = /결승|final/i.test(clean(candidate.phase, 80)) ? 'final' : base.phase;
+  const phase = /결승|final|종합|overall/i.test(clean(candidate.phase, 80)) ? 'final' : base.phase;
 
   return {
     ...base,
@@ -795,8 +817,8 @@ function normalizeEvent(eventLabel, divisionLabel) {
   const divisionMeta = divisionHierarchyService.normalizeDivision(division || inferDivisionLabel(raw));
   const phase = inferPhase(raw);
   const rawWithoutPhase = raw
-    .replace(/\b(final|semi-final|semi|heat|prelim|qualifying)\b/gi, ' ')
-    .replace(/결승|준결승|예선|본선|타임레이스|타임\s*레이스/g, ' ');
+    .replace(/\b(final|semi-final|semi|heat|prelim|qualifying|overall)\b/gi, ' ')
+    .replace(/준결승|결승|예선|본선|종합|타임레이스|타임\s*레이스/g, ' ');
   const eventName = rawWithoutPhase
     .replace(/^(남자|여자|남|여)\s*/g, '')
     .replace(/^(M|W|U)\d{1,2}\s*/i, '')
@@ -863,6 +885,7 @@ function canonicalEventKey(value) {
     ['marathon', /마라톤|marathon/],
     ['10000m', /10000m/],
     ['5000m', /5000m/],
+    ['3000m-steeplechase', /3000m(?:sc|steeple|장애물)/],
     ['3000m', /3000m/],
     ['1500m', /1500m/],
     ['800m', /800m/],
@@ -891,6 +914,7 @@ function canonicalEventLabel(value, eventKey) {
     '400m-hurdles': '400m 허들',
     '110m-hurdles': '110m 허들',
     '100m-hurdles': '100m 허들',
+    '3000m-steeplechase': '3000mSC',
     'high-jump': '높이뛰기',
     'long-jump': '멀리뛰기',
     'triple-jump': '세단뛰기',
@@ -914,8 +938,8 @@ function inferPhase(value) {
   const text = clean(value, 160);
   if (/준결승|semi/i.test(text)) return 'semi-final';
   if (/예선|heat|prelim|qual/i.test(text)) return 'heat';
-  if (/결승|final/i.test(text)) return 'final';
-  return 'final';
+  if (/결승|final|종합|overall/i.test(text)) return 'final';
+  return '';
 }
 
 function parseRecord(mark, direction) {
@@ -1215,6 +1239,8 @@ module.exports = {
   getFilters,
   getPopularEvents,
   searchAthletes,
+  searchTeamStatistics,
+  getTeamStatistics,
   getAthleteSummary,
   getSeasonRecords,
   warmup,

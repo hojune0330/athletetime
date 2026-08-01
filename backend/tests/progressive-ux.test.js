@@ -31,36 +31,43 @@ test('UX-DISCLOSE-001: athlete panel uses click-to-open disclosure sections', ()
   assert.match(page, /\{open && <CardContent/);
 });
 
+test('UX-MOBILE-001: anonymous insight cards do not widen the records page on narrow screens', () => {
+  const insights = readSource('frontend/src/components/record-insights/AnonymousInsightCards.tsx');
+  assert.match(
+    insights,
+    /className="grid min-w-0 gap-3 md:grid-cols-2 lg:grid-cols-3"/,
+    'the insight grid must allow its intrinsic width to shrink',
+  );
+
+  const cardClassNames = [...insights.matchAll(/<Card className="([^"]*)">/g)]
+    .map((match) => match[1]);
+  assert.equal(cardClassNames.length, 3, 'all three insight cards must declare a shrinkable width');
+  for (const className of cardClassNames) {
+    assert.match(className, /\bmin-w-0\b/, 'each insight card must shrink within the mobile grid');
+  }
+});
+
 test('UX-MYREC-001: a user-selected local collection stays visible without claiming identity', () => {
   const hook = readSource('frontend/src/components/record-insights/useMyAthlete.ts');
   assert.match(hook, /athletetime\.my-athlete\.v1/, 'stable storage key');
   assert.match(hook, /localStorage/);
-  // 자동 지정 금지 — 사용자가 직접 누른 것만
   assert.match(hook, /자동 매칭\/추정 지정은 하지 않는다/);
 
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
   assert.match(page, /useMyAthlete/);
-  // 담긴 게 있으면 버튼 없이 바로 보임 — 숨김이 아니라 접기만 가능
-  assert.match(page, /myEntries\.length > 0 && \(/, 'card renders whenever entries exist');
-  assert.match(page, /myRecordsCollapsed/, 'collapse-not-hide model');
-  assert.match(page, /펼치기/, 'collapsed slim bar reopens the card');
-  assert.doesNotMatch(page, /내 기록 바로 보기/, 'separate view button removed — card itself is the entry');
-  assert.match(page, /내가 모아 보는 기록/);
-  assert.match(page, /이 기록 담기/);
+  assert.match(page, /<RecordsMineFlow/, 'self flow stays separate from public browsing');
+  assert.match(page, /<RecordCandidateList/, 'general browsing uses workspace candidates');
+  assert.match(page, /workspaceStore\.saveWorkspaceDraft/, 'general selection writes only the workspace draft');
+  assert.doesNotMatch(page, /<MyRecordsCard|<RecordSearchResults/, 'legacy aggregate surfaces are not mounted');
   assert.doesNotMatch(page, /내 기록이에요/, 'the page must not assert that a searched athlete is the visitor');
 });
 
 test('UX-COLLECT-001: local collection is opt-in, reversible, and never auto-merges an estimated identity', () => {
-  const hook = readSource('frontend/src/components/record-insights/useMyAthlete.ts');
-  assert.match(hook, /addMany/, 'manually selected candidates may be collected together');
-  assert.match(hook, /remove/, 'hook must support after-the-fact removal');
-  assert.match(hook, /toggle/, 'hook must support one-tap toggle');
-
-  const card = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
-  assert.match(card, /sourceTeam/, 'each record keeps its source team badge');
-  assert.match(card, /onRemove/, 'removal chips are the correction path');
-  assert.match(card, /원본 데이터는 그대로/, 'screen-only merge disclosure');
-  assert.match(card, /이 기기에만 저장/, 'collection scope is explicit');
+  const editor = readSource('frontend/src/features/record-workspace/useRecordWorkspaceEditor.ts');
+  assert.match(editor, /removeWorkspaceSubject/, 'profile fragments can be removed independently');
+  assert.match(editor, /excludedRecordIds/, 'record hiding stays local to one workspace');
+  assert.match(editor, /undoWorkspaceEdit/, 'the latest destructive action is reversible');
+  assert.match(editor, /restoreAllWorkspaceRecords/, 'all hidden records remain recoverable');
 
   const estimated = readSource('frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx');
   assert.match(estimated, /onSelectAthlete/, 'each suggested record can be inspected first');
@@ -69,46 +76,37 @@ test('UX-COLLECT-001: local collection is opt-in, reversible, and never auto-mer
   assert.doesNotMatch(estimated, /모두 내 기록으로 합치기/);
 
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
-  assert.match(page, /MyRecordsCard/);
-  assert.match(page, /addManyMyAthletes/);
-  assert.match(page, /toggleMyAthlete/);
+  assert.match(page, /navigate\('\/records\/workspaces\/new'\)/, 'selected candidates enter explicit review');
+  assert.match(page, /clearWorkspaceDraft/, 'cancel clears the general selection draft');
+  assert.doesNotMatch(page, /<MyRecordsCard|<RecordSearchResults/, 'the instant aggregate path stays removed');
   assert.doesNotMatch(page, /<EstimatedSameAthleteCard[\s\S]*onCombine/, 'estimated candidates require individual review');
 });
 
-test('UX-COMBINE-002: search candidates offer direct "나" designation with instant merge', () => {
-  // 검색 후보 카드에서 바로 "나" 지정 — 여러 카드를 누르면 전부 내 기록으로 합산
-  const results = readSource('frontend/src/components/records/RecordSearchResults.tsx');
-  assert.match(results, /onToggleMine/, 'candidate card exposes one-tap mine toggle');
-  assert.match(results, /이 기록 담기/, 'action names the collection action, not athlete ownership');
-  assert.match(results, /✓ 내가 모아 보는 기록/, 'selected card shows collection state');
-  assert.match(results, /모아 보는 기록 보기/, 'collection entry point is clear');
-  assert.match(results, /aria-pressed=\{mine\}/, 'mine toggle is accessible');
-  assert.doesNotMatch(results, /내 기록이에요|하나로 합쳐져요|합친 기록 보기/);
+test('UX-COMBINE-002: search candidates require explicit collect mode and review', () => {
+  const results = readSource('frontend/src/features/record-workspace/components/RecordCandidateList.tsx');
+  assert.match(results, /기록 묶어 보기/, 'collection mode has an explicit entry');
+  assert.match(results, /mode=\{selectionMode \? 'collect' : 'browse'\}/, 'card activation has one meaning per mode');
+  assert.match(results, /한 번에 6개까지 선택할 수 있어요/, 'selection limit is disclosed');
+  assert.match(results, /<WorkspaceDraftTray/, 'review is reached through one action bar');
+  assert.doesNotMatch(results, /onToggleMine|isMine|비교에 담기/, 'ownership and comparison stay outside browse selection');
 
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
-  assert.match(page, /onToggleMine=\{/, 'page wires candidate mine toggle');
-  assert.match(page, /onViewMyRecords=\{/, 'page wires merged dashboard opener');
-
-  // 대시보드: 종목별 베스트·시즌 베스트도 묶음 전체 합산
-  const card = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
-  assert.match(card, /eventBests/, 'per-event bests merged across clusters');
-  assert.match(card, /seasonBest/, 'season best merged across clusters');
-  assert.match(card, /markSortValue/, 'record marks compared numerically');
+  assert.match(page, /draftSubjectKeys=\{workspaceDraftKeys\}/, 'candidate selection comes from the isolated draft');
+  assert.match(page, /onReviewDraft=\{\(\) => navigate\('\/records\/workspaces\/new'\)\}/, 'selection opens review');
+  assert.doesNotMatch(page, /onToggleMine=\{|onViewMyRecords=\{/, 'general search cannot write the self collection');
 });
 
-test('UX-COMBINE-003: mine designation is unambiguous and detail info is toggleable', () => {
-  // 후보 카드: 모호한 "나" 대신 문장형 라벨 + 담김 상태 + 해제 안내
-  const results = readSource('frontend/src/components/records/RecordSearchResults.tsx');
-  assert.match(results, /이 기록 담기/, 'plain collection label');
-  assert.match(results, /내가 모아 보는 기록에 담김/, 'designated state is explicit');
-  assert.match(results, /누르면 빼요/, 'undo affordance on the same button');
-  // 담긴 묶음이 있으면 하단 고정 바(장바구니 패턴)로 다음 행동 안내
-  assert.match(results, /fixed inset-x-0 bottom-0/, 'sticky merge bar');
-  assert.match(results, /이 기기에서만 모아 봐요/, 'device-local scope is explicit');
-  assert.match(results, /모아 보는 기록 보기/);
-  assert.doesNotMatch(results, /내 기록이에요|하나로 합쳐져요|합친 기록 보기/);
+test('UX-COMBINE-003: workspace editing is unambiguous and record details stay optional', () => {
+  const review = readSource('frontend/src/features/record-workspace/components/WorkspaceReviewContent.tsx');
+  assert.match(review, /같은 이름이어도 같은 사람으로 확인됐다는 뜻은 아니에요/);
+  assert.match(review, /한 사람의 기록 모음으로 저장할 수 없어요/);
+  assert.match(review, /선수 비교로 옮기기/);
 
-  // 순위·날짜·비고 보기/숨기기 토글 — 기기 단위 기억
+  const workspace = readSource('frontend/src/features/record-workspace/pages/WorkspaceRecordTab.tsx');
+  assert.match(workspace, /이 모음에서 숨기기/);
+  assert.match(workspace, /다시 모두 보기/);
+  assert.doesNotMatch(workspace, /내 기록이에요|하나로 합쳐져요|합친 기록 보기/);
+
   const pref = readSource('frontend/src/components/record-insights/useRecordDetailPref.ts');
   assert.match(pref, /athletetime\.record-detail\.v1/, 'stable storage key');
   assert.match(pref, /localStorage/);
@@ -119,10 +117,6 @@ test('UX-COMBINE-003: mine designation is unambiguous and detail info is togglea
   assert.match(page, /간단히 보기|자세히 보기|detailToggleLabel/, 'toggle label');
   assert.match(page, /자료가 있는 대회 기록만 보여드려요/, 'coverage transparency');
   assert.match(page, /연도와 대회별로 빠진 기록이 있을 수 있어요/, 'no continuous-coverage claim');
-
-  const myCard = readSource('frontend/src/components/record-insights/MyRecordsCard.tsx');
-  assert.match(myCard, /useRecordDetailPref/);
-  assert.match(myCard, /record\.rank/, 'rank in merged dashboard rows');
 });
 
 test('UX-COLLECT-004: the guided collection flow never defaults an identity or a merge', () => {

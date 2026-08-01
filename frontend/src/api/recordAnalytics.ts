@@ -56,6 +56,37 @@ export type AthleteSearchCard = {
   note: string;
 };
 
+export type TeamSeasonStatistic = {
+  season: number;
+  athleteCount: number;
+  resultCount: number;
+  competitionCount: number;
+  topThreeCount: number;
+};
+
+export type TeamEventStatistic = {
+  eventKey: string;
+  eventLabel: string;
+  athleteCount: number;
+  resultCount: number;
+};
+
+export type TeamStatistics = {
+  teamKey: string;
+  teamLabel: string;
+  athleteCount: number;
+  resultCount: number;
+  competitionCount: number;
+  eventCount: number;
+  firstSeason: number | null;
+  latestSeason: number | null;
+  latestDate: string | null;
+  rankCounts: { first: number; second: number; third: number; topThree: number };
+  seasonStats: TeamSeasonStatistic[];
+  eventStats: TeamEventStatistic[];
+  disclaimer: string;
+};
+
 export type PublicRecord = {
   id: string;
   athleteKey: string;
@@ -293,6 +324,13 @@ export async function getShadowCluster(athleteKey: string): Promise<ShadowCluste
 
 export async function searchRecordAthletes(query: string, limit = 12): Promise<AthleteSearchCard[]> {
   const { data } = await apiClient.get<ApiListResponse<AthleteSearchCard>>(`${BASE}/records/search`, {
+    params: { q: query, limit },
+  });
+  return data.data;
+}
+
+export async function searchTeamStatistics(query: string, limit = 20): Promise<TeamStatistics[]> {
+  const { data } = await apiClient.get<ApiListResponse<TeamStatistics>>(`${BASE}/teams/search`, {
     params: { q: query, limit },
   });
   return data.data;

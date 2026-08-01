@@ -7,3 +7,4 @@ export { apiClient } from './client';
 
 // Posts API
 export * from './posts';
+export * from './recordWorkspace';

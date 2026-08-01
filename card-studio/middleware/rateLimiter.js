@@ -146,6 +146,14 @@ const dataRequestLimiter = createRateLimiter({
   noStore: true,
 });
 
+const workspacePreviewLimiter = createRateLimiter({
+  keyPrefix: 'record-workspace-preview',
+  max: 30,
+  message: 'RATE_LIMITED',
+  skipAdmin: false,
+  noStore: true,
+});
+
 module.exports = {
   createRateLimiter,
   searchLimiter,
@@ -153,4 +161,5 @@ module.exports = {
   competitionLimiter,
   publicLimiter,
   dataRequestLimiter,
+  workspacePreviewLimiter,
 };

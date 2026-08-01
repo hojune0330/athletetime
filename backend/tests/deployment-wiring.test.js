@@ -50,6 +50,27 @@ test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build and no retired
   assert.match(toml, /\/api\/\*/);
 });
 
+test('DEPLOY-NETLIFY-002: production CSP permits the Render websocket origin', () => {
+  const toml = readSource('netlify.toml');
+
+  assert.match(
+    toml,
+    /connect-src[^;]*wss:\/\/athletetime-backend\.onrender\.com/,
+  );
+});
+
+test('DEPLOY-CI-001: every pull request runs the full repository verification gate', () => {
+  const workflow = readSource('.github/workflows/data-rights-postgres.yml');
+  const pullRequestBlock = workflow.split('workflow_dispatch:')[0];
+
+  assert.match(pullRequestBlock, /pull_request:\s*\n/);
+  assert.doesNotMatch(pullRequestBlock, /\n\s+paths:/);
+  assert.match(workflow, /- run: npm run test:data-rights/);
+  assert.match(workflow, /- run: npm run verify/);
+  assert.doesNotMatch(workflow, /- run: npm test\s*$/m);
+  assert.doesNotMatch(workflow, /- run: npm run build:check --prefix frontend/);
+});
+
 test('DEPLOY-HTTP-001: production CORS never reflects arbitrary origins with credentialed cookies', () => {
   const server = readSource('src/server.js');
 

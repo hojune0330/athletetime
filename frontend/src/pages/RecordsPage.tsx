@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getAnalyticsFilters,
   getAthleteAnalytics,
@@ -18,7 +18,6 @@ import { Input } from '../components/ui/input';
 import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
-import { MyRecordsCard } from '../components/record-insights/MyRecordsCard';
 import { useRecordDetailPref, detailToggleLabel } from '../components/record-insights/useRecordDetailPref';
 import { useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
@@ -30,7 +29,13 @@ import { useCompareTray } from '../components/record-insights/useCompareTray';
 import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
 import { RecordsHub } from '../components/records/RecordsHub';
 import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
-import { RecordSearchResults } from '../components/records/RecordSearchResults';
+import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
+import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFilter';
+import { searchTeamPerformance } from '../features/team-performance/teamPerformanceApi';
+import { parseTeamCategory } from '../features/team-performance/teamPerformanceContracts';
+import type { TeamCategory, TeamSearchSummary } from '../features/team-performance/teamPerformanceContracts';
+import { RecordCandidateList } from '../features/record-workspace/components/RecordCandidateList';
+import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
 
 type Mode = 'athlete' | 'season';
@@ -42,12 +47,16 @@ const DATA_NOTICE = TRUST_NOTICE.collectedPublic;
 const TRUST_POINTS = POLICY_TRUST_POINTS;
 
 export default function RecordsPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [mode, setMode] = useState<Mode>('athlete');
   const [query, setQuery] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [searchState, setSearchState] = useState<LoadState>('idle');
   const [athletes, setAthletes] = useState<AthleteSearchCard[]>([]);
+  const [teamStatistics, setTeamStatistics] = useState<readonly TeamSearchSummary[]>([]);
   const [selectedAthleteKey, setSelectedAthleteKey] = useState('');
   const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
   const [profileState, setProfileState] = useState<LoadState>('idle');
@@ -59,15 +68,33 @@ export default function RecordsPage() {
   const [divisionKey, setDivisionKey] = useState('');
   const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
   const [seasonState, setSeasonState] = useState<LoadState>('idle');
+  const [workspaceSelectionMode, setWorkspaceSelectionMode] = useState(false);
   const [compareNotice, setCompareNotice] = useState('');
-  const [myRecordsCollapsed, setMyRecordsCollapsed] = useState(false);
   const compareTray = useCompareTray();
+  const workspaceStore = useRecordWorkspaceStore();
   const { entries: myEntries, isMine, toggle: toggleMyAthlete, addMany: addManyMyAthletes, remove: removeMyAthlete } = useMyAthlete();
   const selectedAthleteParam = (searchParams.get('athlete') || '').trim();
   const activeFlow = normalizeRecordsFlow(searchParams.get('flow'));
   const mineStep = normalizeMineStep(searchParams.get('step'));
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
+  const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
+  const teamCategory = parseTeamCategory(searchParams.get('category'));
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
+  const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
+
+  const toggleProfileComparison = (currentProfile: AthleteAnalyticsProfile) => {
+    const result = compareTray.toggle({
+      athleteKey: currentProfile.athlete.athleteKey,
+      name: currentProfile.athlete.name,
+      team: currentProfile.athlete.team,
+    });
+    setCompareNotice(!result.removed && result.reason === 'full' ? '선수 비교는 4명까지 가능해요.' : '');
+  };
+
+  useEffect(() => {
+    const state = location.state as { focusSearch?: boolean } | null;
+    if (state?.focusSearch) searchInputRef.current?.focus();
+  }, [location.key, location.state]);
 
   useEffect(() => {
     let active = true;
@@ -143,6 +170,7 @@ export default function RecordsPage() {
     const trimmed = submittedQuery.trim();
     if (trimmed.length < 2) {
       setAthletes([]);
+      setTeamStatistics([]);
       setSearchState('idle');
       if (!selectedAthleteParam) {
         setProfile(null);
@@ -158,20 +186,34 @@ export default function RecordsPage() {
       setSelectedAthleteKey('');
     }
 
-    searchRecordAthletes(trimmed)
-      .then((results) => {
-        if (!active) return;
-        setAthletes(results);
-        setSearchState('ready');
-      })
-      .catch(() => {
-        if (active) setSearchState('error');
-      });
+    if (isTeamBrowse) {
+      setAthletes([]);
+      searchTeamPerformance({ query: trimmed, category: teamCategory })
+        .then((results) => {
+          if (!active) return;
+          setTeamStatistics(results);
+          setSearchState('ready');
+        })
+        .catch(() => {
+          if (active) setSearchState('error');
+        });
+    } else {
+      setTeamStatistics([]);
+      searchRecordAthletes(trimmed)
+        .then((results) => {
+          if (!active) return;
+          setAthletes(results);
+          setSearchState('ready');
+        })
+        .catch(() => {
+          if (active) setSearchState('error');
+        });
+    }
 
     return () => {
       active = false;
     };
-  }, [submittedQuery, selectedAthleteParam]);
+  }, [submittedQuery, selectedAthleteParam, isTeamBrowse, teamCategory]);
 
   useEffect(() => {
     if (!season || !eventKey || !divisionKey) return;
@@ -291,7 +333,6 @@ export default function RecordsPage() {
   };
 
   const showMyRecordsHome = () => {
-    setMyRecordsCollapsed(false);
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'mine');
     next.set('step', 'done');
@@ -324,7 +365,16 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
+    next.delete('category');
     setMode(choice === 'season' ? 'season' : 'athlete');
+    setSearchParams(next);
+  };
+
+  const selectTeamCategory = (category: TeamCategory | null) => {
+    const next = new URLSearchParams(searchParams);
+    if (category) next.set('category', category);
+    else next.delete('category');
+    next.delete('athlete');
     setSearchParams(next);
   };
 
@@ -465,26 +515,30 @@ export default function RecordsPage() {
         <section className="border border-line bg-surface p-6 sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
+              <p className="text-sm font-semibold text-brand">{isTeamBrowse ? '소속 통계' : '공개 기록 모아보기'}</p>
               <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-                공개 기록, 이름만 알면 찾아요.
+                {isTeamBrowse ? '소속의 기록을 숫자로 살펴봐요.' : '공개 기록, 이름만 알면 찾아요.'}
               </h1>
               {activeFlow === 'browse' && browseChoice && (
                 <p className="mt-2 text-sm text-ink-3">
-                  {browseChoice === 'season' ? '시즌 기록표를 둘러보고 있어요.' : '이름이나 소속으로 공개 기록 후보를 찾아보세요.'}
+                  {browseChoice === 'season'
+                    ? '시즌 기록표를 둘러보고 있어요.'
+                    : isTeamBrowse
+                      ? '이 소속으로 출전한 기록의 시즌·종목·순위 표기를 모아 봐요.'
+                      : '이름이나 소속으로 공개 기록 후보를 찾아보세요.'}
                 </p>
               )}
             </div>
-            <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            {!isTeamBrowse && <div className="flex flex-col items-stretch gap-2 sm:items-end">
               <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
-                <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
+                <ModeButton active={mode === 'athlete'} onClick={() => openBrowseChoice('athlete')}>
                   기록 한눈에
                 </ModeButton>
-                <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
+                <ModeButton active={mode === 'season'} onClick={() => openBrowseChoice('season')}>
                   시즌 기록표
                 </ModeButton>
               </div>
-            </div>
+            </div>}
           </div>
 
           {mode === 'athlete' && (
@@ -495,9 +549,10 @@ export default function RecordsPage() {
                 </label>
                 <Input
                   id="records-search"
+                  ref={searchInputRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder={browseChoice === 'team' ? '소속을 입력하세요(예: 서울고, 청양군청)' : '이름 또는 소속(예: 홍길동, 서울고)'}
+                  placeholder={isTeamBrowse ? '찾을 소속을 입력하세요' : '이름 또는 소속(예: 홍길동, 서울고)'}
                   aria-describedby="records-search-help"
                   className="h-12 border-line bg-white text-base"
                 />
@@ -506,14 +561,17 @@ export default function RecordsPage() {
                 </Button>
               </form>
               <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
-                두 글자 이상 입력하면 검색할 수 있어요.
+                {isTeamBrowse ? '학교나 팀 이름을 두 글자 이상 입력해 주세요.' : '두 글자 이상 입력하면 검색할 수 있어요.'}
               </p>
+              {isTeamBrowse && (
+                <TeamCategoryFilter selected={teamCategory} onSelect={selectTeamCategory} />
+              )}
             </>
           )}
         </section>
       )}
 
-      {compareKeys.length >= 2 && (
+      {!isTeamBrowse && compareKeys.length >= 2 && (
         <CompareView
           athleteKeys={compareKeys}
           onSelectAthlete={(key) => {
@@ -532,58 +590,35 @@ export default function RecordsPage() {
         />
       )}
 
-      {shouldShowRecordsSurface && searchState === 'ready' && submittedQuery.trim().length >= 2 && athletes.length === 0 && (
+      {shouldShowRecordsSurface && searchState === 'ready' && submittedQuery.trim().length >= 2
+        && (isTeamBrowse ? teamStatistics.length === 0 : athletes.length === 0) && (
         <NoticeCard
           role="status"
-          title="찾는 기록이 아직 없어요"
-          description="이름이나 소속을 바꿔보세요. 시즌 기록표에서 종목·부문으로도 둘러볼 수 있어요."
-          action={
-            <Button type="button" variant="outline" onClick={() => setMode('season')}>
+          title={isTeamBrowse ? '찾는 소속이 아직 없어요' : '찾는 기록이 아직 없어요'}
+          description={isTeamBrowse
+            ? '원천 경기 결과의 소속 표기를 기준으로 찾아요. 소속 이름을 줄이거나 다른 표기로 검색해 보세요.'
+            : '이름이나 소속을 바꿔보세요. 시즌 기록표에서 종목·부문으로도 둘러볼 수 있어요.'}
+          action={!isTeamBrowse ? (
+            <Button type="button" variant="outline" onClick={() => openBrowseChoice('season')}>
               시즌 기록표 보기
             </Button>
-          }
+          ) : undefined}
         />
       )}
 
-      {shouldShowRecordsSurface && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && !profile && (
+      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && !profile && (
         <div className="space-y-6">
-          <StartPanel onSeasonMode={() => setMode('season')} />
+          <StartPanel onSeasonMode={() => openBrowseChoice('season')} />
           <AnonymousInsightCards
             onPickEvent={(key) => {
               setEventKey(key);
-              setMode('season');
+              openBrowseChoice('season');
             }}
           />
         </div>
       )}
 
-      {shouldShowRecordsSurface && myEntries.length > 0 && (
-        myRecordsCollapsed ? (
-          <button
-            type="button"
-            id="my-records"
-            onClick={() => setMyRecordsCollapsed(false)}
-            className="flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
-          >
-            <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">내가 모아 보는 기록</span>
-              <span className="ml-2 font-semibold">{myEntries[0].name}</span>
-              <span className="ml-2 text-ink-4">{myEntries.length}개 묶음 모아 보는 중</span>
-            </span>
-            <span className="shrink-0 text-sm font-semibold text-brand">펼치기</span>
-          </button>
-        ) : (
-          <div id="my-records">
-            <MyRecordsCard
-              entries={myEntries}
-              onClose={() => setMyRecordsCollapsed(true)}
-              onRemove={removeMyAthlete}
-            />
-          </div>
-        )
-      )}
-
-      {shouldShowRecordsSurface && shouldPrioritizeAthletePanel && (
+      {shouldShowRecordsSurface && !isTeamBrowse && shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
           state={profileState}
@@ -603,52 +638,34 @@ export default function RecordsPage() {
           onShowSearchCandidates={showSearchCandidates}
           onToggleCompare={() => {
             if (!profile) return;
-            const res = compareTray.toggle({
-              athleteKey: profile.athlete.athleteKey,
-              name: profile.athlete.name,
-              team: profile.athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+            toggleProfileComparison(profile);
           }}
         />
       )}
 
-      {shouldShowRecordsSurface && athletes.length > 0 && (
-        <RecordSearchResults
+      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes.length > 0 && !selectedAthleteParam && (
+        <RecordCandidateList
           athletes={athletes}
-          query={submittedQuery}
-          selectedAthleteKey={selectedAthleteKey}
-          compareNotice={compareNotice}
-          isInCompareTray={compareTray.isInTray}
-          isMine={isMine}
-          myCount={myEntries.length}
-          onViewMyRecords={showMyRecordsHome}
-          onToggleMine={(athlete) => {
-            toggleMyAthlete({
-              athleteKey: athlete.athleteKey,
-              name: athlete.name,
-              team: athlete.team,
-            });
+          draftSubjectKeys={workspaceDraftKeys}
+          selectionMode={workspaceSelectionMode}
+          onDraftChange={(subjectKeys) => {
+            workspaceStore.saveWorkspaceDraft(subjectKeys);
           }}
-          onSelectAthlete={handleSelectAthlete}
-          onToggleCompare={(athlete) => {
-            const res = compareTray.toggle({
-              athleteKey: athlete.athleteKey,
-              name: athlete.name,
-              team: athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+          onEnterSelectionMode={() => setWorkspaceSelectionMode(true)}
+          onExitSelectionMode={() => {
+            workspaceStore.clearWorkspaceDraft();
+            setWorkspaceSelectionMode(false);
           }}
+          onOpenAthlete={(athleteKey) => navigate(`/records/athletes/${athleteKey}`)}
+          onReviewDraft={() => navigate('/records/workspaces/new')}
         />
       )}
 
-      {shouldShowRecordsSurface && shouldShowAthletePanel && !shouldPrioritizeAthletePanel && (
+      {shouldShowRecordsSurface && isTeamBrowse && teamStatistics.length > 0 && (
+        <TeamStatisticsResults teams={teamStatistics} query={submittedQuery} />
+      )}
+
+      {shouldShowRecordsSurface && !isTeamBrowse && shouldShowAthletePanel && !shouldPrioritizeAthletePanel && (
         <AthletePanel
           profile={profile}
           state={profileState}
@@ -666,15 +683,7 @@ export default function RecordsPage() {
           }}
           onToggleCompare={() => {
             if (!profile) return;
-            const res = compareTray.toggle({
-              athleteKey: profile.athlete.athleteKey,
-              name: profile.athlete.name,
-              team: profile.athlete.team,
-            });
-            if (!res.ok && res.reason === 'full') {
-              setCompareNotice('비교는 최대 4명까지 나란히 볼 수 있어요.');
-              window.setTimeout(() => setCompareNotice(''), 2400);
-            }
+            toggleProfileComparison(profile);
           }}
         />
       )}
@@ -724,6 +733,7 @@ export default function RecordsPage() {
       </p>
 
       {/* 비교 트레이 분량만큼 하단 여백 (담은 게 있을 때만) */}
+      {compareNotice && <p role="status" className="text-sm font-medium text-warn">{compareNotice}</p>}
       {compareTray.count > 0 && <div aria-hidden className="h-28 sm:h-24" />}
       <CompareTray
         onCompare={(athleteKeys) => {
