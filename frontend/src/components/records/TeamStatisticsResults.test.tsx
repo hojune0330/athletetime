@@ -1,41 +1,56 @@
-import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
-import type { TeamStatistics } from '../../api/recordAnalytics';
-import { TeamStatisticsResults } from './TeamStatisticsResults';
+import { renderToStaticMarkup } from 'react-dom/server'
+import { MemoryRouter } from 'react-router-dom'
+import { describe, expect, it } from 'vitest'
+import { parseTeamSearchResponse } from '../../features/team-performance/teamPerformanceContracts'
+import { TeamStatisticsResults } from './TeamStatisticsResults'
 
-const team: TeamStatistics = {
-  teamKey: 'team-jindo',
-  teamLabel: '진도군청',
-  athleteCount: 18,
-  resultCount: 116,
-  competitionCount: 31,
-  eventCount: 12,
-  firstSeason: 2017,
-  latestSeason: 2026,
-  latestDate: '2026-05-20',
-  rankCounts: { first: 14, second: 12, third: 8, topThree: 34 },
-  seasonStats: [
-    { season: 2026, athleteCount: 5, resultCount: 18, competitionCount: 4, topThreeCount: 7 },
-    { season: 2025, athleteCount: 12, resultCount: 54, competitionCount: 15, topThreeCount: 16 },
-  ],
-  eventStats: [
-    { eventKey: '5000m', eventLabel: '5000m', athleteCount: 8, resultCount: 35 },
-    { eventKey: '1500m', eventLabel: '1500m', athleteCount: 7, resultCount: 28 },
-  ],
-  disclaimer: 'AthleteTime이 모은 공개 기록을 기준으로 계산했어요.',
-};
+describe('team statistics search results', () => {
+  it('renders compact affiliation cards that open an independent aggregate page', () => {
+    // Given one versioned team search summary.
+    const teams = parseTeamSearchResponse(searchEnvelope())
 
-describe('team statistics results', () => {
-  it('renders affiliation-level counts and distributions without individual record controls', () => {
-    const html = renderToStaticMarkup(<TeamStatisticsResults teams={[team]} query="진도" />);
+    // When the search result is rendered.
+    const html = renderToStaticMarkup(
+      <MemoryRouter>
+        <TeamStatisticsResults teams={teams} query="진도" />
+      </MemoryRouter>,
+    )
 
-    expect(html).toContain('진도군청');
-    expect(html).toContain('모은 선수');
-    expect(html).toContain('시즌 흐름');
-    expect(html).toContain('종목 구성');
-    expect(html).toContain('1위 표기');
-    expect(html).not.toContain('기록 담기');
-    expect(html).not.toContain('비교에 담기');
-  });
-});
+    // Then the card exposes useful totals and a shareable team destination without athlete controls.
+    expect(html).toContain('진도군청')
+    expect(html).toContain('대회')
+    expect(html).toContain('36개')
+    expect(html).toContain('확인된 입상')
+    expect(html).toContain('43건')
+    expect(html).toContain('/records/teams/1234567890abcdef?category=corporate')
+    expect(html).not.toContain('선수 목록')
+    expect(html).not.toContain('기록 담기')
+    expect(html).not.toContain('비교에 담기')
+  })
+})
 
+function searchEnvelope() {
+  return {
+    success: true,
+    contractVersion: 1,
+    total: 1,
+    data: [{
+      teamKey: '1234567890abcdef',
+      teamLabel: '진도군청',
+      selectedCategory: 'corporate',
+      primaryCategory: 'corporate',
+      categoryEvidence: { category: 'corporate', resultCount: 138, confidence: 0.9, reasons: ['team_signature:corporate'] },
+      categoryBreakdown: [{ category: 'corporate', resultCount: 138, confidence: 0.9, reasons: ['team_signature:corporate'] }],
+      athleteCount: 19,
+      resultCount: 138,
+      competitionCount: 36,
+      eventCount: 13,
+      confirmedPodiumCount: 43,
+      indexedImprovementCount: 37,
+      firstSeason: 2019,
+      latestSeason: 2026,
+      latestDate: '2026-06-01',
+      coverageDisclaimer: '모은 공개 기록 기준이에요.',
+    }],
+  }
+}

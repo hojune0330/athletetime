@@ -1,6 +1,6 @@
 # AthleteTime 팀 성과 대시보드 구현 계획
 
-> 상태: 작업 1-4 완료 · 작업 5 대기
+> 상태: 작업 1-6 완료 · 작업 7 대기
 > 기준일: 2026-07-31
 > 상위 계획: `.omo/plans/athlete-record-workspace-ux.md`의 6B
 
@@ -34,7 +34,7 @@
   - `GET /api/analytics/teams/search`
 - `frontend/src/components/records/TeamStatisticsResults.tsx`
   - 소속 후보 분리
-  - 진도군청 실측 19명·138건·36대회·13종목 표시
+  - 진도군청 실측 19명·138건·49대회·13종목 표시
 - `card-studio/services/divisionHierarchyService.js`
   - `general · university · high · middle · elementary` 부문 정규화
 
@@ -264,7 +264,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 카테고리·범위 query를 허용값으로만 정규화한다.
 - 숫자 누락과 오래된 응답은 오류/자료 범위 상태로 처리한다.
 
-### 작업 5. 팀 검색 분류와 독립 상세 이동
+### 작업 5. 팀 검색 분류와 독립 상세 이동 (완료)
 
 **소유 파일**
 - `frontend/src/components/records/TeamStatisticsResults.tsx`
@@ -277,7 +277,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 카드 선택은 독립 팀 페이지로 이동한다.
 - 검색 URL, 뒤로 가기, 키보드 초점을 보존한다.
 
-### 작업 6. 단일 팀 대시보드
+### 작업 6. 단일 팀 대시보드 (완료)
 
 **소유 파일**
 - 신규 `frontend/src/features/team-performance/TeamPerformancePage.tsx`
@@ -343,8 +343,8 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 
 2026-07-31 실제 보유 데이터와 HTTP 응답으로 다음을 확인했다.
 
-- 진도군청: `corporate`, 결과 138건, 참가 대회 36개, 확인된 입상 43건,
-  모은 기록 기준 최고 갱신 37건
+- 진도군청: `corporate`, 결과 138건, 참가 대회 49개, 확인된 입상 43건,
+  모은 기록 기준 최고 갱신 36건
 - 전남진도초등학교: `elementary`, 결과 7건, 참가 대회 5개, 최고 갱신 1건
 - 강진도암중학교: `middle`
 - 건국대학교(A): `university`, 결과 420건, 참가 대회 63개,
@@ -362,7 +362,7 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 작업 3 HTTP 실측 결과:
 
 - `category=corporate` 진도군청 검색과 `scope=all` 상세의 결과 138건,
-  참가 대회 36개, 확인된 입상 43건이 일치한다.
+  참가 대회 49개, 확인된 입상 43건이 일치한다.
 - `category=elementary` 검색에는 전남진도초등학교가 별도 팀으로 반환된다.
 - 상세 응답에는 `records`, `athleteKey`, `name` 키가 없다.
 - 잘못된 category는 `400 INVALID_TEAM_CATEGORY`, 없는 팀은 `404 TEAM_NOT_FOUND`다.
@@ -374,7 +374,28 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 프로덕션 타입 검사가 비교 목록 토글 결과의 분기 누락을 발견했고,
   `removed=false`일 때만 `reason`을 읽도록 기존 기록 화면도 함께 바로잡았다.
 
-다음 작업자는 작업 5부터 시작한다. 작업 1-4의 집계 의미를 변경할 때는
+작업 5-6 실브라우저 검증 결과:
+
+- `진도` 검색에서 `실업팀`은 진도군청만, `초등부`는 전남진도초등학교만
+  반환해 지역명이 같은 소속이 유형 사이에서 섞이지 않았다.
+- 팀 카드는 긴 선수·기록 목록을 제거하고 참가 대회·확인된 입상·최고 갱신을
+  먼저 보여 준 뒤 독립 팀 주소로 이동한다.
+- 진도군청 전체 기간 상세에서 대회 49개를 확인했다. 수기 TOP100 배치의 서로
+  다른 대회가 하나의 대회 ID로 합쳐지던 문제를 바로잡아 각 실제 대회 날짜로
+  분리했다.
+- `3000mSC`가 `3000m`와 별도 표기만 중복되던 종목 키를
+  `3000m-steeplechase`로 통일했다. 실제 평지 `3000m` 기록은 그대로 분리된다.
+- 360x800 모바일에서 핵심 지표 2x2와 탭을 확인했고, 유형 세그먼트만 의도적으로
+  내부 가로 스크롤한다. 본문 카드와 지표는 화면 폭을 벗어나지 않는다.
+- 상세에서 뒤로 이동하면 `q=진도&category=corporate`가 복원되고 검색 입력창에
+  다시 초점이 놓인다.
+- 공통 레이아웃의 주 본문 안에 별도 `<main>`을 중첩하지 않아 페이지당 주 본문
+  랜드마크가 하나만 남는다.
+- 로딩·잘못된 주소·404·429·네트워크 오류는 각기 다른 복구 문구와 동작을 가진다.
+- 프론트 작업 5-6 계약 테스트 8개, 백엔드 상세 API 테스트 7개, 타입 검사와
+  프로덕션 빌드가 통과했다.
+
+다음 작업자는 작업 7부터 시작한다. 작업 1-4의 집계 의미를 변경할 때는
 `team-category.test.js`와 `team-performance.test.js`를 먼저 갱신하고, 예선·단계 미상·
 계주 중복·첫 관찰 기록 방어 조건을 약화하지 않는다.
 

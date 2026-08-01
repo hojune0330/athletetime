@@ -153,6 +153,16 @@ export class TeamPerformanceContractError extends Error {
   }
 }
 
+export function parseTeamCategory(input: unknown): TeamCategory | null {
+  const parsed = TeamCategorySchema.safeParse(input)
+  return parsed.success ? parsed.data : null
+}
+
+export function parseTeamKey(input: unknown): TeamKey | null {
+  const parsed = TeamKeySchema.safeParse(input)
+  return parsed.success ? parsed.data : null
+}
+
 export function parseTeamSearchResponse(input: unknown): readonly TeamSearchSummary[] {
   return parsePayload(TeamSearchEnvelopeSchema, input).data
 }

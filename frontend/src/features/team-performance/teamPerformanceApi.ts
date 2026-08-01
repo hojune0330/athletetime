@@ -1,4 +1,5 @@
 import { apiClient } from '../../api/client'
+import axios from 'axios'
 import {
   parseTeamDetailResponse,
   parseTeamSearchResponse,
@@ -25,6 +26,8 @@ export type TeamDetailInput = {
   readonly period: TeamDetailPeriod
 }
 
+export type TeamRequestErrorKind = 'not-found' | 'limited' | 'network' | 'invalid' | 'unknown'
+
 export async function searchTeamPerformance(input: TeamSearchInput): Promise<readonly TeamSearchSummary[]> {
   const response = await apiClient.get<unknown>(`${BASE}/search`, {
     params: {
@@ -41,6 +44,15 @@ export async function getTeamPerformance(input: TeamDetailInput): Promise<TeamPe
     params: detailParams(input.category, input.period),
   })
   return parseTeamDetailResponse(response.data)
+}
+
+export function resolveTeamRequestError(error: unknown): TeamRequestErrorKind {
+  if (!axios.isAxiosError(error)) return 'unknown'
+  if (!error.response) return 'network'
+  if (error.response.status === 404) return 'not-found'
+  if (error.response.status === 429) return 'limited'
+  if (error.response.status === 400) return 'invalid'
+  return 'unknown'
 }
 
 function detailParams(category: TeamCategory | null, period: TeamDetailPeriod) {

@@ -30,6 +30,7 @@ const RecordAthletePage = lazy(() => import('./features/record-workspace/pages/R
 const RecordWorkspaceManagerPage = lazy(() => import('./features/record-workspace/pages/RecordWorkspaceManagerPage'))
 const RecordWorkspacePage = lazy(() => import('./features/record-workspace/pages/RecordWorkspacePage'))
 const RecordWorkspaceReviewPage = lazy(() => import('./features/record-workspace/pages/RecordWorkspaceReviewPage'))
+const TeamPerformancePage = lazy(() => import('./features/team-performance/TeamPerformancePage'))
 const AboutDataPage = lazy(() => import('./pages/AboutDataPage'))
 const ScheduleCardPage = lazy(() => import('./pages/ScheduleCardPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
@@ -113,6 +114,7 @@ function App() {
             <Route path="/records" element={<Layout />}>
               <Route index element={lazyPage(<RecordsPage />)} />
               <Route path="athletes/:athleteKey" element={lazyPage(<RecordAthletePage />)} />
+              <Route path="teams/:teamKey" element={lazyPage(<TeamPerformancePage />)} />
               <Route path="workspaces" element={lazyPage(<RecordWorkspaceManagerPage />)} />
               <Route path="workspaces/new" element={lazyPage(<RecordWorkspaceReviewPage />)} />
               <Route path="workspaces/:workspaceId" element={lazyPage(<RecordWorkspacePage />)} />

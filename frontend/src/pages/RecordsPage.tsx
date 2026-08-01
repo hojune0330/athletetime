@@ -6,13 +6,11 @@ import {
   getAthleteAnalytics,
   getSeasonRecordTable,
   searchRecordAthletes,
-  searchTeamStatistics,
   type AnalyticsFilters,
   type AthleteAnalyticsProfile,
   type AthleteSearchCard,
   type PublicRecord,
   type SeasonRecordTable,
-  type TeamStatistics,
 } from '../api/recordAnalytics';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -32,6 +30,10 @@ import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/R
 import { RecordsHub } from '../components/records/RecordsHub';
 import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
 import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
+import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFilter';
+import { searchTeamPerformance } from '../features/team-performance/teamPerformanceApi';
+import { parseTeamCategory } from '../features/team-performance/teamPerformanceContracts';
+import type { TeamCategory, TeamSearchSummary } from '../features/team-performance/teamPerformanceContracts';
 import { RecordCandidateList } from '../features/record-workspace/components/RecordCandidateList';
 import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
@@ -54,7 +56,7 @@ export default function RecordsPage() {
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [searchState, setSearchState] = useState<LoadState>('idle');
   const [athletes, setAthletes] = useState<AthleteSearchCard[]>([]);
-  const [teamStatistics, setTeamStatistics] = useState<TeamStatistics[]>([]);
+  const [teamStatistics, setTeamStatistics] = useState<readonly TeamSearchSummary[]>([]);
   const [selectedAthleteKey, setSelectedAthleteKey] = useState('');
   const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
   const [profileState, setProfileState] = useState<LoadState>('idle');
@@ -76,6 +78,7 @@ export default function RecordsPage() {
   const mineStep = normalizeMineStep(searchParams.get('step'));
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
+  const teamCategory = parseTeamCategory(searchParams.get('category')) ?? 'corporate';
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
   const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
 
@@ -185,7 +188,7 @@ export default function RecordsPage() {
 
     if (isTeamBrowse) {
       setAthletes([]);
-      searchTeamStatistics(trimmed)
+      searchTeamPerformance({ query: trimmed, category: teamCategory })
         .then((results) => {
           if (!active) return;
           setTeamStatistics(results);
@@ -210,7 +213,7 @@ export default function RecordsPage() {
     return () => {
       active = false;
     };
-  }, [submittedQuery, selectedAthleteParam, isTeamBrowse]);
+  }, [submittedQuery, selectedAthleteParam, isTeamBrowse, teamCategory]);
 
   useEffect(() => {
     if (!season || !eventKey || !divisionKey) return;
@@ -362,7 +365,16 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
+    if (choice === 'team') next.set('category', 'corporate');
+    else next.delete('category');
     setMode(choice === 'season' ? 'season' : 'athlete');
+    setSearchParams(next);
+  };
+
+  const selectTeamCategory = (category: TeamCategory) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('category', category);
+    next.delete('athlete');
     setSearchParams(next);
   };
 
@@ -551,6 +563,9 @@ export default function RecordsPage() {
               <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
                 {isTeamBrowse ? '학교나 팀 이름을 두 글자 이상 입력해 주세요.' : '두 글자 이상 입력하면 검색할 수 있어요.'}
               </p>
+              {isTeamBrowse && (
+                <TeamCategoryFilter selected={teamCategory} onSelect={selectTeamCategory} />
+              )}
             </>
           )}
         </section>
