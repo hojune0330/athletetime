@@ -6,6 +6,7 @@ import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
 import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
+import { parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
@@ -25,6 +26,7 @@ export default function RecordAthletePage() {
   const activeTab = normalizeTab(pageParams.get('tab'))
   const selectedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
+  const selectedSeason = parseRecordAthleteSeason(pageParams)
 
   const updatePageState = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(pageParams)
@@ -53,6 +55,8 @@ export default function RecordAthletePage() {
   }
 
   const subject = preview.subjects[0]
+  const sameNameCaution = subject.note.trim()
+    || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
   const addToDraft = () => {
     const current = store.workspaceDraft?.subjectKeys ?? []
     const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
@@ -104,6 +108,12 @@ export default function RecordAthletePage() {
           recordCount={preview.coverage.totalMatched}
           visibleRecordCount={preview.coverage.returned}
         />
+        <p
+          className="mt-4 border-l-2 border-warn bg-[#F7EDE0] px-3 py-2 text-body-sm font-medium leading-5 text-ink-2"
+          role="note"
+        >
+          {sameNameCaution}
+        </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button type="button" onClick={addToDraft}>기록 모음에 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
@@ -123,8 +133,8 @@ export default function RecordAthletePage() {
 
       <nav className="grid grid-cols-3 border border-line bg-surface p-1" aria-label="선수 기록 보기">
         <TabButton active={activeTab === 'records'} onClick={() => updatePageState({ tab: null })}>종목별 기록</TabButton>
-        <TabButton active={activeTab === 'affiliations'} onClick={() => updatePageState({ tab: 'affiliations', event: null, record: null })}>소속 이력</TabButton>
-        <TabButton active={activeTab === 'sources'} onClick={() => updatePageState({ tab: 'sources', event: null, record: null })}>출처</TabButton>
+        <TabButton active={activeTab === 'affiliations'} onClick={() => updatePageState({ tab: 'affiliations', event: null, record: null, season: null })}>소속 이력</TabButton>
+        <TabButton active={activeTab === 'sources'} onClick={() => updatePageState({ tab: 'sources', event: null, record: null, season: null })}>출처</TabButton>
       </nav>
 
       {activeTab === 'records' && (
@@ -134,11 +144,13 @@ export default function RecordAthletePage() {
           onLoadMore={() => void athlete.fetchNextPage()}
           onOpenRecord={(recordId) => updatePageState({ record: recordId })}
           onSelectEvent={(eventKey) => {
-            updatePageState({ event: eventKey, record: null })
+            updatePageState({ event: eventKey, record: null, season: null })
           }}
+          onSelectSeason={(season) => setPageParams(updateRecordAthleteSeason(pageParams, season))}
           preview={preview}
           selectedEventKey={selectedEventKey}
           selectedRecordId={selectedRecordId}
+          selectedSeason={selectedSeason}
         />
       )}
       {activeTab === 'affiliations' && <AffiliationHistory context="athlete" items={preview.affiliations} />}

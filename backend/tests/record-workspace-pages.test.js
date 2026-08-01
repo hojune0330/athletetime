@@ -58,3 +58,16 @@ test('Given public workspace routes When source contracts are scanned Then ident
   assert.match(manager, /다음 삭제 전까지 되돌릴 수 있어요/);
   assert.doesNotMatch(`${review}\n${page}\n${manager}`, /<main/);
 });
+
+test('Given a records browse page When display modes change Then the address owns the visible mode', () => {
+  // Given the records page can switch between athlete and season browsing.
+  const recordsPage = fs.readFileSync(path.join(FRONTEND, 'src/pages/RecordsPage.tsx'), 'utf8');
+
+  // When mode controls and contextual season actions are inspected.
+  // Then they use the browse-route transition instead of local-only state.
+  assert.match(recordsPage, /onClick=\{\(\) => openBrowseChoice\('athlete'\)\}/u);
+  assert.match(recordsPage, /onClick=\{\(\) => openBrowseChoice\('season'\)\}/u);
+  assert.match(recordsPage, /onSeasonMode=\{\(\) => openBrowseChoice\('season'\)\}/u);
+  assert.match(recordsPage, /setEventKey\(key\);\s*openBrowseChoice\('season'\);/u);
+  assert.doesNotMatch(recordsPage, /onClick=\{\(\) => setMode\(/u);
+});

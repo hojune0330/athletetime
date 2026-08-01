@@ -14,7 +14,7 @@ export function TeamStatisticsResults({ teams, query }: Props) {
       <div className="flex items-baseline justify-between gap-4 px-1">
         <div>
           <h2 className="text-lg font-semibold text-ink">소속 {teams.length}곳을 찾았어요</h2>
-          <p className="mt-1 text-xs leading-5 text-ink-4">같은 이름도 유형별로 나눠 계산했어요.</p>
+          <p className="mt-1 text-xs leading-5 text-ink-4">원천 결과의 소속 표기별로 모아 계산했어요.</p>
         </div>
         <span className="font-mono text-xs text-ink-4">{query}</span>
       </div>
@@ -29,8 +29,12 @@ export function TeamStatisticsResults({ teams, query }: Props) {
 }
 
 function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; readonly query: string }) {
-  const category = team.selectedCategory ?? team.primaryCategory
-  const destination = `/records/teams/${team.teamKey}?category=${category}&from=${encodeURIComponent(query)}`
+  const category = team.selectedCategory
+  const destinationParams = new URLSearchParams()
+  if (category) destinationParams.set('category', category)
+  destinationParams.set('scope', 'all')
+  destinationParams.set('from', query)
+  const destination = `/records/teams/${team.teamKey}?${destinationParams.toString()}`
   return (
     <Link
       to={destination}
@@ -40,7 +44,7 @@ function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; rea
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <span className="font-mono text-[11px] font-semibold tracking-[0.08em] text-brand">
-            {teamCategoryLabel(category)}
+            {category ? teamCategoryLabel(category) : '전체'}
           </span>
           <h3 className="mt-2 truncate text-xl font-semibold tracking-tight text-ink">{team.teamLabel}</h3>
         </div>

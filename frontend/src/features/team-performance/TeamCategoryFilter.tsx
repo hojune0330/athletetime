@@ -11,8 +11,8 @@ const LABELS: Readonly<Record<TeamCategory, string>> = {
 }
 
 type Props = {
-  readonly selected: TeamCategory
-  readonly onSelect: (category: TeamCategory) => void
+  readonly selected: TeamCategory | null
+  readonly onSelect: (category: TeamCategory | null) => void
 }
 
 export function TeamCategoryFilter({ selected, onSelect }: Props) {
@@ -20,6 +20,14 @@ export function TeamCategoryFilter({ selected, onSelect }: Props) {
     <fieldset className="mt-6">
       <legend className="text-xs font-semibold text-ink-4">소속 유형</legend>
       <div className="mt-2 flex gap-2 overflow-x-auto pb-1" aria-label="소속 유형 선택">
+        <button
+          type="button"
+          aria-pressed={selected === null}
+          onClick={() => onSelect(null)}
+          className={categoryClass(selected === null)}
+        >
+          전체
+        </button>
         {TEAM_CATEGORIES.map((category) => (
           <button
             key={category}

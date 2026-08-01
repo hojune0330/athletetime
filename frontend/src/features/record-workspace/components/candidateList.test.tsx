@@ -26,7 +26,7 @@ function candidate(index: number): AthleteSearchCard {
 const CANDIDATES = Array.from({ length: 7 }, (_, index) => candidate(index + 1))
 
 describe('record candidate browsing', () => {
-  it('keeps browse cards to one action and four visible facts', () => {
+  it('keeps browse cards to one action, four visible facts, and one identity caution', () => {
     // Given a candidate with multiple teams, events, and divisions.
     const athlete = candidate(1)
 
@@ -40,7 +40,7 @@ describe('record candidate browsing', () => {
       />,
     )
 
-    // Then one whole-card action shows only name, affiliation, seasons, and record count.
+    // Then one whole-card action shows the four candidate facts and the identity caution.
     expect(markup.match(/<button/g)).toHaveLength(1)
     expect(markup).toContain(athlete.name)
     expect(markup).toContain(athlete.team)
@@ -50,6 +50,48 @@ describe('record candidate browsing', () => {
     expect(markup).not.toContain('남자 중등부')
     expect(markup).not.toContain('비교')
     expect(markup).not.toContain('내 기록')
+    expect(markup).toContain('같은 이름의 다른 선수일 수 있어요')
+  })
+
+  it('keeps the API same-name caution visible on each search candidate', () => {
+    // Given a search candidate whose API response includes an identity caution.
+    const athlete = {
+      ...candidate(1),
+      note: '같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요.',
+    }
+
+    // When its browse card is rendered.
+    const markup = renderToStaticMarkup(
+      <RecordCandidateCard
+        athlete={athlete}
+        mode="browse"
+        selected={false}
+        onActivate={() => undefined}
+      />,
+    )
+
+    // Then the API caution remains visible as user-facing copy.
+    expect(markup).toContain(athlete.note)
+    expect(markup).toContain(`aria-label="${athlete.name} 기록 보기. ${athlete.note}"`)
+  })
+
+  it('shows a safe same-name fallback even when one candidate has no caution note', () => {
+    // Given a single candidate whose API note and ambiguity flag do not express the Layer-2 risk.
+    const athlete = { ...candidate(2), ambiguity: 'none', note: '' }
+
+    // When its browse card is rendered.
+    const markup = renderToStaticMarkup(
+      <RecordCandidateCard
+        athlete={athlete}
+        mode="browse"
+        selected={false}
+        onActivate={() => undefined}
+      />,
+    )
+
+    // Then the always-visible fallback still asks the user to verify the visible context.
+    expect(markup).toContain('같은 이름의 다른 선수일 수 있어요')
+    expect(markup).toContain('소속과 시즌을 확인해 주세요')
   })
 
   it('enters selection only through the explicit collect action', () => {

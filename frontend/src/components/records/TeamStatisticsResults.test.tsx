@@ -27,9 +27,27 @@ describe('team statistics search results', () => {
     expect(html).not.toContain('기록 담기')
     expect(html).not.toContain('비교에 담기')
   })
+
+  it('keeps a neutral search card on the all-category detail route', () => {
+    // Given an unfiltered team summary whose primary category is only an inference.
+    const teams = parseTeamSearchResponse(searchEnvelope({ selectedCategory: null, categoryEvidence: null }))
+
+    // When the neutral result card is rendered.
+    const html = renderToStaticMarkup(
+      <MemoryRouter>
+        <TeamStatisticsResults teams={teams} query="진도" />
+      </MemoryRouter>,
+    )
+
+    // Then the link preserves the complete aggregate instead of injecting the primary category.
+    expect(html).toContain('전체')
+    expect(html).toContain('원천 결과의 소속 표기별로 모아 계산했어요.')
+    expect(html).toContain('/records/teams/1234567890abcdef?scope=all&amp;from=')
+    expect(html).not.toContain('category=corporate')
+  })
 })
 
-function searchEnvelope() {
+function searchEnvelope(overrides: Readonly<Record<string, unknown>> = {}) {
   return {
     success: true,
     contractVersion: 1,
@@ -51,6 +69,7 @@ function searchEnvelope() {
       latestSeason: 2026,
       latestDate: '2026-06-01',
       coverageDisclaimer: '모은 공개 기록 기준이에요.',
+      ...overrides,
     }],
   }
 }

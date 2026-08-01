@@ -55,7 +55,7 @@ test('Given the shared records layout When the team page is inspected Then landm
   const filter = read('frontend/src/features/team-performance/TeamCategoryFilter.tsx');
 
   // When landmark and filter contracts are inspected.
-  const categories = ['실업팀', '대학팀', '고등부', '중등부', '초등부', '분류 확인 중'];
+  const categories = ['전체', '실업팀', '대학팀', '고등부', '중등부', '초등부', '분류 확인 중'];
 
   // Then the page adds no nested main and every fixed category remains keyboard-readable.
   assert.doesNotMatch(page, /<main\b/u);
@@ -63,4 +63,18 @@ test('Given the shared records layout When the team page is inspected Then landm
   assert.match(page, /seasons=\{detail\.coverage\.availableSeasons\}/u);
   assert.match(filter, /aria-pressed=/u);
   for (const category of categories) assert.match(filter, new RegExp(category));
+});
+
+test('Given team browsing without a chosen type When the route is built Then corporate is never forced', () => {
+  // Given the records entry point and invalid-link recovery surface.
+  const recordsPage = read('frontend/src/pages/RecordsPage.tsx');
+  const teamPage = read('frontend/src/features/team-performance/TeamPerformancePage.tsx');
+
+  // When neutral team routes are scanned.
+  const source = `${recordsPage}\n${teamPage}`;
+
+  // Then missing or invalid categories remain neutral until the user selects one.
+  assert.doesNotMatch(source, /\?\? 'corporate'/u);
+  assert.doesNotMatch(source, /category=corporate/u);
+  assert.doesNotMatch(source, /next\.set\('category', 'corporate'\)/u);
 });

@@ -1,11 +1,12 @@
 const fs = require('node:fs'), http = require('node:http'), net = require('node:net'), path = require('node:path');
 const { spawn } = require('node:child_process'), assert = require('node:assert/strict'), { chromium } = require('playwright');
+const express = require('express');
+const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
 
 const ROOT = path.join(__dirname, '..', '..');
 const FRONTEND = path.join(ROOT, 'frontend');
 const VITE_BIN = path.join(FRONTEND, 'node_modules', 'vite', 'bin', 'vite.js');
 const EVIDENCE_DIR = path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
-const EVIDENCE_PATH = path.join(EVIDENCE_DIR, 'records-flow-e2e-results.json');
 const viewport = { width: 375, height: 667 };
 
 const athletes = [
@@ -70,14 +71,16 @@ function makeProfile(key) {
   };
 }
 
-async function withRecordsPage(runScenario) {
+async function withRecordsPage(runScenario, evidence = {}) {
   const port = await getFreePort();
-  const server = await startViteServer(port);
+  const teamApiServer = await startTeamApiServer();
+  let server;
   let browser;
   let context;
   const state = { page: null, baseUrl: `http://127.0.0.1:${port}`, visited: [], consoleErrors: [], pageErrors: [] };
 
   try {
+    server = await startViteServer(port);
     browser = await chromium.launch({ channel: 'chrome' });
     context = await browser.newContext({ viewport, deviceScaleFactor: 1, isMobile: true });
     state.page = await context.newPage();
@@ -85,30 +88,36 @@ async function withRecordsPage(runScenario) {
       if (message.type() === 'error') state.consoleErrors.push(message.text());
     });
     state.page.on('pageerror', (error) => state.pageErrors.push(error.message));
-    await installApiMocks(state.page);
+    await installApiMocks(state.page, teamApiServer.baseUrl);
     await runScenario(state);
     assert.deepEqual(state.consoleErrors, [], 'browser console should not contain errors');
     assert.deepEqual(state.pageErrors, [], 'page should not throw errors');
   } finally {
-    writeEvidence(state);
+    writeEvidence(state, evidence);
     if (context) await context.close().catch(() => {});
     if (browser) await browser.close().catch(() => {});
-    await stopServer(server);
+    if (server) await stopServer(server);
+    await teamApiServer.close();
   }
 }
 
-async function installApiMocks(page) {
+async function installApiMocks(page, teamApiBaseUrl) {
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (!url.pathname.startsWith('/api/')) {
       await route.continue();
       return;
     }
-    await fulfillApi(route, url.pathname);
+    await fulfillApi(route, url, teamApiBaseUrl);
   });
 }
 
-async function fulfillApi(route, pathname) {
+async function fulfillApi(route, url, teamApiBaseUrl) {
+  const pathname = url.pathname;
+  if (pathname.includes('/analytics/teams')) {
+    const response = await route.fetch({ url: `${teamApiBaseUrl}${pathname}${url.search}` });
+    return route.fulfill({ response });
+  }
   if (pathname.endsWith('/analytics/filters')) return fulfillJson(route, { success: true, data: filters });
   if (pathname.endsWith('/analytics/popular-events')) {
     return fulfillJson(route, {
@@ -124,6 +133,19 @@ async function fulfillApi(route, pathname) {
   if (pathname.endsWith('/analytics/season-records')) return fulfillJson(route, { success: true, data: seasonTable });
   if (pathname.endsWith('/analytics/insights')) return fulfillJson(route, { success: true, data: makeInsights() });
   return fulfillJson(route, { success: true, data: null });
+}
+
+async function startTeamApiServer() {
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use('/api/card-studio/analytics', recordAnalyticsRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  return {
+    baseUrl: `http://127.0.0.1:${server.address().port}`,
+    close: () => new Promise((resolve) => server.close(resolve)),
+  };
 }
 
 function makeInsights() {
@@ -146,7 +168,7 @@ async function startViteServer(port) {
   assert.ok(fs.existsSync(VITE_BIN), `Vite binary not found at ${VITE_BIN}`);
   const child = spawn(process.execPath, [VITE_BIN, '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
     cwd: FRONTEND,
-    env: { ...process.env, BROWSER: 'none' },
+    env: { ...process.env, BROWSER: 'none', VITE_API_BASE_URL: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   const output = [];
@@ -217,12 +239,13 @@ async function stopServer(server) {
   });
 }
 
-function writeEvidence(state) {
+function writeEvidence(state, evidence) {
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
-  fs.writeFileSync(EVIDENCE_PATH, JSON.stringify({
+  const evidencePath = path.join(EVIDENCE_DIR, evidence.fileName || 'records-flow-e2e-results.json');
+  fs.writeFileSync(evidencePath, JSON.stringify({
     generatedAt: new Date().toISOString(),
-    scenario: 'records flow e2e',
-    invocation: 'node --test backend/tests/records-flow-e2e.test.js',
+    scenario: evidence.scenario || 'records flow e2e',
+    invocation: evidence.invocation || 'node --test backend/tests/records-flow-e2e.test.js',
     baseUrl: state.baseUrl,
     viewport,
     visited: state.visited,

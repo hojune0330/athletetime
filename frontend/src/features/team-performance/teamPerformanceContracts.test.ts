@@ -54,6 +54,26 @@ describe('team performance API boundary', () => {
     expect(parsed).not.toHaveProperty('records')
   })
 
+  it('accepts an all-category team identity when no category was selected', () => {
+    // Given a detail envelope built from every indexed category for one affiliation.
+    const payload = detailEnvelope({}, {
+      selectedCategory: null,
+      categoryEvidence: null,
+      otherCategories: [
+        { category: 'unclassified', resultCount: 3, confidence: 0, reasons: ['insufficient_evidence'] },
+        { category: 'university', resultCount: 2, confidence: 1, reasons: ['division_level:university'] },
+      ],
+    })
+
+    // When the neutral detail crosses the frontend trust boundary.
+    const parsed = parseTeamDetailResponse(payload)
+
+    // Then the nullable identity is retained without inventing a selected category.
+    expect(parsed.identity.selectedCategory).toBeNull()
+    expect(parsed.identity.categoryEvidence).toBeNull()
+    expect(parsed.identity.otherCategories).toHaveLength(2)
+  })
+
   it('normalizes valid category and period URLs into one legal query state', () => {
     // Given an explicit category and season URL.
     const params = new URLSearchParams('category=corporate&season=2025')
@@ -115,7 +135,10 @@ function searchEnvelope(overrides: Readonly<Record<string, unknown>> = {}) {
   }
 }
 
-function detailEnvelope(overrides: Readonly<Record<string, unknown>> = {}) {
+function detailEnvelope(
+  overrides: Readonly<Record<string, unknown>> = {},
+  identityOverrides: Readonly<Record<string, unknown>> = {},
+) {
   const aggregate = {
     athleteCount: 19,
     resultCount: 138,
@@ -138,6 +161,7 @@ function detailEnvelope(overrides: Readonly<Record<string, unknown>> = {}) {
         selectedCategory: 'corporate',
         categoryEvidence: { category: 'corporate', resultCount: 138, confidence: 0.9, reasons: ['team_signature:corporate'] },
         otherCategories: [],
+        ...identityOverrides,
       },
       summary: aggregate,
       seasonTrend: [{ season: 2026, ...aggregate }],

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { PublicRecord } from '@/api/recordAnalytics'
 import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
 import { groupRecords, type RecordEventGroup, type RecordSortOrder } from '../groupRecords'
+import { resolveRecordAthleteSeason } from '../recordAthleteUrlState'
 import { RecordDetailSheet } from '../components/RecordDetailSheet'
 import { RecordEventFilter } from '../components/RecordEventFilter'
 import { RecordGroupList } from '../components/RecordGroupList'
@@ -12,9 +13,11 @@ type RecordAthleteRecordTabProps = {
   readonly onLoadMore: () => void
   readonly onOpenRecord: (recordId: string) => void
   readonly onSelectEvent: (eventKey: string | null) => void
+  readonly onSelectSeason: (season: number) => void
   readonly preview: RecordWorkspacePreview
   readonly selectedEventKey: string | null
   readonly selectedRecordId: string | null
+  readonly selectedSeason: number | null
 }
 
 function eventIndex(preview: RecordWorkspacePreview): readonly RecordEventGroup[] {
@@ -43,21 +46,25 @@ export function RecordAthleteRecordTab({
   onLoadMore,
   onOpenRecord,
   onSelectEvent,
+  onSelectSeason,
   preview,
   selectedEventKey,
   selectedRecordId,
+  selectedSeason,
 }: RecordAthleteRecordTabProps) {
   const groups = useMemo(() => eventIndex(preview), [preview])
   const selectedGroup = groups.find((group) => group.eventKey === selectedEventKey) ?? null
-  const [selectedSeason, setSelectedSeason] = useState(selectedGroup?.seasons[0]?.season ?? 0)
   const [sortOrder, setSortOrder] = useState<RecordSortOrder>('newest')
   const [visibleCount, setVisibleCount] = useState(10)
   const selectedRecord = preview.records.find((record) => record.id === selectedRecordId) ?? null
+  const activeSeason = resolveRecordAthleteSeason(
+    selectedSeason,
+    selectedGroup?.seasons.map((season) => season.season) ?? [],
+  )
 
   useEffect(() => {
-    setSelectedSeason(selectedGroup?.seasons[0]?.season ?? 0)
     setVisibleCount(10)
-  }, [selectedEventKey, selectedGroup?.eventKey, selectedGroup?.seasons[0]?.season])
+  }, [selectedEventKey, selectedSeason])
 
   if (!selectedEventKey) {
     return (
@@ -84,12 +91,12 @@ export function RecordAthleteRecordTab({
         <RecordGroupList
           key={selectedEventKey}
           group={selectedGroup}
-          selectedSeason={selectedSeason}
+          selectedSeason={activeSeason ?? 0}
           sortOrder={sortOrder}
           visibleCount={visibleCount}
           onOpenRecord={(record) => onOpenRecord(record.id)}
           onSeasonChange={(season) => {
-            setSelectedSeason(season)
+            onSelectSeason(season)
             setVisibleCount(10)
           }}
           onShowMore={setVisibleCount}

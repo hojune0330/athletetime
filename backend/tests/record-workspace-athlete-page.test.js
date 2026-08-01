@@ -41,5 +41,8 @@ test('Given the public athlete route When source contracts are scanned Then self
   assert.match(page, /pageParams\.get\('record'\)/);
   assert.match(page, /pageParams\.get\('tab'\)/);
   assert.match(page, /athlete\.refetch/);
+  assert.match(page, /subject\.note\.trim\(\)/);
+  assert.match(page, /같은 이름의 다른 선수일 수 있어요/);
+  assert.match(page, /소속·연도·종목을 확인해 주세요/);
   assert.doesNotMatch(page, /내 기록|selfClaim|MyRecords|onToggleMine|isMine/);
 });

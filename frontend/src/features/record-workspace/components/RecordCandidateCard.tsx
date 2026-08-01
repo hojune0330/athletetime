@@ -26,13 +26,15 @@ export function RecordCandidateCard({
   selected,
 }: RecordCandidateCardProps) {
   const collecting = mode === 'collect'
+  const sameNameCaution = athlete.note.trim()
+    || '같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요.'
 
   return (
     <button
       type="button"
-      aria-label={collecting
+      aria-label={`${collecting
         ? `${athlete.name} 기록 ${selected ? '선택 해제' : '선택'}`
-        : `${athlete.name} 기록 보기`}
+        : `${athlete.name} 기록 보기`}. ${sameNameCaution}`}
       aria-pressed={collecting ? selected : undefined}
       className={cn(
         'grid min-h-11 w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-3 border bg-surface p-4 text-left',
@@ -68,6 +70,9 @@ export function RecordCandidateCard({
 
       <span className="col-span-2 font-mono text-[12px] text-ink-3 [font-variant-numeric:tabular-nums]">
         {seasonLabel(athlete.years)}
+      </span>
+      <span className="col-span-2 border-l-2 border-warn pl-2 text-[12px] leading-5 text-ink-3" role="note">
+        {sameNameCaution}
       </span>
     </button>
   )

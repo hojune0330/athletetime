@@ -71,7 +71,7 @@ export default function TeamPerformancePage() {
         <div className="mt-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-xs font-semibold tracking-[0.1em] text-brand">
-              {teamCategoryLabel(detail.identity.selectedCategory)} · TEAM PERFORMANCE
+              {detail.identity.selectedCategory ? teamCategoryLabel(detail.identity.selectedCategory) : '전체'} · TEAM PERFORMANCE
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">{detail.identity.teamLabel}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-3">
@@ -152,7 +152,7 @@ function CoverageNotice({ detail }: { readonly detail: TeamPerformanceDetail }) 
 }
 
 function InvalidTeamLink() {
-  return <StateCard title="팀 주소를 확인해 주세요" description="주소가 바뀌었거나 지원하지 않는 조건이에요." action={<Link className="font-semibold text-brand" to="/records?flow=browse&browse=team&category=corporate">소속 다시 찾기</Link>} />
+  return <StateCard title="팀 주소를 확인해 주세요" description="주소가 바뀌었거나 지원하지 않는 조건이에요." action={<Link className="font-semibold text-brand" to="/records?flow=browse&browse=team">소속 다시 찾기</Link>} />
 }
 
 function TeamLoading() {
@@ -197,7 +197,8 @@ function updateView(params: URLSearchParams, view: View): URLSearchParams {
 }
 
 function buildBackUrl(category: TeamPerformanceDetail['identity']['selectedCategory'], query: string | null): string {
-  const params = new URLSearchParams({ flow: 'browse', browse: 'team', category })
+  const params = new URLSearchParams({ flow: 'browse', browse: 'team' })
+  if (category) params.set('category', category)
   if (query) params.set('q', query)
   return `/records?${params.toString()}`
 }

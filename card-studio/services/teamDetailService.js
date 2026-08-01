@@ -15,10 +15,12 @@ function getDetail({ records, normalizeTeam }, teamKey, options = {}) {
     undefined,
     teamLabel,
   );
-  const selectedCategory = clean(options.category) || categorySummary.primaryCategory;
-  const categoryRecords = teamRecords.filter((record) => (
-    teamCategoryService.classifyRecord(record, undefined, teamLabel).category === selectedCategory
-  ));
+  const selectedCategory = clean(options.category) || null;
+  const categoryRecords = selectedCategory
+    ? teamRecords.filter((record) => (
+      teamCategoryService.classifyRecord(record, undefined, teamLabel).category === selectedCategory
+    ))
+    : teamRecords;
   if (categoryRecords.length === 0) return null;
 
   const latestSeason = newestSeason(categoryRecords);
@@ -32,8 +34,9 @@ function getDetail({ records, normalizeTeam }, teamKey, options = {}) {
   const aggregate = summarizeAggregate(scopedRecords);
   const participation = summarizeParticipation(scopedRecords);
   const improvement = summarizeImprovement(scopedRecords);
-  const categoryEvidence = categorySummary.categoryBreakdown
-    .find((item) => item.category === selectedCategory) || null;
+  const categoryEvidence = selectedCategory
+    ? categorySummary.categoryBreakdown.find((item) => item.category === selectedCategory) || null
+    : null;
 
   return {
     identity: {
@@ -42,7 +45,7 @@ function getDetail({ records, normalizeTeam }, teamKey, options = {}) {
       selectedCategory,
       categoryEvidence,
       otherCategories: categorySummary.categoryBreakdown
-        .filter((item) => item.category !== selectedCategory),
+        .filter((item) => !selectedCategory || item.category !== selectedCategory),
     },
     summary: aggregate,
     seasonTrend: summarizeGroups(scopedRecords, seasonGroup).slice(0, MAX_SECTION_ITEMS),

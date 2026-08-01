@@ -78,7 +78,7 @@ export default function RecordsPage() {
   const mineStep = normalizeMineStep(searchParams.get('step'));
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
-  const teamCategory = parseTeamCategory(searchParams.get('category')) ?? 'corporate';
+  const teamCategory = parseTeamCategory(searchParams.get('category'));
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
   const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
 
@@ -365,15 +365,15 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
-    if (choice === 'team') next.set('category', 'corporate');
-    else next.delete('category');
+    next.delete('category');
     setMode(choice === 'season' ? 'season' : 'athlete');
     setSearchParams(next);
   };
 
-  const selectTeamCategory = (category: TeamCategory) => {
+  const selectTeamCategory = (category: TeamCategory | null) => {
     const next = new URLSearchParams(searchParams);
-    next.set('category', category);
+    if (category) next.set('category', category);
+    else next.delete('category');
     next.delete('athlete');
     setSearchParams(next);
   };
@@ -531,10 +531,10 @@ export default function RecordsPage() {
             </div>
             {!isTeamBrowse && <div className="flex flex-col items-stretch gap-2 sm:items-end">
               <div className="grid grid-cols-2 border border-line bg-surface-2 p-1">
-                <ModeButton active={mode === 'athlete'} onClick={() => setMode('athlete')}>
+                <ModeButton active={mode === 'athlete'} onClick={() => openBrowseChoice('athlete')}>
                   기록 한눈에
                 </ModeButton>
-                <ModeButton active={mode === 'season'} onClick={() => setMode('season')}>
+                <ModeButton active={mode === 'season'} onClick={() => openBrowseChoice('season')}>
                   시즌 기록표
                 </ModeButton>
               </div>
@@ -599,7 +599,7 @@ export default function RecordsPage() {
             ? '원천 경기 결과의 소속 표기를 기준으로 찾아요. 소속 이름을 줄이거나 다른 표기로 검색해 보세요.'
             : '이름이나 소속을 바꿔보세요. 시즌 기록표에서 종목·부문으로도 둘러볼 수 있어요.'}
           action={!isTeamBrowse ? (
-            <Button type="button" variant="outline" onClick={() => setMode('season')}>
+            <Button type="button" variant="outline" onClick={() => openBrowseChoice('season')}>
               시즌 기록표 보기
             </Button>
           ) : undefined}
@@ -608,11 +608,11 @@ export default function RecordsPage() {
 
       {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && !profile && (
         <div className="space-y-6">
-          <StartPanel onSeasonMode={() => setMode('season')} />
+          <StartPanel onSeasonMode={() => openBrowseChoice('season')} />
           <AnonymousInsightCards
             onPickEvent={(key) => {
               setEventKey(key);
-              setMode('season');
+              openBrowseChoice('season');
             }}
           />
         </div>

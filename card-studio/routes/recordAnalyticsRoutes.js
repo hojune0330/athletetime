@@ -25,8 +25,8 @@ const router = express.Router();
 router.get('/filters', publicLimiter, (req, res) => {
   try {
     res.json({ success: true, data: recordAnalyticsService.getFilters() });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -37,8 +37,8 @@ router.get('/popular-events', publicLimiter, (req, res) => {
       limit: req.query.limit,
     });
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -51,16 +51,16 @@ router.get('/insights', publicLimiter, (req, res) => {
       windowDays: req.query.windowDays,
     });
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
 router.get('/data-quality', publicLimiter, (req, res) => {
   try {
     res.json({ success: true, data: dataQualityService.getDataQualityReport() });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -68,8 +68,8 @@ router.get('/identity/shadow-cluster', publicLimiter, (req, res) => {
   try {
     const data = identityShadowService.getShadowCluster({ athleteKey: req.query.athleteKey });
     res.json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -90,8 +90,8 @@ router.get('/records/search', searchLimiter, async (req, res) => {
       total: athletes.length,
       dataRights: dataRightsPolicy.RESPONSE_NOTICE,
     });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -120,8 +120,8 @@ router.get('/teams/search', searchLimiter, (req, res) => {
       total: teams.length,
       dataRights: dataRightsPolicy.RESPONSE_NOTICE,
     });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalTeamError(res);
   }
 });
 
@@ -156,8 +156,8 @@ router.get('/teams/:teamKey', publicLimiter, (req, res) => {
       data: detail,
       dataRights: dataRightsPolicy.RESPONSE_NOTICE,
     });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalTeamError(res);
   }
 });
 
@@ -167,8 +167,8 @@ router.get('/records/zero-result-summary', publicLimiter, async (req, res) => {
       success: true,
       data: await zeroResultSearchService.getZeroResultSearchSummary({ limit: req.query.limit }),
     });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -179,8 +179,8 @@ router.get('/athletes/:athleteKey', publicLimiter, (req, res) => {
       return res.status(404).json({ success: false, error: 'Athlete analytics profile not found.' });
     }
     return res.json({ success: true, data: profile, dataRights: dataRightsPolicy.RESPONSE_NOTICE });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -194,8 +194,8 @@ router.get('/season-records', publicLimiter, (req, res) => {
       limit: req.query.limit,
     });
     return res.json({ success: true, data: table, dataRights: dataRightsPolicy.RESPONSE_NOTICE });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message });
+  } catch {
+    return internalAnalyticsError(res);
   }
 });
 
@@ -218,6 +218,14 @@ function parseBoundedInteger(value, fallback, min, max) {
 
 function invalidTeamRequest(res, code, error) {
   return res.status(400).json({ success: false, code, error });
+}
+
+function internalTeamError(res) {
+  return internalAnalyticsError(res, '팀 통계를 불러오지 못했어요.');
+}
+
+function internalAnalyticsError(res, error = '기록 정보를 불러오지 못했어요.') {
+  return res.status(500).json({ success: false, code: 'INTERNAL_ERROR', error });
 }
 
 module.exports = router;

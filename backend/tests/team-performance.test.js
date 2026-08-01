@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+const { normalizeEvent } = require('../../card-studio/services/recordAnalyticsService');
 const { summarize } = require('../../card-studio/services/teamPerformanceService');
 
 test('Given final preliminary ambiguous and relay results When podium is summarized Then only defensible counts are confirmed', () => {
@@ -62,6 +63,32 @@ test('Given ambiguous and confirmed relay copies When podium is summarized Then 
 
   assert.equal(result.podium.confirmed.total, 1);
   assert.equal(result.podium.ambiguous.total, 0);
+});
+
+test('Given a ranked result without stage evidence When it is normalized and summarized Then its podium stays ambiguous', () => {
+  // Given an event label that contains no final, heat, or overall marker.
+  const normalizedEvent = normalizeEvent('100m', '남자 일반부');
+  const koreanOverall = normalizeEvent('100m 종합', '남자 일반부');
+  const englishOverall = normalizeEvent('100m overall', '남자 일반부');
+
+  // When the production normalization result reaches the team summary.
+  const result = summarize([
+    record({ id: 'stage-unknown', rank: 1, phase: normalizedEvent.phase }),
+    record({ id: 'stage-overall-ko', athleteKey: 'athlete-b', rank: 2, phase: koreanOverall.phase }),
+    record({ id: 'stage-overall-en', athleteKey: 'athlete-c', rank: 3, phase: englishOverall.phase }),
+  ]);
+
+  // Then missing evidence is never promoted to a confirmed podium.
+  assert.equal(normalizedEvent.phase, '');
+  assert.deepEqual(
+    [koreanOverall, englishOverall].map(({ phase, eventKey, eventLabel }) => ({ phase, eventKey, eventLabel })),
+    [
+      { phase: 'final', eventKey: '100m', eventLabel: '100m' },
+      { phase: 'final', eventKey: '100m', eventLabel: '100m' },
+    ],
+  );
+  assert.equal(result.podium.confirmed.total, 2);
+  assert.equal(result.podium.ambiguous.total, 1);
 });
 
 function record(overrides = {}) {

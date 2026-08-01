@@ -71,9 +71,9 @@ const TeamDetailSchema = z.object({
   identity: z.object({
     teamKey: TeamKeySchema,
     teamLabel: z.string().min(1).max(100),
-    selectedCategory: TeamCategorySchema,
-    categoryEvidence: CategoryEvidenceSchema,
-    otherCategories: z.array(CategoryEvidenceSchema).max(TEAM_CATEGORIES.length - 1).readonly(),
+    selectedCategory: TeamCategorySchema.nullable(),
+    categoryEvidence: CategoryEvidenceSchema.nullable(),
+    otherCategories: z.array(CategoryEvidenceSchema).max(TEAM_CATEGORIES.length).readonly(),
   }).readonly(),
   summary: AggregateSchema,
   seasonTrend: z.array(z.object({

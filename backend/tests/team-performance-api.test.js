@@ -4,6 +4,27 @@ const express = require('express');
 
 const analytics = require('../../card-studio/services/recordAnalyticsService');
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
+const teamStatistics = require('../../card-studio/services/teamStatisticsService');
+
+test('Given a mixed team with an unclassified majority When category is omitted Then search and detail totals agree', () => {
+  // Given two university rows and three rows whose category evidence is insufficient.
+  const records = [
+    ...['u1', 'u2'].map((id, index) => teamRecord(id, 'university', `university-${index}`)),
+    ...['x1', 'x2', 'x3'].map((id, index) => teamRecord(id, 'general', `unclassified-${index}`)),
+  ];
+  const context = { records, normalizeTeam: (value) => String(value || '').trim() };
+  const searchSummary = teamStatistics.search(context, '혼합대표', 20)[0];
+
+  // When the neutral card destination requests the complete indexed period without a category.
+  const detail = teamStatistics.getDetail(context, searchSummary.teamKey, { scope: 'all' });
+
+  // Then no inferred primary category removes the majority of the search result.
+  assert.equal(searchSummary.selectedCategory, null);
+  assert.equal(searchSummary.resultCount, 5);
+  assert.equal(detail.identity.selectedCategory, null);
+  assert.equal(detail.summary.resultCount, searchSummary.resultCount);
+  assert.equal(detail.summary.athleteCount, searchSummary.athleteCount);
+});
 
 test('Given a category-filtered team search When one team is opened Then search and detail totals agree', () => {
   // Given team records filtered to the corporate category.
@@ -134,6 +155,33 @@ test('Given a valid category search When it is served Then the frontend contract
   assert.ok(response.body.data.length > 0);
 });
 
+test('Given an internal team service failure When the public routes respond Then implementation details stay private', async (t) => {
+  // Given both public team service calls fail with a sensitive internal detail.
+  const originalSearch = analytics.searchTeamStatistics;
+  const originalDetail = analytics.getTeamStatistics;
+  const secret = 'SECRET_INTERNAL_PATH C:/private/raw-results.xlsx';
+  analytics.searchTeamStatistics = () => { throw new Error(secret); };
+  analytics.getTeamStatistics = () => { throw new Error(secret); };
+  t.after(() => {
+    analytics.searchTeamStatistics = originalSearch;
+    analytics.getTeamStatistics = originalDetail;
+  });
+  const server = await startServer();
+  t.after(server.close);
+
+  // When unauthenticated callers reach search and detail routes.
+  const search = await getJson(server.baseUrl, '/teams/search?q=진도');
+  const detail = await getJson(server.baseUrl, '/teams/0000000000000000?scope=all');
+
+  // Then both responses use one stable generic error and reveal no service message.
+  for (const response of [search, detail]) {
+    assert.equal(response.status, 500);
+    assert.equal(response.body.code, 'INTERNAL_ERROR');
+    assert.equal(response.body.error, '팀 통계를 불러오지 못했어요.');
+    assert.doesNotMatch(JSON.stringify(response.body), /SECRET_INTERNAL_PATH|private|xlsx/u);
+  }
+});
+
 async function startServer() {
   const app = express();
   app.set('trust proxy', 1);
@@ -160,4 +208,22 @@ function hasForbiddenKey(value, forbidden) {
   if (!value || typeof value !== 'object') return false;
   if (Array.isArray(value)) return value.some((item) => hasForbiddenKey(item, forbidden));
   return Object.entries(value).some(([key, child]) => forbidden.has(key) || hasForbiddenKey(child, forbidden));
+}
+
+function teamRecord(id, divisionLevel, competitionId) {
+  return {
+    id,
+    team: '혼합대표',
+    athleteKey: `athlete-${id}`,
+    divisionLevel,
+    season: 2025,
+    competitionId,
+    competitionName: competitionId,
+    eventKey: '100m',
+    eventLabel: '100m',
+    rank: 4,
+    phase: 'final',
+    date: '2025-06-01',
+    source: {},
+  };
 }

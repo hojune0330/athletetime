@@ -761,7 +761,7 @@ function normalizeCandidateTopEvent(candidate) {
   const detailClassCd = clean(candidate.detailClassCd, 20).toLowerCase();
   const eventKey = mapped?.key || stableSlug(rawEvent || detailClassCd);
   const isField = !!field;
-  const phase = /결승|final/i.test(clean(candidate.phase, 80)) ? 'final' : base.phase;
+  const phase = /결승|final|종합|overall/i.test(clean(candidate.phase, 80)) ? 'final' : base.phase;
 
   return {
     ...base,
@@ -817,8 +817,8 @@ function normalizeEvent(eventLabel, divisionLabel) {
   const divisionMeta = divisionHierarchyService.normalizeDivision(division || inferDivisionLabel(raw));
   const phase = inferPhase(raw);
   const rawWithoutPhase = raw
-    .replace(/\b(final|semi-final|semi|heat|prelim|qualifying)\b/gi, ' ')
-    .replace(/결승|준결승|예선|본선|타임레이스|타임\s*레이스/g, ' ');
+    .replace(/\b(final|semi-final|semi|heat|prelim|qualifying|overall)\b/gi, ' ')
+    .replace(/준결승|결승|예선|본선|종합|타임레이스|타임\s*레이스/g, ' ');
   const eventName = rawWithoutPhase
     .replace(/^(남자|여자|남|여)\s*/g, '')
     .replace(/^(M|W|U)\d{1,2}\s*/i, '')
@@ -938,8 +938,8 @@ function inferPhase(value) {
   const text = clean(value, 160);
   if (/준결승|semi/i.test(text)) return 'semi-final';
   if (/예선|heat|prelim|qual/i.test(text)) return 'heat';
-  if (/결승|final/i.test(text)) return 'final';
-  return 'final';
+  if (/결승|final|종합|overall/i.test(text)) return 'final';
+  return '';
 }
 
 function parseRecord(mark, direction) {

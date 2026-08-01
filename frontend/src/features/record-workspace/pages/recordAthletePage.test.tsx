@@ -115,8 +115,10 @@ describe('dedicated athlete record page', () => {
       onLoadMore: () => undefined,
       onOpenRecord: () => undefined,
       onSelectEvent: () => undefined,
+      onSelectSeason: () => undefined,
       preview: athletePreview,
       selectedRecordId: null,
+      selectedSeason: null,
     }
 
     // When the index and selected-event views render.
@@ -133,5 +135,29 @@ describe('dedicated athlete record page', () => {
     expect(eventMarkup.match(/data-record-row=/g)).toHaveLength(10)
     expect(eventMarkup).toContain('10개 더 보기')
     expect(eventMarkup).toContain('나머지 기록 불러오기')
+  })
+
+  it('renders the season restored from the athlete page URL instead of resetting to the latest season', () => {
+    // Given a shared athlete URL whose selected event season is 2025.
+    const athletePreview = preview(Array.from({ length: 50 }, (_, index) => record(index)), 50, false)
+
+    // When the dedicated athlete record tab is restored with that URL-backed season.
+    const markup = renderToStaticMarkup(
+      <RecordAthleteRecordTab
+        isLoadingMore={false}
+        onCloseRecord={() => undefined}
+        onLoadMore={() => undefined}
+        onOpenRecord={() => undefined}
+        onSelectEvent={() => undefined}
+        onSelectSeason={() => undefined}
+        preview={athletePreview}
+        selectedEventKey="100m"
+        selectedRecordId={null}
+        selectedSeason={2025}
+      />,
+    )
+
+    // Then the rendered record list keeps 2025 rather than falling back to 2026.
+    expect(markup).toContain('2025 시즌 · 25개')
   })
 })
