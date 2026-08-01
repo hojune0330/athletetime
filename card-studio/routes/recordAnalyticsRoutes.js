@@ -10,6 +10,8 @@ const dataRightsPolicy = require('../dataRightsPolicy');
 const { CATEGORY_ORDER: TEAM_CATEGORIES } = require('../services/teamCategoryService');
 const { createRecordWorkspaceRouter } = require('./recordWorkspaceRoutes');
 
+const TEAM_CONTRACT_VERSION = 1;
+
 async function tryRecordZeroResultSearch(query) {
   try {
     return await zeroResultSearchService.recordZeroResultSearch({ query, surface: 'records' });
@@ -113,6 +115,7 @@ router.get('/teams/search', searchLimiter, (req, res) => {
     const teams = recordAnalyticsService.searchTeamStatistics(query, limit, { category });
     return res.json({
       success: true,
+      contractVersion: TEAM_CONTRACT_VERSION,
       data: teams,
       total: teams.length,
       dataRights: dataRightsPolicy.RESPONSE_NOTICE,
@@ -147,7 +150,12 @@ router.get('/teams/:teamKey', publicLimiter, (req, res) => {
       return res.status(404).json({ success: false, code: 'TEAM_NOT_FOUND', error: '조건에 맞는 팀 기록을 찾지 못했어요.' });
     }
     res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
-    return res.json({ success: true, data: detail, dataRights: dataRightsPolicy.RESPONSE_NOTICE });
+    return res.json({
+      success: true,
+      contractVersion: TEAM_CONTRACT_VERSION,
+      data: detail,
+      dataRights: dataRightsPolicy.RESPONSE_NOTICE,
+    });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }

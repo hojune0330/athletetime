@@ -1,6 +1,6 @@
 # AthleteTime 팀 성과 대시보드 구현 계획
 
-> 상태: 작업 1-3 완료 · 작업 4 대기
+> 상태: 작업 1-4 완료 · 작업 5 대기
 > 기준일: 2026-07-31
 > 상위 계획: `.omo/plans/athlete-record-workspace-ux.md`의 6B
 
@@ -252,12 +252,12 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 응답에 선수 이름·원본 파일 경로·전체 기록 행이 없다.
 - 전체 덤프형 요청과 과도한 limit는 차단된다.
 
-### 작업 4. 프론트 타입과 데이터 경계
+### 작업 4. 프론트 타입과 데이터 경계 (완료)
 
 **소유 파일**
-- `frontend/src/api/recordAnalytics.ts`
 - 신규 `frontend/src/features/team-performance/teamPerformanceContracts.ts`
 - 신규 `frontend/src/features/team-performance/teamPerformanceContracts.test.ts`
+- 신규 `frontend/src/features/team-performance/teamPerformanceApi.ts`
 
 **구현**
 - 공개 응답을 화면 타입으로 파싱한다.
@@ -367,8 +367,14 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 상세 응답에는 `records`, `athleteKey`, `name` 키가 없다.
 - 잘못된 category는 `400 INVALID_TEAM_CATEGORY`, 없는 팀은 `404 TEAM_NOT_FOUND`다.
 - 상세 응답은 `max-age=60, stale-while-revalidate=300`으로 짧게 캐시된다.
+- 검색·상세 응답은 `contractVersion=1`을 명시하며 프론트는 다른 버전을 거부한다.
+- Zod 경계 테스트 5/5와 백엔드 API 계약 테스트 5/5가 통과한다.
+- category·scope·season URL은 모순 없는 구별된 상태로 변환되고 잘못된 값은
+  `INVALID_TEAM_*` 상태로 분리된다.
+- 프로덕션 타입 검사가 비교 목록 토글 결과의 분기 누락을 발견했고,
+  `removed=false`일 때만 `reason`을 읽도록 기존 기록 화면도 함께 바로잡았다.
 
-다음 작업자는 작업 4부터 시작한다. 작업 1-3의 집계 의미를 변경할 때는
+다음 작업자는 작업 5부터 시작한다. 작업 1-4의 집계 의미를 변경할 때는
 `team-category.test.js`와 `team-performance.test.js`를 먼저 갱신하고, 예선·단계 미상·
 계주 중복·첫 관찰 기록 방어 조건을 약화하지 않는다.
 

@@ -84,9 +84,24 @@ test('Given a valid team detail request When it is served Then it is briefly cac
 
   // Then only aggregate sections are returned under a short public cache policy.
   assert.equal(response.status, 200);
+  assert.equal(response.body.contractVersion, 1);
   assert.match(response.headers['cache-control'], /max-age=60/);
   assert.equal(response.body.data.identity.teamLabel, '진도군청');
   assert.equal(hasForbiddenKey(response.body.data, new Set(['records', 'athleteKey', 'name'])), false);
+});
+
+test('Given a valid category search When it is served Then the frontend contract version is explicit', async (t) => {
+  const server = await startServer();
+  t.after(server.close);
+
+  // Given the bounded team search endpoint.
+  // When a valid corporate-team query is requested.
+  const response = await getJson(server.baseUrl, '/teams/search?q=진도&category=corporate&limit=20');
+
+  // Then clients can reject older response shapes before rendering them.
+  assert.equal(response.status, 200);
+  assert.equal(response.body.contractVersion, 1);
+  assert.ok(response.body.data.length > 0);
 });
 
 async function startServer() {
