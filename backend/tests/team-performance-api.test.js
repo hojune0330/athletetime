@@ -1,0 +1,118 @@
+const assert = require('node:assert/strict');
+const test = require('node:test');
+const express = require('express');
+
+const analytics = require('../../card-studio/services/recordAnalyticsService');
+const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
+
+test('Given a category-filtered team search When one team is opened Then search and detail totals agree', () => {
+  // Given team records filtered to the corporate category.
+  const teams = analytics.searchTeamStatistics('진도', 20, { category: 'corporate' });
+  const searchSummary = teams.find((team) => team.teamLabel === '진도군청');
+  assert.ok(searchSummary);
+
+  // When the same public team key is opened for the full indexed period.
+  const detail = analytics.getTeamStatistics(searchSummary.teamKey, {
+    category: 'corporate',
+    scope: 'all',
+  });
+
+  // Then both surfaces use the same bounded category aggregate without athlete rows.
+  assert.equal(searchSummary.selectedCategory, 'corporate');
+  assert.equal(detail.identity.selectedCategory, 'corporate');
+  assert.equal(detail.summary.resultCount, searchSummary.resultCount);
+  assert.equal(detail.summary.athleteCount, searchSummary.athleteCount);
+  assert.equal(detail.summary.competitionCount, searchSummary.competitionCount);
+  assert.equal(detail.summary.confirmedPodiumCount, searchSummary.confirmedPodiumCount);
+  assert.equal(detail.summary.indexedImprovementCount, searchSummary.indexedImprovementCount);
+  assert.equal(hasForbiddenKey(detail, new Set(['records', 'athleteKey', 'name'])), false);
+});
+
+test('Given a team with several seasons When latest scope is opened Then only its latest confirmed season is summarized', () => {
+  // Given a known team and its complete category aggregate.
+  const team = analytics.searchTeamStatistics('진도군청', 5, { category: 'corporate' })[0];
+  const all = analytics.getTeamStatistics(team.teamKey, { category: 'corporate', scope: 'all' });
+
+  // When the default latest-season detail is requested.
+  const latest = analytics.getTeamStatistics(team.teamKey, { category: 'corporate', scope: 'latest' });
+
+  // Then its applied season, rows, and trend are limited without changing team identity.
+  assert.equal(latest.identity.teamKey, all.identity.teamKey);
+  assert.equal(latest.coverage.appliedScope, 'latest');
+  assert.equal(latest.coverage.appliedSeason, all.coverage.latestSeason);
+  assert.ok(latest.summary.resultCount <= all.summary.resultCount);
+  assert.deepEqual(latest.seasonTrend.map((item) => item.season), [all.coverage.latestSeason]);
+});
+
+test('Given invalid team API inputs When they reach the route Then they fail closed with stable codes', async (t) => {
+  const server = await startServer();
+  t.after(server.close);
+
+  // Given unsupported category, excessive limit, malformed key, and impossible season values.
+  // When each value reaches the public API boundary.
+  const invalidCategory = await getJson(server.baseUrl, '/teams/search?q=진도&category=elite');
+  const excessiveLimit = await getJson(server.baseUrl, '/teams/search?q=진도&limit=31');
+  const invalidKey = await getJson(server.baseUrl, '/teams/not-a-team-key');
+  const invalidSeason = await getJson(server.baseUrl, '/teams/0000000000000000?season=1800');
+  const missingTeam = await getJson(server.baseUrl, '/teams/0000000000000000?scope=all');
+
+  // Then no invalid value is silently coerced and a valid-but-missing key remains a 404.
+  assert.deepEqual(
+    [invalidCategory, excessiveLimit, invalidKey, invalidSeason, missingTeam]
+      .map(({ status, body }) => [status, body.code]),
+    [
+      [400, 'INVALID_TEAM_CATEGORY'],
+      [400, 'INVALID_TEAM_LIMIT'],
+      [400, 'INVALID_TEAM_KEY'],
+      [400, 'INVALID_TEAM_SEASON'],
+      [404, 'TEAM_NOT_FOUND'],
+    ],
+  );
+});
+
+test('Given a valid team detail request When it is served Then it is briefly cacheable and contains no raw athlete rows', async (t) => {
+  const team = analytics.searchTeamStatistics('진도군청', 5, { category: 'corporate' })[0];
+  const server = await startServer();
+  t.after(server.close);
+
+  // Given a team key obtained from the bounded public search.
+  // When its latest corporate summary is requested through HTTP.
+  const response = await getJson(
+    server.baseUrl,
+    `/teams/${team.teamKey}?category=corporate&scope=latest`,
+  );
+
+  // Then only aggregate sections are returned under a short public cache policy.
+  assert.equal(response.status, 200);
+  assert.match(response.headers['cache-control'], /max-age=60/);
+  assert.equal(response.body.data.identity.teamLabel, '진도군청');
+  assert.equal(hasForbiddenKey(response.body.data, new Set(['records', 'athleteKey', 'name'])), false);
+});
+
+async function startServer() {
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(recordAnalyticsRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  return {
+    baseUrl: `http://127.0.0.1:${server.address().port}`,
+    close: () => new Promise((resolve) => server.close(resolve)),
+  };
+}
+
+async function getJson(baseUrl, pathname) {
+  const response = await fetch(`${baseUrl}${pathname}`);
+  return {
+    status: response.status,
+    headers: Object.fromEntries(response.headers.entries()),
+    body: await response.json(),
+  };
+}
+
+function hasForbiddenKey(value, forbidden) {
+  if (!value || typeof value !== 'object') return false;
+  if (Array.isArray(value)) return value.some((item) => hasForbiddenKey(item, forbidden));
+  return Object.entries(value).some(([key, child]) => forbidden.has(key) || hasForbiddenKey(child, forbidden));
+}

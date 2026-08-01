@@ -59,8 +59,21 @@ function searchAthletes(query, limit = 12) {
     .map(toSearchCard);
 }
 
-function searchTeamStatistics(query, limit = 12) {
-  return teamStatisticsService.search({ records: getIndex().records, normalizeTeam }, query, limit);
+function searchTeamStatistics(query, limit = 12, options = {}) {
+  return teamStatisticsService.search(
+    { records: getIndex().records, normalizeTeam },
+    query,
+    limit,
+    options,
+  );
+}
+
+function getTeamStatistics(teamKey, options = {}) {
+  return teamStatisticsService.getDetail(
+    { records: getIndex().records, normalizeTeam },
+    clean(teamKey, 16),
+    options,
+  );
 }
 
 function getAthleteSummary(athleteKey) {
@@ -1222,6 +1235,7 @@ module.exports = {
   getPopularEvents,
   searchAthletes,
   searchTeamStatistics,
+  getTeamStatistics,
   getAthleteSummary,
   getSeasonRecords,
   warmup,

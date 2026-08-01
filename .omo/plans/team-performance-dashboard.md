@@ -1,6 +1,6 @@
 # AthleteTime 팀 성과 대시보드 구현 계획
 
-> 상태: 작업 1-2 완료 · 작업 3 대기
+> 상태: 작업 1-3 완료 · 작업 4 대기
 > 기준일: 2026-07-31
 > 상위 계획: `.omo/plans/athlete-record-workspace-ux.md`의 6B
 
@@ -232,10 +232,11 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 - 첫 관찰 기록은 최고 갱신 0건이다.
 - 소속 변경 조각은 자동 연결하지 않는다.
 
-### 작업 3. 검색·상세 API
+### 작업 3. 검색·상세 API (완료)
 
 **소유 파일**
 - `card-studio/services/teamStatisticsService.js`
+- 신규 `card-studio/services/teamDetailService.js`
 - `card-studio/services/recordAnalyticsService.js`
 - `card-studio/routes/recordAnalyticsRoutes.js`
 - 신규 `backend/tests/team-performance-api.test.js`
@@ -353,11 +354,21 @@ GET /api/analytics/teams/:teamKey?category=corporate&scope=latest
 자동 검증 결과:
 
 - 사전 계약 테스트 12/12 통과
+- 작업 3 반영 후 사전 계약 테스트 16/16 통과
 - 전체 테스트 322 통과, 5개 의도적 skip, 실패 0
 - 프론트 타입 검사와 프로덕션 빌드 통과
 - `GET /api/card-studio/analytics/teams/search?q=진도&limit=20` 실측 통과
 
-다음 작업자는 작업 3부터 시작한다. 작업 1-2의 집계 의미를 변경할 때는
+작업 3 HTTP 실측 결과:
+
+- `category=corporate` 진도군청 검색과 `scope=all` 상세의 결과 138건,
+  참가 대회 36개, 확인된 입상 43건이 일치한다.
+- `category=elementary` 검색에는 전남진도초등학교가 별도 팀으로 반환된다.
+- 상세 응답에는 `records`, `athleteKey`, `name` 키가 없다.
+- 잘못된 category는 `400 INVALID_TEAM_CATEGORY`, 없는 팀은 `404 TEAM_NOT_FOUND`다.
+- 상세 응답은 `max-age=60, stale-while-revalidate=300`으로 짧게 캐시된다.
+
+다음 작업자는 작업 4부터 시작한다. 작업 1-3의 집계 의미를 변경할 때는
 `team-category.test.js`와 `team-performance.test.js`를 먼저 갱신하고, 예선·단계 미상·
 계주 중복·첫 관찰 기록 방어 조건을 약화하지 않는다.
 

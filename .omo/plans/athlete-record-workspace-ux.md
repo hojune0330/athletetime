@@ -970,7 +970,7 @@ type RecordWorkspacePreview = {
   **구현 순서**:
   - [x] 부문 판정기와 운영자 override
   - [x] 입상·참가·최고 갱신 계산기
-  - [ ] 팀 검색/상세 API
+  - [x] 팀 검색/상세 API
   - [ ] 검색 category와 독립 팀 페이지
   - [ ] 실데이터·모바일·신뢰 출시 게이트
 
@@ -979,7 +979,7 @@ type RecordWorkspacePreview = {
   - [x] 예선 1위와 단계 미상 1~3위를 확인된 입상에서 제외한다.
   - [x] 계주 한 팀을 선수 수만큼 중복 계산하지 않는다.
   - [x] 첫 관찰 기록과 소속 변경 조각을 개인 최고 갱신으로 세지 않는다.
-  - [ ] 검색 요약과 단일 팀 상세 총계가 일치한다.
+  - [x] 검색 요약과 단일 팀 상세 총계가 일치한다.
   - [ ] 360px 첫 화면에 핵심 네 지표가 보이고 개인 기록 행은 0개다.
 
   **예정 Commit**: `feat(records): add category-aware team performance dashboard`

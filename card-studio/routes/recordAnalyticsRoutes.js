@@ -7,6 +7,7 @@ const anonymousInsightsService = require('../services/anonymousInsightsService')
 const identityShadowService = require('../services/identityShadowService');
 const zeroResultSearchService = require('../services/zeroResultSearchService');
 const dataRightsPolicy = require('../dataRightsPolicy');
+const { CATEGORY_ORDER: TEAM_CATEGORIES } = require('../services/teamCategoryService');
 const { createRecordWorkspaceRouter } = require('./recordWorkspaceRoutes');
 
 async function tryRecordZeroResultSearch(query) {
@@ -101,13 +102,52 @@ router.get('/teams/search', searchLimiter, (req, res) => {
     if (query.length < 2) {
       return res.status(400).json({ success: false, error: 'Search query must be at least 2 characters.' });
     }
-    const teams = recordAnalyticsService.searchTeamStatistics(query, req.query.limit);
+    const category = cleanQuery(req.query.category, 30).toLowerCase();
+    if (category && !TEAM_CATEGORIES.includes(category)) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_CATEGORY', '지원하지 않는 팀 종류예요.');
+    }
+    const limit = parseBoundedInteger(req.query.limit, 20, 1, 30);
+    if (limit === null) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_LIMIT', '한 번에 1개부터 30개 팀까지 볼 수 있어요.');
+    }
+    const teams = recordAnalyticsService.searchTeamStatistics(query, limit, { category });
     return res.json({
       success: true,
       data: teams,
       total: teams.length,
       dataRights: dataRightsPolicy.RESPONSE_NOTICE,
     });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.get('/teams/:teamKey', publicLimiter, (req, res) => {
+  try {
+    const teamKey = cleanQuery(req.params.teamKey, 40).toLowerCase();
+    if (!/^[a-f0-9]{16}$/u.test(teamKey)) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_KEY', '팀 주소가 올바르지 않아요.');
+    }
+    const category = cleanQuery(req.query.category, 30).toLowerCase();
+    if (category && !TEAM_CATEGORIES.includes(category)) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_CATEGORY', '지원하지 않는 팀 종류예요.');
+    }
+    const scope = cleanQuery(req.query.scope, 20).toLowerCase() || 'latest';
+    if (!['latest', 'all'].includes(scope)) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_SCOPE', '기간 범위가 올바르지 않아요.');
+    }
+    const season = req.query.season === undefined
+      ? null
+      : parseBoundedInteger(req.query.season, null, 1900, new Date().getFullYear() + 1);
+    if (req.query.season !== undefined && season === null) {
+      return invalidTeamRequest(res, 'INVALID_TEAM_SEASON', '시즌 연도가 올바르지 않아요.');
+    }
+    const detail = recordAnalyticsService.getTeamStatistics(teamKey, { category, scope, season });
+    if (!detail) {
+      return res.status(404).json({ success: false, code: 'TEAM_NOT_FOUND', error: '조건에 맞는 팀 기록을 찾지 못했어요.' });
+    }
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+    return res.json({ success: true, data: detail, dataRights: dataRightsPolicy.RESPONSE_NOTICE });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message });
   }
@@ -152,5 +192,24 @@ router.get('/season-records', publicLimiter, (req, res) => {
 });
 
 router.use('/record-workspaces', createRecordWorkspaceRouter());
+
+function cleanQuery(value, max) {
+  return String(value || '')
+    .trim()
+    .replace(/[\x00-\x1f\x7f]/gu, '')
+    .slice(0, max);
+}
+
+function parseBoundedInteger(value, fallback, min, max) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const normalized = String(value).trim();
+  if (!/^\d+$/u.test(normalized)) return null;
+  const parsed = Number(normalized);
+  return Number.isSafeInteger(parsed) && parsed >= min && parsed <= max ? parsed : null;
+}
+
+function invalidTeamRequest(res, code, error) {
+  return res.status(400).json({ success: false, code, error });
+}
 
 module.exports = router;
