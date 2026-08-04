@@ -1,4 +1,5 @@
 /**
+const { logger } = require('../utils/privacyGuardLogger');
  * Poll 라우터 (v4.0.0 - Clean Architecture)
  * 
  * 경로: /api/posts/:postId/poll
@@ -109,7 +110,7 @@ router.post('/vote', async (req, res) => {
 
     const updatedPoll = result.rows[0].updated_poll;
 
-    console.log(`✅ 투표 처리: postId=${postId}, userId=${user_id}, options=${option_ids}`);
+    logger.info(`투표 처리: postId=${postId}, userId=${user_id}, options=${option_ids}`);
 
     res.json({
       success: true,
@@ -118,7 +119,7 @@ router.post('/vote', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [POST /api/posts/:postId/poll/vote] 에러:', error);
+    logger.error('[POST /api/posts/:postId/poll/vote] 에러', error);
     
     // PostgreSQL 제약 조건 에러 처리
     if (error.code === '23505') { // UNIQUE violation
@@ -242,7 +243,7 @@ router.delete('/vote', async (req, res) => {
 
     await client.query('COMMIT');
 
-    console.log(`✅ 투표 취소: postId=${postId}, userId=${user_id}`);
+    logger.info(`투표 취소: postId=${postId}, userId=${user_id}`);
 
     res.json({
       success: true,
@@ -252,7 +253,7 @@ router.delete('/vote', async (req, res) => {
 
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ [DELETE /api/posts/:postId/poll/vote] 에러:', error);
+    logger.error('[DELETE /api/posts/:postId/poll/vote] 에러', error);
     res.status(500).json({
       success: false,
       error: '투표 취소 중 오류가 발생했습니다.'
@@ -332,7 +333,7 @@ router.get('/results', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [GET /api/posts/:postId/poll/results] 에러:', error);
+    logger.error('[GET /api/posts/:postId/poll/results] 에러', error);
     res.status(500).json({
       success: false,
       error: '투표 결과 조회 중 오류가 발생했습니다.'
@@ -375,7 +376,7 @@ router.get('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ [GET /api/posts/:postId/poll] 에러:', error);
+    logger.error('[GET /api/posts/:postId/poll] 에러', error);
     res.status(500).json({
       success: false,
       error: 'Poll 정보 조회 중 오류가 발생했습니다.'

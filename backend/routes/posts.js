@@ -15,6 +15,18 @@ const bcrypt = require('bcryptjs');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const { redactPostListRow } = require('../utils/postRedaction');
+const { createViewDedup } = require('../utils/viewDedup');
+const { logger } = require('../utils/privacyGuardLogger');
+
+/**
+ * 조회수 dedup (P0-F1).
+ * - 같은 (post_id, IP+UA+anon 세션) 조합으로 TTL(15분) 안 두번째 호출은 count skip.
+ * - 정상 사용자는 15분 지나면 정상 카운트되며 영향 없음.
+ *
+ * 단위 테스트: backend/tests/view-dedup.test.js
+ */
+const viewDedup = createViewDedup();
 
 /**
  * GET /api/posts
@@ -165,21 +177,22 @@ router.get('/', async (req, res) => {
     
     res.json({
       success: true,
-      posts: postsResult.rows.map(row => ({
-        ...row,
-        images: Array.isArray(row.images) ? row.images : [],
-        comments: Array.isArray(row.comments) ? row.comments : []
-      })),
+      posts: postsResult.rows.map(row => {
+        const sanitized = redactPostListRow(row);
+        sanitized.images = Array.isArray(sanitized.images) ? sanitized.images : [];
+        sanitized.comments = Array.isArray(sanitized.comments) ? sanitized.comments : [];
+        return sanitized;
+      }),
       count: parseInt(countResult.rows[0].total),
       page: actualPage,
       limit: actualLimit
     });
-    
+
   } catch (error) {
-    console.error('❌ [GET /api/posts] 에러:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: '게시글 목록을 불러올 수 없습니다.' 
+    logger.error('GET /api/posts 에러', error);
+    res.status(500).json({
+      success: false,
+      error: '게시글 목록을 불러올 수 없습니다.'
     });
   }
 });
@@ -187,16 +200,22 @@ router.get('/', async (req, res) => {
 /**
  * GET /api/posts/:id
  * 게시글 상세 조회 (조회수 자동 증가)
+ *
+ * 보안: GET이 무조건 views +1 이던 부분 (P0-F1) 을 dedup로 차단.
+ *   같은 요청자가 15분 안에 다시 요청하면 DB UPDATE 스킵.
+ *   정상 사용자는 15분 지나면 정상 카운트되며 영향 없음.
  */
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // 조회수 증가
-    await req.app.locals.pool.query(
-      'UPDATE posts SET views = views + 1 WHERE id = $1',
-      [id]
-    );
+
+    // 조회수 증가 (dedup 적용)
+    if (viewDedup.shouldIncrement(req, id)) {
+      await req.app.locals.pool.query(
+        'UPDATE posts SET views = views + 1 WHERE id = $1',
+        [id]
+      );
+    }
     
     // 게시글 상세 조회 (이미지, 댓글 포함)
     // '자유' 카테고리는 null로 반환
@@ -282,7 +301,7 @@ router.get('/:id', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [GET /api/posts/${req.params.id}] 에러:`, error);
+    logger.error(`[GET /api/posts/${req.params.id}] 에러`, error);
     res.status(500).json({ 
       success: false, 
       error: '게시글을 불러올 수 없습니다.' 
@@ -323,9 +342,9 @@ router.post('/', optionalAuth, async (req, res) => {
       poll = null  // 투표 데이터
     } = req.body;
     
-    // 디버그: req.body 전체 출력
-    console.log('📝 게시글 작성 req.body:', JSON.stringify(req.body, null, 2));
-    console.log('📊 poll 원본 값:', poll, '타입:', typeof poll);
+    // 디버그: req.body 전체 출력 (운영 환경에선 PII 마스킹)
+    logger.debug('게시글 작성 req.body:', req.body);
+    logger.debug('poll 원본 값:', poll, '타입:', typeof poll);
     
     // 유효성 검사
     if (!title || !content || !author || !password) {
@@ -380,7 +399,7 @@ router.post('/', optionalAuth, async (req, res) => {
       canSetNotice = true;
     }
     
-    console.log('📝 게시글 작성 - 관리자 체크:', { user: req.user, isNotice, canSetNotice });
+    logger.debug('게시글 작성 - 관리자 체크:', { user: req.user, isNotice, canSetNotice });
     
     // isNotice 값 파싱 (문자열 "true" 처리)
     const isNoticeValue = canSetNotice && (isNotice === true || isNotice === 'true');
@@ -394,7 +413,7 @@ router.post('/', optionalAuth, async (req, res) => {
       try {
         parsedPoll = JSON.parse(poll);
       } catch (e) {
-        console.log('📊 투표 데이터 파싱 실패:', e);
+        logger.warn('투표 데이터 파싱 실패', e);
         parsedPoll = null;
       }
     }
@@ -414,7 +433,7 @@ router.post('/', optionalAuth, async (req, res) => {
           allow_multiple: false,
           voters: []  // 투표한 사용자 ID 목록 (중복 방지용)
         };
-        console.log('📊 투표 데이터 생성:', pollData);
+        logger.debug('투표 데이터 생성', pollData);
       }
     }
     
@@ -493,7 +512,7 @@ router.post('/', optionalAuth, async (req, res) => {
       }
     });
     
-    console.log(`✅ 게시글 작성 완료: ID=${post.id}, 제목="${title}"`);
+    logger.info(`게시글 작성 완료: ID=${post.id}, 제목="${title}"`);
     
     res.status(201).json({
       success: true,
@@ -503,7 +522,7 @@ router.post('/', optionalAuth, async (req, res) => {
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error('❌ [POST /api/posts] 에러:', error);
+    logger.error('[POST /api/posts] 에러', error);
     res.status(500).json({ 
       success: false, 
       error: error.message || '게시글 작성에 실패했습니다.' 
@@ -563,7 +582,7 @@ router.post('/:id/verify-password', async (req, res) => {
       });
     }
     
-    console.log(`✅ 게시글 비밀번호 검증 성공: ID=${id}`);
+    logger.info(`게시글 비밀번호 검증 성공: ID=${id}`);
     
     res.json({
       success: true,
@@ -571,7 +590,7 @@ router.post('/:id/verify-password', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [POST /api/posts/${req.params.id}/verify-password] 에러:`, error);
+    logger.error(`[POST /api/posts/${req.params.id}/verify-password] 에러`, error);
     res.status(500).json({ 
       success: false, 
       error: '비밀번호 검증에 실패했습니다.' 
@@ -730,7 +749,7 @@ router.put('/:id', async (req, res) => {
     
     const post = result.rows[0];
     
-    console.log(`✅ 게시글 수정 완료: ID=${id}, 제목="${title}"`);
+    logger.info(`게시글 수정 완료: ID=${id}, 제목="${title}"`);
     
     res.json({
       success: true,
@@ -743,7 +762,7 @@ router.put('/:id', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [PUT /api/posts/${req.params.id}] 에러:`, error);
+    logger.error(`[PUT /api/posts/${req.params.id}] 에러`, error);
     res.status(500).json({ 
       success: false, 
       error: '게시글 수정에 실패했습니다.' 
@@ -793,7 +812,7 @@ router.delete('/:id', optionalAuth, async (req, res) => {
         [deleteReason.trim(), id]
       );
       
-      console.log(`✅ [관리자] 게시글 삭제 완료: ID=${id}, 사유="${deleteReason}", 관리자=${req.user.email}`);
+      logger.info(`[관리자] 게시글 삭제 완료: ID=${id}, 사유="${deleteReason}", 관리자ID=${req.user.id}`);
       
       return res.json({
         success: true,
@@ -836,7 +855,7 @@ router.delete('/:id', optionalAuth, async (req, res) => {
       [id]
     );
     
-    console.log(`✅ 게시글 삭제 완료: ID=${id}`);
+    logger.info(`게시글 삭제 완료: ID=${id}`);
     
     res.json({
       success: true,
@@ -844,7 +863,7 @@ router.delete('/:id', optionalAuth, async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [DELETE /api/posts/${req.params.id}] 에러:`, error);
+    logger.error(`[DELETE /api/posts/${req.params.id}] 에러`, error);
     res.status(500).json({ 
       success: false, 
       error: '게시글 삭제에 실패했습니다.' 
@@ -922,7 +941,7 @@ router.post('/:id/poll/vote', async (req, res) => {
       [JSON.stringify(poll), id]
     );
     
-    console.log(`✅ 투표 완료: postId=${id}, optionId=${optionId}, visitorId=${visitorId}`);
+    logger.info(`투표 완료: postId=${id}, optionId=${optionId}, visitorId=${visitorId}`);
     
     res.json({
       success: true,
@@ -931,7 +950,7 @@ router.post('/:id/poll/vote', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [POST /api/posts/${req.params.id}/poll/vote] 에러:`, error);
+    logger.error(`[POST /api/posts/${req.params.id}/poll/vote] 에러`, error);
     res.status(500).json({
       success: false,
       error: '투표 처리 중 오류가 발생했습니다.'

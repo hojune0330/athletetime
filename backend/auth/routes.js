@@ -6,6 +6,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('../utils/db');
 const { generateAccessToken, generateRefreshToken, verifyToken } = require('../utils/jwt');
+const { logger } = require('../utils/privacyGuardLogger');
 const { sendVerificationEmail, sendWelcomeEmail, sendResetPasswordCodeEmail } = require('../utils/email');
 const { authenticateToken, extractAccessToken } = require('../middleware/auth');
 const {
@@ -212,15 +213,15 @@ router.post('/send-verification', verificationDeliveryIpLimiter, verificationDel
     // 인증 이메일 발송
     try {
       await sendVerificationEmail(email, verificationCode, '회원');
-      console.log('✅ 인증 코드 발송 요청 처리 완료');
+      logger.info('인증 코드 발송 요청 처리 완료');
     } catch (emailError) {
-      console.error('이메일 발송 실패:', getErrorMessage(emailError));
+      logger.warn('이메일 발송 실패', getErrorMessage(emailError));
     }
 
     sendAuthCodeAccepted(res);
 
   } catch (error) {
-    console.error('❌ 인증 코드 발송 오류:', error);
+    logger.error('인증 코드 발송 오류', error);
     res.status(500).json({
       success: false,
       error: '인증 코드 발송 중 오류가 발생했습니다'
@@ -281,7 +282,7 @@ router.post('/verify-code', verificationCodeAttemptIpLimiter, verificationCodeAt
 
   } catch (error) {
     if (transactionOpen) await client.query('ROLLBACK');
-    console.error('❌ 인증 코드 확인 오류:', error);
+    logger.error('인증 코드 확인 오류', error);
     res.status(500).json({
       success: false,
       error: '인증 코드 확인 중 오류가 발생했습니다'
@@ -331,7 +332,7 @@ router.post('/check-nickname', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ 닉네임 확인 오류:', error);
+    logger.error('닉네임 확인 오류', error);
     res.status(500).json({
       success: false,
       available: false,
@@ -510,7 +511,7 @@ router.post('/register', async (req, res) => {
         );
       })
       .catch(async (error) => {
-        console.error('이메일 발송 실패:', error);
+        logger.warn('이메일 발송 실패', error);
         // 발송 실패 로그 업데이트
         await db.query(
           `UPDATE email_logs 
@@ -548,7 +549,7 @@ router.post('/register', async (req, res) => {
 
   } catch (error) {
     if (transactionOpen) await client.query('ROLLBACK');
-    console.error('❌ 회원가입 오류:', error);
+    logger.error('회원가입 오류', error);
     res.status(500).json({
       success: false,
       error: '회원가입 처리 중 오류가 발생했습니다'
@@ -661,7 +662,7 @@ router.post('/verify-email', verificationCodeAttemptIpLimiter, verificationCodeA
 
     // 환영 이메일 발송 (비동기, 실패해도 무시)
     sendWelcomeEmail(email, user.nickname).catch(err => {
-      console.error('환영 이메일 발송 실패:', err);
+      logger.warn('환영 이메일 발송 실패', err);
     });
 
     res.json({
@@ -676,7 +677,7 @@ router.post('/verify-email', verificationCodeAttemptIpLimiter, verificationCodeA
 
   } catch (error) {
     if (transactionOpen) await client.query('ROLLBACK');
-    console.error('❌ 이메일 인증 오류:', error);
+    logger.error('이메일 인증 오류', error);
     res.status(500).json({
       success: false,
       error: '인증 처리 중 오류가 발생했습니다'
@@ -748,7 +749,7 @@ router.post('/resend-code', verificationDeliveryIpLimiter, verificationDeliveryL
     });
 
   } catch (error) {
-    console.error('❌ 인증 코드 재발송 오류:', error);
+    logger.error('인증 코드 재발송 오류', error);
     res.status(500).json({
       success: false,
       error: '인증 코드 재발송 중 오류가 발생했습니다'
@@ -866,7 +867,7 @@ router.post('/login', loginAttemptIpLimiter, loginAttemptLimiter, async (req, re
     });
 
   } catch (error) {
-    console.error('❌ 로그인 오류:', error);
+    logger.error('로그인 오류', error);
     res.status(500).json({
       success: false,
       error: '로그인 처리 중 오류가 발생했습니다'
@@ -955,7 +956,7 @@ router.post('/refresh', requireCsrfForCookieAuth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ 토큰 재발급 오류:', error);
+    logger.error('토큰 재발급 오류', error);
     res.status(401).json({
       success: false,
       error: 'refresh token을 확인할 수 없습니다'
@@ -987,7 +988,7 @@ router.post('/logout', requireCsrfForCookieAuth, authenticateToken, async (req, 
     });
 
   } catch (error) {
-    console.error('❌ 로그아웃 오류:', error);
+    logger.error('로그아웃 오류', error);
     res.status(500).json({
       success: false,
       error: '로그아웃 처리 중 오류가 발생했습니다'
@@ -1053,7 +1054,7 @@ router.get('/me', (req, res, next) => {
     });
 
   } catch (error) {
-    console.error('❌ 사용자 정보 조회 오류:', error);
+    logger.error('사용자 정보 조회 오류', error);
     res.status(500).json({
       success: false,
       error: '사용자 정보 조회 중 오류가 발생했습니다'
@@ -1119,15 +1120,15 @@ router.post('/forgot-password', forgotPasswordIpLimiter, forgotPasswordLimiter, 
     // 인증 이메일 발송
     try {
       await sendResetPasswordCodeEmail(email, verificationCode, user.nickname);
-      console.log('✅ 비밀번호 재설정 인증 코드 발송 요청 처리 완료');
+      logger.info('비밀번호 재설정 인증 코드 발송 요청 처리 완료');
     } catch (emailError) {
-      console.error('이메일 발송 실패:', getErrorMessage(emailError));
+      logger.warn('이메일 발송 실패', getErrorMessage(emailError));
     }
 
     sendAuthCodeAccepted(res);
 
   } catch (error) {
-    console.error('❌ 비밀번호 찾기 오류:', error);
+    logger.error('비밀번호 찾기 오류', error);
     res.status(500).json({
       success: false,
       error: '비밀번호 찾기 처리 중 오류가 발생했습니다'
@@ -1171,7 +1172,7 @@ router.post('/verify-reset-code', resetCodeAttemptIpLimiter, resetCodeAttemptLim
     });
 
   } catch (error) {
-    console.error('❌ 인증 코드 확인 오류:', error);
+    logger.error('인증 코드 확인 오류', error);
     res.status(500).json({
       success: false,
       error: '인증 코드 확인 중 오류가 발생했습니다'
@@ -1254,7 +1255,7 @@ router.post('/reset-password', resetCodeAttemptIpLimiter, resetCodeAttemptLimite
     await client.query('COMMIT');
     transactionOpen = false;
 
-    console.log('✅ 비밀번호 재설정 완료');
+    logger.info('비밀번호 재설정 완료');
 
     res.json({
       success: true,
@@ -1265,7 +1266,7 @@ router.post('/reset-password', resetCodeAttemptIpLimiter, resetCodeAttemptLimite
     if (transactionOpen) {
       await client.query('ROLLBACK');
     }
-    console.error('❌ 비밀번호 재설정 오류:', error);
+    logger.error('비밀번호 재설정 오류', error);
     res.status(500).json({
       success: false,
       error: '비밀번호 재설정 중 오류가 발생했습니다'
@@ -1329,7 +1330,7 @@ router.put('/profile', requireCsrfForCookieAuth, authenticateToken, async (req, 
 
     const result = await db.query(query, params);
     
-    console.log('✅ 프로필 수정 완료:', result.rows[0]);
+    logger.info('프로필 수정 완료', { id: result.rows[0].id, nickname: result.rows[0].nickname });
 
     res.json({
       success: true,
@@ -1338,7 +1339,7 @@ router.put('/profile', requireCsrfForCookieAuth, authenticateToken, async (req, 
     });
 
   } catch (error) {
-    console.error('❌ 프로필 수정 오류:', error);
+    logger.error('프로필 수정 오류', error);
     res.status(500).json({
       success: false,
       error: '프로필 수정 중 오류가 발생했습니다'
@@ -1395,7 +1396,7 @@ if (!IS_PRODUCTION) {
         });
       }
 
-      console.log('✅ 관리자 권한 부여 완료');
+      logger.info('관리자 권한 부여 완료');
 
       res.json({
         success: true,
@@ -1403,7 +1404,7 @@ if (!IS_PRODUCTION) {
         user: result.rows[0]
       });
     } catch (error) {
-      console.error('❌ 관리자 설정 오류:', error);
+      logger.error('관리자 설정 오류', error);
       res.status(500).json({
         success: false,
         error: '관리자 설정 중 오류가 발생했습니다.'

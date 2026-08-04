@@ -9,6 +9,7 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router();
 const { optionalAuth, requireAdmin, authenticateToken } = require('../middleware/auth');
 
@@ -104,7 +105,7 @@ router.get('/competition/:competitionId', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [GET /api/match-results/competition/${req.params.competitionId}] 에러:`, error);
+    logger.error(`❌ [GET /api/match-results/competition/${req.params.competitionId}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '경기 결과 목록을 불러올 수 없습니다.' 
@@ -145,7 +146,7 @@ router.get('/:id', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [GET /api/match-results/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [GET /api/match-results/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '경기 결과를 불러올 수 없습니다.' 
@@ -196,7 +197,7 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
       RETURNING *
     `, [competition_id, event, division, round, JSON.stringify(results), event_date || null, notes, req.user.id]);
     
-    console.log(`✅ 경기 결과 등록: ${event} ${division} ${round}`);
+    logger.info(`✅ 경기 결과 등록: ${event} ${division} ${round}`);
     
     res.status(201).json({
       success: true,
@@ -205,7 +206,7 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ [POST /api/match-results] 에러:', error);
+    logger.error('❌ [POST /api/match-results] 에러:', error);
     res.status(500).json({ 
       success: false, 
       error: '경기 결과 등록에 실패했습니다.' 
@@ -250,7 +251,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
       RETURNING *
     `, [event, division, round, JSON.stringify(results), event_date || null, notes, id]);
     
-    console.log(`✅ 경기 결과 수정: ID=${id}`);
+    logger.info(`✅ 경기 결과 수정: ID=${id}`);
     
     res.json({
       success: true,
@@ -259,7 +260,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [PUT /api/match-results/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [PUT /api/match-results/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '경기 결과 수정에 실패했습니다.' 
@@ -295,7 +296,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
     );
     
     const { event, division, round } = existing.rows[0];
-    console.log(`✅ 경기 결과 삭제: ID=${id}, ${event} ${division} ${round}`);
+    logger.info(`✅ 경기 결과 삭제: ID=${id}, ${event} ${division} ${round}`);
     
     res.json({
       success: true,
@@ -303,7 +304,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [DELETE /api/match-results/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [DELETE /api/match-results/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '경기 결과 삭제에 실패했습니다.' 

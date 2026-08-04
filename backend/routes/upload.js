@@ -3,12 +3,13 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router();
 const { upload } = require('../middleware/upload');
 const { uploadToCloudinary } = require('../utils/cloudinary');
 const { authenticateToken } = require('../middleware/auth');
 
-console.log('✅ Upload 라우터 로드됨');
+logger.info('✅ Upload 라우터 로드됨');
 
 /**
  * POST /api/upload/image
@@ -39,7 +40,7 @@ router.post('/image', authenticateToken, upload.single('image'), async (req, res
       public_id: result.public_id,
     });
   } catch (error) {
-    console.error('이미지 업로드 처리에 실패했습니다.');
+    logger.error('이미지 업로드 처리에 실패했습니다.');
     res.status(500).json({ error: '이미지 업로드에 실패했습니다.' });
   }
 });
@@ -78,7 +79,7 @@ router.post('/images', authenticateToken, upload.array('images', 10), async (req
 
     res.json({ images });
   } catch (error) {
-    console.error('이미지 업로드 처리에 실패했습니다.');
+    logger.error('이미지 업로드 처리에 실패했습니다.');
     res.status(500).json({ error: '이미지 업로드에 실패했습니다.' });
   }
 });

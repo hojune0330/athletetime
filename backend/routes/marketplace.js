@@ -4,6 +4,7 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router();
 const { optionalAuth, authenticateToken } = require('../middleware/auth');
 
@@ -108,7 +109,7 @@ router.get('/', optionalAuth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('❌ 상품 목록 조회 오류:', error);
+    logger.error('❌ 상품 목록 조회 오류:', error);
     res.status(500).json({ 
       success: false, 
       error: '상품 목록을 불러올 수 없습니다.' 
@@ -159,7 +160,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       [status, id]
     );
 
-    console.log(`✅ 상품 상태 변경: ${id} → ${status}`);
+    logger.info(`✅ 상품 상태 변경: ${id} → ${status}`);
 
     res.json({
       success: true,
@@ -167,7 +168,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
       item: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ 상품 상태 변경 오류:', error);
+    logger.error('❌ 상품 상태 변경 오류:', error);
     res.status(500).json({
       success: false,
       error: '상태 변경에 실패했습니다.'
@@ -213,7 +214,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
       item: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ 상품 상세 조회 오류:', error);
+    logger.error('❌ 상품 상세 조회 오류:', error);
     res.status(500).json({
       success: false,
       error: '상품 정보를 불러올 수 없습니다.'
@@ -272,7 +273,7 @@ router.post('/', authenticateToken, async (req, res) => {
       req.user.id
     ]);
 
-    console.log(`✅ 상품 등록: ${title} (${req.user.nickname})`);
+    logger.info(`✅ 상품 등록: ${title} (${req.user.nickname})`);
 
     res.status(201).json({
       success: true,
@@ -280,7 +281,7 @@ router.post('/', authenticateToken, async (req, res) => {
       item: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ 상품 등록 오류:', error);
+    logger.error('❌ 상품 등록 오류:', error);
     res.status(500).json({
       success: false,
       error: '상품 등록에 실패했습니다.'
@@ -403,7 +404,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       RETURNING *
     `, updateValues);
 
-    console.log(`✅ 상품 수정: ${id}`);
+    logger.info(`✅ 상품 수정: ${id}`);
 
     res.json({
       success: true,
@@ -411,7 +412,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       item: result.rows[0]
     });
   } catch (error) {
-    console.error('❌ 상품 수정 오류:', error);
+    logger.error('❌ 상품 수정 오류:', error);
     res.status(500).json({
       success: false,
       error: '상품 수정에 실패했습니다.'
@@ -453,14 +454,14 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       [id]
     );
 
-    console.log(`✅ 상품 삭제: ${id}`);
+    logger.info(`✅ 상품 삭제: ${id}`);
 
     res.json({
       success: true,
       message: '상품이 삭제되었습니다.'
     });
   } catch (error) {
-    console.error('❌ 상품 삭제 오류:', error);
+    logger.error('❌ 상품 삭제 오류:', error);
     res.status(500).json({
       success: false,
       error: '상품 삭제에 실패했습니다.'
@@ -492,7 +493,7 @@ router.get('/:id/comments', optionalAuth, async (req, res) => {
       comments: result.rows
     });
   } catch (error) {
-    console.error('❌ 댓글 목록 조회 오류:', error);
+    logger.error('❌ 댓글 목록 조회 오류:', error);
     res.status(500).json({
       success: false,
       error: '댓글 목록을 불러올 수 없습니다.'
@@ -533,7 +534,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
       WHERE mc.id = $1
     `, [result.rows[0].id]);
 
-    console.log(`✅ 댓글 작성: 상품 ${id} (${req.user.nickname})`);
+    logger.info(`✅ 댓글 작성: 상품 ${id} (${req.user.nickname})`);
 
     res.status(201).json({
       success: true,
@@ -541,7 +542,7 @@ router.post('/:id/comments', authenticateToken, async (req, res) => {
       comment: commentWithUser.rows[0]
     });
   } catch (error) {
-    console.error('❌ 댓글 작성 오류:', error);
+    logger.error('❌ 댓글 작성 오류:', error);
     res.status(500).json({
       success: false,
       error: '댓글 작성에 실패했습니다.'
@@ -583,14 +584,14 @@ router.delete('/:itemId/comments/:commentId', authenticateToken, async (req, res
       [commentId]
     );
 
-    console.log(`✅ 댓글 삭제: ${commentId}`);
+    logger.info(`✅ 댓글 삭제: ${commentId}`);
 
     res.json({
       success: true,
       message: '댓글이 삭제되었습니다.'
     });
   } catch (error) {
-    console.error('❌ 댓글 삭제 오류:', error);
+    logger.error('❌ 댓글 삭제 오류:', error);
     res.status(500).json({
       success: false,
       error: '댓글 삭제에 실패했습니다.'

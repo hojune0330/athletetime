@@ -9,6 +9,7 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router();
 const { optionalAuth, requireAdmin, authenticateToken } = require('../middleware/auth');
 
@@ -76,7 +77,7 @@ router.get('/', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ [GET /api/competitions] 에러:', error);
+    logger.error('❌ [GET /api/competitions] 에러:', error);
     res.status(500).json({ 
       success: false, 
       error: '대회 목록을 불러올 수 없습니다.' 
@@ -111,7 +112,7 @@ router.get('/:id', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [GET /api/competitions/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [GET /api/competitions/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '대회 정보를 불러올 수 없습니다.' 
@@ -172,7 +173,7 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
       RETURNING *
     `, [name, type, category, start_date, end_date, year, month, location, description, req.user.id]);
     
-    console.log(`✅ 대회 등록: ${name} (${year})`);
+    logger.info(`✅ 대회 등록: ${name} (${year})`);
     
     res.status(201).json({
       success: true,
@@ -181,7 +182,7 @@ router.post('/', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ [POST /api/competitions] 에러:', error);
+    logger.error('❌ [POST /api/competitions] 에러:', error);
     res.status(500).json({ 
       success: false, 
       error: '대회 등록에 실패했습니다.' 
@@ -232,7 +233,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
       RETURNING *
     `, [name, type, category, start_date, end_date, year, month, location, description, id]);
     
-    console.log(`✅ 대회 수정: ID=${id}`);
+    logger.info(`✅ 대회 수정: ID=${id}`);
     
     res.json({
       success: true,
@@ -241,7 +242,7 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [PUT /api/competitions/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [PUT /api/competitions/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '대회 수정에 실패했습니다.' 
@@ -276,7 +277,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
       [id]
     );
     
-    console.log(`✅ 대회 삭제: ID=${id}, Name=${existing.rows[0].name}`);
+    logger.info(`✅ 대회 삭제: ID=${id}, Name=${existing.rows[0].name}`);
     
     res.json({
       success: true,
@@ -284,7 +285,7 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [DELETE /api/competitions/${req.params.id}] 에러:`, error);
+    logger.error(`❌ [DELETE /api/competitions/${req.params.id}] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '대회 삭제에 실패했습니다.' 

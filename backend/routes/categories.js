@@ -6,6 +6,7 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router();
 
 /**
@@ -31,7 +32,7 @@ router.get('/', async (req, res) => {
     res.json(result.rows);
     
   } catch (error) {
-    console.error('❌ [GET /api/categories] 에러:', error);
+    logger.error('❌ [GET /api/categories] 에러:', error);
     res.status(500).json({ 
       success: false, 
       error: '카테고리 목록을 불러올 수 없습니다.' 

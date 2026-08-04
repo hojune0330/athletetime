@@ -5,6 +5,7 @@
 const { verifyToken } = require('../utils/jwt');
 const db = require('../utils/db');
 const { ACCESS_COOKIE, getCookie } = require('../utils/authCookies');
+const { logger } = require('../utils/privacyGuardLogger');
 
 function extractAccessToken(req) {
   const authHeader = req.headers.authorization;
@@ -84,7 +85,7 @@ async function authenticateToken(req, res, next) {
 
     next();
   } catch (error) {
-    console.error('❌ 토큰 검증 실패:', error);
+    logger.error('토큰 검증 실패', error);
     
     if (error.message === '토큰이 만료되었습니다') {
       return res.status(401).json({

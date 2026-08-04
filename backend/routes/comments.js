@@ -7,6 +7,7 @@
  */
 
 const express = require('express');
+const { logger } = require('../utils/privacyGuardLogger');
 const router = express.Router({ mergeParams: true });
 const { broadcastToClients } = require('../utils/websocket');
 
@@ -149,7 +150,7 @@ router.post('/', async (req, res) => {
       comment: { author, content }
     });
     
-    console.log(`✅ 댓글 작성 완료: PostID=${postId}, 작성자="${author}"`);
+    logger.info(`✅ 댓글 작성 완료: PostID=${postId}, 작성자="${author}"`);
     
     res.json({
       success: true,
@@ -161,7 +162,7 @@ router.post('/', async (req, res) => {
     });
     
   } catch (error) {
-    console.error(`❌ [POST /api/posts/${req.params.postId}/comments] 에러:`, error);
+    logger.error(`❌ [POST /api/posts/${req.params.postId}/comments] 에러:`, error);
     res.status(500).json({ 
       success: false, 
       error: '댓글 작성에 실패했습니다.' 

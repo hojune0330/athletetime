@@ -10,6 +10,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const { broadcastToClients } = require('../utils/websocket');
+const { logger } = require('../utils/privacyGuardLogger');
 
 /**
  * POST /api/posts/:postId/vote
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
           [postId, userId]
         );
         // DB 트리거가 자동으로 카운터 감소 처리
-        console.log(`✅ 투표 취소: PostID=${postId}, Type=${type}`);
+        logger.info(`투표 취소: PostID=${postId}, Type=${type}`);
       } else {
         // 다른 타입으로 변경
         await client.query(
@@ -75,7 +76,7 @@ router.post('/', async (req, res) => {
           [type, postId, userId]
         );
         // DB 트리거가 자동으로 카운터 업데이트 처리 (기존 타입 -1, 새 타입 +1)
-        console.log(`✅ 투표 변경: PostID=${postId}, ${oldType} → ${type}`);
+        logger.info(`투표 변경: PostID=${postId}, ${oldType} → ${type}`);
       }
     } else {
       // 새 투표
@@ -84,7 +85,7 @@ router.post('/', async (req, res) => {
         [postId, userId, type]
       );
       // DB 트리거가 자동으로 카운터 증가 처리
-      console.log(`✅ 신규 투표: PostID=${postId}, Type=${type}`);
+      logger.info(`신규 투표: PostID=${postId}, Type=${type}`);
     }
     
     await client.query('COMMIT');
@@ -184,7 +185,7 @@ router.post('/', async (req, res) => {
     
   } catch (error) {
     await client.query('ROLLBACK');
-    console.error(`❌ [POST /api/posts/${req.params.postId}/vote] 에러:`, error);
+    logger.error(`[POST /api/posts/${req.params.postId}/vote] 에러`, error);
     res.status(500).json({ 
       success: false, 
       error: error.message || '투표에 실패했습니다.' 
