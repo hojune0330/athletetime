@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { log } from '@/lib/log';
 import type { FormEvent } from 'react'
 import { ChartBarIcon, MegaphoneIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../context/AuthContext'
@@ -103,7 +104,7 @@ export function CommunityQuickPostForm({
       onSubmitted(newPost.isNotice ? '공지사항이 등록됐어요!' : '게시글이 등록됐어요!')
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : '게시글을 등록하지 못했어요.'
-      console.error(message)
+      log.error(message)
       setFormError('게시글을 등록하지 못했어요. 잠시 후 다시 시도해주세요.')
     }
   }

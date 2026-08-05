@@ -1,4 +1,5 @@
 import { StrictMode } from 'react'
+import { log } from '@/lib/log';
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
@@ -9,7 +10,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (const registration of registrations) {
       registration.unregister();
-      console.log('Service Worker unregistered:', registration.scope);
+      log.debug('Service Worker unregistered:', registration.scope);
     }
   });
 }

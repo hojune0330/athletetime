@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { log } from '@/lib/log';
 
 interface ChartDownloadButtonsProps {
   chartId: string;
@@ -44,7 +45,7 @@ export const ChartDownloadButtons: React.FC<ChartDownloadButtonsProps> = ({
         pdf.save(`${filename}.pdf`);
       }
     } catch (error) {
-      console.error('Download failed:', error);
+      log.error('Download failed:', error);
       alert('다운로드 중 오류가 발생했습니다.');
     }
   }, [chartId, filename]);

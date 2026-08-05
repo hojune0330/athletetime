@@ -7,6 +7,7 @@
 
 import { STORAGE_KEYS } from '../types';
 
+import { log } from '@/lib/log';
 /**
  * 익명 사용자 ID 생성
  * 
@@ -136,7 +137,7 @@ export async function convertToMember(
   // POST /api/auth/convert
   // { anonymousId, email, password: _password, nickname }
   
-  console.log('[TODO] Convert anonymous user to member:', {
+  log.debug('[TODO] Convert anonymous user to member:', {
     anonymousId,
     email,
     nickname,

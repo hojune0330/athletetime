@@ -1,3 +1,4 @@
+import { log } from '@/lib/log';
 /**
  * 🌐 Athlete Time - 전역 상수 및 URL 관리
  * 
@@ -82,26 +83,26 @@ export const getApiBaseUrl = (): string => {
   // 환경 변수가 명시적으로 설정된 경우 최우선
   const envApiUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL;
   if (envApiUrl) {
-    console.log('[Config] Using env API URL:', envApiUrl);
+    log.debug('[Config] Using env API URL:', envApiUrl);
     return envApiUrl;
   }
   
   // 프로덕션 환경 (명시적 체크)
   const isProd = import.meta.env.MODE === 'production' || import.meta.env.PROD === true;
   if (isProd) {
-    console.log('[Config] Production mode - using:', BACKEND_URL);
+    log.debug('[Config] Production mode - using:', BACKEND_URL);
     return BACKEND_URL;
   }
   
   // 샌드박스 환경 자동 감지
   const sandboxUrl = getSandboxBackendUrl();
   if (sandboxUrl) {
-    console.log('[Config] Sandbox detected - using:', sandboxUrl);
+    log.debug('[Config] Sandbox detected - using:', sandboxUrl);
     return sandboxUrl;
   }
   
   // 로컬 개발 환경
-  console.log('[Config] Local development - using:', LOCAL_BACKEND_URL);
+  log.debug('[Config] Local development - using:', LOCAL_BACKEND_URL);
   return LOCAL_BACKEND_URL;
 };
 
@@ -217,13 +218,13 @@ export const STORAGE_KEYS = {
 // ============================================
 
 if (import.meta.env.DEV) {
-  console.group('🌐 Athlete Time Configuration');
-  console.log('Environment:', import.meta.env.MODE);
-  console.log('Frontend URL:', FRONTEND_URL);
-  console.log('Backend URL:', getApiBaseUrl());
-  console.log('WebSocket URL:', getWebSocketUrl());
-  console.log('Version:', APP_CONFIG.VERSION);
-  console.groupEnd();
+  log.group('🌐 Athlete Time Configuration', () => {
+      log.debug('Environment:', import.meta.env.MODE);
+      log.debug('Frontend URL:', FRONTEND_URL);
+      log.debug('Backend URL:', getApiBaseUrl());
+      log.debug('WebSocket URL:', getWebSocketUrl());
+      log.debug('Version:', APP_CONFIG.VERSION);
+  });
 }
 
 // ============================================

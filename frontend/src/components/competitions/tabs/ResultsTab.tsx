@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { log } from '@/lib/log';
 import type { CompetitionHighlight, ResultCompetition, ResultEvent, ResultMeta } from '../../../api/competitions';
 import { getResultCompetitions, getResultEvents } from '../../../api/competitions';
 import { CompetitionHighlights } from '../CompetitionHighlights';
@@ -34,7 +35,7 @@ export function ResultsTab({ searchParams, setSearchParams }: { searchParams: UR
           setSelectedComp(latestResultCompetition.filename);
           setSelectedYear(latestResultCompetition.year || '');
         }
-      } catch (e) { console.error(e); }
+      } catch (e) { log.error(e); }
       finally { setLoading(false); }
     })();
   }, []);
@@ -52,7 +53,7 @@ export function ResultsTab({ searchParams, setSearchParams }: { searchParams: UR
         newParams.set('tab', 'results');
         newParams.set('comp', selectedComp);
         setSearchParams(newParams, { replace: true });
-      } catch (e) { console.error(e); }
+      } catch (e) { log.error(e); }
       finally { setLoadingEvents(false); }
     })();
   }, [selectedComp, eventTypeFilter]);

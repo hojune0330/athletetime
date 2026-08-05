@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/log';
 import { BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon, Megaphone } from 'lucide-react';
@@ -64,7 +65,7 @@ export default function WritePage() {
   const isAdmin = user?.isAdmin || false;
   
   // 디버깅용 로그
-  console.log('WritePage - Auth state:', { user, loading, isAdmin });
+  log.debug('WritePage - Auth state:', { user, loading, isAdmin });
   
   // 폼 상태
   const [formData, setFormData] = useState<FormData>({
@@ -143,7 +144,7 @@ export default function WritePage() {
       showToast('✅ 게시글이 작성되었습니다!', { type: 'success' });
       setTimeout(() => navigate(`/community/post/${post.id}`), 500);
     } catch (err: any) {
-      console.error('게시글 작성 실패:', err);
+      log.error('게시글 작성 실패:', err);
       setError(err.message || '게시글 작성에 실패했습니다.');
       showToast('게시글 작성에 실패했습니다.', { type: 'error' });
     }

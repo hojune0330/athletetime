@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { log } from '@/lib/log';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
@@ -78,7 +79,7 @@ apiClient.interceptors.request.use(
     return config
   },
   (error: unknown) => {
-    console.error('API request error:', error)
+    log.error('API request error:', error)
     return Promise.reject(error)
   }
 )
@@ -105,7 +106,7 @@ async function runRefresh(): Promise<boolean> {
     return Boolean(response.data?.success)
   } catch (error: unknown) {
     if (error instanceof Error && import.meta.env.DEV) {
-      console.warn('Session refresh failed:', error.message)
+      log.warn('Session refresh failed:', error.message)
     }
     return false
   }
@@ -161,11 +162,11 @@ apiClient.interceptors.response.use(
     }
 
     if (error.response) {
-      console.error(`API response error [${error.response.status}] ${error.config?.url}:`, error.response.data)
+      log.error(`API response error [${error.response.status}] ${error.config?.url}:`, error.response.data)
     } else if (error.request) {
-      console.error('API response missing:', error.config?.url)
+      log.error('API response missing:', error.config?.url)
     } else {
-      console.error('API request setup error:', error.message)
+      log.error('API request setup error:', error.message)
     }
 
     return Promise.reject(error)

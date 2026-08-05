@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/log';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
@@ -53,7 +54,7 @@ export default function ProfilePage() {
           navigate('/');
         }
       } catch (error) {
-        console.error('사용자 정보 로드 실패:', error);
+        log.error('사용자 정보 로드 실패:', error);
         navigate('/');
       } finally {
         setLoading(false);

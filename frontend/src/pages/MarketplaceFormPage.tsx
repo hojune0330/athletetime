@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/log';
 import { CenteredSpinner } from '@/components/ui/loading-state';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -113,12 +114,12 @@ export default function MarketplaceFormPage() {
         }
       }
 
-      console.log('📤 이미지 업로드 시작:', fileArray.length, '개 파일');
+      log.debug('📤 이미지 업로드 시작:', fileArray.length, '개 파일');
       
       // 백엔드 API를 통해 업로드
       const response = await uploadImages(fileArray);
       
-      console.log('✅ 이미지 업로드 성공:', response);
+      log.debug('✅ 이미지 업로드 성공:', response);
       
       const uploadedUrls = response.images.map((img) => img.url);
 
@@ -137,9 +138,9 @@ export default function MarketplaceFormPage() {
       
       alert(`${uploadedUrls.length}개 이미지가 업로드되었습니다.`);
     } catch (error: unknown) {
-      console.error('❌ 이미지 업로드 오류:', error);
+      log.error('❌ 이미지 업로드 오류:', error);
       if (axios.isAxiosError(error)) {
-        console.error('❌ 에러 상세:', error.response?.data);
+        log.error('❌ 에러 상세:', error.response?.data);
       }
       
       // 더 자세한 에러 메시지

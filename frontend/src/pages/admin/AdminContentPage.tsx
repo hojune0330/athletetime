@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 
+import { log } from '@/lib/log';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import * as adminApi from '../../api/admin';
 import {
@@ -28,7 +29,7 @@ export default function AdminContentPage() {
       setQueueStatus(queue);
       setPipelineHistory(history?.history || []);
     } catch (e) {
-      console.error('데이터 로드 실패:', e);
+      log.error('데이터 로드 실패:', e);
     } finally {
       setLoading(false);
     }

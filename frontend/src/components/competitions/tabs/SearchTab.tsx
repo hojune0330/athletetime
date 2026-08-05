@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import { log } from '@/lib/log';
 import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon, TrophyIcon } from '@heroicons/react/24/outline';
 import type { SearchSection } from '../../../api/competitions';
@@ -41,7 +42,7 @@ export function SearchTab({ searchParams, setSearchParams }: { searchParams: URL
       newParams.set('q', q.trim());
       newParams.set('stype', type);
       setSearchParams(newParams, { replace: true });
-    } catch (e) { console.error(e); }
+    } catch (e) { log.error(e); }
     finally { setLoading(false); }
   };
 

@@ -3,6 +3,7 @@
  */
 
 import { createContext, useContext, useState, useEffect } from 'react';
+import { log } from '@/lib/log';
 import type { ReactNode } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -100,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(response.user ? toContextUser(response.user) : null);
     } catch (error) {
       if (!isHttpStatus(error, 401) && !isHttpStatus(error, 403)) {
-        console.error('사용자 정보 조회 실패:', error);
+        log.error('사용자 정보 조회 실패:', error);
       }
       setUser(null);
     } finally {
@@ -144,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authApi.logout();
     } catch (error) {
-      console.error('로그아웃 실패:', error);
+      log.error('로그아웃 실패:', error);
     } finally {
       setUser(null);
       // D: 로그아웃은 "그만 본다"가 아니라 "익명으로 계속 본다" — 홈으로.

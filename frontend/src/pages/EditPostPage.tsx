@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { log } from '@/lib/log';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
@@ -116,7 +117,7 @@ export default function EditPostPage() {
       showToast('✅ 게시글이 수정되었습니다!', { type: 'success' });
       setTimeout(() => navigate(`/community/post/${id}`), 500);
     } catch (err: any) {
-      console.error('게시글 수정 실패:', err);
+      log.error('게시글 수정 실패:', err);
       setError(err.message || '게시글 수정에 실패했습니다.');
       showToast('게시글 수정에 실패했습니다.', { type: 'error' });
     }

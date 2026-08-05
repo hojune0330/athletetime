@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { log } from '@/lib/log';
 import type { RoomId, ChatMessage, WebSocketMessage } from '../types';
 
 // WebSocket URL 결정 순서:
@@ -112,18 +113,18 @@ export function useWebSocket({
     
     // 이미 연결된 상태면 무시
     if (wsRef.current && (wsRef.current.readyState === WebSocket.CONNECTING || wsRef.current.readyState === WebSocket.OPEN)) {
-      console.log('⚠️ WebSocket 이미 연결됨/연결중, 중복 연결 방지');
+      log.debug('⚠️ WebSocket 이미 연결됨/연결중, 중복 연결 방지');
       return;
     }
 
     setConnectionStatus('connecting');
-    console.log('🔄 WebSocket 연결 시도 중...', WS_URL);
+    log.debug('🔄 WebSocket 연결 시도 중...', WS_URL);
 
     try {
       wsRef.current = new WebSocket(WS_URL);
 
       wsRef.current.onopen = () => {
-        console.log('✅ WebSocket 연결됨');
+        log.debug('✅ WebSocket 연결됨');
         setConnectionStatus('connected');
         reconnectAttempts.current = 0;
         
@@ -143,17 +144,17 @@ export function useWebSocket({
           const data: WebSocketMessage = JSON.parse(event.data);
           handleMessage(data);
         } catch (error) {
-          console.error('메시지 파싱 오류:', error);
+          log.error('메시지 파싱 오류:', error);
         }
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('❌ WebSocket 오류:', error);
+        log.error('❌ WebSocket 오류:', error);
         setConnectionStatus('disconnected');
       };
 
       wsRef.current.onclose = (event) => {
-        console.log('🔌 WebSocket 연결 종료', event.code, event.reason);
+        log.debug('🔌 WebSocket 연결 종료', event.code, event.reason);
         setConnectionStatus('disconnected');
         wsRef.current = null;
         
@@ -161,18 +162,18 @@ export function useWebSocket({
         if (reconnectAttempts.current < maxReconnectAttempts && nicknameRef.current) {
           reconnectAttempts.current++;
           const delay = Math.min(3000 * reconnectAttempts.current, 15000); // 최대 15초
-          console.log(`🔄 ${delay/1000}초 후 재연결 시도... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
+          log.debug(`🔄 ${delay/1000}초 후 재연결 시도... (${reconnectAttempts.current}/${maxReconnectAttempts})`);
           
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, delay);
         } else if (reconnectAttempts.current >= maxReconnectAttempts) {
-          console.log('❌ 최대 재연결 시도 횟수 초과');
+          log.debug('❌ 최대 재연결 시도 횟수 초과');
           callbacksRef.current.onSystemMessage?.('서버 연결에 실패했습니다. 페이지를 새로고침 해주세요.');
         }
       };
     } catch (error) {
-      console.error('WebSocket 연결 오류:', error);
+      log.error('WebSocket 연결 오류:', error);
       setConnectionStatus('disconnected');
     }
   }, [handleMessage]); // 의존성 최소화

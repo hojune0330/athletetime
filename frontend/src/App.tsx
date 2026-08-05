@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react'
+import { log } from '@/lib/log';
 import type { ReactNode } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
@@ -54,11 +55,11 @@ function App() {
     
     // 에러 처리
     window.addEventListener('error', (event) => {
-      console.error('Global error:', event.error)
+      log.error('Global error:', event.error)
     })
     
     window.addEventListener('unhandledrejection', (event) => {
-      console.error('Unhandled rejection:', event.reason)
+      log.error('Unhandled rejection:', event.reason)
     })
   }, [])
 
