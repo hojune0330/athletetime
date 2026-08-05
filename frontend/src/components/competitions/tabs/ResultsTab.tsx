@@ -26,8 +26,9 @@ export function ResultsTab({ searchParams, setSearchParams }: { searchParams: UR
         const res = await getResultCompetitions();
         setResultComps(res.data);
         setAvailableYears(res.years);
-        if (searchParams.get('comp') && res.data.find(c => c.filename === searchParams.get('comp'))) {
-          setSelectedComp(searchParams.get('comp')!);
+        const compParam = searchParams.get('comp');
+        if (compParam && res.data.some(c => c.filename === compParam)) {
+          setSelectedComp(compParam);
         } else if (res.data.length === 1) {
           setSelectedComp(res.data[0].filename);
         } else if (res.data.length > 1) {

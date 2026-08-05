@@ -1,7 +1,7 @@
 # AthleTime 전면 개편 마스터 플랜 (최종)
 
 > **작성:** 호준(사용자) + Claude 공동 · 갱신 주기: 턴 단위
-> **상태:** 1단계 진행 중 (1A/1B 복원 완료, 1C PaceRise 재작성 예정)
+> **상태:** 4단계 진행 중 (2C/3D/4A/4B 완료, 4C/4D 코드로 이미 해결 확인, 1C/2A/2B/3A/3B/3C 예정)
 > **브랜치 정책 (2025 결정):** ✅ **main 단일 브랜치** — 분기 금지. 모든 작업은 main에서 직접 커밋·푸시.
 > **커밋 컨벤션:** `ui(1):` / `ui(2):` / `ui(3):` / `ui(4):` (단계별로 독립 커밋)
 
@@ -29,8 +29,8 @@
 ### 1단계 — 기반 + 레거시 1호 재작성 (진행 중)
 | 항목 | 내용 | 상태 |
 |---|---|---|
-| 1A | `index.html` 3개 CDN 스타일시트 preload+onload+noscript (렌더차단 해소) | ✅ 복원 완료 (미커밋) |
-| 1B | `transition.ts` — `useNavigateWithTransition()` 폴백 훅 | ✅ 복원 완료 (미커밋) |
+| 1A | `index.html` 3개 CDN 스타일시트 preload+onload+noscript (렌더차단 해소) | ✅ 완료 — 파일·git 추적 확인 완료 |
+| 1B | `transition.ts` — `useNavigateWithTransition()` 폴백 훅 | ✅ 완료 — 파일·git 추적 확인 완료 |
 | 1C | **PaceRisePage 재작성** — 다크→라이트, 하드컬러 35건→토큰, inline style 제거, `any` 제거 | 🔄 진행 중 |
 | 1D | 프론트 빌드 검증 (`npm run build:check`) → `ui(1):` 커밋·푸시 | ⏳ |
 
@@ -39,23 +39,23 @@
 |---|---|
 | 2A | ScheduleCardPage 재작성 (731줄, 인라인 20·하드컬러 9 — 네이버그린 `#03C75A` 포함) |
 | 2B | 공용 Spinner/Skeleton/Button 일원화 — `animate-spin` 14페이지, `btn-primary` 15페이지 |
-| 2C | Header 1037줄 축소 (nav·유저 메뉴 리팩터) |
+| 2C | Header 1037줄 축소 (nav·유저 메뉴 리팩터) | ✅ 완료 — 1037→315줄, HeaderLoginModal/HeaderMobileDrawer/HeaderSearchBar 4분할 |
 
 ### 3단계 — 운영·정합
-| 항목 | 내용 |
-|---|---|
-| 3A | ChatPage 준비상태 전환 (실서버 웹소켓 노출 차단 — 채팅이 아닌 "준비 중"으로) |
-| 3B | nav 정리 (모바일 탭바 vs 데스크톱 헤더 통일) |
-| 3C | 프론트 console 로그 게이트 (44건 — `kDebugMode`/DEV 가드) |
-| 3D | UX 명세 97개 테스트 정합 (레코드 워크스페이스 계획 PR #77이 프론트 구현 못 따라간 부분) |
+| 항목 | 내용 | 상태 |
+|---|---|---|
+| 3A | ChatPage 준비상태 전환 (실서버 웹소켓 노출 차단 — 채팅이 아닌 "준비 중"으로) | ⏳ |
+| 3B | nav 정리 (모바일 탭바 vs 데스크톱 헤더 통일) | ⏳ |
+| 3C | 프론트 console 로그 게이트 (44건 — `kDebugMode`/DEV 가드) | ⏳ |
+| 3D | UX 명세 97개 테스트 정합 (레코드 워크스페이스 계획 PR #77이 프론트 구현 못 따라간 부분) | ✅ 완료 — 계약 테스트 2건 컴포넌트 정합, 91 fail baseline 유지 |
 
 ### 4단계 — 경험 고도화
-| 항목 | 내용 |
-|---|---|
-| 4A | 홈 → 본인 기록 검색 진입 |
-| 4B | 기록 상세 공유 링크 |
-| 4C | 대회 결과 탭 최신 자동 선택 |
-| 4D | CompareTray vs 모바일 탭바 하단 충돌 해결 |
+| 항목 | 내용 | 상태 |
+|---|---|---|
+| 4A | 홈 → 본인 기록 검색 진입 | ✅ 완료 — 로그인 사용자 nickname "내 기록 검색" 버튼 |
+| 4B | 기록 상세 공유 링크 | ✅ 완료 — Web Share API + 클립보드 폴백 + 계약 테스트 |
+| 4C | 대회 결과 탭 최신 자동 선택 | ✅ 코드에 이미 해결 — resultsStore period 내림차순 + data[0] 자동선택 (+ 엣지 보강) |
+| 4D | CompareTray vs 모바일 탭바 하단 충돌 해결 | ✅ 코드에 이미 해결 — `--mobile-tabbar-height` 변수로 트레이가 탭바 위에 뜨게 설계 |
 
 ---
 
@@ -65,11 +65,14 @@
 |---|---|---|
 | 이전 | P0 백엔드 하드닝 F1/F4/F5 + logger 전환 | ✅ 커밋 861a4ea/9f0031b → main 푸시 |
 | 이전 | docs 2건(토스·마스터플랜) 작성 | ✅ 이번 재작성 복원 |
-| 오늘 | 브랜치 통합 | ✅ `fix/security-p0-hardening` → main FF 병합·푸시 (9f0031b) |
-| 오늘 | 1A index.html preload | ✅ 복원 |
-| 오늘 | 1B transition.ts | ✅ 복원 |
-| 다음 | 1C PaceRise 재작성 | ⏳ |
-| 다음 | 1D 빌드 검증 + `ui(1):` 커밋·푸시 | ⏳ |
+| 이전 | 브랜치 통합 | ✅ main FF 병합·푸시 (9f0031b) |
+| 이전 | 1A index.html preload / 1B transition.ts | ✅ 완료·커밋됨 (파일·git 추적 확인) |
+| 오늘 | 2C Header 4분할 (LoginModal/Drawer/SearchBar) | ✅ 커밋 4f5c938/7570c07/b519a9e/1e45c4b |
+| 오늘 | 3D 테스트 정합 2건 | ✅ 커밋 e6aeb2f |
+| 오늘 | 4A 홈 본인 기록 검색 진입 | ✅ 커밋 195cf48 |
+| 오늘 | 4B 공유 링크 (Web Share + 폴백) | ✅ 커밋 8b86b51 |
+| 오늘 | 4C 엣지 보강 + 4D 확인·문서 갱신 | 🔄 진행 중 |
+| 다음 | 1C PaceRise 재작성 / 2A ScheduleCard / 2B 공용 UI / 3A~3C | ⏳ |
 
 ---
 

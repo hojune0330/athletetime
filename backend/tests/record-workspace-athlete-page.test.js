@@ -46,3 +46,21 @@ test('Given the public athlete route When source contracts are scanned Then self
   assert.match(page, /소속·연도·종목을 확인해 주세요/);
   assert.doesNotMatch(page, /내 기록|selfClaim|MyRecords|onToggleMine|isMine/);
 });
+
+test('Given the athlete share contract When RecordAthletePage is scanned Then sharing stays public and truthful', () => {
+  // Given the dedicated athlete page source that now owns the share action.
+  const page = fs.readFileSync(
+    path.join(FRONTEND, 'src/features/record-workspace/pages/RecordAthletePage.tsx'),
+    'utf8',
+  );
+
+  // When the share button, Web Share first, and clipboard fallback are inspected.
+  // Then the page exposes a public share entry and never claims ownership of the record.
+  assert.match(page, /ShareIcon/);
+  assert.match(page, />\s*공유\s*</);
+  assert.match(page, /navigator\.share/);
+  assert.match(page, /navigator\.clipboard\.writeText/);
+  assert.match(page, /링크를 복사했어요/);
+  assert.match(page, /AbortError/);
+  assert.doesNotMatch(page, /내 기록|내 공유|소유|selfClaim/);
+});
