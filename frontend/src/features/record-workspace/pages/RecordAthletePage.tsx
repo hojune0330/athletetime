@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { ShareIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { AffiliationHistory } from '../components/AffiliationHistory'
 import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
@@ -57,6 +58,24 @@ export default function RecordAthletePage() {
   const subject = preview.subjects[0]
   const sameNameCaution = subject.note.trim()
     || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
+  const shareRecord = async () => {
+    const url = window.location.href
+    const title = `${subject.name} 선수 기록`
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title, url })
+        return
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url)
+      setActionNotice('링크를 복사했어요. 공유할 곳에 붙여 넣어 주세요.')
+    } catch {
+      setActionNotice('주소를 복사하지 못했어요. 다시 시도해 주세요.')
+    }
+  }
   const addToDraft = () => {
     const current = store.workspaceDraft?.subjectKeys ?? []
     const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
@@ -117,6 +136,10 @@ export default function RecordAthletePage() {
         <div className="mt-5 flex flex-wrap gap-2">
           <Button type="button" onClick={addToDraft}>기록 모음에 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
+          <Button type="button" variant="outline" onClick={shareRecord}>
+            <ShareIcon className="h-4 w-4" aria-hidden="true" />
+            공유
+          </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
               <Link to="/records/workspaces/new">선택 검토하기 · {draftCount}개</Link>
