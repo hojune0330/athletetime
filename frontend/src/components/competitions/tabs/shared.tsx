@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import type {
   Competition,
   ProvenanceMeta,
@@ -214,10 +215,5 @@ export function EmptyState({
 }
 
 export function LoadingSpinner() {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 gap-3">
-      <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-500 border-t-transparent" />
-      <span className="text-sm text-neutral-400">데이터를 불러오는 중...</span>
-    </div>
-  );
+  return <CenteredSpinner size="lg" text="데이터를 불러오는 중..." />;
 }

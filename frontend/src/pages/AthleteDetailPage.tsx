@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import { Link, useParams } from 'react-router-dom';
 import {
   ArrowTopRightOnSquareIcon,
@@ -45,7 +46,7 @@ export default function AthleteDetailPage() {
   if (state === 'loading') {
     return (
       <div className="rounded-[2rem] border border-neutral-200 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-primary-100 border-t-primary-500" />
+        <CenteredSpinner size="lg" />
         <p className="mt-4 text-sm font-bold text-neutral-500">선수 기록을 불러오는 중입니다.</p>
       </div>
     );

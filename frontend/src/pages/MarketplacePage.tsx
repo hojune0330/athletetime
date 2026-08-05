@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import { Link, useNavigate } from 'react-router-dom';
 import { PlusIcon, MagnifyingGlassIcon, EyeIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import PageHeader from '../components/common/PageHeader';
@@ -225,7 +226,7 @@ export default function MarketplacePage() {
       {/* 로딩 */}
       {isLoading && (
         <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+          <CenteredSpinner size="lg" />
         </div>
       )}
 

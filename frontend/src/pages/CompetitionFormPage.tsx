@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import PageHeader from '../components/common/PageHeader';
 import { useCompetition, useCreateCompetition, useUpdateCompetition } from '../hooks/useCompetitions';
@@ -159,7 +160,7 @@ export default function CompetitionFormPage() {
   if (isEditMode && isLoadingCompetition) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <CenteredSpinner size="lg" />
       </div>
     );
   }
@@ -315,7 +316,7 @@ export default function CompetitionFormPage() {
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner />
                   <span>{isEditMode ? '수정 중...' : '등록 중...'}</span>
                 </>
               ) : (

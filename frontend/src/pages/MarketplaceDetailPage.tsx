@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeftIcon,
@@ -142,7 +143,7 @@ export default function MarketplaceDetailPage() {
   if (isLoadingItem) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <CenteredSpinner size="lg" />
       </div>
     );
   }
@@ -392,7 +393,7 @@ export default function MarketplaceDetailPage() {
             {/* 댓글 목록 */}
             {isLoadingComments ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary-500 border-t-transparent"></div>
+                <CenteredSpinner size="md" />
               </div>
             ) : comments.length === 0 ? (
               <div className="text-center py-12 text-neutral-500">

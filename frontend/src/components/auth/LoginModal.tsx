@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
+import { BusySpinner } from '@/components/ui/loading-state';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -123,7 +124,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner className="h-5 w-5" />
                   <span>로그인 중...</span>
                 </>
               ) : (

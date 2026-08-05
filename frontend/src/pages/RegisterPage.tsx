@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import { BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
@@ -285,7 +286,7 @@ export default function RegisterPage() {
                     }`}
                   >
                     {sendingEmail ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <BusySpinner className="h-5 w-5" />
                     ) : emailVerified ? (
                       <CheckCircleIcon className="w-5 h-5" />
                     ) : emailSent ? (
@@ -335,7 +336,7 @@ export default function RegisterPage() {
                       className="px-4 py-2 text-sm font-medium bg-primary-500 text-white rounded-xl hover:bg-primary-600 disabled:opacity-50 transition-all whitespace-nowrap"
                     >
                       {verifyingEmail ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <BusySpinner className="h-5 w-5" />
                       ) : (
                         '확인'
                       )}
@@ -414,7 +415,7 @@ export default function RegisterPage() {
                     }`}
                   >
                     {checkingNickname ? (
-                      <div className="w-5 h-5 border-2 border-neutral-500 border-t-transparent rounded-full animate-spin" />
+                      <BusySpinner className="h-5 w-5 border-neutral-500 border-t-transparent" />
                     ) : nicknameAvailable ? (
                       <CheckCircleIcon className="w-5 h-5" />
                     ) : (
@@ -441,7 +442,7 @@ export default function RegisterPage() {
               >
                 {loading ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BusySpinner className="h-5 w-5" />
                     <span>처리 중...</span>
                   </>
                 ) : (

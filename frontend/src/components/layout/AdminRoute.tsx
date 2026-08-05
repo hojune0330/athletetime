@@ -7,6 +7,7 @@
 
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 
 export default function AdminRoute() {
   const { user, loading } = useAuth();
@@ -16,7 +17,7 @@ export default function AdminRoute() {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <CenteredSpinner size="lg" className="mb-4" />
           <p className="text-neutral-500 text-sm">권한 확인 중...</p>
         </div>
       </div>

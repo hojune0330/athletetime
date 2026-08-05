@@ -3,6 +3,8 @@
  */
 
 import { useState, useEffect } from 'react';
+
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import * as adminApi from '../../api/admin';
 import {
   TrashIcon,
@@ -111,7 +113,7 @@ export default function AdminGalleryPage() {
       {/* 이미지 그리드 */}
       {loading && images.length === 0 ? (
         <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <CenteredSpinner size="md" />
         </div>
       ) : filteredImages.length === 0 ? (
         <div className="text-center py-16">

@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
@@ -206,7 +207,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+        <CenteredSpinner size="md" />
       </div>
     );
   }
@@ -294,7 +295,7 @@ export default function ProfilePage() {
                     }`}
                   >
                     {checkingNickname ? (
-                      <div className="w-5 h-5 border-2 border-neutral-500 border-t-transparent rounded-full animate-spin" />
+                      <BusySpinner className="h-5 w-5 border-neutral-500 border-t-transparent" />
                     ) : nicknameAvailable && formData.nickname !== originalNickname ? (
                       <CheckCircleIcon className="w-5 h-5" />
                     ) : (
@@ -369,7 +370,7 @@ export default function ProfilePage() {
               >
                 {saving ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BusySpinner className="h-5 w-5" />
                     <span>저장 중...</span>
                   </>
                 ) : (

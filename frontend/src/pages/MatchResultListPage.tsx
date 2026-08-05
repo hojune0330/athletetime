@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useParams, Link } from 'react-router-dom';
 import { 
   PlusIcon,
@@ -67,7 +68,7 @@ function DeleteModal({ isOpen, resultInfo, onClose, onConfirm, isDeleting }: Del
             >
               {isDeleting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner />
                   <span>삭제 중...</span>
                 </>
               ) : (
@@ -133,7 +134,7 @@ export default function MatchResultListPage() {
       {/* 로딩 */}
       {isLoading && (
         <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+          <CenteredSpinner size="lg" />
         </div>
       )}
       

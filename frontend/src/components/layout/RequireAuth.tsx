@@ -13,6 +13,7 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 
 export default function RequireAuth() {
   const { user, loading, promptLogin } = useAuth();
@@ -33,7 +34,7 @@ export default function RequireAuth() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <CenteredSpinner size="lg" className="mb-4" />
           <p className="text-neutral-500 text-sm">불러오는 중…</p>
         </div>
       </div>

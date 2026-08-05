@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { CenteredSpinner } from '@/components/ui/loading-state';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -250,7 +251,7 @@ export default function MarketplaceFormPage() {
   if (isLoading && isEditMode) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <CenteredSpinner size="lg" />
       </div>
     );
   }

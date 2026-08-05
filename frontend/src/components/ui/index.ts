@@ -7,6 +7,7 @@ export { Badge, badgeVariants, type BadgeProps } from './badge';
 export { Input } from './input';
 export { Separator } from './separator';
 export { Skeleton } from './skeleton';
+export { LoadingState, BusySpinner, CenteredSpinner } from './loading-state';
 export {
   Dialog,
   DialogPortal,

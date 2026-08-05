@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react'
-import { LoaderCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { BusySpinner } from '@/components/ui/loading-state'
 import { cn } from '@/lib/utils'
 
 type WorkspaceRecoveryKind =
@@ -87,12 +87,9 @@ export function WorkspaceRecoveryState({
       role="status"
     >
       <div className="flex items-start gap-3">
-        {isLoading && (
-          <LoaderCircle
-            aria-hidden="true"
-            className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-brand motion-reduce:animate-none"
-          />
-        )}
+          {isLoading && (
+            <BusySpinner tone="brand" size="md" className="mt-0.5 shrink-0" />
+          )}
         <div className="min-w-0">
           <h2 className="text-body font-semibold leading-6 text-ink">{copy.title}</h2>
           <p className="mt-1 text-body-sm leading-5 text-ink-2">{copy.description}</p>

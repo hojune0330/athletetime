@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { usePost, useUpdatePost } from '../hooks/usePosts';
@@ -150,7 +151,7 @@ export default function EditPostPage() {
     return (
       <div>
         <div className="flex justify-center items-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+          <CenteredSpinner size="lg" />
         </div>
       </div>
     );
@@ -293,7 +294,7 @@ export default function EditPostPage() {
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner className="h-5 w-5" />
                   <span>수정 중...</span>
                 </>
               ) : (

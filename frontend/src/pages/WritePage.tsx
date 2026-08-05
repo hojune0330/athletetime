@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { BusySpinner } from '@/components/ui/loading-state';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon, Megaphone } from 'lucide-react';
 import { useCreatePost, useCategories } from '../hooks/usePosts';
@@ -380,7 +381,7 @@ export default function WritePage() {
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner className="h-5 w-5" />
                   <span>작성 중...</span>
                 </>
               ) : (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { BusySpinner } from '@/components/ui/loading-state';
 interface NicknameModalProps {
   isOpen: boolean;
   nickname: string;
@@ -123,7 +124,7 @@ export const NicknameModal: React.FC<NicknameModalProps> = ({
           >
             {isLoading ? (
               <>
-                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                <BusySpinner className="border-ink/80 border-t-transparent" />
                 확인 중...
               </>
             ) : (

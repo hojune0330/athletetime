@@ -3,6 +3,7 @@
  */
 
 import { useState } from 'react';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   EyeIcon, 
@@ -384,7 +385,7 @@ function CommentSection({ comments, commentsCount, onSubmit, isSubmitting }: Com
             >
               {isSubmitting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <BusySpinner />
                   <span>작성 중...</span>
                 </>
               ) : (
@@ -489,7 +490,7 @@ function EditPasswordModal({ isOpen, onClose, onConfirm, isVerifying, error }: E
               >
                 {isVerifying ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BusySpinner />
                     <span>확인 중...</span>
                   </>
                 ) : (
@@ -558,7 +559,7 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
               >
                 {isDeleting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BusySpinner />
                     <span>삭제 중...</span>
                   </>
                 ) : (
@@ -667,7 +668,7 @@ function AdminDeleteModal({ isOpen, onClose, onConfirm, isDeleting }: AdminDelet
               >
                 {isDeleting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BusySpinner />
                     <span>삭제 중...</span>
                   </>
                 ) : (
@@ -812,7 +813,7 @@ export default function PostDetailPage() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+        <CenteredSpinner size="lg" />
       </div>
     );
   }
