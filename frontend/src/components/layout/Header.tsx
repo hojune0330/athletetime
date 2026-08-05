@@ -1,29 +1,25 @@
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import {
   Bars3Icon,
   XMarkIcon,
   ClockIcon,
-  UserIcon,
-  MagnifyingGlassIcon
+  UserIcon
 } from '@heroicons/react/24/outline'
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { BusySpinner } from '@/components/ui/loading-state'
 import HeaderLoginModal, { type LoginModalMode } from './HeaderLoginModal'
 import HeaderMobileDrawer from './HeaderMobileDrawer'
+import HeaderSearchBar from './HeaderSearchBar'
 import { OPEN_MOBILE_MENU_EVENT } from './MobileTabBar'
 
 export default function Header() {
   const location = useLocation()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null)
-  const recordSearchInputRef = useRef<HTMLInputElement>(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [loginInitialMode, setLoginInitialMode] = useState<LoginModalMode>('login')
-  const [recordSearchQuery, setRecordSearchQuery] = useState('')
 
   // AuthContext에서 로그인 상태 가져오기 (전체 앱과 동기화)
   // login/closeLoginPrompt는 HeaderLoginModal 내부에서 직접 사용한다.
@@ -75,27 +71,6 @@ export default function Header() {
     window.addEventListener(OPEN_MOBILE_MENU_EVENT, openDrawer)
     return () => window.removeEventListener(OPEN_MOBILE_MENU_EVENT, openDrawer)
   }, [])
-
-  const submitRecordSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const trimmed = recordSearchQuery.trim()
-    if (!trimmed) {
-      recordSearchInputRef.current?.focus()
-      return
-    }
-
-    navigate(`/records?q=${encodeURIComponent(trimmed)}`)
-    setRecordSearchQuery('')
-  }
-
-  const handleRecordSearchKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== 'Enter') return
-
-    event.preventDefault()
-    if (event.nativeEvent.isComposing) return
-    event.currentTarget.form?.requestSubmit()
-  }
 
   const handleLogout = async () => {
     await logoutWithContext()
@@ -224,27 +199,8 @@ export default function Header() {
                 </div>
               </nav>
 
-              <form role="search" onSubmit={submitRecordSearch} className="hidden lg:flex w-56 items-center gap-1">
-                <label className="sr-only" htmlFor="header-record-search">기록 검색</label>
-                <input
-                  id="header-record-search"
-                  ref={recordSearchInputRef}
-                  name="record-search"
-                  type="search"
-                  value={recordSearchQuery}
-                  onChange={(event) => setRecordSearchQuery(event.target.value)}
-                  onKeyDown={handleRecordSearchKeyDown}
-                  placeholder="기록 검색"
-                  className="h-9 min-w-0 flex-1 rounded-sm border border-line bg-surface px-3 text-sm text-ink placeholder:text-ink-4 focus:border-brand focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  aria-label="기록 검색"
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink focus:outline-none focus:ring-2 focus:ring-brand"
-                >
-                  <MagnifyingGlassIcon className="h-4 w-4" />
-                </button>
-              </form>
+              {/* 기록 검색 — HeaderSearchBar로 분리 (2C-4) */}
+              <HeaderSearchBar />
 
               {/* 관리자 드롭다운 (데스크톱) + 로그인/회원가입 */}
               <div className="hidden md:flex items-center gap-2">
