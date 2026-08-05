@@ -241,6 +241,16 @@ export default function MainPage() {
             </form>
 
             <div className="mt-4 flex flex-wrap gap-2">
+              {/* 로그인 사용자 전용 — 자신의 이름으로 기록 검색 (4A) */}
+              {user && user.nickname && (
+                <Link
+                  to={`/records?q=${encodeURIComponent(user.nickname)}`}
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-brand bg-brand-50 px-3 py-1.5 text-body-sm font-medium text-brand transition-colors hover:bg-brand-50/80"
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                  내 기록 검색 ({user.nickname})
+                </Link>
+              )}
               {quickSearches.map((item) => (
                 <Link
                   key={item.label}
