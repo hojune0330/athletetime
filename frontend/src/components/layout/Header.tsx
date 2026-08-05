@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { BusySpinner } from '@/components/ui/loading-state'
 import HeaderLoginModal, { type LoginModalMode } from './HeaderLoginModal'
+import HeaderMobileDrawer from './HeaderMobileDrawer'
 import { OPEN_MOBILE_MENU_EVENT } from './MobileTabBar'
 
 export default function Header() {
@@ -67,19 +68,6 @@ export default function Header() {
   const closeMobileMenu = () => {
     setMobileMenuOpen(false)
   }
-
-  useEffect(() => {
-    if (!mobileMenuOpen) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setMobileMenuOpen(false)
-      mobileMenuButtonRef.current?.focus()
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [mobileMenuOpen])
 
   // 모바일 하단 탭바의 '더보기'가 헤더 드로어를 열도록 커스텀 이벤트를 수신한다.
   useEffect(() => {
@@ -349,154 +337,16 @@ export default function Header() {
         </div>
       </header>
 
-      {mobileMenuOpen && (
-        <div
-          className="mobile-menu-overlay active"
-          onClick={closeMobileMenu}
-        />
-      )}
-
-      {mobileMenuOpen && (
-      <div
-        id="mobile-navigation-drawer"
-        role="dialog"
-        aria-modal="true"
-        className="mobile-drawer active"
-      >
-        <div className="flex flex-col h-full">
-          {/* 드로어 헤더 */}
-          <div className="flex items-center justify-between p-4 border-b border-line">
-            <Link to="/" onClick={closeMobileMenu} className="flex items-center gap-2">
-              <ClockIcon className="w-6 h-6 text-brand" />
-              <span className="text-lg font-semibold tracking-tight text-ink">애타</span>
-            </Link>
-            <button
-              onClick={closeMobileMenu}
-              className="rounded-sm p-2 text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
-            >
-              <XMarkIcon className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* 드로어 내비게이션 */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-0.5">
-              {/* 핵심 메뉴 — 기록 중심 루프 */}
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={closeMobileMenu}
-                  className={`flex items-center gap-3 border-l-2 px-4 py-3 transition-colors ${
-                    isActive(item.path)
-                      ? 'border-brand bg-surface-2 text-brand'
-                      : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
-                  }`}
-                >
-                  <span className="font-medium">{item.mobileLabel}</span>
-                </Link>
-              ))}
-            </div>
-
-            {/* 도구·부가 기능 — 핵심 루프 밖 화면 그룹 */}
-            <div className="mt-6 pt-4 border-t border-hair">
-              <div className="px-4 py-2 font-mono text-mono-xs uppercase tracking-widest-2 text-ink-4">
-                도구·부가 기능
-              </div>
-              <div className="space-y-0.5">
-                {moreNavItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={closeMobileMenu}
-                    className={`flex items-baseline justify-between gap-3 border-l-2 px-4 py-3 transition-colors ${
-                      isActive(item.path)
-                        ? 'border-brand bg-surface-2 text-brand'
-                        : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
-                    }`}
-                  >
-                    <span className="font-medium">{item.label}</span>
-                    <span className="text-mono-xs text-ink-4">{item.note}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* 모바일 로그인/회원가입 또는 사용자 정보 */}
-            <div className="mt-6 pt-6 border-t border-line space-y-0.5">
-              {/* 관리자 메뉴 (모바일) */}
-              {user?.isAdmin && (
-                <div className="mb-4">
-                  <div className="px-4 py-2 font-mono text-mono-xs uppercase tracking-widest-2 text-ink-4">
-                    Admin
-                  </div>
-                  {adminNavItems.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={closeMobileMenu}
-                      className={`flex items-center gap-3 border-l-2 px-4 py-3 transition-colors ${
-                        isActive(item.path)
-                          ? 'border-brand bg-surface-2 text-brand'
-                          : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
-                      }`}
-                    >
-                      <span className="font-medium">{item.label}</span>
-                    </Link>
-                  ))}
-                  <div className="my-2 border-b border-hair" />
-                </div>
-              )}
-              {user ? (
-                <>
-                  <Link
-                    to="/profile"
-                    onClick={closeMobileMenu}
-                    className="flex w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2"
-                  >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">
-                      {user.nickname.charAt(0)}
-                    </div>
-                    <span className="font-medium">{user.nickname}</span>
-                    <span className="ml-auto font-mono text-mono-xs uppercase tracking-wider-2 text-ink-4">Profile →</span>
-                  </Link>
-                  <button
-                    onClick={() => {
-                      closeMobileMenu()
-                      handleLogout()
-                    }}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
-                  >
-                    <span className="font-medium">로그아웃</span>
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      closeMobileMenu()
-                      setShowLoginModal(true)
-                    }}
-                    className="flex w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2"
-                  >
-                    <UserIcon className="w-5 h-5 text-ink-3" />
-                    <span className="font-medium">로그인</span>
-                  </button>
-                  <Link
-                    to="/register"
-                    onClick={closeMobileMenu}
-                    className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-brand-600"
-                  >
-                    <UserIcon className="w-5 h-5" />
-                    <span className="font-medium">회원가입</span>
-                  </Link>
-                </>
-              )}
-            </div>
-          </nav>
-        </div>
-      </div>
-      )}
+      {/* 모바일 드로어 — HeaderMobileDrawer로 분리 (2C-3) */}
+      <HeaderMobileDrawer
+        open={mobileMenuOpen}
+        onClose={closeMobileMenu}
+        onOpenLogin={() => setShowLoginModal(true)}
+        triggerRef={mobileMenuButtonRef}
+        items={navItems}
+        moreItems={moreNavItems}
+        adminItems={adminNavItems}
+      />
 
       {/* 로그인/비밀번호 찾기 모달 — HeaderLoginModal로 분리 (2C-2B) */}
       <HeaderLoginModal
