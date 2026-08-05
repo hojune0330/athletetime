@@ -4,11 +4,10 @@
 
 import { useState, useEffect } from 'react';
 
-import { CenteredSpinner } from '@/components/ui/loading-state';
+import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
 import * as adminApi from '../../api/admin';
 import {
   TrashIcon,
-  ArrowPathIcon,
   MagnifyingGlassIcon,
   PhotoIcon,
   ArrowDownTrayIcon,
@@ -87,7 +86,7 @@ export default function AdminGalleryPage() {
           disabled={loading}
           className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-all disabled:opacity-50"
         >
-          <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <BusySpinner size="sm" tone="ink" />
           새로고침
         </button>
       </div>

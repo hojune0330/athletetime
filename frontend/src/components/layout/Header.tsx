@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { 
+import {
   Bars3Icon,
   XMarkIcon,
   ClockIcon,
@@ -13,6 +13,7 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import * as authApi from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
+import { BusySpinner } from '@/components/ui/loading-state'
 import { OPEN_MOBILE_MENU_EVENT } from './MobileTabBar'
 
 type ModalMode = 'login' | 'forgotPassword' | 'verifyCode' | 'resetPassword';
@@ -461,7 +462,7 @@ export default function Header() {
                 )}
 
                 {isLoadingUser ? (
-                  <div className="w-4 h-4 border-2 border-line border-t-brand rounded-full animate-spin" />
+                  <BusySpinner tone="brand" size="sm" />
                 ) : user ? (
                   <>
                     <Link
@@ -758,7 +759,7 @@ export default function Header() {
                     >
                       {isLoggingIn ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <BusySpinner size="md" />
                           <span>로그인 중...</span>
                         </>
                       ) : (
@@ -847,7 +848,7 @@ export default function Header() {
                     >
                       {isSendingCode ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <BusySpinner size="md" />
                           <span>발송 중...</span>
                         </>
                       ) : (
@@ -920,7 +921,7 @@ export default function Header() {
                     >
                       {isVerifyingCode ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <BusySpinner size="md" />
                           <span>확인 중...</span>
                         </>
                       ) : (
@@ -1018,7 +1019,7 @@ export default function Header() {
                     >
                       {isResettingPassword ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <BusySpinner size="md" />
                           <span>변경 중...</span>
                         </>
                       ) : (
