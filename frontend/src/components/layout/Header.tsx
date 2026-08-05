@@ -804,7 +804,7 @@ export default function Header() {
                     <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <EnvelopeIcon className="w-8 h-8 text-brand" />
                     </div>
-                    <p className="text-neutral-600 text-sm">
+                    <p className="text-sm text-ink-2">
                       가입한 이메일 주소를 입력하시면<br />
                       비밀번호 재설정 인증 코드를 보내드립니다.
                     </p>
@@ -876,7 +876,7 @@ export default function Header() {
                     <div className="w-16 h-16 bg-primary-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <KeyIcon className="w-8 h-8 text-brand" />
                     </div>
-                    <p className="text-neutral-600 text-sm">
+                    <p className="text-sm text-ink-2">
                       <strong>{forgotEmail}</strong>으로<br />
                       등록된 이메일이라면 받은 6자리 인증 코드를 입력해주세요.
                     </p>
@@ -950,7 +950,7 @@ export default function Header() {
                     <div className="w-16 h-16 bg-success-50 rounded-full flex items-center justify-center mx-auto mb-4">
                       <KeyIcon className="w-8 h-8 text-success-500" />
                     </div>
-                    <p className="text-neutral-600 text-sm">
+                    <p className="text-sm text-ink-2">
                       인증이 완료되었습니다.<br />
                       새로운 비밀번호를 설정해주세요.
                     </p>

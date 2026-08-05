@@ -35,7 +35,7 @@ export default function RequireAuth() {
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <CenteredSpinner size="lg" className="mb-4" />
-          <p className="text-neutral-500 text-sm">불러오는 중…</p>
+          <p className="text-sm text-ink-3">불러오는 중…</p>
         </div>
       </div>
     );

@@ -5,7 +5,7 @@ import MobileTabBar from './MobileTabBar'
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <Header />
       <div className="max-w-5xl mx-auto w-full px-4 py-6 flex-1">
         <main>
@@ -26,7 +26,7 @@ export default function Layout() {
  */
 export function FullWidthLayout() {
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <Header />
       <div className="flex-1">
         <main>

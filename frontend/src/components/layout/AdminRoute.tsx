@@ -15,10 +15,10 @@ export default function AdminRoute() {
   // 로딩 중
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen bg-bg flex items-center justify-center">
         <div className="text-center">
           <CenteredSpinner size="lg" className="mb-4" />
-          <p className="text-neutral-500 text-sm">권한 확인 중...</p>
+          <p className="text-sm text-ink-3">권한 확인 중...</p>
         </div>
       </div>
     );
