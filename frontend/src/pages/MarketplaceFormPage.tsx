@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/log';
 import { CenteredSpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -441,10 +442,10 @@ export default function MarketplaceFormPage() {
               <Link to={isEditMode ? `/marketplace/${id}` : '/marketplace'} className="btn-secondary flex-1">
                 취소
               </Link>
-              <button
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="btn-primary flex-1 disabled:opacity-50"
+                className="flex-1"
               >
                 {isSubmitting
                   ? isEditMode
@@ -453,7 +454,7 @@ export default function MarketplaceFormPage() {
                   : isEditMode
                   ? '수정하기'
                   : '등록하기'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

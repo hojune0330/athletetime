@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 
 type FeaturePreparingPageProps = {
   title: string
@@ -15,8 +16,12 @@ export default function FeaturePreparingPage({ title, description }: FeaturePrep
         안전한 운영 기준과 신고·검토 절차를 먼저 갖춘 뒤 열겠습니다.
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Link to="/records" className="btn-primary">내 기록 찾기</Link>
-        <Link to="/competitions" className="btn-secondary">대회 결과 보기</Link>
+        <Button asChild>
+          <Link to="/records">내 기록 찾기</Link>
+        </Button>
+        <Button asChild variant="secondary">
+          <Link to="/competitions">대회 결과 보기</Link>
+        </Button>
       </div>
     </section>
   )

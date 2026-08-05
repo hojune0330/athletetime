@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button'
+
 type RecordContextPromptProps = {
   readonly recordContext: string
   readonly onStart: () => void
@@ -21,12 +23,12 @@ export function RecordContextPrompt({ recordContext, onStart }: RecordContextPro
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <a href={recordSearchHref} className="btn-secondary text-center">
-              기록 다시 보기
-            </a>
-            <button type="button" onClick={onStart} className="btn-primary">
+            <Button asChild variant="secondary">
+              <a href={recordSearchHref}>기록 다시 보기</a>
+            </Button>
+            <Button type="button" onClick={onStart}>
               이 기록 이야기하기
-            </button>
+            </Button>
           </div>
         </div>
       </div>

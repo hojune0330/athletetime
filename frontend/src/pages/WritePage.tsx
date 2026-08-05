@@ -12,6 +12,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/log';
 import { BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon, Megaphone } from 'lucide-react';
 import { useCreatePost, useCategories } from '../hooks/usePosts';
@@ -375,10 +376,10 @@ export default function WritePage() {
               취소
             </button>
             
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary w-full sm:w-auto"
+              className="w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <>
@@ -391,7 +392,7 @@ export default function WritePage() {
                   <span>게시글 작성</span>
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </form>
         

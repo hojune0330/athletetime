@@ -4,6 +4,7 @@ import { ArrowTopRightOnSquareIcon, CalendarIcon, FunnelIcon, MagnifyingGlassIco
 import type { Competition, ResultCompetition } from '../../../api/competitions';
 import { getResultCompetitions } from '../../../api/competitions';
 import { useCompetitions } from '../../../hooks/useCompetitions';
+import { Button } from '@/components/ui/button';
 import { CATEGORY_ORDER, currentYear, DdayBadge, EmptyState, formatDateRange, LoadingSpinner, STATUS_OPTIONS, YEAR_OPTIONS } from './shared';
 
 export function ScheduleTab() {
@@ -107,7 +108,7 @@ export function ScheduleTab() {
       {!isLoading && !isError && totalCount === 0 && (
         <EmptyState emoji="🏆" title="등록된 대회가 없습니다"
           description={hasFilters ? '검색 조건에 맞는 대회가 없습니다.' : `${selectedYear}년 대회 정보가 아직 등록되지 않았습니다.`}
-          action={hasFilters ? <button onClick={clearFilters} className="btn-primary mt-4">필터 초기화</button> : undefined} />
+          action={hasFilters ? <Button type="button" onClick={clearFilters} className="mt-4">필터 초기화</Button> : undefined} />
       )}
       {!isLoading && !isError && totalCount > 0 && (
         <div>

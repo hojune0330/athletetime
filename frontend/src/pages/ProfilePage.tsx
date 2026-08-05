@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/log';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
@@ -364,10 +365,10 @@ export default function ProfilePage() {
               )}
 
               {/* 제출 버튼 */}
-              <button
+              <Button
                 type="submit"
                 disabled={saving}
-                className="btn-primary w-full mt-6"
+                className="w-full mt-6"
               >
                 {saving ? (
                   <>
@@ -377,7 +378,7 @@ export default function ProfilePage() {
                 ) : (
                   '저장하기'
                 )}
-              </button>
+              </Button>
             </form>
           </div>
         </div>

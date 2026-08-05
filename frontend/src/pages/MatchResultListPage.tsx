@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useParams, Link } from 'react-router-dom';
 import { 
   PlusIcon,
@@ -158,10 +159,12 @@ export default function MatchResultListPage() {
             backText="대회 목록으로"
             actions={
               isAdmin ? (
-                <Link to={`/matchResult/${competitionId}/new`} className="btn-primary">
-                  <PlusIcon className="w-5 h-5" />
-                  경기 결과 등록
-                </Link>
+                <Button asChild>
+                  <Link to={`/matchResult/${competitionId}/new`}>
+                    <PlusIcon className="w-5 h-5" />
+                    경기 결과 등록
+                  </Link>
+                </Button>
               ) : undefined
             }
           >
@@ -241,10 +244,12 @@ export default function MatchResultListPage() {
                 {hasFilters ? '필터 조건에 맞는 결과가 없습니다.' : '아직 등록된 경기 결과가 없습니다.'}
               </p>
               {isAdmin && !hasFilters && (
-                <Link to={`/matchResult/${competitionId}/new`} className="btn-primary mt-4">
-                  <PlusIcon className="w-5 h-5" />
-                  경기 결과 등록하기
-                </Link>
+                <Button asChild className="mt-4">
+                  <Link to={`/matchResult/${competitionId}/new`}>
+                    <PlusIcon className="w-5 h-5" />
+                    경기 결과 등록하기
+                  </Link>
+                </Button>
               )}
             </div>
           ) : (

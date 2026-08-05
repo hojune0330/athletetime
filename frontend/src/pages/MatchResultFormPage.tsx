@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import PageHeader from '../components/common/PageHeader';
@@ -108,9 +109,9 @@ export default function MatchResultFormPage() {
           <div className="empty-state-icon">🔒</div>
           <h3 className="empty-state-title">접근 권한이 없습니다</h3>
           <p className="empty-state-description">관리자만 접근할 수 있는 페이지입니다.</p>
-          <Link to={`/matchResult/${competitionId}`} className="btn-primary mt-4">
-            목록으로 돌아가기
-          </Link>
+          <Button asChild className="mt-4">
+            <Link to={`/matchResult/${competitionId}`}>목록으로 돌아가기</Link>
+          </Button>
         </div>
       </div>
     );
@@ -411,10 +412,10 @@ export default function MatchResultFormPage() {
             >
               취소
             </button>
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary flex-1"
+              className="flex-1"
             >
               {isSubmitting ? (
                 <>
@@ -424,7 +425,7 @@ export default function MatchResultFormPage() {
               ) : (
                 isEditMode ? '수정하기' : '등록하기'
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

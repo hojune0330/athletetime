@@ -8,6 +8,7 @@
 import { Link } from 'react-router-dom';
 import { EyeIcon, HandThumbUpIcon, ChatBubbleLeftIcon, FireIcon } from '@heroicons/react/24/outline';
 import { usePosts } from '../../hooks/usePosts';
+import { Button } from '@/components/ui/button';
 import type { Post } from '../../types';
 
 // ============================================
@@ -176,12 +177,9 @@ function ErrorDisplay({ error, onRetry }: { error: Error; onRetry: () => void })
           <p className="empty-state-description">
             커뮤니티 글과 댓글은 로그인한 뒤에 확인할 수 있어요.
           </p>
-          <Link
-            to="/login"
-            className="btn-primary"
-          >
-            로그인
-          </Link>
+          <Button asChild>
+            <Link to="/login">로그인</Link>
+          </Button>
         </div>
       </div>
     );
@@ -197,12 +195,9 @@ function ErrorDisplay({ error, onRetry }: { error: Error; onRetry: () => void })
         <p className="empty-state-description">
           지금은 게시글을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
         </p>
-        <button
-          onClick={onRetry}
-          className="btn-primary"
-        >
+        <Button type="button" onClick={onRetry}>
           다시 시도
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -223,12 +218,9 @@ function EmptyState() {
         <p className="empty-state-description">
           첫 글을 남겨 이야기를 시작해 보세요.
         </p>
-        <Link
-          to="/write"
-          className="btn-primary"
-        >
-          글쓰기
-        </Link>
+        <Button asChild>
+          <Link to="/write">글쓰기</Link>
+        </Button>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   EyeIcon, 
@@ -378,10 +379,9 @@ function CommentSection({ comments, commentsCount, onSubmit, isSubmitting }: Com
             disabled={isSubmitting}
           />
           <div className="flex justify-end mt-3">
-            <button 
+            <Button 
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary"
             >
               {isSubmitting ? (
                 <>
@@ -391,7 +391,7 @@ function CommentSection({ comments, commentsCount, onSubmit, isSubmitting }: Com
               ) : (
                 '댓글 작성'
               )}
-            </button>
+            </Button>
           </div>
         </form>
         
@@ -483,10 +483,10 @@ function EditPasswordModal({ isOpen, onClose, onConfirm, isVerifying, error }: E
               >
                 취소
               </button>
-              <button
+              <Button
                 type="submit"
                 disabled={isVerifying || !password.trim()}
-                className="btn-primary flex-1"
+                className="flex-1"
               >
                 {isVerifying ? (
                   <>
@@ -496,7 +496,7 @@ function EditPasswordModal({ isOpen, onClose, onConfirm, isVerifying, error }: E
                 ) : (
                   '확인'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -827,9 +827,9 @@ export default function PostDetailPage() {
         <p className="empty-state-description">
           {error instanceof Error ? error.message : '게시글이 삭제되었거나 존재하지 않습니다.'}
         </p>
-        <Link to="/" className="btn-primary">
-          목록으로 돌아가기
-        </Link>
+        <Button asChild>
+          <Link to="/">목록으로 돌아가기</Link>
+        </Button>
       </div>
     );
   }

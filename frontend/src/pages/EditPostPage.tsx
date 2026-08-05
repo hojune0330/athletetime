@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { log } from '@/lib/log';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send, AlertCircle, Image as ImageIcon } from 'lucide-react';
 import { usePost, useUpdatePost } from '../hooks/usePosts';
@@ -168,9 +169,9 @@ export default function EditPostPage() {
           <p className="empty-state-description">
             게시글이 삭제되었거나 존재하지 않습니다.
           </p>
-          <button onClick={() => navigate('/community')} className="btn-primary">
+          <Button type="button" onClick={() => navigate('/community')}>
             목록으로 돌아가기
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -288,10 +289,10 @@ export default function EditPostPage() {
               취소
             </button>
             
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="btn-primary w-full sm:w-auto"
+              className="w-full sm:w-auto"
             >
               {isSubmitting ? (
                 <>
@@ -304,7 +305,7 @@ export default function EditPostPage() {
                   <span>게시글 수정</span>
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

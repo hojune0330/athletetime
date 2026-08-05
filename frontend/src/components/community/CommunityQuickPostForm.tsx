@@ -5,6 +5,7 @@ import { ChartBarIcon, MegaphoneIcon, PhotoIcon } from '@heroicons/react/24/outl
 import { useAuth } from '../../context/AuthContext'
 import { useCreatePost } from '../../hooks/usePosts'
 import { getAnonymousId } from '../../utils/anonymousUser'
+import { Button } from '@/components/ui/button'
 import { CommunityImagePicker } from './CommunityImagePicker'
 import { CommunityPollBuilder } from './CommunityPollBuilder'
 
@@ -196,12 +197,12 @@ export function CommunityQuickPostForm({
               </button>
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={onCancel} className="btn-secondary">
+              <Button type="button" variant="secondary" onClick={onCancel}>
                 취소
-              </button>
-              <button type="submit" disabled={isSubmitting} className="btn-primary disabled:cursor-not-allowed disabled:opacity-50">
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? '작성 중...' : '익명으로 작성'}
-              </button>
+              </Button>
             </div>
           </div>
 

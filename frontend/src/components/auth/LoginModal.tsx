@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -117,10 +118,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
             </div>
 
             {/* 로그인 버튼 */}
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full"
+              className="w-full"
             >
               {loading ? (
                 <>
@@ -130,7 +131,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
               ) : (
                 '로그인'
               )}
-            </button>
+            </Button>
           </form>
         </div>
       </div>

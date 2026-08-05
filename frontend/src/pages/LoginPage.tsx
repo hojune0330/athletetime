@@ -4,6 +4,7 @@
 
 import { useState } from 'react';
 import { BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -116,10 +117,10 @@ export default function LoginPage() {
               </div>
 
               {/* 로그인 버튼 */}
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full"
+                className="w-full"
               >
                 {loading ? (
                   <>
@@ -129,7 +130,7 @@ export default function LoginPage() {
                 ) : (
                   '로그인'
                 )}
-              </button>
+              </Button>
             </form>
 
             {/* 링크들 */}

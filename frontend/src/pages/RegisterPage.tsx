@@ -9,6 +9,7 @@
 
 import { useState } from 'react';
 import { BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
@@ -435,10 +436,10 @@ export default function RegisterPage() {
               </div>
 
               {/* 제출 버튼 */}
-              <button
+              <Button
                 type="submit"
                 disabled={loading || !emailVerified || !nicknameAvailable}
-                className="btn-primary w-full mt-6"
+                className="w-full mt-6"
               >
                 {loading ? (
                   <>
@@ -448,7 +449,7 @@ export default function RegisterPage() {
                 ) : (
                   '회원가입'
                 )}
-              </button>
+              </Button>
             </form>
 
             {/* 로그인 링크 */}

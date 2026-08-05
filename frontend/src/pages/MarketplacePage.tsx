@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { CenteredSpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { PlusIcon, MagnifyingGlassIcon, EyeIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline';
 import PageHeader from '../components/common/PageHeader';
@@ -156,10 +157,12 @@ export default function MarketplacePage() {
         description="육상 용품을 사고팔아보세요"
         actions={
           user ? (
-            <Link to="/marketplace/new" className="btn-primary">
-              <PlusIcon className="w-5 h-5" />
-              상품 등록
-            </Link>
+            <Button asChild>
+              <Link to="/marketplace/new">
+                <PlusIcon className="h-4 w-4" />
+                상품 등록
+              </Link>
+            </Button>
           ) : undefined
         }
       />
@@ -178,9 +181,9 @@ export default function MarketplacePage() {
               className="input pl-10 w-full"
             />
           </div>
-          <button type="submit" className="btn-primary">
+          <Button type="submit">
             검색
-          </button>
+          </Button>
         </form>
 
         {/* 필터 & 정렬 */}
@@ -308,10 +311,12 @@ function MarketplaceEmptyState({
         ))}
       </div>
       {userSignedIn ? (
-        <Link to="/marketplace/new" className="btn-primary mt-5">
-          <PlusIcon className="w-5 h-5" />
-          장비 등록하기
-        </Link>
+        <Button asChild className="mt-5">
+          <Link to="/marketplace/new">
+            <PlusIcon className="h-4 w-4" />
+            장비 등록하기
+          </Link>
+        </Button>
       ) : (
         <p className="mt-5 text-sm text-neutral-500">로그인하면 판매 글을 등록할 수 있어요.</p>
       )}

@@ -5,6 +5,7 @@
 
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { CenteredSpinner, BusySpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { 
   PencilSquareIcon,
   TrashIcon
@@ -129,9 +130,9 @@ export default function MatchResultDetailPage() {
           <div className="empty-state-icon">⚠️</div>
           <h3 className="empty-state-title">경기 결과를 찾을 수 없습니다</h3>
           <p className="empty-state-description">요청하신 경기 결과가 존재하지 않습니다.</p>
-          <Link to={`/matchResult/${competitionId}`} className="btn-primary mt-4">
-            목록으로 돌아가기
-          </Link>
+          <Button asChild className="mt-4">
+            <Link to={`/matchResult/${competitionId}`}>목록으로 돌아가기</Link>
+          </Button>
         </div>
       </div>
     );
@@ -176,9 +177,9 @@ export default function MatchResultDetailPage() {
           <div className="empty-state-icon">📊</div>
           <h3 className="empty-state-title">등록된 기록이 없습니다</h3>
           {isAdmin && (
-            <Link to={`/matchResult/${competitionId}/${resultId}/edit`} className="btn-primary mt-4">
-              기록 추가하기
-            </Link>
+            <Button asChild className="mt-4">
+              <Link to={`/matchResult/${competitionId}/${resultId}/edit`}>기록 추가하기</Link>
+            </Button>
           )}
         </div>
       ) : (

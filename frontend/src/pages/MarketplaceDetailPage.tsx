@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { CenteredSpinner } from '@/components/ui/loading-state';
+import { Button } from '@/components/ui/button';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeftIcon,
@@ -153,9 +154,9 @@ export default function MarketplaceDetailPage() {
       <div className="empty-state py-16">
         <div className="empty-state-icon">🛒</div>
         <h3 className="empty-state-title">상품을 찾을 수 없습니다</h3>
-        <Link to="/marketplace" className="btn-primary mt-4">
-          목록으로 돌아가기
-        </Link>
+        <Button asChild className="mt-4">
+          <Link to="/marketplace">목록으로 돌아가기</Link>
+        </Button>
       </div>
     );
   }
@@ -322,13 +323,12 @@ export default function MarketplaceDetailPage() {
               <div className="space-y-3">
                 {isOwner ? (
                   <>
-                    <Link
-                      to={`/marketplace/${item.id}/edit`}
-                      className="btn-primary w-full flex items-center justify-center gap-2"
-                    >
-                      <PencilSquareIcon className="w-5 h-5" />
-                      수정하기
-                    </Link>
+                    <Button asChild className="w-full">
+                      <Link to={`/marketplace/${item.id}/edit`}>
+                        <PencilSquareIcon className="h-4 w-4" />
+                        수정하기
+                      </Link>
+                    </Button>
                     <button
                       onClick={handleDeleteItem}
                       disabled={deleteItemMutation.isPending}
@@ -339,13 +339,14 @@ export default function MarketplaceDetailPage() {
                     </button>
                   </>
                 ) : (
-                  <button
+                  <Button
+                    type="button"
                     onClick={handlePurchase}
                     disabled={item.status !== '판매중'}
-                    className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full"
                   >
                     {item.status === '판매중' ? '구매하기' : '판매 완료된 상품'}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -368,25 +369,23 @@ export default function MarketplaceDetailPage() {
                   disabled={createCommentMutation.isPending}
                 />
                 <div className="flex justify-end mt-2">
-                  <button
+                  <Button
                     type="submit"
                     disabled={createCommentMutation.isPending || !commentContent.trim()}
-                    className="btn-primary disabled:opacity-50"
                   >
                     {createCommentMutation.isPending ? '작성 중...' : '댓글 작성'}
-                  </button>
+                  </Button>
                 </div>
               </form>
             ) : (
               <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-6 text-center mb-6">
                 <p className="text-neutral-600 mb-3">댓글을 작성하려면 로그인이 필요합니다.</p>
-                <button
+                <Button
                   type="button"
                   onClick={() => promptLogin(window.location.pathname + window.location.search)}
-                  className="btn-primary inline-block"
                 >
                   로그인
-                </button>
+                </Button>
               </div>
             )}
 
