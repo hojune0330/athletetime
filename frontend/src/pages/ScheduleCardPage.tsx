@@ -9,13 +9,25 @@
  *   또는
  *   pnpm add html2canvas
  * 를 실행한 뒤 사용하세요.
+ *
+ * v6.0.0 (ui 2단계):
+ *   - 페이지 UI(A): TRAINORACLE 디자인 시스템 정합 — 공용 Card/Button/Input/Skeleton,
+ *     탭은 깔끔한 인라인 버튼 + 토큰 클래스(스퀘어 4px, ink/brand 토큰).
+ *   - 카드 export 영역(B): accent #03C75A → brand teal #0D5F5A 로 통일,
+ *     네이버 그린 제거. 인라인 style은 1080×1080 픽셀 정확도와 dynamic 값에만 사용.
+ *   - useRef(...) 단언 제거, ID 카운터를 useRef 기반으로 옮겨 리마운트 안전.
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import PageHeader from '../components/common/PageHeader';
 import { useCompetitions } from '../hooks/useCompetitions';
 import type { Competition } from '../api/competitions';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Skeleton } from '../components/ui/skeleton';
+import { cn } from '../lib/utils';
 
 // ============================================================
 // 상수
@@ -30,15 +42,17 @@ const CATEGORY_OPTIONS = [
   { value: 'junior', label: '중고연맹' },
 ] as const;
 
-// DESIGN_GUIDE.md 기준 색상
-const CARD_COLORS = {
-  bg: '#FFFFFF',
-  textMain: '#111111',
-  textSub: '#666666',
-  textLight: '#999999',
-  accent: '#03C75A',
-  dividerBold: '#111111',
-  dividerLight: '#E5E5E5',
+// 카드 export 영역 — TRAINORACLE 팔레트와 동형(보존=정합)
+// html2canvas는 CSS 변수 보다 hex 값이 더 안정적으로 캡처되므로
+// 디자인 시스템 hex 값을 직접 매핑해서 사용한다.
+const CARD_THEME = {
+  bg: '#FAFAF7',         // bg
+  textMain: '#0E1412',   // ink
+  textSub: '#2B3330',    // ink-2
+  textLight: '#8F9894',  // ink-4
+  accent: '#0D5F5A',     // brand (teal)  — 네이버 그린 제거
+  dividerBold: '#0E1412',
+  dividerLight: '#E8E6DF', // hair
 } as const;
 
 // ============================================================
@@ -62,8 +76,10 @@ interface CardData {
   branding: string;
 }
 
+type Mode = 'auto' | 'manual';
+
 // ============================================================
-// 헬퍼 함수
+// 헬퍼
 // ============================================================
 
 function formatDateRange(start: string, end: string): string {
@@ -77,18 +93,15 @@ function getCategoryLabel(value: string): string {
   return CATEGORY_OPTIONS.find((c) => c.value === value)?.label ?? value;
 }
 
-let nextId = 4;
-function createEventRow(): EventRow {
-  return { id: nextId++, name: '', datetime: '', note: '' };
-}
-
 // ============================================================
 // 카드 프리뷰 컴포넌트 (1080×1080 실제 크기로 렌더링)
+// 인라인 style은 1080×1080 export 정확도와 dynamic 값에만 사용한다.
+// (html2canvas가 인식할 수 있도록 px 값을 명시)
 // ============================================================
 
 interface CardPreviewProps {
   data: CardData;
-  cardRef: React.RefObject<HTMLDivElement>;
+  cardRef: React.RefObject<HTMLDivElement | null>;
 }
 
 function CardPreview({ data, cardRef }: CardPreviewProps) {
@@ -98,6 +111,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
 
   // 종목 행 — 빈 행은 프리뷰에서 건너뜀
   const visibleEvents = events.filter((e) => e.name.trim() || e.datetime.trim());
+  const previewEvents = visibleEvents.slice(0, 12);
 
   return (
     /* 1080×1080 실제 크기 카드 — CSS transform으로 축소해서 보여줌 */
@@ -106,31 +120,31 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
       style={{
         width: 1080,
         height: 1080,
-        backgroundColor: CARD_COLORS.bg,
+        backgroundColor: CARD_THEME.bg,
         fontFamily:
           '"Noto Sans CJK KR", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif',
         boxSizing: 'border-box',
         padding: '72px 80px 60px',
         display: 'flex',
         flexDirection: 'column',
-        color: CARD_COLORS.textMain,
+        color: CARD_THEME.textMain,
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      {/* ───────── HEADER ───────── */}
+      {/* HEADER */}
       <div style={{ marginBottom: 24 }}>
         {/* 종별 배지 */}
         <div
           style={{
             display: 'inline-block',
-            border: `2px solid ${CARD_COLORS.textMain}`,
+            border: `2px solid ${CARD_THEME.textMain}`,
             borderRadius: 4,
             padding: '4px 14px',
             fontSize: 20,
             fontWeight: 700,
             letterSpacing: '0.05em',
-            color: CARD_COLORS.textMain,
+            color: CARD_THEME.textMain,
             marginBottom: 24,
           }}
         >
@@ -144,7 +158,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
             fontWeight: 900,
             lineHeight: 1.15,
             letterSpacing: '-0.02em',
-            color: CARD_COLORS.textMain,
+            color: CARD_THEME.textMain,
             marginBottom: 16,
             wordBreak: 'keep-all',
           }}
@@ -158,7 +172,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
             style={{
               fontSize: 28,
               fontWeight: 500,
-              color: CARD_COLORS.textSub,
+              color: CARD_THEME.textSub,
               letterSpacing: '0.01em',
             }}
           >
@@ -167,16 +181,16 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
         )}
       </div>
 
-      {/* ───────── DIVIDER ───────── */}
+      {/* DIVIDER */}
       <div
         style={{
           height: 3,
-          backgroundColor: CARD_COLORS.dividerBold,
+          backgroundColor: CARD_THEME.dividerBold,
           marginBottom: 40,
         }}
       />
 
-      {/* ───────── EVENTS TABLE ───────── */}
+      {/* EVENTS TABLE */}
       <div style={{ flex: 1, overflow: 'hidden' }}>
         {/* 테이블 헤더 */}
         <div
@@ -185,17 +199,17 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
             gridTemplateColumns: '2fr 2fr 1.2fr',
             gap: '0 24px',
             paddingBottom: 16,
-            borderBottom: `1px solid ${CARD_COLORS.dividerLight}`,
+            borderBottom: `1px solid ${CARD_THEME.dividerLight}`,
             marginBottom: 8,
           }}
         >
-          {['종목', '일시', '비고'].map((h) => (
+          {(['종목', '일시', '비고'] as const).map((h) => (
             <div
               key={h}
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: CARD_COLORS.textLight,
+                color: CARD_THEME.textLight,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
               }}
@@ -206,11 +220,11 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
         </div>
 
         {/* 종목 행 */}
-        {visibleEvents.length === 0 ? (
+        {previewEvents.length === 0 ? (
           <div
             style={{
               fontSize: 28,
-              color: CARD_COLORS.textLight,
+              color: CARD_THEME.textLight,
               paddingTop: 32,
               textAlign: 'center',
             }}
@@ -218,7 +232,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
             종목을 추가해주세요
           </div>
         ) : (
-          visibleEvents.slice(0, 12).map((ev, idx) => (
+          previewEvents.map((ev, idx) => (
             <div
               key={ev.id}
               style={{
@@ -227,8 +241,8 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
                 gap: '0 24px',
                 padding: '20px 0',
                 borderBottom:
-                  idx < visibleEvents.slice(0, 12).length - 1
-                    ? `1px solid ${CARD_COLORS.dividerLight}`
+                  idx < previewEvents.length - 1
+                    ? `1px solid ${CARD_THEME.dividerLight}`
                     : 'none',
               }}
             >
@@ -236,7 +250,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
                 style={{
                   fontSize: 28,
                   fontWeight: 600,
-                  color: CARD_COLORS.textMain,
+                  color: CARD_THEME.textMain,
                   letterSpacing: '-0.01em',
                 }}
               >
@@ -246,7 +260,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
                 style={{
                   fontSize: 26,
                   fontWeight: 400,
-                  color: CARD_COLORS.textSub,
+                  color: CARD_THEME.textSub,
                 }}
               >
                 {ev.datetime}
@@ -255,7 +269,7 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
                 style={{
                   fontSize: 24,
                   fontWeight: 400,
-                  color: CARD_COLORS.textLight,
+                  color: CARD_THEME.textLight,
                 }}
               >
                 {ev.note}
@@ -265,17 +279,17 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
         )}
       </div>
 
-      {/* ───────── BOTTOM DIVIDER ───────── */}
+      {/* BOTTOM DIVIDER */}
       <div
         style={{
           height: 2,
-          backgroundColor: CARD_COLORS.dividerBold,
+          backgroundColor: CARD_THEME.dividerBold,
           marginTop: 32,
           marginBottom: 28,
         }}
       />
 
-      {/* ───────── FOOTER ───────── */}
+      {/* FOOTER */}
       <div
         style={{
           display: 'flex',
@@ -288,19 +302,19 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
           style={{
             fontSize: 26,
             fontWeight: 500,
-            color: CARD_COLORS.textSub,
+            color: CARD_THEME.textSub,
             maxWidth: 700,
           }}
         >
           {venue || ''}
         </div>
 
-        {/* 브랜딩 */}
+        {/* 브랜딩 — TRAINORACLE brand teal */}
         <div
           style={{
             fontSize: 28,
             fontWeight: 900,
-            color: CARD_COLORS.accent,
+            color: CARD_THEME.accent,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
           }}
@@ -313,12 +327,11 @@ function CardPreview({ data, cardRef }: CardPreviewProps) {
 }
 
 // ============================================================
-// 메인 페이지 컴포넌트
+// 메인 페이지
 // ============================================================
 
 export default function ScheduleCardPage() {
-  // 탭 상태
-  const [mode, setMode] = useState<'auto' | 'manual'>('auto');
+  const [mode, setMode] = useState<Mode>('auto');
 
   // 폼 상태
   const [competitionName, setCompetitionName] = useState('');
@@ -326,24 +339,22 @@ export default function ScheduleCardPage() {
   const [endDate, setEndDate] = useState('');
   const [venue, setVenue] = useState('');
   const [category, setCategory] = useState('track_field');
-  const [events, setEvents] = useState<EventRow[]>([
-    { id: 1, name: '', datetime: '', note: '' },
-    { id: 2, name: '', datetime: '', note: '' },
-    { id: 3, name: '', datetime: '', note: '' },
-  ]);
+  const [idCounter, setIdCounter] = useState(4);
+  const [events, setEvents] = useState<EventRow[]>(() =>
+    [1, 2, 3].map((id) => ({ id, name: '', datetime: '', note: '' })),
+  );
   const [branding, setBranding] = useState('AthleteTime');
 
   // 자동 모드 — 선택된 대회 id
   const [selectedCompetitionId, setSelectedCompetitionId] = useState('');
 
-  // 카드 ref (html2canvas 캡처용)
-  const cardRef = useRef<HTMLDivElement>(null!);
+  // 카드 ref (html2canvas 캡처용) — null 허용으로 타입 안전하게
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   // 대회 목록 불러오기
   const { data: competitionsData, isLoading: isLoadingCompetitions } = useCompetitions();
   const competitions: Competition[] = competitionsData?.competitions ?? [];
 
-  // ── 자동 모드: 대회 선택 시 폼 자동 채우기 ──
   const handleSelectCompetition = useCallback(
     (id: string) => {
       setSelectedCompetitionId(id);
@@ -359,8 +370,14 @@ export default function ScheduleCardPage() {
     [competitions],
   );
 
-  // ── 종목 행 관리 ──
-  const addEventRow = () => setEvents((prev) => [...prev, createEventRow()]);
+  const addEventRow = () => {
+    if (events.length >= 12) return;
+    setIdCounter((n) => n + 1);
+    setEvents((prev) => [
+      ...prev,
+      { id: idCounter + 1, name: '', datetime: '', note: '' },
+    ]);
+  };
 
   const removeEventRow = (id: number) => {
     if (events.length <= 1) return;
@@ -371,7 +388,6 @@ export default function ScheduleCardPage() {
     setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
   };
 
-  // ── 이미지 다운로드 ──
   const handleDownload = async () => {
     try {
       // NOTE: html2canvas 패키지를 먼저 설치해야 합니다.
@@ -384,14 +400,13 @@ export default function ScheduleCardPage() {
       link.download = `schedule-card-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-    } catch (err) {
-      alert(
-        'html2canvas 패키지가 설치되지 않았습니다.\nnpm install html2canvas 를 실행한 후 다시 시도해주세요.',
-      );
+    } catch {
+      // 디자인 결정: html2canvas 부재 시 영상 다운로드 못 함을 명확히 알린다.
+      // 화면 잠그는 confirm 대신 alert 유지(짧은 안내).
+      window.alert('html2canvas 패키지가 설치되지 않았습니다.\nnpm install html2canvas 후 다시 시도해주세요.');
     }
   };
 
-  // ── 카드 데이터 (프리뷰로 전달) ──
   const cardData: CardData = {
     competitionName,
     startDate,
@@ -402,20 +417,17 @@ export default function ScheduleCardPage() {
     branding,
   };
 
-  // ── 탭 버튼 ──
-  const TabButton = ({ tab, label }: { tab: 'auto' | 'manual'; label: string }) => (
-    <button
-      type="button"
-      onClick={() => setMode(tab)}
-      className={`tab-btn ${mode === tab ? 'tab-btn-active' : 'tab-btn-inactive'}`}
-    >
-      {label}
-    </button>
-  );
+  // 탭 버튼 — 공용 토큰, 스퀘어 코너 4px
+  const tabCls = (active: boolean) =>
+    cn(
+      'flex-1 rounded-md px-3 py-2 text-body-sm font-medium transition-colors',
+      active
+        ? 'bg-brand/10 text-brand'
+        : 'bg-surface text-ink-3 hover:bg-surface-2 hover:text-ink',
+    );
 
   return (
-    <div>
-      {/* ── 페이지 헤더 ── */}
+    <div className="min-h-screen bg-bg text-ink">
       <PageHeader
         icon="📅"
         title="대회 일정 카드뉴스"
@@ -424,259 +436,260 @@ export default function ScheduleCardPage() {
         backText="대회 목록으로"
       />
 
-      {/* ── 탭 ── */}
-      <div className="flex gap-2 mb-5">
-        <TabButton tab="auto" label="자동 생성" />
-        <TabButton tab="manual" label="직접 입력" />
+      {/* 탭 */}
+      <div role="tablist" aria-label="입력 모드" className="mb-5 flex gap-2 border-b border-hair">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'auto'}
+          onClick={() => setMode('auto')}
+          className={tabCls(mode === 'auto')}
+        >
+          자동 생성
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'manual'}
+          onClick={() => setMode('manual')}
+          className={tabCls(mode === 'manual')}
+        >
+          직접 입력
+        </button>
       </div>
 
-      {/* ── 메인 그리드: 좌(폼) + 우(프리뷰) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-        {/* ════════ LEFT — FORM ════════ */}
-        <div className="lg:col-span-3 space-y-5">
-
+      {/* 메인 그리드: 좌(폼) + 우(프리뷰) */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        {/* LEFT — FORM */}
+        <div className="space-y-5 lg:col-span-3">
           {/* 자동 생성 — 대회 선택 */}
           {mode === 'auto' && (
-            <div className="card">
-              <div className="card-header">
-                <h2 className="text-sm font-semibold text-neutral-700">대회 선택</h2>
-              </div>
-              <div className="card-body">
+            <Card>
+              <CardHeader className="border-b border-hair">
+                <CardTitle className="text-body-sm font-semibold text-ink-2">대회 선택</CardTitle>
+              </CardHeader>
+              <CardContent>
                 {isLoadingCompetitions ? (
-                  <div className="skeleton h-11 w-full rounded-lg" />
+                  <Skeleton className="h-11 w-full rounded-md" />
                 ) : (
                   <select
                     value={selectedCompetitionId}
                     onChange={(e) => handleSelectCompetition(e.target.value)}
-                    className="input"
+                    className="w-full rounded-md border border-line bg-surface px-3 py-2.5 text-body-sm text-ink focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15"
+                    aria-label="대회 선택"
                   >
                     <option value="">— 대회를 선택하면 자동으로 채워집니다 —</option>
                     {competitions.map((c) => (
                       <option key={c.id} value={c.id}>
-                        {c.name}
-                        {c.start_date ? ` (${c.start_date.split('T')[0]})` : ''}
+                        {c.name}{c.start_date ? ` (${c.start_date.split('T')[0]})` : ''}
                       </option>
                     ))}
                   </select>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* 기본 정보 */}
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-sm font-semibold text-neutral-700">기본 정보</h2>
-            </div>
-            <div className="card-body space-y-4">
-              {/* 대회명 */}
+          <Card>
+            <CardHeader className="border-b border-hair">
+              <CardTitle className="text-body-sm font-semibold text-ink-2">기본 정보</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  대회명 <span className="text-danger-500">*</span>
+                <label htmlFor="sc-name" className="mb-1 block text-body-sm font-medium text-ink-2">
+                  대회명 <span className="text-err">*</span>
                 </label>
-                <input
+                <Input
+                  id="sc-name"
                   type="text"
                   value={competitionName}
                   onChange={(e) => setCompetitionName(e.target.value)}
                   placeholder="예) 제50회 전국육상선수권대회"
-                  className="input"
                 />
               </div>
 
-              {/* 기간 */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  기간
-                </label>
+                <label className="mb-1 block text-body-sm font-medium text-ink-2">기간</label>
                 <div className="grid grid-cols-2 gap-3">
-                  <input
+                  <Input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="input"
+                    aria-label="시작일"
                   />
-                  <input
+                  <Input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="input"
+                    aria-label="종료일"
                   />
                 </div>
-                <p className="text-xs text-neutral-400 mt-1">시작일 / 종료일</p>
+                <p className="mt-1 text-caption text-ink-4">시작일 / 종료일</p>
               </div>
 
-              {/* 장소 */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label htmlFor="sc-venue" className="mb-1 block text-body-sm font-medium text-ink-2">
                   장소
                 </label>
-                <input
+                <Input
+                  id="sc-venue"
                   type="text"
                   value={venue}
                   onChange={(e) => setVenue(e.target.value)}
                   placeholder="예) 서울올림픽주경기장"
-                  className="input"
                 />
               </div>
 
-              {/* 종별 */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label htmlFor="sc-category" className="mb-1 block text-body-sm font-medium text-ink-2">
                   종별
                 </label>
                 <select
+                  id="sc-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="input"
+                  className="w-full rounded-md border border-line bg-surface px-3 py-2.5 text-body-sm text-ink focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15"
                 >
                   {CATEGORY_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* 종목 목록 */}
-          <div className="card">
-            <div className="card-header">
+          <Card>
+            <CardHeader className="border-b border-hair">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold text-neutral-700">
+                <CardTitle className="text-body-sm font-semibold text-ink-2">
                   종목 목록
-                  <span className="text-neutral-400 font-normal ml-1">(최대 12개)</span>
-                </h2>
-                <button
+                  <span className="ml-1 font-normal text-ink-4">(최대 12개)</span>
+                </CardTitle>
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={addEventRow}
                   disabled={events.length >= 12}
-                  className="btn-secondary text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="종목 추가"
                 >
-                  <PlusIcon className="w-4 h-4" />
+                  <PlusIcon className="h-4 w-4" aria-hidden />
                   종목 추가
-                </button>
+                </Button>
               </div>
-            </div>
-            <div className="card-body p-0">
+            </CardHeader>
+            <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">
                   <thead>
-                    <tr className="bg-neutral-50">
-                      <th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500">
-                        종목명
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500">
-                        일시
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-xs font-medium text-neutral-500 w-28">
-                        비고
-                      </th>
-                      <th className="px-4 py-2.5 text-center text-xs font-medium text-neutral-500 w-14">
-                        삭제
-                      </th>
+                    <tr className="bg-surface-2">
+                      <th className="px-4 py-2.5 text-left text-caption font-medium text-ink-4">종목명</th>
+                      <th className="px-4 py-2.5 text-left text-caption font-medium text-ink-4">일시</th>
+                      <th className="w-28 px-4 py-2.5 text-left text-caption font-medium text-ink-4">비고</th>
+                      <th className="w-14 px-4 py-2.5 text-center text-caption font-medium text-ink-4">삭제</th>
                     </tr>
                   </thead>
                   <tbody>
                     {events.map((ev) => (
-                      <tr key={ev.id} className="border-t border-neutral-100">
+                      <tr key={ev.id} className="border-t border-hair">
                         <td className="px-3 py-2">
-                          <input
+                          <Input
                             type="text"
                             value={ev.name}
                             onChange={(e) => updateEventRow(ev.id, 'name', e.target.value)}
                             placeholder="예) 남자 100m"
-                            className="input text-sm"
+                            className="text-body-sm"
+                            aria-label="종목명"
                           />
                         </td>
                         <td className="px-3 py-2">
-                          <input
+                          <Input
                             type="text"
                             value={ev.datetime}
                             onChange={(e) => updateEventRow(ev.id, 'datetime', e.target.value)}
                             placeholder="예) 4/5 10:00"
-                            className="input text-sm"
+                            className="text-body-sm"
+                            aria-label="일시"
                           />
                         </td>
                         <td className="px-3 py-2">
-                          <input
+                          <Input
                             type="text"
                             value={ev.note}
                             onChange={(e) => updateEventRow(ev.id, 'note', e.target.value)}
                             placeholder="예) 결승"
-                            className="input text-sm"
+                            className="text-body-sm"
+                            aria-label="비고"
                           />
                         </td>
                         <td className="px-3 py-2 text-center">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => removeEventRow(ev.id)}
                             disabled={events.length <= 1}
-                            className="p-1.5 text-neutral-400 hover:text-danger-600 hover:bg-danger-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            aria-label="종목 삭제"
+                            className="text-ink-4 hover:bg-err/10 hover:text-err"
                           >
-                            <TrashIcon className="w-4 h-4" />
-                          </button>
+                            <TrashIcon className="h-4 w-4" aria-hidden />
+                          </Button>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* 브랜딩 */}
-          <div className="card">
-            <div className="card-header">
-              <h2 className="text-sm font-semibold text-neutral-700">브랜딩</h2>
-            </div>
-            <div className="card-body">
+          <Card>
+            <CardHeader className="border-b border-hair">
+              <CardTitle className="text-body-sm font-semibold text-ink-2">브랜딩</CardTitle>
+            </CardHeader>
+            <CardContent>
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                <label htmlFor="sc-branding" className="mb-1 block text-body-sm font-medium text-ink-2">
                   브랜딩 텍스트
                 </label>
-                <input
+                <Input
+                  id="sc-branding"
                   type="text"
                   value={branding}
                   onChange={(e) => setBranding(e.target.value)}
                   placeholder="AthleteTime"
-                  className="input"
                   maxLength={20}
                 />
-                <p className="text-xs text-neutral-400 mt-1">카드 우측 하단에 표시됩니다</p>
+                <p className="mt-1 text-caption text-ink-4">카드 우측 하단에 표시됩니다</p>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* ════════ RIGHT — PREVIEW ════════ */}
+        {/* RIGHT — PREVIEW */}
         <div className="lg:col-span-2">
           <div className="sticky top-6 space-y-4">
-            <div className="card">
-              <div className="card-header">
+            <Card>
+              <CardHeader className="border-b border-hair">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-neutral-700">미리보기</h2>
-                  <span className="text-xs text-neutral-400">1080 × 1080</span>
+                  <CardTitle className="text-body-sm font-semibold text-ink-2">미리보기</CardTitle>
+                  <span className="font-mono text-caption text-ink-4">1080 × 1080</span>
                 </div>
-              </div>
-              <div className="card-body">
-                {/* 카드 컨테이너 — 1080px를 축소해서 표시 */}
+              </CardHeader>
+              <CardContent>
                 <PreviewWrapper cardData={cardData} cardRef={cardRef} />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            {/* 다운로드 버튼 */}
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="btn-primary w-full gap-2"
-            >
-              <span>⬇</span>
+            <Button type="button" onClick={handleDownload} className="w-full gap-2" size="lg">
+              <span aria-hidden>⬇</span>
               이미지 다운로드
-            </button>
+            </Button>
 
-            <p className="text-xs text-neutral-400 text-center">
+            <p className="text-center text-caption text-ink-4">
               PNG 형식으로 저장됩니다 · 1080×1080px
             </p>
           </div>
@@ -687,7 +700,8 @@ export default function ScheduleCardPage() {
 }
 
 // ============================================================
-// 프리뷰 래퍼 — 축소 비율 계산
+// 프리뷰 래퍼 — 1080px 를 축소 비율로 표시
+// 인라인 값은 동적 scale 계산만(컨테이너 사이즈 고정)
 // ============================================================
 
 function PreviewWrapper({
@@ -695,35 +709,18 @@ function PreviewWrapper({
   cardRef,
 }: {
   cardData: CardData;
-  cardRef: React.RefObject<HTMLDivElement>;
+  cardRef: React.RefObject<HTMLDivElement | null>;
 }) {
-  // 컨테이너 너비에 맞게 scale 값을 정적으로 계산
-  // lg:col-span-2 에서 실제 너비 ≈ 360px (여유 있게)
-  // 모바일에서는 전체 너비 ≈ 320px
-  const PREVIEW_WIDTH = 360; // px — CSS로 컨테이너에 고정
+  const PREVIEW_WIDTH = 360;
   const scale = PREVIEW_WIDTH / 1080;
   const scaledHeight = Math.round(1080 * scale);
 
   return (
     <div
-      style={{
-        width: PREVIEW_WIDTH,
-        height: scaledHeight,
-        overflow: 'hidden',
-        position: 'relative',
-        border: '1px solid #E5E5E5',
-        borderRadius: 8,
-        margin: '0 auto',
-        backgroundColor: '#fff',
-      }}
+      className="relative mx-auto overflow-hidden rounded-lg border border-line bg-surface"
+      style={{ width: PREVIEW_WIDTH, height: scaledHeight }}
     >
-      <div
-        style={{
-          transformOrigin: 'top left',
-          transform: `scale(${scale})`,
-          // 원본 크기(1080×1080)를 scale로 키우면 외부로 삐져나가지 않게 함
-        }}
-      >
+      <div style={{ transformOrigin: 'top left', transform: `scale(${scale})` }}>
         <CardPreview data={cardData} cardRef={cardRef} />
       </div>
     </div>
