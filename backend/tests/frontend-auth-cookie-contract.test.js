@@ -68,12 +68,14 @@ test('frontend treats an anonymous me response as a quiet unauthenticated state'
 });
 
 test('password recovery keeps its account-existence response truthful and non-enumerating', () => {
-  const header = read('frontend/src/components/layout/Header.tsx');
+  // 2C-2B에서 로그인/비밀번호 찾기 모달이 HeaderLoginModal.tsx로 분리되었다.
+  // 문구 검증은 모달 소스에서 수행한다 (3D 정합).
+  const loginModal = read('frontend/src/components/layout/HeaderLoginModal.tsx');
   const routes = read('backend/auth/routes.js');
 
-  assert.match(header, /등록된 이메일이라면 인증 코드를 보냈어요/);
-  assert.doesNotMatch(header, /인증 코드가 발송되었습니다\. 이메일을 확인해주세요\./);
-  assert.match(header, /등록된 이메일이라면 받은 6자리 인증 코드를 입력해주세요/);
-  assert.doesNotMatch(header, /발송된 6자리 인증 코드를 입력해주세요/);
+  assert.match(loginModal, /등록된 이메일이라면 인증 코드를 보냈어요/);
+  assert.doesNotMatch(loginModal, /인증 코드가 발송되었습니다\. 이메일을 확인해주세요\./);
+  assert.match(loginModal, /등록된 이메일이라면 받은 6자리 인증 코드를 입력해주세요/);
+  assert.doesNotMatch(loginModal, /발송된 6자리 인증 코드를 입력해주세요/);
   assert.match(routes, /등록된 이메일이라면 인증 코드를 보냈습니다\./);
 });
