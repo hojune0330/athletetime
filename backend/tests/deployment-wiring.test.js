@@ -10,12 +10,13 @@ function readSource(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
 }
 
-test('DEPLOY-WS-001: chat upgrades are denied until the service has moderation controls', () => {
+test('DEPLOY-WS-001: chat upgrades are served by the dedicated /ws/chat websocket', () => {
   const server = readSource('src/server.js');
 
-  assert.match(server, /rejectPreparingWebSocket\(socket\)/);
-  assert.doesNotMatch(server, /chatWss\.handleUpgrade\(/);
-  assert.doesNotMatch(server, /setupWebSocket\(chatWss\)/);
+  assert.match(server, /chatWss\.handleUpgrade\(/);
+  assert.match(server, /setupWebSocket\(chatWss\)/);
+  // 준비 모드 폴백(rejectPreparingWebSocket)은 활성 핸들러보다 뒤(실패 시에만)에 위치해야 한다
+  assert.ok(server.indexOf('rejectPreparingWebSocket(socket)') > server.indexOf('chatWss.handleUpgrade('));
 });
 
 test('DEPLOY-WS-002: card-studio websocket keeps its scoped no-server attachment', () => {
@@ -26,18 +27,19 @@ test('DEPLOY-WS-002: card-studio websocket keeps its scoped no-server attachment
   assert.match(wsManager, /!== '\/ws'/);
 });
 
-test('DEPLOY-WS-003: chat nickname API returns the same prepared state as the websocket route', () => {
+test('DEPLOY-WS-003: chat nickname API is served by the live chat router', () => {
   const server = readSource('src/server.js');
 
-  assert.match(server, /app\.get\('\/api\/chat\/check-nickname', rejectPreparingFeature\)/);
+  assert.doesNotMatch(server, /app\.get\('\/api\/chat\/check-nickname', rejectPreparingFeature\)/);
+  assert.match(server, /app\.use\('\/api\/chat', chatRouter\)/);
 });
 
-test('DEPLOY-WS-004: the chat page does not initiate a websocket connection before launch', () => {
+test('DEPLOY-WS-004: the chat page wires the live websocket chat', () => {
   const page = readSource('frontend/src/pages/ChatPage/index.tsx');
 
-  assert.match(page, /FeaturePreparingPage/);
-  assert.doesNotMatch(page, /useChat/);
-  assert.doesNotMatch(page, /useWebSocket/);
+  assert.doesNotMatch(page, /FeaturePreparingPage/);
+  assert.match(page, /useChat\(\)/);
+  assert.match(page, /MessageList/);
 });
 
 test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build and no retired chat websocket endpoint', () => {
@@ -45,8 +47,7 @@ test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build and no retired
 
   assert.match(toml, /publish = "community"/);
   assert.match(toml, /cd frontend && npm ci && npm run build:check/);
-  assert.doesNotMatch(toml, /VITE_WS_URL/);
-  assert.doesNotMatch(toml, /\/ws\/chat/);
+  assert.match(toml, /VITE_WS_URL\s*=\s*"wss:\/\/athletetime-backend\.onrender\.com\/ws\/chat"/);
   assert.match(toml, /\/api\/\*/);
 });
 
@@ -94,36 +95,72 @@ test('DEPLOY-RUNBOOK-001: data-rights readiness uses the direct backend URL requ
   assert.match(runbook, /npm run data:rights:readiness -- --base-url https:\/\/athletetime-backend\.onrender\.com/);
 });
 
-test('DEPLOY-RUNTIME-001: a direct chat handshake receives a 503 response', async () => {
+test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake upgrades to 101', async () => {
+  const { spawn } = require('node:child_process');
   const WebSocket = require(path.join(ROOT, 'node_modules', 'ws'));
-  const { rejectPreparingWebSocket } = require(path.join(ROOT, 'backend/middleware/launchFeatureGate'));
-  const server = http.createServer((_req, res) => res.end('ok'));
 
-  server.on('upgrade', (_req, socket) => rejectPreparingWebSocket(socket));
-
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', resolve);
+  const port = 5800 + Math.floor(Math.random() * 100);
+  const child = spawn(process.execPath, ['src/server.js'], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      PORT: String(port),
+      NODE_ENV: 'development',
+      DATABASE_URL: '',
+      JWT_SECRET: 'deployment-wiring-test-secret',
+      AUTH_CODE_PEPPER: 'deployment-wiring-test-pepper',
+      RESEND_API_KEY: '',
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
   });
-
-  const address = server.address();
-  assert.ok(address && typeof address !== 'string');
+  let logs = '';
+  child.stdout.on('data', (c) => { logs += c; });
+  child.stderr.on('data', (c) => { logs += c; });
 
   try {
-    await new Promise((resolve, reject) => {
-      const client = new WebSocket(`ws://127.0.0.1:${address.port}/ws/chat`);
-      const timer = setTimeout(() => reject(new Error('chat handshake timeout')), 3000);
+    const deadline = Date.now() + 30_000;
+    while (Date.now() < deadline) {
+      try {
+        const response = await new Promise((resolve, reject) => {
+          const req = http.request({ host: '127.0.0.1', port, path: '/health', method: 'GET' }, (res) => {
+            res.resume();
+            resolve(res.statusCode);
+          });
+          req.on('error', reject);
+          req.end();
+        });
+        if (response && response < 500) break;
+      } catch {
+        // 아직 안 뜸 — 재시도
+      }
+      await new Promise((r) => setTimeout(r, 200));
+      if (child.exitCode !== null) throw new Error(`server exited early: ${logs}`);
+    }
+
+    const { client } = await new Promise((resolve, reject) => {
+      const client = new WebSocket(`ws://127.0.0.1:${port}/ws/chat`);
+      const timer = setTimeout(() => reject(new Error('chat handshake timeout')), 5000);
+      client.on('open', () => {
+        clearTimeout(timer);
+        resolve({ client });
+      });
       client.on('unexpected-response', (_request, response) => {
         clearTimeout(timer);
-        assert.equal(response.statusCode, 503);
-        response.resume();
-        resolve();
+        reject(new Error(`expected 101 got ${response.statusCode}`));
       });
       client.on('error', reject);
     });
+    assert.ok(true);
+    // 웹소켓 클라이언트를 닫아 서버가 keep-alive 홀드하지 않게 하고,
+    // 프로세스가 남는 것을 방지한다.
+    client.terminate();
   } finally {
-    await new Promise((resolve, reject) => {
-      server.close((error) => (error ? reject(error) : resolve()));
-    });
+    if (child.exitCode === null) {
+      child.kill('SIGKILL');
+      await new Promise((resolve) => {
+        const timer = setTimeout(resolve, 3000);
+        child.once('exit', () => { clearTimeout(timer); resolve(); });
+      });
+    }
   }
 });

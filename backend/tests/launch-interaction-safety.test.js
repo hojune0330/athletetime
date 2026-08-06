@@ -111,7 +111,6 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
   const writes = [
     ['/api/posts', '{"title":"direct write","content":"must not persist"}', 'application/json'],
     ['/api/marketplace', '{"title":"direct listing","price":1000}', 'application/json'],
-    ['/api/chat', '{"message":"direct chat"}', 'application/json'],
     ['/api/upload/image', '--audit-boundary\r\ncontent-disposition: form-data; name="image"\r\n\r\nbytes\r\n--audit-boundary--', 'multipart/form-data; boundary=audit-boundary'],
   ];
 
@@ -122,7 +121,7 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     assert.deepEqual(response.body, expected);
   }
 
-  for (const requestPath of ['/api/posts', '/api/POSTS', '/api/%70osts', '/api/marketplace', '/api/chat']) {
+  for (const requestPath of ['/api/posts', '/api/POSTS', '/api/%70osts', '/api/marketplace']) {
     const response = await request(port, 'POST', requestPath, '{not-json');
     assert.equal(response.status, 503, `${requestPath} must reject before JSON parsing`);
     assert.match(response.headers['cache-control'] || '', /no-store/);
@@ -134,11 +133,15 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
   assert.notEqual((await request(port, 'GET', '/api/upload/image')).status, 503);
 });
 
-test('Given launch preparation mode When a chat upgrade is requested Then server rejects it before WebSocket setup', () => {
+test('Given chat is live When a /ws/chat upgrade is requested Then server routes it to the chat WebSocketServer', () => {
   const source = readSource('src/server.js');
 
-  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*rejectPreparingWebSocket\(socket\);\s*return;/);
-  assert.doesNotMatch(source, /chatWss\.handleUpgrade\(/);
+  // 활성 브랜치: /ws/chat → 채팅 WSS로 업그레이드
+  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*chatWss\.handleUpgrade\(req, socket, head/);
+  // 준비 모드 폴백(rejectPreparingWebSocket)은 ws 로드 실패 catch 브랜치에만 남는다 (활성보다 뒤)
+  const activeIdx = source.indexOf('chatWss.handleUpgrade(');
+  const fallbackIdx = source.indexOf('rejectPreparingWebSocket(socket)');
+  assert.ok(activeIdx > -1 && fallbackIdx > activeIdx, 'chat upgrade must activate before the preparing fallback');
 });
 
 test('Given unreleased social interactions When a direct write request is sent Then it is rejected instead of returning fake success', () => {

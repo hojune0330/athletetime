@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-08-01T15:36:36.320Z",
+  "generatedAt": "2026-08-06T12:38:00.298Z",
   "scenario": "team browse and aggregate detail flow e2e",
   "invocation": "node --test backend/tests/records-flow-e2e.test.js",
-  "baseUrl": "http://127.0.0.1:53819",
+  "baseUrl": "http://127.0.0.1:36827",
   "viewport": {
     "width": 375,
     "height": 667
   },
   "visited": [
-    "http://127.0.0.1:53819/records?flow=browse&browse=team&q=%EC%A7%84%EB%8F%84",
-    "http://127.0.0.1:53819/records/teams/5ce698403b63328f?from=%EC%A7%84%EB%8F%84&scope=latest&view=events"
+    "http://127.0.0.1:36827/records?flow=browse&browse=team&q=%EC%A7%84%EB%8F%84",
+    "http://127.0.0.1:36827/records/teams/5ce698403b63328f?from=%EC%A7%84%EB%8F%84&scope=latest&view=events"
   ],
   "consoleErrors": [],
   "pageErrors": []

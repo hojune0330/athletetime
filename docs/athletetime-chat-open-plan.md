@@ -109,9 +109,11 @@
 
 ## 4. 테스트 원칙
 
-- 백엔드 `node --test backend/tests/` = **344 tests / 250 pass / 91 fail(baseline 고정) / 3 skip**.
-  신규 변경이 **91 fail을 초과하면 안 된다.**
-- 기존 4건(fail-closed 계약)이 "활성화됐으니 통과"로 원복되며, 이에 따라 fail 수가 **줄어드는** 방향이어야 한다.
+- 백엔드 테스트는 **순차 실행**(`node --test --test-concurrency=1 ...`)이 원칙이다.
+  병렬(`node --test backend/tests/`)은 서버 스폰 테스트들이 여러 개 동시에 뜨며 리소스 경합으로 hang된다 (과거 91 fail baseline의 근본 원인).
+- 최종 검증 결과 (순차, 채팅 활성화 반영): **440 tests / 431 pass / 0 fail / 9 skip**.
+  신규 변경이 **0 fail을 넘지 않도록** 유지한다.
+- 기존 fail-closed 계약들이 "활성화됐으니 통과"로 원복되며 fail 수가 0이 된 것이 정상 목표다.
 - `npx tsc -b --pretty false` + `npx vite build` 통과 필수.
 - Mock DB/standalone 모드(NODE_ENV=development, DATABASE_URL='')에서도 채팅 WS가 크래시 없이 기동 → DB try/catch + 인메모리 폴백 필수.
 - 신규 채팅 계약 테스트: check-nickname 200, reports 라우트 3명 블라인드(단위), contentFilter blocked/flagged 분리.

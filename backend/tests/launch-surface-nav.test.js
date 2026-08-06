@@ -57,7 +57,9 @@ test('secondary tools stay reachable through the more menu group', () => {
   // PaceRise 연동 화면은 3차 가공임을 네비 단계에서부터 표시한다.
   assert.match(moreBlock, /PaceRise \uc5f0\ub3d9/);
   assert.match(moreBlock, /path: '\/community', label: '커뮤니티', note: '준비 중'/);
-  assert.match(moreBlock, /path: '\/chat', label: '오픈 채팅', note: '준비 중'/);
+  // 채팅「자유수다」는 실서비스화 — '준비 중' note가 제거되어야 한다.
+  assert.match(moreBlock, /path: '\/chat', label: '오픈 채팅'/);
+  assert.equal(moreBlock.includes("note: '준비 중',"), false);
 });
 
 test('W2-PACERISE-LABEL-001: pacerise more-menu label describes result lookup, not live coverage', () => {
