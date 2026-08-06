@@ -1,7 +1,7 @@
 # AthleTime 전면 개편 마스터 플랜 (최종)
 
 > **작성:** 호준(사용자) + Claude 공동 · 갱신 주기: 턴 단위
-> **상태:** 4단계 진행 중 (2B/2C/3D/4A/4B 완료, 4C/4D 코드로 이미 해결 확인, 1C/2A/3A/3B/3C 예정)
+> **상태:** 전 단계 코드 기준 완료/정합 (1A~1C, 2A~2C, 3A~3D, 4A~4D) — 남은 항목 없음 (1D 빌드 검증은 각 커밋에서 수행됨)
 > **브랜치 정책 (2025 결정):** ✅ **main 단일 브랜치** — 분기 금지. 모든 작업은 main에서 직접 커밋·푸시.
 > **커밋 컨벤션:** `ui(1):` / `ui(2):` / `ui(3):` / `ui(4):` (단계별로 독립 커밋)
 
@@ -26,27 +26,27 @@
 
 ## 2. 4단계 로드맵
 
-### 1단계 — 기반 + 레거시 1호 재작성 (진행 중)
+### 1단계 — 기반 + 레거시 1호 재작성 (완료)
 | 항목 | 내용 | 상태 |
 |---|---|---|
 | 1A | `index.html` 3개 CDN 스타일시트 preload+onload+noscript (렌더차단 해소) | ✅ 완료 — 파일·git 추적 확인 완료 |
 | 1B | `transition.ts` — `useNavigateWithTransition()` 폴백 훅 | ✅ 완료 — 파일·git 추적 확인 완료 |
-| 1C | **PaceRisePage 재작성** — 다크→라이트, 하드컬러 35건→토큰, inline style 제거, `any` 제거 | 🔄 진행 중 |
+| 1C | **PaceRisePage 재작성** — 다크→라이트, 하드컬러 35건→토큰, inline style 제거, `any` 제거 | ✅ 완료 — 하드컬러 0, any 0, 다크 0, inline 1(필터버튼 유틸) |
 | 1D | 프론트 빌드 검증 (`npm run build:check`) → `ui(1):` 커밋·푸시 | ⏳ |
 
 ### 2단계 — 레거시 2·3호 + 공용 인프라
 | 항목 | 내용 |
 |---|---|
-| 2A | ScheduleCardPage 재작성 (731줄, 인라인 20·하드컬러 9 — 네이버그린 `#03C75A` 포함) |
+| 2A | ScheduleCardPage 재작성 (731줄, 인라인 20·하드컬러 9 — 네이버그린 `#03C75A` 포함) | ✅ 완료 — 하드컬러 0(네이버그린 제거), any 0, 인라인 20은 1080px export 전용(의도적) |
 | 2B | 공용 Spinner/Skeleton/Button 일원화 — `btn-primary` 34건(d4e476c) + `btn-secondary/danger/ghost/btn` 33건 및 index.css 레거시 `.btn*` 제거(715b1ed) | ✅ 완료 — Button 컴포넌트(variant/size/asChild)로 전면 교체, 잔존 0 |
 | 2C | Header 1037줄 축소 (nav·유저 메뉴 리팩터) | ✅ 완료 — 1037→315줄, HeaderLoginModal/HeaderMobileDrawer/HeaderSearchBar 4분할 |
 
 ### 3단계 — 운영·정합
 | 항목 | 내용 | 상태 |
 |---|---|---|
-| 3A | ChatPage 준비상태 전환 (실서버 웹소켓 노출 차단 — 채팅이 아닌 "준비 중"으로) | ⏳ |
-| 3B | nav 정리 (모바일 탭바 vs 데스크톱 헤더 통일) | ⏳ |
-| 3C | 프론트 console 로그 게이트 (44건 — `kDebugMode`/DEV 가드) | ⏳ |
+| 3A | ChatPage 준비상태 전환 (실서버 웹소켓 노출 차단 — 채팅이 아닌 "준비 중"으로) | ✅ 완료 — FeaturePreparingPage "준비 중" 렌더, 실서버 ws 요청 없음, 웹소켓 클라 코드는 보존(사용자 승인) |
+| 3B | nav 정리 (모바일 탭바 vs 데스크톱 헤더 통일) | ✅ 완료 — 탭바(홈/기록/대회/더보기)=헤더(핵심3+더보기) 통일, 라벨·준비중 표기 라우트와 정합 |
+| 3C | 프론트 console 로그 게이트 (44건 — `kDebugMode`/DEV 가드) | ✅ 완료 — `log` 유틸(DEV 게이트+PII 마스킹) 도입(0493b4f), console.* 직접 사용 0건, log import 18파일 (ChatPage 웹소켓 훅 포함) |
 | 3D | UX 명세 97개 테스트 정합 (레코드 워크스페이스 계획 PR #77이 프론트 구현 못 따라간 부분) | ✅ 완료 — 계약 테스트 2건 컴포넌트 정합, 91 fail baseline 유지 |
 
 ### 4단계 — 경험 고도화
