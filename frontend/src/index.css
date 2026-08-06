@@ -166,35 +166,6 @@
 
 @layer components {
   /* =============================================
-     Button Styles
-     ============================================= */
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
-    min-height: 44px; /* Touch target */
-  }
-
-  .btn-primary {
-    @apply btn bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
-    @apply shadow-sm hover:shadow-md;
-  }
-
-  .btn-secondary {
-    @apply btn bg-neutral-100 text-neutral-700 hover:bg-neutral-200 border border-neutral-200;
-  }
-
-  .btn-ghost {
-    @apply btn text-neutral-600 hover:text-primary-600 hover:bg-primary-50;
-  }
-
-  .btn-accent {
-    @apply btn bg-accent-500 text-white hover:bg-accent-600;
-  }
-
-  .btn-danger {
-    @apply btn bg-danger-500 text-white hover:bg-danger-600;
-  }
-
-  /* =============================================
      Card Styles
      ============================================= */
   .card {

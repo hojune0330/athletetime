@@ -259,23 +259,27 @@ export default function MarketplacePage() {
               {/* 페이지네이션 */}
               {data && data.pagination.totalPages > 1 && (
                 <div className="flex justify-center gap-2">
-                  <button
+                  <Button
+                    type="button"
                     onClick={() => setPage(page - 1)}
                     disabled={page === 1}
-                    className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="secondary"
+                    className="disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     이전
-                  </button>
+                  </Button>
                   <span className="px-4 py-2 text-sm text-neutral-600">
                     {page} / {data.pagination.totalPages}
                   </span>
-                  <button
+                  <Button
+                    type="button"
                     onClick={() => setPage(page + 1)}
                     disabled={page === data.pagination.totalPages}
-                    className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="secondary"
+                    className="disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     다음
-                  </button>
+                  </Button>
                 </div>
               )}
             </>

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import { log } from '@/lib/log';
 
 interface ChartDownloadButtonsProps {
@@ -82,30 +83,33 @@ export const ChartDownloadButtons: React.FC<ChartDownloadButtonsProps> = ({
 
   return (
     <div className="download-btn no-print flex gap-2 flex-wrap">
-      <button
+      <Button
         type="button"
+        size="sm"
         onClick={() => downloadChart('png')}
-        className="btn btn-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white !ring-blue-500/30 hover:from-blue-600 hover:to-blue-700"
       >
         <i className="fas fa-image mr-1"></i>
         <span className="hidden md:inline">PNG</span>
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        size="sm"
         onClick={() => downloadChart('pdf')}
-        className="btn btn-sm bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700"
+        className="bg-gradient-to-r from-red-500 to-red-600 text-white !ring-red-500/30 hover:from-red-600 hover:to-red-700"
       >
         <i className="fas fa-file-pdf mr-1"></i>
         <span className="hidden md:inline">PDF</span>
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        size="sm"
         onClick={printChart}
-        className="btn btn-sm bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700"
+        className="bg-gradient-to-r from-gray-500 to-gray-600 text-white !ring-gray-500/30 hover:from-gray-600 hover:to-gray-700"
       >
         <i className="fas fa-print mr-1"></i>
         <span className="hidden md:inline">인쇄</span>
-      </button>
+      </Button>
     </div>
   );
 };

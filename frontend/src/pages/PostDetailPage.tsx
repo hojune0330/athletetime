@@ -263,10 +263,12 @@ function PostActions({
     <div className="p-6 border-t border-neutral-100 bg-neutral-50">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <button 
+          <Button 
+            type="button"
             onClick={() => onVote('like')}
             disabled={isVoting}
-            className={`btn-secondary transition-all ${
+            variant="secondary"
+            className={`transition-all ${
               isLiked 
                 ? 'bg-primary-100 text-primary-600 border-primary-300' 
                 : 'hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200'
@@ -275,12 +277,14 @@ function PostActions({
             <HandThumbUpIcon className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
             <span>{isLiked ? '추천 취소' : '추천'}</span>
             <span className="font-bold text-primary-600">{likesCount}</span>
-          </button>
+          </Button>
           
-          <button 
+          <Button 
+            type="button"
             onClick={() => onVote('dislike')}
             disabled={isVoting}
-            className={`btn-secondary transition-all ${
+            variant="secondary"
+            className={`transition-all ${
               isDisliked 
                 ? 'bg-danger-100 text-danger-600 border-danger-300' 
                 : 'hover:bg-danger-50 hover:text-danger-600 hover:border-danger-200'
@@ -291,33 +295,39 @@ function PostActions({
             {dislikesCount > 0 && (
               <span className="font-bold text-danger-500">{dislikesCount}</span>
             )}
-          </button>
+          </Button>
           
-          <button 
+          <Button 
+            type="button"
             onClick={handleShare}
-            className="btn-secondary hover:bg-neutral-100"
+            variant="secondary"
+            className="hover:bg-neutral-100"
           >
             <ShareIcon className="w-5 h-5" />
             <span className="hidden sm:inline">공유</span>
-          </button>
+          </Button>
         </div>
         
         <div className="flex items-center gap-2">
-          <button 
+          <Button 
+            type="button"
             onClick={onEdit}
-            className="btn-ghost text-primary-500 hover:bg-primary-50"
+            variant="ghost"
+            className="text-primary-500 hover:bg-primary-50"
           >
             <PencilSquareIcon className="w-5 h-5" />
             <span>수정</span>
-          </button>
+          </Button>
           
-          <button 
+          <Button 
+            type="button"
             onClick={onDelete}
-            className="btn-ghost text-danger-500 hover:bg-danger-50"
+            variant="ghost"
+            className="text-danger-500 hover:bg-danger-50"
           >
             <TrashIcon className="w-5 h-5" />
             <span>삭제</span>
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -475,14 +485,14 @@ function EditPasswordModal({ isOpen, onClose, onConfirm, isVerifying, error }: E
               autoFocus
             />
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
-                className="btn-secondary flex-1"
+                className="flex-1"
                 disabled={isVerifying}
               >
                 취소
-              </button>
+              </Button>
               <Button
                 type="submit"
                 disabled={isVerifying || !password.trim()}
@@ -544,18 +554,19 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
               autoFocus
             />
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
-                className="btn-secondary flex-1"
+                className="flex-1"
                 disabled={isDeleting}
               >
                 취소
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isDeleting || !password.trim()}
-                className="btn-danger flex-1"
+                variant="destructive"
+                className="flex-1"
               >
                 {isDeleting ? (
                   <>
@@ -565,7 +576,7 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
                 ) : (
                   '삭제'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -653,18 +664,19 @@ function AdminDeleteModal({ isOpen, onClose, onConfirm, isDeleting }: AdminDelet
             )}
             
             <div className="flex gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
-                className="btn-secondary flex-1"
+                className="flex-1"
                 disabled={isDeleting}
               >
                 취소
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isDeleting || !isValid}
-                className="btn-danger flex-1"
+                variant="destructive"
+                className="flex-1"
               >
                 {isDeleting ? (
                   <>
@@ -674,7 +686,7 @@ function AdminDeleteModal({ isOpen, onClose, onConfirm, isDeleting }: AdminDelet
                 ) : (
                   '삭제'
                 )}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

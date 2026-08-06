@@ -367,14 +367,14 @@ export default function WritePage() {
           
           {/* 제출 버튼 */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <button
+            <Button
               type="button"
               onClick={handleCancel}
-              className="btn-secondary w-full sm:w-auto"
+              className="w-full sm:w-auto"
               disabled={isSubmitting}
             >
               취소
-            </button>
+            </Button>
             
             <Button
               type="submit"

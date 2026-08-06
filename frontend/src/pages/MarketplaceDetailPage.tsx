@@ -329,14 +329,16 @@ export default function MarketplaceDetailPage() {
                         수정하기
                       </Link>
                     </Button>
-                    <button
+                    <Button
+                      type="button"
                       onClick={handleDeleteItem}
                       disabled={deleteItemMutation.isPending}
-                      className="btn-danger w-full flex items-center justify-center gap-2"
+                      variant="destructive"
+                      className="w-full flex items-center justify-center gap-2"
                     >
                       <TrashIcon className="w-5 h-5" />
                       {deleteItemMutation.isPending ? '삭제 중...' : '삭제하기'}
-                    </button>
+                    </Button>
                   </>
                 ) : (
                   <Button

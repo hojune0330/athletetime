@@ -302,14 +302,14 @@ export default function CompetitionFormPage() {
           
           {/* 버튼 */}
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
               onClick={() => navigate('/competitions')}
-              className="btn-secondary flex-1"
+              className="flex-1"
               disabled={isSubmitting}
             >
               취소
-            </button>
+            </Button>
             <Button
               type="submit"
               disabled={isSubmitting}

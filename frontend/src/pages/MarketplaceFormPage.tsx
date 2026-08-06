@@ -355,9 +355,10 @@ export default function MarketplaceFormPage() {
                   disabled={isUploading || formData.images.length >= 10}
                   className="hidden"
                 />
-                <label
-                  htmlFor="image-upload"
-                  className={`btn-secondary w-full flex items-center justify-center gap-2 cursor-pointer ${
+                <Button
+                  asChild
+                  variant="secondary"
+                  className={`w-full flex items-center justify-center gap-2 cursor-pointer ${
                     isUploading || formData.images.length >= 10
                       ? 'opacity-50 cursor-not-allowed'
                       : ''
@@ -365,13 +366,15 @@ export default function MarketplaceFormPage() {
                     errors.images ? 'border-2 border-danger-500' : ''
                   }`}
                 >
-                  <PhotoIcon className="w-5 h-5" />
-                  {isUploading
-                    ? '업로드 중...'
-                    : formData.images.length >= 10
-                    ? '최대 10개까지 업로드 가능'
-                    : '이미지 선택'}
-                </label>
+                  <label htmlFor="image-upload">
+                    <PhotoIcon className="w-5 h-5" />
+                    {isUploading
+                      ? '업로드 중...'
+                      : formData.images.length >= 10
+                      ? '최대 10개까지 업로드 가능'
+                      : '이미지 선택'}
+                  </label>
+                </Button>
                 {errors.images && (
                   <p className="mt-1 text-sm text-danger-600">{errors.images}</p>
                 )}
@@ -439,9 +442,11 @@ export default function MarketplaceFormPage() {
 
             {/* 제출 버튼 */}
             <div className="flex gap-3 pt-4 border-t border-neutral-200">
-              <Link to={isEditMode ? `/marketplace/${id}` : '/marketplace'} className="btn-secondary flex-1">
-                취소
-              </Link>
+              <Button asChild variant="secondary" className="flex-1">
+                <Link to={isEditMode ? `/marketplace/${id}` : '/marketplace'}>
+                  취소
+                </Link>
+              </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}

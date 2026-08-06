@@ -58,19 +58,20 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
             이 경기 결과를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
           </p>
           <div className="flex gap-2">
-            <button
+            <Button
               type="button"
               onClick={onClose}
-              className="btn-secondary flex-1"
+              className="flex-1"
               disabled={isDeleting}
             >
               취소
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={onConfirm}
               disabled={isDeleting}
-              className="btn-danger flex-1"
+              variant="destructive"
+              className="flex-1"
             >
               {isDeleting ? (
                 <>
@@ -80,7 +81,7 @@ function DeleteModal({ isOpen, onClose, onConfirm, isDeleting }: DeleteModalProp
               ) : (
                 '삭제'
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -152,20 +153,23 @@ export default function MatchResultDetailPage() {
         actions={
           isAdmin ? (
             <>
-              <Link
-                to={`/matchResult/${competitionId}/${resultId}/edit`}
-                className="btn-secondary"
-              >
-                <PencilSquareIcon className="w-4 h-4" />
-                수정
-              </Link>
-              <button
+              <Button asChild variant="secondary">
+                <Link
+                  to={`/matchResult/${competitionId}/${resultId}/edit`}
+                >
+                  <PencilSquareIcon className="w-4 h-4" />
+                  수정
+                </Link>
+              </Button>
+              <Button
+                type="button"
                 onClick={() => setShowDeleteModal(true)}
-                className="btn-ghost text-danger-500 hover:bg-danger-50"
+                variant="ghost"
+                className="text-danger-500 hover:bg-danger-50"
               >
                 <TrashIcon className="w-4 h-4" />
                 삭제
-              </button>
+              </Button>
             </>
           ) : undefined
         }

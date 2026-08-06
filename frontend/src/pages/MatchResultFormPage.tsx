@@ -292,15 +292,16 @@ export default function MatchResultFormPage() {
               <label className="block text-sm font-medium text-neutral-700">
                 선수 기록 <span className="text-danger-500">*</span>
               </label>
-              <button
+              <Button
                 type="button"
                 onClick={addResultItem}
-                className="btn-secondary text-sm"
+                variant="secondary"
+                className="text-sm"
                 disabled={isSubmitting}
               >
                 <PlusIcon className="w-4 h-4" />
                 선수 추가
-              </button>
+              </Button>
             </div>
             
             <div className="overflow-x-auto">
@@ -404,14 +405,14 @@ export default function MatchResultFormPage() {
           
           {/* 버튼 */}
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
               onClick={() => navigate(`/matchResult/${competitionId}`)}
-              className="btn-secondary flex-1"
+              className="flex-1"
               disabled={isSubmitting}
             >
               취소
-            </button>
+            </Button>
             <Button
               type="submit"
               disabled={isSubmitting}

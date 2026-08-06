@@ -53,19 +53,20 @@ function DeleteModal({ isOpen, resultInfo, onClose, onConfirm, isDeleting }: Del
             <strong>"{resultInfo}"</strong> 경기 결과를 삭제하시겠습니까?
           </p>
           <div className="flex gap-2">
-            <button
+            <Button
               type="button"
               onClick={onClose}
-              className="btn-secondary flex-1"
+              className="flex-1"
               disabled={isDeleting}
             >
               취소
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={onConfirm}
               disabled={isDeleting}
-              className="btn-danger flex-1"
+              variant="destructive"
+              className="flex-1"
             >
               {isDeleting ? (
                 <>
@@ -75,7 +76,7 @@ function DeleteModal({ isOpen, resultInfo, onClose, onConfirm, isDeleting }: Del
               ) : (
                 '삭제'
               )}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

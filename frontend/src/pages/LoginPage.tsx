@@ -160,12 +160,11 @@ export default function LoginPage() {
 
             {/* 게스트로 둘러보기 */}
             <div className="mt-8 pt-6 border-t border-neutral-100">
-              <Link
-                to="/"
-                className="btn-secondary w-full justify-center"
-              >
-                게스트로 둘러보기
-              </Link>
+              <Button asChild variant="secondary" className="w-full justify-center">
+                <Link to="/">
+                  게스트로 둘러보기
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
