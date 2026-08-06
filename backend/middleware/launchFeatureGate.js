@@ -3,7 +3,6 @@ const PREPARING_MESSAGE = '이 기능은 준비 중이에요.';
 const UNAVAILABLE_INTERACTION_PREFIXES = [
   '/api/posts',
   '/api/marketplace',
-  '/api/chat',
   '/api/upload',
   '/api/competitions',
   '/api/match-results',

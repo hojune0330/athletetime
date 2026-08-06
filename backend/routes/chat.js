@@ -24,8 +24,15 @@ const NICKNAME_MIN = 2;
 const NICKNAME_MAX = 10;
 
 function getPool(req) {
-  // posts.js와 동일 패턴 — 실 DB 풀, 없으면 req.app.locals.pool 폴백
-  return req.app.locals.pool || null;
+  // 실 DB(PG) 풀만 사용 — req.app.locals.pool은 Mock DB 객체를 담을 수 있어,
+  // 준비되지 않은 SQL을 실행하지 않으려면 db.pool(실 PG) 존재로 판별한다.
+  try {
+    const db = require('../utils/db');
+    if (db.pool) return db.pool;
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 /**
