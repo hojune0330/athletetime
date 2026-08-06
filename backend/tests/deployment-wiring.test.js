@@ -164,3 +164,44 @@ test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake upgrades to 101', async ()
     }
   }
 });
+
+test('DEPLOY-ENV-001: production must fail fast (exit 1) when AUTH_CODE_PEPPER is missing', () => {
+  const recoveryCodes = readSource('backend/auth/recoveryCodes.js');
+  const server = readSource('src/server.js');
+
+  // production에서 AUTH_CODE_PEPPER(32자 미만)면 즉시 throw → 프로세스 exit 1
+  assert.match(recoveryCodes, /environment\.NODE_ENV === 'production'/);
+  assert.match(recoveryCodes, /throw new Error\('AUTH_CODE_PEPPER 환경변수가 설정되지 않았습니다\.'\)/);
+  assert.match(recoveryCodes, /configured\.trim\(\)\.length >= 32/);
+  // server.js가 모듈 최상단에서 즉시 호출(APP 생성 전) → 실패가 늦게 드러나지 않는다
+  assert.match(server, /assertRecoveryCodeEnvironment\(\);/);
+  assert.ok(server.indexOf('assertRecoveryCodeEnvironment();') < server.indexOf("const app = express();"));
+});
+
+test('DEPLOY-ENV-002: production must fail fast when DATABASE_URL is missing', () => {
+  const db = readSource('backend/utils/db.js');
+
+  assert.match(db, /if \(IS_PRODUCTION\)/);
+  assert.match(db, /throw new Error\('운영 환경에서는 DATABASE_URL이 필요합니다\./);
+});
+
+test('DEPLOY-ENV-003: production must fail fast when JWT_SECRET is missing', () => {
+  const jwt = readSource('backend/utils/jwt.js');
+
+  assert.match(jwt, /if \(IS_PRODUCTION\)/);
+  assert.match(jwt, /throw new Error\('JWT_SECRET 환경변수가 설정되지 않았습니다\./);
+});
+
+test('DEPLOY-ENV-004: deploy:check script is wired and covers the three hard-required envs', () => {
+  const pkg = JSON.parse(readSource('package.json'));
+  const script = readSource('scripts/check-production-env.js');
+
+  assert.ok(pkg.scripts['deploy:check'], 'deploy:check script must exist');
+  assert.ok(pkg.scripts['predeploy'], 'predeploy script must exist');
+  assert.match(pkg.scripts['deploy:check'], /check-production-env\.js/);
+
+  // 점검 스크립트가 3가지 필수 env(AUTH_CODE_PEPPER, DATABASE_URL, JWT_SECRET)를 모두 커버하는지
+  for (const key of ['AUTH_CODE_PEPPER', 'DATABASE_URL', 'JWT_SECRET']) {
+    assert.ok(script.includes(`key: '${key}'`), `check script must check ${key}`);
+  }
+});

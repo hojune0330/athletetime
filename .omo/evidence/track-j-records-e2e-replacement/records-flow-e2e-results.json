@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-08-06T13:20:37.395Z",
+  "generatedAt": "2026-08-06T20:21:00.099Z",
   "scenario": "records flow e2e",
   "invocation": "node --test backend/tests/records-flow-e2e.test.js",
-  "baseUrl": "http://127.0.0.1:36305",
+  "baseUrl": "http://127.0.0.1:33939",
   "viewport": {
     "width": 375,
     "height": 667
   },
   "visited": [
-    "http://127.0.0.1:36305/records",
-    "http://127.0.0.1:36305/records?flow=mine&step=candidates&q=Alpha&mineDraft=alpha-2016%2Calpha-2020",
-    "http://127.0.0.1:36305/records?flow=mine&step=done&q=Alpha",
-    "http://127.0.0.1:36305/records?flow=browse",
-    "http://127.0.0.1:36305/records?athlete=alpha-2016",
-    "http://127.0.0.1:36305/records?compare=alpha-2016,beta-2016"
+    "http://127.0.0.1:33939/records",
+    "http://127.0.0.1:33939/records?flow=mine&step=candidates&q=Alpha&mineDraft=alpha-2016%2Calpha-2020",
+    "http://127.0.0.1:33939/records?flow=mine&step=done&q=Alpha",
+    "http://127.0.0.1:33939/records?flow=browse",
+    "http://127.0.0.1:33939/records?athlete=alpha-2016",
+    "http://127.0.0.1:33939/records?compare=alpha-2016,beta-2016"
   ],
   "consoleErrors": [],
   "pageErrors": []

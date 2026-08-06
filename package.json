@@ -16,6 +16,8 @@
     "data:rights:roundtrip": "node tools/check-data-rights-rollout.js roundtrip",
     "server": "node src/server.js",
     "server:dev": "node src/server.js",
+    "deploy:check": "node scripts/check-production-env.js",
+    "predeploy": "node scripts/check-production-env.js",
     "pipeline": "node card-studio/pipeline.js",
     "pipeline:url": "node card-studio/pipeline.js --url",
     "pipeline:all": "node card-studio/pipeline.js --process-all",
