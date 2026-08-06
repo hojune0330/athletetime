@@ -6,6 +6,7 @@ type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
 interface ChatHeaderProps {
   currentRoom: RoomId;
   userCount: number;
+  today?: number; // 오늘 참여 인원 — 유지보수: 접속자 수 10명 미만이면 오늘 참여로 표기
   isConnected: boolean;
   connectionStatus?: ConnectionStatus;
   onMenuToggle?: () => void;
@@ -15,6 +16,7 @@ interface ChatHeaderProps {
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   currentRoom,
   userCount,
+  today = 0,
   isConnected,
   connectionStatus = isConnected ? 'connected' : 'disconnected',
   onMenuToggle,
@@ -25,7 +27,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const getStatusInfo = () => {
     switch (connectionStatus) {
       case 'connected':
-        return { color: 'bg-green-500', text: `${userCount}명 접속중`, animate: 'animate-pulse' };
+        // H-1c: 10명 미만이면 '오늘 참여 N명', 10명 이상이면 '현재 N명'
+        const countText = userCount < 10
+          ? `오늘 참여 ${today || userCount}명`
+          : `현재 ${userCount}명`;
+        return { color: 'bg-green-500', text: countText, animate: 'animate-pulse' };
       case 'connecting':
         return { color: 'bg-yellow-500', text: '연결 중...', animate: 'animate-ping' };
       case 'disconnected':

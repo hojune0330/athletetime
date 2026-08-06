@@ -29,6 +29,7 @@ export interface UseChatReturn {
   isJoined: boolean;
   messages: (ChatMessage | { type: 'system'; text: string })[];
   userCount: number;
+  today: number;
   currentRoom: RoomId;
   isConnected: boolean;
   connectionStatus: 'disconnected' | 'connecting' | 'connected';
@@ -41,9 +42,13 @@ export interface UseChatReturn {
   sendMessage: (text: string) => void;
   changeRoom: (room: RoomId) => void;
   checkNickname: (nickname: string) => Promise<{ available: boolean; message: string }>;
+  reportMessage: (messageId: string, reasonCode: string, detail?: string) => Promise<boolean>;
 }
 
 export function useChat(): UseChatReturn {
+  // 오늘 참여 인원 (H-1c: 10명 미만이면 '오늘 참여 N명')
+  const [today, setToday] = useState(0);
+
   // sessionStorage에서 닉네임과 userId 불러오기
   const [nickname, setNicknameState] = useState(getSavedNickname);
   const [isJoined, setIsJoined] = useState(() => !!getSavedNickname());
@@ -91,6 +96,29 @@ export function useChat(): UseChatReturn {
     setUserCount(count);
   }, []);
 
+  // 서버로부터 오늘 참여 인원 수신
+  const handleTodayChange = useCallback((count: number) => {
+    setToday(count);
+  }, []);
+
+  // 메시지 신고 (고유 신고자 3명 누적 시 서버가 자동 블라인드)
+  const reportMessage = useCallback(async (messageId: string, reasonCode: string, detail?: string): Promise<boolean> => {
+    try {
+      const response = await apiClient.post('/api/chat/reports', {
+        messageId,
+        reasonCode,
+        detail: detail ?? '',
+        reporterKey: userId,
+      });
+      return response.data?.success === true;
+    } catch (error: any) {
+      // 이미 신고한 사용자는 409 — 조용히 성공처럼 처리 (중복 신고 방지 UX)
+      if (error.response?.status === 409) return true;
+      setNicknameError('신고 처리 중 오류가 발생했습니다.');
+      return false;
+    }
+  }, [userId]);
+
   const {
     isConnected,
     connectionStatus,
@@ -105,6 +133,7 @@ export function useChat(): UseChatReturn {
     onSystemMessage: handleSystemMessage,
     onHistory: handleHistory,
     onUserCountChange: handleUserCountChange,
+    onToday: handleTodayChange,
   });
 
   const joinChat = useCallback(async (): Promise<boolean> => {
@@ -158,6 +187,7 @@ export function useChat(): UseChatReturn {
     isJoined,
     messages,
     userCount,
+    today,
     currentRoom,
     isConnected,
     connectionStatus,
@@ -168,5 +198,6 @@ export function useChat(): UseChatReturn {
     sendMessage: wsSendMessage,
     changeRoom,
     checkNickname,
+    reportMessage,
   };
 }

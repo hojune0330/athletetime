@@ -23,6 +23,9 @@ interface UseWebSocketOptions {
   onSystemMessage?: (text: string) => void;
   onHistory?: (messages: ChatMessage[]) => void;
   onUserCountChange?: (count: number) => void;
+  onError?: (code: string, message: string) => void;
+  onBlind?: (messageId: string) => void;
+  onToday?: (count: number) => void;
 }
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
@@ -44,6 +47,9 @@ export function useWebSocket({
   onSystemMessage,
   onHistory,
   onUserCountChange,
+  onError,
+  onBlind,
+  onToday,
 }: UseWebSocketOptions): UseWebSocketReturn {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
   const [currentRoom, setCurrentRoom] = useState<RoomId>('main');
@@ -56,7 +62,7 @@ export function useWebSocket({
   const nicknameRef = useRef(nickname);
   const userIdRef = useRef(userId);
   const currentRoomRef = useRef(currentRoom);
-  const callbacksRef = useRef({ onMessage, onSystemMessage, onHistory, onUserCountChange });
+  const callbacksRef = useRef({ onMessage, onSystemMessage, onHistory, onUserCountChange, onError, onBlind, onToday });
   
   // ref 값 업데이트
   useEffect(() => {
@@ -69,11 +75,11 @@ export function useWebSocket({
   }, [currentRoom]);
   
   useEffect(() => {
-    callbacksRef.current = { onMessage, onSystemMessage, onHistory, onUserCountChange };
-  }, [onMessage, onSystemMessage, onHistory, onUserCountChange]);
+    callbacksRef.current = { onMessage, onSystemMessage, onHistory, onUserCountChange, onError, onBlind, onToday };
+  }, [onMessage, onSystemMessage, onHistory, onUserCountChange, onError, onBlind, onToday]);
 
   const handleMessage = useCallback((data: WebSocketMessage) => {
-    const { onMessage, onSystemMessage, onHistory, onUserCountChange } = callbacksRef.current;
+    const { onMessage, onSystemMessage, onHistory, onUserCountChange, onError, onBlind, onToday } = callbacksRef.current;
     
     switch (data.type) {
       case 'history':
@@ -83,8 +89,14 @@ export function useWebSocket({
             text: msg.message,
             timestamp: msg.created_at,
             userId: msg.user_id,
+            isBlinded: !!msg.is_blinded,
           }));
           onHistory(messages);
+
+        // 오늘 참여 인원 — 입장 직후 히스토리와 함께 도착
+        if (data.today !== undefined && onToday) {
+          onToday(data.today);
+        }
         }
         break;
 
@@ -103,6 +115,18 @@ export function useWebSocket({
       case 'userCount':
         if (data.count !== undefined && onUserCountChange) {
           onUserCountChange(data.count);
+        }
+        break;
+
+      case 'error':
+        if (data.code && data.message && onError) {
+          onError(data.code, data.message);
+        }
+        break;
+
+      case 'blind':
+        if (data.messageId && onBlind) {
+          onBlind(data.messageId);
         }
         break;
     }

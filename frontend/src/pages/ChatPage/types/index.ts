@@ -1,6 +1,6 @@
 // 채팅 관련 타입 정의
 
-export type RoomId = 'main' | 'running' | 'free';
+export type RoomId = 'main';
 
 export interface ChatRoom {
   id: RoomId;
@@ -14,6 +14,7 @@ export interface ChatMessage {
   text: string;
   timestamp: string | Date;
   userId: string;
+  isBlinded?: boolean;
 }
 
 export interface SystemMessage {
@@ -22,7 +23,7 @@ export interface SystemMessage {
 }
 
 export interface WebSocketMessage {
-  type: 'join' | 'message' | 'history' | 'system' | 'userCount';
+  type: 'join' | 'message' | 'history' | 'system' | 'userCount' | 'error' | 'blind';
   room?: RoomId;
   nickname?: string;
   userId?: string;
@@ -33,12 +34,15 @@ export interface WebSocketMessage {
     message: string;
     created_at: string;
     user_id: string;
+    is_blinded?: boolean;
   }>;
   count?: number;
+  today?: number;
+  code?: string;
+  message?: string;
+  messageId?: string;
 }
 
 export const CHAT_ROOMS: ChatRoom[] = [
-  { id: 'main', name: '메인 채팅방', icon: '🏠' },
-  { id: 'running', name: '러닝 채팅방', icon: '🏃' },
-  { id: 'free', name: '자유 채팅방', icon: '💬' },
+  { id: 'main', name: '자유수다', icon: '💬' },
 ];
