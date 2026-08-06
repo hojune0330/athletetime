@@ -1,7 +1,7 @@
 # AthleTime 전면 개편 마스터 플랜 (최종)
 
 > **작성:** 호준(사용자) + Claude 공동 · 갱신 주기: 턴 단위
-> **상태:** 4단계 진행 중 (2C/3D/4A/4B 완료, 4C/4D 코드로 이미 해결 확인, 1C/2A/2B/3A/3B/3C 예정)
+> **상태:** 4단계 진행 중 (2B/2C/3D/4A/4B 완료, 4C/4D 코드로 이미 해결 확인, 1C/2A/3A/3B/3C 예정)
 > **브랜치 정책 (2025 결정):** ✅ **main 단일 브랜치** — 분기 금지. 모든 작업은 main에서 직접 커밋·푸시.
 > **커밋 컨벤션:** `ui(1):` / `ui(2):` / `ui(3):` / `ui(4):` (단계별로 독립 커밋)
 
@@ -38,7 +38,7 @@
 | 항목 | 내용 |
 |---|---|
 | 2A | ScheduleCardPage 재작성 (731줄, 인라인 20·하드컬러 9 — 네이버그린 `#03C75A` 포함) |
-| 2B | 공용 Spinner/Skeleton/Button 일원화 — `animate-spin` 14페이지, `btn-primary` 15페이지 |
+| 2B | 공용 Spinner/Skeleton/Button 일원화 — `btn-primary` 34건(d4e476c) + `btn-secondary/danger/ghost/btn` 33건 및 index.css 레거시 `.btn*` 제거(715b1ed) | ✅ 완료 — Button 컴포넌트(variant/size/asChild)로 전면 교체, 잔존 0 |
 | 2C | Header 1037줄 축소 (nav·유저 메뉴 리팩터) | ✅ 완료 — 1037→315줄, HeaderLoginModal/HeaderMobileDrawer/HeaderSearchBar 4분할 |
 
 ### 3단계 — 운영·정합
