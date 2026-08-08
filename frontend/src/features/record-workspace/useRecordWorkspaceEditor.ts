@@ -64,11 +64,11 @@ export function hideSelectedWorkspaceRecords(state: WorkspaceEditorState): Works
 export function removeWorkspaceSubject(state: WorkspaceEditorState, subjectKey: string): WorkspaceEditorState {
   if (!state.subjectKeys.includes(subjectKey)) return state
   if (state.subjectKeys.length <= 1) {
-    return { ...state, announcement: '마지막 기록 후보는 모음에서 뺄 수 없어요.' }
+    return { ...state, announcement: '마지막 선수 후보는 모음에서 뺄 수 없어요.' }
   }
   return {
     ...state,
-    announcement: '최근 변경: 기록 후보 1개 제외 · 되돌릴 수 있어요.',
+    announcement: '최근 변경: 선수 후보 1명 제외 · 되돌릴 수 있어요.',
     focusRecordId: null,
     selectedRecordIds: [],
     selectionMode: false,

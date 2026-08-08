@@ -175,7 +175,7 @@ function WorkspaceTabs({ active, onChange }: { readonly active: WorkspaceTab; re
     <nav className="grid grid-cols-3 border border-line bg-surface p-1" aria-label="기록 모음 보기">
       {([
         ['records', '종목별 기록'],
-        ['affiliations', '기록 후보·소속'],
+        ['affiliations', '선수 후보·소속'],
         ['sources', '출처'],
       ] as const).map(([value, label]) => (
         <button

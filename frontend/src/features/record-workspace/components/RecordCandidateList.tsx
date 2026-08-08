@@ -62,7 +62,7 @@ export function RecordCandidateList({
     }
     const result = nextWorkspaceDraftSelection(draftSubjectKeys, athlete.athleteKey)
     if (result.kind === 'limit') {
-      setNotice('한 번에 6개까지 선택할 수 있어요.')
+      setNotice(`한 모음에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
       return
     }
     setNotice('')
@@ -77,12 +77,12 @@ export function RecordCandidateList({
             SEARCH RESULTS
           </p>
           <h2 className="mt-1 text-h3 font-semibold text-ink">
-            {selectionMode ? '함께 볼 기록 후보를 선택하세요' : `기록 후보 ${athletes.length}개`}
+            {selectionMode ? '함께 볼 선수 후보를 선택하세요' : `선수 후보 ${athletes.length}명`}
           </h2>
           <p className="mt-1 text-body-sm text-ink-3">
             {selectionMode
-              ? '소속과 시즌을 확인하며 최대 6명까지 선택할 수 있어요.'
-              : '카드를 누르면 이 기록 후보를 열어요.'}
+              ? `소속과 시즌을 확인하고 최대 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`
+              : '카드를 누르면 이 선수 후보의 기록을 열어요.'}
           </p>
         </div>
         {!selectionMode && athletes.length > 0 && (
@@ -91,7 +91,7 @@ export function RecordCandidateList({
             className="min-h-11 shrink-0 border border-line px-4 text-body-sm font-semibold text-ink hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             onClick={onEnterSelectionMode}
           >
-            기록 묶어 보기
+            선수 기록 모아 보기
           </button>
         )}
       </header>

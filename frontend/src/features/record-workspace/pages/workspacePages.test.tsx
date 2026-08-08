@@ -156,7 +156,7 @@ describe('record workspace pages', () => {
     )
 
     // Then only a generic recovery message is rendered.
-    expect(markup).toContain('선택한 기록 후보 하나를 불러오지 못했어요')
+    expect(markup).toContain('선택한 선수 후보 하나를 불러오지 못했어요')
     expect(markup).not.toContain(KEY_B)
     expect(markup).not.toContain('현 소속')
   })

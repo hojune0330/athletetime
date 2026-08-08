@@ -80,13 +80,13 @@ export default function RecordAthletePage() {
     const current = store.workspaceDraft?.subjectKeys ?? []
     const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
     if (next.kind === 'limit') {
-      setActionNotice(`기록 후보 모음은 ${WORKSPACE_LIMITS.workspaceDraftSubjects}개까지 담을 수 있어요.`)
+      setActionNotice(`한 모음에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
       return
     }
     const result = store.saveWorkspaceDraft(next.subjectKeys)
     setActionNotice(result.ok
-      ? next.kind === 'already_added' ? '이미 기록 후보 모음에 담겨 있어요.' : '기록 후보 모음에 담았어요.'
-      : '이 기기에 기록 후보 모음을 저장하지 못했어요.')
+      ? next.kind === 'already_added' ? '이미 선수 후보 모음에 담겨 있어요.' : '선수 후보 모음에 담았어요.'
+      : '이 기기에 선수 후보 모음을 저장하지 못했어요.')
   }
   const startComparison = () => {
     const comparison = buildAthleteComparisonSetup(athleteKey, crypto.randomUUID(), new Date().toISOString())
@@ -134,7 +134,7 @@ export default function RecordAthletePage() {
           {sameNameCaution}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="button" onClick={addToDraft}>이 기록 후보 담기</Button>
+          <Button type="button" onClick={addToDraft}>이 선수 후보 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
           <Button type="button" variant="outline" onClick={shareRecord}>
             <ShareIcon className="h-4 w-4" aria-hidden="true" />
@@ -142,7 +142,7 @@ export default function RecordAthletePage() {
           </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
-              <Link to="/records/workspaces/new">선택한 기록 후보 보기 · {draftCount}개</Link>
+              <Link to="/records/workspaces/new">선택한 선수 후보 보기 · {draftCount}명</Link>
             </Button>
           )}
           <Button asChild type="button" variant="ghost">

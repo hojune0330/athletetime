@@ -63,7 +63,7 @@ export function RecordCoverageReceipt({
   const titleId = useId()
   const isWorkspace = context === 'workspace'
   const scopeCopy = isWorkspace
-    ? `선택한 기록 후보 ${subjectCount}개에서 확인된 ${coverage.totalMatched}개`
+    ? `선택한 선수 후보 ${subjectCount}명에서 확인된 ${coverage.totalMatched}개`
     : `AthleteTime에서 확인된 ${coverage.totalMatched}개`
 
   return (

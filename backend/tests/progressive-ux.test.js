@@ -84,9 +84,9 @@ test('UX-COLLECT-001: local collection is opt-in, reversible, and never auto-mer
 
 test('UX-COMBINE-002: search candidates require explicit collect mode and review', () => {
   const results = readSource('frontend/src/features/record-workspace/components/RecordCandidateList.tsx');
-  assert.match(results, /기록 묶어 보기/, 'collection mode has an explicit entry');
+  assert.match(results, /선수 기록 모아 보기/, 'collection mode has an explicit entry');
   assert.match(results, /mode=\{selectionMode \? 'collect' : 'browse'\}/, 'card activation has one meaning per mode');
-  assert.match(results, /한 번에 6개까지 선택할 수 있어요/, 'selection limit is disclosed');
+  assert.match(results, /한 모음에는 \$\{WORKSPACE_LIMITS\.workspaceDraftSubjects\}명까지 담을 수 있어요/, 'selection limit is disclosed');
   assert.match(results, /<WorkspaceDraftTray/, 'review is reached through one action bar');
   assert.doesNotMatch(results, /onToggleMine|isMine|비교에 담기/, 'ownership and comparison stay outside browse selection');
 
