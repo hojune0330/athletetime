@@ -79,6 +79,18 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.waitForURL(/step=done/);
     await expectVisible(page.locator('[data-records-step="mine-done"]'));
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
+
+    await page.getByRole('button', { name: 'Seoul High 묶음을 이 목록에서 빼기' }).click();
+    await page.getByRole('button', { name: 'Seoul Track Club 묶음을 이 목록에서 빼기' }).click();
+    await expectVisible(page.getByRole('heading', { name: '기록 모음이 비었어요.' }));
+    assert.equal(
+      await page.locator('[data-records-sticky-cta="mine-done"] button').count(),
+      1,
+      'an empty saved collection has one live recovery action',
+    );
+    await page.getByRole('button', { name: '기록 담기', exact: true }).click();
+    await page.waitForURL(/step=name/);
+    await expectVisible(page.locator('#mine-records-name'));
     visited.push(page.url());
 
     await navigateToReady(page, `${baseUrl}/records?flow=mine&step=name`);
