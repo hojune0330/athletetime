@@ -301,6 +301,7 @@ async function stopServer(server) {
 }
 
 function writeEvidence(state, evidence) {
+  if (!shouldWriteEvidence()) return;
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
   const evidencePath = path.join(EVIDENCE_DIR, evidence.fileName || 'records-flow-e2e-results.json');
   fs.writeFileSync(evidencePath, JSON.stringify({
@@ -313,6 +314,10 @@ function writeEvidence(state, evidence) {
     consoleErrors: state.consoleErrors,
     pageErrors: state.pageErrors,
   }, null, 2));
+}
+
+function shouldWriteEvidence(value = process.env.WRITE_E2E_EVIDENCE) {
+  return value === '1';
 }
 
 async function expectVisible(locator) {
@@ -342,4 +347,4 @@ async function expectUrlParam(page, name, expectedPart) {
   );
 }
 
-module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, selectedCandidateCount, waitForSelectedCandidateCount, withRecordsPage };
+module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, selectedCandidateCount, shouldWriteEvidence, waitForSelectedCandidateCount, withRecordsPage };

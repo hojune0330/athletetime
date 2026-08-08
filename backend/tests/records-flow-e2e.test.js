@@ -5,9 +5,16 @@ const {
   expectUrlParam,
   expectVisible,
   selectedCandidateCount,
+  shouldWriteEvidence,
   waitForSelectedCandidateCount,
   withRecordsPage,
 } = require('./records-flow-e2e-fixture');
+
+test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do not rewrite tracked evidence', () => {
+  assert.equal(shouldWriteEvidence(undefined), false);
+  assert.equal(shouldWriteEvidence('true'), false);
+  assert.equal(shouldWriteEvidence('1'), true);
+});
 
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
