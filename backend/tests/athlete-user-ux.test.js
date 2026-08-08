@@ -88,13 +88,15 @@ test.after(async () => {
   });
 });
 
-test('home page sends users to their own record search instead of a sample showcase', () => {
+test('home page sends users to public record search instead of a sample showcase', () => {
   const source = readSource('frontend/src/pages/MainPage.tsx');
 
   assert.equal(source.includes('AthleteInsightShowcase'), false);
   assert.equal(source.includes('#record-insight'), false);
   assert.equal(source.includes('예시'), false);
-  assert.match(source, /내 이름으로 기록 찾기[\s\S]*자기 이름/);
+  assert.match(source, /이름으로 공개 기록 찾기/);
+  assert.match(source, /이름을 넣으면 공개된 대회 기록 후보를 찾아 보여드려요/);
+  assert.doesNotMatch(source, /내 기록 찾기|내 기록 검색/);
 });
 
 test('home only advertises destinations that are available at launch', () => {

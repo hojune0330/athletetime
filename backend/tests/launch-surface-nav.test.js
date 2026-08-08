@@ -106,6 +106,10 @@ test('not-found page recovers users into the record search loop', () => {
   assert.match(notFound, /\/records\?q=\$\{encodeURIComponent\(trimmed\)\}/);
   assert.match(notFound, /\/records/);
   assert.match(notFound, /\/competitions/);
+  assert.match(notFound, /placeholder="이름 또는 소속\(학교·팀\)"/);
+  assert.doesNotMatch(notFound, /placeholder="선수 이름, 소속, 종목"/);
+  assert.match(notFound, /이름·소속으로 공개 기록 찾기/);
+  assert.doesNotMatch(notFound, /이름·소속·종목으로 공개 기록 찾기/);
 
   // 신뢰 톤 — 미래약속·과장 금지.
   assert.equal(notFound.includes('곧'), false);
