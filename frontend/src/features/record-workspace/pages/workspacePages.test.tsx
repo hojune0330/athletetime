@@ -223,7 +223,7 @@ describe('record workspace pages', () => {
 
     // Then the row identifies the public profile and the affiliation shown for that result.
     expect(markup).toContain('김선수 · 서울고')
-    expect(markup).toContain('같은 이름의 기록을 한 사람으로 합치지 않아요.')
+    expect(markup).toContain('같은 이름의 선수 후보를 한 사람으로 합치지 않아요.')
   })
 
   it('requires an event before record-edit mode can start', () => {

@@ -85,7 +85,7 @@ export function WorkspaceRecordTab({
       {selectedGroup ? (
         <>
           <p className="border border-line bg-surface px-4 py-3 text-caption leading-5 text-ink-3" role="note">
-            같은 이름의 기록을 한 사람으로 합치지 않아요. 이름과 기록 당시 소속을 확인해 주세요.
+            같은 이름의 선수 후보를 한 사람으로 합치지 않아요. 이름과 기록 당시 소속을 확인해 주세요.
           </p>
           <RecordGroupList
             key={selectedEventKey}
