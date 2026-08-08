@@ -10,6 +10,7 @@ type RecordRowProps = {
   readonly onToggleSelection?: (record: PublicRecord) => void
   readonly record: PublicRecord
   readonly selected?: boolean
+  readonly showSubjectContext?: boolean
 }
 
 function rankLabel(rank: number | null) {
@@ -22,6 +23,7 @@ export function RecordRow({
   onToggleSelection,
   record,
   selected = false,
+  showSubjectContext = false,
 }: RecordRowProps) {
   const display = resolveRecordDisplay(record.record, record.note)
   const selectionMode = mode === 'select'
@@ -55,7 +57,8 @@ export function RecordRow({
         {record.competitionName}
       </span>
       <span className={cn(
-        'row-span-2 flex shrink-0 flex-col items-end justify-center font-mono',
+        showSubjectContext ? 'row-span-3' : 'row-span-2',
+        'flex shrink-0 flex-col items-end justify-center font-mono',
         '[font-variant-numeric:tabular-nums]',
       )}>
         {!display.hasMark && (
@@ -70,6 +73,11 @@ export function RecordRow({
           {display.text}
         </span>
       </span>
+      {showSubjectContext && (
+        <span className="min-w-0 truncate text-caption text-ink-3">
+          {record.name} · {record.team || '소속 확인 안 됨'}
+        </span>
+      )}
       <span className="flex min-w-0 items-center gap-2 font-mono text-[12px] text-ink-3 [font-variant-numeric:tabular-nums]">
         <span>{record.date || '날짜 미상'}</span>
         <span aria-hidden="true">·</span>

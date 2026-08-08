@@ -52,9 +52,9 @@ function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; rea
       </div>
 
       <dl className="mt-5 grid grid-cols-3 border-l border-t border-line">
-        <CompactMetric label="대회" value={`${team.competitionCount}개`} />
-        <CompactMetric label="확인된 입상" value={`${team.confirmedPodiumCount}건`} />
-        <CompactMetric label="최고 갱신" value={`${team.indexedImprovementCount}건`} />
+        <CompactMetric label="출전 대회" value={`${team.competitionCount}개`} />
+        <CompactMetric label="1~3위 확인" value={`${team.confirmedPodiumCount}건`} />
+        <CompactMetric label="기록 개선" value={`${team.indexedImprovementCount}건`} />
       </dl>
       <p className="mt-4 text-xs text-ink-4">
         {formatSeasonRange(team.firstSeason, team.latestSeason)} · 모은 기록 {team.resultCount}건

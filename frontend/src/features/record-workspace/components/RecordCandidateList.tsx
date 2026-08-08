@@ -77,12 +77,12 @@ export function RecordCandidateList({
             SEARCH RESULTS
           </p>
           <h2 className="mt-1 text-h3 font-semibold text-ink">
-            {selectionMode ? '함께 볼 기록을 선택하세요' : `선수 ${athletes.length}명`}
+            {selectionMode ? '함께 볼 기록 후보를 선택하세요' : `기록 후보 ${athletes.length}개`}
           </h2>
           <p className="mt-1 text-body-sm text-ink-3">
             {selectionMode
               ? '소속과 시즌을 확인하며 최대 6명까지 선택할 수 있어요.'
-              : '카드를 누르면 이 선수의 기록으로 이동해요.'}
+              : '카드를 누르면 이 기록 후보를 열어요.'}
           </p>
         </div>
         {!selectionMode && athletes.length > 0 && (

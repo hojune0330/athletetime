@@ -18,11 +18,14 @@ describe('team statistics search results', () => {
 
     // Then the card exposes useful totals and a shareable team destination without athlete controls.
     expect(html).toContain('진도군청')
-    expect(html).toContain('대회')
+    expect(html).toContain('출전 대회')
     expect(html).toContain('36개')
-    expect(html).toContain('확인된 입상')
+    expect(html).toContain('1~3위 확인')
+    expect(html).toContain('기록 개선')
     expect(html).toContain('43건')
     expect(html).toContain('/records/teams/1234567890abcdef?category=corporate')
+    expect(html).not.toContain('19명')
+    expect(html).not.toContain('athleteKey')
     expect(html).not.toContain('선수 목록')
     expect(html).not.toContain('기록 담기')
     expect(html).not.toContain('비교에 담기')

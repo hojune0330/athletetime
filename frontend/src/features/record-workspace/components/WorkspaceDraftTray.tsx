@@ -13,13 +13,13 @@ export function WorkspaceDraftTray({
 }: WorkspaceDraftTrayProps) {
   return (
     <section
-      aria-label="선택한 기록 묶음"
+      aria-label="선택한 기록 후보"
       className="fixed inset-x-0 bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom))] z-40 border-y border-line bg-surface px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] md:bottom-4 md:left-1/2 md:right-auto md:w-[min(44rem,calc(100vw-2rem))] md:-translate-x-1/2 md:border"
     >
       <div className="mx-auto flex max-w-3xl items-center gap-3">
         <div className="min-w-0 flex-1">
           <p className="font-mono text-[12px] font-semibold text-ink [font-variant-numeric:tabular-nums]">
-            {selectedCount}개 선택
+            기록 후보 {selectedCount}개 선택
           </p>
           <p
             aria-live="polite"

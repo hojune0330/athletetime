@@ -20,11 +20,14 @@ describe('team performance dashboard sections', () => {
     ].join('')
 
     // Then team-level counts are clear and raw athlete claims never appear.
-    expect(html).toContain('확인된 입상')
-    expect(html).toContain('참가 대회')
-    expect(html).toContain('최고 갱신')
+    expect(html).toContain('모은 기록에서 확인한 입상')
+    expect(html).toContain('출전이 확인된 대회')
+    expect(html).toContain('기록 개선 확인')
+    expect(html).toContain('소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.')
     expect(html).toContain('전국대회')
     expect(html).not.toContain('홍길동')
+    expect(html).not.toContain('19명')
+    expect(html).not.toContain('athleteKey')
     expect(html).not.toContain('공식 메달')
     expect(html).not.toContain('팀 랭킹')
   })

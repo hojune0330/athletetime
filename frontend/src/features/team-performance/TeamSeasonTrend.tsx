@@ -21,7 +21,7 @@ export function TeamSeasonTrend({ rows }: Props) {
               <div className="h-full bg-brand" style={{ width: `${Math.max(4, (row.resultCount / max) * 100)}%` }} />
             </div>
             <p className="mt-2 text-xs text-ink-4">
-              대회 {row.competitionCount}개 · 확인된 입상 {row.confirmedPodiumCount}건 · 최고 갱신 {row.indexedImprovementCount}건
+              출전이 확인된 대회 {row.competitionCount}개 · 모은 기록에서 확인한 입상 {row.confirmedPodiumCount}건 · 기록 개선 확인 {row.indexedImprovementCount}건
             </p>
           </div>
         ))}

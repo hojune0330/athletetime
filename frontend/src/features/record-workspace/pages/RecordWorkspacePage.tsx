@@ -162,7 +162,7 @@ function WorkspaceShell({ children, title }: { readonly children: ReactNode; rea
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <div className="flex items-center justify-between gap-3">
-        <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">저장한 모음</Link>
+        <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">기록 모음 목록</Link>
         <span className="max-w-[55%] truncate text-body-sm font-semibold text-ink-3">{title}</span>
       </div>
       {children}
@@ -175,7 +175,7 @@ function WorkspaceTabs({ active, onChange }: { readonly active: WorkspaceTab; re
     <nav className="grid grid-cols-3 border border-line bg-surface p-1" aria-label="기록 모음 보기">
       {([
         ['records', '종목별 기록'],
-        ['affiliations', '소속·선택'],
+        ['affiliations', '기록 후보·소속'],
         ['sources', '출처'],
       ] as const).map(([value, label]) => (
         <button
