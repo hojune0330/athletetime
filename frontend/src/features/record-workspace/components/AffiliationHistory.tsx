@@ -28,7 +28,7 @@ export function AffiliationHistory({
 }: AffiliationHistoryProps) {
   const titleId = useId()
   const isMultiRecordView = context === 'workspace' || context === 'comparison'
-  const sectionTitle = isMultiRecordView ? '선택한 기록의 소속' : '기록에서 확인한 소속'
+  const sectionTitle = isMultiRecordView ? '선택한 선수 후보의 소속' : '기록에서 확인한 소속'
 
   if (items.length === 0) {
     return (
@@ -59,7 +59,7 @@ export function AffiliationHistory({
       <ol>
         {items.map((item) => {
           const statusLabel = isMultiRecordView
-            ? '선택한 기록에서 확인'
+            ? '선택한 선수 후보에서 확인'
             : STATUS_LABELS[item.status]
 
           return (

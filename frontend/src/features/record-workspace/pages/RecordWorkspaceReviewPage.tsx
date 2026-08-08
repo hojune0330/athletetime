@@ -55,7 +55,7 @@ export default function RecordWorkspaceReviewPage() {
     setBusy(false)
     if (!result.ok) {
       setNotice(result.reason === 'workspace_limit'
-        ? '저장한 모음이 20개예요. 기존 모음을 정리한 뒤 다시 시도해 주세요.'
+        ? '저장한 기록 모음이 20개예요. 기존 모음을 정리한 뒤 다시 시도해 주세요.'
         : '기록 모음을 저장하지 못했어요.')
       return
     }
@@ -96,7 +96,7 @@ export default function RecordWorkspaceReviewPage() {
       />
       {notice.includes('20개') && (
         <Link className="inline-flex min-h-11 items-center font-semibold text-brand" to="/records/workspaces">
-          저장한 모음 관리
+          저장한 기록 모음 관리
         </Link>
       )}
     </ReviewShell>
@@ -111,7 +111,7 @@ function ReviewShell({ children }: { readonly children: ReactNode }) {
           선택으로 돌아가기
         </Link>
         <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">
-          저장한 모음
+          기록 모음 목록
         </Link>
       </div>
       {children}

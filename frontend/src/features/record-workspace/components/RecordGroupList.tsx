@@ -17,6 +17,7 @@ type RecordGroupListProps = {
   readonly selectedRecordIds?: readonly string[]
   readonly selectedSeason: number
   readonly selectionMode?: boolean
+  readonly showSubjectContext?: boolean
   readonly sortOrder: RecordSortOrder
   readonly visibleCount: number
 }
@@ -31,6 +32,7 @@ export function RecordGroupList({
   selectedRecordIds = [],
   selectedSeason,
   selectionMode = false,
+  showSubjectContext = false,
   sortOrder,
   visibleCount,
 }: RecordGroupListProps) {
@@ -105,6 +107,7 @@ export function RecordGroupList({
                 mode={selectionMode ? 'select' : 'browse'}
                 record={record}
                 selected={selectedRecordIds.includes(record.id)}
+                showSubjectContext={showSubjectContext}
                 onOpen={onOpenRecord}
                 onToggleSelection={onToggleSelection}
               />

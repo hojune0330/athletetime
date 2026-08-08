@@ -17,8 +17,8 @@ export function WorkspaceSubjectList({
   return (
     <section className="border border-line bg-surface" aria-labelledby="workspace-subjects-title">
       <div className="border-b border-line px-4 py-3">
-        <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">SELECTED PROFILES</p>
-        <h2 id="workspace-subjects-title" className="mt-1 text-body font-semibold text-ink">선택한 공개 기록 묶음</h2>
+        <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">선택한 선수 후보</p>
+        <h2 id="workspace-subjects-title" className="mt-1 text-body font-semibold text-ink">모음에 담은 선수 후보</h2>
         <p className="mt-1 text-body-sm leading-5 text-ink-3">
           묶음을 빼도 원본 기록은 바뀌지 않아요.
         </p>
@@ -46,7 +46,7 @@ export function WorkspaceSubjectList({
         {unavailableSubjectKeys.map((subjectKey) => (
           <li key={subjectKey} className="flex items-center gap-3 border-b border-hair px-4 py-3 last:border-b-0">
             <div className="min-w-0 flex-1">
-              <p className="text-body-sm font-semibold text-ink">선택한 기록 하나를 불러오지 못했어요</p>
+              <p className="text-body-sm font-semibold text-ink">선택한 선수 후보 하나를 불러오지 못했어요</p>
               <p className="mt-1 text-caption text-ink-3">과거 이름이나 소속으로 대신 표시하지 않아요.</p>
             </div>
             <Button
@@ -63,7 +63,7 @@ export function WorkspaceSubjectList({
       </ul>
       {subjectKeys.length <= 1 && (
         <p className="border-t border-line px-4 py-3 text-caption leading-5 text-ink-3">
-          마지막 기록 묶음은 모음을 유지하기 위해 남겨둬요.
+          마지막 선수 후보는 모음을 유지하기 위해 남겨둬요.
         </p>
       )}
     </section>

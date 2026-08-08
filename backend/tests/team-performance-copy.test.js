@@ -21,10 +21,10 @@ test('Given public team statistics When trust copy is scanned Then required limi
 
   // When its user-facing copy is reviewed as one contract.
   const required = [
-    'AthleteTime이 모은 공개 기록 기준이에요.',
-    '공식 팀 명단이나 공식 입상 집계가 아니에요.',
+    '소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.',
+    '모든 대회를 뜻하지는 않아요.',
     '단계가 확인되지 않은 1~3위 표기',
-    '최고 갱신은 같은 공개 프로필 조각 안에서 계산했어요.',
+    '기록 개선 확인은 같은 공개 프로필 조각 안에서 계산했어요.',
   ];
 
   // Then collection limits and calculation scope cannot silently disappear.

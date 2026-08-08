@@ -33,9 +33,9 @@ export function RecordIdentityHeader({
   visibleRecordCount,
 }: RecordIdentityHeaderProps) {
   const summary = context === 'workspace'
-    ? `선택한 공개 기록 ${subjectCount}묶음에서 확인된 ${recordCount}개`
+    ? `선택한 선수 후보 ${subjectCount}명에서 확인된 ${recordCount}개`
     : context === 'comparison'
-      ? `비교 대상 ${subjectCount}명에서 확인된 ${recordCount}개`
+      ? `비교 선수 후보 ${subjectCount}명에서 확인된 ${recordCount}개`
       : `AthleteTime에서 확인된 ${recordCount}개`
   const displaySummary = visibleRecordCount !== undefined && visibleRecordCount < recordCount
     ? `${summary} · 현재 ${visibleRecordCount}개 표시`
@@ -43,9 +43,9 @@ export function RecordIdentityHeader({
   const affiliationSummary = affiliationCount === undefined
     ? null
     : context === 'workspace'
-      ? `선택한 기록의 소속 ${affiliationCount}곳`
+      ? `선택한 선수 후보의 소속 ${affiliationCount}곳`
       : context === 'comparison'
-        ? `비교 대상 기록의 소속 ${affiliationCount}곳`
+        ? `비교 선수 후보의 소속 ${affiliationCount}곳`
         : `공개 기록에서 소속 ${affiliationCount}곳 확인`
 
   return (

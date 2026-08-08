@@ -156,7 +156,7 @@ describe('record workspace pages', () => {
     )
 
     // Then only a generic recovery message is rendered.
-    expect(markup).toContain('선택한 기록 하나를 불러오지 못했어요')
+    expect(markup).toContain('선택한 선수 후보 하나를 불러오지 못했어요')
     expect(markup).not.toContain(KEY_B)
     expect(markup).not.toContain('현 소속')
   })
@@ -191,6 +191,37 @@ describe('record workspace pages', () => {
     expect(editMarkup).toContain('취소')
     expect(editMarkup).not.toContain('비교')
     expect(emptyMarkup).toContain('다시 모두 보기')
+  })
+
+  it('keeps each selected profile visible beside a workspace record', () => {
+    // Given a workspace that contains a public profile record.
+    const athletePreview = preview('none')
+
+    // When the selected event is rendered inside the workspace.
+    const markup = renderToStaticMarkup(
+      <WorkspaceRecordTab
+        isLoadingMore={false}
+        onCancelSelection={emptyAction}
+        onCloseRecord={emptyAction}
+        onHideSelected={emptyAction}
+        onLoadMore={emptyAction}
+        onOpenRecord={emptyAction}
+        onRestoreAll={emptyAction}
+        onSelectEvent={emptyAction}
+        onStartSelection={emptyAction}
+        onToggleRecord={emptyAction}
+        preview={athletePreview}
+        records={athletePreview.records}
+        selectedEventKey="100m"
+        selectedRecordId={null}
+        selectedRecordIds={[]}
+        selectionMode={false}
+      />,
+    )
+
+    // Then the row identifies the public profile and the affiliation shown for that result.
+    expect(markup).toContain('김선수 · 서울고')
+    expect(markup).toContain('같은 이름의 기록을 한 사람으로 합치지 않아요.')
   })
 
   it('requires an event before record-edit mode can start', () => {

@@ -146,7 +146,7 @@ function CoverageNotice({ detail }: { readonly detail: TeamPerformanceDetail }) 
   return (
     <aside className="border border-line bg-surface-2 p-5 text-xs leading-5 text-ink-4">
       <p>{detail.coverage.disclaimer}</p>
-      <p className="mt-2">단계가 확인되지 않은 1~3위 표기 {excluded}건은 합계에서 뺐어요. 최고 갱신은 같은 공개 프로필 조각 안에서 계산했어요.</p>
+      <p className="mt-2">단계가 확인되지 않은 1~3위 표기 {excluded}건은 합계에서 뺐어요. 기록 개선 확인은 같은 공개 프로필 조각 안에서 계산했어요.</p>
     </aside>
   )
 }

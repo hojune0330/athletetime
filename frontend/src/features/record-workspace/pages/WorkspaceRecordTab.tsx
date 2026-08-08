@@ -83,26 +83,32 @@ export function WorkspaceRecordTab({
         {!selectionMode && <Button className="min-h-11" type="button" variant="outline" onClick={onStartSelection}>기록 고르기</Button>}
       </div>
       {selectedGroup ? (
-        <RecordGroupList
-          key={selectedEventKey}
-          group={selectedGroup}
-          selectedRecordIds={selectedRecordIds}
-          selectedSeason={selectedSeason}
-          selectionMode={selectionMode}
-          sortOrder={sortOrder}
-          visibleCount={visibleCount}
-          onOpenRecord={(record) => onOpenRecord(record.id)}
-          onSeasonChange={(season) => {
-            setSelectedSeason(season)
-            setVisibleCount(10)
-          }}
-          onShowMore={setVisibleCount}
-          onSortOrderChange={(order) => {
-            setSortOrder(order)
-            setVisibleCount(10)
-          }}
-          onToggleSelection={(record) => onToggleRecord(record.id)}
-        />
+        <>
+          <p className="border border-line bg-surface px-4 py-3 text-caption leading-5 text-ink-3" role="note">
+            같은 이름의 기록을 한 사람으로 합치지 않아요. 이름과 기록 당시 소속을 확인해 주세요.
+          </p>
+          <RecordGroupList
+            key={selectedEventKey}
+            group={selectedGroup}
+            selectedRecordIds={selectedRecordIds}
+            selectedSeason={selectedSeason}
+            selectionMode={selectionMode}
+            showSubjectContext
+            sortOrder={sortOrder}
+            visibleCount={visibleCount}
+            onOpenRecord={(record) => onOpenRecord(record.id)}
+            onSeasonChange={(season) => {
+              setSelectedSeason(season)
+              setVisibleCount(10)
+            }}
+            onShowMore={setVisibleCount}
+            onSortOrderChange={(order) => {
+              setSortOrder(order)
+              setVisibleCount(10)
+            }}
+            onToggleSelection={(record) => onToggleRecord(record.id)}
+          />
+        </>
       ) : (
         <p className="border border-line bg-surface px-4 py-5 text-body-sm text-ink-3">이 종목의 기록을 아직 불러오지 못했어요.</p>
       )}

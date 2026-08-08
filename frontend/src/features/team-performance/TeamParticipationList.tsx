@@ -8,7 +8,7 @@ type Props = {
 export function TeamParticipationList({ rows }: Props) {
   return (
     <section aria-labelledby="team-participation-heading">
-      <SectionTitle id="team-participation-heading" title="참가 대회" meta={`${rows.length}개`} />
+      <SectionTitle id="team-participation-heading" title="출전이 확인된 대회" meta={`${rows.length}개`} />
       {rows.length === 0 ? (
         <p className="mt-5 border border-dashed border-line p-6 text-center text-sm text-ink-4">확인된 대회가 없어요.</p>
       ) : (
@@ -20,7 +20,7 @@ export function TeamParticipationList({ rows }: Props) {
                 <p className="mt-1 text-xs text-ink-4">{formatCompetitionMeta(row.season, row.latestDate)}</p>
               </div>
               <p className="font-mono text-xs text-ink-3">
-                기록 {row.resultCount} · 확인된 입상 {row.confirmedPodiumCount}
+                확인한 기록 {row.resultCount} · 모은 기록에서 확인한 입상 {row.confirmedPodiumCount}
               </p>
             </li>
           ))}

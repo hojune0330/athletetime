@@ -58,7 +58,7 @@ export function WorkspaceManagerCard({
             <>
               <h2 className="truncate text-h3 font-semibold text-ink">{workspace.title}</h2>
               <p className="mt-1 font-mono text-[12px] text-ink-3">
-                선택 {workspace.subjectKeys.length}묶음 · 마지막 사용 {formatDate(workspace.updatedAt)}
+                선수 후보 {workspace.subjectKeys.length}명 · 마지막 사용 {formatDate(workspace.updatedAt)}
               </p>
             </>
           )}
