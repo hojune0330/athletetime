@@ -58,6 +58,23 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('[data-records-step="mine-confirm"]'));
     assert.equal(await page.locator('[data-records-step="mine-confirm"] button[aria-pressed]').count(), 2);
 
+    await page.locator('[data-records-step="mine-confirm"] button[aria-pressed]').first().click();
+    await page.locator('[data-records-step="mine-confirm"] button[aria-pressed]').first().click();
+    await expectVisible(page.getByRole('heading', { name: '선수를 골라주세요.' }));
+    assert.equal(
+      await page.locator('[data-records-sticky-cta="mine-confirm"] button').count(),
+      1,
+      'an empty confirmation has one live recovery action',
+    );
+    await page.getByRole('button', { name: '선수 고르기', exact: true }).click();
+    await page.waitForURL(/step=candidates/);
+    await expectVisible(page.locator('[data-records-step="mine-candidates"]'));
+
+    await candidateButtons.filter({ hasText: 'Seoul High' }).click();
+    await candidateButtons.filter({ hasText: 'Seoul Track Club' }).click();
+    await page.locator('[data-records-sticky-cta="mine-candidates"] button').click();
+    await page.waitForURL(/step=confirm/);
+
     await page.locator('[data-records-sticky-cta="mine-confirm"] button').last().click();
     await page.waitForURL(/step=done/);
     await expectVisible(page.locator('[data-records-step="mine-done"]'));

@@ -427,7 +427,7 @@ export default function RecordsPage() {
     const nextKeys = Array.from(selected);
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'mine');
-    next.set('step', 'candidates');
+    next.set('step', mineStep === 'confirm' ? 'confirm' : 'candidates');
     if (nextKeys.length > 0) {
       next.set('mineDraft', serializeKeyList(nextKeys));
     } else {
