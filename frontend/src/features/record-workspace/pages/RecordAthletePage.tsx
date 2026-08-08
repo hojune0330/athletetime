@@ -48,9 +48,10 @@ export default function RecordAthletePage() {
     return (
       <PageNotice
         title="기록을 불러오지 못했어요"
-        description="잠시 후 다시 시도하거나 검색으로 돌아가 주세요."
+        description="연결을 확인한 뒤 다시 불러와 주세요."
         actionLabel="다시 불러오기"
         onAction={() => void athlete.refetch()}
+        showSearchLink={false}
       />
     )
   }
@@ -85,8 +86,8 @@ export default function RecordAthletePage() {
     }
     const result = store.saveWorkspaceDraft(next.subjectKeys)
     setActionNotice(result.ok
-      ? next.kind === 'already_added' ? '이미 선수 후보 모음에 담겨 있어요.' : '선수 후보 모음에 담았어요.'
-      : '이 기기에 선수 후보 모음을 저장하지 못했어요.')
+      ? next.kind === 'already_added' ? '이미 이 선수가 기록 모음에 담겨 있어요.' : '이 선수를 기록 모음에 담았어요.'
+      : '이 기기에 기록 모음을 저장하지 못했어요.')
   }
   const startComparison = () => {
     const comparison = buildAthleteComparisonSetup(athleteKey, crypto.randomUUID(), new Date().toISOString())
@@ -142,7 +143,7 @@ export default function RecordAthletePage() {
           </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
-              <Link to="/records/workspaces/new">선택한 선수 후보 보기 · {draftCount}명</Link>
+              <Link to="/records/workspaces/new">선택한 선수 보기 · {draftCount}명</Link>
             </Button>
           )}
           <Button asChild type="button" variant="ghost">
@@ -205,11 +206,13 @@ function PageNotice({
   actionLabel,
   description,
   onAction,
+  showSearchLink = true,
   title,
 }: {
   actionLabel?: string
   description: string
   onAction?: () => void
+  showSearchLink?: boolean
   title: string
 }) {
   return (
@@ -219,9 +222,11 @@ function PageNotice({
       {actionLabel && onAction && (
         <Button className="mt-5" type="button" onClick={onAction}>{actionLabel}</Button>
       )}
-      <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
-        기록 검색으로 이동
-      </Link>
+      {showSearchLink && (
+        <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
+          기록 검색으로 이동
+        </Link>
+      )}
     </div>
   )
 }

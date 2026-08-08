@@ -86,6 +86,20 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
+    await page.goto(`${baseUrl}/records/athletes/missing-athlete`, { waitUntil: 'domcontentloaded' });
+    await expectVisible(page.getByRole('heading', { name: '기록을 불러오지 못했어요' }));
+    assert.equal(
+      await page.getByRole('button', { name: '다시 불러오기', exact: true }).count(),
+      1,
+      'an unresolved athlete link offers one direct recovery action',
+    );
+    assert.equal(
+      await page.getByRole('link', { name: '기록 검색으로 이동', exact: true }).count(),
+      0,
+      'an unresolved athlete link does not compete with the retry action',
+    );
+    visited.push(page.url());
+
     await page.goto(`${baseUrl}/records?compare=alpha-2016,beta-2016`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
