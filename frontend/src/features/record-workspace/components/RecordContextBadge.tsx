@@ -5,7 +5,7 @@ export type RecordViewContext = 'athlete' | 'comparison' | 'self' | 'workspace'
 const CONTEXT_LABELS: Readonly<Record<RecordViewContext, string>> = {
   athlete: '선수 기록',
   comparison: '기록 비교',
-  self: '이 기기에서 선택한 기록',
+  self: '이 기기에서 선택한 선수 후보',
   workspace: '기록 모음',
 }
 

@@ -26,7 +26,7 @@ export function RecordsHub({
             공개 기록, 이름만 알면 찾아요.
           </h1>
           <p className="mt-3 text-sm leading-6 text-ink-3">
-            내 기록이든 다른 선수 기록이든, 이름과 소속을 확인한 뒤 원하는 후보만 모아 보세요.
+            찾는 선수 기록을 이름과 소속으로 확인한 뒤, 원하는 후보만 모아 보세요.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export function RecordsHub({
             className="mt-6 flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
           >
             <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">이 기기에서 모아 본 기록</span>
+              <span className="font-bold text-brand">이 기기에서 모아 본 선수 후보</span>
               <span className="ml-2 font-semibold">{myEntryName || '이름 미상'}</span>
               <span className="ml-2 text-ink-4">{myEntriesCount}명 선택</span>
             </span>

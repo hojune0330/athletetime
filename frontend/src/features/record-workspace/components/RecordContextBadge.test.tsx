@@ -9,7 +9,7 @@ describe('record context badges', () => {
 
     // When its context badge is rendered.
     // Then it describes the local selection and never implies verified ownership.
-    expect(markup).toContain('이 기기에서 선택한 기록')
+    expect(markup).toContain('이 기기에서 선택한 선수 후보')
     expect(markup).not.toContain('내 기록')
   })
 })

@@ -199,6 +199,17 @@ test('record collection calls its selected unit an athlete, not an owned record'
   assert.doesNotMatch(source, /이 기록 담기|선택한 기록 담기|내가 모아 보는 기록/);
 });
 
+test('legacy collection entry copy still avoids claiming a visitor owns a public record', () => {
+  const source = [
+    'frontend/src/components/records/RecordsHub.tsx',
+    'frontend/src/features/record-workspace/components/RecordContextBadge.tsx',
+  ].map(readSource).join('\n');
+
+  assert.match(source, /찾는 선수 기록을 이름과 소속으로 확인한 뒤/);
+  assert.match(source, /이 기기에서 선택한 선수 후보/);
+  assert.doesNotMatch(source, /내 기록이든|이 기기에서 선택한 기록/);
+});
+
 test('records athlete selection creates a shareable records URL instead of state-only detail', () => {
   const source = readSource('frontend/src/pages/RecordsPage.tsx');
 
