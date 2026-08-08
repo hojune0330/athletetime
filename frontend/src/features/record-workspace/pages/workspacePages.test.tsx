@@ -140,6 +140,8 @@ describe('record workspace pages', () => {
     )
 
     // Then save is absent and the comparison route is the only forward action.
+    expect(markup).toContain('한 기록 모음으로 저장할 수 없어요')
+    expect(markup).not.toContain('한 사람의 기록 모음')
     expect(markup).toContain('선수 비교로 옮기기')
     expect(markup).not.toContain('기록 모음 만들기')
   })
