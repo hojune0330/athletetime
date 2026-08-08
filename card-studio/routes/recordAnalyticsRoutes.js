@@ -112,7 +112,9 @@ router.get('/teams/search', searchLimiter, (req, res) => {
     if (limit === null) {
       return invalidTeamRequest(res, 'INVALID_TEAM_LIMIT', '한 번에 1개부터 30개 팀까지 볼 수 있어요.');
     }
-    const teams = recordAnalyticsService.searchTeamStatistics(query, limit, { category });
+    const teams = recordAnalyticsService
+      .searchTeamStatistics(query, limit, { category })
+      .map(toPublicTeamSearchSummary);
     return res.json({
       success: true,
       contractVersion: TEAM_CONTRACT_VERSION,
@@ -200,6 +202,27 @@ router.get('/season-records', publicLimiter, (req, res) => {
 });
 
 router.use('/record-workspaces', createRecordWorkspaceRouter());
+
+function toPublicTeamSearchSummary(team) {
+  return {
+    teamKey: team.teamKey,
+    teamLabel: team.teamLabel,
+    selectedCategory: team.selectedCategory,
+    primaryCategory: team.primaryCategory,
+    categoryEvidence: team.categoryEvidence,
+    categoryBreakdown: team.categoryBreakdown,
+    athleteCount: team.athleteCount,
+    resultCount: team.resultCount,
+    competitionCount: team.competitionCount,
+    eventCount: team.eventCount,
+    confirmedPodiumCount: team.confirmedPodiumCount,
+    indexedImprovementCount: team.indexedImprovementCount,
+    firstSeason: team.firstSeason,
+    latestSeason: team.latestSeason,
+    latestDate: team.latestDate,
+    coverageDisclaimer: team.coverageDisclaimer,
+  };
+}
 
 function cleanQuery(value, max) {
   return String(value || '')

@@ -153,6 +153,7 @@ test('Given a valid category search When it is served Then the frontend contract
   assert.equal(response.status, 200);
   assert.equal(response.body.contractVersion, 1);
   assert.ok(response.body.data.length > 0);
+  assert.equal(hasForbiddenKey(response.body.data, TEAM_PRIVATE_KEYS), false);
 });
 
 test('Given an internal team service failure When the public routes respond Then implementation details stay private', async (t) => {
@@ -213,10 +214,15 @@ function hasForbiddenKey(value, forbidden) {
 const TEAM_PRIVATE_KEYS = new Set([
   'affiliations',
   'athleteKey',
+  'athleteKeys',
   'attachment',
+  'eventStats',
   'name',
   'note',
+  'performance',
+  'rankCounts',
   'records',
+  'seasonStats',
   'workspace',
 ]);
 
