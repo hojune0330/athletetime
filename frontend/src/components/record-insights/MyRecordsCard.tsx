@@ -130,9 +130,9 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
       <CardHeader className="bg-brand/5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand">MY COLLECTION · 내가 모아 보는 기록</p>
+            <p className="text-xs font-bold tracking-[0.14em] text-brand">기록 모음</p>
             <CardTitle className="mt-1.5 text-2xl">{name}</CardTitle>
-            <p className="mt-1 text-xs text-ink-4">{entries.length}개 묶음을 이 기기에서 모아 보고 있어요</p>
+            <p className="mt-1 text-xs text-ink-4">선수 후보 {entries.length}명을 이 기기에서 함께 보고 있어요</p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={onClose}>
             접기

@@ -751,7 +751,7 @@ function StartPanel({ onSeasonMode }: { onSeasonMode: () => void }) {
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-ink">위 검색창에 이름을 적어보세요.</h2>
           <p className="mt-1 text-sm text-ink-3">
-            같은 이름이 여러 명이면 소속을 확인한 뒤, 원하는 카드만 "이 기록 담기"로 이 기기에서 모아 보세요.
+            같은 이름이 여러 명이면 소속을 확인한 뒤, 원하는 선수만 "이 선수 담기"로 이 기기에서 모아 보세요.
           </p>
         </div>
         <Button type="button" variant="outline" onClick={onSeasonMode} className="shrink-0">
@@ -864,7 +864,7 @@ function AthletePanel({
                       : 'border-brand-500 bg-white text-brand hover:bg-brand-50'
                   }`}
                 >
-                  {isMyAthlete ? '✓ 내가 모아 보는 기록에 담김 — 누르면 빼요' : '이 기록 담기'}
+                  {isMyAthlete ? '✓ 기록 모음에 담은 선수 — 누르면 빼요' : '이 선수 담기'}
                 </button>
               )}
               <button

@@ -184,6 +184,21 @@ test('records collection completion labels the existing athlete detail destinati
   assert.doesNotMatch(source, /기록 카드 공유/);
 });
 
+test('record collection calls its selected unit an athlete, not an owned record', () => {
+  const source = [
+    'frontend/src/components/records/RecordSearchResults.tsx',
+    'frontend/src/components/records/RecordsMineConfirmStep.tsx',
+    'frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx',
+    'frontend/src/components/record-insights/MyRecordsCard.tsx',
+    'frontend/src/pages/RecordsPage.tsx',
+  ].map(readSource).join('\n');
+
+  assert.match(source, /이 선수 담기/);
+  assert.match(source, /선택한 선수 담기/);
+  assert.match(source, /기록 모음/);
+  assert.doesNotMatch(source, /이 기록 담기|선택한 기록 담기|내가 모아 보는 기록/);
+});
+
 test('records athlete selection creates a shareable records URL instead of state-only detail', () => {
   const source = readSource('frontend/src/pages/RecordsPage.tsx');
 
