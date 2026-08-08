@@ -324,6 +324,15 @@ async function expectVisible(locator) {
   await locator.first().waitFor({ state: 'visible', timeout: 10_000 });
 }
 
+async function navigateToReady(page, url) {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => document.readyState === 'complete' && !document.body?.textContent?.includes('화면을 불러오는 중...'),
+    undefined,
+    { timeout: 10_000 },
+  );
+}
+
 async function assertCountAtLeast(locator, expected, message) {
   await expectVisible(locator.first());
   const count = await locator.count();
@@ -347,4 +356,4 @@ async function expectUrlParam(page, name, expectedPart) {
   );
 }
 
-module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, selectedCandidateCount, shouldWriteEvidence, waitForSelectedCandidateCount, withRecordsPage };
+module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, navigateToReady, selectedCandidateCount, shouldWriteEvidence, waitForSelectedCandidateCount, withRecordsPage };

@@ -4,6 +4,7 @@ const {
   assertCountAtLeast,
   expectUrlParam,
   expectVisible,
+  navigateToReady,
   selectedCandidateCount,
   shouldWriteEvidence,
   waitForSelectedCandidateCount,
@@ -18,7 +19,7 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
 
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await page.goto(`${baseUrl}/records`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records`);
     visited.push(page.url());
     await expectVisible(page.locator('[data-records-flow="hub"]'));
     assert.equal(await page.locator('#records-search').count(), 0, 'hub renders before the search surface');
@@ -63,20 +64,20 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?flow=browse`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records?flow=browse`);
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
     await expectVisible(page.getByRole('button', { name: /소속 통계 보기/ }));
     await expectVisible(page.getByRole('button', { name: /시즌 기록표/ }));
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?athlete=alpha-2016`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records?athlete=alpha-2016`);
     await expectVisible(page.locator('text=Alpha Kim'));
     await expectVisible(page.locator('text=기록 한눈에'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records/athletes/alpha-2016`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
     await expectVisible(page.getByRole('button', { name: '이 선수 담기', exact: true }));
     await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
     assert.equal(
@@ -86,7 +87,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records/athletes/missing-athlete`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records/athletes/missing-athlete`);
     await expectVisible(page.getByRole('heading', { name: '기록을 불러오지 못했어요' }));
     assert.equal(
       await page.getByRole('button', { name: '다시 불러오기', exact: true }).count(),
@@ -100,7 +101,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
-    await page.goto(`${baseUrl}/records?compare=alpha-2016,beta-2016`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,beta-2016`);
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
     visited.push(page.url());
@@ -110,7 +111,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
 test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team Then real local aggregates preserve URL state', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given team browse starts without silently selecting a team category.
-    await page.goto(`${baseUrl}/records?flow=browse&browse=team`, { waitUntil: 'domcontentloaded' });
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=team`);
     await expectVisible(page.getByRole('heading', { name: '소속의 기록을 숫자로 살펴봐요.' }));
     await expectVisible(page.locator('#records-search'));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
