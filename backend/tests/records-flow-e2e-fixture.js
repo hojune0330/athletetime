@@ -114,6 +114,10 @@ async function installApiMocks(page, teamApiBaseUrl) {
 
 async function fulfillApi(route, url, teamApiBaseUrl) {
   const pathname = url.pathname;
+  if (pathname.endsWith('/analytics/record-workspaces/preview')) {
+    const response = await route.fetch({ url: `${teamApiBaseUrl}${pathname}${url.search}` });
+    return route.fulfill({ response });
+  }
   if (pathname.includes('/analytics/teams')) {
     const response = await route.fetch({ url: `${teamApiBaseUrl}${pathname}${url.search}` });
     return route.fulfill({ response });
@@ -138,6 +142,12 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
 async function startTeamApiServer() {
   const app = express();
   app.set('trust proxy', 1);
+  app.post('/api/card-studio/analytics/record-workspaces/preview', express.json(), (req, res) => {
+    const subjectKeys = Array.isArray(req.body?.subjectKeys)
+      ? req.body.subjectKeys.filter((subjectKey) => typeof subjectKey === 'string')
+      : [];
+    return res.json({ success: true, data: makeWorkspacePreview(subjectKeys) });
+  });
   app.use('/api/card-studio/analytics', recordAnalyticsRoutes);
   const server = await new Promise((resolve) => {
     const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
@@ -145,6 +155,57 @@ async function startTeamApiServer() {
   return {
     baseUrl: `http://127.0.0.1:${server.address().port}`,
     close: () => new Promise((resolve) => server.close(resolve)),
+  };
+}
+
+function makeWorkspacePreview(subjectKeys) {
+  const subjects = subjectKeys
+    .map((subjectKey) => athletes.find((athlete) => athlete.athleteKey === subjectKey))
+    .filter(Boolean);
+  const records = subjects.flatMap((subject) => [makeRecord(subject, 0), makeRecord(subject, 1)]);
+  const affiliationCounts = new Map();
+  for (const subject of subjects) {
+    affiliationCounts.set(subject.team, (affiliationCounts.get(subject.team) || 0) + 2);
+  }
+  const eventCounts = new Map();
+  for (const record of records) {
+    const previous = eventCounts.get(record.eventKey) || [];
+    eventCounts.set(record.eventKey, [...previous, record]);
+  }
+  const names = [...new Set(subjects.map((subject) => subject.name))];
+  return {
+    subjects,
+    unavailableSubjectKeys: subjectKeys.filter((subjectKey) => !subjects.some((subject) => subject.athleteKey === subjectKey)),
+    identity: {
+      displayName: names.join(' · ') || '선수 후보',
+      distinctNames: names,
+      warning: names.length > 1 ? 'different_names' : 'none',
+    },
+    affiliations: Array.from(affiliationCounts.entries()).map(([label, recordCount]) => ({
+      label,
+      firstObservedSeason: 2024,
+      lastObservedSeason: 2026,
+      recordCount,
+      status: 'latest_observed',
+    })),
+    coverage: {
+      totalMatched: records.length,
+      returned: records.length,
+      hasMore: false,
+      nextCursor: null,
+      observedSeasons: [2026],
+      competitionCount: records.length,
+      sourceCount: subjects.length,
+      lastCapturedAt: '2026-07-13T00:00:00.000Z',
+      qualityState: 'visible_index',
+    },
+    events: Array.from(eventCounts.entries()).map(([eventKey, eventRecords]) => ({
+      eventKey,
+      eventLabel: eventRecords[0].eventLabel,
+      recordCount: eventRecords.length,
+      best: eventRecords[0],
+    })),
+    records,
   };
 }
 

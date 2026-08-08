@@ -99,7 +99,8 @@ test('UX-COMBINE-002: search candidates require explicit collect mode and review
 test('UX-COMBINE-003: workspace editing is unambiguous and record details stay optional', () => {
   const review = readSource('frontend/src/features/record-workspace/components/WorkspaceReviewContent.tsx');
   assert.match(review, /같은 이름이어도 같은 사람으로 확인됐다는 뜻은 아니에요/);
-  assert.match(review, /한 사람의 기록 모음으로 저장할 수 없어요/);
+  assert.match(review, /한 기록 모음으로 저장할 수 없어요/);
+  assert.doesNotMatch(review, /한 사람의 기록 모음/);
   assert.match(review, /선수 비교로 옮기기/);
 
   const workspace = readSource('frontend/src/features/record-workspace/pages/WorkspaceRecordTab.tsx');

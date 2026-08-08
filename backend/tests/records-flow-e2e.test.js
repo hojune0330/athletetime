@@ -69,6 +69,16 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
     visited.push(page.url());
 
+    await page.goto(`${baseUrl}/records/athletes/alpha-2016`, { waitUntil: 'domcontentloaded' });
+    await expectVisible(page.getByRole('button', { name: '이 선수 담기', exact: true }));
+    await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
+    assert.equal(
+      await page.getByRole('button', { name: '이 선수 후보 담기', exact: true }).count(),
+      0,
+      'dedicated athlete action uses the same candidate-selection wording as search',
+    );
+    visited.push(page.url());
+
     await page.goto(`${baseUrl}/records?compare=alpha-2016,beta-2016`, { waitUntil: 'domcontentloaded' });
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');

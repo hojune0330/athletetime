@@ -134,7 +134,7 @@ export default function RecordAthletePage() {
           {sameNameCaution}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="button" onClick={addToDraft}>이 선수 후보 담기</Button>
+          <Button type="button" onClick={addToDraft}>이 선수 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
           <Button type="button" variant="outline" onClick={shareRecord}>
             <ShareIcon className="h-4 w-4" aria-hidden="true" />
