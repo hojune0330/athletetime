@@ -77,7 +77,7 @@ export function RecordCandidateList({
             SEARCH RESULTS
           </p>
           <h2 className="mt-1 text-h3 font-semibold text-ink">
-            {selectionMode ? '함께 볼 선수 후보를 선택하세요' : `선수 후보 ${athletes.length}명`}
+            {selectionMode ? '함께 볼 선수를 선택하세요' : `선수 ${athletes.length}명`}
           </h2>
           <p className="mt-1 text-body-sm text-ink-3">
             {selectionMode

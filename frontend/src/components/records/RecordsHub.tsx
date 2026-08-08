@@ -37,9 +37,9 @@ export function RecordsHub({
             className="mt-6 flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
           >
             <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">이 기기에서 모아 본 선수 후보</span>
+              <span className="font-bold text-brand">이 기기에서 만든 기록 모음</span>
               <span className="ml-2 font-semibold">{myEntryName || '이름 미상'}</span>
-              <span className="ml-2 text-ink-4">{myEntriesCount}명 선택</span>
+              <span className="ml-2 text-ink-4">{myEntriesCount}명 담음</span>
             </span>
             <span className="shrink-0 text-sm font-semibold text-brand">이어보기</span>
           </button>
@@ -48,7 +48,7 @@ export function RecordsHub({
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <FlowChoiceCard
             title="기록 찾아 모으기"
-            description="이름과 소속을 확인한 뒤 원하는 선수 후보만 이 기기에 모아요."
+            description="이름과 소속을 확인한 뒤 원하는 선수 기록을 이 기기에 모아요."
             primary
             onClick={onStartMine}
           />
