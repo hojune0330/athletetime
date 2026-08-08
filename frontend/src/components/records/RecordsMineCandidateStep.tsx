@@ -3,21 +3,22 @@ import { Button } from '../ui/button';
 import type { RecordsLoadState } from './RecordsMineTypes';
 
 export function CandidateStep({
-  query,
   athletes,
   state,
   selectedKeys,
+  onResetSearch,
   onToggleDraft,
   onNext,
 }: {
-  readonly query: string;
   readonly athletes: readonly AthleteSearchCard[];
   readonly state: RecordsLoadState;
   readonly selectedKeys: readonly string[];
+  readonly onResetSearch: () => void;
   readonly onToggleDraft: (athlete: AthleteSearchCard) => void;
   readonly onNext: () => void;
 }) {
   const selectedCount = selectedKeys.length;
+  const needsNewSearch = state === 'error' || (state === 'ready' && athletes.length === 0);
 
   return (
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-candidates">
@@ -32,10 +33,10 @@ export function CandidateStep({
 
       <div className="mt-6 space-y-2">
         {state === 'loading' && <p role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">후보를 찾고 있어요.</p>}
-        {state === 'error' && <p role="alert" className="border border-line bg-surface-2 p-4 text-sm text-err">검색을 불러오지 못했어요. 뒤로 가서 다시 시도해 주세요.</p>}
+        {state === 'error' && <p role="alert" className="border border-line bg-surface-2 p-4 text-sm text-err">검색을 불러오지 못했어요. 검색어를 다시 입력해 주세요.</p>}
         {state === 'ready' && athletes.length === 0 && (
           <p role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
-            {query}에 맞는 기록이 아직 없어요. 이름이나 소속을 바꿔보세요.
+            아직 찾지 못했어요. 이름이나 소속을 다시 입력해 주세요.
           </p>
         )}
         {athletes.map((athlete) => (
@@ -49,9 +50,13 @@ export function CandidateStep({
       </div>
 
       <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto border-t border-hair bg-surface py-4 md:bottom-0" data-records-sticky-cta="mine-candidates">
-        <Button type="button" size="lg" className="w-full" disabled={selectedCount === 0} onClick={onNext}>
-          {selectedCount}개 선택됨 · 다음
-        </Button>
+        {needsNewSearch ? (
+          <Button type="button" size="lg" className="w-full" onClick={onResetSearch}>검색어 다시 입력</Button>
+        ) : (
+          <Button type="button" size="lg" className="w-full" disabled={selectedCount === 0} onClick={onNext}>
+            {selectedCount}개 선택됨 · 다음
+          </Button>
+        )}
       </div>
     </div>
   );

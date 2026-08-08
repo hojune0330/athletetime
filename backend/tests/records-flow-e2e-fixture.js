@@ -129,7 +129,11 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
       data: { season: 2026, events: filters.events.map((event) => ({ ...event, recordCount: 12, athleteCount: 7 })), note: 'QA fixture' },
     });
   }
-  if (pathname.endsWith('/analytics/records/search')) return fulfillJson(route, { success: true, total: athletes.length, data: athletes });
+  if (pathname.endsWith('/analytics/records/search')) {
+    const query = url.searchParams.get('q')?.trim().toLowerCase() || '';
+    const results = query.includes('missing') ? [] : athletes;
+    return fulfillJson(route, { success: true, total: results.length, data: results });
+  }
   if (pathname.includes('/analytics/athletes/')) {
     const key = decodeURIComponent(pathname.split('/').pop() || '');
     return fulfillJson(route, { success: true, data: makeProfile(key) });

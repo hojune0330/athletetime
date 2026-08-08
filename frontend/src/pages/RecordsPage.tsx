@@ -487,7 +487,6 @@ export default function RecordsPage() {
         <RecordsMineFlow
           step={mineStep}
           query={query}
-          submittedQuery={submittedQuery}
           searchState={searchState}
           athletes={athletes}
           selectedDraftKeys={mineDraftKeys}

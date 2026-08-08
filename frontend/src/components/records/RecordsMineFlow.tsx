@@ -13,7 +13,6 @@ export type { MineStep } from './RecordsMineTypes';
 type RecordsMineFlowProps = {
   readonly step: MineStep;
   readonly query: string;
-  readonly submittedQuery: string;
   readonly searchState: RecordsLoadState;
   readonly athletes: readonly AthleteSearchCard[];
   readonly selectedDraftKeys: readonly string[];
@@ -37,7 +36,6 @@ export function normalizeMineStep(value: string | null): MineStep {
 export function RecordsMineFlow({
   step,
   query,
-  submittedQuery,
   searchState,
   athletes,
   selectedDraftKeys,
@@ -66,10 +64,10 @@ export function RecordsMineFlow({
         )}
         {step === 'candidates' && (
           <CandidateStep
-            query={submittedQuery}
             athletes={athletes}
             state={searchState}
             selectedKeys={selectedDraftKeys}
+            onResetSearch={() => onGoToStep('name')}
             onToggleDraft={onToggleDraft}
             onNext={() => onGoToStep('confirm')}
           />

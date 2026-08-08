@@ -64,6 +64,16 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
     visited.push(page.url());
 
+    await navigateToReady(page, `${baseUrl}/records?flow=mine&step=name`);
+    await page.locator('#mine-records-name').fill('Missing');
+    await page.locator('[data-records-sticky-cta="mine-name"] button').click();
+    await page.waitForURL(/step=candidates/);
+    await expectVisible(page.getByText('아직 찾지 못했어요.', { exact: false }));
+    await page.getByRole('button', { name: '검색어 다시 입력', exact: true }).click();
+    await page.waitForURL(/step=name/);
+    await expectVisible(page.locator('#mine-records-name'));
+    visited.push(page.url());
+
     await navigateToReady(page, `${baseUrl}/records?flow=browse`);
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
