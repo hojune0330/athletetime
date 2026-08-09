@@ -142,6 +142,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     visited.push(page.url());
 
     await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
+    await expectVisible(page.locator('[data-record-row]').first());
     await expectVisible(page.getByRole('button', { name: '이 선수 담기', exact: true }));
     await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
     assert.equal(

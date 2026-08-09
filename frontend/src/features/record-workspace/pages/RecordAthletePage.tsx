@@ -7,6 +7,7 @@ import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
 import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
+import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
@@ -25,7 +26,7 @@ export default function RecordAthletePage() {
   const preview = athlete.preview
   const draftCount = store.workspaceDraft?.subjectKeys.length ?? 0
   const activeTab = normalizeTab(pageParams.get('tab'))
-  const selectedEventKey = pageParams.get('event')?.trim() || null
+  const requestedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
   const selectedSeason = parseRecordAthleteSeason(pageParams)
 
@@ -57,6 +58,7 @@ export default function RecordAthletePage() {
   }
 
   const subject = preview.subjects[0]
+  const selectedEventKey = selectInitialRecordEventKey(requestedEventKey, preview.records)
   const sameNameCaution = subject.note.trim()
     || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
   const shareRecord = async () => {
