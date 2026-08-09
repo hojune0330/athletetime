@@ -29,6 +29,8 @@ describe('team performance dashboard sections', () => {
     expect(summaryHtml).not.toContain('확인한 기록')
     expect(html).toContain('소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.')
     expect(html).toContain('자료 기준 2019-2026 시즌 · 마지막 자료 2026-06-01')
+    expect(html).toContain('시즌별 기록 수')
+    expect(html).toContain('막대 길이는 모은 기록 수예요. 성적의 높낮이를 뜻하지 않아요.')
     expect(html).toContain('전국대회')
     expect(html).not.toContain('홍길동')
     expect(html).not.toContain('19명')
