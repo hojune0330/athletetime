@@ -17,7 +17,7 @@
 - Recorded: `.omo/evidence/task-8-security-gates.json` distinguishes the protected authentication/admin boundaries from the confirmed anonymous-ID and public-upload boundaries that must block future feature work.
 - Verified without a new change: candidate cards and athlete pages already keep a same-name caution, affiliation, and observed-season context visible; they do not auto-merge people.
 - Deliberately deferred for an owner decision: public team suppression for small groups, account-backed private notes/photos, default redaction of minor share cards, anonymous-session identity migration, and any verified-owner/claim language.
-- Verification note: focused frontend, build, Node privacy, and real-browser record-flow gates passed. The root `npm test` runner exceeded the tool capture window and exited later without a captured final summary, so it is not counted as a passed gate.
+- Verification note: focused frontend, build, Node privacy, and real-browser record-flow gates passed. A full root `npm test` completed with 335 passing, 0 failing, and 5 conditionally skipped Node checks; its record/team browser flow completed 3 of 3 scenarios.
 
 ## Scope
 ### Must have
