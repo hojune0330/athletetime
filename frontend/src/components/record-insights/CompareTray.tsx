@@ -7,10 +7,16 @@ import { TRUST_NOTICE } from '../../config/dataPolicy';
  *
  * 신뢰: "나란히 보기"(NOT 대결/순위). 담은 게 없으면 렌더하지 않음.
  */
-export function CompareTray({ onCompare }: { onCompare?: (athleteKeys: string[]) => void }) {
+export function CompareTray({
+  hidden = false,
+  onCompare,
+}: {
+  readonly hidden?: boolean;
+  readonly onCompare?: (athleteKeys: string[]) => void;
+}) {
   const { entries, count, remove, clear } = useCompareTray();
 
-  if (count === 0) return null;
+  if (hidden || count === 0) return null;
 
   return (
     <div

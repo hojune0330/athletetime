@@ -732,9 +732,8 @@ export default function RecordsPage() {
 
       {/* 비교 트레이 분량만큼 하단 여백 (담은 게 있을 때만) */}
       {compareNotice && <p role="status" className="text-sm font-medium text-warn">{compareNotice}</p>}
-      {compareTray.count > 0 && <div aria-hidden className="h-28 sm:h-24" />}
-      <CompareTray
-        onCompare={(athleteKeys) => {
+      {compareTray.count > 0 && !workspaceSelectionMode && activeFlow !== 'mine' && compareKeys.length === 0 && <div aria-hidden className="h-28 sm:h-24" />}
+      <CompareTray hidden={workspaceSelectionMode || activeFlow === 'mine' || compareKeys.length > 0} onCompare={(athleteKeys) => {
           setSearchParams({ compare: athleteKeys.join(',') });
         }}
       />
