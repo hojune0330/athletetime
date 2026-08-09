@@ -22,7 +22,7 @@ export function TeamPerformanceSummary({ detail }: Props) {
         <Metric label="출전이 확인된 대회" value={`${summary.competitionCount}개`} />
         <Metric label="모은 기록에서 확인한 입상" value={`${summary.confirmedPodiumCount}건`} />
         <Metric label="기록 개선 확인" value={`${summary.indexedImprovementCount}건`} />
-        <Metric label="확인한 기록" value={`${summary.resultCount}건`} />
+        <Metric label="확인한 종목" value={`${summary.eventCount}종목`} />
       </dl>
       <div className="mt-4 border-l-2 border-brand bg-surface-2 px-4 py-3 text-xs leading-5 text-ink-3">
         소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요. 모든 대회를 뜻하지는 않아요.

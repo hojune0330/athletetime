@@ -201,10 +201,11 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
     await expectVisible(page.getByText('개인 기록을 나열하지 않고', { exact: false }));
     await expectVisible(page.getByText('자료 기준', { exact: false }));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
+    assert.equal(new URL(page.url()).searchParams.get('scope'), null, 'team detail starts on the latest observed season');
 
     // Then period and section changes stay encoded in the shareable URL.
-    await page.getByRole('button', { name: '최근', exact: true }).click();
-    await expectUrlParam(page, 'scope', 'latest');
+    await page.getByRole('button', { name: '전체', exact: true }).click();
+    await expectUrlParam(page, 'scope', 'all');
     await page.getByRole('button', { name: '종목', exact: true }).click();
     await expectUrlParam(page, 'view', 'events');
     assert.equal(new URL(page.url()).searchParams.get('category'), null);

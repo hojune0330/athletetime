@@ -12,8 +12,9 @@ describe('team performance dashboard sections', () => {
     const detail = parseTeamDetailResponse(detailEnvelope())
 
     // When every dashboard section is rendered.
+    const summaryHtml = renderToStaticMarkup(<TeamPerformanceSummary detail={detail} />)
     const html = [
-      renderToStaticMarkup(<TeamPerformanceSummary detail={detail} />),
+      summaryHtml,
       renderToStaticMarkup(<TeamSeasonTrend rows={detail.seasonTrend} />),
       renderToStaticMarkup(<TeamEventBreakdown rows={detail.eventBreakdown} />),
       renderToStaticMarkup(<TeamParticipationList rows={detail.participation} />),
@@ -23,6 +24,9 @@ describe('team performance dashboard sections', () => {
     expect(html).toContain('모은 기록에서 확인한 입상')
     expect(html).toContain('출전이 확인된 대회')
     expect(html).toContain('기록 개선 확인')
+    expect(html).toContain('확인한 종목')
+    expect(html).toContain('13종목')
+    expect(summaryHtml).not.toContain('확인한 기록')
     expect(html).toContain('소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.')
     expect(html).toContain('자료 기준 2019-2026 시즌 · 마지막 자료 2026-06-01')
     expect(html).toContain('전국대회')

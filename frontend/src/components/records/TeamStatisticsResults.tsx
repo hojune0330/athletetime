@@ -32,7 +32,6 @@ function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; rea
   const category = team.selectedCategory
   const destinationParams = new URLSearchParams()
   if (category) destinationParams.set('category', category)
-  destinationParams.set('scope', 'all')
   destinationParams.set('from', query)
   const destination = `/records/teams/${team.teamKey}?${destinationParams.toString()}`
   return (
