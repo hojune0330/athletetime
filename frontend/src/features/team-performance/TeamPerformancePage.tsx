@@ -71,7 +71,7 @@ export default function TeamPerformancePage() {
         <div className="mt-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-xs font-semibold tracking-[0.1em] text-brand">
-              {detail.identity.selectedCategory ? teamCategoryLabel(detail.identity.selectedCategory) : '전체'} · TEAM PERFORMANCE
+              {detail.identity.selectedCategory ? teamCategoryLabel(detail.identity.selectedCategory) : '전체'} · 소속 기록 통계
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">{detail.identity.teamLabel}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-3">
@@ -113,22 +113,25 @@ function PeriodFilter({ period, seasons, onChange }: {
   readonly onChange: (period: TeamDetailPeriod) => void
 }) {
   return (
-    <div className="grid grid-cols-[auto_auto_minmax(7rem,1fr)] border border-line bg-surface-2 p-1">
-      <PeriodButton active={period.kind === 'latest'} label="최근" onClick={() => onChange({ kind: 'latest' })} />
-      <PeriodButton active={period.kind === 'all'} label="전체" onClick={() => onChange({ kind: 'all' })} />
-      <label className="sr-only" htmlFor="team-season">시즌 선택</label>
-      <select
-        id="team-season"
-        value={period.kind === 'season' ? String(period.season) : ''}
-        onChange={(event) => {
-          const season = Number(event.target.value)
-          if (Number.isInteger(season)) onChange({ kind: 'season', season })
-        }}
-        className="min-h-10 border-0 bg-transparent px-3 text-sm font-semibold text-ink outline-none focus:ring-2 focus:ring-brand"
-      >
-        <option value="">시즌 선택</option>
-        {seasons.map((season) => <option key={season} value={season}>{season}</option>)}
-      </select>
+    <div className="w-full lg:w-auto">
+      <div className="grid grid-cols-[auto_auto_minmax(7rem,1fr)] border border-line bg-surface-2 p-1">
+        <PeriodButton active={period.kind === 'latest'} label="최근 시즌" onClick={() => onChange({ kind: 'latest' })} />
+        <PeriodButton active={period.kind === 'all'} label="전체" onClick={() => onChange({ kind: 'all' })} />
+        <label className="sr-only" htmlFor="team-season">시즌 선택</label>
+        <select
+          id="team-season"
+          value={period.kind === 'season' ? String(period.season) : ''}
+          onChange={(event) => {
+            const season = Number(event.target.value)
+            if (Number.isInteger(season)) onChange({ kind: 'season', season })
+          }}
+          className="min-h-10 border-0 bg-transparent px-3 text-sm font-semibold text-ink outline-none focus:ring-2 focus:ring-brand"
+        >
+          <option value="">시즌 선택</option>
+          {seasons.map((season) => <option key={season} value={season}>{season}</option>)}
+        </select>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-ink-4">찾아진 공개 기록이 있는 시즌만 보여요. 없는 시즌은 출전하지 않았다는 뜻이 아니에요.</p>
     </div>
   )
 }

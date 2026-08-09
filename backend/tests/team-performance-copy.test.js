@@ -25,6 +25,8 @@ test('Given public team statistics When trust copy is scanned Then required limi
     '모든 대회를 뜻하지는 않아요.',
     '단계가 확인되지 않은 1~3위 표기',
     '기록 개선 확인은 같은 공개 프로필 조각 안에서 계산했어요.',
+    '최근 시즌',
+    '찾아진 공개 기록이 있는 시즌만 보여요.',
   ];
 
   // Then collection limits and calculation scope cannot silently disappear.

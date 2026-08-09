@@ -23,6 +23,8 @@ describe('team statistics search results', () => {
     expect(html).toContain('1~3위 확인')
     expect(html).toContain('기록 개선')
     expect(html).toContain('43건')
+    expect(html).toContain('모은 전체 기간 2019-2026 시즌')
+    expect(html).toContain('열면 최근 확인 시즌 통계부터 보여줘요.')
     expect(html).toContain('공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
     expect(html).toContain('/records/teams/1234567890abcdef?category=corporate&amp;from=')
     expect(html).not.toContain('scope=all')

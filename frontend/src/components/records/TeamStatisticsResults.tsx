@@ -56,8 +56,9 @@ function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; rea
         <CompactMetric label="기록 개선" value={`${team.indexedImprovementCount}건`} />
       </dl>
       <p className="mt-4 text-xs text-ink-4">
-        {formatSeasonRange(team.firstSeason, team.latestSeason)} · 모은 기록 {team.resultCount}건
+        모은 전체 기간 {formatSeasonRange(team.firstSeason, team.latestSeason)} · 모은 기록 {team.resultCount}건
       </p>
+      <p className="mt-1 text-xs text-ink-4">열면 최근 확인 시즌 통계부터 보여줘요.</p>
     </Link>
   )
 }
@@ -73,5 +74,5 @@ function CompactMetric({ label, value }: { readonly label: string; readonly valu
 
 function formatSeasonRange(first: number | null, latest: number | null): string {
   if (!first || !latest) return '확인 시즌 미상'
-  return first === latest ? `${first} 시즌` : `${first}-${latest}`
+  return first === latest ? `${first} 시즌` : `${first}-${latest} 시즌`
 }
