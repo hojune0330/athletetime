@@ -3,28 +3,69 @@ import { describe, expect, it } from 'vitest'
 import type { AthleteSearchCard } from '../../api/recordAnalytics'
 import { CandidateStep } from './RecordsMineCandidateStep'
 
-const ATHLETE: AthleteSearchCard = {
-  athleteKey: 'aaaaaaaaaaaaaaaa',
-  name: '김선수',
-  team: '서울고',
-  teams: ['서울고'],
+const selectionLimitCandidates: readonly AthleteSearchCard[] = Array.from({ length: 7 }, (_, index) => ({
+  athleteKey: `candidate-${index + 1}`,
+  name: `선수 ${index + 1}`,
+  team: '테스트고',
+  teams: ['테스트고'],
   years: [2026],
   events: ['100m'],
   divisions: ['남자 고등부'],
-  recordCount: 2,
-  ambiguity: 'none',
+  recordCount: 1,
+  ambiguity: 'name_team',
   note: '',
-}
+}));
 
-describe('RecordsMineCandidateStep', () => {
+describe('record collection empty search state', () => {
+  it('offers one clear return action instead of a disabled next action', () => {
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={[]}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[]}
+        state="ready"
+      />,
+    )
+
+    expect(markup).toContain('아직 찾지 못했어요.')
+    expect(markup).toContain('검색어 다시 입력')
+    expect(markup).not.toContain('0개 선택됨')
+  })
+
+  it('explains the six-athlete limit and leaves only deselection available at capacity', () => {
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={selectionLimitCandidates}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={selectionLimitCandidates.slice(0, 6).map((athlete) => athlete.athleteKey)}
+        state="ready"
+      />,
+    )
+
+    expect(markup).toContain('한 번에 6명까지');
+    expect(markup).toContain('선택을 빼고 다시 골라주세요.');
+    expect(markup).toContain('disabled=""');
+  })
+
   it('keeps a visible keyboard focus indicator on a selectable athlete', () => {
     // Given a ready candidate search with one selectable athlete.
     const markup = renderToStaticMarkup(
-      <CandidateStep athletes={[ATHLETE]} state="ready" selectedKeys={[]} onResetSearch={() => undefined} onToggleDraft={() => undefined} onNext={() => undefined} />,
+      <CandidateStep
+        athletes={selectionLimitCandidates.slice(0, 1)}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[]}
+        state="ready"
+      />,
     )
 
     // When the candidate row is rendered.
     // Then keyboard users receive the same clear selection boundary as touch users.
-    expect(markup).toMatch(/<button(?=[^>]*aria-label="김선수 기록 선택 안 됨")(?=[^>]*focus-visible:ring-2)[^>]*>/)
+    expect(markup).toMatch(/<button(?=[^>]*aria-label="선수 1 기록 선택 안 됨")(?=[^>]*focus-visible:ring-2)[^>]*>/)
   })
 })
