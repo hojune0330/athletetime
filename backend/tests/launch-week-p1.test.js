@@ -9,6 +9,16 @@ function readSource(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
+function readViteProxyTarget(viteSource, route) {
+  const escapedRoute = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const proxyBlock = viteSource.match(new RegExp(`'${escapedRoute}':\\s*\\{([^}]*)\\}`));
+  assert.ok(proxyBlock, `${route} proxy block exists`);
+
+  const target = proxyBlock[1].match(/target:\s*'([^']+)'/);
+  assert.ok(target, `${route} proxy target exists`);
+  return target[1];
+}
+
 test('P1-FRESH-001(revised): freshness badge removed by owner decision — match results are immutable, collection date adds no user value', () => {
   const schedule = readSource('frontend/src/components/competitions/tabs/ScheduleTab.tsx');
   const resultSourceSummary = readSource('frontend/src/components/competitions/ResultSourceSummary.tsx');
@@ -43,9 +53,9 @@ test('LOCAL-PROXY-001: Given the default local server When Vite proxies API requ
   const vite = readSource('frontend/vite.config.ts');
 
   assert.match(server, /const PORT = process\.env\.PORT \|\| 3000/);
-  assert.match(vite, /'\/api': \{[\s\S]*?target: 'http:\/\/localhost:3000'/);
-  assert.match(vite, /'\/health': \{[\s\S]*?target: 'http:\/\/localhost:3000'/);
-  assert.match(vite, /'\/ws': \{[\s\S]*?target: 'ws:\/\/localhost:3000'/);
+  assert.equal(readViteProxyTarget(vite, '/api'), 'http://localhost:3000');
+  assert.equal(readViteProxyTarget(vite, '/health'), 'http://localhost:3000');
+  assert.equal(readViteProxyTarget(vite, '/ws'), 'ws://localhost:3000');
   assert.doesNotMatch(vite, /localhost:3005/);
 });
 
