@@ -14,6 +14,7 @@
 - Completed: blinded posts and comments are removed by the database query before public list, detail, comment-create, vote, or post-update responses are shaped in `0e541f2`, `edc871b`, and `800e509`.
 - Completed: the record-collection name field no longer opens the mobile keyboard before a user taps it in `13fdd94`.
 - Completed: public team search cards now state that they contain aggregate public results, not individual record lists, and team detail shows the observed season span plus last collected date in `e9df33d` and `51c9266`.
+- Recorded: `.omo/evidence/task-8-security-gates.json` distinguishes the protected authentication/admin boundaries from the confirmed anonymous-ID and public-upload boundaries that must block future feature work.
 - Verified without a new change: candidate cards and athlete pages already keep a same-name caution, affiliation, and observed-season context visible; they do not auto-merge people.
 - Deliberately deferred for an owner decision: public team suppression for small groups, account-backed private notes/photos, default redaction of minor share cards, anonymous-session identity migration, and any verified-owner/claim language.
 - Verification note: focused frontend, build, Node privacy, and real-browser record-flow gates passed. The root `npm test` runner exceeded the tool capture window and exited later without a captured final summary, so it is not counted as a passed gate.
