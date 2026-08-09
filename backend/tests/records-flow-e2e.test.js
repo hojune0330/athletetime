@@ -129,6 +129,17 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('[data-records-step="mine-done"]'));
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
 
+    const doneActions = page.locator('[data-records-sticky-cta="mine-done"]').locator(':scope > a, :scope > button');
+    const viewSelectedAthlete = page.getByRole('link', { name: '\uC120\uC218 \uAE30\uB85D \uBCF4\uAE30', exact: true });
+    assert.equal(await doneActions.first().evaluate((element) => element.tagName), 'A', 'the first completion action is the public athlete-record link');
+    assert.equal(await viewSelectedAthlete.getAttribute('href'), '/records?athlete=alpha-2016');
+    await viewSelectedAthlete.click();
+    await page.waitForURL(/\/records\?athlete=alpha-2016/u);
+    await expectVisible(page.locator('text=Alpha Kim'));
+    await page.goBack();
+    await page.waitForURL(/step=done/);
+    await expectVisible(page.locator('[data-records-step="mine-done"]'));
+
     await page.getByRole('button', { name: 'Seoul High 묶음을 이 목록에서 빼기' }).click();
     await page.getByRole('button', { name: 'Seoul Track Club 묶음을 이 목록에서 빼기' }).click();
     await expectVisible(page.getByRole('heading', { name: '기록 모음이 비었어요.' }));

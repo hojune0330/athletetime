@@ -43,7 +43,9 @@ test('LOCAL-PROXY-001: Given the default local server When Vite proxies API requ
   const vite = readSource('frontend/vite.config.ts');
 
   assert.match(server, /const PORT = process\.env\.PORT \|\| 3000/);
-  assert.match(vite, /target: 'http:\/\/localhost:3000'/);
+  assert.match(vite, /'\/api': \{[\s\S]*?target: 'http:\/\/localhost:3000'/);
+  assert.match(vite, /'\/health': \{[\s\S]*?target: 'http:\/\/localhost:3000'/);
+  assert.match(vite, /'\/ws': \{[\s\S]*?target: 'ws:\/\/localhost:3000'/);
   assert.doesNotMatch(vite, /localhost:3005/);
 });
 
