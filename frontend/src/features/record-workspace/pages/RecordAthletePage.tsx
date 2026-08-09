@@ -115,7 +115,7 @@ export default function RecordAthletePage() {
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <button
         type="button"
-        className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand"
+        className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         onClick={goBackToSearch}
       >
         검색으로 돌아가기
@@ -195,8 +195,8 @@ function TabButton({ active, children, onClick }: { active: boolean; children: s
       type="button"
       aria-pressed={active}
       className={active
-        ? 'min-h-11 bg-ink px-3 text-body-sm font-semibold text-white'
-        : 'min-h-11 px-3 text-body-sm font-semibold text-ink-3 hover:bg-surface-2 hover:text-ink'}
+        ? 'min-h-11 bg-ink px-3 text-body-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'
+        : 'min-h-11 px-3 text-body-sm font-semibold text-ink-3 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}
       onClick={onClick}
     >
       {children}
