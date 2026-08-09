@@ -826,7 +826,7 @@ function AthletePanel({
     const now = Date.now();
     if (now - shareCopyStartedAtRef.current < 500) return;
     shareCopyStartedAtRef.current = now;
-    const shareUrl = window.location.href;
+    const shareUrl = `${window.location.origin}/records/athletes/${encodeURIComponent(athlete.athleteKey)}`;
     setShareLinkMessage('공유 링크를 복사하는 중이에요.');
     if (!navigator.clipboard?.writeText) {
       setShareLinkMessage('주소창의 링크를 직접 복사해 주세요.');

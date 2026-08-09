@@ -7,7 +7,7 @@ import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
 import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
-import { parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
+import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
@@ -60,7 +60,7 @@ export default function RecordAthletePage() {
   const sameNameCaution = subject.note.trim()
     || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
   const shareRecord = async () => {
-    const url = window.location.href
+    const url = new URL(createRecordAthleteSharePath(athleteKey, pageParams), window.location.origin).toString()
     const title = `${subject.name} 선수 기록`
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {

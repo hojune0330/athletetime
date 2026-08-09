@@ -128,6 +128,16 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('text=Alpha Kim'));
     await expectVisible(page.locator('text=기록 한눈에'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: async (value) => { window.__copiedRecordLink = value; } },
+      });
+    });
+    await page.getByRole('button', { name: '기록 링크 공유', exact: true }).click();
+    await expectVisible(page.getByText('공유 링크를 복사했어요.', { exact: true }));
+    const copiedRecordLink = await page.evaluate(() => window.__copiedRecordLink);
+    assert.equal(copiedRecordLink, `${baseUrl}/records/athletes/alpha-2016`, 'legacy panel shares the canonical athlete page');
     visited.push(page.url());
 
     await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
