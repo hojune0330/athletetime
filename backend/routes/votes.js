@@ -140,7 +140,7 @@ router.post('/', async (req, res) => {
           )
           FROM comments cm 
           WHERE cm.post_id = p.id 
-            AND cm.deleted_at IS NULL),
+            AND cm.deleted_at IS NULL AND cm.is_blinded = FALSE),
           '[]'::json
         ) as comments
       FROM posts p
