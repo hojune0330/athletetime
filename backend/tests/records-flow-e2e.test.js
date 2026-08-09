@@ -204,7 +204,11 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
     assert.equal(new URL(page.url()).searchParams.get('scope'), null, 'team detail starts on the latest observed season');
 
     // Then period and section changes stay encoded in the shareable URL.
-    await page.getByRole('button', { name: '전체', exact: true }).click();
+    const allPeriodButton = page.getByRole('button', { name: '전체', exact: true });
+    await allPeriodButton.focus();
+    assert.equal(await allPeriodButton.evaluate((element) => document.activeElement === element), true);
+    assert.match(await allPeriodButton.getAttribute('class') || '', /min-h-11.*focus-visible:ring-2/u);
+    await allPeriodButton.click();
     await expectUrlParam(page, 'scope', 'all');
     await page.getByRole('button', { name: '종목', exact: true }).click();
     await expectUrlParam(page, 'view', 'events');

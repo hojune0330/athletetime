@@ -61,6 +61,8 @@ test('Given the shared records layout When the team page is inspected Then landm
   assert.doesNotMatch(page, /<main\b/u);
   assert.match(page, /aria-label="팀 통계 보기"/u);
   assert.match(page, /seasons=\{detail\.coverage\.availableSeasons\}/u);
+  assert.ok((page.match(/focus-visible:ring-2/g) || []).length >= 3);
+  assert.ok((page.match(/min-h-11/g) || []).length >= 3);
   assert.match(filter, /aria-pressed=/u);
   for (const category of categories) assert.match(filter, new RegExp(category));
 });

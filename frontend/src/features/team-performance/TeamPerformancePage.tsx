@@ -64,7 +64,7 @@ export default function TeamPerformancePage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-5 pb-12" data-team-performance-page>
       <header className="border border-line bg-surface p-5 sm:p-8">
-        <Link to={backUrl} state={{ focusSearch: true }} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-3 hover:text-ink">
+        <Link to={backUrl} state={{ focusSearch: true }} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
           <ArrowLeft className="size-4" aria-hidden="true" />
           소속 검색으로
         </Link>
@@ -134,11 +134,11 @@ function PeriodFilter({ period, seasons, onChange }: {
 }
 
 function PeriodButton({ active, label, onClick }: { readonly active: boolean; readonly label: string; readonly onClick: () => void }) {
-  return <button type="button" aria-pressed={active} onClick={onClick} className={active ? 'bg-ink px-4 py-2 text-sm font-semibold text-white' : 'px-4 py-2 text-sm font-semibold text-ink-3 hover:text-ink'}>{label}</button>
+  return <button type="button" aria-pressed={active} onClick={onClick} className={active ? 'min-h-11 bg-ink px-4 py-2 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset' : 'min-h-11 px-4 py-2 text-sm font-semibold text-ink-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}>{label}</button>
 }
 
 function ViewLink({ active, label, onClick }: { readonly active: boolean; readonly label: string; readonly onClick: () => void }) {
-  return <button type="button" aria-current={active ? 'page' : undefined} onClick={onClick} className={active ? 'border-b-2 border-brand bg-brand/5 px-3 py-4 text-sm font-semibold text-ink' : 'border-b-2 border-transparent px-3 py-4 text-sm font-semibold text-ink-4 hover:text-ink'}>{label}</button>
+  return <button type="button" aria-current={active ? 'page' : undefined} onClick={onClick} className={active ? 'min-h-11 border-b-2 border-brand bg-brand/5 px-3 py-4 text-sm font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset' : 'min-h-11 border-b-2 border-transparent px-3 py-4 text-sm font-semibold text-ink-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}>{label}</button>
 }
 
 function CoverageNotice({ detail }: { readonly detail: TeamPerformanceDetail }) {
