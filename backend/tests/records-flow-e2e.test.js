@@ -186,6 +186,7 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
     await page.getByRole('button', { name: '검색', exact: true }).click();
 
     // Then teams from different inferred categories remain visible in the neutral result set.
+    await expectVisible(page.getByText('개인 기록은 보여주지 않아요.', { exact: false }));
     await expectVisible(page.getByRole('link', { name: '진도군청 팀 통계 보기' }));
     await expectVisible(page.getByRole('link', { name: '전남진도초등학교 팀 통계 보기' }));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);

@@ -14,7 +14,7 @@ export function TeamStatisticsResults({ teams, query }: Props) {
       <div className="flex items-baseline justify-between gap-4 px-1">
         <div>
           <h2 className="text-lg font-semibold text-ink">소속 {teams.length}곳을 찾았어요</h2>
-          <p className="mt-1 text-xs leading-5 text-ink-4">원천 결과의 소속 표기별로 모아 계산했어요.</p>
+          <p className="mt-1 text-xs leading-5 text-ink-4">공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.</p>
         </div>
         <span className="font-mono text-xs text-ink-4">{query}</span>
       </div>

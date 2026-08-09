@@ -23,6 +23,7 @@ describe('team statistics search results', () => {
     expect(html).toContain('1~3위 확인')
     expect(html).toContain('기록 개선')
     expect(html).toContain('43건')
+    expect(html).toContain('공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
     expect(html).toContain('/records/teams/1234567890abcdef?category=corporate')
     expect(html).not.toContain('19명')
     expect(html).not.toContain('athleteKey')
@@ -44,7 +45,7 @@ describe('team statistics search results', () => {
 
     // Then the link preserves the complete aggregate instead of injecting the primary category.
     expect(html).toContain('전체')
-    expect(html).toContain('원천 결과의 소속 표기별로 모아 계산했어요.')
+    expect(html).toContain('공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
     expect(html).toContain('/records/teams/1234567890abcdef?scope=all&amp;from=')
     expect(html).not.toContain('category=corporate')
   })
