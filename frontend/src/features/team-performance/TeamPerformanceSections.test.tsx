@@ -24,6 +24,7 @@ describe('team performance dashboard sections', () => {
     expect(html).toContain('출전이 확인된 대회')
     expect(html).toContain('기록 개선 확인')
     expect(html).toContain('소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.')
+    expect(html).toContain('자료 기준 2019-2026 시즌 · 마지막 자료 2026-06-01')
     expect(html).toContain('전국대회')
     expect(html).not.toContain('홍길동')
     expect(html).not.toContain('19명')

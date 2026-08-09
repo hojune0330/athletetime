@@ -197,6 +197,7 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
     await expectVisible(page.locator('[data-team-performance-page]'));
     await expectVisible(page.getByRole('heading', { name: '진도군청' }));
     await expectVisible(page.getByText('개인 기록을 나열하지 않고', { exact: false }));
+    await expectVisible(page.getByText('자료 기준', { exact: false }));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
 
     // Then period and section changes stay encoded in the shareable URL.

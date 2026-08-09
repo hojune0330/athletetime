@@ -15,6 +15,9 @@ export function TeamPerformanceSummary({ detail }: Props) {
         </div>
         <span className="text-xs text-ink-4">{formatScope(coverage.appliedScope, coverage.appliedSeason)}</span>
       </div>
+      <p className="mt-1 text-xs text-ink-4">
+        자료 기준 {formatObservedPeriod(coverage.firstSeason, coverage.latestSeason)} · 마지막 자료 {coverage.latestDate ?? '확인 안 됨'}
+      </p>
       <dl className="mt-4 grid grid-cols-2 border-l border-t border-line">
         <Metric label="출전이 확인된 대회" value={`${summary.competitionCount}개`} />
         <Metric label="모은 기록에서 확인한 입상" value={`${summary.confirmedPodiumCount}건`} />
@@ -41,4 +44,9 @@ function formatScope(scope: 'latest' | 'all' | 'season', season: number | null):
   if (scope === 'all') return '모은 전체 기간'
   if (scope === 'season' && season) return `${season} 시즌`
   return '최근 확인 시즌'
+}
+
+function formatObservedPeriod(firstSeason: number | null, latestSeason: number | null): string {
+  if (firstSeason && latestSeason) return firstSeason === latestSeason ? `${firstSeason} 시즌` : `${firstSeason}-${latestSeason} 시즌`
+  return '확인 시즌 미상'
 }
