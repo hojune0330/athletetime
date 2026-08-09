@@ -2,6 +2,8 @@ import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
 import type { RecordsLoadState } from './RecordsMineTypes';
 
+const MAX_MINE_SELECTION = 6;
+
 export function CandidateStep({
   athletes,
   state,
@@ -19,6 +21,7 @@ export function CandidateStep({
 }) {
   const selectedCount = selectedKeys.length;
   const needsNewSearch = state === 'error' || (state === 'ready' && athletes.length === 0);
+  const selectionLimitReached = selectedCount >= MAX_MINE_SELECTION;
 
   return (
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-candidates">
@@ -29,6 +32,11 @@ export function CandidateStep({
           같은 이름이 여러 명일 수 있어요. 소속·연도·종목을 확인한 뒤 원하는 기록만 고르세요.
         </p>
         <p className="mt-1 text-xs text-ink-4">선택해도 목록 위치는 바뀌지 않아요.</p>
+        {selectionLimitReached && (
+          <p className="mt-2 text-sm font-medium text-brand" role="status">
+            한 번에 6명까지 함께 볼 수 있어요. 선택을 빼고 다시 골라주세요.
+          </p>
+        )}
       </div>
 
       <div className="mt-6 space-y-2">
@@ -43,6 +51,7 @@ export function CandidateStep({
           <CandidateRow
             key={athlete.athleteKey}
             athlete={athlete}
+            disabled={selectionLimitReached && !selectedKeys.includes(athlete.athleteKey)}
             selected={selectedKeys.includes(athlete.athleteKey)}
             onToggle={() => onToggleDraft(athlete)}
           />
@@ -64,20 +73,23 @@ export function CandidateStep({
 
 function CandidateRow({
   athlete,
+  disabled,
   selected,
   onToggle,
 }: {
   readonly athlete: AthleteSearchCard;
+  readonly disabled: boolean;
   readonly selected: boolean;
   readonly onToggle: () => void;
 }) {
   return (
     <button
       type="button"
+      disabled={disabled}
       aria-pressed={selected}
-      aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : '선택 안 됨'}`}
+      aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : disabled ? '선택 한도 도달' : '선택 안 됨'}`}
       onClick={onToggle}
-      className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition ${
+      className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
         selected ? 'border-brand bg-brand/10' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
       }`}
     >

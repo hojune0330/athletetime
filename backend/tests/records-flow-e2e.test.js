@@ -17,7 +17,7 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
   assert.equal(shouldWriteEvidence('1'), true);
 });
 
-test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 90_000 }, async () => {
+test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 120_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(page, `${baseUrl}/records`);
     visited.push(page.url());
@@ -101,6 +101,20 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.getByRole('button', { name: '검색어 다시 입력', exact: true }).click();
     await page.waitForURL(/step=name/);
     await expectVisible(page.locator('#mine-records-name'));
+    visited.push(page.url());
+
+    await page.locator('#mine-records-name').fill('Limit');
+    await page.locator('[data-records-sticky-cta="mine-name"] button').click();
+    await page.waitForURL(/step=candidates/);
+    const limitCandidateButtons = page.locator('[data-records-step="mine-candidates"] button[aria-pressed]');
+    await expectVisible(limitCandidateButtons.first());
+    assert.equal(await limitCandidateButtons.count(), 7, 'limit scenario renders more candidates than the collection cap');
+    for (let index = 0; index < 6; index += 1) {
+      await limitCandidateButtons.nth(index).click();
+      await waitForSelectedCandidateCount(page, index + 1);
+    }
+    await expectVisible(page.getByText('한 번에 6명까지 함께 볼 수 있어요.', { exact: false }));
+    assert.equal(await limitCandidateButtons.nth(6).isDisabled(), true, 'the seventh candidate is disabled at capacity');
     visited.push(page.url());
 
     await navigateToReady(page, `${baseUrl}/records?flow=browse`);
