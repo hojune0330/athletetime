@@ -56,7 +56,7 @@ test('UX-MYREC-001: a user-selected local collection stays visible without claim
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
   assert.match(page, /useMyAthlete/);
   assert.match(page, /<RecordsMineFlow/, 'self flow stays separate from public browsing');
-  assert.match(page, /<RecordCandidateList/, 'general browsing uses workspace candidates');
+  assert.match(page, /<RecordCandidatesSurface/, 'general browsing uses the routed workspace candidate surface');
   assert.match(page, /workspaceStore\.saveWorkspaceDraft/, 'general selection writes only the workspace draft');
   assert.doesNotMatch(page, /<MyRecordsCard|<RecordSearchResults/, 'legacy aggregate surfaces are not mounted');
   assert.doesNotMatch(page, /내 기록이에요/, 'the page must not assert that a searched athlete is the visitor');

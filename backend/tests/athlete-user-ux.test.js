@@ -287,7 +287,7 @@ test('records shared athlete URL prioritizes the athlete panel before candidate 
 
   assert.match(source, /const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean\(selectedAthleteParam\)/);
   assert.match(source, /shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes\.length > 0 && !selectedAthleteParam && \(/);
-  assert.ok(source.indexOf('shouldPrioritizeAthletePanel && (') < source.indexOf('<RecordCandidateList'));
+  assert.ok(source.indexOf('shouldPrioritizeAthletePanel && (') < source.indexOf('<RecordCandidatesSurface'));
   assert.match(source, /shouldShowAthletePanel && !shouldPrioritizeAthletePanel && \(/);
 });
 
