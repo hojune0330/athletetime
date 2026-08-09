@@ -130,7 +130,7 @@ test('UX-COLLECT-004: the guided collection flow never defaults an identity or a
   assert.match(name, /기록 모아보기/);
   assert.match(candidates, /화면에 모아 볼 기록을 고르세요/);
   assert.match(candidates, /원하는 기록만 고르세요/);
-  assert.match(confirm, /선택한 선수의 공개 기록만 이 기기에서 함께 보여줘요/);
+  assert.match(confirm, /선택한 후보의 공개 기록만 이 기기에서 함께 보여줘요/);
   assert.match(confirm, /선택한 선수 담기/);
   assert.doesNotMatch(confirm, /선택한 기록 담기/);
   assert.match(done, /모아 보는 기록이 준비됐어요/);

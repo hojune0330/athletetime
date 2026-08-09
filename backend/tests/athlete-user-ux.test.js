@@ -179,7 +179,7 @@ test('records collection candidates expose an unselected control and reveal a ch
 test('records collection completion labels the existing athlete detail destination honestly', () => {
   const source = readSource('frontend/src/components/records/RecordsMineDoneStep.tsx');
 
-  assert.match(source, /선수 기록 자세히 보기/);
+  assert.match(source, /선수 기록 보기/);
   assert.match(source, /\/records\?athlete=/);
   assert.doesNotMatch(source, /기록 카드 공유/);
 });

@@ -19,10 +19,10 @@ export function ConfirmStep({
       <div>
         <p className="text-sm font-semibold text-brand">3단계</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
-          {hasSelectedAthletes ? '선택한 선수를 확인하세요.' : '선수를 골라주세요.'}
+          {hasSelectedAthletes ? '이 사람들 맞나요?' : '선수를 골라주세요.'}
         </h1>
         <p className="mt-3 text-sm leading-6 text-ink-3">
-          선택한 선수의 공개 기록만 이 기기에서 함께 보여줘요. 다른 사람 기록이면 지금 빼세요.
+          선택한 후보의 공개 기록만 이 기기에서 함께 보여줘요. 다른 사람 기록이면 지금 빼세요.
         </p>
       </div>
 

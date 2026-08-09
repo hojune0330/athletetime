@@ -32,6 +32,9 @@ export function CandidateStep({
           같은 이름이 여러 명일 수 있어요. 소속·연도·종목을 확인한 뒤 원하는 기록만 고르세요.
         </p>
         <p className="mt-1 text-xs text-ink-4">선택해도 목록 위치는 바뀌지 않아요.</p>
+        <p className="mt-2 text-sm font-medium text-ink" role="status" aria-live="polite">
+          {selectedCount}명 선택됨 / 최대 {MAX_MINE_SELECTION}명
+        </p>
         {selectionLimitReached && (
           <p className="mt-2 text-sm font-medium text-brand" role="status">
             한 번에 6명까지 함께 볼 수 있어요. 선택을 빼고 다시 골라주세요.

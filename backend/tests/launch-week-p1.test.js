@@ -38,6 +38,15 @@ test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out o
   assert.match(vite, /page-tools/);
 });
 
+test('LOCAL-PROXY-001: Given the default local server When Vite proxies API requests Then both use port 3000', () => {
+  const server = readSource('src/server.js');
+  const vite = readSource('frontend/vite.config.ts');
+
+  assert.match(server, /const PORT = process\.env\.PORT \|\| 3000/);
+  assert.match(vite, /target: 'http:\/\/localhost:3000'/);
+  assert.doesNotMatch(vite, /localhost:3005/);
+});
+
 test('P1-FIX-W4: Migration execution plan exists before migration code and covers launch transition risks', () => {
   const plan = readSource('docs/athletetime-migration-execution-plan.md');
 

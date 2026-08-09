@@ -25,15 +25,15 @@ export default defineConfig({
     // API 프록시 → 백엔드 서버
     proxy: {
       '/api': {
-        target: 'http://localhost:3005',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
       '/health': {
-        target: 'http://localhost:3005',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
       '/ws': {
-        target: 'ws://localhost:3005',
+        target: 'ws://localhost:3000',
         ws: true,
       },
     },

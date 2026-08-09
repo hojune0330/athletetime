@@ -47,13 +47,13 @@ export function RecordsHub({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <FlowChoiceCard
-            title="기록 찾아 모으기"
-            description="이름과 소속을 확인한 뒤 원하는 선수 기록을 이 기기에 모아요."
+            title="내 이름으로 기록 찾기"
+            description="이름과 소속을 확인해 원하는 공개 기록만 고르세요."
             primary
             onClick={onStartMine}
           />
           <FlowChoiceCard
-            title="기록 둘러보기"
+            title="다른 기록 찾아보기"
             description="선수·팀·시즌 기록표를 한 단계씩 찾아봐요."
             onClick={onStartBrowse}
           />

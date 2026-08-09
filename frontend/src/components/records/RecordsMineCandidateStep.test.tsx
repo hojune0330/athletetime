@@ -51,6 +51,21 @@ describe('record collection empty search state', () => {
     expect(markup).toContain('disabled=""');
   })
 
+  it('shows selection progress before the user reaches the next action', () => {
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={selectionLimitCandidates.slice(0, 2)}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[selectionLimitCandidates[0].athleteKey]}
+        state="ready"
+      />,
+    )
+
+    expect(markup).toContain('1명 선택됨 / 최대 6명')
+  })
+
   it('keeps a visible keyboard focus indicator on a selectable athlete', () => {
     // Given a ready candidate search with one selectable athlete.
     const markup = renderToStaticMarkup(

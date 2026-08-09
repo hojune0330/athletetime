@@ -31,13 +31,13 @@ export function DoneStep({
 
       {hasEntries ? (
         <div className="grid gap-2 sm:grid-cols-3" data-records-sticky-cta="mine-done">
-          <Button type="button" variant="outline" onClick={onAddMore}>기록 더 담기</Button>
-          <Button type="button" variant="outline" onClick={onSeasonForMine}>시즌 기록표 보기</Button>
-          <Button asChild variant="outline">
+          <Button asChild>
             <Link to={firstEntry ? `/records?athlete=${encodeURIComponent(firstEntry.athleteKey)}` : '/records'}>
-              선수 기록 자세히 보기
+              선수 기록 보기
             </Link>
           </Button>
+          <Button type="button" variant="outline" onClick={onAddMore}>기록 더 담기</Button>
+          <Button type="button" variant="outline" onClick={onSeasonForMine}>시즌 기록표 보기</Button>
         </div>
       ) : (
         <div data-records-sticky-cta="mine-done">
