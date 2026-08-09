@@ -50,6 +50,13 @@ test('data request form asks for the minimum information needed to review a requ
   assert.match(dataRequestPage, /회신용 연락처 \(선택\)/);
 });
 
+test('data request type choices expose their selected state to keyboard and assistive technology', () => {
+  const dataRequestPage = readSource('frontend/src/pages/DataRequestPage.tsx');
+
+  assert.match(dataRequestPage, /onClick=\{\(\) => setType\(opt\.value\)\} aria-pressed=\{active\}/);
+  assert.match(dataRequestPage, /border px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2/u);
+});
+
 test('active docs point to data-request and avoid legal loophole positioning', () => {
   const sources = [
     'docs/athletetime-data-strategy-master.md',

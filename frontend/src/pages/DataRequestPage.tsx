@@ -206,8 +206,8 @@ export default function DataRequestPage() {
                   <button
                     key={opt.value}
                     type="button"
-                    onClick={() => setType(opt.value)}
-                    className={`border px-3 py-3 text-left transition-colors ${
+                    onClick={() => setType(opt.value)} aria-pressed={active}
+                    className={`border px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
                       active
                         ? 'border-brand-500 bg-brand-50'
                         : 'border-hair bg-surface hover:border-line-2 hover:bg-surface-2'
