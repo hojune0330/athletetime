@@ -131,7 +131,7 @@ router.post('/', async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.id = $1 
-        AND p.deleted_at IS NULL
+        AND p.deleted_at IS NULL AND p.is_blinded = FALSE
     `, [postId]);
     
     if (postResult.rows.length === 0) {

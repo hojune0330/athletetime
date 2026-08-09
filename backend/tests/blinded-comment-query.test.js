@@ -4,9 +4,15 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const postsRoute = fs.readFileSync(path.join(__dirname, '../routes/posts.js'), 'utf8');
+const commentsRoute = fs.readFileSync(path.join(__dirname, '../routes/comments.js'), 'utf8');
+const votesRoute = fs.readFileSync(path.join(__dirname, '../routes/votes.js'), 'utf8');
 const commentMutationRoutes = [
-  ['comment creation response', fs.readFileSync(path.join(__dirname, '../routes/comments.js'), 'utf8')],
-  ['vote response', fs.readFileSync(path.join(__dirname, '../routes/votes.js'), 'utf8')],
+  ['comment creation response', commentsRoute],
+  ['vote response', votesRoute],
+];
+const publicPostDetailRoutes = [
+  ['post detail response', postsRoute],
+  ...commentMutationRoutes,
 ];
 
 test('PUBLIC-COMMENT-BOUNDARY Given public post queries Then blinded comments are excluded before response shaping', () => {
@@ -31,6 +37,20 @@ test('PUBLIC-COMMENT-BOUNDARY Given public mutation responses Then blinded comme
     assert.ok(
       commentFilters[0].includes('cm.is_blinded = FALSE'),
       `${responseName} must exclude blinded comment content before response shaping`,
+    );
+  }
+});
+
+test('PUBLIC-POST-BOUNDARY Given a blinded post When any public detail response is shaped Then the post is excluded', () => {
+  for (const [responseName, route] of publicPostDetailRoutes) {
+    const postFilters = route.match(
+      /WHERE p\.id = \$1\s+AND p\.deleted_at IS NULL(?:\s+AND p\.is_blinded = FALSE)?/g,
+    ) ?? [];
+
+    assert.equal(postFilters.length, 1, `${responseName} must define one post visibility boundary`);
+    assert.ok(
+      postFilters[0].includes('p.is_blinded = FALSE'),
+      `${responseName} must exclude blinded posts before response shaping`,
     );
   }
 });

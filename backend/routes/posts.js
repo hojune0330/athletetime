@@ -279,7 +279,7 @@ router.get('/:id', async (req, res) => {
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.id = $1 
-        AND p.deleted_at IS NULL
+        AND p.deleted_at IS NULL AND p.is_blinded = FALSE
     `, [id]);
     
     if (result.rows.length === 0) {
