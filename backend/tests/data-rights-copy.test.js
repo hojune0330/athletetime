@@ -42,6 +42,14 @@ test('public record search and data request inputs use neutral placeholders', ()
   assert.match(dataRequestPage, /placeholder="대회명을 입력하세요"/);
 });
 
+test('data request form asks for the minimum information needed to review a request', () => {
+  const dataRequestPage = readSource('frontend/src/pages/DataRequestPage.tsx');
+
+  assert.match(dataRequestPage, /선수 이름과 요청 사유만/);
+  assert.match(dataRequestPage, /주민등록번호·사진·진단서 같은 민감한 정보는 적지 말아 주세요/);
+  assert.match(dataRequestPage, /회신용 연락처 \(선택\)/);
+});
+
 test('active docs point to data-request and avoid legal loophole positioning', () => {
   const sources = [
     'docs/athletetime-data-strategy-master.md',

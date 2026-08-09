@@ -172,8 +172,8 @@ export default function DataRequestPage() {
         </h1>
         <p className="mt-2 max-w-frame text-body-sm leading-relaxed text-ink-3">
           AthleteTime은 공개된 경기 결과를 모아 정리한 자료예요. 공식 기록 서비스가 아니에요.
-          선수 본인 또는 권리자는 아래 양식으로 기록의 정정·비노출·이의제기를 요청할 수 있어요.
-          {' '}{CORRECTION_POLICY.slaNotice}
+          선수 본인 또는 권리자는 선수 이름과 요청 사유만 적어 주세요. 소속·대회·종목은 기억나는 내용만 적어 주세요.
+          주민등록번호·사진·진단서 같은 민감한 정보는 적지 말아 주세요. {' '}{CORRECTION_POLICY.slaNotice}
         </p>
 
         <div className="mt-4 border border-hair bg-surface-2 px-4 py-3">
