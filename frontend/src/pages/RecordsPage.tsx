@@ -34,7 +34,7 @@ import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFil
 import { searchTeamPerformance } from '../features/team-performance/teamPerformanceApi';
 import { parseTeamCategory } from '../features/team-performance/teamPerformanceContracts';
 import type { TeamCategory, TeamSearchSummary } from '../features/team-performance/teamPerformanceContracts';
-import { RecordCandidateList } from '../features/record-workspace/components/RecordCandidateList';
+import { RecordCandidatesSurface } from '../features/record-workspace/components/RecordCandidatesSurface';
 import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
 
@@ -643,7 +643,7 @@ export default function RecordsPage() {
       )}
 
       {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes.length > 0 && !selectedAthleteParam && (
-        <RecordCandidateList
+        <RecordCandidatesSurface
           athletes={athletes}
           draftSubjectKeys={workspaceDraftKeys}
           selectionMode={workspaceSelectionMode}
@@ -655,7 +655,6 @@ export default function RecordsPage() {
             workspaceStore.clearWorkspaceDraft();
             setWorkspaceSelectionMode(false);
           }}
-          onOpenAthlete={(athleteKey) => navigate(`/records/athletes/${athleteKey}`)}
           onReviewDraft={() => navigate('/records/workspaces/new')}
         />
       )}

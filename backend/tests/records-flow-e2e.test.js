@@ -44,6 +44,27 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
   });
 });
 
+test('RECORDS-ATHLETE-RETURN-E2E Given an in-app candidate When its detail closes Then the original result context returns without entering the share URL', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    const resultsUrl = `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`;
+    await navigateToReady(page, resultsUrl);
+    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
+
+    await page.getByRole('button', { name: /Alpha Kim 기록 보기/ }).first().click();
+    await page.waitForURL(/\/records\/athletes\/alpha-2016/u);
+    await expectVisible(page.getByRole('button', { name: '결과로 돌아가기', exact: true }));
+
+    await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).click();
+    await page.waitForURL(/\/records\?flow=browse&browse=athlete&q=Alpha/u);
+    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
+
+    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
+    await expectVisible(page.getByRole('button', { name: '기록 찾기', exact: true }));
+    assert.equal(await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).count(), 0);
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 120_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(page, `${baseUrl}/records`);

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ShareIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { AffiliationHistory } from '../components/AffiliationHistory'
@@ -8,6 +8,7 @@ import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
 import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
 import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
+import { resolveRecordAthleteReturnPath } from '../recordAthleteNavigationState'
 import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
@@ -18,6 +19,7 @@ type AthleteTab = 'affiliations' | 'records' | 'sources'
 
 export default function RecordAthletePage() {
   const { athleteKey = '' } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const [pageParams, setPageParams] = useSearchParams()
   const [actionNotice, setActionNotice] = useState('')
@@ -29,6 +31,7 @@ export default function RecordAthletePage() {
   const requestedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
   const selectedSeason = parseRecordAthleteSeason(pageParams)
+  const returnPath = resolveRecordAthleteReturnPath(location.state)
 
   const updatePageState = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(pageParams)
@@ -103,9 +106,8 @@ export default function RecordAthletePage() {
     })
   }
   const goBackToSearch = () => {
-    const historyIndex = Number(window.history.state?.idx)
-    if (Number.isFinite(historyIndex) && historyIndex > 0) {
-      navigate(-1)
+    if (returnPath) {
+      navigate(returnPath, { state: { focusSearch: true } })
       return
     }
     navigate('/records?flow=browse&browse=athlete', { replace: true })
@@ -118,7 +120,7 @@ export default function RecordAthletePage() {
         className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         onClick={goBackToSearch}
       >
-        검색으로 돌아가기
+        {returnPath ? '결과로 돌아가기' : '기록 찾기'}
       </button>
 
       <section className="border border-line bg-surface p-5 sm:p-7">
