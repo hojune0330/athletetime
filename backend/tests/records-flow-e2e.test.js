@@ -17,6 +17,33 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
   assert.equal(shouldWriteEvidence('1'), true);
 });
 
+test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens without an event Then its loaded records appear immediately', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await page.addInitScript((savedWorkspaces) => {
+      window.localStorage.setItem('athletetime.recordWorkspaces.v1', JSON.stringify(savedWorkspaces));
+    }, {
+      version: 1,
+      items: [{
+        id: '11111111-1111-4111-8111-111111111111',
+        title: 'Alpha 기록 모음',
+        subjectKeys: ['aaaaaaaaaaaaaaaa'],
+        excludedRecordIds: [],
+        filter: {},
+        createdAt: '2026-08-09T00:00:00.000Z',
+        updatedAt: '2026-08-09T00:00:00.000Z',
+      }],
+    });
+
+    await navigateToReady(page, `${baseUrl}/records/workspaces/11111111-1111-4111-8111-111111111111`);
+
+    await expectVisible(page.locator('[data-record-row]').first());
+    assert.equal(new URL(page.url()).searchParams.get('event'), null, 'implicit event selection keeps the saved link clean');
+    await page.getByRole('button', { name: '종목 목록', exact: true }).click();
+    await expectVisible(page.getByText('종목을 고르면', { exact: false }));
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 120_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(page, `${baseUrl}/records`);

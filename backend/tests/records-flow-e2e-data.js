@@ -4,6 +4,8 @@ const athletes = [
   athlete('beta-2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
 ];
 
+const savedWorkspaceAthlete = athlete('aaaaaaaaaaaaaaaa', 'Workspace Kim', 'Saved High', [2026], ['100m'], 2);
+
 const limitAthletes = Array.from({ length: 7 }, (_, index) => (
   athlete(`limit-${index + 1}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
 ));
@@ -72,7 +74,7 @@ function makeProfile(key) {
 
 function makeWorkspacePreview(subjectKeys) {
   const subjects = subjectKeys
-    .map((subjectKey) => athletes.find((athlete) => athlete.athleteKey === subjectKey))
+    .map((subjectKey) => [...athletes, savedWorkspaceAthlete].find((athlete) => athlete.athleteKey === subjectKey))
     .filter(Boolean);
   const records = subjects.flatMap((subject) => [makeRecord(subject, 0), makeRecord(subject, 1)]);
   const affiliationCounts = new Map();

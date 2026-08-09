@@ -8,6 +8,7 @@ import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceSubjectList } from '../components/WorkspaceSubjectList'
+import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { visibleWorkspaceRecords, useRecordWorkspaceEditor } from '../useRecordWorkspaceEditor'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
@@ -51,7 +52,8 @@ function LoadedWorkspacePage({
   const previewQuery = useRecordWorkspacePreview(editor.state.subjectKeys)
   const preview = previewQuery.preview
   const tab = normalizeTab(params.get('tab'))
-  const selectedEventKey = params.get('event')?.trim() || null
+  const requestedEventKey = params.get('event')?.trim() || null
+  const showEventIndex = params.get('eventIndex') === 'true'
   const selectedRecordId = params.get('record')?.trim() || null
 
   const updatePageState = (updates: Readonly<Record<string, string | null>>) => {
@@ -89,6 +91,7 @@ function LoadedWorkspacePage({
   }
 
   const visibleRecords = visibleWorkspaceRecords(preview.records, editor.state.excludedRecordIds)
+  const selectedEventKey = showEventIndex ? null : selectInitialRecordEventKey(requestedEventKey, visibleRecords)
   const visibleCoverage = { ...preview.coverage, returned: visibleRecords.length }
 
   return (
@@ -119,6 +122,7 @@ function LoadedWorkspacePage({
       <WorkspaceTabs active={tab} onChange={(nextTab) => updatePageState({
         tab: nextTab === 'records' ? null : nextTab,
         event: null,
+        eventIndex: null,
         record: null,
       })} />
 
@@ -131,7 +135,11 @@ function LoadedWorkspacePage({
           onLoadMore={() => void previewQuery.fetchNextPage()}
           onOpenRecord={(recordId) => updatePageState({ record: recordId })}
           onRestoreAll={editor.restoreAll}
-          onSelectEvent={(eventKey) => updatePageState({ event: eventKey, record: null })}
+          onSelectEvent={(eventKey) => updatePageState({
+            event: eventKey,
+            eventIndex: eventKey ? null : 'true',
+            record: null,
+          })}
           onStartSelection={editor.startSelection}
           onToggleRecord={editor.toggleRecord}
           preview={preview}
