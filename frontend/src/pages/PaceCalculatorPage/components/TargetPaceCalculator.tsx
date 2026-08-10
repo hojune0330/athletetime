@@ -44,6 +44,7 @@ export const TargetPaceCalculator: React.FC = () => {
   const [minutes, setMinutes] = useState(20);
   const [seconds, setSeconds] = useState(0);
   const [result, setResult] = useState<PaceResult | null>(null);
+  const [validationError, setValidationError] = useState('');
 
   const targetTimeSeconds = useMemo(() => hours * 3600 + minutes * 60 + seconds, [hours, minutes, seconds]);
   const distanceKm = (distance / 1000).toFixed(3);
@@ -65,6 +66,8 @@ export const TargetPaceCalculator: React.FC = () => {
     const nextDistanceKm = Number.parseFloat(value);
     if (Number.isFinite(nextDistanceKm) && nextDistanceKm > 0) {
       setDistance(nextDistanceKm * 1000);
+    } else {
+      setDistance(0);
     }
     setIsCustom(true);
     setIsSteeple(false);
@@ -92,10 +95,12 @@ export const TargetPaceCalculator: React.FC = () => {
 
   const calculate = () => {
     if (targetTimeSeconds <= 0 || distance <= 0) {
-      alert('거리와 시간을 입력해 주세요.');
+      setValidationError('거리와 시간을 입력해 주세요.');
+      setResult(null);
       return;
     }
 
+    setValidationError('');
     const pacePerKm = calculatePaceFromTarget(targetTimeSeconds, distance);
     setResult({
       pacePerKm: formatPace(pacePerKm),
@@ -123,9 +128,18 @@ export const TargetPaceCalculator: React.FC = () => {
           <p className="max-w-md text-body-sm leading-relaxed text-ink-3">
             목표 거리와 완주 시간을 넣으면 km·400m·100m 기준 페이스를 바로 계산해요.
           </p>
-        </div>
+          </div>
 
-        <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
+          {validationError && (
+            <div
+              role="alert"
+              className="mt-4 border border-err/40 border-l-2 border-l-err bg-surface px-3 py-2 text-body-sm text-err"
+            >
+              {validationError}
+            </div>
+          )}
+
+          <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
           <div>
             <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
               Distance
@@ -204,9 +218,10 @@ export const TargetPaceCalculator: React.FC = () => {
                   value={customDistance}
                   onChange={(event) => handleCustomDistanceChange(event.target.value)}
                   min="0.1"
-                  step="0.1"
-                  className={`${numberInputClass} w-28`}
-                  placeholder="거리"
+                    step="0.1"
+                    className={`${numberInputClass} w-28`}
+                    aria-label="직접 거리 (km)"
+                    placeholder="거리"
                 />
                 <span className="text-body-sm text-ink-3">km</span>
               </div>
@@ -327,9 +342,10 @@ const TimeField: React.FC<TimeFieldProps> = ({ label, value, max, onChange }) =>
   <div className="flex flex-1 flex-col items-center">
     <input
       type="number"
-      value={value}
-      onChange={(event) => onChange(Number(event.target.value))}
-      min="0"
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        aria-label={label}
+        min="0"
       max={max}
       className={`${numberInputClass} w-full`}
     />

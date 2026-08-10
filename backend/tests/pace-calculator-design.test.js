@@ -96,3 +96,16 @@ test('PACE-DS-004: track event splits expose steeplechase water-jump variants', 
   assert.match(index, /TrackEventSplits/, 'track tab wired into pace page');
   assert.match(index, /트랙 종목/, 'track tab label present');
 });
+
+test('PACE-UX-005: invalid custom input stays in-page and cannot reuse a prior distance', () => {
+  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+
+  // Given a runner clears a custom distance after selecting another distance.
+  // When they ask to calculate a pace.
+  // Then the page keeps feedback in context and rejects the stale distance.
+  assert.match(target, /role="alert"/, 'invalid input is announced inside the calculator');
+  assert.doesNotMatch(target, /\balert\(/, 'browser alerts do not block the calculator');
+  assert.match(target, /setDistance\(0\)/, 'an empty custom distance clears the prior selected distance');
+  assert.match(target, /aria-label="직접 거리 \(km\)"/, 'the custom-distance field has an accessible label');
+  assert.match(target, /aria-label=\{label\}/, 'every time field exposes its label to assistive technology');
+});
