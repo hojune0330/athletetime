@@ -45,7 +45,7 @@ export function CompareTray({
                   type="button"
                   onClick={() => remove(e.athleteKey)}
                   aria-label={`${e.name} 비교에서 빼기`}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-ink-4 transition hover:bg-line hover:text-ink"
+                  className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-ink-4 transition hover:bg-line hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   ✕
                 </button>
@@ -57,7 +57,7 @@ export function CompareTray({
           <button
             type="button"
             onClick={clear}
-            className="rounded-lg border border-line px-3 py-2 text-sm text-ink-3 transition hover:bg-surface-2"
+            className="min-h-11 rounded-lg border border-line px-3 py-2 text-sm text-ink-3 transition hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             비우기
           </button>
@@ -66,7 +66,7 @@ export function CompareTray({
             disabled={count < 2}
             onClick={() => onCompare?.(entries.map((e) => e.athleteKey))}
             className={[
-              'rounded-lg px-4 py-2 text-sm font-semibold transition',
+              'min-h-11 rounded-lg px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
               count < 2
                 ? 'cursor-not-allowed border border-line bg-surface-2 text-ink-4'
                 : 'bg-brand-500 text-white hover:bg-brand-600',
