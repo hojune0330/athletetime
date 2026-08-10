@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { z } from 'zod';
 import {
   formatTime,
   formatPace,
@@ -170,24 +171,36 @@ export function useSplitCalculator() {
 }
 
 // 즐겨찾기 관리 훅
-interface Favorite {
-  id: string;
-  name: string;
-  distance: number;
-  targetTime: number;
-  strategy: PaceStrategy;
-  createdAt: number;
+const savedPacePlanSchema = z.object({
+  id: z.string(),
+  name: z.string().trim().min(1).max(80),
+  distance: z.number().finite().positive(),
+  targetTime: z.number().finite().positive(),
+  strategy: z.enum(['even', 'negative', 'positive']),
+  createdAt: z.number().finite().nonnegative(),
+});
+
+const savedPacePlansSchema = z.array(savedPacePlanSchema);
+
+export type SavedPacePlan = z.infer<typeof savedPacePlanSchema>;
+
+function loadSavedPacePlans(): SavedPacePlan[] {
+  if (typeof window === 'undefined') return [];
+  const saved = localStorage.getItem('paceCalculatorFavorites');
+  if (!saved) return [];
+
+  try {
+    return savedPacePlansSchema.parse(JSON.parse(saved));
+  } catch {
+    return [];
+  }
 }
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<Favorite[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem('paceCalculatorFavorites');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [favorites, setFavorites] = useState<SavedPacePlan[]>(loadSavedPacePlans);
   
   const saveFavorite = useCallback((name: string, distance: number, targetTime: number, strategy: PaceStrategy) => {
-    const newFavorite: Favorite = {
+    const newFavorite: SavedPacePlan = {
       id: Date.now().toString(),
       name,
       distance,
