@@ -144,6 +144,8 @@ test('records search gives same-name candidates practical narrowing controls', (
   const source = [
     readSource('frontend/src/pages/RecordsPage.tsx'),
     readSource('frontend/src/components/records/RecordSearchResults.tsx'),
+    readSource('frontend/src/components/records/RecordSearchFilterChips.tsx'),
+    readSource('frontend/src/components/records/RecordSearchResultCard.tsx'),
   ].join('\n');
 
   assert.match(source, /후보를 좁혀보세요/);
@@ -187,6 +189,7 @@ test('records collection completion labels the existing athlete detail destinati
 test('record collection calls its selected unit an athlete, not an owned record', () => {
   const source = [
     'frontend/src/components/records/RecordSearchResults.tsx',
+    'frontend/src/components/records/RecordSearchResultCard.tsx',
     'frontend/src/components/records/RecordsMineConfirmStep.tsx',
     'frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx',
     'frontend/src/components/record-insights/MyRecordsCard.tsx',
