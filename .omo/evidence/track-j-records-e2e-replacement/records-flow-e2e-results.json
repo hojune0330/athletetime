@@ -1,20 +1,25 @@
 {
-  "generatedAt": "2026-08-08T19:14:58.561Z",
+  "generatedAt": "2026-08-10T00:49:38.980Z",
   "scenario": "records flow e2e",
   "invocation": "node --test backend/tests/records-flow-e2e.test.js",
-  "baseUrl": "http://127.0.0.1:51419",
+  "baseUrl": "http://127.0.0.1:59165",
   "viewport": {
     "width": 375,
     "height": 667
   },
   "visited": [
-    "http://127.0.0.1:51419/records",
-    "http://127.0.0.1:51419/records?flow=mine&step=candidates&q=Alpha&mineDraft=alpha-2016%2Calpha-2020",
-    "http://127.0.0.1:51419/records?flow=mine&step=done&q=Alpha",
-    "http://127.0.0.1:51419/records?flow=browse",
-    "http://127.0.0.1:51419/records?athlete=alpha-2016",
-    "http://127.0.0.1:51419/records/athletes/alpha-2016",
-    "http://127.0.0.1:51419/records?compare=alpha-2016,beta-2016"
+    "http://127.0.0.1:59165/records",
+    "http://127.0.0.1:59165/records?flow=browse&browse=team",
+    "http://127.0.0.1:59165/records",
+    "http://127.0.0.1:59165/records?flow=mine&step=candidates&q=Alpha&mineDraft=alpha-2016%2Calpha-2020",
+    "http://127.0.0.1:59165/records?flow=mine&step=name&q=Alpha",
+    "http://127.0.0.1:59165/records?flow=mine&step=name&q=Missing",
+    "http://127.0.0.1:59165/records?flow=mine&step=candidates&q=Limit&mineDraft=limit-1%2Climit-2%2Climit-3%2Climit-4%2Climit-5%2Climit-6",
+    "http://127.0.0.1:59165/records?flow=browse",
+    "http://127.0.0.1:59165/records?athlete=alpha-2016",
+    "http://127.0.0.1:59165/records/athletes/alpha-2016",
+    "http://127.0.0.1:59165/records/athletes/missing-athlete",
+    "http://127.0.0.1:59165/records?compare=alpha-2016,beta-2016"
   ],
   "consoleErrors": [],
   "pageErrors": []

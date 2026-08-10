@@ -72,7 +72,17 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('[data-records-flow="hub"]'));
     assert.equal(await page.locator('#records-search').count(), 0, 'hub renders before the search surface');
 
-    await page.getByRole('button', { name: /내 이름으로 기록 찾기/ }).first().click();
+    await page.getByRole('button', { name: /^팀 성과 보기/u }).click();
+    await page.waitForURL(/flow=browse.*browse=team|browse=team.*flow=browse/u);
+    await expectUrlParam(page, 'browse', 'team');
+    await expectVisible(page.locator('#records-search'));
+    visited.push(page.url());
+    await page.goBack();
+    await page.waitForURL(/\/records$/u);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+
+    await page.getByRole('button', { name: /이름 또는 소속으로 기록 찾기/ }).first().click();
     await page.waitForURL(/flow=mine.*step=name|step=name.*flow=mine/);
     await expectVisible(page.locator('[data-records-step="mine-name"]'));
     assert.equal(await page.locator('#mine-records-name').evaluate((element) => document.activeElement === element), false, 'mobile entry waits for the user to focus the search field');
@@ -179,9 +189,9 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
 
     await navigateToReady(page, `${baseUrl}/records?flow=browse`);
     await expectVisible(page.locator('[data-records-flow="browse"]'));
-    await expectVisible(page.getByRole('button', { name: /선수 찾기/ }));
-    await expectVisible(page.getByRole('button', { name: /소속 통계 보기/ }));
-    await expectVisible(page.getByRole('button', { name: /시즌 기록표/ }));
+    await expectVisible(page.getByRole('button', { name: /팀 성과 보기/ }));
+    assert.equal(await page.getByRole('button', { name: /선수 찾기/ }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: /시즌 기록표/ }).count(), 0);
     visited.push(page.url());
 
     await navigateToReady(page, `${baseUrl}/records?athlete=alpha-2016`);

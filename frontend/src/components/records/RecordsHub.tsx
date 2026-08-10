@@ -5,7 +5,7 @@ type RecordsHubProps = {
   readonly myEntryName: string;
   readonly onOpenMyRecords: () => void;
   readonly onStartMine: () => void;
-  readonly onStartBrowse: () => void;
+  readonly onOpenTeamPerformance: () => void;
   readonly children?: ReactNode;
 };
 
@@ -14,7 +14,7 @@ export function RecordsHub({
   myEntryName,
   onOpenMyRecords,
   onStartMine,
-  onStartBrowse,
+  onOpenTeamPerformance,
   children,
 }: RecordsHubProps) {
   return (
@@ -47,15 +47,15 @@ export function RecordsHub({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <FlowChoiceCard
-            title="내 이름으로 기록 찾기"
-            description="이름과 소속을 확인해 원하는 공개 기록만 고르세요."
+            title="이름 또는 소속으로 기록 찾기"
+            description="이름과 소속을 확인해 공개 기록 후보를 직접 고르세요."
             primary
             onClick={onStartMine}
           />
           <FlowChoiceCard
-            title="다른 기록 찾아보기"
-            description="선수·팀·시즌 기록표를 한 단계씩 찾아봐요."
-            onClick={onStartBrowse}
+            title="팀 성과 보기"
+            description="팀·학교의 공개 기록을 집계로 살펴봐요."
+            onClick={onOpenTeamPerformance}
           />
         </div>
       </section>

@@ -10,8 +10,8 @@ export function RecordsBrowseGateway({ onBackToHub, onPick }: RecordsBrowseGatew
     <section className="border border-line bg-surface p-6 sm:p-8" data-records-flow="browse">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-brand">기록 둘러보기</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">무엇을 볼까요?</h1>
+          <p className="text-sm font-semibold text-brand">공개 기록 집계</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink">팀 성과를 살펴보세요</h1>
         </div>
         <button
           type="button"
@@ -22,21 +22,11 @@ export function RecordsBrowseGateway({ onBackToHub, onPick }: RecordsBrowseGatew
         </button>
       </div>
 
-      <div className="mt-6 grid gap-3 md:grid-cols-3">
+      <div className="mt-6 max-w-xl">
         <BrowseCard
-          title="선수 찾기"
-          description="다른 선수의 공개 기록을 이름으로 찾아봐요."
-          onClick={() => onPick('athlete')}
-        />
-        <BrowseCard
-          title="소속 통계 보기"
-          description="팀·학교의 시즌 흐름과 종목 구성을 숫자로 살펴봐요."
+          title="팀 성과 보기"
+          description="팀·학교의 공개 기록을 시즌별 집계로 살펴봐요."
           onClick={() => onPick('team')}
-        />
-        <BrowseCard
-          title="시즌 기록표"
-          description="종목·부문별 기록 모음을 봐요."
-          onClick={() => onPick('season')}
         />
       </div>
     </section>

@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "active_work_id": "persona-led-records-ux-improvement",
+  "works": {
+    "persona-led-records-ux-improvement": {
+      "work_id": "persona-led-records-ux-improvement",
+      "active_plan": ".omo/plans/persona-led-records-ux-improvement.md",
+      "plan_name": "persona-led-records-ux-improvement",
+      "session_ids": ["codex:019e8dc6-097d-7420-9f61-6467e186b94a"],
+      "status": "active",
+      "worktree_path": null
+    }
+  }
+}

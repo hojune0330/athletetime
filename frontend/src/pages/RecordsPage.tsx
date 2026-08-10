@@ -343,20 +343,6 @@ export default function RecordsPage() {
     setSearchParams(next);
   };
 
-  const openBrowseGateway = () => {
-    const next = new URLSearchParams(searchParams);
-    next.set('flow', 'browse');
-    next.delete('step');
-    next.delete('browse');
-    next.delete('mineDraft');
-    next.delete('athlete');
-    next.delete('compare');
-    next.delete('q');
-    setQuery('');
-    setSubmittedQuery('');
-    setSearchParams(next);
-  };
-
   const openBrowseChoice = (choice: BrowseChoice) => {
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'browse');
@@ -472,7 +458,7 @@ export default function RecordsPage() {
           myEntryName={myEntries[0]?.name || ''}
           onOpenMyRecords={showMyRecordsHome}
           onStartMine={openMineStart}
-          onStartBrowse={openBrowseGateway}
+          onOpenTeamPerformance={() => openBrowseChoice('team')}
         >
           <AnonymousInsightCards
             onPickEvent={(key) => {
