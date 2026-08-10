@@ -3,6 +3,7 @@ const { spawn } = require('node:child_process'), assert = require('node:assert/s
 const express = require('express');
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
 const { filters, getSearchResults, makeInsights, makeProfile, makeWorkspacePreview, seasonTable } = require('./records-flow-e2e-data');
+const { startViteWithLock } = require('./records-flow-e2e-startup-lock');
 
 const ROOT = path.join(__dirname, '..', '..');
 const FRONTEND = path.join(ROOT, 'frontend');
@@ -20,7 +21,7 @@ async function withRecordsPage(runScenario, evidence = {}) {
   const state = { page: null, baseUrl: `http://127.0.0.1:${port}`, visited: [], consoleErrors: [], pageErrors: [] };
 
   try {
-    server = await startViteServer(port);
+    server = await startViteWithLock(() => startViteServer(port));
     browser = await chromium.launch({ channel: 'chrome' });
     context = await browser.newContext({ viewport, deviceScaleFactor: 1, isMobile: true });
     state.page = await context.newPage();

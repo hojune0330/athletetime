@@ -1,4 +1,6 @@
 const assert = require('node:assert/strict');
+const os = require('node:os');
+const path = require('node:path');
 const test = require('node:test');
 const {
   expectVisible,
@@ -6,6 +8,32 @@ const {
   shouldWriteEvidence,
   withRecordsPage,
 } = require('./records-flow-e2e-fixture');
+const { createViteStartupLock } = require('./records-flow-e2e-startup-lock');
+
+test('RECORDS-E2E-STARTUP-LOCK Given parallel browser workers When one Vite startup is active Then the next waits until it is released', async () => {
+  const lockPath = path.join(os.tmpdir(), `athletetime-records-e2e-${process.pid}-${Date.now()}.lock`);
+  const acquire = createViteStartupLock(lockPath, { retryMs: 5, timeoutMs: 1_000, staleMs: 1_000 });
+  let releaseFirst = await acquire();
+  let releaseSecond;
+
+  try {
+    let secondAcquired = false;
+    const secondPending = acquire().then((release) => {
+      secondAcquired = true;
+      return release;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    assert.equal(secondAcquired, false);
+
+    await releaseFirst();
+    releaseFirst = null;
+    releaseSecond = await secondPending;
+    assert.equal(secondAcquired, true);
+  } finally {
+    if (releaseFirst) await releaseFirst();
+    if (releaseSecond) await releaseSecond();
+  }
+});
 
 test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do not rewrite tracked evidence', () => {
   assert.equal(shouldWriteEvidence(undefined), false);
@@ -38,6 +66,41 @@ test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When r
     scenario: 'temporary record search failure and retry',
     invocation: 'node --test backend/tests/records-recovery-e2e.test.js',
     expectedConsoleErrors: ['Service Unavailable', 'API response error [503]'],
+  });
+});
+
+test('RECORDS-SEARCH-BUSY-E2E Given a slow public-record search When it waits Then the request state prevents a duplicate submit', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    let searchRequestCount = 0;
+    let releaseResponse = () => {};
+    const responseGate = new Promise((resolve) => { releaseResponse = resolve; });
+    await page.route('**/api/card-studio/analytics/records/search**', async (route) => {
+      searchRequestCount += 1;
+      if (searchRequestCount > 1) {
+        await route.fallback();
+        return;
+      }
+      await responseGate;
+      await route.fallback();
+    });
+
+    try {
+      await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+      const searchForm = page.locator('form[aria-busy="true"]');
+      await expectVisible(searchForm);
+      const statusTexts = await page.locator('[role="status"]').allTextContents();
+      assert.ok(
+        statusTexts.includes('검색 중이에요. 잠시만 기다려 주세요.'),
+        `the pending search should expose an accessible status message; got ${JSON.stringify(statusTexts)}`,
+      );
+      assert.equal(await page.getByRole('button', { name: '검색 중', exact: true }).isDisabled(), true);
+
+      releaseResponse();
+      await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/u }));
+      visited.push(page.url());
+    } finally {
+      releaseResponse();
+    }
   });
 });
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { FormEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getAnalyticsFilters,
@@ -14,7 +14,6 @@ import {
 } from '../api/recordAnalytics';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
 import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
@@ -28,6 +27,7 @@ import { ShareCard } from '../components/record-insights/ShareCard';
 import { useCompareTray } from '../components/record-insights/useCompareTray';
 import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
 import { RecordsHub } from '../components/records/RecordsHub';
+import { RecordSearchForm } from '../components/records/RecordSearchForm';
 import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
 import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
 import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFilter';
@@ -259,13 +259,10 @@ export default function RecordsPage() {
   const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean(selectedAthleteParam);
   const isSharedLinkFallback = Boolean(selectedAthleteParam) && profileState === 'error';
 
-  const handleSearch = (event: FormEvent) => {
-    event.preventDefault();
-    const trimmed = query.trim();
-    if (trimmed.length < 2) return;
-    setSubmittedQuery(trimmed);
+  const handleSearch = (trimmedQuery: string) => {
+    setSubmittedQuery(trimmedQuery);
     const next = new URLSearchParams(searchParams);
-    next.set('q', trimmed);
+    next.set('q', trimmedQuery);
     next.delete('athlete');
     setSearchParams(next);
   };
@@ -528,26 +525,14 @@ export default function RecordsPage() {
 
           {mode === 'athlete' && (
             <>
-              <form onSubmit={handleSearch} className="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <label htmlFor="records-search" className="sr-only">
-                  공개 기록 검색
-                </label>
-                <Input
-                  id="records-search"
-                  ref={searchInputRef}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={isTeamBrowse ? '찾을 소속을 입력하세요' : '이름 또는 소속(예: 홍길동, 서울고)'}
-                  aria-describedby="records-search-help"
-                  className="h-12 border-line bg-white text-base"
-                />
-                <Button type="submit" size="lg" disabled={query.trim().length < 2 || searchState === 'loading'}>
-                  {searchState === 'loading' ? '검색 중' : '검색'}
-                </Button>
-              </form>
-              <p id="records-search-help" className="mt-2 text-xs leading-5 text-ink-4">
-                {isTeamBrowse ? '학교나 팀 이름을 두 글자 이상 입력해 주세요.' : '두 글자 이상 입력하면 검색할 수 있어요.'}
-              </p>
+              <RecordSearchForm
+                query={query}
+                loading={searchState === 'loading'}
+                teamSearch={isTeamBrowse}
+                inputRef={searchInputRef}
+                onQueryChange={setQuery}
+                onSubmit={handleSearch}
+              />
               {isTeamBrowse && (
                 <TeamCategoryFilter selected={teamCategory} onSelect={selectTeamCategory} />
               )}
