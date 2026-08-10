@@ -33,13 +33,17 @@ The following real Chrome-at-375px scenarios pass with no unexpected console or 
 6. Team browse and team detail begin with the latest observed season and remain aggregate-only.
 7. The mobile drawer receives initial focus, contains keyboard focus, and restores focus to its trigger after Escape.
 8. The mobile comparison dock remains the only fixed control during workspace selection.
+9. A slow public-record search announces that it is in progress, disables repeat submission, and shows results after the request completes.
+10. A comparison link with one unavailable profile keeps the available people separate and explains that only their records are shown.
+11. A stale athlete or comparison link returns to record search through one touch-safe recovery action instead of leaving a blank page.
 
 Evidence commands:
 
 ```text
-node --test backend/tests/records-flow-e2e.test.js backend/tests/records-mobile-dock-e2e.test.js
+node --test backend/tests/records-flow-e2e.test.js backend/tests/records-recovery-e2e.test.js backend/tests/records-workspace-e2e.test.js backend/tests/records-mobile-dock-e2e.test.js
 npm.cmd --prefix frontend run type-check
 npm.cmd --prefix frontend run build:check
+npm.cmd test
 ```
 
 ## Product Rules Locked by This Matrix
