@@ -96,6 +96,29 @@ test('STALE-COMPARE-LINK-E2E Given unavailable comparison candidates When the sh
   });
 });
 
+test('STALE-ATHLETE-LINK-E2E Given an unavailable athlete link When it opens Then one action returns to record search', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/records?athlete=missing-one`);
+    await expectVisible(page.getByText('링크의 선수를 못 찾았어요', { exact: true }));
+
+    const recoveryAction = page.getByRole('button', { name: '검색 결과 보기', exact: true });
+    assert.equal(await recoveryAction.count(), 1, 'the broken-link notice should expose one recovery action');
+    const actionBox = await recoveryAction.boundingBox();
+    const actionClass = await recoveryAction.getAttribute('class');
+    assert.ok(
+      actionBox && actionBox.height >= 44,
+      `the shared-link recovery action should be touch-safe; rendered ${actionBox?.height}px (${actionClass})`,
+    );
+    await recoveryAction.click();
+
+    await page.waitForURL(/\/records$/u);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+  }, {
+    expectedConsoleErrors: ['status of 404', 'API response error [404]'],
+  });
+});
+
 test('SAME-NAME-COMPARE-E2E Given separate same-name candidates When their comparison link opens Then both remain renderable without browser errors', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020`);
