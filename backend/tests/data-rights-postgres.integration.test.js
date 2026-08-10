@@ -488,20 +488,21 @@ test('CHAT-MIGRATION-006: Given a reports decoy in another schema When migrating
   const decoy = `decoy_${crypto.randomUUID().replaceAll('-', '')}`;
   await createPreMigrationUsersTable(pool);
   await pool.query(`CREATE SCHEMA ${decoy}`);
-  t.after(async () => {
-    await pool.query(`DROP SCHEMA IF EXISTS ${decoy} CASCADE`);
-  });
-  await pool.query(`CREATE TABLE ${decoy}.reports (id BIGSERIAL PRIMARY KEY, target_type VARCHAR(16) NOT NULL)`);
-  await pool.query(`SET search_path TO ${active}, ${decoy}`);
+  try {
+    await pool.query(`CREATE TABLE ${decoy}.reports (id BIGSERIAL PRIMARY KEY, target_type VARCHAR(16) NOT NULL)`);
+    await pool.query(`SET search_path TO ${active}, ${decoy}`);
 
-  await runMigrations({ pool });
-  await assertChatReportsReady(pool);
-  const decoyColumns = await pool.query(`
-    SELECT column_name FROM information_schema.columns
-    WHERE table_schema = $1 AND table_name = 'reports'
-    ORDER BY ordinal_position
-  `, [decoy]);
-  assert.deepEqual(decoyColumns.rows, [{ column_name: 'id' }, { column_name: 'target_type' }]);
+    await runMigrations({ pool });
+    await assertChatReportsReady(pool);
+    const decoyColumns = await pool.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema = $1 AND table_name = 'reports'
+      ORDER BY ordinal_position
+    `, [decoy]);
+    assert.deepEqual(decoyColumns.rows, [{ column_name: 'id' }, { column_name: 'target_type' }]);
+  } finally {
+    await pool.query(`DROP SCHEMA IF EXISTS ${decoy} CASCADE`);
+  }
 });
 
 test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then requests survive restart without plaintext leakage', {
