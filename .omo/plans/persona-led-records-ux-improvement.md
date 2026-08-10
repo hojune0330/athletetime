@@ -238,7 +238,7 @@ AthleteTime의 핵심 가치는 공개 경기 결과를 `찾기 → 후보 확�
 
 **커밋**: `feat(navigation): add recovery actions to record failures`
 
-- [ ] Task 2.3: 출처·정정 요청의 최소 정보 UX
+- [x] Task 2.3: 출처·정정 요청의 최소 정보 UX
 
 **목적**: 기록의 출처와 한계를 먼저 알리고, 정정 요청은 삭제보다 안전한 교정 흐름으로 이해되게 한다.
 

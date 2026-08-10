@@ -125,7 +125,7 @@ export default function AthleteDetailPage() {
             </p>
           </div>
           <Link
-            to={`${recordCorrectionUrl}?athlete=${encodeURIComponent(profile.name)}`}
+                to={`${recordCorrectionUrl}?${new URLSearchParams({ type: 'correction', athlete: profile.name }).toString()}`}
             className="inline-flex items-center justify-center rounded-xl border border-neutral-900 bg-white px-4 py-2 text-sm font-bold text-neutral-950 hover:bg-neutral-950 hover:text-white"
           >
             내 기록 빼거나 고치기

@@ -50,6 +50,25 @@ test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When r
   });
 });
 
+test('DATA-REQUEST-INTENT-E2E Given a typed request link When the form opens Then it retains only a valid explicit request type', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/data-request?type=deletion&athlete=Alpha%20Kim`);
+    const selectedDeletion = page.locator('button[aria-pressed="true"]');
+    await expectVisible(selectedDeletion);
+    assert.match(await selectedDeletion.textContent() || '', /삭제/u);
+    const prefilledAthleteName = await page.locator('textarea').evaluate((textarea) => (
+      textarea.closest('form')?.querySelector('input')?.value
+    ));
+    assert.equal(prefilledAthleteName, 'Alpha Kim');
+
+    await navigateToReady(page, `${baseUrl}/data-request?type=unknown`);
+    const selectedCorrection = page.locator('button[aria-pressed="true"]');
+    await expectVisible(selectedCorrection);
+    assert.match(await selectedCorrection.textContent() || '', /정정/u);
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given only the record-workspace local storage key is unavailable before the app starts.

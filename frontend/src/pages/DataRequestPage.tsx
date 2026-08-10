@@ -10,7 +10,8 @@
  *   2) 접수 번호로 처리 상태 조회
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import {
@@ -24,6 +25,7 @@ import {
   type DataRequestStatusInfo,
 } from '../api/dataRequests';
 import { CORRECTION_POLICY } from '../config/dataPolicy';
+import { resolveDataRequestType, resolvePrefilledAthleteName } from './dataRequestFormState';
 
 const REQUEST_TYPE_OPTIONS: { value: DataRequestType; label: string; desc: string }[] = [
   { value: 'correction', label: '정정', desc: '기록·소속 등 정보가 사실과 다릅니다' },
@@ -32,8 +34,11 @@ const REQUEST_TYPE_OPTIONS: { value: DataRequestType; label: string; desc: strin
 ];
 
 export default function DataRequestPage() {
-  const [type, setType] = useState<DataRequestType>('deletion');
-  const [athleteName, setAthleteName] = useState('');
+  const [searchParams] = useSearchParams();
+  const requestedType = resolveDataRequestType(searchParams.get('type'));
+  const requestedAthleteName = resolvePrefilledAthleteName(searchParams.get('athlete'));
+  const [type, setType] = useState<DataRequestType>(requestedType);
+  const [athleteName, setAthleteName] = useState(requestedAthleteName);
   const [affiliation, setAffiliation] = useState('');
   const [competition, setCompetition] = useState('');
   const [event, setEvent] = useState('');
@@ -49,6 +54,11 @@ export default function DataRequestPage() {
   const [lookupResult, setLookupResult] = useState<DataRequestStatusInfo | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [lookingUp, setLookingUp] = useState(false);
+
+  useEffect(() => {
+    setType(requestedType);
+    setAthleteName(requestedAthleteName);
+  }, [requestedAthleteName, requestedType]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -165,10 +175,10 @@ export default function DataRequestPage() {
     <div className="mx-auto max-w-article px-4 py-10">
       <header className="mb-6">
         <span className="text-body-sm font-semibold text-brand-500">
-          정정·비노출 요청
+          기록 정정 요청
         </span>
         <h1 className="mt-1 text-h1 font-medium tracking-tighter-3 text-ink">
-          정보 정정 · 삭제 요청
+          기록을 고치거나 숨기고 싶다면
         </h1>
         <p className="mt-2 max-w-frame text-body-sm leading-relaxed text-ink-3">
           AthleteTime은 공개된 경기 결과를 모아 정리한 자료예요. 공식 기록 서비스가 아니에요.
@@ -265,10 +275,15 @@ export default function DataRequestPage() {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={4}
+              aria-describedby="request-sensitive-guidance"
               placeholder="정정/삭제를 요청하시는 사유를 적어 주세요."
               className="flex w-full rounded-md border border-line bg-surface px-3 py-2 text-body text-ink transition-colors placeholder:text-ink-4 focus-visible:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
             />
           </Field>
+
+          <p id="request-sensitive-guidance" className="-mt-2 text-caption leading-relaxed text-ink-4">
+            주민등록번호, 생년월일, 연락처, 사진, 진단서처럼 공개 기록 확인에 필요 없는 개인정보는 적지 마세요.
+          </p>
 
           <Field label="회신용 연락처 (선택)">
             <Input
