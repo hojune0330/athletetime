@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { MyRecordsCard } from '../record-insights/MyRecordsCard';
 import type { MyAthleteEntry } from '../record-insights/useMyAthlete';
+import { createRecordAthleteMineReturnState } from '../../features/record-workspace/recordAthleteNavigationState';
 
 export function DoneStep({
   entries,
@@ -32,7 +33,10 @@ export function DoneStep({
       {hasEntries ? (
         <div className="grid gap-2 sm:grid-cols-3" data-records-sticky-cta="mine-done">
           <Button asChild>
-            <Link to={firstEntry ? `/records?athlete=${encodeURIComponent(firstEntry.athleteKey)}` : '/records'}>
+            <Link
+              state={firstEntry ? createRecordAthleteMineReturnState() : undefined}
+              to={firstEntry ? `/records/athletes/${encodeURIComponent(firstEntry.athleteKey)}` : '/records'}
+            >
               선수 기록 보기
             </Link>
           </Button>

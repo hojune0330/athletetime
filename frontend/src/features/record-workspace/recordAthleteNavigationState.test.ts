@@ -19,4 +19,13 @@ describe('record athlete navigation state', () => {
     expect(resolveRecordAthleteReturnPath({ recordsReturnPath: '/records?flow=mine&browse=athlete&q=Alpha' })).toBeNull()
     expect(resolveRecordAthleteReturnPath({ recordsReturnPath: '/records?flow=browse&browse=athlete&q=A' })).toBeNull()
   })
+
+  it('keeps the finished device-local collection as a safe return destination', () => {
+    // Given the dedicated athlete page opened from the completed collection flow.
+    const state = { recordsReturnPath: '/records?flow=mine&step=done' }
+
+    // When the page resolves the return destination.
+    // Then it restores the completed local collection without carrying an athlete identity through the URL.
+    expect(resolveRecordAthleteReturnPath(state)).toBe('/records?flow=mine&step=done')
+  })
 })

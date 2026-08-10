@@ -182,7 +182,8 @@ test('records collection completion labels the existing athlete detail destinati
   const source = readSource('frontend/src/components/records/RecordsMineDoneStep.tsx');
 
   assert.match(source, /선수 기록 보기/);
-  assert.match(source, /\/records\?athlete=/);
+  assert.match(source, /\/records\/athletes\//);
+  assert.doesNotMatch(source, /\/records\?athlete=/);
   assert.doesNotMatch(source, /기록 카드 공유/);
 });
 

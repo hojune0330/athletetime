@@ -35,6 +35,7 @@ describe('record collection completion empty state', () => {
     );
 
     expect(markup).toContain('선수 기록 보기');
+    expect(markup).toContain('href="/records/athletes/candidate-1"');
     expect(markup).toContain('bg-primary');
     expect(markup).not.toContain('선수 기록 자세히 보기');
   });
