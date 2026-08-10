@@ -20,7 +20,7 @@ export function useMobileDrawerFocus({
   const closeAndRestoreFocus = useCallback(() => {
     onClose()
     const focusTarget = restoreTargetRef.current ?? triggerRef?.current
-    window.requestAnimationFrame(() => focusTarget?.focus())
+    focusTarget?.focus({ preventScroll: true })
   }, [onClose, triggerRef])
 
   useEffect(() => {
