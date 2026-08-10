@@ -41,6 +41,20 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
   assert.equal(shouldWriteEvidence('1'), true);
 });
 
+test('RECORDS-E2E-READINESS-CONTRACT Given no route locator When navigation starts Then it rejects before loading a page', async () => {
+  let gotoCalled = false;
+  const page = {
+    goto: async () => { gotoCalled = true; },
+    waitForFunction: async () => undefined,
+  };
+
+  await assert.rejects(
+    () => navigateToReady(page, 'http://127.0.0.1:4317/records'),
+    /ready locator/u,
+  );
+  assert.equal(gotoCalled, false);
+});
+
 test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When retrying Then the current query runs again', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     let requestCount = 0;
@@ -53,7 +67,7 @@ test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When r
       await route.fallback();
     });
 
-    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`, page.getByRole('alert'));
     await expectVisible(page.getByRole('alert'));
     await expectVisible(page.getByRole('button', { name: '다시 시도', exact: true }));
     await page.getByRole('button', { name: '다시 시도', exact: true }).click();
@@ -85,7 +99,7 @@ test('RECORDS-SEARCH-BUSY-E2E Given a slow public-record search When it waits Th
     });
 
     try {
-      await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+      await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`, page.locator('form[aria-busy="true"]'));
       const searchForm = page.locator('form[aria-busy="true"]');
       await expectVisible(searchForm);
       const statusTexts = await page.locator('[role="status"]').allTextContents();
@@ -106,7 +120,7 @@ test('RECORDS-SEARCH-BUSY-E2E Given a slow public-record search When it waits Th
 
 test('DATA-REQUEST-INTENT-E2E Given a typed request link When the form opens Then it retains only a valid explicit request type', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/data-request?type=deletion&athlete=Alpha%20Kim`);
+    await navigateToReady(page, `${baseUrl}/data-request?type=deletion&athlete=Alpha%20Kim`, page.locator('button[aria-pressed="true"]'));
     const selectedDeletion = page.locator('button[aria-pressed="true"]');
     await expectVisible(selectedDeletion);
     assert.match(await selectedDeletion.textContent() || '', /삭제/u);
@@ -115,7 +129,7 @@ test('DATA-REQUEST-INTENT-E2E Given a typed request link When the form opens The
     ));
     assert.equal(prefilledAthleteName, 'Alpha Kim');
 
-    await navigateToReady(page, `${baseUrl}/data-request?type=unknown`);
+    await navigateToReady(page, `${baseUrl}/data-request?type=unknown`, page.locator('button[aria-pressed="true"]'));
     const selectedCorrection = page.locator('button[aria-pressed="true"]');
     await expectVisible(selectedCorrection);
     assert.match(await selectedCorrection.textContent() || '', /정정/u);
@@ -125,7 +139,7 @@ test('DATA-REQUEST-INTENT-E2E Given a typed request link When the form opens The
 
 test('MOBILE-DRAWER-FOCUS-E2E Given the mobile menu opens When using a keyboard Then focus remains in the drawer and Escape restores its trigger', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records`);
+    await navigateToReady(page, `${baseUrl}/records`, page.locator('[data-records-flow="hub"]'));
     const trigger = page.locator('button[aria-controls="mobile-navigation-drawer"]').first();
     await trigger.click();
     const drawer = page.locator('#mobile-navigation-drawer');
@@ -170,7 +184,7 @@ test('STALE-COMPARE-LINK-E2E Given unavailable comparison candidates When the sh
 
 test('STALE-ATHLETE-LINK-E2E Given an unavailable athlete link When it opens Then one action returns to record search', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records?athlete=missing-one`);
+    await navigateToReady(page, `${baseUrl}/records?athlete=missing-one`, page.getByText('링크의 선수를 못 찾았어요', { exact: true }));
     await expectVisible(page.getByText('링크의 선수를 못 찾았어요', { exact: true }));
 
     const recoveryAction = page.getByRole('button', { name: '검색 결과 보기', exact: true });
@@ -193,7 +207,7 @@ test('STALE-ATHLETE-LINK-E2E Given an unavailable athlete link When it opens The
 
 test('SAME-NAME-COMPARE-E2E Given separate same-name candidates When their comparison link opens Then both remain renderable without browser errors', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020`);
+    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020`, page.locator('text=기록 나란히 보기'));
     await expectVisible(page.locator('text=기록 나란히 보기'));
     await expectVisible(page.getByText(/Seoul High/u));
     await expectVisible(page.getByText(/Seoul Track Club/u));

@@ -12,7 +12,7 @@ const {
 
 test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links Then Track J routing works in a real browser', { timeout: 120_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records`);
+    await navigateToReady(page, `${baseUrl}/records`, page.locator('[data-records-flow="hub"]'));
     visited.push(page.url());
     await expectVisible(page.locator('[data-records-flow="hub"]'));
     assert.equal(await page.locator('#records-search').count(), 0, 'hub renders before the search surface');
@@ -115,7 +115,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('#mine-records-name'));
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?flow=mine&step=name`);
+    await navigateToReady(page, `${baseUrl}/records?flow=mine&step=name`, page.locator('#mine-records-name'));
     await page.locator('#mine-records-name').fill('Missing');
     await page.locator('[data-records-sticky-cta="mine-name"] button').click();
     await page.waitForURL(/step=candidates/);
@@ -139,14 +139,14 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(await limitCandidateButtons.nth(6).isDisabled(), true, 'the seventh candidate is disabled at capacity');
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?flow=browse`);
+    await navigateToReady(page, `${baseUrl}/records?flow=browse`, page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /팀 성과 보기/ }));
     assert.equal(await page.getByRole('button', { name: /선수 찾기/ }).count(), 0);
     assert.equal(await page.getByRole('button', { name: /시즌 기록표/ }).count(), 0);
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?athlete=alpha-2016`);
+    await navigateToReady(page, `${baseUrl}/records?athlete=alpha-2016`, page.locator('text=기록 한눈에'));
     await expectVisible(page.locator('text=Alpha Kim'));
     await expectVisible(page.locator('text=기록 한눈에'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
@@ -162,7 +162,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(copiedRecordLink, `${baseUrl}/records/athletes/alpha-2016`, 'legacy panel shares the canonical athlete page');
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
+    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.locator('[data-record-row]').first());
     await expectVisible(page.locator('[data-record-row]').first());
     await expectVisible(page.getByRole('button', { name: '이 선수 담기', exact: true }));
     await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
@@ -173,7 +173,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records/athletes/missing-athlete`);
+    await navigateToReady(page, `${baseUrl}/records/athletes/missing-athlete`, page.getByRole('heading', { name: '기록을 불러오지 못했어요' }));
     await expectVisible(page.getByRole('heading', { name: '기록을 불러오지 못했어요' }));
     assert.equal(
       await page.getByRole('button', { name: '다시 불러오기', exact: true }).count(),
@@ -187,7 +187,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,beta-2016`);
+    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,beta-2016`, page.locator('text=기록 나란히 보기'));
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
     visited.push(page.url());
@@ -197,7 +197,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
 test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team Then real local aggregates preserve URL state', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given team browse starts without silently selecting a team category.
-    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=team`);
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=team`, page.getByRole('heading', { name: '소속의 기록을 숫자로 살펴봐요.' }));
     await expectVisible(page.getByRole('heading', { name: '소속의 기록을 숫자로 살펴봐요.' }));
     await expectVisible(page.locator('#records-search'));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
