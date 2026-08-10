@@ -572,6 +572,7 @@ export default function RecordsPage() {
           role="alert"
           title="검색을 불러오지 못했습니다"
           description="잠시 후 다시 시도해 주세요."
+          action={<Button type="button" variant="outline" onClick={() => navigate(0)}>다시 시도</Button>}
         />
       )}
 
@@ -621,6 +622,7 @@ export default function RecordsPage() {
             if (!wasMine) showMyRecordsHome();
           }}
           onShowSearchCandidates={showSearchCandidates}
+          onRetry={() => navigate(0)}
           onToggleCompare={() => {
             if (!profile) return;
             toggleProfileComparison(profile);
@@ -665,6 +667,7 @@ export default function RecordsPage() {
             });
             if (!wasMine) showMyRecordsHome();
           }}
+          onRetry={() => navigate(0)}
           onToggleCompare={() => {
             if (!profile) return;
             toggleProfileComparison(profile);
@@ -705,6 +708,7 @@ export default function RecordsPage() {
             setDivisionLevel(nextDivisionLevel);
             setDivisionKey(toDivisionKey(genderKey, nextDivisionLevel));
           }}
+          onRetry={() => navigate(0)}
         />
       )}
 
@@ -753,6 +757,7 @@ function AthletePanel({
   isMyAthlete = false,
   onSetMyAthlete,
   onShowSearchCandidates,
+  onRetry,
   onToggleCompare,
 }: {
   profile: AthleteAnalyticsProfile | null;
@@ -762,6 +767,7 @@ function AthletePanel({
   isMyAthlete?: boolean;
   onSetMyAthlete?: () => void;
   onShowSearchCandidates?: () => void;
+  onRetry?: () => void;
   onToggleCompare?: () => void;
 }) {
   const [showShareCard, setShowShareCard] = useState(false);
@@ -790,6 +796,10 @@ function AthletePanel({
           isSharedLinkFallback && onShowSearchCandidates ? (
             <Button type="button" variant="outline" onClick={onShowSearchCandidates}>
               검색 결과 보기
+            </Button>
+          ) : onRetry ? (
+            <Button type="button" variant="outline" onClick={onRetry}>
+              다시 시도
             </Button>
           ) : undefined
         }
@@ -1018,6 +1028,7 @@ function SeasonPanel({
   onEventChange,
   onGenderChange,
   onDivisionLevelChange,
+  onRetry,
 }: {
   filters: AnalyticsFilters | null;
   season?: number;
@@ -1031,6 +1042,7 @@ function SeasonPanel({
   onEventChange: (eventKey: string) => void;
   onGenderChange: (genderKey: string) => void;
   onDivisionLevelChange: (divisionLevel: string) => void;
+  onRetry: () => void;
 }) {
   const visibleLevelOptions = (filters?.levelOptions || []).filter((item) => {
     if (item.key !== 'unspecified') return true;
@@ -1090,7 +1102,7 @@ function SeasonPanel({
         )}
 
         {state === 'loading' && <NoticeCard role="status" title="시즌 기록표를 불러오는 중입니다" description="모은 기록을 정렬하고 있습니다." />}
-        {state === 'error' && <NoticeCard role="alert" title="시즌 기록표를 불러오지 못했습니다" description="필터를 바꾸거나 다시 시도해 주세요." />}
+        {state === 'error' && <NoticeCard role="alert" title="시즌 기록표를 불러오지 못했습니다" description="필터를 바꾸거나 다시 시도해 주세요." action={<Button type="button" variant="outline" onClick={onRetry}>다시 시도</Button>} />}
 
         {table && state !== 'loading' && (
           <>

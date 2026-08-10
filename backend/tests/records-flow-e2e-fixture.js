@@ -30,7 +30,11 @@ async function withRecordsPage(runScenario, evidence = {}) {
     state.page.on('pageerror', (error) => state.pageErrors.push(error.message));
     await installApiMocks(state.page, teamApiServer.baseUrl);
     await runScenario(state);
-    assert.deepEqual(state.consoleErrors, [], 'browser console should not contain errors');
+    const expectedConsoleErrors = evidence.expectedConsoleErrors || [];
+    const unexpectedConsoleErrors = state.consoleErrors.filter((message) => (
+      !expectedConsoleErrors.some((expected) => message.includes(expected))
+    ));
+    assert.deepEqual(unexpectedConsoleErrors, [], 'browser console should not contain unexpected errors');
     assert.deepEqual(state.pageErrors, [], 'page should not throw errors');
   } finally {
     writeEvidence(state, evidence);

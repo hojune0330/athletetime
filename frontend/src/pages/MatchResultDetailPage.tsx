@@ -129,8 +129,8 @@ export default function MatchResultDetailPage() {
       <div className="py-16">
         <div className="empty-state">
           <div className="empty-state-icon">⚠️</div>
-          <h3 className="empty-state-title">경기 결과를 찾을 수 없습니다</h3>
-          <p className="empty-state-description">요청하신 경기 결과가 존재하지 않습니다.</p>
+          <h3 className="empty-state-title">경기 결과를 불러오지 못했습니다</h3>
+          <p className="empty-state-description">대회 결과 목록에서 다시 확인해 주세요.</p>
           <Button asChild className="mt-4">
             <Link to={`/matchResult/${competitionId}`}>목록으로 돌아가기</Link>
           </Button>

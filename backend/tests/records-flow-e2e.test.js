@@ -17,6 +17,39 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
   assert.equal(shouldWriteEvidence('1'), true);
 });
 
+test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When retrying Then the current query runs again', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    let requestCount = 0;
+    await page.route('**/api/card-studio/analytics/records/search**', async (route) => {
+      requestCount += 1;
+      if (requestCount === 1) {
+        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ success: false }) });
+        return;
+      }
+      await route.fallback();
+    });
+
+    // Given an entered public-search URL fails once at the service boundary.
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+    await expectVisible(page.getByRole('alert'));
+    await expectVisible(page.getByRole('button', { name: '다시 시도', exact: true }));
+
+    // When the person chooses the single recovery action.
+    await page.getByRole('button', { name: '다시 시도', exact: true }).click();
+
+    // Then reload keeps the query in the URL and makes the request again.
+    await page.waitForURL(/q=Alpha/u);
+    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/u }));
+    assert.equal(requestCount, 2);
+    visited.push(page.url());
+  }, {
+    fileName: 'record-search-recovery-e2e-results.json',
+    scenario: 'temporary record search failure and retry',
+    invocation: 'node --test backend/tests/records-flow-e2e.test.js',
+    expectedConsoleErrors: ['Service Unavailable', 'API response error [503]'],
+  });
+});
+
 test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given only the record-workspace local storage key is unavailable before the app starts.

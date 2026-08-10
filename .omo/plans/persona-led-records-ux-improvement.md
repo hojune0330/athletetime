@@ -211,7 +211,7 @@ AthleteTime의 핵심 가치는 공개 경기 결과를 `찾기 → 후보 확�
 
 **커밋**: `feat(workspace): surface local storage recovery state`
 
-- [ ] Task 2.2: 공유·대회·네트워크 실패의 다음 행동 통일
+- [x] Task 2.2: 공유·대회·네트워크 실패의 다음 행동 통일
 
 **목적**: 깨진 링크 또는 부분 실패가 빈 화면·막다른 길이 되지 않게 한다.
 

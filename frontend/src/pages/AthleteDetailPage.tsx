@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CenteredSpinner } from '@/components/ui/loading-state';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowTopRightOnSquareIcon,
   CheckCircleIcon,
@@ -14,6 +14,7 @@ type LoadState = 'loading' | 'ready' | 'not-found' | 'error';
 
 export default function AthleteDetailPage() {
   const { id = '' } = useParams();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<AthleteProfile | null>(null);
   const [state, setState] = useState<LoadState>('loading');
 
@@ -52,17 +53,34 @@ export default function AthleteDetailPage() {
     );
   }
 
-  if (!profile || state === 'not-found') {
+  if (state === 'not-found') {
     return (
       <div className="rounded-[2rem] border border-dashed border-neutral-300 bg-white p-8 text-center">
         <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-neutral-300" />
         <h1 className="mt-5 text-2xl font-black text-neutral-950">선수 기록을 찾지 못했습니다</h1>
         <p className="mt-3 text-sm leading-6 text-neutral-500">
-          검색 비노출 처리 중이거나 아직 인사이트에 묶이지 않은 기록일 수 있습니다.
+          이름과 당시 소속을 함께 넣어 다시 찾아보세요.
         </p>
         <Link to="/records" className="mt-6 inline-flex rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700">
-          검색으로 돌아가기
+          기록 다시 찾기
         </Link>
+      </div>
+    );
+  }
+
+  if (state === 'error' || !profile) {
+    return (
+      <div className="rounded-[2rem] border border-dashed border-neutral-300 bg-white p-8 text-center">
+        <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-neutral-300" />
+        <h1 className="mt-5 text-2xl font-black text-neutral-950">선수 기록을 불러오지 못했습니다</h1>
+        <p className="mt-3 text-sm leading-6 text-neutral-500">연결을 확인하고 다시 시도해 주세요.</p>
+        <button
+          type="button"
+          onClick={() => navigate(0)}
+          className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
