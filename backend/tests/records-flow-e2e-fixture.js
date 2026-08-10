@@ -216,13 +216,17 @@ async function expectVisible(locator) {
 }
 
 async function navigateToReady(page, url, readyLocator) {
+  if (!readyLocator) {
+    throw new TypeError('navigateToReady requires a ready locator');
+  }
+
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () => document.readyState === 'complete' && !document.body?.textContent?.includes('화면을 불러오는 중...'),
     undefined,
     { timeout: 10_000 },
   );
-  if (readyLocator) await expectVisible(readyLocator);
+  await expectVisible(readyLocator);
 }
 
 async function assertCountAtLeast(locator, expected, message) {

@@ -17,6 +17,14 @@
       "session_ids": ["codex:019e8dc6-097d-7420-9f61-6467e186b94a"],
       "status": "completed",
       "worktree_path": null
+    },
+    "records-e2e-route-readiness-contract": {
+      "work_id": "records-e2e-route-readiness-contract",
+      "active_plan": ".omo/plans/records-e2e-route-readiness-contract.md",
+      "plan_name": "records-e2e-route-readiness-contract",
+      "session_ids": ["codex:019e8dc6-097d-7420-9f61-6467e186b94a"],
+      "status": "completed",
+      "worktree_path": null
     }
   }
 }

@@ -17,7 +17,7 @@ test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening s
       });
     });
 
-    await navigateToReady(page, `${baseUrl}/records/workspaces`);
+    await navigateToReady(page, `${baseUrl}/records/workspaces`, page.locator('[data-workspace-storage-status="volatile"]'));
     const blockedStorageResult = await page.evaluate(() => {
       try {
         window.localStorage.getItem('athletetime.recordWorkspaces.v1');
@@ -58,7 +58,7 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
       }],
     });
 
-    await navigateToReady(page, `${baseUrl}/records/workspaces/11111111-1111-4111-8111-111111111111`);
+    await navigateToReady(page, `${baseUrl}/records/workspaces/11111111-1111-4111-8111-111111111111`, page.locator('[data-record-row]').first());
     await expectVisible(page.locator('[data-record-row]').first());
     assert.equal(await page.locator('[data-workspace-storage-status="volatile"]').count(), 0, 'working browser storage does not show a recovery warning');
     assert.equal(new URL(page.url()).searchParams.get('event'), null, 'implicit event selection keeps the saved link clean');
@@ -71,7 +71,7 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
 test('RECORDS-ATHLETE-RETURN-E2E Given an in-app candidate When its detail closes Then the original result context returns without entering the share URL', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     const resultsUrl = `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`;
-    await navigateToReady(page, resultsUrl);
+    await navigateToReady(page, resultsUrl, page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
     await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
     await page.getByRole('button', { name: /Alpha Kim 기록 보기/ }).first().click();
     await page.waitForURL(/\/records\/athletes\/alpha-2016/u);
@@ -79,7 +79,7 @@ test('RECORDS-ATHLETE-RETURN-E2E Given an in-app candidate When its detail close
     await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).click();
     await page.waitForURL(/\/records\?flow=browse&browse=athlete&q=Alpha/u);
     await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
-    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`);
+    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.getByRole('button', { name: '기록 찾기', exact: true }));
     await expectVisible(page.getByRole('button', { name: '기록 찾기', exact: true }));
     assert.equal(await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).count(), 0);
     visited.push(page.url());

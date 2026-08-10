@@ -16,7 +16,7 @@ test('RECORDS-MOBILE-DOCK-E2E Given a saved comparison When workspace selection 
       }]));
     });
 
-    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`, page.getByText('기록 나란히 보기', { exact: true }));
     await expectVisible(page.getByText('기록 나란히 보기', { exact: true }));
 
     await page.getByRole('button', { name: '선수 기록 모아 보기', exact: true }).click();
@@ -37,7 +37,7 @@ test('MOBILE-COMPARE-TRAY-E2E Given two saved candidates When the comparison tra
     });
 
     // Given two separately selected public-record candidates.
-    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`);
+    await navigateToReady(page, `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`, page.getByRole('button', { name: '나란히 보기', exact: true }));
 
     const removeButtons = page.getByRole('button', { name: /비교에서 빼기/u });
     const clearButton = page.getByRole('button', { name: '비우기', exact: true });
