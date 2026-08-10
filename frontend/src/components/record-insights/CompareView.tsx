@@ -7,6 +7,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { COMPARE_MAX } from './useCompareTray';
 import { COMPARE_POLICY, TRUST_NOTICE } from '../../config/dataPolicy';
+import { CompareChart, type CompareChartPoint, type RecordDirection } from './CompareChart';
+import { CompareErrorNotice, CompareInlineNotice } from './CompareNotices';
 
 /**
  * 기록 나란히 보기 (Compare View) — P1-7-2.
@@ -27,7 +29,7 @@ type Loaded = {
   profile: AthleteAnalyticsProfile;
 };
 
-type EventPoint = { date: string; value: number; record: string; competitionName: string; windLegal: boolean };
+type EventPoint = CompareChartPoint & { record: string; competitionName: string; windLegal: boolean };
 
 function pointsFor(profile: AthleteAnalyticsProfile, eventKey: string): EventPoint[] {
   return profile.records
@@ -42,13 +44,11 @@ function pointsFor(profile: AthleteAnalyticsProfile, eventKey: string): EventPoi
       windLegal: r.windLegal,
     }));
 }
-
-function bestFor(points: EventPoint[], direction: 'lower' | 'higher'): EventPoint | null {
+function bestFor(points: EventPoint[], direction: RecordDirection): EventPoint | null {
   if (points.length === 0) return null;
   return points.slice().sort((a, b) => (direction === 'lower' ? a.value - b.value : b.value - a.value))[0];
 }
-
-function directionFor(profile: AthleteAnalyticsProfile, eventKey: string): 'lower' | 'higher' {
+function directionFor(profile: AthleteAnalyticsProfile, eventKey: string): RecordDirection {
   const r = profile.records.find((rr) => rr.eventKey === eventKey);
   return r?.direction === 'higher' ? 'higher' : 'lower';
 }
@@ -108,11 +108,11 @@ export function CompareView({
   }, [commonEvents, activeEvent]);
 
   if (state === 'loading') {
-    return <NoticeBox title="기록을 나란히 정리하는 중이에요" />;
+    return <CompareErrorNotice title="기록을 나란히 정리하는 중이에요" />;
   }
   if (state === 'error') {
     return (
-      <NoticeBox
+      <CompareErrorNotice
         title="나란히 볼 기록을 불러오지 못했어요"
         body="비교에는 2명 이상이 필요해요. 다시 담아 주세요."
         onClose={onClose}
@@ -121,6 +121,14 @@ export function CompareView({
   }
 
   const direction = activeEvent ? directionFor(loaded[0].profile, activeEvent) : 'lower';
+  const chartSeries = loaded.map((item, index) => ({
+    athleteKey: item.athleteKey,
+    name: item.profile.athlete.name,
+    color: LINE_COLORS[index % LINE_COLORS.length],
+    points: pointsFor(item.profile, activeEvent),
+  }));
+  const chartPointCount = chartSeries.flatMap((item) => item.points).length;
+  const canRenderChart = chartPointCount >= 2 && !chartSeries.every((item) => item.points.length < 2);
 
   return (
     <Card>
@@ -136,7 +144,7 @@ export function CompareView({
             <button
               type="button"
               onClick={onClose}
-              className="shrink-0 whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
+              className="min-h-11 shrink-0 whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               닫기
             </button>
@@ -166,7 +174,7 @@ export function CompareView({
         </div>
 
         {commonEvents.length === 0 ? (
-          <NoticeInline title="함께 가진 종목이 없어요" body="같은 종목·같은 단위에서만 나란히 볼 수 있어요." />
+          <CompareInlineNotice title="함께 가진 종목이 없어요" body="같은 종목·같은 단위에서만 나란히 볼 수 있어요." />
         ) : (
           <>
             {/* 공통 종목 선택 */}
@@ -195,7 +203,14 @@ export function CompareView({
             </div>
 
             {/* 오버레이 추이 그래프 */}
-            <CompareChart loaded={loaded} eventKey={activeEvent} direction={direction} />
+            {canRenderChart ? (
+              <CompareChart series={chartSeries} direction={direction} ariaLabel="종목별 기록 흐름 비교" />
+            ) : (
+              <CompareInlineNotice
+                title="흐름을 그리기엔 기록이 적어요"
+                body="이 종목에서 비교 가능한 기록이 한쪽이라도 적어요. 표로만 보여드릴게요."
+              />
+            )}
 
             {/* 선수별 베스트 표 */}
             <div className="overflow-x-auto">
@@ -255,110 +270,5 @@ export function CompareView({
         </p>
       </CardContent>
     </Card>
-  );
-}
-
-function CompareChart({
-  loaded,
-  eventKey,
-  direction,
-}: {
-  loaded: Loaded[];
-  eventKey: string;
-  direction: 'lower' | 'higher';
-}) {
-  const series = loaded.map((l, i) => ({
-    name: l.profile.athlete.name,
-    color: LINE_COLORS[i % LINE_COLORS.length],
-    points: pointsFor(l.profile, eventKey),
-  }));
-
-  const allPoints = series.flatMap((s) => s.points);
-  if (allPoints.length < 2 || series.every((s) => s.points.length < 2)) {
-    return (
-      <NoticeInline
-        title="흐름을 그리기엔 기록이 적어요"
-        body="이 종목에서 비교 가능한 기록이 한쪽이라도 적어요. 표로만 보여드릴게요."
-      />
-    );
-  }
-
-  const W = 640;
-  const H = 200;
-  const PAD = 28;
-  const dates = allPoints.map((p) => new Date(p.date).getTime()).filter((n) => Number.isFinite(n));
-  const values = allPoints.map((p) => p.value);
-  const minX = Math.min(...dates);
-  const maxX = Math.max(...dates);
-  const minV = Math.min(...values);
-  const maxV = Math.max(...values);
-  const spanX = maxX - minX || 1;
-  const spanV = maxV - minV || 1;
-
-  // y: 화면상 위가 "좋은 기록"이 되도록 방향 반영(평가가 아니라 가독성 목적, 색은 중립).
-  const xFor = (t: number) => PAD + ((t - minX) / spanX) * (W - PAD * 2);
-  const yFor = (v: number) => {
-    const norm = (v - minV) / spanV; // 0..1
-    const up = direction === 'lower' ? norm : 1 - norm;
-    return PAD + up * (H - PAD * 2);
-  };
-
-  return (
-    <div className="overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="종목별 기록 흐름 비교">
-        {series.map((s) => {
-          const pts = s.points
-            .map((p) => ({ x: xFor(new Date(p.date).getTime()), y: yFor(p.value) }))
-            .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
-          if (pts.length === 0) return null;
-          const d = pts.map((p, idx) => `${idx === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-          return (
-            <g key={s.name}>
-              {pts.length >= 2 ? <path d={d} fill="none" stroke={s.color} strokeWidth={2} /> : null}
-              {pts.map((p, idx) => (
-                <circle key={idx} cx={p.x} cy={p.y} r={3} fill={s.color} />
-              ))}
-            </g>
-          );
-        })}
-      </svg>
-      <div className="mt-1 flex flex-wrap gap-3">
-        {series.map((s) => (
-          <span key={s.name} className="inline-flex items-center gap-1.5 text-xs text-ink-3">
-            <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: s.color }} />
-            {s.name}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function NoticeBox({ title, body, onClose }: { title: string; body?: string; onClose?: () => void }) {
-  return (
-    <Card>
-      <CardContent className="py-8 text-center">
-        <p className="text-sm font-medium text-ink">{title}</p>
-        {body ? <p className="mt-1 text-xs text-ink-3">{body}</p> : null}
-        {onClose ? (
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-3 whitespace-nowrap rounded-lg border border-line px-3 py-1.5 text-sm text-ink-3 transition hover:bg-surface-2"
-          >
-            닫기
-          </button>
-        ) : null}
-      </CardContent>
-    </Card>
-  );
-}
-
-function NoticeInline({ title, body }: { title: string; body?: string }) {
-  return (
-    <div className="rounded-lg border border-line bg-surface-2 px-4 py-6 text-center">
-      <p className="text-sm font-medium text-ink">{title}</p>
-      {body ? <p className="mt-1 text-xs text-ink-3">{body}</p> : null}
-    </div>
   );
 }

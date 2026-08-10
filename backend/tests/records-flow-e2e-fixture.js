@@ -80,7 +80,12 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
   }
   if (pathname.includes('/analytics/athletes/')) {
     const key = decodeURIComponent(pathname.split('/').pop() || '');
-    return fulfillJson(route, { success: true, data: makeProfile(key) });
+    const profile = makeProfile(key);
+    if (!profile) {
+      await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ success: false, error: 'Not found' }) });
+      return;
+    }
+    return fulfillJson(route, { success: true, data: profile });
   }
   if (pathname.endsWith('/analytics/season-records')) return fulfillJson(route, { success: true, data: seasonTable });
   if (pathname.endsWith('/analytics/insights')) return fulfillJson(route, { success: true, data: makeInsights() });

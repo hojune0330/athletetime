@@ -57,7 +57,8 @@ function getSearchResults(query) {
 }
 
 function makeProfile(key) {
-  const item = athletes.find((candidate) => candidate.athleteKey === key) || athletes[0];
+  const item = athletes.find((candidate) => candidate.athleteKey === key);
+  if (!item) return null;
   const records = [makeRecord(item, 0), makeRecord(item, 1)];
   return {
     athlete: item,

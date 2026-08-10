@@ -92,6 +92,34 @@ test('MOBILE-DRAWER-FOCUS-E2E Given the mobile menu opens When using a keyboard 
   });
 });
 
+test('STALE-COMPARE-LINK-E2E Given unavailable comparison candidates When the shared link opens Then one close action returns to the record hub', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/records?compare=missing-one,missing-two`);
+    await expectVisible(page.getByText('나란히 볼 기록을 불러오지 못했어요', { exact: true }));
+
+    const closeButton = page.getByRole('button', { name: '닫기', exact: true });
+    const closeButtonBox = await closeButton.boundingBox();
+    assert.ok(closeButtonBox && closeButtonBox.height >= 44, 'the recovery action should be touch-safe');
+    await closeButton.click();
+
+    await page.waitForURL(/\/records$/u);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+  }, {
+    expectedConsoleErrors: ['status of 404', 'API response error [404]'],
+  });
+});
+
+test('SAME-NAME-COMPARE-E2E Given separate same-name candidates When their comparison link opens Then both remain renderable without browser errors', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020`);
+    await expectVisible(page.locator('text=기록 나란히 보기'));
+    await expectVisible(page.getByText(/Seoul High/u));
+    await expectVisible(page.getByText(/Seoul Track Club/u));
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given only the record-workspace local storage key is unavailable before the app starts.
