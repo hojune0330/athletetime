@@ -135,6 +135,11 @@ test('MOBILE-DRAWER-FOCUS-E2E Given the mobile menu opens When using a keyboard 
     await page.keyboard.press('Shift+Tab');
     await page.keyboard.press('Shift+Tab');
     assert.equal(await drawer.evaluate((element) => element.contains(document.activeElement)), true);
+    // Closing must restore focus in the same interaction. A later animation frame
+    // can run after the dialog has disappeared, which leaves keyboard users lost.
+    await page.evaluate(() => {
+      window.requestAnimationFrame = () => 0;
+    });
     await page.keyboard.press('Escape');
     await drawer.waitFor({ state: 'detached' });
     assert.equal(await trigger.evaluate((element) => document.activeElement === element), true);
