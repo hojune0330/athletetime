@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-08-10T07:54:45.920Z",
+  "scenario": "records flow e2e",
+  "invocation": "node --test backend/tests/records-flow-e2e.test.js",
+  "baseUrl": "http://127.0.0.1:59771",
+  "viewport": {
+    "width": 375,
+    "height": 667
+  },
+  "visited": [
+    "http://127.0.0.1:59771/records"
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "[FE] ERROR API response error [404] /api/card-studio/analytics/athletes/missing-one: {success: false, error: Not found}",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)",
+    "[FE] ERROR API response error [404] /api/card-studio/analytics/athletes/missing-one: {success: false, error: Not found}"
+  ],
+  "pageErrors": []
+}

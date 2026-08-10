@@ -145,7 +145,11 @@ test('MOBILE-DRAWER-FOCUS-E2E Given the mobile menu opens When using a keyboard 
 
 test('STALE-COMPARE-LINK-E2E Given unavailable comparison candidates When the shared link opens Then one close action returns to the record hub', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records?compare=missing-one,missing-two`);
+    await navigateToReady(
+      page,
+      `${baseUrl}/records?compare=missing-one,missing-two`,
+      page.getByText('나란히 볼 기록을 불러오지 못했어요', { exact: true }),
+    );
     await expectVisible(page.getByText('나란히 볼 기록을 불러오지 못했어요', { exact: true }));
     const closeButton = page.getByRole('button', { name: '닫기', exact: true });
     const closeButtonBox = await closeButton.boundingBox();
@@ -194,8 +198,13 @@ test('SAME-NAME-COMPARE-E2E Given separate same-name candidates When their compa
 
 test('PARTIAL-COMPARE-LINK-E2E Given one unavailable comparison profile When the shared link opens Then available people remain separately usable', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020,missing-one`);
+    await navigateToReady(
+      page,
+      `${baseUrl}/records?compare=alpha-2016,alpha-2020,missing-one`,
+      page.getByText('일부 기록을 불러오지 못했어요', { exact: true }),
+    );
     await expectVisible(page.getByText('일부 기록을 불러오지 못했어요', { exact: true }));
+    await expectVisible(page.getByText('선택한 기록 1개를 불러오지 못했어요. 불러온 기록만 나란히 보여드려요.', { exact: true }));
     await expectVisible(page.getByText(/Seoul High/u));
     await expectVisible(page.getByText(/Seoul Track Club/u));
 
@@ -206,6 +215,28 @@ test('PARTIAL-COMPARE-LINK-E2E Given one unavailable comparison profile When the
       assert.ok(box && box.height >= 44, 'comparison athlete actions should be touch-safe');
       assert.match(await athleteChips.nth(index).getAttribute('class') || '', /focus-visible/u);
     }
+    visited.push(page.url());
+  }, {
+    expectedConsoleErrors: ['status of 404', 'API response error [404]'],
+  });
+});
+
+test('ONE-AVAILABLE-COMPARE-LINK-E2E Given one available comparison profile When the shared link opens Then it explains that comparison cannot start yet', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(
+      page,
+      `${baseUrl}/records?compare=alpha-2016,missing-one`,
+      page.getByText('한 명의 기록만 불러왔어요', { exact: true }),
+    );
+    await expectVisible(page.getByText('한 명의 기록만 불러왔어요', { exact: true }));
+    await expectVisible(page.getByText('나란히 보려면 두 명 이상의 기록이 필요해요. 다시 담아 주세요.', { exact: true }));
+
+    const closeButton = page.getByRole('button', { name: '닫기', exact: true });
+    const closeButtonBox = await closeButton.boundingBox();
+    assert.ok(closeButtonBox && closeButtonBox.height >= 44, 'the recovery action should be touch-safe');
+    await closeButton.click();
+    await page.waitForURL(/\/records$/u);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
     visited.push(page.url());
   }, {
     expectedConsoleErrors: ['status of 404', 'API response error [404]'],
