@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import type { RecordWorkspace, WorkspaceUpdate } from '../storage'
+import type { RecordWorkspace, StorageStatus, WorkspaceUpdate } from '../storage'
 import { Button } from '@/components/ui/button'
 import { AffiliationHistory } from '../components/AffiliationHistory'
 import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
+import { StorageStatusNotice } from '../components/StorageStatusNotice'
 import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceSubjectList } from '../components/WorkspaceSubjectList'
 import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
@@ -34,6 +35,7 @@ export default function RecordWorkspacePage() {
   return (
     <LoadedWorkspacePage
       workspace={workspace}
+      storageStatus={store.status}
       onUpdate={(changes) => store.updateWorkspace(workspace.id, changes).ok}
     />
   )
@@ -41,9 +43,11 @@ export default function RecordWorkspacePage() {
 
 function LoadedWorkspacePage({
   onUpdate,
+  storageStatus,
   workspace,
 }: {
   readonly onUpdate: (changes: WorkspaceUpdate) => boolean
+  readonly storageStatus: StorageStatus
   readonly workspace: RecordWorkspace
 }) {
   const [params, setParams] = useSearchParams()
@@ -96,6 +100,7 @@ function LoadedWorkspacePage({
 
   return (
     <WorkspaceShell title={workspace.title}>
+      <StorageStatusNotice status={storageStatus} />
       <section className="border border-line bg-surface p-5 sm:p-7">
         <RecordIdentityHeader
           affiliationCount={preview.affiliations.length}

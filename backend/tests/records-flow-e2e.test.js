@@ -17,6 +17,49 @@ test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do n
   assert.equal(shouldWriteEvidence('1'), true);
 });
 
+test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    // Given only the record-workspace local storage key is unavailable before the app starts.
+    await page.addInitScript(() => {
+      const originalGetItem = Storage.prototype.getItem;
+      Object.defineProperty(Storage.prototype, 'getItem', {
+        configurable: true,
+        value(key) {
+          if (key === 'athletetime.recordWorkspaces.v1') {
+            throw new DOMException('Record workspace storage is blocked.', 'SecurityError');
+          }
+          return originalGetItem.call(this, key);
+        },
+      });
+    });
+
+    // When the saved-record manager is opened with the blocked boundary.
+    await navigateToReady(page, `${baseUrl}/records/workspaces`);
+    const blockedStorageResult = await page.evaluate(() => {
+      try {
+        window.localStorage.getItem('athletetime.recordWorkspaces.v1');
+        return 'available';
+      } catch (error) {
+        return error instanceof DOMException ? error.name : 'unknown';
+      }
+    });
+    assert.equal(blockedStorageResult, 'SecurityError');
+    await expectVisible(page.locator('[data-workspace-storage-status="volatile"]'));
+    await expectVisible(page.getByRole('heading', { name: '기기 저장이 일시적으로 안 돼요' }));
+    await expectVisible(page.getByText('브라우저가 이 기기의 저장을 허용하지 않았어요.', { exact: true }));
+
+    // Then the person gets one safe way back to record search without a console or page error.
+    await page.getByRole('link', { name: '기록 다시 찾기', exact: true }).click();
+    await page.waitForURL(/\/records$/u);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+  }, {
+    fileName: 'workspace-storage-e2e-results.json',
+    scenario: 'blocked workspace storage recovery e2e',
+    invocation: 'node --test backend/tests/records-flow-e2e.test.js',
+  });
+});
+
 test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens without an event Then its loaded records appear immediately', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript((savedWorkspaces) => {
@@ -37,6 +80,7 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
     await navigateToReady(page, `${baseUrl}/records/workspaces/11111111-1111-4111-8111-111111111111`);
 
     await expectVisible(page.locator('[data-record-row]').first());
+    assert.equal(await page.locator('[data-workspace-storage-status="volatile"]').count(), 0, 'working browser storage does not show a recovery warning');
     assert.equal(new URL(page.url()).searchParams.get('event'), null, 'implicit event selection keeps the saved link clean');
     await page.getByRole('button', { name: '종목 목록', exact: true }).click();
     await expectVisible(page.getByText('종목을 고르면', { exact: false }));

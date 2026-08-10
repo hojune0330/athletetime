@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { WorkspaceManagerCard } from '../components/WorkspaceManagerCard'
+import { StorageStatusNotice } from '../components/StorageStatusNotice'
 import type { RecordWorkspace } from '../storage'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 
@@ -88,11 +89,7 @@ export default function RecordWorkspaceManagerPage() {
         </div>
       )}
 
-      {store.status.mode === 'volatile' && (
-        <p className="border border-warn bg-[#F7EDE0] px-4 py-3 text-body-sm leading-5 text-ink-2">
-          지금은 이 탭에서만 볼 수 있어요. 브라우저 저장이 허용되면 다시 저장해 주세요.
-        </p>
-      )}
+      <StorageStatusNotice status={store.status} />
     </div>
   )
 }
