@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useCallback, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { ClockIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../context/AuthContext'
+import { useMobileDrawerFocus } from './useMobileDrawerFocus'
 
 export interface HeaderNavItem {
   path: string
@@ -66,46 +67,13 @@ export default function HeaderMobileDrawer({
     return location.pathname === path || location.pathname.startsWith(path + '/')
   }
 
-  const closeAndRestoreFocus = useCallback(() => {
-    onClose()
-    window.requestAnimationFrame(() => triggerRef?.current?.focus())
-  }, [onClose, triggerRef])
-
-  useEffect(() => {
-    if (!open) return
-
-    const focusFrame = window.requestAnimationFrame(() => {
-      closeButtonRef.current?.focus()
-    })
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        closeAndRestoreFocus()
-        return
-      }
-      if (event.key !== 'Tab') return
-
-      const focusable = getFocusableElements(drawerRef.current)
-      const first = focusable.at(0)
-      const last = focusable.at(-1)
-      if (!first || !last) return
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.cancelAnimationFrame(focusFrame)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [open, closeAndRestoreFocus])
+  const closeAndRestoreFocus = useMobileDrawerFocus({
+    open,
+    onClose,
+    triggerRef,
+    drawerRef,
+    closeButtonRef,
+  })
 
   const handleLogout = async () => {
     onClose()
@@ -263,10 +231,4 @@ export default function HeaderMobileDrawer({
       </div>
     </>
   )
-}
-
-function getFocusableElements(root: HTMLDivElement | null): HTMLElement[] {
-  if (!root) return []
-  return [...root.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
-    .filter((element) => element.tabIndex >= 0 && !element.hasAttribute('aria-hidden'))
 }

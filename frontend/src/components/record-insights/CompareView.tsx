@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { COMPARE_MAX } from './useCompareTray';
 import { COMPARE_POLICY, TRUST_NOTICE } from '../../config/dataPolicy';
 import { CompareChart, type CompareChartPoint, type RecordDirection } from './CompareChart';
+import { CompareBestTable, type CompareBestRow } from './CompareBestTable';
 import { CompareErrorNotice, CompareInlineNotice } from './CompareNotices';
 
 /**
@@ -129,6 +130,19 @@ export function CompareView({
   }));
   const chartPointCount = chartSeries.flatMap((item) => item.points).length;
   const canRenderChart = chartPointCount >= 2 && !chartSeries.every((item) => item.points.length < 2);
+  const bestRows: CompareBestRow[] = loaded.map((item, index) => {
+    const points = pointsFor(item.profile, activeEvent);
+    const years = item.profile.athlete.years.slice().sort((a, b) => a - b);
+    return {
+      athleteKey: item.athleteKey,
+      name: item.profile.athlete.name,
+      color: LINE_COLORS[index % LINE_COLORS.length],
+      best: bestFor(points, direction),
+      recordCount: points.length,
+      period: years.length ? `${years[0]}–${years[years.length - 1]}` : '—',
+    };
+  });
+  const hasPartialProfiles = loaded.length < keys.length;
 
   return (
     <Card>
@@ -156,6 +170,12 @@ export function CompareView({
         <p className="rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs leading-5 text-ink-3">
           {COMPARE_POLICY.ownCentricNotice}
         </p>
+        {hasPartialProfiles ? (
+          <CompareInlineNotice
+            title="일부 기록을 불러오지 못했어요"
+            body="불러온 기록만 나란히 보여드려요. 필요한 기록은 다시 담아 주세요."
+          />
+        ) : null}
 
         {/* 선수 칩 */}
         <div className="flex flex-wrap gap-2">
@@ -164,7 +184,7 @@ export function CompareView({
               key={l.athleteKey}
               type="button"
               onClick={() => onSelectAthlete?.(l.athleteKey)}
-              className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-sm text-ink transition hover:border-line-2"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-sm text-ink transition hover:border-line-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: LINE_COLORS[i % LINE_COLORS.length] }} />
               {l.profile.athlete.name}
@@ -189,7 +209,7 @@ export function CompareView({
                       type="button"
                       onClick={() => setActiveEvent(e.eventKey)}
                       className={[
-                        'rounded-full border px-3 py-1.5 text-sm transition',
+                        'min-h-11 rounded-full border px-3 py-1.5 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2',
                         active
                           ? 'border-brand-500 bg-brand-500 text-white'
                           : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink',
@@ -212,55 +232,7 @@ export function CompareView({
               />
             )}
 
-            {/* 선수별 베스트 표 */}
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[28rem] border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-line text-left text-xs text-ink-4">
-                    <th className="py-2 pr-3 font-medium">선수</th>
-                    <th className="py-2 pr-3 font-medium">모은 기록 중 최고</th>
-                    <th className="py-2 pr-3 font-medium">기록 수</th>
-                    <th className="py-2 font-medium">기간</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {loaded.map((l, i) => {
-                    const pts = pointsFor(l.profile, activeEvent);
-                    const best = bestFor(pts, direction);
-                    const years = (l.profile.athlete.years || []).slice().sort((a, b) => a - b);
-                    return (
-                      <tr key={l.athleteKey} className="border-b border-hair">
-                        <td className="py-2 pr-3">
-                          <span className="inline-flex items-center gap-2">
-                            <span
-                              className="h-2.5 w-2.5 rounded-full"
-                              style={{ backgroundColor: LINE_COLORS[i % LINE_COLORS.length] }}
-                            />
-                            {l.profile.athlete.name}
-                          </span>
-                        </td>
-                        <td className="py-2 pr-3 font-semibold text-ink">
-                          {best ? (
-                            <>
-                              {best.record}
-                              {!best.windLegal ? (
-                                <span className="ml-1.5 text-[11px] text-amber-700">참고용·풍속 초과</span>
-                              ) : null}
-                            </>
-                          ) : (
-                            <span className="text-ink-4">—</span>
-                          )}
-                        </td>
-                        <td className="py-2 pr-3 text-ink-3">{pts.length}건</td>
-                        <td className="py-2 text-ink-3">
-                          {years.length ? `${years[0]}–${years[years.length - 1]}` : '—'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <CompareBestTable rows={bestRows} />
           </>
         )}
 
