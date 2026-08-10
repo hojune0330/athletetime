@@ -8,6 +8,7 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
     setSelectedLane,
     targetTime,
     setTargetTime,
+    hasValidTargetTime,
     lanesData,
     selectedLaneData,
   } = useTrackLaneCalculator();
@@ -19,7 +20,7 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
 
   // 애니메이션 시작
   const startAnimation = useCallback(() => {
-    if (isRunning) return;
+    if (isRunning || !hasValidTargetTime) return;
     setIsRunning(true);
     setProgress(0);
     startTimeRef.current = performance.now();
@@ -39,7 +40,7 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
     };
     
     animationRef.current = requestAnimationFrame(animate);
-  }, [isRunning, targetTime]);
+  }, [hasValidTargetTime, isRunning, targetTime]);
 
   // 애니메이션 일시정지
   const pauseAnimation = useCallback(() => {
@@ -141,37 +142,46 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
         {/* 입력 컨트롤 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="lane-target-time" className="block text-sm font-medium text-gray-700 mb-2">
               🎯 목표 시간 (초)
             </label>
             <input
+              id="lane-target-time"
               type="number"
-              value={targetTime}
-              onChange={(e) => setTargetTime(Number(e.target.value))}
-              min="30"
-              max="120"
+              value={Number.isFinite(targetTime) ? targetTime : ''}
+              onChange={(event) => setTargetTime(event.currentTarget.valueAsNumber)}
+              min="0.1"
               step="0.1"
+              inputMode="decimal"
+              aria-label="400m 목표 시간 (초)"
+              aria-describedby={hasValidTargetTime ? undefined : 'lane-time-error'}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-mono"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="lane-selector" className="block text-sm font-medium text-gray-700 mb-2">
               🏃 레인 선택
             </label>
             <select
+              id="lane-selector"
               value={selectedLane}
               onChange={(e) => setSelectedLane(Number(e.target.value))}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map(lane => (
                 <option key={lane} value={lane}>
-                  {lane}번 레인 ({lanesData[lane-1]?.distance.toFixed(2)}m)
+                  {lane}번 레인 ({lanesData[lane - 1]?.distance.toFixed(2) ?? '—'}m)
                 </option>
               ))}
             </select>
           </div>
         </div>
-        
+        {!hasValidTargetTime ? (
+          <p id="lane-time-error" role="alert" className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            목표 시간은 0보다 크게 입력해 주세요.
+          </p>
+        ) : (
+          <>
         {/* 3D 트랙 시각화 */}
         <div className="track-visualization-container mb-6">
           <div className="track-header">
@@ -413,6 +423,8 @@ export const TrackLaneCalculator: React.FC<{ id?: string }> = ({ id = 'lane-calc
             </p>
           </div>
         </div>
+          </>
+        )}
       </div>
     </div>
   );

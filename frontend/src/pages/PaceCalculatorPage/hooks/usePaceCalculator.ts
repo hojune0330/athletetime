@@ -92,10 +92,12 @@ export function useTargetPaceCalculator() {
 export function useTrackLaneCalculator() {
   const [selectedLane, setSelectedLane] = useState<number>(1);
   const [targetTime, setTargetTime] = useState<number>(60); // 초
+  const hasValidTargetTime = Number.isFinite(targetTime) && targetTime > 0;
   
   const lanesData = useMemo(() => {
+    if (!hasValidTargetTime) return [];
     return calculateAllLanesData(targetTime, selectedLane);
-  }, [targetTime, selectedLane]);
+  }, [hasValidTargetTime, targetTime, selectedLane]);
   
   const selectedLaneData = useMemo(() => {
     return lanesData.find(l => l.isSelected);
@@ -106,6 +108,7 @@ export function useTrackLaneCalculator() {
     setSelectedLane,
     targetTime,
     setTargetTime,
+    hasValidTargetTime,
     lanesData,
     selectedLaneData,
   };

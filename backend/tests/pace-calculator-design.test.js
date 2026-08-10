@@ -138,3 +138,14 @@ test('PACE-UX-007: track-event time input rejects impossible clock values in con
   assert.match(trackEvents, /aria-label="목표 시간 \(초\)"/, 'seconds input has an accessible label');
   assert.match(trackEvents, /aria-pressed=\{event === option\.id\}/, 'the selected event is exposed to assistive technology');
 });
+
+test('PACE-UX-008: lane calculator rejects zero target time before lane math runs', () => {
+  const hook = readSource(`${PACE_DIR}/hooks/usePaceCalculator.ts`);
+  const lane = readSource(`${PACE_DIR}/components/TrackLaneCalculator.tsx`);
+
+  assert.match(hook, /hasValidTargetTime/, 'lane time has an explicit validity boundary');
+  assert.match(hook, /if \(!hasValidTargetTime\) return \[\]/, 'invalid lane time produces no lane data');
+  assert.match(lane, /role="alert"/, 'invalid lane time receives an in-page explanation');
+  assert.match(lane, /aria-label="400m 목표 시간 \(초\)"/, 'lane target-time input has an accessible label');
+  assert.match(lane, /!hasValidTargetTime/, 'the visual result area is gated by valid input');
+});
