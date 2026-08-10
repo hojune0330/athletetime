@@ -1,13 +1,35 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const express = require('express');
+const fs = require('node:fs');
+const path = require('node:path');
 const test = require('node:test');
 const { Pool } = require('pg');
-const { runMigrations } = require('../database/run-migrations');
+const { checksum, legacyChecksums, runMigrations } = require('../database/run-migrations');
 const { PostgresDataRightsRepository } = require('../../card-studio/repositories/postgresDataRightsRepository');
 const { buildImportPlan, importPlan } = require('../../tools/migrate-data-rights-files');
 
-const connectionString = process.env.TEST_DATABASE_URL;
+function disposableTestDatabaseUrl(value, acknowledgement = process.env.TEST_DATABASE_DESTRUCTIVE_OK) {
+  if (!value) return null;
+  if (acknowledgement !== 'yes') {
+    throw new Error('TEST_DATABASE_DESTRUCTIVE_OK=yes is required before PostgreSQL tests can drop schemas');
+  }
+
+  const parsed = new URL(value);
+  const databaseName = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+  const localHosts = new Set(['127.0.0.1', '::1', 'localhost']);
+  if (!localHosts.has(parsed.hostname.toLowerCase()) || !/(?:^|[_-])test(?:[_-]|$)/i.test(databaseName)) {
+    throw new Error('TEST_DATABASE_URL must target a local database whose name includes test');
+  }
+  return value;
+}
+
+const connectionString = disposableTestDatabaseUrl(process.env.TEST_DATABASE_URL);
+const migrationDirectory = path.join(__dirname, '..', 'database');
+
+function migrationChecksum(name) {
+  return checksum(fs.readFileSync(path.join(migrationDirectory, name), 'utf8'));
+}
 
 async function isolatedPool(t) {
   const schema = `rights_${crypto.randomUUID().replaceAll('-', '')}`;
@@ -42,6 +64,112 @@ async function createPreMigrationUsersTable(pool) {
     VALUES ($1, FALSE, '123456', NOW() + INTERVAL '10 minutes')
   `, [userId]);
   return userId;
+}
+
+async function createLegacyCommunityReports(pool, userId) {
+  await pool.query('CREATE TABLE posts (id BIGSERIAL PRIMARY KEY)');
+  await pool.query('CREATE TABLE comments (id BIGSERIAL PRIMARY KEY)');
+  const post = await pool.query('INSERT INTO posts DEFAULT VALUES RETURNING id');
+  const comment = await pool.query('INSERT INTO comments DEFAULT VALUES RETURNING id');
+  await pool.query(`
+    CREATE TABLE reports (
+      id BIGSERIAL PRIMARY KEY,
+      post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
+      comment_id BIGINT REFERENCES comments(id) ON DELETE CASCADE,
+      user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+      reason VARCHAR(50) NOT NULL,
+      description TEXT,
+      status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'rejected')),
+      admin_note TEXT,
+      created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+      reviewed_at TIMESTAMPTZ
+    )
+  `);
+  await pool.query('CREATE INDEX idx_reports_post_id ON reports(post_id)');
+  await pool.query('CREATE INDEX idx_reports_comment_id ON reports(comment_id)');
+  await pool.query('CREATE INDEX idx_reports_user_id ON reports(user_id)');
+  await pool.query('CREATE INDEX idx_reports_status ON reports(status)');
+  await pool.query(`
+    CREATE FUNCTION update_reports_count() RETURNS trigger AS $$
+    BEGIN
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql
+  `);
+  await pool.query(`
+    CREATE TRIGGER reports_count_trigger
+    AFTER INSERT ON reports
+    FOR EACH ROW
+    EXECUTE FUNCTION update_reports_count()
+  `);
+  await pool.query(
+    'INSERT INTO reports (post_id, comment_id, user_id, reason) VALUES ($1, $2, $3, $4)',
+    [post.rows[0].id, comment.rows[0].id, userId, 'legacy-report'],
+  );
+  return { commentId: comment.rows[0].id, postId: post.rows[0].id };
+}
+
+async function recordChatMigration(pool, migrationChecksumValue = migrationChecksum('migration-007-chat.sql')) {
+  await pool.query(`
+    CREATE TABLE athletetime_migrations (
+      name TEXT PRIMARY KEY,
+      checksum CHAR(64) NOT NULL,
+      applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(
+    'INSERT INTO athletetime_migrations (name, checksum) VALUES ($1, $2)',
+    ['migration-007-chat.sql', migrationChecksumValue],
+  );
+}
+
+async function createChatReports(
+  pool,
+  targetCheck = "target_type IN ('post', 'comment', 'chat')",
+  idDefinition = 'BIGSERIAL PRIMARY KEY',
+) {
+  await pool.query(`
+    CREATE TABLE reports (
+      id ${idDefinition},
+      target_type VARCHAR(16) NOT NULL CHECK (${targetCheck}),
+      target_id VARCHAR(64) NOT NULL,
+      reporter_anonymous_id VARCHAR(255) NOT NULL,
+      reason_code VARCHAR(32) NOT NULL,
+      detail TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (target_type, target_id, reporter_anonymous_id)
+    )
+  `);
+}
+
+async function assertChatReportsReady(pool) {
+  const created = await pool.query(`
+    INSERT INTO reports (target_type, target_id, reporter_anonymous_id, reason_code, detail)
+    VALUES ('chat', 'message-1', 'anonymous-1', 'spam', 'fixture')
+    RETURNING id, target_type, target_id, reporter_anonymous_id, reason_code
+  `);
+  assert.deepEqual(created.rows, [{
+    id: '1',
+    target_type: 'chat',
+    target_id: 'message-1',
+    reporter_anonymous_id: 'anonymous-1',
+    reason_code: 'spam',
+  }]);
+  await assert.rejects(
+    pool.query(`
+      INSERT INTO reports (target_type, target_id, reporter_anonymous_id, reason_code)
+      VALUES ('chat', 'message-1', 'anonymous-1', 'spam')
+    `),
+    { code: '23505' },
+  );
+  const indexes = await pool.query(`
+    SELECT indexname
+    FROM pg_indexes
+    WHERE schemaname = current_schema() AND tablename = 'reports'
+    ORDER BY indexname
+  `);
+  assert.equal(indexes.rows.some((row) => row.indexname === 'reports_target_idx'), true);
+  assert.equal(indexes.rows.some((row) => row.indexname === 'reports_created_idx'), true);
 }
 
 async function assertLegacyVerificationWasRetired(pool, userId) {
@@ -146,6 +274,235 @@ test('RIGHTS-PG-003: Given an applied migration that later drifts When restartin
     SELECT COUNT(*)::int AS count FROM athletetime_migrations
   `);
   assert.equal(applied.rows[0].count, beforeDrift.rows[0].count);
+});
+
+test('CHAT-MIGRATION-001: Given legacy community reports When migrating Then records are preserved before chat reports are created', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  const legacy = await createLegacyCommunityReports(pool, userId);
+
+  const firstMigration = await runMigrations({ pool });
+  assert.equal(firstMigration.applied.includes('migration-006a-legacy-reports-isolation.sql'), true);
+  assert.equal(firstMigration.applied.includes('migration-007-chat.sql'), true);
+  assert.equal(firstMigration.applied.includes('migration-008-chat-reports-repair.sql'), true);
+
+  const legacyRows = await pool.query('SELECT post_id, comment_id, user_id, reason FROM legacy_community_reports');
+  assert.deepEqual(legacyRows.rows, [{
+    post_id: legacy.postId,
+    comment_id: legacy.commentId,
+    user_id: userId,
+    reason: 'legacy-report',
+  }]);
+
+  await assertChatReportsReady(pool);
+
+  const secondMigration = await runMigrations({ pool });
+  assert.deepEqual(secondMigration.applied, []);
+});
+
+test('RIGHTS-PG-TEST-GUARD: Given a destructive integration setup When the URL is not explicitly local test-only Then it refuses to run', () => {
+  assert.throws(
+    () => disposableTestDatabaseUrl('postgresql://user:password@db.example.com:5432/athletetime', 'yes'),
+    /local database whose name includes test/i,
+  );
+  assert.throws(
+    () => disposableTestDatabaseUrl('postgresql://user:password@127.0.0.1:5432/athletetime_test', 'no'),
+    /TEST_DATABASE_DESTRUCTIVE_OK=yes/i,
+  );
+  assert.equal(
+    disposableTestDatabaseUrl('postgresql://user:password@127.0.0.1:5432/athletetime_rights_test', 'yes'),
+    'postgresql://user:password@127.0.0.1:5432/athletetime_rights_test',
+  );
+});
+
+test('CHAT-MIGRATION-002: Given recorded 007 with legacy reports When migrating Then 008 creates chat reports without losing legacy rows', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  const legacy = await createLegacyCommunityReports(pool, userId);
+  await recordChatMigration(pool);
+
+  const migrated = await runMigrations({ pool });
+  assert.equal(migrated.applied.includes('migration-006a-legacy-reports-isolation.sql'), true);
+  assert.equal(migrated.applied.includes('migration-007-chat.sql'), false);
+  assert.equal(migrated.applied.includes('migration-008-chat-reports-repair.sql'), true);
+  const legacyRows = await pool.query('SELECT post_id, comment_id, user_id, reason FROM legacy_community_reports');
+  assert.deepEqual(legacyRows.rows, [{
+    post_id: legacy.postId,
+    comment_id: legacy.commentId,
+    user_id: userId,
+    reason: 'legacy-report',
+  }]);
+  await assertChatReportsReady(pool);
+});
+
+test('CHAT-MIGRATION-003: Given recorded 007 without reports When migrating Then 008 creates a usable chat reports table', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  await createPreMigrationUsersTable(pool);
+  await recordChatMigration(pool);
+
+  const migrated = await runMigrations({ pool });
+  assert.equal(migrated.applied.includes('migration-007-chat.sql'), false);
+  assert.equal(migrated.applied.includes('migration-008-chat-reports-repair.sql'), true);
+  await assertChatReportsReady(pool);
+});
+
+test('CHAT-MIGRATION-003A: Given a CRLF-era recorded 007 checksum When migrating Then it upgrades the ledger without replaying 007', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  await createPreMigrationUsersTable(pool);
+  const sql = fs.readFileSync(path.join(migrationDirectory, 'migration-007-chat.sql'), 'utf8');
+  const historicChecksum = [...legacyChecksums(sql)].find((value) => value !== checksum(sql));
+  assert.ok(historicChecksum);
+  await recordChatMigration(pool, historicChecksum);
+
+  const migrated = await runMigrations({ pool });
+  assert.equal(migrated.applied.includes('migration-007-chat.sql'), false);
+  assert.equal(migrated.applied.includes('migration-008-chat-reports-repair.sql'), true);
+  const ledger = await pool.query(
+    "SELECT checksum FROM athletetime_migrations WHERE name = 'migration-007-chat.sql'",
+  );
+  assert.equal(ledger.rows[0].checksum.trim(), checksum(sql));
+  await assertChatReportsReady(pool);
+});
+
+test('CHAT-MIGRATION-003B: Given a chat-shaped table with an expanded target check When migrating Then it refuses the unknown schema', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  await createPreMigrationUsersTable(pool);
+  await createChatReports(pool, "target_type IN ('post', 'comment', 'chat', 'system')");
+
+  await assert.rejects(runMigrations({ pool }), /Unrecognized reports table/i);
+  const table = await pool.query("SELECT to_regclass('reports') AS name");
+  assert.equal(table.rows[0].name, 'reports');
+});
+
+test('CHAT-MIGRATION-003C: Given a recorded 007 and a chat-shaped table without an owned id sequence When migrating Then it leaves the table and ledger untouched', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  await createPreMigrationUsersTable(pool);
+  await recordChatMigration(pool);
+  await createChatReports(pool, "target_type IN ('post', 'comment', 'chat')", 'BIGINT NOT NULL DEFAULT 1 PRIMARY KEY');
+
+  await assert.rejects(runMigrations({ pool }), /Unrecognized reports table/i);
+  const table = await pool.query("SELECT to_regclass('reports') AS name");
+  assert.equal(table.rows[0].name, 'reports');
+  const ledger = await pool.query('SELECT name FROM athletetime_migrations ORDER BY name');
+  assert.deepEqual(ledger.rows, [{ name: 'migration-007-chat.sql' }]);
+});
+
+test('CHAT-MIGRATION-004: Given malformed chat-like reports When migrating Then the transaction leaves it untouched', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  await createPreMigrationUsersTable(pool);
+  await pool.query('CREATE TABLE reports (id BIGSERIAL PRIMARY KEY, target_type VARCHAR(16) NOT NULL)');
+
+  await assert.rejects(runMigrations({ pool }), /Unrecognized reports table/i);
+  const columns = await pool.query(`
+    SELECT column_name FROM information_schema.columns
+    WHERE table_schema = current_schema() AND table_name = 'reports'
+    ORDER BY ordinal_position
+  `);
+  assert.deepEqual(columns.rows, [{ column_name: 'id' }, { column_name: 'target_type' }]);
+  const legacyTable = await pool.query("SELECT to_regclass('legacy_community_reports') AS name");
+  assert.equal(legacyTable.rows[0].name, null);
+  const ledger = await pool.query("SELECT to_regclass('athletetime_migrations') AS name");
+  assert.equal(ledger.rows[0].name, null);
+});
+
+test('CHAT-MIGRATION-005: Given preserved-table collision When migrating Then both legacy tables remain unchanged', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  await createLegacyCommunityReports(pool, userId);
+  await pool.query('CREATE TABLE legacy_community_reports (id BIGINT PRIMARY KEY, marker TEXT NOT NULL)');
+  await pool.query("INSERT INTO legacy_community_reports (id, marker) VALUES (1, 'existing-preservation')");
+
+  await assert.rejects(runMigrations({ pool }), /legacy report object already exists/i);
+  const reportsCount = await pool.query('SELECT COUNT(*)::int AS count FROM reports');
+  const preservedRows = await pool.query('SELECT marker FROM legacy_community_reports');
+  assert.equal(reportsCount.rows[0].count, 1);
+  assert.deepEqual(preservedRows.rows, [{ marker: 'existing-preservation' }]);
+});
+
+test('CHAT-MIGRATION-005A: Given a legacy reports table with a broadened status check When migrating Then it remains untouched', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  await createLegacyCommunityReports(pool, userId);
+  await pool.query('ALTER TABLE reports DROP CONSTRAINT reports_status_check');
+  await pool.query(`
+    ALTER TABLE reports ADD CONSTRAINT reports_status_check
+    CHECK (status IN ('pending', 'reviewed', 'resolved', 'rejected', 'archived'))
+  `);
+
+  await assert.rejects(runMigrations({ pool }), /Unrecognized reports constraints/i);
+  const table = await pool.query("SELECT to_regclass('reports') AS name");
+  assert.equal(table.rows[0].name, 'reports');
+});
+
+test('CHAT-MIGRATION-005B: Given a legacy reports table with a swapped foreign key When migrating Then it remains untouched', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  await createLegacyCommunityReports(pool, userId);
+  await pool.query('ALTER TABLE reports DROP CONSTRAINT reports_post_id_fkey');
+  await pool.query(`
+    ALTER TABLE reports ADD CONSTRAINT reports_post_id_fkey
+    FOREIGN KEY (comment_id) REFERENCES posts(id) ON DELETE CASCADE
+  `);
+
+  await assert.rejects(runMigrations({ pool }), /Unrecognized reports constraints/i);
+  const table = await pool.query("SELECT to_regclass('reports') AS name");
+  assert.equal(table.rows[0].name, 'reports');
+});
+
+test('CHAT-MIGRATION-006: Given a reports decoy in another schema When migrating Then only the active schema is changed', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const active = (await pool.query('SELECT current_schema() AS name')).rows[0].name;
+  const decoy = `decoy_${crypto.randomUUID().replaceAll('-', '')}`;
+  await createPreMigrationUsersTable(pool);
+  await pool.query(`CREATE SCHEMA ${decoy}`);
+  try {
+    await pool.query(`CREATE TABLE ${decoy}.reports (id BIGSERIAL PRIMARY KEY, target_type VARCHAR(16) NOT NULL)`);
+    await pool.query(`SET search_path TO ${active}, ${decoy}`);
+
+    await runMigrations({ pool });
+    await assertChatReportsReady(pool);
+    const decoyColumns = await pool.query(`
+      SELECT column_name FROM information_schema.columns
+      WHERE table_schema = $1 AND table_name = 'reports'
+      ORDER BY ordinal_position
+    `, [decoy]);
+    assert.deepEqual(decoyColumns.rows, [{ column_name: 'id' }, { column_name: 'target_type' }]);
+  } finally {
+    await pool.query(`DROP SCHEMA IF EXISTS ${decoy} CASCADE`);
+  }
 });
 
 test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then requests survive restart without plaintext leakage', {
