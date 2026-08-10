@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
@@ -6,7 +7,7 @@ const {
   createPublicTicket,
   hashPublicTicket,
 } = require('../../card-studio/services/dataRightsCrypto');
-const { listMigrationFiles, migrationPoolOptions } = require('../database/run-migrations');
+const { checksum, legacyChecksums, listMigrationFiles, migrationPoolOptions } = require('../database/run-migrations');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -27,7 +28,25 @@ test('RIGHTS-MIGRATION-001: Given managed migrations When listing Then legacy ad
     'migration-006-auth-recovery-security.sql',
     'migration-006a-legacy-reports-isolation.sql',
     'migration-007-chat.sql',
+    'migration-008-chat-reports-repair.sql',
   ]);
+});
+
+test('RIGHTS-MIGRATION-002: Given identical SQL with Windows line endings When checksumming Then its ledger identity stays stable', () => {
+  assert.equal(
+    checksum('CREATE TABLE reports (id BIGSERIAL PRIMARY KEY);\r\n'),
+    checksum('CREATE TABLE reports (id BIGSERIAL PRIMARY KEY);\n'),
+  );
+});
+
+test('RIGHTS-MIGRATION-003: Given a ledger checksum written before newline normalization When checking Then only known LF or CRLF forms are accepted', () => {
+  const lf = 'CREATE TABLE reports (id BIGSERIAL PRIMARY KEY);\n';
+  const crlf = lf.replace(/\n/g, '\r\n');
+  const accepted = legacyChecksums(lf);
+
+  assert.equal(accepted.has(checksum(lf)), true);
+  assert.equal(accepted.has(crypto.createHash('sha256').update(crlf, 'utf8').digest('hex')), true);
+  assert.equal(accepted.has(crypto.createHash('sha256').update(`${lf}-- altered`, 'utf8').digest('hex')), false);
 });
 
 test('RIGHTS-PRIVACY-001: Given the data-rights schema When inspected Then query text and ticket plaintext have no columns', () => {

@@ -18,7 +18,13 @@ function listMigrationFiles(directory = __dirname) {
 }
 
 function checksum(sql) {
-  return crypto.createHash('sha256').update(sql, 'utf8').digest('hex');
+  return crypto.createHash('sha256').update(sql.replace(/\r\n/g, '\n'), 'utf8').digest('hex');
+}
+
+function legacyChecksums(sql) {
+  const canonical = sql.replace(/\r\n/g, '\n');
+  const digest = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex');
+  return new Set([digest(sql), digest(canonical.replace(/\n/g, '\r\n'))]);
 }
 
 async function runMigrations({ pool, directory = __dirname } = {}) {
@@ -46,8 +52,15 @@ async function runMigrations({ pool, directory = __dirname } = {}) {
       );
 
       if (existing.rowCount > 0) {
-        if (existing.rows[0].checksum !== digest) {
+        const recordedChecksum = existing.rows[0].checksum.trim();
+        if (recordedChecksum !== digest && !legacyChecksums(sql).has(recordedChecksum)) {
           throw new Error(`Applied migration checksum mismatch: ${name}`);
+        }
+        if (recordedChecksum !== digest) {
+          await client.query(
+            'UPDATE athletetime_migrations SET checksum = $2 WHERE name = $1',
+            [name, digest],
+          );
         }
         await validateDataRightsSchemaContract(client, name);
         continue;
@@ -97,4 +110,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { checksum, listMigrationFiles, migrationPoolOptions, runMigrations };
+module.exports = { checksum, legacyChecksums, listMigrationFiles, migrationPoolOptions, runMigrations };

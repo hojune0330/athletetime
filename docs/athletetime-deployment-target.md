@@ -55,10 +55,25 @@
 빈 검증 DB는 아래 순서로만 만든다.
 
 1. 폐기 가능한 새 PostgreSQL 데이터베이스를 만든다.
-2. `backend/database/schema-fixed.sql`로 기본 스키마를 만든다. 이 파일은 기존 테이블을 지우므로 운영 DB에는 실행하지 않는다.
+2. `backend/database/schema-fixed.sql`로 기본 스키마를 만든다. 이 파일은 현재 채팅 신고용 `reports` 구조를 포함하며, 기존 테이블을 지우므로 운영 DB에는 실행하지 않는다.
 3. `migration-001`부터 `migration-003`을 검증 DB에서만 순서대로 적용한다.
 4. `npm run data:rights:schema:migrate`로 `migration-004`부터 현재 마이그레이션을 적용한다.
 5. 계정 가입·로그인·비밀번호 재설정·기록 검색·권리 요청을 실제로 점검한다.
+
+자동 PostgreSQL 통합 테스트는 스키마를 만들고 지우므로, 로컬 검증 DB에서만 `TEST_DATABASE_URL`과 `TEST_DATABASE_DESTRUCTIVE_OK=yes`를 함께 지정한다. 주소가 로컬이 아니거나 DB 이름에 `test`가 없으면 테스트가 시작되지 않는다.
+
+`npm run test:data-rights`는 별도 서버 없이도 PGlite로 `007` 기록 상태, 보존·거절 경로, 새 `reports` 부트스트랩 삽입을 매번 재현한다. GitHub Actions는 같은 테스트를 실제 폐기용 PostgreSQL 서비스에서도 다시 실행한다.
+
+### `reports` 이름 충돌 복구 게이트
+
+과거 커뮤니티 신고 테이블과 현재 채팅 신고 테이블은 모두 `reports`라는 이름을 사용한 이력이 있다. `migration-006a-legacy-reports-isolation.sql`과 `migration-008-chat-reports-repair.sql`은 알려진 과거 구조만 `legacy_community_reports`로 보존하고, 현재 채팅 구조를 확인하거나 새로 만든다. 이미 기록된 `migration-007-chat.sql`의 파일 내용은 바꾸지 않는다.
+
+다음은 코드 반영만으로 운영 실행을 승인하지 않는다.
+
+1. 운영 DB의 백업 식별자와 복원 담당자를 먼저 기록한다.
+2. 운영과 분리된 PostgreSQL에서 같은 마이그레이션 기록 상태를 재현해, 보존된 행 수와 채팅 신고 삽입·조회가 모두 맞는지 확인한다.
+3. `reports` 또는 `legacy_community_reports`가 예상과 다르면 마이그레이션은 중단된다. 이 경우 우회 실행하거나 테이블을 지우지 말고, 스키마 덤프를 근거로 별도 복구 결정을 한다.
+4. 위 확인 결과를 검토한 뒤에만, 승인된 담당자가 별도 유지보수 창에서 운영 실행 여부를 결정한다.
 
 ## 운영 반영 게이트
 

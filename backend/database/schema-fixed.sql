@@ -217,27 +217,17 @@ CREATE INDEX idx_comments_created_at ON comments(created_at);
 -- ============================================
 CREATE TABLE reports (
     id BIGSERIAL PRIMARY KEY,
-    post_id BIGINT REFERENCES posts(id) ON DELETE CASCADE,
-    comment_id BIGINT REFERENCES comments(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    
-    -- 신고 정보
-    reason VARCHAR(50) NOT NULL,
-    description TEXT,
-    
-    -- 처리 상태
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'resolved', 'rejected')),
-    admin_note TEXT,
-    
-    -- 타임스탬프
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP WITH TIME ZONE
+    target_type VARCHAR(16) NOT NULL CHECK (target_type IN ('post', 'comment', 'chat')),
+    target_id VARCHAR(64) NOT NULL,
+    reporter_anonymous_id VARCHAR(255) NOT NULL,
+    reason_code VARCHAR(32) NOT NULL,
+    detail TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (target_type, target_id, reporter_anonymous_id)
 );
 
-CREATE INDEX idx_reports_post_id ON reports(post_id);
-CREATE INDEX idx_reports_comment_id ON reports(comment_id);
-CREATE INDEX idx_reports_user_id ON reports(user_id);
-CREATE INDEX idx_reports_status ON reports(status);
+CREATE INDEX reports_target_idx ON reports(target_type, target_id);
+CREATE INDEX reports_created_idx ON reports(created_at DESC);
 
 -- ============================================
 -- 8. 알림 테이블
@@ -369,35 +359,6 @@ CREATE TRIGGER posts_comments_count_trigger
     AFTER INSERT OR DELETE ON comments
     FOR EACH ROW
     EXECUTE FUNCTION update_post_comments_count();
-
--- 신고 카운터 업데이트
-CREATE OR REPLACE FUNCTION update_reports_count() RETURNS trigger AS $$
-BEGIN
-    IF TG_OP = 'INSERT' THEN
-        IF NEW.post_id IS NOT NULL THEN
-            UPDATE posts SET reports_count = reports_count + 1 WHERE id = NEW.post_id;
-            
-            -- 신고 10건 이상 시 자동 블라인드
-            UPDATE posts SET is_blinded = TRUE, blind_reason = 'auto_reports' 
-            WHERE id = NEW.post_id AND reports_count >= 10;
-        END IF;
-        
-        IF NEW.comment_id IS NOT NULL THEN
-            UPDATE comments SET reports_count = reports_count + 1 WHERE id = NEW.comment_id;
-            
-            -- 신고 5건 이상 시 자동 블라인드
-            UPDATE comments SET is_blinded = TRUE, blind_reason = 'auto_reports' 
-            WHERE id = NEW.comment_id AND reports_count >= 5;
-        END IF;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER reports_count_trigger
-    AFTER INSERT ON reports
-    FOR EACH ROW
-    EXECUTE FUNCTION update_reports_count();
 
 -- ============================================
 -- 유용한 뷰 (Views)
