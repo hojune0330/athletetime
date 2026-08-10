@@ -10,6 +10,11 @@ import { COMPARE_POLICY, TRUST_NOTICE } from '../../config/dataPolicy';
 import { CompareChart, type CompareChartPoint, type RecordDirection } from './CompareChart';
 import { CompareBestTable, type CompareBestRow } from './CompareBestTable';
 import { CompareErrorNotice, CompareInlineNotice } from './CompareNotices';
+import {
+  assertComparisonOutcomeIsExhaustive,
+  resolveComparisonRequestOutcome,
+  type ComparisonRequestOutcome,
+} from './comparisonRequestOutcome';
 
 /**
  * 기록 나란히 보기 (Compare View) — P1-7-2.
@@ -65,28 +70,21 @@ export function CompareView({
 }) {
   const keys = useMemo(() => athleteKeys.slice(0, COMPARE_MAX), [athleteKeys]);
   const [loaded, setLoaded] = useState<Loaded[]>([]);
-  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [outcome, setOutcome] = useState<ComparisonRequestOutcome>({ kind: 'loading' });
   const [activeEvent, setActiveEvent] = useState<string>('');
 
   useEffect(() => {
     let active = true;
-    setState('loading');
-    Promise.all(
-      keys.map((k) =>
-        getAthleteAnalytics(k)
-          .then((profile) => ({ athleteKey: k, profile }))
-          .catch(() => null),
-      ),
-    )
-      .then((results) => {
-        if (!active) return;
-        const ok = results.filter((r): r is Loaded => r !== null);
-        setLoaded(ok);
-        setState(ok.length >= 2 ? 'ready' : 'error');
-      })
-      .catch(() => {
-        if (active) setState('error');
-      });
+    setLoaded([]);
+    setOutcome({ kind: 'loading' });
+    Promise.allSettled(
+      keys.map((athleteKey) => getAthleteAnalytics(athleteKey).then((profile): Loaded => ({ athleteKey, profile }))),
+    ).then((results) => {
+      if (!active) return;
+      const availableProfiles = results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []));
+      setLoaded(availableProfiles);
+      setOutcome(resolveComparisonRequestOutcome(keys.length, availableProfiles.length));
+    });
     return () => {
       active = false;
     };
@@ -108,17 +106,30 @@ export function CompareView({
     }
   }, [commonEvents, activeEvent]);
 
-  if (state === 'loading') {
-    return <CompareErrorNotice title="기록을 나란히 정리하는 중이에요" />;
-  }
-  if (state === 'error') {
-    return (
-      <CompareErrorNotice
-        title="나란히 볼 기록을 불러오지 못했어요"
-        body="비교에는 2명 이상이 필요해요. 다시 담아 주세요."
-        onClose={onClose}
-      />
-    );
+  switch (outcome.kind) {
+    case 'loading':
+      return <CompareErrorNotice title="기록을 나란히 정리하는 중이에요" />;
+    case 'one-available':
+      return (
+        <CompareErrorNotice
+          title="한 명의 기록만 불러왔어요"
+          body="나란히 보려면 두 명 이상의 기록이 필요해요. 다시 담아 주세요."
+          onClose={onClose}
+        />
+      );
+    case 'unavailable':
+      return (
+        <CompareErrorNotice
+          title="나란히 볼 기록을 불러오지 못했어요"
+          body="비교에는 2명 이상이 필요해요. 다시 담아 주세요."
+          onClose={onClose}
+        />
+      );
+    case 'complete':
+    case 'partial':
+      break;
+    default:
+      return assertComparisonOutcomeIsExhaustive(outcome);
   }
 
   const direction = activeEvent ? directionFor(loaded[0].profile, activeEvent) : 'lower';
@@ -142,8 +153,6 @@ export function CompareView({
       period: years.length ? `${years[0]}–${years[years.length - 1]}` : '—',
     };
   });
-  const hasPartialProfiles = loaded.length < keys.length;
-
   return (
     <Card>
       <CardHeader>
@@ -170,10 +179,10 @@ export function CompareView({
         <p className="rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs leading-5 text-ink-3">
           {COMPARE_POLICY.ownCentricNotice}
         </p>
-        {hasPartialProfiles ? (
+        {outcome.kind === 'partial' ? (
           <CompareInlineNotice
             title="일부 기록을 불러오지 못했어요"
-            body="불러온 기록만 나란히 보여드려요. 필요한 기록은 다시 담아 주세요."
+            body={`선택한 기록 ${outcome.unavailableCount}개를 불러오지 못했어요. 불러온 기록만 나란히 보여드려요.`}
           />
         ) : null}
 

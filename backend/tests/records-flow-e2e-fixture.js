@@ -8,7 +8,7 @@ const { startViteWithLock } = require('./records-flow-e2e-startup-lock');
 const ROOT = path.join(__dirname, '..', '..');
 const FRONTEND = path.join(ROOT, 'frontend');
 const VITE_BIN = path.join(FRONTEND, 'node_modules', 'vite', 'bin', 'vite.js');
-const EVIDENCE_DIR = path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
+const EVIDENCE_DIR = process.env.RECORDS_E2E_EVIDENCE_DIR || path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
 const viewport = { width: 375, height: 667 };
 
 
@@ -215,13 +215,14 @@ async function expectVisible(locator) {
   await locator.first().waitFor({ state: 'visible', timeout: 10_000 });
 }
 
-async function navigateToReady(page, url) {
+async function navigateToReady(page, url, readyLocator) {
   await page.goto(url, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(
     () => document.readyState === 'complete' && !document.body?.textContent?.includes('화면을 불러오는 중...'),
     undefined,
     { timeout: 10_000 },
   );
+  if (readyLocator) await expectVisible(readyLocator);
 }
 
 async function assertCountAtLeast(locator, expected, message) {
