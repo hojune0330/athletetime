@@ -1,5 +1,6 @@
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
+import { CandidateContextFacts } from './CandidateContextFacts';
 import type { RecordsLoadState } from './RecordsMineTypes';
 
 const MAX_MINE_SELECTION = 6;
@@ -95,16 +96,10 @@ function CandidateRow({
       className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
         selected ? 'border-brand bg-brand/10' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
       }`}
-    >
+      >
       <span className="min-w-0">
         <span className="block text-lg font-semibold text-ink">{athlete.name}</span>
-        <span className="mt-1 block truncate text-sm text-ink-3">{athlete.team || '소속 미상'}</span>
-        <span className="mt-3 flex flex-wrap gap-1.5">
-          <span className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">{formatYearRange(athlete.years)}</span>
-          {athlete.events.slice(0, 3).map((event) => (
-            <span key={event} className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">{event}</span>
-          ))}
-        </span>
+        <CandidateContextFacts athlete={athlete} />
       </span>
       {selected ? (
         <span
@@ -118,10 +113,4 @@ function CandidateRow({
       )}
     </button>
   );
-}
-
-function formatYearRange(years: readonly number[]) {
-  if (!years.length) return '연도 미상';
-  if (years.length === 1) return String(years[0]);
-  return `${years[0]}-${years[years.length - 1]}`;
 }

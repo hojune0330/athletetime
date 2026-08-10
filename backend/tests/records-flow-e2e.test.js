@@ -93,6 +93,9 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
 
     const candidateButtons = page.locator('[data-records-step="mine-candidates"] button[aria-pressed]');
     await assertCountAtLeast(candidateButtons, 2, 'candidate step should render API-backed candidates');
+    await expectVisible(page.getByText('기록에 적힌 소속', { exact: true }).first());
+    await expectVisible(page.getByText('확인된 기간', { exact: true }).first());
+    await expectVisible(page.getByText('출처 범위', { exact: true }).first());
     await candidateButtons.filter({ hasText: 'Seoul High' }).click();
     await expectUrlParam(page, 'mineDraft', 'alpha-2016');
     await waitForSelectedCandidateCount(page, 1);
@@ -115,6 +118,8 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.locator('[data-records-sticky-cta="mine-candidates"] button').click();
     await page.waitForURL(/step=confirm/);
     await expectVisible(page.locator('[data-records-step="mine-confirm"]'));
+    await expectVisible(page.getByText('기록에 적힌 소속', { exact: true }).first());
+    await expectVisible(page.getByText('종목', { exact: true }).first());
     assert.equal(await page.locator('[data-records-step="mine-confirm"] button[aria-pressed]').count(), 2);
 
     await page.locator('[data-records-step="mine-confirm"] button[aria-pressed]').first().click();

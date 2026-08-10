@@ -66,6 +66,28 @@ describe('record collection empty search state', () => {
     expect(markup).toContain('1명 선택됨 / 최대 6명')
   })
 
+  it('labels every candidate fact so same-name visitors can compare context before selecting', () => {
+    // Given a same-name candidate with observed team, period, event, and public-source scope.
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={selectionLimitCandidates.slice(0, 1)}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[]}
+        state="ready"
+      />,
+    )
+
+    // When the candidate is rendered.
+    // Then each fact keeps its meaning instead of appearing as an unlabeled, merge-like summary.
+    expect(markup).toContain('기록에 적힌 소속')
+    expect(markup).toContain('확인된 기간')
+    expect(markup).toContain('종목')
+    expect(markup).toContain('출처 범위')
+    expect(markup).toContain('공개 경기 결과')
+  })
+
   it('keeps a visible keyboard focus indicator on a selectable athlete', () => {
     // Given a ready candidate search with one selectable athlete.
     const markup = renderToStaticMarkup(

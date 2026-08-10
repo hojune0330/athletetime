@@ -1,5 +1,6 @@
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
+import { CandidateContextFacts } from './CandidateContextFacts';
 
 export function ConfirmStep({
   selectedAthletes,
@@ -42,9 +43,8 @@ export function ConfirmStep({
             >
               <span className="min-w-0">
                 <span className="block font-semibold text-ink">{athlete.name}</span>
-                <span className="mt-1 block truncate text-sm text-ink-3">
-                  {athlete.team || '소속 미상'} · {formatYearRange(athlete.years)} · 기록 {athlete.recordCount}건
-                </span>
+                <CandidateContextFacts athlete={athlete} />
+                <span className="mt-3 block text-xs text-ink-3">공개 기록 {athlete.recordCount}건</span>
               </span>
               <span className="shrink-0 text-sm font-semibold text-brand">빼기</span>
             </button>
@@ -70,10 +70,4 @@ export function ConfirmStep({
       )}
     </div>
   );
-}
-
-function formatYearRange(years: readonly number[]) {
-  if (!years.length) return '연도 미상';
-  if (years.length === 1) return String(years[0]);
-  return `${years[0]}-${years[years.length - 1]}`;
 }
