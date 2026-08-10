@@ -96,6 +96,16 @@ test('CALC-DS-005: calculator copy keeps trust tone', () => {
   }
 });
 
+test('CALC-UX-006: required calculator inputs keep validation inside the page', () => {
+  const page = readSource(`${CALC_DIR}/index.tsx`);
+
+  // Given an athlete misses a required input.
+  // When they ask to generate a plan.
+  // Then the page announces the issue without a browser dialog that blocks the flow.
+  assert.match(page, /role="alert"/, 'validation errors are announced in the page');
+  assert.doesNotMatch(page, /\balert\(/, 'browser alerts do not block calculator validation');
+});
+
 test('CALC-ROUTE-001: legacy calculators route opens the training calculator instead of 404', () => {
   const app = readSource('frontend/src/App.tsx');
 

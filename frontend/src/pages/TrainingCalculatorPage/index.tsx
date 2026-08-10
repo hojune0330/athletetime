@@ -40,16 +40,12 @@ const TrainingCalculatorPage: React.FC = () => {
     const result = calculate();
     
     if (!result.success) {
-      // 에러 타입에 따라 alert 표시 및 포커싱
       if (result.errorType === 'gender') {
-        alert('성별을 선택해주세요.');
         genderSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (result.errorType === 'distance') {
-        alert('종목을 선택해주세요.');
         distanceSelectRef.current?.focus();
         distanceSelectRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (result.errorType === 'time') {
-        alert('기록을 입력해주세요.');
         timeInputRef.current?.focus();
         timeInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
