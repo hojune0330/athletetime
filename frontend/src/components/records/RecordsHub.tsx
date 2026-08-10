@@ -5,7 +5,7 @@ type RecordsHubProps = {
   readonly myEntryName: string;
   readonly onOpenMyRecords: () => void;
   readonly onStartMine: () => void;
-  readonly onStartBrowse: () => void;
+  readonly onOpenTeamPerformance: () => void;
   readonly children?: ReactNode;
 };
 
@@ -14,7 +14,7 @@ export function RecordsHub({
   myEntryName,
   onOpenMyRecords,
   onStartMine,
-  onStartBrowse,
+  onOpenTeamPerformance,
   children,
 }: RecordsHubProps) {
   return (
@@ -23,10 +23,10 @@ export function RecordsHub({
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-brand">공개 기록 모아보기</p>
           <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-            내 기록, 이름만 알면 찾아요.
+            공개 기록, 이름만 알면 찾아요.
           </h1>
           <p className="mt-3 text-sm leading-6 text-ink-3">
-            먼저 내 기록을 찾을지, 다른 선수와 시즌 기록을 둘러볼지 고르세요.
+            찾는 선수 기록을 이름과 소속으로 확인한 뒤, 원하는 후보만 모아 보세요.
           </p>
         </div>
 
@@ -37,9 +37,9 @@ export function RecordsHub({
             className="mt-6 flex w-full items-center justify-between gap-3 border border-brand border-l-4 bg-brand/5 px-4 py-3 text-left transition hover:bg-brand/10"
           >
             <span className="min-w-0 truncate text-sm text-ink">
-              <span className="font-bold text-brand">이 기기의 내 기록</span>
+              <span className="font-bold text-brand">이 기기에서 만든 기록 모음</span>
               <span className="ml-2 font-semibold">{myEntryName || '이름 미상'}</span>
-              <span className="ml-2 text-ink-4">{myEntriesCount}개 묶음</span>
+              <span className="ml-2 text-ink-4">{myEntriesCount}명 담음</span>
             </span>
             <span className="shrink-0 text-sm font-semibold text-brand">이어보기</span>
           </button>
@@ -47,15 +47,15 @@ export function RecordsHub({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <FlowChoiceCard
-            title="내 기록 찾기"
-            description="이름만 입력하면 흩어진 내 기록을 단계별로 모아요."
+            title="이름 또는 소속으로 기록 찾기"
+            description="이름과 소속을 확인해 공개 기록 후보를 직접 고르세요."
             primary
             onClick={onStartMine}
           />
           <FlowChoiceCard
-            title="기록 둘러보기"
-            description="선수·팀·시즌 기록표를 한 단계씩 찾아봐요."
-            onClick={onStartBrowse}
+            title="팀 성과 보기"
+            description="팀·학교의 공개 기록을 집계로 살펴봐요."
+            onClick={onOpenTeamPerformance}
           />
         </div>
       </section>

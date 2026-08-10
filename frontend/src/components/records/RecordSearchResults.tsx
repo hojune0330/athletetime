@@ -1,23 +1,21 @@
 import { useMemo, useState } from 'react';
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
+import { RecordSearchFilterChips } from './RecordSearchFilterChips';
+import { RecordSearchResultCard } from './RecordSearchResultCard';
+import { buildRecordSearchOptions, countSameName } from './recordSearchHelpers';
 
-type Props = {
-  athletes: AthleteSearchCard[];
-  query: string;
-  selectedAthleteKey: string;
-  compareNotice: string;
-  isInCompareTray: (athleteKey: string) => boolean;
-  onSelectAthlete: (athleteKey: string) => void;
-  onToggleCompare: (athlete: AthleteSearchCard) => void;
-  isMine: (athleteKey: string) => boolean;
-  onToggleMine: (athlete: AthleteSearchCard) => void;
-  myCount: number;
-  onViewMyRecords: () => void;
-};
-
-type FilterOption = {
-  label: string;
-  count: number;
+type RecordSearchResultsProps = {
+  readonly athletes: readonly AthleteSearchCard[];
+  readonly query: string;
+  readonly selectedAthleteKey: string;
+  readonly compareNotice: string;
+  readonly isInCompareTray: (athleteKey: string) => boolean;
+  readonly onSelectAthlete: (athleteKey: string) => void;
+  readonly onToggleCompare: (athlete: AthleteSearchCard) => void;
+  readonly isMine: (athleteKey: string) => boolean;
+  readonly onToggleMine: (athlete: AthleteSearchCard) => void;
+  readonly myCount: number;
+  readonly onViewMyRecords: () => void;
 };
 
 export function RecordSearchResults({
@@ -32,13 +30,13 @@ export function RecordSearchResults({
   onToggleMine,
   myCount,
   onViewMyRecords,
-}: Props) {
+}: RecordSearchResultsProps) {
   const [eventFilter, setEventFilter] = useState('');
   const [teamFilter, setTeamFilter] = useState('');
 
-  const eventOptions = useMemo(() => buildOptions(athletes.flatMap((athlete) => athlete.events)), [athletes]);
+  const eventOptions = useMemo(() => buildRecordSearchOptions(athletes.flatMap((athlete) => athlete.events)), [athletes]);
   const teamOptions = useMemo(
-    () => buildOptions(athletes.flatMap((athlete) => athlete.teams.length > 0 ? athlete.teams : [athlete.team])),
+    () => buildRecordSearchOptions(athletes.flatMap((athlete) => athlete.teams.length > 0 ? athlete.teams : [athlete.team])),
     [athletes],
   );
 
@@ -62,7 +60,7 @@ export function RecordSearchResults({
             <p className="text-sm font-semibold text-ink">후보를 좁혀보세요</p>
             <p className="mt-1 text-xs leading-5 text-ink-4">
               {sameNameCount >= 2
-                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 소속·연도·종목을 확인한 뒤 원하는 카드만 "이 기록 담기"로 모아 보세요.`
+                ? `이름이 같은 선수가 ${sameNameCount}명 보여요. 소속·연도·종목을 확인한 뒤 원하는 선수만 "이 선수 담기"로 모아 보세요.`
                 : '이름이 같은 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'}
             </p>
           </div>
@@ -71,13 +69,13 @@ export function RecordSearchResults({
           </p>
         </div>
 
-        <FilterChips
+        <RecordSearchFilterChips
           title="종목으로 좁히기"
           options={eventOptions}
           selected={eventFilter}
           onSelect={setEventFilter}
         />
-        <FilterChips
+        <RecordSearchFilterChips
           title="소속으로 좁히기"
           options={teamOptions}
           selected={teamFilter}
@@ -92,7 +90,7 @@ export function RecordSearchResults({
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {filteredAthletes.map((athlete) => (
-            <AthleteResultCard
+            <RecordSearchResultCard
               key={athlete.athleteKey}
               athlete={athlete}
               selected={selectedAthleteKey === athlete.athleteKey}
@@ -112,190 +110,18 @@ export function RecordSearchResults({
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-brand bg-surface px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
             <p className="min-w-0 truncate text-sm text-ink">
-              <span className="font-semibold text-brand">내가 모아 보는 기록</span>에 {myCount}개 묶음 담김 — 이 기기에서만 모아 봐요
+              <span className="font-semibold text-brand">기록 모음</span>에 선수 {myCount}명 담김 — 이 기기에서만 모아 봐요
             </p>
             <button
               type="button"
               onClick={onViewMyRecords}
-              className="shrink-0 border border-brand bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+              className="min-h-11 shrink-0 border border-brand bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
             >
-              모아 보는 기록 보기
+              기록 모음 보기
             </button>
           </div>
         </div>
       )}
     </section>
   );
-}
-
-function FilterChips({
-  title,
-  options,
-  selected,
-  onSelect,
-}: {
-  title: string;
-  options: FilterOption[];
-  selected: string;
-  onSelect: (value: string) => void;
-}) {
-  if (options.length === 0) return null;
-
-  return (
-    <div className="mt-4">
-      <p className="text-xs font-semibold text-ink-3">{title}</p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <button
-          type="button"
-          aria-pressed={!selected}
-          onClick={() => onSelect('')}
-          className={filterClass(!selected)}
-        >
-          전체
-        </button>
-        {options.slice(0, 8).map((option) => (
-          <button
-            key={option.label}
-            type="button"
-            aria-pressed={selected === option.label}
-            onClick={() => onSelect(option.label)}
-            className={filterClass(selected === option.label)}
-          >
-            {option.label}
-            <span className="ml-1 font-mono text-[10px] opacity-65">{option.count}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AthleteResultCard({
-  athlete,
-  selected,
-  inTray,
-  mine,
-  onSelect,
-  onToggleCompare,
-  onToggleMine,
-}: {
-  athlete: AthleteSearchCard;
-  selected: boolean;
-  inTray: boolean;
-  mine: boolean;
-  onSelect: () => void;
-  onToggleCompare: () => void;
-  onToggleMine: () => void;
-}) {
-  const isHomonym = athlete.ambiguity === 'name_team' || athlete.ambiguity === 'name';
-
-  return (
-    <div
-      className={`relative border p-4 transition-colors ${
-        mine
-          ? 'border-brand bg-brand/10'
-          : selected
-            ? 'border-brand bg-brand/5'
-            : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
-      }`}
-    >
-      {mine && (
-        <span className="absolute right-3 top-3 border border-brand bg-brand px-2 py-0.5 text-[11px] font-semibold text-white">
-          ✓ 내가 모아 보는 기록에 담김
-        </span>
-      )}
-      <button type="button" onClick={onSelect} className="block w-full text-left">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-ink">{athlete.name}</h2>
-            <p className="mt-1 text-sm text-ink-3">{athlete.team || '소속 미상'}</p>
-          </div>
-          {!mine && <span className="font-mono text-xs text-ink-4">기록 {athlete.recordCount}건</span>}
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          <span className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">
-            {formatYearRange(athlete.years)}
-          </span>
-          {athlete.events.slice(0, 3).map((event) => (
-            <span key={event} className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">
-              {event}
-            </span>
-          ))}
-        </div>
-
-        {isHomonym ? (
-          <p className="mt-3 text-xs text-warn">
-            이 소속·연도의 기록만 모았어요. 같은 이름의 다른 선수일 수 있어요.
-          </p>
-        ) : (
-          <p className="mt-2 text-xs text-ink-4">공개 기록 모음 · 공식 기록 아님</p>
-        )}
-        <span className="mt-4 inline-flex text-sm font-semibold text-brand">이 기록 보기</span>
-      </button>
-
-      <button
-        type="button"
-        onClick={onToggleMine}
-        aria-pressed={mine}
-        className={`mt-3 flex w-full items-center justify-center gap-1.5 border px-3 py-2.5 text-sm font-semibold transition ${
-          mine
-            ? 'border-brand-500 bg-brand-500 text-white'
-            : 'border-brand-500 bg-surface text-brand hover:bg-brand-50'
-        }`}
-      >
-        {mine ? '✓ 내가 모아 보는 기록에 담김 — 누르면 빼요' : '이 기록 담기'}
-      </button>
-      <button
-        type="button"
-        onClick={onToggleCompare}
-        className={`mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-          inTray
-            ? 'border-brand-500 bg-brand-500 text-white'
-            : 'border-line bg-surface-2 text-ink-3 hover:border-brand-500/50 hover:text-ink'
-        }`}
-      >
-        {inTray ? '✓ 비교에 담음' : '+ 비교에 담기'}
-      </button>
-    </div>
-  );
-}
-
-function buildOptions(values: string[]): FilterOption[] {
-  const counts = new Map<string, number>();
-  for (const raw of values) {
-    const label = raw.trim();
-    if (!label || label === '소속 미상' || label === '종목 미상') continue;
-    counts.set(label, (counts.get(label) ?? 0) + 1);
-  }
-
-  return Array.from(counts.entries())
-    .map(([label, count]) => ({ label, count }))
-    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'ko-KR'));
-}
-
-function filterClass(active: boolean): string {
-  return active
-    ? 'border border-brand bg-brand px-3 py-1.5 text-xs font-semibold text-white'
-    : 'border border-line bg-surface-2 px-3 py-1.5 text-xs font-medium text-ink-3 hover:border-line-2 hover:text-ink';
-}
-
-function formatYearRange(years: number[]) {
-  if (!years.length) return '연도 미상';
-  if (years.length === 1) return String(years[0]);
-  return `${years[0]}-${years[years.length - 1]}`;
-}
-
-function countSameName(athletes: AthleteSearchCard[], query: string): number {
-  const norm = (value: string) => value.replace(/\s+/g, '').trim();
-  const normalizedQuery = norm(query);
-  if (!normalizedQuery) {
-    const counts = new Map<string, number>();
-    for (const athlete of athletes) {
-      const key = norm(athlete.name);
-      counts.set(key, (counts.get(key) ?? 0) + 1);
-    }
-    return Math.max(0, ...counts.values());
-  }
-  return athletes.filter((athlete) => norm(athlete.name) === normalizedQuery).length;
 }

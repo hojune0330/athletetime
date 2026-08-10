@@ -59,9 +59,9 @@ function readSnapshot(store: ReturnType<typeof createBrowserStore>): StoreSnapsh
   return {
     comparison: store.getComparison(),
     selfClaimDraft: store.getSelfClaimDraft(),
-    status: store.getStatus(),
     workspaceDraft: store.getWorkspaceDraft(),
     workspaces: store.listWorkspaces(),
+    status: store.getStatus(),
   }
 }
 

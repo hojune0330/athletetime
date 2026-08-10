@@ -5,11 +5,12 @@ type Props = {
 }
 
 export function TeamSeasonTrend({ rows }: Props) {
-  if (rows.length === 0) return <EmptySection title="시즌 흐름" />
+  if (rows.length === 0) return <EmptySection title="시즌별 기록 수" />
   const max = Math.max(1, ...rows.map((row) => row.resultCount))
   return (
     <section aria-labelledby="team-season-heading">
-      <SectionTitle id="team-season-heading" title="시즌 흐름" meta={`${rows.length}개 시즌`} />
+      <SectionTitle id="team-season-heading" title="시즌별 기록 수" meta={`${rows.length}개 시즌`} />
+      <p className="mt-2 text-xs text-ink-4">막대 길이는 모은 기록 수예요. 성적의 높낮이를 뜻하지 않아요.</p>
       <div className="mt-5 space-y-5">
         {rows.map((row) => (
           <div key={row.season}>
@@ -21,7 +22,7 @@ export function TeamSeasonTrend({ rows }: Props) {
               <div className="h-full bg-brand" style={{ width: `${Math.max(4, (row.resultCount / max) * 100)}%` }} />
             </div>
             <p className="mt-2 text-xs text-ink-4">
-              대회 {row.competitionCount}개 · 확인된 입상 {row.confirmedPodiumCount}건 · 최고 갱신 {row.indexedImprovementCount}건
+              출전이 확인된 대회 {row.competitionCount}개 · 모은 기록에서 확인한 입상 {row.confirmedPodiumCount}건 · 기록 개선 확인 {row.indexedImprovementCount}건
             </p>
           </div>
         ))}

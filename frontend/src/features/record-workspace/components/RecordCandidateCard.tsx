@@ -33,7 +33,7 @@ export function RecordCandidateCard({
     <button
       type="button"
       aria-label={`${collecting
-        ? `${athlete.name} 기록 ${selected ? '선택 해제' : '선택'}`
+        ? `${athlete.name} 선수 후보 ${selected ? '선택 해제' : '선택'}`
         : `${athlete.name} 기록 보기`}. ${sameNameCaution}`}
       aria-pressed={collecting ? selected : undefined}
       className={cn(

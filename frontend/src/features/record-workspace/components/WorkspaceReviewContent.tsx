@@ -68,9 +68,9 @@ export function WorkspaceReviewContent({
       <section className="border border-line bg-surface p-4 sm:p-5">
         {differentNames ? (
           <>
-            <h2 className="text-body font-semibold text-ink">한 사람의 기록 모음으로 저장할 수 없어요</h2>
+            <h2 className="text-body font-semibold text-ink">한 기록 모음으로 저장할 수 없어요</h2>
             <p className="mt-1 text-body-sm leading-5 text-ink-3">
-              서로 다른 이름은 기록을 합치지 않고 선수 비교로 옮겨야 해요.
+              서로 다른 이름은 한 화면에서 섞지 않고 선수 비교로 옮겨야 해요.
             </p>
             <Button className="mt-4 min-h-11" type="button" onClick={onCompare}>선수 비교로 옮기기</Button>
           </>

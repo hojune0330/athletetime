@@ -64,14 +64,14 @@ export default function TeamPerformancePage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-5 pb-12" data-team-performance-page>
       <header className="border border-line bg-surface p-5 sm:p-8">
-        <Link to={backUrl} state={{ focusSearch: true }} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-3 hover:text-ink">
+        <Link to={backUrl} state={{ focusSearch: true }} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2">
           <ArrowLeft className="size-4" aria-hidden="true" />
           소속 검색으로
         </Link>
         <div className="mt-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="font-mono text-xs font-semibold tracking-[0.1em] text-brand">
-              {detail.identity.selectedCategory ? teamCategoryLabel(detail.identity.selectedCategory) : '전체'} · TEAM PERFORMANCE
+              {detail.identity.selectedCategory ? teamCategoryLabel(detail.identity.selectedCategory) : '전체'} · 소속 기록 통계
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ink sm:text-5xl">{detail.identity.teamLabel}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-3">
@@ -113,32 +113,35 @@ function PeriodFilter({ period, seasons, onChange }: {
   readonly onChange: (period: TeamDetailPeriod) => void
 }) {
   return (
-    <div className="grid grid-cols-[auto_auto_minmax(7rem,1fr)] border border-line bg-surface-2 p-1">
-      <PeriodButton active={period.kind === 'latest'} label="최근" onClick={() => onChange({ kind: 'latest' })} />
-      <PeriodButton active={period.kind === 'all'} label="전체" onClick={() => onChange({ kind: 'all' })} />
-      <label className="sr-only" htmlFor="team-season">시즌 선택</label>
-      <select
-        id="team-season"
-        value={period.kind === 'season' ? String(period.season) : ''}
-        onChange={(event) => {
-          const season = Number(event.target.value)
-          if (Number.isInteger(season)) onChange({ kind: 'season', season })
-        }}
-        className="min-h-10 border-0 bg-transparent px-3 text-sm font-semibold text-ink outline-none focus:ring-2 focus:ring-brand"
-      >
-        <option value="">시즌 선택</option>
-        {seasons.map((season) => <option key={season} value={season}>{season}</option>)}
-      </select>
+    <div className="w-full lg:w-auto">
+      <div className="grid grid-cols-[auto_auto_minmax(7rem,1fr)] border border-line bg-surface-2 p-1">
+        <PeriodButton active={period.kind === 'latest'} label="최근 시즌" onClick={() => onChange({ kind: 'latest' })} />
+        <PeriodButton active={period.kind === 'all'} label="전체" onClick={() => onChange({ kind: 'all' })} />
+        <label className="sr-only" htmlFor="team-season">시즌 선택</label>
+        <select
+          id="team-season"
+          value={period.kind === 'season' ? String(period.season) : ''}
+          onChange={(event) => {
+            const season = Number(event.target.value)
+            if (Number.isInteger(season)) onChange({ kind: 'season', season })
+          }}
+          className="min-h-10 border-0 bg-transparent px-3 text-sm font-semibold text-ink outline-none focus:ring-2 focus:ring-brand"
+        >
+          <option value="">시즌 선택</option>
+          {seasons.map((season) => <option key={season} value={season}>{season}</option>)}
+        </select>
+      </div>
+      <p className="mt-2 text-xs leading-5 text-ink-4">찾아진 공개 기록이 있는 시즌만 보여요. 없는 시즌은 출전하지 않았다는 뜻이 아니에요.</p>
     </div>
   )
 }
 
 function PeriodButton({ active, label, onClick }: { readonly active: boolean; readonly label: string; readonly onClick: () => void }) {
-  return <button type="button" aria-pressed={active} onClick={onClick} className={active ? 'bg-ink px-4 py-2 text-sm font-semibold text-white' : 'px-4 py-2 text-sm font-semibold text-ink-3 hover:text-ink'}>{label}</button>
+  return <button type="button" aria-pressed={active} onClick={onClick} className={active ? 'min-h-11 bg-ink px-4 py-2 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset' : 'min-h-11 px-4 py-2 text-sm font-semibold text-ink-3 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}>{label}</button>
 }
 
 function ViewLink({ active, label, onClick }: { readonly active: boolean; readonly label: string; readonly onClick: () => void }) {
-  return <button type="button" aria-current={active ? 'page' : undefined} onClick={onClick} className={active ? 'border-b-2 border-brand bg-brand/5 px-3 py-4 text-sm font-semibold text-ink' : 'border-b-2 border-transparent px-3 py-4 text-sm font-semibold text-ink-4 hover:text-ink'}>{label}</button>
+  return <button type="button" aria-current={active ? 'page' : undefined} onClick={onClick} className={active ? 'min-h-11 border-b-2 border-brand bg-brand/5 px-3 py-4 text-sm font-semibold text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset' : 'min-h-11 border-b-2 border-transparent px-3 py-4 text-sm font-semibold text-ink-4 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}>{label}</button>
 }
 
 function CoverageNotice({ detail }: { readonly detail: TeamPerformanceDetail }) {
@@ -146,7 +149,7 @@ function CoverageNotice({ detail }: { readonly detail: TeamPerformanceDetail }) 
   return (
     <aside className="border border-line bg-surface-2 p-5 text-xs leading-5 text-ink-4">
       <p>{detail.coverage.disclaimer}</p>
-      <p className="mt-2">단계가 확인되지 않은 1~3위 표기 {excluded}건은 합계에서 뺐어요. 최고 갱신은 같은 공개 프로필 조각 안에서 계산했어요.</p>
+      <p className="mt-2">단계가 확인되지 않은 1~3위 표기 {excluded}건은 합계에서 뺐어요. 기록 개선 확인은 같은 공개 프로필 조각 안에서 계산했어요.</p>
     </aside>
   )
 }

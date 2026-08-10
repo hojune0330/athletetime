@@ -44,6 +44,10 @@ test('Given the public athlete route When source contracts are scanned Then self
   assert.match(page, /subject\.note\.trim\(\)/);
   assert.match(page, /같은 이름의 다른 선수일 수 있어요/);
   assert.match(page, /소속·연도·종목을 확인해 주세요/);
+  assert.match(page, />\s*이 선수 담기\s*</);
+  assert.ok((page.match(/focus-visible:ring-2/g) || []).length >= 2);
+  assert.ok((page.match(/min-h-11/g) || []).length >= 2);
+  assert.doesNotMatch(page, /이 선수 후보 담기/);
   assert.doesNotMatch(page, /내 기록|selfClaim|MyRecords|onToggleMine|isMine/);
 });
 

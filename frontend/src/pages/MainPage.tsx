@@ -31,7 +31,7 @@ const SHORTCUT_STORAGE_KEY = 'athletetime.home.shortcuts';
 const DEFAULT_SHORTCUT_IDS = ['today', 'records', 'calendar'];
 
 const quickSearches = [
-  { label: '내 이름으로 기록 찾기', to: '/records' },
+  { label: '이름으로 기록 찾기', to: '/records' },
   { label: '시즌 기록표', to: '/records' },
   { label: '오늘 경기', to: '/competitions?tab=results' },
   { label: '내일 일정', to: '/competitions' },
@@ -53,13 +53,13 @@ const utilityCards = [
   },
   {
     title: '기록 검색',
-    description: '자기 이름을 넣고 소속과 연도를 보며 내 기록을 찾아요.',
+    description: '이름을 넣고 소속과 연도를 보며 공개 기록 후보를 찾아요.',
     to: '/records',
     icon: ChartBarIcon,
   },
   {
     title: '기록 카드',
-    description: '내 기록을 공유하기 좋은 이미지 카드로 만들 수 있어요.',
+    description: '기록을 공유하기 좋은 이미지 카드로 만들 수 있어요.',
     to: '/profile-card',
     icon: SparklesIcon,
   },
@@ -92,12 +92,12 @@ const visitModes = [
 const todayBoard: Array<[string, string]> = [
   ['대회 시간표', '대회 전후에는 일정부터 확인'],
   ['경기 결과', '공개된 결과 기준으로 조회'],
-  ['내 기록 검색', '이름을 넣고 소속·연도·종목으로 확인'],
+  ['기록 검색', '이름을 넣고 소속·연도·종목으로 확인'],
 ];
 
 const recordFlowSteps: Array<[string, string]> = [
-  ['자기 이름을 입력합니다', '지금 확인하고 싶은 이름으로 바로 시작합니다.'],
-  ['후보를 직접 고릅니다', '동명이인이 있으면 소속·연도·종목을 보고 나에게 맞는 기록을 고릅니다.'],
+  ['이름을 입력합니다', '지금 확인하고 싶은 이름으로 바로 시작합니다.'],
+  ['후보를 직접 고릅니다', '동명이인이 있으면 소속·연도·종목을 보고 확인할 후보를 고릅니다.'],
   ['기록의 흐름을 봅니다', '최고 기록(PB), 이번 시즌 기록, 최근 기록, 시즌 기록표로 바로 이어집니다.'],
 ];
 
@@ -106,7 +106,7 @@ const shortcutOptions: HomeShortcut[] = [
   { id: 'records', label: '선수 기록', description: '이름과 소속 검색', to: '/records' },
   { id: 'calendar', label: '연간 일정', description: '다가오는 대회', to: '/competitions' },
   { id: 'data-source', label: '자료 수집 방식', description: '기록을 모은 방법', to: '/about-data' },
-  { id: 'card', label: '기록 카드', description: '내 기록 공유', to: '/profile-card' },
+  { id: 'card', label: '기록 카드', description: '기록 카드 만들기', to: '/profile-card' },
 ];
 
 const operatingRules = [
@@ -213,12 +213,12 @@ export default function MainPage() {
             </div>
 
             <h1 className="mt-5 text-h1 font-medium text-ink">
-              내 이름으로 기록 찾기
+              이름으로 공개 기록 찾기
               <span className="block text-brand">소속·연도까지 확인합니다.</span>
             </h1>
 
             <p className="mt-5 max-w-xl text-body-lg leading-relaxed text-ink-3">
-              자기 이름을 넣으면 공개된 대회 기록을 찾아 보여드려요.
+              이름을 넣으면 공개된 대회 기록 후보를 찾아 보여드려요.
               최고 기록(PB), 이번 시즌 기록, 최근 기록까지 한 번에 볼 수 있어요.
             </p>
 
@@ -230,7 +230,7 @@ export default function MainPage() {
                   <Input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="내 이름이나 소속(학교·팀)을 입력하세요"
+                    placeholder="이름 또는 소속(학교·팀)을 입력하세요"
                     className="h-12 rounded-md pl-11 pr-4 text-body-lg"
                   />
                 </label>
@@ -241,14 +241,13 @@ export default function MainPage() {
             </form>
 
             <div className="mt-4 flex flex-wrap gap-2">
-              {/* 로그인 사용자 전용 — 자신의 이름으로 기록 검색 (4A) */}
               {user && user.nickname && (
                 <Link
                   to={`/records?q=${encodeURIComponent(user.nickname)}`}
                   className="inline-flex items-center gap-1.5 rounded-sm border border-brand bg-brand-50 px-3 py-1.5 text-body-sm font-medium text-brand transition-colors hover:bg-brand-50/80"
                 >
                   <SparklesIcon className="h-4 w-4" />
-                  내 기록 검색 ({user.nickname})
+                  기록 검색 ({user.nickname})
                 </Link>
               )}
               {quickSearches.map((item) => (
@@ -341,7 +340,7 @@ export default function MainPage() {
 
             <div className="border-t border-hair p-4">
               <Link to="/records" className={cn(buttonVariants({ variant: 'outline' }), 'w-full justify-between')}>
-                내 기록 찾기
+                기록 찾아보기
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
             </div>
@@ -440,9 +439,9 @@ export default function MainPage() {
         <Card>
           <CardContent className="p-6">
             <SectionHeader title="기록 발견" />
-            <h2 className="text-h3 font-semibold tracking-tight text-ink">내 기록을 확인하는 순서</h2>
+            <h2 className="text-h3 font-semibold tracking-tight text-ink">공개 기록을 찾는 순서</h2>
             <p className="mt-3 text-body-sm leading-relaxed text-ink-3">
-              내가 궁금한 이름을 직접 넣고, 소속과 연도를 보며 맞는 후보를 고르는 흐름입니다.
+              궁금한 이름을 직접 넣고, 소속과 연도를 보며 맞는 후보를 고르는 흐름입니다.
             </p>
             <div className="mt-5 divide-y divide-hair border-y border-hair">
               {recordFlowSteps.map(([title, description], index) => (

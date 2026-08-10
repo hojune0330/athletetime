@@ -9,6 +9,16 @@ function readSource(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
+function readViteProxyTarget(viteSource, route) {
+  const escapedRoute = route.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const proxyBlock = viteSource.match(new RegExp(`'${escapedRoute}':\\s*\\{([^}]*)\\}`));
+  assert.ok(proxyBlock, `${route} proxy block exists`);
+
+  const target = proxyBlock[1].match(/target:\s*'([^']+)'/);
+  assert.ok(target, `${route} proxy target exists`);
+  return target[1];
+}
+
 test('P1-FRESH-001(revised): freshness badge removed by owner decision — match results are immutable, collection date adds no user value', () => {
   const schedule = readSource('frontend/src/components/competitions/tabs/ScheduleTab.tsx');
   const resultSourceSummary = readSource('frontend/src/components/competitions/ResultSourceSummary.tsx');
@@ -36,6 +46,17 @@ test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out o
   assert.match(vite, /page-records/);
   assert.match(vite, /page-competitions/);
   assert.match(vite, /page-tools/);
+});
+
+test('LOCAL-PROXY-001: Given the default local server When Vite proxies API requests Then both use port 3000', () => {
+  const server = readSource('src/server.js');
+  const vite = readSource('frontend/vite.config.ts');
+
+  assert.match(server, /const PORT = process\.env\.PORT \|\| 3000/);
+  assert.equal(readViteProxyTarget(vite, '/api'), 'http://localhost:3000');
+  assert.equal(readViteProxyTarget(vite, '/health'), 'http://localhost:3000');
+  assert.equal(readViteProxyTarget(vite, '/ws'), 'ws://localhost:3000');
+  assert.doesNotMatch(vite, /localhost:3005/);
 });
 
 test('P1-FIX-W4: Migration execution plan exists before migration code and covers launch transition risks', () => {

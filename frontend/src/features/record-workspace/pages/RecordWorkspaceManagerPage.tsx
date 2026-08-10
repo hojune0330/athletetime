@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { WorkspaceManagerCard } from '../components/WorkspaceManagerCard'
+import { StorageStatusNotice } from '../components/StorageStatusNotice'
 import type { RecordWorkspace } from '../storage'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 
@@ -44,7 +45,7 @@ export default function RecordWorkspaceManagerPage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <header className="border border-line bg-surface p-5 sm:p-7">
-        <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">SAVED WORKSPACES</p>
+        <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">기록 모음 목록</p>
         <h1 className="mt-2 text-h1 font-semibold text-ink">저장한 기록 모음</h1>
         <p className="mt-2 max-w-2xl text-body-sm leading-6 text-ink-3">
           이 기기에서 직접 만든 모음이에요. 공개 기록 원본이나 선수 신원을 합치지 않아요.
@@ -66,7 +67,7 @@ export default function RecordWorkspaceManagerPage() {
 
       {workspaces.length === 0 ? (
         <section className="border border-line bg-surface p-6 sm:p-8">
-          <h2 className="text-h2 font-semibold text-ink">저장한 모음이 없어요</h2>
+          <h2 className="text-h2 font-semibold text-ink">저장한 기록 모음이 없어요</h2>
           <p className="mt-2 text-body-sm leading-6 text-ink-3">선수 기록에서 함께 볼 기록을 골라 새 모음을 만들 수 있어요.</p>
           <Button asChild className="mt-5 min-h-11"><Link to="/records">기록 찾기</Link></Button>
         </section>
@@ -88,11 +89,7 @@ export default function RecordWorkspaceManagerPage() {
         </div>
       )}
 
-      {store.status.mode === 'volatile' && (
-        <p className="border border-warn bg-[#F7EDE0] px-4 py-3 text-body-sm leading-5 text-ink-2">
-          지금은 이 탭에서만 볼 수 있어요. 브라우저 저장이 허용되면 다시 저장해 주세요.
-        </p>
-      )}
+      <StorageStatusNotice status={store.status} />
     </div>
   )
 }

@@ -55,6 +55,7 @@ test('Given public workspace routes When source contracts are scanned Then ident
   assert.doesNotMatch(review, /window\.history\.back/);
   assert.doesNotMatch(page, /현 소속/);
   assert.match(page, /visibleCoverage/);
+  assert.match(page, /selectInitialRecordEventKey\(requestedEventKey, visibleRecords\)/);
   assert.match(manager, /다음 삭제 전까지 되돌릴 수 있어요/);
   assert.doesNotMatch(`${review}\n${page}\n${manager}`, /<main/);
 });

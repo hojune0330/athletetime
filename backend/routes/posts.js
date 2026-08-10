@@ -97,7 +97,7 @@ router.get('/', async (req, res) => {
           )
           FROM comments cm 
           WHERE cm.post_id = p.id 
-            AND cm.deleted_at IS NULL),
+            AND cm.deleted_at IS NULL AND cm.is_blinded = FALSE),
           '[]'::json
         ) as comments
       FROM posts p
@@ -272,14 +272,14 @@ router.get('/:id', async (req, res) => {
           )
           FROM comments cm 
           WHERE cm.post_id = p.id 
-            AND cm.deleted_at IS NULL),
+            AND cm.deleted_at IS NULL AND cm.is_blinded = FALSE),
           '[]'::json
         ) as comments
       FROM posts p
       LEFT JOIN categories c ON p.category_id = c.id
       LEFT JOIN users u ON p.user_id = u.id
       WHERE p.id = $1 
-        AND p.deleted_at IS NULL
+        AND p.deleted_at IS NULL AND p.is_blinded = FALSE
     `, [id]);
     
     if (result.rows.length === 0) {
@@ -739,7 +739,7 @@ router.put('/:id', async (req, res) => {
           )
           FROM comments cm 
           WHERE cm.post_id = p.id 
-            AND cm.deleted_at IS NULL),
+            AND cm.deleted_at IS NULL AND cm.is_blinded = FALSE),
           '[]'::json
         ) as comments
       FROM posts p

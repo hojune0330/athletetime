@@ -56,7 +56,7 @@ test('UX-MYREC-001: a user-selected local collection stays visible without claim
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
   assert.match(page, /useMyAthlete/);
   assert.match(page, /<RecordsMineFlow/, 'self flow stays separate from public browsing');
-  assert.match(page, /<RecordCandidateList/, 'general browsing uses workspace candidates');
+  assert.match(page, /<RecordCandidatesSurface/, 'general browsing uses the routed workspace candidate surface');
   assert.match(page, /workspaceStore\.saveWorkspaceDraft/, 'general selection writes only the workspace draft');
   assert.doesNotMatch(page, /<MyRecordsCard|<RecordSearchResults/, 'legacy aggregate surfaces are not mounted');
   assert.doesNotMatch(page, /내 기록이에요/, 'the page must not assert that a searched athlete is the visitor');
@@ -84,9 +84,9 @@ test('UX-COLLECT-001: local collection is opt-in, reversible, and never auto-mer
 
 test('UX-COMBINE-002: search candidates require explicit collect mode and review', () => {
   const results = readSource('frontend/src/features/record-workspace/components/RecordCandidateList.tsx');
-  assert.match(results, /기록 묶어 보기/, 'collection mode has an explicit entry');
+  assert.match(results, /선수 기록 모아 보기/, 'collection mode has an explicit entry');
   assert.match(results, /mode=\{selectionMode \? 'collect' : 'browse'\}/, 'card activation has one meaning per mode');
-  assert.match(results, /한 번에 6개까지 선택할 수 있어요/, 'selection limit is disclosed');
+  assert.match(results, /한 모음에는 \$\{WORKSPACE_LIMITS\.workspaceDraftSubjects\}명까지 담을 수 있어요/, 'selection limit is disclosed');
   assert.match(results, /<WorkspaceDraftTray/, 'review is reached through one action bar');
   assert.doesNotMatch(results, /onToggleMine|isMine|비교에 담기/, 'ownership and comparison stay outside browse selection');
 
@@ -99,7 +99,8 @@ test('UX-COMBINE-002: search candidates require explicit collect mode and review
 test('UX-COMBINE-003: workspace editing is unambiguous and record details stay optional', () => {
   const review = readSource('frontend/src/features/record-workspace/components/WorkspaceReviewContent.tsx');
   assert.match(review, /같은 이름이어도 같은 사람으로 확인됐다는 뜻은 아니에요/);
-  assert.match(review, /한 사람의 기록 모음으로 저장할 수 없어요/);
+  assert.match(review, /한 기록 모음으로 저장할 수 없어요/);
+  assert.doesNotMatch(review, /한 사람의 기록 모음/);
   assert.match(review, /선수 비교로 옮기기/);
 
   const workspace = readSource('frontend/src/features/record-workspace/pages/WorkspaceRecordTab.tsx');
@@ -129,8 +130,9 @@ test('UX-COLLECT-004: the guided collection flow never defaults an identity or a
   assert.match(name, /기록 모아보기/);
   assert.match(candidates, /화면에 모아 볼 기록을 고르세요/);
   assert.match(candidates, /원하는 기록만 고르세요/);
-  assert.match(confirm, /선택한 기록만 이 기기에서 함께 보여줘요/);
-  assert.match(confirm, /선택한 기록 담기/);
+  assert.match(confirm, /선택한 후보의 공개 기록만 이 기기에서 함께 보여줘요/);
+  assert.match(confirm, /선택한 선수 담기/);
+  assert.doesNotMatch(confirm, /선택한 기록 담기/);
   assert.match(done, /모아 보는 기록이 준비됐어요/);
   assert.match(frame, /기록 모아보기/);
   assert.doesNotMatch(confirm, /회원님 것 같아요|기본으로 모두 합치기|이대로 합치기/);

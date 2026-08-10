@@ -115,11 +115,11 @@ describe('record candidate browsing', () => {
     )
 
     // Then browse exposes entry but no tray, while collect exposes selectable cards and one tray.
-    expect(browse).toContain('기록 묶어 보기')
-    expect(browse).not.toContain('선택한 기록 묶음')
-    expect(collect).not.toContain('기록 묶어 보기')
+    expect(browse).toContain('선수 기록 모아 보기')
+    expect(browse).not.toContain('선택한 선수')
+    expect(collect).not.toContain('선수 기록 모아 보기')
     expect(collect.match(/aria-pressed="false"/g)).toHaveLength(7)
-    expect(collect.match(/aria-label="선택한 기록 묶음"/g)).toHaveLength(1)
+    expect(collect.match(/aria-label="선택한 선수"/g)).toHaveLength(1)
   })
 
   it('rejects a seventh subject without changing the six-key draft', () => {
@@ -140,7 +140,7 @@ describe('record candidate browsing', () => {
     // When the fixed tray renders.
     const markup = renderToStaticMarkup(
       <WorkspaceDraftTray
-        notice="한 번에 6개까지 선택할 수 있어요."
+        notice="한 모음에는 6명까지 담을 수 있어요."
         selectedCount={6}
         onCancel={() => undefined}
         onContinue={() => undefined}
@@ -148,8 +148,8 @@ describe('record candidate browsing', () => {
     )
 
     // Then the count, live notice, and safe-area offset remain visible.
-    expect(markup).toContain('6개 선택')
-    expect(markup).toContain('한 번에 6개까지')
+    expect(markup).toContain('선수 6명 선택')
+    expect(markup).toContain('한 모음에는 6명까지')
     expect(markup).toContain('aria-live="polite"')
     expect(markup).toContain('safe-area-inset-bottom')
     expect(markup).toContain('var(--mobile-tabbar-height)')

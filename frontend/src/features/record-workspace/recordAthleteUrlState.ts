@@ -26,3 +26,27 @@ export function updateRecordAthleteSeason(
   else next.set('season', String(season))
   return next
 }
+
+export function createRecordAthleteSharePath(
+  athleteKey: string,
+  params: URLSearchParams,
+): string {
+  const next = new URLSearchParams()
+  const tab = params.get('tab')
+  if (tab === 'affiliations' || tab === 'sources') next.set('tab', tab)
+
+  if (tab === null || tab === 'records') {
+    const eventKey = params.get('event')?.trim()
+    if (eventKey) {
+      next.set('event', eventKey)
+      const season = parseRecordAthleteSeason(params)
+      if (season !== null) next.set('season', String(season))
+      const recordId = params.get('record')?.trim()
+      if (recordId) next.set('record', recordId)
+    }
+  }
+
+  const query = next.toString()
+  const path = `/records/athletes/${encodeURIComponent(athleteKey)}`
+  return query ? `${path}?${query}` : path
+}

@@ -13,6 +13,18 @@ test('RIGHTS-LOG-001: Given either public API mount When logging a ticket lookup
   }), '/api/data-requests/[redacted]');
 });
 
+test('RIGHTS-LOG-002: Given an athlete analytics lookup When logging Then the athlete key is redacted', () => {
+  const { requestLogPath } = require('../../src/requestLogPath');
+  assert.equal(requestLogPath({
+    originalUrl: '/api/card-studio/analytics/athletes/alpha-2016?source=compare',
+    path: '/analytics/athletes/alpha-2016',
+  }), '/api/card-studio/analytics/athletes/[redacted]');
+  assert.equal(requestLogPath({
+    originalUrl: '/api/analytics/athletes/alpha-2020/',
+    path: '/analytics/athletes/alpha-2020',
+  }), '/api/analytics/athletes/[redacted]');
+});
+
 test('RIGHTS-RECOVERY-001: Given one transient storage failure When the next write arrives Then readiness recovers', async () => {
   const servicePath = '../../card-studio/services/dataRequestService';
   const previous = { nodeEnv: process.env.NODE_ENV, testUrl: process.env.TEST_DATABASE_URL };

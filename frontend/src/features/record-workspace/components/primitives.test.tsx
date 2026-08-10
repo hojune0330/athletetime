@@ -37,7 +37,7 @@ describe('record workspace trust primitives', () => {
 
     // When the shared identity and coverage primitives render.
     // Then they state the observed scope and never overclaim official completeness.
-    expect(markup).toContain('선택한 공개 기록 3묶음에서 확인된 124개')
+    expect(markup).toContain('선택한 선수 3명에서 확인된 124개')
     expect(markup).toContain('확인된 124개 중 50개를 먼저 보여드려요')
     expect(markup).toContain('마지막 수집 2026.07.29')
     expect(markup).toContain('같은 사람으로 확인된 것은 아닙니다')
@@ -72,7 +72,7 @@ describe('record workspace trust primitives', () => {
     // Then chronology is explicit without treating a multi-key workspace as one career.
     expect(single).toContain('최근 확인 소속')
     expect(single).toContain('이전 확인 소속')
-    expect(workspace).toContain('선택한 기록의 소속')
+    expect(workspace).toContain('선택한 선수의 소속')
     expect(workspace).not.toContain('최근 확인 소속')
     expect(workspace).not.toContain('현 소속')
   })

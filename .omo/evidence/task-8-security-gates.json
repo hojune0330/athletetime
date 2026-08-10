@@ -1,0 +1,32 @@
+{
+  "capturedAt": "2026-08-09",
+  "scope": "records UX trust hardening",
+  "blindedResponses": {
+    "status": "confirmed",
+    "result": "Public detail, comment-create, and vote responses now exclude blinded posts and comments before response shaping.",
+    "tests": ["backend/tests/blinded-comment-query.test.js"],
+    "commits": ["0e541f2", "edc871b", "800e509"]
+  },
+  "anonymousIds": {
+    "status": "confirmed",
+    "result": "Community mutation routes accept a browser-provided anonymousId. Writes remain launch-gated; a server-bound identity design is required before enabling those routes.",
+    "tests": ["backend/tests/launch-interaction-safety.test.js"],
+    "decision": "Do not enable community writes until a server-bound anonymous session or member identity replaces raw client authority."
+  },
+  "authEnumeration": {
+    "status": "already_protected",
+    "result": "Password recovery uses generic public responses, hashed recovery codes, and rate limits.",
+    "tests": ["backend/tests/auth-security-readiness.test.js", "backend/tests/auth-recovery-hardening.test.js"]
+  },
+  "adminBootstrap": {
+    "status": "already_protected",
+    "result": "Production does not register the legacy set-admin route.",
+    "tests": ["backend/tests/auth-admin-bootstrap-production.test.js"]
+  },
+  "cloudinaryPrivateData": {
+    "status": "confirmed",
+    "result": "The existing upload path returns public Cloudinary identifiers and delivery URLs. It is not a private note or private photo store.",
+    "tests": ["backend/tests/cloudinary-contract.test.js", "backend/tests/upload-multer-contract.test.js"],
+    "decision": "Keep private notes/photos out of this path; require a separate access-controlled storage design before adding them."
+  }
+}

@@ -2,7 +2,7 @@
  * NotFoundPage — 길을 잃은 사용자를 핵심 루프(기록 검색)로 되돌리는 화면.
  *
  * 오픈 첫 주 UX 신뢰 관점:
- * - 죽은 끝(dead-end) 대신 서비스의 존재 이유(내 기록 찾기)로 바로 이어지는 검색창을 둔다.
+ * - 죽은 끝(dead-end) 대신 서비스의 존재 이유(공개 기록 찾기)로 바로 이어지는 검색창을 둔다.
  * - 공유 링크가 데이터 정리로 바뀌었을 가능성을 사람 언어로 설명한다(미래약속·과장 없음).
  * - 디자인 토큰(ink/surface/line/brand)을 다른 화면과 통일해 "깨진 느낌"을 없앤다.
  */
@@ -12,7 +12,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { MagnifyingGlassIcon, ArrowRightIcon } from '@heroicons/react/24/outline'
 
 const recoveryLinks = [
-  { to: '/records', label: '기록 검색', description: '이름·소속·종목으로 공개 기록 찾기' },
+  { to: '/records', label: '기록 검색', description: '이름·소속으로 공개 기록 찾기' },
   { to: '/competitions', label: '대회 일정', description: '다가오는 대회와 공개된 결과' },
   { to: '/community', label: '커뮤니티', description: '기록과 훈련 이야기' },
 ]
@@ -51,7 +51,7 @@ export default function NotFoundPage() {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="선수 이름, 소속, 종목"
+              placeholder="이름 또는 소속(학교·팀)"
               className="h-11 w-full rounded-sm border border-line bg-surface pl-10 pr-3 text-sm text-ink placeholder:text-ink-4 focus:border-brand focus:outline-none"
             />
           </label>

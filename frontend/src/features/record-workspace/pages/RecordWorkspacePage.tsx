@@ -1,13 +1,15 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import type { RecordWorkspace, WorkspaceUpdate } from '../storage'
+import type { RecordWorkspace, StorageStatus, WorkspaceUpdate } from '../storage'
 import { Button } from '@/components/ui/button'
 import { AffiliationHistory } from '../components/AffiliationHistory'
 import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
+import { StorageStatusNotice } from '../components/StorageStatusNotice'
 import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceSubjectList } from '../components/WorkspaceSubjectList'
+import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { visibleWorkspaceRecords, useRecordWorkspaceEditor } from '../useRecordWorkspaceEditor'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
@@ -33,6 +35,7 @@ export default function RecordWorkspacePage() {
   return (
     <LoadedWorkspacePage
       workspace={workspace}
+      storageStatus={store.status}
       onUpdate={(changes) => store.updateWorkspace(workspace.id, changes).ok}
     />
   )
@@ -40,9 +43,11 @@ export default function RecordWorkspacePage() {
 
 function LoadedWorkspacePage({
   onUpdate,
+  storageStatus,
   workspace,
 }: {
   readonly onUpdate: (changes: WorkspaceUpdate) => boolean
+  readonly storageStatus: StorageStatus
   readonly workspace: RecordWorkspace
 }) {
   const [params, setParams] = useSearchParams()
@@ -51,7 +56,8 @@ function LoadedWorkspacePage({
   const previewQuery = useRecordWorkspacePreview(editor.state.subjectKeys)
   const preview = previewQuery.preview
   const tab = normalizeTab(params.get('tab'))
-  const selectedEventKey = params.get('event')?.trim() || null
+  const requestedEventKey = params.get('event')?.trim() || null
+  const showEventIndex = params.get('eventIndex') === 'true'
   const selectedRecordId = params.get('record')?.trim() || null
 
   const updatePageState = (updates: Readonly<Record<string, string | null>>) => {
@@ -89,10 +95,12 @@ function LoadedWorkspacePage({
   }
 
   const visibleRecords = visibleWorkspaceRecords(preview.records, editor.state.excludedRecordIds)
+  const selectedEventKey = showEventIndex ? null : selectInitialRecordEventKey(requestedEventKey, visibleRecords)
   const visibleCoverage = { ...preview.coverage, returned: visibleRecords.length }
 
   return (
     <WorkspaceShell title={workspace.title}>
+      <StorageStatusNotice status={storageStatus} />
       <section className="border border-line bg-surface p-5 sm:p-7">
         <RecordIdentityHeader
           affiliationCount={preview.affiliations.length}
@@ -119,6 +127,7 @@ function LoadedWorkspacePage({
       <WorkspaceTabs active={tab} onChange={(nextTab) => updatePageState({
         tab: nextTab === 'records' ? null : nextTab,
         event: null,
+        eventIndex: null,
         record: null,
       })} />
 
@@ -131,7 +140,11 @@ function LoadedWorkspacePage({
           onLoadMore={() => void previewQuery.fetchNextPage()}
           onOpenRecord={(recordId) => updatePageState({ record: recordId })}
           onRestoreAll={editor.restoreAll}
-          onSelectEvent={(eventKey) => updatePageState({ event: eventKey, record: null })}
+          onSelectEvent={(eventKey) => updatePageState({
+            event: eventKey,
+            eventIndex: eventKey ? null : 'true',
+            record: null,
+          })}
           onStartSelection={editor.startSelection}
           onToggleRecord={editor.toggleRecord}
           preview={preview}
@@ -162,7 +175,7 @@ function WorkspaceShell({ children, title }: { readonly children: ReactNode; rea
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <div className="flex items-center justify-between gap-3">
-        <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">저장한 모음</Link>
+        <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">기록 모음 목록</Link>
         <span className="max-w-[55%] truncate text-body-sm font-semibold text-ink-3">{title}</span>
       </div>
       {children}
@@ -175,7 +188,7 @@ function WorkspaceTabs({ active, onChange }: { readonly active: WorkspaceTab; re
     <nav className="grid grid-cols-3 border border-line bg-surface p-1" aria-label="기록 모음 보기">
       {([
         ['records', '종목별 기록'],
-        ['affiliations', '소속·선택'],
+        ['affiliations', '선수 후보·소속'],
         ['sources', '출처'],
       ] as const).map(([value, label]) => (
         <button

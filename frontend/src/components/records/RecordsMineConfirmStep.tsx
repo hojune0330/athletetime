@@ -1,5 +1,6 @@
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
+import { CandidateContextFacts } from './CandidateContextFacts';
 
 export function ConfirmStep({
   selectedAthletes,
@@ -12,20 +13,24 @@ export function ConfirmStep({
   readonly onBackToCandidates: () => void;
   readonly onConfirm: () => void;
 }) {
+  const hasSelectedAthletes = selectedAthletes.length > 0;
+
   return (
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-confirm">
       <div>
         <p className="text-sm font-semibold text-brand">3단계</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">선택한 기록을 확인하세요.</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
+          {hasSelectedAthletes ? '이 사람들 맞나요?' : '선수를 골라주세요.'}
+        </h1>
         <p className="mt-3 text-sm leading-6 text-ink-3">
-          선택한 기록만 이 기기에서 함께 보여줘요. 다른 사람 기록이면 지금 빼세요.
+          선택한 후보의 공개 기록만 이 기기에서 함께 보여줘요. 다른 사람 기록이면 지금 빼세요.
         </p>
       </div>
 
       <div className="mt-6 space-y-2">
-        {selectedAthletes.length === 0 ? (
+        {!hasSelectedAthletes ? (
           <div role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
-            선택한 후보가 없어요. 후보 화면으로 돌아가서 기록을 골라주세요.
+            선택한 선수가 없어요. 후보 화면으로 돌아가서 선수를 골라주세요.
           </div>
         ) : (
           selectedAthletes.map((athlete) => (
@@ -38,9 +43,8 @@ export function ConfirmStep({
             >
               <span className="min-w-0">
                 <span className="block font-semibold text-ink">{athlete.name}</span>
-                <span className="mt-1 block truncate text-sm text-ink-3">
-                  {athlete.team || '소속 미상'} · {formatYearRange(athlete.years)} · 기록 {athlete.recordCount}건
-                </span>
+                <CandidateContextFacts athlete={athlete} />
+                <span className="mt-3 block text-xs text-ink-3">공개 기록 {athlete.recordCount}건</span>
               </span>
               <span className="shrink-0 text-sm font-semibold text-brand">빼기</span>
             </button>
@@ -48,20 +52,22 @@ export function ConfirmStep({
         )}
       </div>
 
-      <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto grid gap-2 border-t border-hair bg-surface py-4 sm:grid-cols-[auto_1fr] md:bottom-0" data-records-sticky-cta="mine-confirm">
-        <Button type="button" variant="outline" size="lg" onClick={onBackToCandidates}>
-          다시 고르기
-        </Button>
-        <Button type="button" size="lg" disabled={selectedAthletes.length === 0} onClick={onConfirm}>
-          선택한 기록 담기
-        </Button>
-      </div>
+      {hasSelectedAthletes ? (
+        <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto grid gap-2 border-t border-hair bg-surface py-4 sm:grid-cols-[auto_1fr] md:bottom-0" data-records-sticky-cta="mine-confirm">
+          <Button type="button" variant="outline" size="lg" onClick={onBackToCandidates}>
+            다시 고르기
+          </Button>
+          <Button type="button" size="lg" onClick={onConfirm}>
+            선택한 선수 담기
+          </Button>
+        </div>
+      ) : (
+        <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto border-t border-hair bg-surface py-4 md:bottom-0" data-records-sticky-cta="mine-confirm">
+          <Button className="w-full sm:w-auto" type="button" size="lg" onClick={onBackToCandidates}>
+            선수 고르기
+          </Button>
+        </div>
+      )}
     </div>
   );
-}
-
-function formatYearRange(years: readonly number[]) {
-  if (!years.length) return '연도 미상';
-  if (years.length === 1) return String(years[0]);
-  return `${years[0]}-${years[years.length - 1]}`;
 }

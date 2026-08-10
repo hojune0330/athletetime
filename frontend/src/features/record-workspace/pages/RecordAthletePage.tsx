@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ShareIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
 import { AffiliationHistory } from '../components/AffiliationHistory'
@@ -7,7 +7,9 @@ import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
 import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
-import { parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
+import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
+import { resolveRecordAthleteReturnPath } from '../recordAthleteNavigationState'
+import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
@@ -17,6 +19,7 @@ type AthleteTab = 'affiliations' | 'records' | 'sources'
 
 export default function RecordAthletePage() {
   const { athleteKey = '' } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const [pageParams, setPageParams] = useSearchParams()
   const [actionNotice, setActionNotice] = useState('')
@@ -25,9 +28,10 @@ export default function RecordAthletePage() {
   const preview = athlete.preview
   const draftCount = store.workspaceDraft?.subjectKeys.length ?? 0
   const activeTab = normalizeTab(pageParams.get('tab'))
-  const selectedEventKey = pageParams.get('event')?.trim() || null
+  const requestedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
   const selectedSeason = parseRecordAthleteSeason(pageParams)
+  const returnPath = resolveRecordAthleteReturnPath(location.state)
 
   const updatePageState = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(pageParams)
@@ -48,18 +52,20 @@ export default function RecordAthletePage() {
     return (
       <PageNotice
         title="기록을 불러오지 못했어요"
-        description="잠시 후 다시 시도하거나 검색으로 돌아가 주세요."
+        description="연결을 확인한 뒤 다시 불러와 주세요."
         actionLabel="다시 불러오기"
         onAction={() => void athlete.refetch()}
+        showSearchLink={false}
       />
     )
   }
 
   const subject = preview.subjects[0]
+  const selectedEventKey = selectInitialRecordEventKey(requestedEventKey, preview.records)
   const sameNameCaution = subject.note.trim()
     || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
   const shareRecord = async () => {
-    const url = window.location.href
+    const url = new URL(createRecordAthleteSharePath(athleteKey, pageParams), window.location.origin).toString()
     const title = `${subject.name} 선수 기록`
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {
@@ -80,12 +86,12 @@ export default function RecordAthletePage() {
     const current = store.workspaceDraft?.subjectKeys ?? []
     const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
     if (next.kind === 'limit') {
-      setActionNotice(`기록 모음은 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
+      setActionNotice(`한 모음에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
       return
     }
     const result = store.saveWorkspaceDraft(next.subjectKeys)
     setActionNotice(result.ok
-      ? next.kind === 'already_added' ? '이미 기록 모음에 담겨 있어요.' : '기록 모음에 담았어요.'
+      ? next.kind === 'already_added' ? '이미 이 선수가 기록 모음에 담겨 있어요.' : '이 선수를 기록 모음에 담았어요.'
       : '이 기기에 기록 모음을 저장하지 못했어요.')
   }
   const startComparison = () => {
@@ -100,9 +106,8 @@ export default function RecordAthletePage() {
     })
   }
   const goBackToSearch = () => {
-    const historyIndex = Number(window.history.state?.idx)
-    if (Number.isFinite(historyIndex) && historyIndex > 0) {
-      navigate(-1)
+    if (returnPath) {
+      navigate(returnPath, { state: { focusSearch: true } })
       return
     }
     navigate('/records?flow=browse&browse=athlete', { replace: true })
@@ -112,10 +117,10 @@ export default function RecordAthletePage() {
     <div className="mx-auto w-full max-w-5xl space-y-4 pb-24">
       <button
         type="button"
-        className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand"
+        className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
         onClick={goBackToSearch}
       >
-        검색으로 돌아가기
+        {returnPath ? '결과로 돌아가기' : '기록 찾기'}
       </button>
 
       <section className="border border-line bg-surface p-5 sm:p-7">
@@ -134,7 +139,7 @@ export default function RecordAthletePage() {
           {sameNameCaution}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="button" onClick={addToDraft}>기록 모음에 담기</Button>
+          <Button type="button" onClick={addToDraft}>이 선수 담기</Button>
           <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
           <Button type="button" variant="outline" onClick={shareRecord}>
             <ShareIcon className="h-4 w-4" aria-hidden="true" />
@@ -142,11 +147,11 @@ export default function RecordAthletePage() {
           </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
-              <Link to="/records/workspaces/new">선택 검토하기 · {draftCount}개</Link>
+              <Link to="/records/workspaces/new">선택한 선수 보기 · {draftCount}명</Link>
             </Button>
           )}
           <Button asChild type="button" variant="ghost">
-            <Link to="/records/workspaces">저장한 모음</Link>
+            <Link to="/records/workspaces">기록 모음 목록</Link>
           </Button>
         </div>
         {actionNotice && <p className="mt-3 text-body-sm text-ink-3" role="status">{actionNotice}</p>}
@@ -192,8 +197,8 @@ function TabButton({ active, children, onClick }: { active: boolean; children: s
       type="button"
       aria-pressed={active}
       className={active
-        ? 'min-h-11 bg-ink px-3 text-body-sm font-semibold text-white'
-        : 'min-h-11 px-3 text-body-sm font-semibold text-ink-3 hover:bg-surface-2 hover:text-ink'}
+        ? 'min-h-11 bg-ink px-3 text-body-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'
+        : 'min-h-11 px-3 text-body-sm font-semibold text-ink-3 hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-inset'}
       onClick={onClick}
     >
       {children}
@@ -205,11 +210,13 @@ function PageNotice({
   actionLabel,
   description,
   onAction,
+  showSearchLink = true,
   title,
 }: {
   actionLabel?: string
   description: string
   onAction?: () => void
+  showSearchLink?: boolean
   title: string
 }) {
   return (
@@ -219,9 +226,11 @@ function PageNotice({
       {actionLabel && onAction && (
         <Button className="mt-5" type="button" onClick={onAction}>{actionLabel}</Button>
       )}
-      <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
-        기록 검색으로 이동
-      </Link>
+      {showSearchLink && (
+        <Link className="mt-5 inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
+          기록 검색으로 이동
+        </Link>
+      )}
     </div>
   )
 }

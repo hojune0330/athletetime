@@ -1,23 +1,28 @@
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
+import { CandidateContextFacts } from './CandidateContextFacts';
 import type { RecordsLoadState } from './RecordsMineTypes';
 
+const MAX_MINE_SELECTION = 6;
+
 export function CandidateStep({
-  query,
   athletes,
   state,
   selectedKeys,
+  onResetSearch,
   onToggleDraft,
   onNext,
 }: {
-  readonly query: string;
   readonly athletes: readonly AthleteSearchCard[];
   readonly state: RecordsLoadState;
   readonly selectedKeys: readonly string[];
+  readonly onResetSearch: () => void;
   readonly onToggleDraft: (athlete: AthleteSearchCard) => void;
   readonly onNext: () => void;
 }) {
   const selectedCount = selectedKeys.length;
+  const needsNewSearch = state === 'error' || (state === 'ready' && athletes.length === 0);
+  const selectionLimitReached = selectedCount >= MAX_MINE_SELECTION;
 
   return (
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-candidates">
@@ -28,20 +33,29 @@ export function CandidateStep({
           같은 이름이 여러 명일 수 있어요. 소속·연도·종목을 확인한 뒤 원하는 기록만 고르세요.
         </p>
         <p className="mt-1 text-xs text-ink-4">선택해도 목록 위치는 바뀌지 않아요.</p>
+        <p className="mt-2 text-sm font-medium text-ink" role="status" aria-live="polite">
+          {selectedCount}명 선택됨 / 최대 {MAX_MINE_SELECTION}명
+        </p>
+        {selectionLimitReached && (
+          <p className="mt-2 text-sm font-medium text-brand" role="status">
+            한 번에 6명까지 함께 볼 수 있어요. 선택을 빼고 다시 골라주세요.
+          </p>
+        )}
       </div>
 
       <div className="mt-6 space-y-2">
         {state === 'loading' && <p role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">후보를 찾고 있어요.</p>}
-        {state === 'error' && <p role="alert" className="border border-line bg-surface-2 p-4 text-sm text-err">검색을 불러오지 못했어요. 뒤로 가서 다시 시도해 주세요.</p>}
+        {state === 'error' && <p role="alert" className="border border-line bg-surface-2 p-4 text-sm text-err">검색을 불러오지 못했어요. 검색어를 다시 입력해 주세요.</p>}
         {state === 'ready' && athletes.length === 0 && (
           <p role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
-            {query}에 맞는 기록이 아직 없어요. 이름이나 소속을 바꿔보세요.
+            아직 찾지 못했어요. 이름이나 소속을 다시 입력해 주세요.
           </p>
         )}
         {athletes.map((athlete) => (
           <CandidateRow
             key={athlete.athleteKey}
             athlete={athlete}
+            disabled={selectionLimitReached && !selectedKeys.includes(athlete.athleteKey)}
             selected={selectedKeys.includes(athlete.athleteKey)}
             onToggle={() => onToggleDraft(athlete)}
           />
@@ -49,9 +63,13 @@ export function CandidateStep({
       </div>
 
       <div className="sticky bottom-[calc(var(--mobile-tabbar-height)+env(safe-area-inset-bottom)+12px)] mt-auto border-t border-hair bg-surface py-4 md:bottom-0" data-records-sticky-cta="mine-candidates">
-        <Button type="button" size="lg" className="w-full" disabled={selectedCount === 0} onClick={onNext}>
-          {selectedCount}개 선택됨 · 다음
-        </Button>
+        {needsNewSearch ? (
+          <Button type="button" size="lg" className="w-full" onClick={onResetSearch}>검색어 다시 입력</Button>
+        ) : (
+          <Button type="button" size="lg" className="w-full" disabled={selectedCount === 0} onClick={onNext}>
+            {selectedCount}개 선택됨 · 다음
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -59,32 +77,29 @@ export function CandidateStep({
 
 function CandidateRow({
   athlete,
+  disabled,
   selected,
   onToggle,
 }: {
   readonly athlete: AthleteSearchCard;
+  readonly disabled: boolean;
   readonly selected: boolean;
   readonly onToggle: () => void;
 }) {
   return (
     <button
       type="button"
+      disabled={disabled}
       aria-pressed={selected}
-      aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : '선택 안 됨'}`}
+      aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : disabled ? '선택 한도 도달' : '선택 안 됨'}`}
       onClick={onToggle}
-      className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition ${
+      className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
         selected ? 'border-brand bg-brand/10' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
       }`}
-    >
+      >
       <span className="min-w-0">
         <span className="block text-lg font-semibold text-ink">{athlete.name}</span>
-        <span className="mt-1 block truncate text-sm text-ink-3">{athlete.team || '소속 미상'}</span>
-        <span className="mt-3 flex flex-wrap gap-1.5">
-          <span className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">{formatYearRange(athlete.years)}</span>
-          {athlete.events.slice(0, 3).map((event) => (
-            <span key={event} className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">{event}</span>
-          ))}
-        </span>
+        <CandidateContextFacts athlete={athlete} />
       </span>
       {selected ? (
         <span
@@ -98,10 +113,4 @@ function CandidateRow({
       )}
     </button>
   );
-}
-
-function formatYearRange(years: readonly number[]) {
-  if (!years.length) return '연도 미상';
-  if (years.length === 1) return String(years[0]);
-  return `${years[0]}-${years[years.length - 1]}`;
 }

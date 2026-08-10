@@ -144,8 +144,11 @@ export default function MatchResultListPage() {
       {isError && (
         <div className="empty-state py-16">
           <div className="empty-state-icon">⚠️</div>
-          <h3 className="empty-state-title">데이터를 불러올 수 없습니다</h3>
-          <p className="empty-state-description">잠시 후 다시 시도해주세요.</p>
+          <h3 className="empty-state-title">경기 결과를 불러오지 못했습니다</h3>
+          <p className="empty-state-description">대회 목록에서 다시 확인해 주세요.</p>
+          <Button asChild className="mt-4">
+            <Link to="/competitions">대회 둘러보기</Link>
+          </Button>
         </div>
       )}
       

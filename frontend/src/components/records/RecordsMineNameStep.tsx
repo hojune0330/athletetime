@@ -27,7 +27,6 @@ export function NameStep({
         <label htmlFor="mine-records-name" className="sr-only">선수 이름 또는 소속</label>
         <input
           id="mine-records-name"
-          autoFocus
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           placeholder="이름 또는 소속을 입력하세요"

@@ -64,7 +64,7 @@ export function EstimatedSameAthleteCard({ athleteKey, onSelectAthlete }: Props)
           </div>
         </div>
         <p className="mt-3 text-[11px] leading-4 text-amber-800/60">
-          같은 선수라고 단정하지 않아요. 각 기록을 열어 소속·연도·종목을 확인한 뒤, 원하는 카드만 "이 기록 담기"로 이 기기에서 모아 보세요.
+          같은 선수라고 단정하지 않아요. 각 기록을 열어 소속·연도·종목을 확인한 뒤, 원하는 선수만 "이 선수 담기"로 이 기기에서 모아 보세요.
         </p>
       </CardContent>
     </Card>

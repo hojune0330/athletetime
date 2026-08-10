@@ -29,6 +29,7 @@ test('Given candidate component sources When ownership language is scanned Then 
   const source = [
     'RecordCandidateCard.tsx',
     'RecordCandidateList.tsx',
+    'RecordCandidatesSurface.tsx',
     'WorkspaceDraftTray.tsx',
   ].map((file) => fs.readFileSync(path.join(COMPONENTS, file), 'utf8')).join('\n');
   const recordsPage = fs.readFileSync(path.join(FRONTEND, 'src/pages/RecordsPage.tsx'), 'utf8');
@@ -39,7 +40,7 @@ test('Given candidate component sources When ownership language is scanned Then 
   assert.doesNotMatch(source, /비교에 담기|내 기록 지정/);
   assert.match(source, /min-h-11/);
   assert.match(source, /safe-area-inset-bottom/);
-  assert.match(recordsPage, /<RecordCandidateList/);
+  assert.match(recordsPage, /<RecordCandidatesSurface/);
   assert.match(recordsPage, /saveWorkspaceDraft/);
   assert.doesNotMatch(recordsPage, /<RecordSearchResults|<MyRecordsCard/);
   assert.match(recordsPage, /result\.reason === 'full'/);

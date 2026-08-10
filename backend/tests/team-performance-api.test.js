@@ -46,7 +46,7 @@ test('Given a category-filtered team search When one team is opened Then search 
   assert.equal(detail.summary.competitionCount, searchSummary.competitionCount);
   assert.equal(detail.summary.confirmedPodiumCount, searchSummary.confirmedPodiumCount);
   assert.equal(detail.summary.indexedImprovementCount, searchSummary.indexedImprovementCount);
-  assert.equal(hasForbiddenKey(detail, new Set(['records', 'athleteKey', 'name'])), false);
+  assert.equal(hasForbiddenKey(detail, TEAM_PRIVATE_KEYS), false);
 });
 
 test('Given a team with several seasons When latest scope is opened Then only its latest confirmed season is summarized', () => {
@@ -138,7 +138,7 @@ test('Given a valid team detail request When it is served Then it is briefly cac
   assert.equal(response.body.contractVersion, 1);
   assert.match(response.headers['cache-control'], /max-age=60/);
   assert.equal(response.body.data.identity.teamLabel, '진도군청');
-  assert.equal(hasForbiddenKey(response.body.data, new Set(['records', 'athleteKey', 'name'])), false);
+  assert.equal(hasForbiddenKey(response.body.data, TEAM_PRIVATE_KEYS), false);
 });
 
 test('Given a valid category search When it is served Then the frontend contract version is explicit', async (t) => {
@@ -153,6 +153,7 @@ test('Given a valid category search When it is served Then the frontend contract
   assert.equal(response.status, 200);
   assert.equal(response.body.contractVersion, 1);
   assert.ok(response.body.data.length > 0);
+  assert.equal(hasForbiddenKey(response.body.data, TEAM_PRIVATE_KEYS), false);
 });
 
 test('Given an internal team service failure When the public routes respond Then implementation details stay private', async (t) => {
@@ -209,6 +210,21 @@ function hasForbiddenKey(value, forbidden) {
   if (Array.isArray(value)) return value.some((item) => hasForbiddenKey(item, forbidden));
   return Object.entries(value).some(([key, child]) => forbidden.has(key) || hasForbiddenKey(child, forbidden));
 }
+
+const TEAM_PRIVATE_KEYS = new Set([
+  'affiliations',
+  'athleteKey',
+  'athleteKeys',
+  'attachment',
+  'eventStats',
+  'name',
+  'note',
+  'performance',
+  'rankCounts',
+  'records',
+  'seasonStats',
+  'workspace',
+]);
 
 function teamRecord(id, divisionLevel, competitionId) {
   return {

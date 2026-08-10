@@ -17,7 +17,7 @@ export default function FeaturePreparingPage({ title, description }: FeaturePrep
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <Button asChild>
-          <Link to="/records">내 기록 찾기</Link>
+          <Link to="/records">기록 찾아보기</Link>
         </Button>
         <Button asChild variant="secondary">
           <Link to="/competitions">대회 결과 보기</Link>

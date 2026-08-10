@@ -2,6 +2,8 @@ const fs = require('node:fs'), http = require('node:http'), net = require('node:
 const { spawn } = require('node:child_process'), assert = require('node:assert/strict'), { chromium } = require('playwright');
 const express = require('express');
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
+const { filters, getSearchResults, makeInsights, makeProfile, makeWorkspacePreview, seasonTable } = require('./records-flow-e2e-data');
+const { startViteWithLock } = require('./records-flow-e2e-startup-lock');
 
 const ROOT = path.join(__dirname, '..', '..');
 const FRONTEND = path.join(ROOT, 'frontend');
@@ -9,67 +11,6 @@ const VITE_BIN = path.join(FRONTEND, 'node_modules', 'vite', 'bin', 'vite.js');
 const EVIDENCE_DIR = path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
 const viewport = { width: 375, height: 667 };
 
-const athletes = [
-  athlete('alpha-2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7),
-  athlete('alpha-2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4), athlete('beta-2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
-];
-
-const filters = {
-  seasons: [2026, 2025],
-  events: [{ key: '100m', label: '100m' }, { key: '200m', label: '200m' }],
-  divisions: [{ key: 'men-high', label: 'Men High', gender: 'men', level: 'high' }, { key: 'men-all', label: 'Men All', gender: 'men', level: 'all' }],
-  genderOptions: [{ key: 'men', label: 'Men' }],
-  levelOptions: [{ key: 'all', label: 'All' }, { key: 'high', label: 'High' }],
-  defaultSeasonSelection: { season: 2026, eventKey: '100m', eventLabel: '100m', divisionKey: 'men-high', divisionLabel: 'Men High', genderKey: 'men', divisionLevel: 'high', rowCount: 18 },
-};
-
-const seasonTable = {
-  season: 2026, eventKey: '100m', divisionKey: 'men-high', eventLabel: '100m', divisionLabel: 'Men High', totalIndexedAthletes: 2,
-  rows: athletes.slice(0, 2).map((item, index) => ({
-    rank: index + 1, athleteKey: item.athleteKey, name: item.name, team: item.team,
-    record: index === 0 ? '10.91' : '11.04', recordValue: index === 0 ? 10.91 : 11.04,
-    date: '2026-04-10', competitionName: 'Fixture Invitational', divisionKey: 'men-high',
-    divisionLabel: 'Men High', divisionLevel: 'high', divisionDetail: null,
-    wind: '+0.7', windLegal: true, highlighted: index === 0,
-  })),
-  filters,
-  disclaimer: 'QA fixture',
-};
-
-function athlete(athleteKey, name, team, years, events, recordCount) {
-  return { athleteKey, name, team, teams: [team], years, events, divisions: ['Men High'], recordCount, ambiguity: 'name_team', note: '' };
-}
-
-function makeRecord(item, index) {
-  const record = index === 0 ? '10.91' : '11.04';
-  const recordValue = index === 0 ? 10.91 : 11.04;
-  return {
-    id: `${item.athleteKey}-${index}`, athleteKey: item.athleteKey, name: item.name, team: item.team,
-    season: 2026, competitionName: 'Fixture Invitational',
-    date: `2026-04-${String(index + 10).padStart(2, '0')}`,
-    venue: 'Fixture Stadium', eventKey: '100m', eventLabel: '100m',
-    divisionKey: 'men-high', divisionLabel: 'Men High', gender: 'men', divisionLevel: 'high',
-    divisionDetail: null, rawDivision: 'Men High', phase: 'final', record, recordValue,
-    direction: 'lower', rank: index + 1, wind: '+0.7', windLegal: true, isComparable: true, note: '',
-    source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceId: `qa-${item.athleteKey}`, sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
-  };
-}
-
-function makeProfile(key) {
-  const item = athletes.find((candidate) => candidate.athleteKey === key) || athletes[0];
-  const records = [makeRecord(item, 0), makeRecord(item, 1)];
-  return {
-    athlete: item,
-    summary: { indexedBest: records[0], seasonBest: records[0], latest: records[1], delta: null, indexedResultCount: records.length, comparableResultCount: records.length, sourceScope: 'qa_fixture', disclaimer: 'QA fixture' },
-    events: [{ eventKey: '100m', eventLabel: '100m', recordCount: records.length, best: records[0] }],
-    recordTrail: records.map((record) => ({
-      id: record.id, date: record.date, season: record.season, value: record.recordValue,
-      record: record.record, eventLabel: record.eventLabel, competitionName: record.competitionName,
-      isComparable: record.isComparable,
-    })),
-    records,
-  };
-}
 
 async function withRecordsPage(runScenario, evidence = {}) {
   const port = await getFreePort();
@@ -80,7 +21,7 @@ async function withRecordsPage(runScenario, evidence = {}) {
   const state = { page: null, baseUrl: `http://127.0.0.1:${port}`, visited: [], consoleErrors: [], pageErrors: [] };
 
   try {
-    server = await startViteServer(port);
+    server = await startViteWithLock(() => startViteServer(port));
     browser = await chromium.launch({ channel: 'chrome' });
     context = await browser.newContext({ viewport, deviceScaleFactor: 1, isMobile: true });
     state.page = await context.newPage();
@@ -90,7 +31,11 @@ async function withRecordsPage(runScenario, evidence = {}) {
     state.page.on('pageerror', (error) => state.pageErrors.push(error.message));
     await installApiMocks(state.page, teamApiServer.baseUrl);
     await runScenario(state);
-    assert.deepEqual(state.consoleErrors, [], 'browser console should not contain errors');
+    const expectedConsoleErrors = evidence.expectedConsoleErrors || [];
+    const unexpectedConsoleErrors = state.consoleErrors.filter((message) => (
+      !expectedConsoleErrors.some((expected) => message.includes(expected))
+    ));
+    assert.deepEqual(unexpectedConsoleErrors, [], 'browser console should not contain unexpected errors');
     assert.deepEqual(state.pageErrors, [], 'page should not throw errors');
   } finally {
     writeEvidence(state, evidence);
@@ -114,6 +59,10 @@ async function installApiMocks(page, teamApiBaseUrl) {
 
 async function fulfillApi(route, url, teamApiBaseUrl) {
   const pathname = url.pathname;
+  if (pathname.endsWith('/analytics/record-workspaces/preview')) {
+    const response = await route.fetch({ url: `${teamApiBaseUrl}${pathname}${url.search}` });
+    return route.fulfill({ response });
+  }
   if (pathname.includes('/analytics/teams')) {
     const response = await route.fetch({ url: `${teamApiBaseUrl}${pathname}${url.search}` });
     return route.fulfill({ response });
@@ -125,10 +74,19 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
       data: { season: 2026, events: filters.events.map((event) => ({ ...event, recordCount: 12, athleteCount: 7 })), note: 'QA fixture' },
     });
   }
-  if (pathname.endsWith('/analytics/records/search')) return fulfillJson(route, { success: true, total: athletes.length, data: athletes });
+  if (pathname.endsWith('/analytics/records/search')) {
+    const query = url.searchParams.get('q')?.trim().toLowerCase() || '';
+    const results = getSearchResults(query);
+    return fulfillJson(route, { success: true, total: results.length, data: results });
+  }
   if (pathname.includes('/analytics/athletes/')) {
     const key = decodeURIComponent(pathname.split('/').pop() || '');
-    return fulfillJson(route, { success: true, data: makeProfile(key) });
+    const profile = makeProfile(key);
+    if (!profile) {
+      await route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ success: false, error: 'Not found' }) });
+      return;
+    }
+    return fulfillJson(route, { success: true, data: profile });
   }
   if (pathname.endsWith('/analytics/season-records')) return fulfillJson(route, { success: true, data: seasonTable });
   if (pathname.endsWith('/analytics/insights')) return fulfillJson(route, { success: true, data: makeInsights() });
@@ -138,6 +96,12 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
 async function startTeamApiServer() {
   const app = express();
   app.set('trust proxy', 1);
+  app.post('/api/card-studio/analytics/record-workspaces/preview', express.json(), (req, res) => {
+    const subjectKeys = Array.isArray(req.body?.subjectKeys)
+      ? req.body.subjectKeys.filter((subjectKey) => typeof subjectKey === 'string')
+      : [];
+    return res.json({ success: true, data: makeWorkspacePreview(subjectKeys) });
+  });
   app.use('/api/card-studio/analytics', recordAnalyticsRoutes);
   const server = await new Promise((resolve) => {
     const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
@@ -145,18 +109,6 @@ async function startTeamApiServer() {
   return {
     baseUrl: `http://127.0.0.1:${server.address().port}`,
     close: () => new Promise((resolve) => server.close(resolve)),
-  };
-}
-
-function makeInsights() {
-  return {
-    generatedAt: '2026-07-13T00:00:00.000Z',
-    scope: 'qa_fixture',
-    privacy: { includesNames: false, includesTeams: false, includesAthleteKeys: false, minGroupSize: 3 },
-    season: 2026,
-    eventConcentration: [{ eventKey: '100m', eventLabel: '100m', recordCount: 22, athleteCount: 12 }],
-    regionActivity: [{ regionCode: 'seoul', regionLabel: 'Seoul', recordCount: 12, eventCount: 3 }],
-    seasonPulse: { windowDays: 28, from: '2026-06-01', to: '2026-06-28', buckets: [{ weekStart: '2026-06-01', weekEnd: '2026-06-07', recordCount: 3 }] },
   };
 }
 
@@ -240,6 +192,7 @@ async function stopServer(server) {
 }
 
 function writeEvidence(state, evidence) {
+  if (!shouldWriteEvidence()) return;
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
   const evidencePath = path.join(EVIDENCE_DIR, evidence.fileName || 'records-flow-e2e-results.json');
   fs.writeFileSync(evidencePath, JSON.stringify({
@@ -254,8 +207,21 @@ function writeEvidence(state, evidence) {
   }, null, 2));
 }
 
+function shouldWriteEvidence(value = process.env.WRITE_E2E_EVIDENCE) {
+  return value === '1';
+}
+
 async function expectVisible(locator) {
   await locator.first().waitFor({ state: 'visible', timeout: 10_000 });
+}
+
+async function navigateToReady(page, url) {
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await page.waitForFunction(
+    () => document.readyState === 'complete' && !document.body?.textContent?.includes('화면을 불러오는 중...'),
+    undefined,
+    { timeout: 10_000 },
+  );
 }
 
 async function assertCountAtLeast(locator, expected, message) {
@@ -281,4 +247,4 @@ async function expectUrlParam(page, name, expectedPart) {
   );
 }
 
-module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, selectedCandidateCount, waitForSelectedCandidateCount, withRecordsPage };
+module.exports = { assertCountAtLeast, expectUrlParam, expectVisible, navigateToReady, selectedCandidateCount, shouldWriteEvidence, waitForSelectedCandidateCount, withRecordsPage };

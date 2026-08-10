@@ -21,10 +21,12 @@ test('Given public team statistics When trust copy is scanned Then required limi
 
   // When its user-facing copy is reviewed as one contract.
   const required = [
-    'AthleteTime이 모은 공개 기록 기준이에요.',
-    '공식 팀 명단이나 공식 입상 집계가 아니에요.',
+    '소속 선수 명단이 아니라, AthleteTime이 모은 공개 기록의 통계예요.',
+    '모든 대회를 뜻하지는 않아요.',
     '단계가 확인되지 않은 1~3위 표기',
-    '최고 갱신은 같은 공개 프로필 조각 안에서 계산했어요.',
+    '기록 개선 확인은 같은 공개 프로필 조각 안에서 계산했어요.',
+    '최근 시즌',
+    '찾아진 공개 기록이 있는 시즌만 보여요.',
   ];
 
   // Then collection limits and calculation scope cannot silently disappear.
@@ -61,6 +63,8 @@ test('Given the shared records layout When the team page is inspected Then landm
   assert.doesNotMatch(page, /<main\b/u);
   assert.match(page, /aria-label="팀 통계 보기"/u);
   assert.match(page, /seasons=\{detail\.coverage\.availableSeasons\}/u);
+  assert.ok((page.match(/focus-visible:ring-2/g) || []).length >= 3);
+  assert.ok((page.match(/min-h-11/g) || []).length >= 3);
   assert.match(filter, /aria-pressed=/u);
   for (const category of categories) assert.match(filter, new RegExp(category));
 });

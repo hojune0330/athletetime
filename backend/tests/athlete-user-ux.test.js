@@ -88,13 +88,15 @@ test.after(async () => {
   });
 });
 
-test('home page sends users to their own record search instead of a sample showcase', () => {
+test('home page sends users to public record search instead of a sample showcase', () => {
   const source = readSource('frontend/src/pages/MainPage.tsx');
 
   assert.equal(source.includes('AthleteInsightShowcase'), false);
   assert.equal(source.includes('#record-insight'), false);
   assert.equal(source.includes('예시'), false);
-  assert.match(source, /내 이름으로 기록 찾기[\s\S]*자기 이름/);
+  assert.match(source, /이름으로 공개 기록 찾기/);
+  assert.match(source, /이름을 넣으면 공개된 대회 기록 후보를 찾아 보여드려요/);
+  assert.doesNotMatch(source, /내 기록 찾기|내 기록 검색/);
 });
 
 test('home only advertises destinations that are available at launch', () => {
@@ -142,6 +144,8 @@ test('records search gives same-name candidates practical narrowing controls', (
   const source = [
     readSource('frontend/src/pages/RecordsPage.tsx'),
     readSource('frontend/src/components/records/RecordSearchResults.tsx'),
+    readSource('frontend/src/components/records/RecordSearchFilterChips.tsx'),
+    readSource('frontend/src/components/records/RecordSearchResultCard.tsx'),
   ].join('\n');
 
   assert.match(source, /후보를 좁혀보세요/);
@@ -177,9 +181,37 @@ test('records collection candidates expose an unselected control and reveal a ch
 test('records collection completion labels the existing athlete detail destination honestly', () => {
   const source = readSource('frontend/src/components/records/RecordsMineDoneStep.tsx');
 
-  assert.match(source, /선수 기록 자세히 보기/);
-  assert.match(source, /\/records\?athlete=/);
+  assert.match(source, /선수 기록 보기/);
+  assert.match(source, /\/records\/athletes\//);
+  assert.doesNotMatch(source, /\/records\?athlete=/);
   assert.doesNotMatch(source, /기록 카드 공유/);
+});
+
+test('record collection calls its selected unit an athlete, not an owned record', () => {
+  const source = [
+    'frontend/src/components/records/RecordSearchResults.tsx',
+    'frontend/src/components/records/RecordSearchResultCard.tsx',
+    'frontend/src/components/records/RecordsMineConfirmStep.tsx',
+    'frontend/src/components/record-insights/EstimatedSameAthleteCard.tsx',
+    'frontend/src/components/record-insights/MyRecordsCard.tsx',
+    'frontend/src/pages/RecordsPage.tsx',
+  ].map(readSource).join('\n');
+
+  assert.match(source, /이 선수 담기/);
+  assert.match(source, /선택한 선수 담기/);
+  assert.match(source, /기록 모음/);
+  assert.doesNotMatch(source, /이 기록 담기|선택한 기록 담기|내가 모아 보는 기록/);
+});
+
+test('legacy collection entry copy still avoids claiming a visitor owns a public record', () => {
+  const source = [
+    'frontend/src/components/records/RecordsHub.tsx',
+    'frontend/src/features/record-workspace/components/RecordContextBadge.tsx',
+  ].map(readSource).join('\n');
+
+  assert.match(source, /찾는 선수 기록을 이름과 소속으로 확인한 뒤/);
+  assert.match(source, /이 기기에서 선택한 선수 후보/);
+  assert.doesNotMatch(source, /내 기록이든|이 기기에서 선택한 기록/);
 });
 
 test('records athlete selection creates a shareable records URL instead of state-only detail', () => {
@@ -259,7 +291,7 @@ test('records shared athlete URL prioritizes the athlete panel before candidate 
 
   assert.match(source, /const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean\(selectedAthleteParam\)/);
   assert.match(source, /shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes\.length > 0 && !selectedAthleteParam && \(/);
-  assert.ok(source.indexOf('shouldPrioritizeAthletePanel && (') < source.indexOf('<RecordCandidateList'));
+  assert.ok(source.indexOf('shouldPrioritizeAthletePanel && (') < source.indexOf('<RecordCandidatesSurface'));
   assert.match(source, /shouldShowAthletePanel && !shouldPrioritizeAthletePanel && \(/);
 });
 

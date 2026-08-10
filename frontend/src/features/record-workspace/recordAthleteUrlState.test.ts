@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  createRecordAthleteSharePath,
   parseRecordAthleteSeason,
   resolveRecordAthleteSeason,
   updateRecordAthleteSeason,
@@ -41,5 +42,29 @@ describe('athlete record URL season state', () => {
     // Then latest is displayed without mutating the restored URL and trapping Back navigation.
     expect(selected).toBe(2026)
     expect(restored.toString()).toBe('event=100m')
+  })
+
+  it('creates a canonical athlete share path without local collection or search state', () => {
+    // Given a detail page URL that also contains transient browsing and device-local state.
+    const current = new URLSearchParams(
+      'tab=records&event=100m&season=2026&record=result-1&flow=browse&step=review&mineDraft=athlete-1&compare=athlete-2&q=%EA%B9%80%EB%AF%BC%EC%A7%80',
+    )
+
+    // When the user creates a public link for the selected athlete.
+    const path = createRecordAthleteSharePath('athlete/kim-minji', current)
+
+    // Then the URL retains only public athlete-detail context.
+    expect(path).toBe('/records/athletes/athlete%2Fkim-minji?event=100m&season=2026&record=result-1')
+  })
+
+  it('drops malformed public detail state from an athlete share path', () => {
+    // Given state that cannot reliably restore a public record detail view.
+    const current = new URLSearchParams('tab=unknown&event=%20&season=2201&record=result-1')
+
+    // When the user creates a public link.
+    const path = createRecordAthleteSharePath('athlete-1', current)
+
+    // Then the link is reduced to the canonical athlete page.
+    expect(path).toBe('/records/athletes/athlete-1')
   })
 })

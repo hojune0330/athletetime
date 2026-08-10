@@ -4,6 +4,9 @@ function requestLogPath(req) {
   if (/^\/api(?:\/card-studio)?\/data-requests\/[^/]+\/?$/.test(value)) {
     return value.replace(/\/[^/]+\/?$/, '/[redacted]');
   }
+  if (/^\/api(?:\/card-studio)?\/analytics\/athletes\/[^/]+\/?$/.test(value)) {
+    return value.replace(/\/athletes\/[^/]+\/?$/, '/athletes/[redacted]');
+  }
   return value;
 }
 
