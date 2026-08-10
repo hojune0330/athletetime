@@ -148,6 +148,46 @@ test('RIGHTS-PG-003: Given an applied migration that later drifts When restartin
   assert.equal(applied.rows[0].count, beforeDrift.rows[0].count);
 });
 
+test('CHAT-MIGRATION-001: Given legacy community reports When migrating Then records are preserved before chat reports are created', {
+  skip: !connectionString,
+  timeout: 30000,
+}, async (t) => {
+  const pool = await isolatedPool(t);
+  const userId = await createPreMigrationUsersTable(pool);
+  await pool.query(`
+    CREATE TABLE reports (
+      id BIGSERIAL PRIMARY KEY,
+      post_id BIGINT,
+      comment_id BIGINT,
+      user_id UUID,
+      reason VARCHAR(50) NOT NULL
+    )
+  `);
+  await pool.query(
+    'INSERT INTO reports (post_id, user_id, reason) VALUES ($1, $2, $3)',
+    [12, userId, 'legacy-report'],
+  );
+
+  const firstMigration = await runMigrations({ pool });
+  assert.equal(firstMigration.applied.includes('migration-006a-legacy-reports-isolation.sql'), true);
+  assert.equal(firstMigration.applied.includes('migration-007-chat.sql'), true);
+
+  const legacyRows = await pool.query('SELECT post_id, user_id, reason FROM legacy_community_reports');
+  assert.deepEqual(legacyRows.rows, [{ post_id: '12', user_id: userId, reason: 'legacy-report' }]);
+
+  const chatReportColumns = await pool.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema() AND table_name = 'reports'
+    ORDER BY ordinal_position
+  `);
+  assert.equal(chatReportColumns.rows.some((row) => row.column_name === 'target_type'), true);
+  assert.equal(chatReportColumns.rows.some((row) => row.column_name === 'post_id'), false);
+
+  const secondMigration = await runMigrations({ pool });
+  assert.deepEqual(secondMigration.applied, []);
+});
+
 test('RIGHTS-PG-001: Given isolated PostgreSQL When exercising lifecycle Then requests survive restart without plaintext leakage', {
   skip: !connectionString,
   timeout: 30000,
