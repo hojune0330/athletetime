@@ -124,3 +124,17 @@ test('PACE-UX-006: split calculator rejects zero values before showing pace outp
   assert.match(splitInput, /aria-label="목표 거리 \(km\)"/, 'the split distance field has an accessible label');
   assert.match(splitInput, /aria-label=\{label\}/, 'the split time fields have accessible labels');
 });
+
+test('PACE-UX-007: track-event time input rejects impossible clock values in context', () => {
+  const trackEvents = readSource(`${PACE_DIR}/components/TrackEventSplits.tsx`);
+
+  // Given a runner clears a time field or enters 60 seconds.
+  // When the track-event split calculator updates.
+  // Then it keeps an in-page explanation and skips the invalid calculation.
+  assert.match(trackEvents, /hasValidTargetTime/, 'track-event time has one explicit validity boundary');
+  assert.match(trackEvents, /seconds < 60/, 'seconds must stay within a clock minute');
+  assert.match(trackEvents, /role="alert"/, 'invalid time is announced inside the calculator');
+  assert.match(trackEvents, /aria-label="목표 시간 \(분\)"/, 'minutes input has an accessible label');
+  assert.match(trackEvents, /aria-label="목표 시간 \(초\)"/, 'seconds input has an accessible label');
+  assert.match(trackEvents, /aria-pressed=\{event === option\.id\}/, 'the selected event is exposed to assistive technology');
+});

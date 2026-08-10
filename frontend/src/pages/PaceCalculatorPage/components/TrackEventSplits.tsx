@@ -36,7 +36,14 @@ export const TrackEventSplits: React.FC = () => {
   const [minutes, setMinutes] = useState(9);
   const [seconds, setSeconds] = useState(30);
 
-  const targetSeconds = minutes * 60 + seconds;
+  const hasValidTargetTime = Number.isInteger(minutes)
+    && minutes >= 0
+    && minutes <= 30
+    && Number.isInteger(seconds)
+    && seconds >= 0
+    && seconds < 60
+    && minutes * 60 + seconds > 0;
+  const targetSeconds = hasValidTargetTime ? minutes * 60 + seconds : 0;
 
   const splits: TrackSplit[] = useMemo(() => {
     if (targetSeconds <= 0) return [];
@@ -74,6 +81,7 @@ export const TrackEventSplits: React.FC = () => {
                   key={option.id}
                   type="button"
                   onClick={() => setEvent(option.id)}
+                  aria-pressed={event === option.id}
                   className={`h-11 border-hair font-mono text-[12px] font-medium transition-colors ${
                     index > 0 ? 'border-l' : ''
                   } ${event === option.id ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'}`}
@@ -112,34 +120,49 @@ export const TrackEventSplits: React.FC = () => {
           </div>
 
           <div>
-            <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
+            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
               Target time
-            </label>
+            </p>
             <div className="flex items-start gap-1.5">
               <div className="flex flex-1 flex-col items-center">
                 <input
+                  id="track-target-minutes"
                   type="number"
-                  value={minutes}
+                  value={Number.isFinite(minutes) ? minutes : ''}
                   min="0"
                   max="30"
-                  onChange={(e) => setMinutes(Number(e.target.value))}
+                  step="1"
+                  inputMode="numeric"
+                  aria-label="목표 시간 (분)"
+                  aria-describedby={hasValidTargetTime ? undefined : 'track-time-error'}
+                  onChange={(event) => setMinutes(event.currentTarget.valueAsNumber)}
                   className={`${numberInputClass} w-full`}
                 />
-                <span className="mt-1 text-caption text-ink-4">분</span>
+                <label htmlFor="track-target-minutes" className="mt-1 text-caption text-ink-4">분</label>
               </div>
               <span className="pt-2.5 font-mono text-lg text-ink-4" aria-hidden>:</span>
               <div className="flex flex-1 flex-col items-center">
                 <input
+                  id="track-target-seconds"
                   type="number"
-                  value={seconds}
+                  value={Number.isFinite(seconds) ? seconds : ''}
                   min="0"
                   max="59"
-                  onChange={(e) => setSeconds(Number(e.target.value))}
+                  step="1"
+                  inputMode="numeric"
+                  aria-label="목표 시간 (초)"
+                  aria-describedby={hasValidTargetTime ? undefined : 'track-time-error'}
+                  onChange={(event) => setSeconds(event.currentTarget.valueAsNumber)}
                   className={`${numberInputClass} w-full`}
                 />
-                <span className="mt-1 text-caption text-ink-4">초</span>
+                <label htmlFor="track-target-seconds" className="mt-1 text-caption text-ink-4">초</label>
               </div>
             </div>
+            {!hasValidTargetTime && (
+              <p id="track-time-error" role="alert" className="mt-2 text-body-sm text-err">
+                목표 시간은 0분 1초 이상, 초는 0부터 59까지 입력해 주세요.
+              </p>
+            )}
           </div>
         </div>
       </section>
