@@ -69,6 +69,29 @@ test('DATA-REQUEST-INTENT-E2E Given a typed request link When the form opens The
   });
 });
 
+test('MOBILE-DRAWER-FOCUS-E2E Given the mobile menu opens When using a keyboard Then focus remains in the drawer and Escape restores its trigger', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/records`);
+    const trigger = page.locator('button[aria-controls="mobile-navigation-drawer"]').first();
+    await trigger.click();
+
+    const drawer = page.locator('#mobile-navigation-drawer');
+    const closeButton = drawer.locator('button').first();
+    await expectVisible(drawer);
+    await page.waitForFunction(() => document.activeElement === document.querySelector('#mobile-navigation-drawer button'));
+
+    await page.keyboard.press('Shift+Tab');
+    await page.keyboard.press('Shift+Tab');
+    assert.equal(await drawer.evaluate((element) => element.contains(document.activeElement)), true);
+
+    await page.keyboard.press('Escape');
+    await drawer.waitFor({ state: 'detached' });
+    assert.equal(await trigger.evaluate((element) => document.activeElement === element), true);
+    assert.equal(await closeButton.count(), 0);
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     // Given only the record-workspace local storage key is unavailable before the app starts.

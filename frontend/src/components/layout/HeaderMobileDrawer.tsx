@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom'
-import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useCallback, useEffect, useRef } from 'react'
 import { ClockIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '../../context/AuthContext'
 
@@ -60,24 +59,53 @@ export default function HeaderMobileDrawer({
 }: HeaderMobileDrawerProps) {
   const location = useLocation()
   const { user, logout: logoutWithContext } = useAuth()
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/')
   }
 
-  // Escape 키로 닫기 + 트리거 버튼 focus 복원
+  const closeAndRestoreFocus = useCallback(() => {
+    onClose()
+    window.requestAnimationFrame(() => triggerRef?.current?.focus())
+  }, [onClose, triggerRef])
+
   useEffect(() => {
     if (!open) return
 
+    const focusFrame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus()
+    })
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      onClose()
-      triggerRef?.current?.focus()
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        closeAndRestoreFocus()
+        return
+      }
+      if (event.key !== 'Tab') return
+
+      const focusable = getFocusableElements(drawerRef.current)
+      const first = focusable.at(0)
+      const last = focusable.at(-1)
+      if (!first || !last) return
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [open, onClose, triggerRef])
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open, closeAndRestoreFocus])
 
   const handleLogout = async () => {
     onClose()
@@ -99,6 +127,8 @@ export default function HeaderMobileDrawer({
         id="mobile-navigation-drawer"
         role="dialog"
         aria-modal="true"
+        aria-label="모바일 메뉴"
+        ref={drawerRef}
         className="mobile-drawer active"
       >
         <div className="flex flex-col h-full">
@@ -109,8 +139,11 @@ export default function HeaderMobileDrawer({
               <span className="text-lg font-semibold tracking-tight text-ink">애타</span>
             </Link>
             <button
-              onClick={onClose}
-              className="rounded-sm p-2 text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+              ref={closeButtonRef}
+              type="button"
+              onClick={closeAndRestoreFocus}
+              aria-label="메뉴 닫기"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-sm text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <XMarkIcon className="w-5 h-5" />
             </button>
@@ -125,7 +158,7 @@ export default function HeaderMobileDrawer({
                   key={item.path}
                   to={item.path}
                   onClick={onClose}
-                  className={`flex items-center gap-3 border-l-2 px-4 py-3 transition-colors ${
+                  className={`flex min-h-11 items-center gap-3 border-l-2 px-4 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                     isActive(item.path)
                       ? 'border-brand bg-surface-2 text-brand'
                       : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
@@ -147,7 +180,7 @@ export default function HeaderMobileDrawer({
                     key={item.path}
                     to={item.path}
                     onClick={onClose}
-                    className={`flex items-baseline justify-between gap-3 border-l-2 px-4 py-3 transition-colors ${
+                    className={`flex min-h-11 items-baseline justify-between gap-3 border-l-2 px-4 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                       isActive(item.path)
                         ? 'border-brand bg-surface-2 text-brand'
                         : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
@@ -173,7 +206,7 @@ export default function HeaderMobileDrawer({
                       key={item.path}
                       to={item.path}
                       onClick={onClose}
-                      className={`flex items-center gap-3 border-l-2 px-4 py-3 transition-colors ${
+                      className={`flex min-h-11 items-center gap-3 border-l-2 px-4 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                         isActive(item.path)
                           ? 'border-brand bg-surface-2 text-brand'
                           : 'border-transparent text-ink-2 hover:bg-surface-2 hover:text-ink'
@@ -190,7 +223,7 @@ export default function HeaderMobileDrawer({
                   <Link
                     to="/profile"
                     onClick={onClose}
-                    className="flex w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2"
+                    className="flex min-h-11 w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-semibold text-white">
                       {user.nickname.charAt(0)}
@@ -200,7 +233,7 @@ export default function HeaderMobileDrawer({
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+                    className="flex min-h-11 w-full items-center gap-3 px-4 py-3 text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <span className="font-medium">로그아웃</span>
                   </button>
@@ -209,7 +242,7 @@ export default function HeaderMobileDrawer({
                 <>
                   <button
                     onClick={handleOpenLogin}
-                    className="flex w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2"
+                    className="flex min-h-11 w-full items-center gap-3 border border-line px-4 py-3 text-ink-2 transition-colors hover:border-line-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <UserIcon className="w-5 h-5 text-ink-3" />
                     <span className="font-medium">로그인</span>
@@ -217,7 +250,7 @@ export default function HeaderMobileDrawer({
                   <Link
                     to="/register"
                     onClick={onClose}
-                    className="flex items-center gap-3 bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-brand-600"
+                    className="flex min-h-11 items-center gap-3 bg-primary px-4 py-3 text-primary-foreground transition-colors hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <UserIcon className="w-5 h-5" />
                     <span className="font-medium">회원가입</span>
@@ -230,4 +263,10 @@ export default function HeaderMobileDrawer({
       </div>
     </>
   )
+}
+
+function getFocusableElements(root: HTMLDivElement | null): HTMLElement[] {
+  if (!root) return []
+  return [...root.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+    .filter((element) => element.tabIndex >= 0 && !element.hasAttribute('aria-hidden'))
 }

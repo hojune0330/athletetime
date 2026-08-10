@@ -321,7 +321,7 @@ AthleteTime의 핵심 가치는 공개 경기 결과를 `찾기 → 후보 확�
 
 **커밋**: `feat(team): apply approved small-group protection`
 
-- [ ] Task 3.3: 모바일 메뉴와 좁은 화면의 상호작용 잠금
+- [x] Task 3.3: 모바일 메뉴와 좁은 화면의 상호작용 잠금
 
 **목적**: 화면 크기나 입력 수단에 따라 메뉴·CTA가 깨지지 않게 한다.
 
