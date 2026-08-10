@@ -122,15 +122,26 @@ export function useSplitCalculator() {
   const targetTimeSeconds = useMemo(() => {
     return hours * 3600 + minutes * 60 + seconds;
   }, [hours, minutes, seconds]);
+
+  const hasValidInput = Number.isFinite(distance)
+    && distance > 0
+    && Number.isFinite(targetTimeSeconds)
+    && targetTimeSeconds > 0;
   
   const averagePace = useMemo(() => {
-    return targetTimeSeconds / distance;
-  }, [targetTimeSeconds, distance]);
+    return hasValidInput ? targetTimeSeconds / distance : 0;
+  }, [distance, hasValidInput, targetTimeSeconds]);
   
   const calculate = useCallback(() => {
+    if (!hasValidInput) {
+      setSplits(null);
+      return false;
+    }
+
     const result = calculateSplits(distance, targetTimeSeconds, strategy);
     setSplits(result);
-  }, [distance, targetTimeSeconds, strategy]);
+    return true;
+  }, [distance, hasValidInput, strategy, targetTimeSeconds]);
   
   const reset = useCallback(() => {
     setSplits(null);
@@ -148,9 +159,10 @@ export function useSplitCalculator() {
     strategy,
     setStrategy,
     targetTimeSeconds,
+    hasValidInput,
     averagePace,
-    averagePaceFormatted: formatPace(averagePace),
-    speedKmh: calculateSpeed(distance * 1000, targetTimeSeconds).toFixed(1),
+    averagePaceFormatted: hasValidInput ? formatPace(averagePace) : '-',
+    speedKmh: hasValidInput ? calculateSpeed(distance * 1000, targetTimeSeconds).toFixed(1) : '-',
     splits,
     calculate,
     reset,

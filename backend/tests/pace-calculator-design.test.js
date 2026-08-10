@@ -109,3 +109,17 @@ test('PACE-UX-005: invalid custom input stays in-page and cannot reuse a prior d
   assert.match(target, /aria-label="직접 거리 \(km\)"/, 'the custom-distance field has an accessible label');
   assert.match(target, /aria-label=\{label\}/, 'every time field exposes its label to assistive technology');
 });
+
+test('PACE-UX-006: split calculator rejects zero values before showing pace output', () => {
+  const hook = readSource(`${PACE_DIR}/hooks/usePaceCalculator.ts`);
+  const split = readSource(`${PACE_DIR}/components/SplitCalculator.tsx`);
+
+  // Given a runner clears the target distance or finish time.
+  // When the split screen recalculates its preview or result.
+  // Then it cannot expose NaN or Infinity as a pace.
+  assert.match(hook, /hasValidInput/, 'the split state has one explicit valid-input boundary');
+  assert.match(hook, /if \(!hasValidInput\)/, 'invalid split inputs skip result generation');
+  assert.match(split, /role="alert"/, 'the split screen explains invalid input in context');
+  assert.match(split, /aria-label="목표 거리 \(km\)"/, 'the split distance field has an accessible label');
+  assert.match(split, /aria-label="시간"/, 'the split time fields have accessible labels');
+});

@@ -74,6 +74,7 @@ export const SplitCalculator: React.FC = () => {
     setSeconds,
     strategy,
     setStrategy,
+    hasValidInput,
     averagePaceFormatted,
     speedKmh,
     splits,
@@ -84,6 +85,7 @@ export const SplitCalculator: React.FC = () => {
   const { favorites, saveFavorite, deleteFavorite } = useFavorites();
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [favoriteName, setFavoriteName] = useState('');
+  const [validationError, setValidationError] = useState('');
 
   // 빠른 거리 선택
   const handleQuickDistance = (dist: number) => {
@@ -100,6 +102,11 @@ export const SplitCalculator: React.FC = () => {
   // 즐겨찾기 저장
   const handleSaveFavorite = () => {
     if (!favoriteName.trim()) return;
+    if (!hasValidInput) {
+      setValidationError('목표 거리와 완주 시간을 0보다 크게 입력해 주세요.');
+      return;
+    }
+
     const targetTime = hours * 3600 + minutes * 60 + seconds;
     saveFavorite(favoriteName, distance, targetTime, strategy);
     setShowSaveModal(false);
@@ -115,6 +122,15 @@ export const SplitCalculator: React.FC = () => {
     setStrategy(fav.strategy);
   };
 
+  const handleCalculate = () => {
+    if (calculate()) {
+      setValidationError('');
+      return;
+    }
+
+    setValidationError('목표 거리와 완주 시간을 0보다 크게 입력해 주세요.');
+  };
+
   return (
     <div className="space-y-6">
       <div className="card p-6">
@@ -123,6 +139,12 @@ export const SplitCalculator: React.FC = () => {
           스플릿 계산기
         </h2>
         <p className="text-gray-600 mb-6">레이스 구간별 목표 시간과 페이스를 계산합니다</p>
+
+        {validationError && (
+          <div role="alert" className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {validationError}
+          </div>
+        )}
 
         {/* 거리 선택 */}
         <div className="mb-6">
@@ -152,6 +174,7 @@ export const SplitCalculator: React.FC = () => {
               onChange={(e) => setDistance(Number(e.target.value))}
               min="0.1"
               step="0.1"
+              aria-label="목표 거리 (km)"
               className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
             <span className="text-gray-600">km</span>
@@ -188,6 +211,7 @@ export const SplitCalculator: React.FC = () => {
                 onChange={(e) => setHours(Number(e.target.value))}
                 min="0"
                 max="12"
+                aria-label="시간"
                 className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-xs text-gray-500 mt-1">시간</span>
@@ -200,6 +224,7 @@ export const SplitCalculator: React.FC = () => {
                 onChange={(e) => setMinutes(Number(e.target.value))}
                 min="0"
                 max="59"
+                aria-label="분"
                 className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-xs text-gray-500 mt-1">분</span>
@@ -212,6 +237,7 @@ export const SplitCalculator: React.FC = () => {
                 onChange={(e) => setSeconds(Number(e.target.value))}
                 min="0"
                 max="59"
+                aria-label="초"
                 className="w-20 px-3 py-3 border border-gray-300 rounded-lg text-center text-xl font-mono focus:ring-2 focus:ring-blue-500"
               />
               <span className="text-xs text-gray-500 mt-1">초</span>
@@ -322,7 +348,7 @@ export const SplitCalculator: React.FC = () => {
         {/* 계산 버튼 */}
         <button
           type="button"
-          onClick={calculate}
+          onClick={handleCalculate}
           className="w-full py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-[1.02]"
         >
           <i className="fas fa-calculator mr-2"></i>
