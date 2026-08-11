@@ -3,7 +3,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const page = fs.readFileSync(path.join(__dirname, '..', '..', 'frontend', 'src', 'pages', 'DataRequestPage.tsx'), 'utf8');
+const root = path.join(__dirname, '..', '..', 'frontend', 'src', 'pages');
+const page = [
+  fs.readFileSync(path.join(root, 'DataRequestPage.tsx'), 'utf8'),
+  fs.readFileSync(path.join(root, 'data-request', 'DataRequestIntro.tsx'), 'utf8'),
+].join('\n');
 
 test('DATA-REQUEST-MINIMUM-UX Given a correction link When the request form opens Then its explicit correction intent is retained', () => {
   assert.match(page, /useSearchParams/);
@@ -17,6 +21,11 @@ test('DATA-REQUEST-MINIMUM-UX Given a person describes a request When entering a
   assert.match(page, /id="request-sensitive-guidance"/);
   assert.match(page, /요청 사유에는 주민등록번호·전화번호·이메일을 적을 수 없어요/);
   assert.match(page, /아래 연락처 칸에만 적어 주세요/);
+});
+
+test('DATA-REQUEST-MINIMUM-UX Given a first mobile visit When the request screen opens Then optional processing detail stays collapsible', () => {
+  assert.match(page, /처리 방식 보기/);
+  assert.match(page, /<details/);
 });
 
 test('DATA-REQUEST-MINIMUM-UX Given a public athlete detail When asking to correct a record Then it sends the correction intent explicitly', () => {

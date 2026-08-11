@@ -28,7 +28,10 @@ test('frontend trust surfaces use public-record indexing copy instead of workaro
 
 test('public record search and data request inputs use neutral placeholders', () => {
   const recordsNameStep = readSource('frontend/src/components/records/RecordsMineNameStep.tsx');
-  const dataRequestPage = readSource('frontend/src/pages/DataRequestPage.tsx');
+  const dataRequestPage = [
+    readSource('frontend/src/pages/DataRequestPage.tsx'),
+    readSource('frontend/src/pages/data-request/DataRequestIntro.tsx'),
+  ].join('\n');
 
   for (const cannedExample of ['홍길동', '김민준', '서울고', '○○실업팀']) {
     assert.equal(recordsNameStep.includes(cannedExample), false);
@@ -43,7 +46,10 @@ test('public record search and data request inputs use neutral placeholders', ()
 });
 
 test('data request form asks for the minimum information needed to review a request', () => {
-  const dataRequestPage = readSource('frontend/src/pages/DataRequestPage.tsx');
+  const dataRequestPage = [
+    readSource('frontend/src/pages/DataRequestPage.tsx'),
+    readSource('frontend/src/pages/data-request/DataRequestIntro.tsx'),
+  ].join('\n');
 
   assert.match(dataRequestPage, /선수 이름과 요청 사유만/);
   assert.match(dataRequestPage, /주민등록번호·사진·진단서 같은 민감한 정보는 적지 말아 주세요/);

@@ -24,8 +24,9 @@ import {
   type DataRequestReceipt,
   type DataRequestStatusInfo,
 } from '../api/dataRequests';
-import { CORRECTION_POLICY } from '../config/dataPolicy';
 import { resolveDataRequestType, resolvePrefilledAthleteName } from './dataRequestFormState';
+import { DataRequestIntro } from './data-request/DataRequestIntro';
+import { DataRequestReceipt as DataRequestReceiptCard } from './data-request/DataRequestReceipt';
 
 const REQUEST_TYPE_OPTIONS: { value: DataRequestType; label: string; desc: string }[] = [
   { value: 'correction', label: '정정', desc: '기록·소속 등 정보가 사실과 다릅니다' },
@@ -115,88 +116,21 @@ export default function DataRequestPage() {
   // ── 접수 완료(접수증) 화면 ──
   if (receipt) {
     return (
-      <div className="mx-auto max-w-article px-4 py-10">
-        <div className="border border-hair bg-surface">
-          <div className="border-b border-hair bg-surface-2 px-5 py-3">
-            <span className="text-body-sm font-semibold text-ok">
-              접수 완료
-            </span>
-            <h1 className="mt-1 text-h2 font-medium tracking-tighter-2 text-ink">
-              요청이 접수되었습니다
-            </h1>
-          </div>
-          <div className="space-y-5 px-5 py-6">
-            <div>
-              <p className="text-caption uppercase tracking-wider-2 text-ink-4">접수 번호</p>
-              <p className="mt-1 font-mono text-h2 font-medium text-brand-500">{receipt.ticketId}</p>
-              <p className="mt-2 text-body-sm text-ink-3">
-                이 번호로 처리 상태를 확인하실 수 있습니다. 캡처하거나 메모해 두세요.
-              </p>
-            </div>
-            <div className="border-t border-hair pt-4 text-body-sm text-ink-3">
-              <p>
-                {CORRECTION_POLICY.slaNotice} 별도의 개별 회신은 드리지 않을 수 있어요.
-                진행 상황은 접수 번호 조회로 확인해 주세요.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setLookupId(receipt.ticketId);
-                  setReceipt(null);
-                }}
-              >
-                상태 조회로 이동
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setReceipt(null);
-                  setAthleteName('');
-                  setAffiliation('');
-                  setCompetition('');
-                  setEvent('');
-                  setReason('');
-                  setContact('');
-                }}
-              >
-                새 요청 작성
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <DataRequestReceiptCard
+        receipt={receipt}
+        onLookup={(ticketId) => { setLookupId(ticketId); setReceipt(null); }}
+        onNewRequest={() => {
+          setReceipt(null); setAthleteName(''); setAffiliation(''); setCompetition('');
+          setEvent(''); setReason(''); setContact('');
+        }}
+      />
     );
   }
 
   // ── 기본(폼 + 조회) 화면 ──
   return (
     <div className="mx-auto max-w-article px-4 py-10">
-      <header className="mb-6">
-        <span className="text-body-sm font-semibold text-brand-500">
-          기록 정정 요청
-        </span>
-        <h1 className="mt-1 text-h1 font-medium tracking-tighter-3 text-ink">
-          기록을 고치거나 숨기고 싶다면
-        </h1>
-        <p className="mt-2 max-w-frame text-body-sm leading-relaxed text-ink-3">
-          AthleteTime은 공개된 경기 결과를 모아 정리한 자료예요. 공식 기록 서비스가 아니에요.
-          선수 본인 또는 권리자는 선수 이름과 요청 사유만 적어 주세요. 소속·대회·종목은 기억나는 내용만 적어 주세요.
-          주민등록번호·사진·진단서 같은 민감한 정보는 적지 말아 주세요. {' '}{CORRECTION_POLICY.slaNotice}
-        </p>
-
-        <div className="mt-4 border border-hair bg-surface-2 px-4 py-3">
-          <p className="text-caption leading-relaxed text-ink-3">
-            <span className="mr-1.5 text-body-sm font-semibold text-brand-500">
-              안내
-            </span>
-            {CORRECTION_POLICY.hideFirstNotice} 결과표에는 기록이 남지만
-            이름·소속 검색과 추천 화면에서는 더 이상 보이지 않게 처리해요.
-            {' '}{CORRECTION_POLICY.minorPriorityNotice}
-          </p>
-        </div>
-      </header>
+      <DataRequestIntro />
 
       {/* 요청 폼 */}
       <form onSubmit={handleSubmit} className="border border-hair bg-surface">
