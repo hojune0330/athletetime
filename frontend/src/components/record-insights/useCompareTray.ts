@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { RECORD_DEVICE_DATA_CLEARED_EVENT } from '../../features/record-workspace/model';
 
 /**
  * 비교 트레이 — "비교에 담기"로 선수를 모아두는 상태 (localStorage 유지).
@@ -56,9 +57,11 @@ export function useCompareTray() {
   useEffect(() => {
     const sync = () => setEntries(readStorage());
     window.addEventListener(EVENT, sync);
+    window.addEventListener(RECORD_DEVICE_DATA_CLEARED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
       window.removeEventListener(EVENT, sync);
+      window.removeEventListener(RECORD_DEVICE_DATA_CLEARED_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
   }, []);

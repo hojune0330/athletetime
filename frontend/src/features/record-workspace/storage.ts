@@ -35,6 +35,19 @@ export type { RecordComparison, RecordWorkspace, RecordWorkspaceDraft, SelfClaim
 export type { StorageLike, StorageStatus }
 export type { SaveResult, WorkspaceUpdate } from './storageContracts'
 
+const RECORD_DEVICE_LOCAL_STORAGE_KEYS = [
+  STORAGE_KEYS.selfClaimDraft,
+  STORAGE_KEYS.workspaces,
+  'athletetime.my-athlete.v1',
+  'athletetime.my-athlete.v2',
+  'athletetime.compareTray.v1',
+] as const
+
+const RECORD_DEVICE_SESSION_STORAGE_KEYS = [
+  STORAGE_KEYS.workspaceDraft,
+  STORAGE_KEYS.comparison,
+] as const
+
 export class RecordWorkspaceStorage {
   readonly #local: StorageLike
   readonly #session: StorageLike
@@ -80,6 +93,14 @@ export class RecordWorkspaceStorage {
 
   clearWorkspaceDraft(): StorageMode {
     return this.#boundary.remove(this.#session, STORAGE_KEYS.workspaceDraft)
+  }
+
+  clearRecordDeviceData(): StorageMode {
+    const results = [
+      ...RECORD_DEVICE_LOCAL_STORAGE_KEYS.map((key) => this.#boundary.remove(this.#local, key)),
+      ...RECORD_DEVICE_SESSION_STORAGE_KEYS.map((key) => this.#boundary.remove(this.#session, key)),
+    ]
+    return results.every((result) => result === 'persistent') ? 'persistent' : 'volatile'
   }
 
   getSelfClaimDraft(): SelfClaimDraft | null {

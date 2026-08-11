@@ -16,6 +16,8 @@ export const STORAGE_KEYS = {
   workspaces: 'athletetime.recordWorkspaces.v1',
 } as const
 
+export const RECORD_DEVICE_DATA_CLEARED_EVENT = 'athletetime:record-device-data-cleared'
+
 const publicAthleteKeyPattern = /^(?:[a-f0-9]{16}|at_[a-z0-9_-]{8,80})$/
 const focusTokenPattern = /^[a-z0-9][a-z0-9:_-]{0,79}$/i
 

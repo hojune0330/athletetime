@@ -89,9 +89,14 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.locator('[data-records-step="mine-done"]'));
     assert.equal(new URL(page.url()).searchParams.get('mineDraft'), null, 'done step clears draft URL state');
 
-    const doneActions = page.locator('[data-records-sticky-cta="mine-done"]').locator(':scope > a, :scope > button');
-    const viewSelectedAthlete = page.getByRole('link', { name: '\uC120\uC218 \uAE30\uB85D \uBCF4\uAE30', exact: true });
-    assert.equal(await doneActions.first().evaluate((element) => element.tagName), 'A', 'the first completion action is the public athlete-record link');
+    const doneActions = page.locator('[data-records-sticky-cta="mine-done"]').locator(':scope > button');
+    const viewSelectedAthlete = page.locator('[data-records-step="mine-done"]').getByRole('link', { name: '기록 보기', exact: true }).first();
+    assert.equal(
+      await page.locator('[data-records-step="mine-done"]').getByRole('link', { name: '기록 보기', exact: true }).count(),
+      2,
+      'each saved candidate keeps its own record destination',
+    );
+    assert.equal(await doneActions.count(), 2, 'completion keeps only collection-wide actions in the sticky area');
     assert.equal(await viewSelectedAthlete.getAttribute('href'), '/records/athletes/alpha-2016');
     await viewSelectedAthlete.click();
     await page.waitForURL(/\/records\/athletes\/alpha-2016/u);

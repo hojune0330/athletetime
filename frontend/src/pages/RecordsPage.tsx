@@ -29,6 +29,7 @@ import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/R
 import { RecordsHub } from '../components/records/RecordsHub';
 import { RecordSearchForm } from '../components/records/RecordSearchForm';
 import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
+import { RecordDeviceDataControls } from '../components/records/RecordDeviceDataControls';
 import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
 import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFilter';
 import { searchTeamPerformance } from '../features/team-performance/teamPerformanceApi';
@@ -81,6 +82,7 @@ export default function RecordsPage() {
   const teamCategory = parseTeamCategory(searchParams.get('category'));
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
   const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
+  const deviceDraftCount = workspaceDraftKeys.length + (workspaceStore.selfClaimDraft?.subjectKeys.length ?? 0);
 
   const toggleProfileComparison = (currentProfile: AthleteAnalyticsProfile) => {
     const result = compareTray.toggle({
@@ -458,6 +460,13 @@ export default function RecordsPage() {
           onStartMine={openMineStart}
           onOpenTeamPerformance={() => openBrowseChoice('team')}
         >
+          <RecordDeviceDataControls
+            candidateCount={myEntries.length}
+            comparisonCount={compareTray.count}
+            draftCount={deviceDraftCount}
+            workspaceCount={workspaceStore.workspaces.length}
+            onClear={workspaceStore.clearRecordDeviceData}
+          />
           <AnonymousInsightCards
             onPickEvent={(key) => {
               setEventKey(key);

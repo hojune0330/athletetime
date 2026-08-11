@@ -94,9 +94,9 @@ test('home page sends users to public record search instead of a sample showcase
   assert.equal(source.includes('AthleteInsightShowcase'), false);
   assert.equal(source.includes('#record-insight'), false);
   assert.equal(source.includes('예시'), false);
-  assert.match(source, /이름으로 공개 기록 찾기/);
-  assert.match(source, /이름을 넣으면 공개된 대회 기록 후보를 찾아 보여드려요/);
-  assert.doesNotMatch(source, /내 기록 찾기|내 기록 검색/);
+  assert.match(source, /내 기록, 이름만 알면 찾아요/);
+  assert.match(source, /동명이인이면 소속을 보고 직접 고를 수 있어요/);
+  assert.match(source, /이름 또는 소속\(학교·팀\)을 입력하세요/);
 });
 
 test('home only advertises destinations that are available at launch', () => {
@@ -108,12 +108,21 @@ test('home only advertises destinations that are available at launch', () => {
   assert.match(source, /to: '\/about-data'|to="\/about-data"/);
 });
 
+test('shared layouts give keyboard users one main destination without nesting landmarks', () => {
+  const layout = readSource('frontend/src/components/layout/Layout.tsx');
+  const home = readSource('frontend/src/pages/MainPage.tsx');
+
+  assert.equal((layout.match(/href=\"#main-content\"/g) || []).length, 2);
+  assert.equal((layout.match(/<main id=\"main-content\">/g) || []).length, 2);
+  assert.doesNotMatch(home, /<main\b/);
+});
+
 test('home and footer keep launch navigation and record language truthful', () => {
   const home = readSource('frontend/src/pages/MainPage.tsx');
   const footer = readSource('frontend/src/components/layout/Footer.tsx');
 
-  assert.match(home, /최고 기록\(PB\), 이번 시즌 기록/);
-  assert.doesNotMatch(home, /PB, 이번 시즌 최고/);
+  assert.match(home, /공개 경기 기록을 이름으로 찾는 곳/);
+  assert.doesNotMatch(home, /공식 순위|전국 랭킹/);
   assert.doesNotMatch(footer, /to: '\/community'|label: '커뮤니티'/);
   assert.match(footer, /자료 수집 방식/);
 });
@@ -181,7 +190,7 @@ test('records collection candidates expose an unselected control and reveal a ch
 test('records collection completion labels the existing athlete detail destination honestly', () => {
   const source = readSource('frontend/src/components/records/RecordsMineDoneStep.tsx');
 
-  assert.match(source, /선수 기록 보기/);
+  assert.match(source, />기록 보기</);
   assert.match(source, /\/records\/athletes\//);
   assert.doesNotMatch(source, /\/records\?athlete=/);
   assert.doesNotMatch(source, /기록 카드 공유/);

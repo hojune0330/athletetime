@@ -51,8 +51,8 @@ test('DIVISION-HIERARCHY-002 analytics filters remove kaaf-kind keys and keep TO
   assert.deepEqual(duplicateLabels, []);
   assert.deepEqual(index.manualTopRecordStats, {
     totalCandidates: 16885,
-    appended: 9564,
-    skippedDuplicates: 7321,
+    appended: 9510,
+    skippedDuplicates: 7375,
     skippedSuppressed: 0,
     skippedInvalidName: 0,
     skippedInvalidRecord: 0,

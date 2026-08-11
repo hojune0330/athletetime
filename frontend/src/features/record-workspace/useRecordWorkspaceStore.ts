@@ -10,6 +10,7 @@ import {
   type StorageStatus,
   type WorkspaceUpdate,
 } from './storage'
+import { RECORD_DEVICE_DATA_CLEARED_EVENT } from './model'
 
 type StoreSnapshot = {
   readonly comparison: RecordComparison | null
@@ -106,6 +107,15 @@ export function useRecordWorkspaceStore() {
     return persistence
   }, [refresh, store])
 
+  const clearRecordDeviceData = useCallback(() => {
+    const persistence = store.clearRecordDeviceData()
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event(RECORD_DEVICE_DATA_CLEARED_EVENT))
+    }
+    refresh()
+    return persistence
+  }, [refresh, store])
+
   const updateWorkspace = useCallback((
     workspaceId: string,
     changes: WorkspaceUpdate,
@@ -129,6 +139,7 @@ export function useRecordWorkspaceStore() {
 
   return {
     ...snapshot,
+    clearRecordDeviceData,
     clearWorkspaceDraft,
     createWorkspace,
     deleteWorkspace,

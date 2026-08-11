@@ -56,7 +56,14 @@ export function DoneStep({
                   <Button asChild type="button" variant="outline">
                     <Link state={createRecordAthleteMineReturnState()} to={`/records/athletes/${encodeURIComponent(entry.athleteKey)}`}>기록 보기</Link>
                   </Button>
-                  <Button type="button" variant="ghost" onClick={() => onRemoveMyAthlete(entry.athleteKey)}>빼기</Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    aria-label={`${entry.team || entry.name} 묶음을 이 목록에서 빼기`}
+                    onClick={() => onRemoveMyAthlete(entry.athleteKey)}
+                  >
+                    빼기
+                  </Button>
                 </div>
               </li>
             ))}

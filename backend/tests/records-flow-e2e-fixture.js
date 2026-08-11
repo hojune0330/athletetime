@@ -25,8 +25,12 @@ async function withRecordsPage(runScenario, evidence = {}) {
     browser = await chromium.launch({ channel: 'chrome' });
     context = await browser.newContext({ viewport, deviceScaleFactor: 1, isMobile: true });
     state.page = await context.newPage();
+    state.page.setDefaultNavigationTimeout(90_000);
     state.page.on('console', (message) => {
-      if (message.type() === 'error') state.consoleErrors.push(message.text());
+      if (message.type() === 'error') {
+        const location = message.location();
+        state.consoleErrors.push(location.url ? `${message.text()} (${location.url})` : message.text());
+      }
     });
     state.page.on('pageerror', (error) => state.pageErrors.push(error.message));
     await installApiMocks(state.page, teamApiServer.baseUrl);

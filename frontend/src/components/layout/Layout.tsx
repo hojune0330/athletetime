@@ -6,9 +6,15 @@ import MobileTabBar from './MobileTabBar'
 export default function Layout() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-ink px-4 py-3 text-body-sm font-semibold text-surface focus:not-sr-only"
+      >
+        본문으로 건너뛰기
+      </a>
       <Header />
       <div className="max-w-5xl mx-auto w-full px-4 py-6 flex-1">
-        <main>
+        <main id="main-content">
           <Outlet />
         </main>
       </div>
@@ -27,9 +33,15 @@ export default function Layout() {
 export function FullWidthLayout() {
   return (
     <div className="min-h-screen bg-bg flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-ink px-4 py-3 text-body-sm font-semibold text-surface focus:not-sr-only"
+      >
+        본문으로 건너뛰기
+      </a>
       <Header />
       <div className="flex-1">
-        <main>
+        <main id="main-content">
           <Outlet />
         </main>
       </div>

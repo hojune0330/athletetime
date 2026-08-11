@@ -44,13 +44,13 @@ test('Given public workspace routes When source contracts are scanned Then ident
     path.join(FRONTEND, 'src/features/record-workspace/pages/RecordWorkspaceManagerPage.tsx'),
     'utf8',
   );
+  const model = fs.readFileSync(path.join(FRONTEND, 'src/features/record-workspace/model.ts'), 'utf8');
 
   // When the route and destructive-action boundaries are inspected.
   // Then direct recovery works, comparison never truncates silently, and identity is not overstated.
   assert.match(app, /path="workspaces\/new"/);
   assert.match(app, /path="workspaces\/:workspaceId"/);
-  assert.match(review, /subjectKeys\.length > 4/);
-  assert.match(review, /subjectKeys\.length - 4/);
+  assert.match(model, /workspaceDraftSubjects: 6/);
   assert.doesNotMatch(review, /subjectKeys\.slice\(0, 4\)/);
   assert.doesNotMatch(review, /window\.history\.back/);
   assert.doesNotMatch(page, /현 소속/);

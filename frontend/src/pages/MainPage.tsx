@@ -105,7 +105,7 @@ export default function MainPage() {
   };
 
   return (
-    <main className="min-h-screen bg-bg text-ink">
+    <div className="min-h-screen bg-bg text-ink">
       <section className="mx-auto max-w-frame px-4 pb-10 pt-12 sm:px-6 lg:px-8 lg:pb-14 lg:pt-16">
         <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
           <div className="max-w-2xl">
@@ -183,6 +183,6 @@ export default function MainPage() {
           onToggle={toggleShortcut}
         />
       </section>
-    </main>
+    </div>
   );
 }

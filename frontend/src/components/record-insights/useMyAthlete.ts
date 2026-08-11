@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { RECORD_DEVICE_DATA_CLEARED_EVENT } from '../../features/record-workspace/model';
 
 /**
  * "내 기록 지정" — 검색한 기록 묶음을 누르는 즉시 내 기록으로 합쳐 보여준다.
@@ -63,7 +64,10 @@ export function useMyAthlete() {
   const [entries, setEntries] = useState<MyAthleteEntry[]>([]);
 
   useEffect(() => {
-    setEntries(readStored());
+    const sync = () => setEntries(readStored());
+    sync();
+    window.addEventListener(RECORD_DEVICE_DATA_CLEARED_EVENT, sync);
+    return () => window.removeEventListener(RECORD_DEVICE_DATA_CLEARED_EVENT, sync);
   }, []);
 
   const isMine = useCallback(

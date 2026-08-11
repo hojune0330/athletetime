@@ -160,6 +160,50 @@ describe('record workspace storage boundaries', () => {
     expect(completeReady.ok).toBe(true)
   })
 
+  it('clears record selections from this device without touching unrelated browser preferences', () => {
+    const local = new TestStorage({
+      [STORAGE_KEYS.selfClaimDraft]: JSON.stringify({ version: 1, subjectKeys: [KEY_A], updatedAt: '2026-07-29T00:00:00.000Z' }),
+      [STORAGE_KEYS.workspaces]: JSON.stringify({ version: 1, items: [workspace(1)] }),
+      [STORAGE_KEYS.migration]: JSON.stringify({ version: 1, status: 'completed', completedAt: '2026-07-29T00:00:00.000Z' }),
+      'athletetime.my-athlete.v1': JSON.stringify({ athleteKey: KEY_A }),
+      'athletetime.my-athlete.v2': JSON.stringify([{ athleteKey: KEY_A, name: '선수', team: '팀' }]),
+      'athletetime.compareTray.v1': JSON.stringify([{ athleteKey: KEY_A, name: '선수', team: '팀' }]),
+      'athletetime.home.shortcuts': JSON.stringify(['records']),
+    })
+    const session = new TestStorage({
+      [STORAGE_KEYS.workspaceDraft]: JSON.stringify({ version: 1, subjectKeys: [KEY_A], updatedAt: '2026-07-29T00:00:00.000Z' }),
+      [STORAGE_KEYS.comparison]: JSON.stringify({
+        version: 1,
+        value: {
+          id: '40000000-0000-4000-8000-000000000001',
+          state: 'setup',
+          subjectKeys: [KEY_A],
+          updatedAt: '2026-07-29T00:00:00.000Z',
+        },
+      }),
+      'athletetime.auth.redirect': '/profile',
+    })
+    const store = createRecordWorkspaceStorage({ local, session })
+
+    const persistence = store.clearRecordDeviceData()
+
+    expect(persistence).toBe('persistent')
+    for (const key of [
+      STORAGE_KEYS.selfClaimDraft,
+      STORAGE_KEYS.workspaces,
+      'athletetime.my-athlete.v1',
+      'athletetime.my-athlete.v2',
+      'athletetime.compareTray.v1',
+    ]) {
+      expect(local.getItem(key)).toBeNull()
+    }
+    expect(session.getItem(STORAGE_KEYS.workspaceDraft)).toBeNull()
+    expect(session.getItem(STORAGE_KEYS.comparison)).toBeNull()
+    expect(local.getItem(STORAGE_KEYS.migration)).toContain('"status":"completed"')
+    expect(local.getItem('athletetime.home.shortcuts')).toBe(JSON.stringify(['records']))
+    expect(session.getItem('athletetime.auth.redirect')).toBe('/profile')
+  })
+
   it('drops stored labels and unsafe return context at the parsing boundary', () => {
     // Given storage containing legacy labels and an unrestricted return URL.
     const session = new TestStorage({

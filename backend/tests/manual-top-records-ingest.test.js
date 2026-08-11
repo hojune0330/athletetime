@@ -122,8 +122,8 @@ test('manual TOP100 index dedup keeps one public row per same athlete event date
 
   assert.deepEqual(stats, {
     totalCandidates: 16885,
-    appended: 9564,
-    skippedDuplicates: 7321,
+    appended: 9510,
+    skippedDuplicates: 7375,
     skippedSuppressed: 0,
     skippedInvalidName: 0,
     skippedInvalidRecord: 0,

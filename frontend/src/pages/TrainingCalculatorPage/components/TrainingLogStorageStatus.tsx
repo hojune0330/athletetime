@@ -41,7 +41,7 @@ export function TrainingLogStorageStatus({
         </p>
         <p className="mt-1.5 text-body-sm font-semibold text-ink">현재는 이 기기 안에서만</p>
         <p className="mt-1 text-body-sm leading-relaxed text-ink-2">
-          훈련 일지는 서버, 계정, 분석 기능과 연결되지 않아요. 저장한 기록은 이 기기에서만 보고 삭제할 수 있어요.
+          훈련 일지는 서버, 계정, 분석 기능과 연결되지 않아요. 저장한 기록은 이 기기에서만 보고 삭제할 수 있어요. 공용 기기에서는 사용을 마친 뒤 아래에서 모두 삭제하세요.
         </p>
         {canClear && (
           <button
