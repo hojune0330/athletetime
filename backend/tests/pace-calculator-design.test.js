@@ -167,3 +167,14 @@ test('PACE-UX-009: calculator tabs stay compact on mobile and identify their pan
   assert.match(index, /grid grid-cols-5 border border-line bg-surface/, 'five calculator tabs stay in one mobile row');
   assert.match(index, /id=\{`tab-\$\{tab\.id\}`\}/, 'tab panel labels point to real tab ids');
 });
+
+test('PACE-UX-010: target pace rejects invalid clock values and clears stale output', () => {
+  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+
+  assert.match(target, /hasValidFinishTime/, 'target time has an explicit validity boundary');
+  assert.match(target, /minutes < 60/, 'target minutes stay within a clock hour');
+  assert.match(target, /seconds < 60/, 'target seconds stay within a clock minute');
+  assert.match(target, /id="target-time-error" role="alert"/, 'invalid target time is announced in context');
+  assert.match(target, /setResult\(null\)/, 'an invalid input cannot leave a stale pace result visible');
+  assert.match(target, /aria-pressed=\{isSteeple\}/, 'distance mode selection exposes its current state');
+});

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MetricCell } from '../../../components/ui/trainoracle';
 import {
   formatTime,
@@ -46,8 +46,27 @@ export const TargetPaceCalculator: React.FC = () => {
   const [result, setResult] = useState<PaceResult | null>(null);
   const [validationError, setValidationError] = useState('');
 
-  const targetTimeSeconds = useMemo(() => hours * 3600 + minutes * 60 + seconds, [hours, minutes, seconds]);
+  const hasValidFinishTime = Number.isInteger(hours)
+    && hours >= 0
+    && hours <= 12
+    && Number.isInteger(minutes)
+    && minutes >= 0
+    && minutes < 60
+    && Number.isInteger(seconds)
+    && seconds >= 0
+    && seconds < 60
+    && hours * 3600 + minutes * 60 + seconds > 0;
+  const targetTimeSeconds = useMemo(
+    () => (hasValidFinishTime ? hours * 3600 + minutes * 60 + seconds : 0),
+    [hasValidFinishTime, hours, minutes, seconds],
+  );
   const distanceKm = (distance / 1000).toFixed(3);
+
+  useEffect(() => {
+    if (!hasValidFinishTime || !Number.isFinite(distance) || distance <= 0) {
+      setResult(null);
+    }
+  }, [distance, hasValidFinishTime]);
 
   const handleDistanceSelect = (selectedDistance: number) => {
     setDistance(selectedDistance);
@@ -94,8 +113,8 @@ export const TargetPaceCalculator: React.FC = () => {
   }, [isSteeple, result, targetTimeSeconds, waterJump]);
 
   const calculate = () => {
-    if (targetTimeSeconds <= 0 || distance <= 0) {
-      setValidationError('거리와 시간을 입력해 주세요.');
+    if (!hasValidFinishTime || distance <= 0) {
+      setValidationError('거리와 올바른 완주 시간을 입력해 주세요.');
       setResult(null);
       return;
     }
@@ -150,6 +169,7 @@ export const TargetPaceCalculator: React.FC = () => {
                   key={option.value}
                   type="button"
                   onClick={() => handleDistanceSelect(option.value)}
+                  aria-pressed={!isCustom && !isSteeple && distance === option.value}
                   className={`h-11 font-mono text-[12px] font-medium transition-colors ${
                     !isCustom && !isSteeple && distance === option.value
                       ? 'bg-ink text-bg'
@@ -162,6 +182,7 @@ export const TargetPaceCalculator: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSteepleSelect}
+                aria-pressed={isSteeple}
                 className={`h-11 font-mono text-[12px] font-medium transition-colors ${
                   isSteeple ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
                 }`}
@@ -174,6 +195,7 @@ export const TargetPaceCalculator: React.FC = () => {
                   setIsCustom(true);
                   setIsSteeple(false);
                 }}
+                aria-pressed={isCustom}
                 className={`h-11 font-mono text-[12px] font-medium transition-colors ${
                   isCustom ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
                 }`}
@@ -193,6 +215,7 @@ export const TargetPaceCalculator: React.FC = () => {
                       key={placement}
                       type="button"
                       onClick={() => setWaterJump(placement)}
+                      aria-pressed={waterJump === placement}
                       className={`flex h-12 flex-col items-center justify-center font-mono text-[11px] transition-colors ${
                         waterJump === placement ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
                       }`}
@@ -232,16 +255,21 @@ export const TargetPaceCalculator: React.FC = () => {
           </div>
 
           <div>
-            <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
+            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
               Finish time
-            </label>
+            </p>
             <div className="flex items-start gap-1.5">
-              <TimeField label="시간" value={hours} max={12} onChange={setHours} />
+              <TimeField label="시간" value={hours} max={12} invalid={!hasValidFinishTime} onChange={setHours} />
               <Separator />
-              <TimeField label="분" value={minutes} max={59} onChange={setMinutes} />
+              <TimeField label="분" value={minutes} max={59} invalid={!hasValidFinishTime} onChange={setMinutes} />
               <Separator />
-              <TimeField label="초" value={seconds} max={59} onChange={setSeconds} />
+              <TimeField label="초" value={seconds} max={59} invalid={!hasValidFinishTime} onChange={setSeconds} />
             </div>
+            {!hasValidFinishTime && (
+              <p id="target-time-error" role="alert" className="mt-2 text-body-sm text-err">
+                완주 시간은 0보다 커야 하고, 분과 초는 0부터 59까지 입력해 주세요.
+              </p>
+            )}
           </div>
         </div>
 
@@ -335,18 +363,22 @@ type TimeFieldProps = {
   readonly label: string;
   readonly value: number;
   readonly max: number;
+  readonly invalid: boolean;
   readonly onChange: (value: number) => void;
 };
 
-const TimeField: React.FC<TimeFieldProps> = ({ label, value, max, onChange }) => (
+const TimeField: React.FC<TimeFieldProps> = ({ label, value, max, invalid, onChange }) => (
   <div className="flex flex-1 flex-col items-center">
     <input
       type="number"
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        aria-label={label}
-        min="0"
+      value={Number.isFinite(value) ? value : ''}
+      onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+      aria-label={label}
+      aria-describedby={invalid ? 'target-time-error' : undefined}
+      min="0"
       max={max}
+      step="1"
+      inputMode="numeric"
       className={`${numberInputClass} w-full`}
     />
     <span className="mt-1 text-caption text-ink-4">{label}</span>
