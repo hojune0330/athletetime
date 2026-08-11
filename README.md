@@ -4,7 +4,7 @@
 
 > **⚠️ 작업자 필독**: 개발 플로우·저장소 역사·작업 규칙은 [`WORKFLOW.md`](./WORKFLOW.md) 참조.
 > 핸드오프 저장소(`2026-first-item`)의 작업은 완료되어 **현재 프로덕션 repo는 `hojune0330/athletetime`** 이다.
-> 현재 상태의 정본은 [`docs/athletetime-current-state.md`](./docs/athletetime-current-state.md), 후속 작업 순서는 [`docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md`](./docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md)를 따른다.
+> 현재 상태의 정본은 [`docs/athletetime-current-state.md`](./docs/athletetime-current-state.md), 후속 작업 순서는 [`docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md`](./docs/work-orders/20260714-system-trust-and-stopped-work-handoff.md)를 따른다. 다중 페르소나 검토 결과와 다음 개선 순서는 [`docs/athletetime-40-persona-next-wave-plan.md`](./docs/athletetime-40-persona-next-wave-plan.md)를 따른다.
 
 ---
 
