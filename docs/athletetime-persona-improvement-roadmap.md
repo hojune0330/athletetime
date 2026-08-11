@@ -240,3 +240,55 @@ Each pass records the exact route, expected action, actual action, console
 errors, and any personal-data boundary crossed. A feature with a missing owner
 decision remains in preparation mode rather than receiving a cosmetic public
 button.
+
+## 2026-08-12 Implementation Checkpoint
+
+This checkpoint prevents the next worker from reopening a preparation-only
+surface or redoing an already completed, reversible fix.
+
+### Delivered without changing the public privacy boundary
+
+- Public record candidates remain separate. The final candidate can be removed
+  from a browser-local collection, which clears the draft and returns to a new
+  records search rather than leaving an invisible selection behind.
+- Browser-local cleanup reports an unconfirmed state when the browser blocks
+  storage deletion. It offers one retry and never claims that data was erased
+  until the removal succeeds.
+- PaceRise canonicalizes a malformed or stale competition URL to an available
+  competition, preserves a valid tab, and offers an honest slow-load recovery
+  state after a bounded wait.
+- The desktop More disclosure has keyboard close and focus-return behavior;
+  it keeps preparation-only destinations out of the primary navigation.
+- Community, chat, marketplace, uploads, and other unfinished interaction
+  endpoints are closed at the server boundary. Direct API and websocket access
+  receive `503` with `Cache-Control: no-store`; a hidden link cannot make an
+  unfinished write surface live.
+- Correction requests reject resident-registration numbers, phone numbers, and
+  email addresses in the free-text reason before storing it. Public requests
+  accept visible context only, never a client-supplied internal record or
+  source identifier.
+- The test preflight rejects cleanup helpers and test commands that explicitly
+  target the repository root. Browser fixtures must use their own temporary
+  directories instead.
+
+### Evidence to rerun after a change
+
+```text
+npm.cmd run pretest
+node --test backend/tests/launch-interaction-safety.test.js
+node --test backend/tests/data-request-sensitive-input.test.js
+npm.cmd --prefix frontend run type-check
+npm.cmd --prefix frontend run build:check
+```
+
+The broad browser suite should run from an isolated worktree, serially, after
+the focused checks are green. Do not mix it with other workers' Vite or browser
+processes.
+
+### Work that remains intentionally deferred
+
+The decision packets in `docs/decisions/` are the only authority for the next
+boundary-changing step. Until the owner chooses an option, do not add a public
+team cohort count or granular chart, account-linked private storage, a private
+photo/note upload, verified chat/community writing, automated editorial
+publication, or a production data-rights migration.
