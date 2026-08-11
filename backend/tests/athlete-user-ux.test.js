@@ -454,18 +454,19 @@ test('marketplace and pace calculator have real first-use empty states', () => {
   assert.match(pace, /목표 기록 넣기/);
 });
 
-test('optional trend APIs return graceful empty data while features are not ready', async () => {
-  const topics = await request('GET', '/api/trending/topics?limit=8');
-  const flashPolls = await request('GET', '/api/flash-polls');
-  const hotRecords = await request('GET', '/api/trending/hot-records?limit=6');
-  const feed = await request('GET', '/api/feed/shortform?limit=10');
+test('prepared trend APIs reject instead of returning fake empty data', async () => {
+  const responses = await Promise.all([
+    request('GET', '/api/trending/topics?limit=8'),
+    request('GET', '/api/flash-polls'),
+    request('GET', '/api/trending/hot-records?limit=6'),
+    request('GET', '/api/feed/shortform?limit=10'),
+  ]);
 
-  assert.equal(topics.status, 200);
-  assert.deepEqual(topics.body.topics, []);
-  assert.equal(flashPolls.status, 200);
-  assert.deepEqual(flashPolls.body.polls, []);
-  assert.equal(hotRecords.status, 200);
-  assert.deepEqual(hotRecords.body.records, []);
-  assert.equal(feed.status, 200);
-  assert.deepEqual(feed.body.items, []);
+  for (const response of responses) {
+    assert.equal(response.status, 503);
+    assert.equal(response.body.success, false);
+    for (const fakePayloadKey of ['topics', 'polls', 'records', 'items']) {
+      assert.equal(Object.hasOwn(response.body, fakePayloadKey), false);
+    }
+  }
 });

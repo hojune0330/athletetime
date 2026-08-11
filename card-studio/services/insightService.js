@@ -136,7 +136,6 @@ function _buildProfiles() {
             provider: 'KAAF',
             sourceType: 'public_result',
             sourceTier: 'L',
-            sourceId: `${filename}:${recordId}`,
             sourceUrl,
             capturedAt,
             sourceLabel: '대한육상연맹 공개 경기결과',

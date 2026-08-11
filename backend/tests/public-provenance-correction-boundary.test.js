@@ -7,6 +7,8 @@ const express = require('express');
 const { createRecordWorkspacePreviewService } = require('../../card-studio/services/recordWorkspacePreviewService');
 const recordAnalyticsService = require('../../card-studio/services/recordAnalyticsService');
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
+const insightService = require('../../card-studio/services/insightService');
+const publicRoutes = require('../../card-studio/routes/publicRoutes');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -139,6 +141,31 @@ test('PUBLIC-PROVENANCE-001B Given a visitor requests an athlete detail route Wh
   for (const field of ['sourceId', 'person_no', 'birthDate', 'birthdate', 'rawExternalId', 'registrationIdentifier']) {
     assert.equal(publicJson.includes(field), false, `public athlete detail must not disclose ${field}`);
   }
+});
+
+test('PUBLIC-PROVENANCE-001C Given a visitor opens the legacy athlete detail route When its public insight profile is serialized Then it omits internal source identifiers', async (t) => {
+  const profile = insightService.getFeaturedProfiles(1)[0];
+  assert.ok(profile, 'the public insight fixture must have a profile');
+
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(publicRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+
+  const response = await fetch(
+    `http://127.0.0.1:${server.address().port}/insights/athlete/${encodeURIComponent(profile.id)}`,
+  );
+  const body = await response.json();
+  const publicJson = JSON.stringify(body);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.equal(publicJson.includes('sourceId'), false);
+  assert.equal(publicJson.includes('person_no'), false);
+  assert.equal(publicJson.includes('birthDate'), false);
 });
 
 test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a public record When the link is built Then it carries only typed intent and the visible name', () => {
