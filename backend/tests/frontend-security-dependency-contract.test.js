@@ -6,6 +6,7 @@ const test = require('node:test');
 const frontendManifest = require('../../frontend/package.json');
 const frontendLockfile = require('../../frontend/package-lock.json');
 const frontendSourceRoot = path.join(__dirname, '..', '..', 'frontend', 'src');
+const { securityHeaders } = require('../../card-studio/middleware/security');
 
 function readFrontendSource(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -37,4 +38,23 @@ test('frontend stays on BrowserRouter and does not opt into unstable React Route
 
   assert.match(appSource, /BrowserRouter as Router/);
   assert.doesNotMatch(allFrontendSource, /react-server-dom|react-router\/rsc|unstable_RSC/);
+});
+
+test('web and API responses deny browser capabilities that AthleteTime does not use', () => {
+  const headers = new Map();
+  let nextCalls = 0;
+  const response = {
+    setHeader: (name, value) => headers.set(name, value),
+    removeHeader: (name) => headers.delete(name),
+  };
+
+  securityHeaders({ path: '/api/card-studio/analytics/records/search' }, response, () => { nextCalls += 1; });
+
+  assert.equal(nextCalls, 1);
+  assert.equal(headers.get('Permissions-Policy'), 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  assert.equal(headers.get('Cache-Control'), 'no-store, no-cache, must-revalidate');
+
+  const netlifyConfig = fs.readFileSync(path.join(__dirname, '..', '..', 'netlify.toml'), 'utf8');
+  assert.match(netlifyConfig, /Permissions-Policy = "camera=\(\), microphone=\(\), geolocation=\(\), payment=\(\), usb=\(\)"/u);
+  assert.match(netlifyConfig, /Content-Security-Policy = /u);
 });

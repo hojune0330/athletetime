@@ -15,6 +15,8 @@ function securityHeaders(req, res, next) {
   
   // Referrer 정책
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  // Deny browser capabilities that the service does not currently use.
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
   
   // 서버 정보 노출 제거
   res.removeHeader('X-Powered-By');
