@@ -45,6 +45,11 @@ coverage is not uniform: 2015--2017 currently have result bundles without the
 matching catalogue metadata, and the 2026 catalogue has 60 listed competitions
 while only 6 have local result bundles.
 
+The local files contain 239 result bundles in total. The public result index
+intentionally serves 216: the remaining 23 are life-sport or masters-style
+events retained as originals but excluded from public discovery. This is an
+intentional scope boundary, not a silent loss of data.
+
 Those are different datasets and neither statement means that every Korean or
 overseas meet since 2005 is present. A year, competition, or athlete record
 outside that verified range must remain a visible collection gap until its
