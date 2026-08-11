@@ -113,6 +113,7 @@ function createRateLimiter({
 const searchLimiter = createRateLimiter({
   keyPrefix: 'search',
   max: 30,
+  noStore: true,
   message: '검색 요청 한도를 초과했습니다. 1분 후 다시 시도해 주세요.',
 });
 

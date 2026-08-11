@@ -269,6 +269,8 @@ surface or redoing an already completed, reversible fix.
   source identifier.
 - Anonymous public insight callers may request a stricter aggregation rule but
   cannot lower the five-record minimum cohort through a query parameter.
+- Name and affiliation search responses are marked `no-store`, so a shared
+  cache does not retain a visitor's search term as a convenience artifact.
 - The test preflight rejects cleanup helpers and test commands that explicitly
   target the repository root. Browser fixtures must use their own temporary
   directories instead.

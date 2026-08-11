@@ -2,6 +2,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 require('./anonymous-insights-boundary.test');
+require('./public-search-cache-contract.test');
 
 const { validateRequest } = require('../../card-studio/services/dataRequestValidation');
 
