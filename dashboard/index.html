@@ -11,11 +11,9 @@
   <script>
     /* ── Admin Gate: redirect non-admin users ── */
     (function() {
-      var token = localStorage.getItem('accessToken');
-      if (!token) { window.location.href = '/'; return; }
       var xhr = new XMLHttpRequest();
       xhr.open('GET', '/api/auth/me', false);
-      xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      xhr.withCredentials = true;
       try {
         xhr.send();
         var d = JSON.parse(xhr.responseText);

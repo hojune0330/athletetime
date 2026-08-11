@@ -7,16 +7,24 @@ const api = {
   // This is an authenticated operator surface, not a public API client.
   baseUrl: '/api/card-studio/admin',
   publicBaseUrl: '/api/card-studio',
+  csrfCookieName: 'athletetime_csrf',
+
+  readCookie(name) {
+    const prefix = `${name}=`;
+    const entry = document.cookie.split('; ').find((value) => value.startsWith(prefix));
+    return entry ? decodeURIComponent(entry.slice(prefix.length)) : null;
+  },
 
   async request(method, path, body = null, options = {}) {
     const { baseUrl = this.baseUrl, authenticated = true } = options;
     const requestOptions = {
       method,
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
     };
-    if (authenticated) {
-      const token = localStorage.getItem('accessToken');
-      if (token) requestOptions.headers.Authorization = `Bearer ${token}`;
+    if (authenticated && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+      const csrfToken = this.readCookie(this.csrfCookieName);
+      if (csrfToken) requestOptions.headers['X-CSRF-Token'] = csrfToken;
     }
     if (body) requestOptions.body = JSON.stringify(body);
 
