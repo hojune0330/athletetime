@@ -72,6 +72,35 @@ instead of relying on this dated snapshot.
 
 ## Improvement sequence
 
+### 2026-08-12 implementation audit
+
+The following policy-neutral items are implemented and must now be treated as
+release regression contracts, not as future feature promises:
+
+- Registration sends an existing visitor to the canonical `/login` route, and
+  password recovery has a stable `/login?mode=reset` address.
+- A stale or malformed PaceRise competition link resolves to an available
+  competition and keeps the selected tab in the URL instead of leaving a
+  blank result area.
+- The record workspace can remove its final selected candidate, clears the
+  temporary draft, and returns to a fresh athlete search with replace-style
+  history behavior.
+- Device-local record selections, collections, and comparison state have a
+  visible clear action. If a browser blocks the deletion, the page says that
+  cleanup could not be confirmed and offers the same action again; it does not
+  claim success.
+- Public workspace provenance keeps a useful source label, source URL, and
+  collection date while omitting internal source IDs, person numbers,
+  birthdates, and raw external identifiers.
+- Preparation-only community, chat, marketplace, and upload paths are closed
+  at the page, HTTP, and websocket boundaries. Their unavailable response is
+  `503` with `Cache-Control: no-store`.
+
+The regression set for these items includes route recovery, device-storage
+failure, public-provenance, data-request sensitive-input, and closed-surface
+tests. It must run before any work that changes the related UI or API
+contracts.
+
 ### Wave A: Keep the core journey calm and recoverable
 
 Scope: reversible UI, routing, and test improvements only.
