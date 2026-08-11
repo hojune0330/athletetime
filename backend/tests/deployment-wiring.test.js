@@ -93,6 +93,16 @@ test('DEPLOY-RUNBOOK-001: data-rights readiness uses the direct backend URL requ
   assert.match(runbook, /npm run data:rights:readiness -- --base-url https:\/\/athletetime-backend\.onrender\.com/);
 });
 
+test('DEPLOY-RUNBOOK-002: chat closure documents never instruct an operator to send or report messages', () => {
+  const checklist = readSource('docs/render-deploy-env-checklist.md');
+  const historicalWorkOrder = readSource('docs/work-orders/20260708-community-activation-track-h.md');
+
+  assert.match(checklist, /채팅은 현재 공개하지 않으며/, 'the Render checklist declares the live feature closed');
+  assert.match(checklist, /\/api\/chat\/\*.*\/ws\/chat.*503/, 'the Render checklist checks closure, not chat behavior');
+  assert.doesNotMatch(checklist, /chat-persona-smoke\.js/, 'operators must not run the obsolete chat smoke');
+  assert.match(historicalWorkOrder, /Historical: 공개 커뮤니티·채팅 재개 금지/, 'the old activation work order cannot be mistaken for active work');
+});
+
 test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake returns 503 while preparing', async () => {
   const { spawn } = require('node:child_process');
   const WebSocket = require(path.join(ROOT, 'node_modules', 'ws'));

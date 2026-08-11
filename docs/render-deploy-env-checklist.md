@@ -46,7 +46,7 @@ Render는 배포 실패 시 직전 **성공한 배포(Live)** 로 롤백을 유�
 ## 배포 전 로컬 점검 (필수 env 빠른 검증)
 
 ```bash
-cd /home/user/flutter_app
+cd <AthleteTime 저장소 루트>
 
 # 1) 현재 셸 env 기준 필수 3종 확인 (없으면 exit 1)
 node scripts/check-production-env.js
@@ -60,20 +60,17 @@ NODE_ENV=production AUTH_CODE_PEPPER='<32자 이상>' DATABASE_URL='<실제>' JW
 
 `npm run deploy:check` 도 동일하다.
 
-## 재배포 후 검증 (채팅 실동작)
+## 재배포 후 검증 (준비 중 기능 차단)
 
-```bash
-# 프로덕션 페르소나 스모크 검증 (실 DB 모드: 스크립트가 persona-athlete/coach/parent 3명으로 신고)
-PERSONA_BASE='https://athletetime-backend.onrender.com' \
-PERSONA_WS='wss://athletetime-backend.onrender.com' \
-PERSONA_ENV='프로덕션 Render' \
-node scripts/chat-persona-smoke.js
-```
+채팅은 현재 공개하지 않으며, 운영자가 메시지를 보내거나 신고를 만드는 검증은 하지 않는다. `/api/chat/*`와 `/ws/chat`은 모두 `503`으로 거절되어야 하고, 채팅 화면은 준비 중 안내만 보여야 한다.
 
-기대 결과: `25 PASS / 0 FAIL` (실 DB 모드 신고는 3명 독립 reporterKey로 동작)
+1. 브라우저에서 `/chat`을 열어 `오픈 채팅은 준비 중이에요` 안내가 보이는지 확인한다.
+2. 직접 `GET /api/chat/check-nickname?nickname=qa`를 요청해 `503`과 `Cache-Control: no-store`를 확인한다.
+3. 직접 `/ws/chat` 연결을 시도해 `503`으로 거절되는지 확인한다. 일반 웹소켓 `/ws`를 채팅 경로로 바꾸거나, 과거 페르소나 스모크를 실행하지 않는다.
 
 ## 이 실패를 재발시키지 않는 안전망
 
 - `npm run deploy:check` (또는 `npm run predeploy`) → 필수 3종 env 사전 검증
 - `backend/tests/deployment-wiring.test.js` 의 `DEPLOY-ENV-001~004` → 회귀 테스트 (npm test 커버)
+- `DEPLOY-WS-*`, `DEPLOY-RUNBOOK-002` → 채팅 준비 화면·HTTP·웹소켓 차단과 운영 문서 회귀 방지
 - **Render 배포 전 반드시**: Environment 탭에 필수 3종이 있는지부터 확인할 것
