@@ -216,6 +216,7 @@ function buildIndex() {
   const divisionMetaByKey = new Map();
   const defaultDivisionByEventCounts = new Map();
   const manualTopRecordDedupKeys = new Set();
+  const publicResultRecordIds = new Set();
   const manualTopRecordStats = {
     totalCandidates: 0,
     appended: 0,
@@ -333,6 +334,8 @@ function buildIndex() {
           result.record,
           event.date || competitionDate,
         ].join('|'));
+        if (publicResultRecordIds.has(recordId)) continue;
+        publicResultRecordIds.add(recordId);
 
         const record = {
           id: recordId,

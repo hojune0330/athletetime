@@ -201,6 +201,13 @@ test('G003 quarantines relay and malformed-event rows from insight profiles', ()
   );
 });
 
+test('G003 publishes each exact individual result once even when the stored source row is repeated', () => {
+  const records = recordAnalyticsService.getIndex().records;
+  const recordIds = records.map((record) => record.id);
+
+  assert.equal(new Set(recordIds).size, recordIds.length);
+});
+
 test('G003 report is deterministic, reasoned, read-only, and enforceable', () => {
   const before2015 = fs.readFileSync(path.join(ROOT, 'data', 'results', '2015.json'));
   const before2016 = fs.readFileSync(path.join(ROOT, 'data', 'results', '2016.json'));
