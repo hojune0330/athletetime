@@ -2,9 +2,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
+const express = require('express');
 
 const { createRecordWorkspacePreviewService } = require('../../card-studio/services/recordWorkspacePreviewService');
 const recordAnalyticsService = require('../../card-studio/services/recordAnalyticsService');
+const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -110,6 +112,33 @@ test('PUBLIC-PROVENANCE-001A Given an indexed athlete row with an internal sourc
   assert.equal(profileJson.includes('person_no'), false);
   assert.equal(profileJson.includes('birthDate'), false);
   assert.equal(profileJson.includes('rawExternalId'), false);
+});
+
+test('PUBLIC-PROVENANCE-001B Given a visitor requests an athlete detail route When it is serialized over HTTP Then restricted provenance fields remain private', async (t) => {
+  const indexedAthlete = recordAnalyticsService.getIndex().athletes.find((athlete) => (
+    athlete.records.some((record) => record.source?.sourceId)
+  ));
+  assert.ok(indexedAthlete);
+
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(recordAnalyticsRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+
+  const response = await fetch(
+    `http://127.0.0.1:${server.address().port}/athletes/${encodeURIComponent(indexedAthlete.athleteKey)}`,
+  );
+  const body = await response.json();
+  const publicJson = JSON.stringify(body);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  for (const field of ['sourceId', 'person_no', 'birthDate', 'birthdate', 'rawExternalId', 'registrationIdentifier']) {
+    assert.equal(publicJson.includes(field), false, `public athlete detail must not disclose ${field}`);
+  }
 });
 
 test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a public record When the link is built Then it carries only typed intent and the visible name', () => {
