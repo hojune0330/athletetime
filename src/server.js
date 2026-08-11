@@ -266,11 +266,9 @@ app.use('/api/public-data', publicLimiter, publicDataRouter);
 // 중요: 레거시 /api 라우트보다 먼저 등록해야 함
 // ============================================
 
-const categoriesRouter = require(path.join(ROOT, 'backend/routes/categories'));
-
-app.use('/api/categories', categoriesRouter);
 // Community and marketplace stay unavailable until their member-safety rules are implemented.
 // Close reads too: a preparation screen must not have a bypass through its public API.
+app.use('/api/categories', rejectPreparingFeature);
 app.use('/api/marketplace', rejectPreparingFeature);
 app.use('/api/posts', rejectPreparingFeature);
 app.use('/api/chat', rejectPreparingFeature);
