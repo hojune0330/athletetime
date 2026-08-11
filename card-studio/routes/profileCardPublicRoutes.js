@@ -6,6 +6,7 @@ const profileCardService = require('../services/profileCardService');
 const { generateLimiter, publicLimiter, searchLimiter } = require('../middleware/rateLimiter');
 const { usesMeterUnit } = require('../eventClassifier');
 const cardEngine = require('../card-engine');
+const { sendPublicServiceError } = require('./publicErrorResponse');
 
 const router = express.Router();
 
@@ -65,7 +66,7 @@ router.post('/generate', generateLimiter, express.json({ limit: '15mb' }), async
     });
   } catch (error) {
     console.error('프로필 카드 생성 오류:', error);
-    return res.status(500).json({ success: false, error: error.message || '카드 생성 중 오류가 발생했습니다.' });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -89,7 +90,7 @@ router.get('/templates', publicLimiter, (req, res) => {
       });
     return res.json({ success: true, data: templates });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -141,7 +142,7 @@ router.post('/generate-modular', generateLimiter, express.json({ limit: '15mb' }
     });
   } catch (error) {
     console.error('모듈러 카드 생성 오류:', error);
-    return res.status(500).json({ success: false, error: error.message || '카드 생성 중 오류가 발생했습니다.' });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -175,7 +176,7 @@ router.post('/preview-html', publicLimiter, express.json({ limit: '1mb' }), (req
     return res.json({ success: true, data: { html: cardEngine.render(preset, cardData, overrides || {}) } });
   } catch (error) {
     console.error('모듈러 프리뷰 오류:', error);
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 

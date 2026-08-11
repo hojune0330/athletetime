@@ -12,6 +12,7 @@ const {
   buildCompetitionHighlights,
   normalizeSeriesName,
 } = require('../services/competitionHighlightsService');
+const { sendPublicServiceError } = require('./publicErrorResponse');
 
 const MASKED_NAME = '비공개 요청 처리 중';
 
@@ -187,7 +188,7 @@ function createResultEventsHandler(dependencies) {
         },
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error: error.message });
+      return sendPublicServiceError(res);
     }
   };
 }

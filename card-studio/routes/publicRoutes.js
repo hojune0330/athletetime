@@ -11,6 +11,7 @@ const { competitionLimiter, dataRequestLimiter, publicLimiter, searchLimiter } =
 const { createResultEventsHandler } = require('./resultEventsRoute');
 const recordAnalyticsRoutes = require('./recordAnalyticsRoutes');
 const profileCardPublicRoutes = require('./profileCardPublicRoutes');
+const { sendPublicServiceError } = require('./publicErrorResponse');
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ router.get('/insights/featured', publicLimiter, (req, res) => {
     const profiles = insightService.getFeaturedProfiles(req.query.limit);
     return res.json({ success: true, data: profiles, total: profiles.length });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -63,7 +64,7 @@ router.get('/insights/search', searchLimiter, (req, res) => {
     const profiles = insightService.searchProfiles(query, req.query.limit);
     return res.json({ success: true, data: profiles, total: profiles.length });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -73,7 +74,7 @@ router.get('/insights/athlete/:id', publicLimiter, (req, res) => {
     if (!profile) return res.status(404).json({ success: false, error: 'Athlete insight profile not found.' });
     return res.json({ success: true, data: profile });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -90,7 +91,7 @@ router.get('/competitions', competitionLimiter, (req, res) => {
     });
     return res.json({ success: true, year, total: competitions.length, data: competitions });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -99,7 +100,7 @@ router.get('/competitions/current', competitionLimiter, (req, res) => {
     const year = parseInt(req.query.year, 10) || new Date().getFullYear();
     return res.json({ success: true, data: competitionService.getCurrentCompetitions(year) });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -108,7 +109,7 @@ router.get('/competitions/calendar', competitionLimiter, (req, res) => {
     const year = parseInt(req.query.year, 10) || new Date().getFullYear();
     return res.json({ success: true, year, data: competitionService.getCalendarView(year) });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -118,7 +119,7 @@ router.get('/competitions/:id', competitionLimiter, (req, res) => {
     if (!competition) return res.status(404).json({ success: false, error: '대회를 찾을 수 없습니다.' });
     return res.json({ success: true, data: competition });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -133,7 +134,7 @@ router.get('/results/competitions', publicLimiter, (req, res) => {
     const years = [...new Set(enriched.map((competition) => competition.year).filter(Boolean))].sort().reverse();
     return res.json({ success: true, data, years, total: data.length });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
@@ -160,7 +161,7 @@ router.get('/data-policy', publicLimiter, (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    return sendPublicServiceError(res);
   }
 });
 
