@@ -1,0 +1,55 @@
+AthleteTime persona-safe next wave
+Recorded: 2026-08-12
+
+Scope
+- Public record search and browser-local collection recovery only.
+- Direct-input calculator first use.
+- Public correction-request identifier boundary.
+- No account, minor, guardian, private storage, team-disclosure, community,
+  chat, editorial, or row-level data-rights expansion.
+
+Completed safe changes
+- Calculator fields begin empty and do not calculate until a visitor enters a
+  valid value. Reset returns to the same empty first-use state.
+- The correction-request first view keeps its short two-sentence safety
+  guidance visible; detailed processing information remains optional.
+- Browser request types cannot include internal record or source identifiers.
+  Public provenance remains limited to source label, URL, and collection date.
+- Existing closed interaction surfaces remain closed: chat, community writing,
+  marketplace writing, uploads, and their related write paths return the
+  preparation response rather than accepting data.
+
+Verification performed on this working copy
+- node --test backend/tests/data-request-sensitive-input.test.js
+  backend/tests/data-rights-policy.test.js
+  backend/tests/public-provenance-correction-boundary.test.js
+  Result: 12 passed, 0 failed.
+- npm.cmd --prefix frontend test -- --run
+  Result: 42 files, 131 tests passed.
+- npm.cmd --prefix frontend run type-check
+  Result: passed.
+- npm.cmd --prefix frontend run build:check
+  Result: passed.
+- Browser coverage already registered in the repository verifies record
+  recovery, workspace separation, device cleanup, correction request, direct
+  calculator input, mobile dock, and PaceRise recovery. This record does not
+  claim a new production deployment.
+
+Release boundary
+- This is a source-control record, not a production release approval.
+- Do not deploy a data-rights migration or change a closed feature gate from
+  this evidence alone.
+- Roll back a public UX regression by restoring the previous Netlify or Render
+  release. Do not delete data, run a down-migration, or reopen an interaction
+  surface as a rollback shortcut.
+
+Intentionally held decisions
+- Small-team aggregate threshold and visible count wording.
+- Account terms, minor/guardian handling, session duration, and consent.
+- Private notes and photos with account-bound storage.
+- Verified-member community, chat moderation, and magazine publication.
+
+Evidence hygiene
+- No names, search terms, affiliations, tickets, contact details, request
+  payloads, tokens, source identifiers, IP addresses, or credentials are
+  recorded in this file.
