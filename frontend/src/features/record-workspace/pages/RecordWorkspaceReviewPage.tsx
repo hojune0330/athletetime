@@ -63,8 +63,12 @@ export default function RecordWorkspaceReviewPage() {
     store.clearWorkspaceDraft()
     navigate(`/records/workspaces/${result.value.id}`, workspaceCreatedNavigation)
   }
-  const returnToSelection = () => {
-    navigate('/records?flow=browse&browse=athlete', { state: { focusSearch: true } })
+  const clearSelectionAndSearch = () => {
+    store.clearWorkspaceDraft()
+    navigate('/records?flow=browse&browse=athlete', {
+      replace: true,
+      state: { focusSearch: true },
+    })
   }
 
   return (
@@ -72,7 +76,7 @@ export default function RecordWorkspaceReviewPage() {
       <WorkspaceReviewContent
         busy={busy}
         notice={notice}
-        onReturnToSelection={returnToSelection}
+        onClearSelection={clearSelectionAndSearch}
         onConfirm={confirmWorkspace}
         onRemoveSubject={removeSubject}
         onTitleChange={setTitle}

@@ -7,7 +7,7 @@ import { WorkspaceSubjectList } from './WorkspaceSubjectList'
 type WorkspaceReviewContentProps = {
   readonly busy: boolean
   readonly notice: string
-  readonly onReturnToSelection: () => void
+  readonly onClearSelection: () => void
   readonly onConfirm: () => void
   readonly onRemoveSubject: (subjectKey: string) => void
   readonly onTitleChange: (title: string) => void
@@ -19,7 +19,7 @@ type WorkspaceReviewContentProps = {
 export function WorkspaceReviewContent({
   busy,
   notice,
-  onReturnToSelection,
+  onClearSelection,
   onConfirm,
   onRemoveSubject,
   onTitleChange,
@@ -70,9 +70,9 @@ export function WorkspaceReviewContent({
           <>
             <h2 className="text-body font-semibold text-ink">한 기록 모음으로 저장할 수 없어요</h2>
             <p className="mt-1 text-body-sm leading-5 text-ink-3">
-              서로 다른 이름은 한 기록 모음으로 저장하지 않아요. 확인할 선수를 다시 골라 주세요.
+              서로 다른 이름은 한 기록 모음으로 저장하지 않아요. 위 선택 목록에서 다른 이름의 선수를 빼거나, 선택을 모두 비우고 새로 찾아 주세요.
             </p>
-            <Button className="mt-4 min-h-11" type="button" onClick={onReturnToSelection}>다시 선택하기</Button>
+            <Button className="mt-4 min-h-11" type="button" variant="outline" onClick={onClearSelection}>선택 모두 비우고 새로 찾기</Button>
           </>
         ) : (
           <>
