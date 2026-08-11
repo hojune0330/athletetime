@@ -9,6 +9,7 @@ const recordAnalyticsService = require('../../card-studio/services/recordAnalyti
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
 const insightService = require('../../card-studio/services/insightService');
 const publicRoutes = require('../../card-studio/routes/publicRoutes');
+const resultsStore = require('../../card-studio/services/resultsStore');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -194,6 +195,33 @@ test('PUBLIC-PROVENANCE-001D Given a visitor uses the legacy record search When 
   assert.equal(publicJson.includes('birthDate'), false);
   assert.equal(publicJson.includes('rawExternalId'), false);
   assert.match(publicJson, /sourceLabel/u);
+});
+
+test('PUBLIC-PROVENANCE-001E Given a visitor opens a public competition result When provenance is serialized Then it omits the source file key', async (t) => {
+  const filename = resultsStore.listFilenames().find((candidate) => resultsStore.isPublicResultFilename(candidate));
+  assert.ok(filename, 'the fixture must have a public result file');
+
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(publicRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+
+  const response = await fetch(
+    `http://127.0.0.1:${server.address().port}/results/${encodeURIComponent(filename)}/events`,
+  );
+  const body = await response.json();
+  const publicJson = JSON.stringify(body);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.meta.sourceLabel);
+  assert.equal(publicJson.includes('sourceId'), false);
+  assert.equal(publicJson.includes('person_no'), false);
+  assert.equal(publicJson.includes('birthDate'), false);
+  assert.equal(publicJson.includes(filename), false);
 });
 
 test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a public record When the link is built Then it carries only typed intent and the visible name', () => {
