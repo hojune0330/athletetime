@@ -12,27 +12,81 @@ const { createViteStartupLock } = require('./records-flow-e2e-startup-lock');
 
 test('RECORDS-E2E-STARTUP-LOCK Given parallel browser workers When one Vite startup is active Then the next waits until it is released', async () => {
   const lockPath = path.join(os.tmpdir(), `athletetime-records-e2e-${process.pid}-${Date.now()}.lock`);
-  const acquire = createViteStartupLock(lockPath, { retryMs: 5, timeoutMs: 1_000, staleMs: 1_000 });
+  let signalContention;
+  const contended = new Promise((resolve) => { signalContention = resolve; });
+  const acquire = createViteStartupLock(lockPath, {
+    onContention: signalContention,
+    retryMs: 5,
+    staleMs: 1,
+    timeoutMs: 1_000,
+  });
   let releaseFirst = await acquire();
   let releaseSecond;
 
   try {
     let secondAcquired = false;
-    const secondPending = acquire().then((release) => {
-      secondAcquired = true;
-      return release;
-    });
-    await new Promise((resolve) => setTimeout(resolve, 25));
+    const secondPending = acquire().then(
+      (release) => {
+        secondAcquired = true;
+        return { release };
+      },
+      (error) => ({ error }),
+    );
+    await contended;
+    await new Promise((resolve) => setTimeout(resolve, 20));
     assert.equal(secondAcquired, false);
 
     await releaseFirst();
     releaseFirst = null;
-    releaseSecond = await secondPending;
+    const outcome = await secondPending;
+    assert.equal(outcome.error, undefined);
+    releaseSecond = outcome.release;
     assert.equal(secondAcquired, true);
   } finally {
     if (releaseFirst) await releaseFirst();
     if (releaseSecond) await releaseSecond();
   }
+});
+
+test('RECORDS-E2E-STARTUP-LOCK-ISOLATION Given distinct workspaces When both start Vite Then neither blocks the other', async () => {
+  const nonce = `${process.pid}-${Date.now()}`;
+  const acquireFirst = createViteStartupLock(path.join(os.tmpdir(), `athletetime-records-e2e-first-${nonce}.lock`));
+  const acquireSecond = createViteStartupLock(path.join(os.tmpdir(), `athletetime-records-e2e-second-${nonce}.lock`));
+  const [releaseFirst, releaseSecond] = await Promise.all([acquireFirst(), acquireSecond()]);
+  await Promise.all([releaseFirst(), releaseSecond()]);
+});
+
+test('RECORDS-E2E-STARTUP-LOCK-WINDOWS-EPERM Given a transient pipe-listen denial When acquiring Then it retries safely', async () => {
+  const lockPath = path.join(os.tmpdir(), `athletetime-records-e2e-${process.pid}-${Date.now()}.lock`);
+  let listenCalls = 0;
+  let closeCalls = 0;
+  const acquire = createViteStartupLock(lockPath, {
+    createServer: () => ({
+      close: (done) => {
+        closeCalls += 1;
+        done();
+      },
+    }),
+    listenPipe: async () => {
+      listenCalls += 1;
+      if (listenCalls === 1) {
+        const error = new Error('temporary Windows file filter denial');
+        error.code = 'EPERM';
+        throw error;
+      }
+    },
+    platform: 'win32',
+    retryMs: 1,
+    timeoutMs: 1_000,
+  });
+
+  const release = await acquire();
+  try {
+    assert.equal(listenCalls, 2);
+  } finally {
+    await release();
+  }
+  assert.equal(closeCalls, 2);
 });
 
 test('RECORDS-FLOW-E2E Given no explicit evidence request Then routine runs do not rewrite tracked evidence', () => {

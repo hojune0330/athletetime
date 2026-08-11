@@ -41,6 +41,36 @@ test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening s
   });
 });
 
+test('RECORDS-WORKSPACE-RESET-E2E Given selected candidates When the user clears selection Then the draft is removed before a fresh search opens', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('athletetime.recordWorkspaceDraft.v1', JSON.stringify({
+        version: 1,
+        subjectKeys: ['aaaaaaaaaaaaaaaa'],
+        updatedAt: '2026-08-11T00:00:00.000Z',
+      }));
+    });
+
+    await navigateToReady(
+      page,
+      `${baseUrl}/records/workspaces/new`,
+      page.getByRole('button', { name: '선택을 비우고 새로 찾기', exact: true }),
+    );
+    await page.getByRole('button', { name: '선택을 비우고 새로 찾기', exact: true }).click();
+    await page.waitForURL(/\/records\?flow=browse&browse=athlete$/u);
+    await expectVisible(page.locator('#records-search'));
+    assert.equal(
+      await page.evaluate(() => window.sessionStorage.getItem('athletetime.recordWorkspaceDraft.v1')),
+      null,
+    );
+    visited.push(page.url());
+  }, {
+    fileName: 'workspace-reset-e2e-results.json',
+    scenario: 'clearing a record workspace draft before a fresh athlete search',
+    invocation: 'node --test backend/tests/records-workspace-e2e.test.js',
+  });
+});
+
 test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens without an event Then its loaded records appear immediately', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript((savedWorkspaces) => {

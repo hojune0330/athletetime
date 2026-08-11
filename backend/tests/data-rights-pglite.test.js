@@ -4,7 +4,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const { PGlite } = require('@electric-sql/pglite');
-const { checksum, runMigrations } = require('../database/run-migrations');
+const { checksum, legacyChecksums, runMigrations } = require('../database/run-migrations');
 
 const ROOT = path.join(__dirname, '..', '..');
 const DATABASE_DIRECTORY = path.join(ROOT, 'backend', 'database');
@@ -47,7 +47,7 @@ function pool(instance) {
   };
 }
 
-async function seedLedger(instance) {
+async function seedLedger(instance, migrationChecksum) {
   const sql = fs.readFileSync(path.join(DATABASE_DIRECTORY, 'migration-007-chat.sql'), 'utf8');
   await instance.exec(`
     CREATE TABLE athletetime_migrations (
@@ -58,7 +58,7 @@ async function seedLedger(instance) {
   `);
   await instance.query(
     'INSERT INTO athletetime_migrations (name, checksum) VALUES ($1, $2)',
-    ['migration-007-chat.sql', checksum(sql)],
+    ['migration-007-chat.sql', migrationChecksum ?? checksum(sql)],
   );
 }
 
@@ -146,6 +146,22 @@ test('REPORTS-PGLITE-002: Given recorded 007 without reports When migrating Then
     'migration-008-chat-reports-repair.sql',
   ]);
   await instance.query("INSERT INTO reports (target_type, target_id, reporter_anonymous_id, reason_code) VALUES ('chat', 'message-2', 'anonymous-2', 'spam')");
+});
+
+test('REPORTS-PGLITE-002A: Given a legacy line-ending checksum When migrating Then the applied ledger stays byte-for-byte unchanged', async (t) => {
+  const instance = await database(t);
+  await instance.exec('CREATE TABLE users (id UUID PRIMARY KEY)');
+  const sql = fs.readFileSync(path.join(DATABASE_DIRECTORY, 'migration-007-chat.sql'), 'utf8');
+  const historicChecksum = [...legacyChecksums(sql)].find((value) => value !== checksum(sql));
+  assert.ok(historicChecksum);
+  await seedLedger(instance, historicChecksum);
+
+  await runMigrations({ directory: migrationDirectory(t), pool: pool(instance) });
+
+  const ledger = await instance.query(
+    "SELECT checksum FROM athletetime_migrations WHERE name = 'migration-007-chat.sql'",
+  );
+  assert.equal(ledger.rows[0].checksum.trim(), historicChecksum);
 });
 
 test('REPORTS-PGLITE-003: Given an expanded chat target check When migrating Then it fails closed', async (t) => {

@@ -56,12 +56,6 @@ async function runMigrations({ pool, directory = __dirname } = {}) {
         if (recordedChecksum !== digest && !legacyChecksums(sql).has(recordedChecksum)) {
           throw new Error(`Applied migration checksum mismatch: ${name}`);
         }
-        if (recordedChecksum !== digest) {
-          await client.query(
-            'UPDATE athletetime_migrations SET checksum = $2 WHERE name = $1',
-            [name, digest],
-          );
-        }
         await validateDataRightsSchemaContract(client, name);
         continue;
       }

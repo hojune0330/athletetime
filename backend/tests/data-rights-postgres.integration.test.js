@@ -355,7 +355,7 @@ test('CHAT-MIGRATION-003: Given recorded 007 without reports When migrating Then
   await assertChatReportsReady(pool);
 });
 
-test('CHAT-MIGRATION-003A: Given a CRLF-era recorded 007 checksum When migrating Then it upgrades the ledger without replaying 007', {
+test('CHAT-MIGRATION-003A: Given a CRLF-era recorded 007 checksum When migrating Then it preserves the ledger without replaying 007', {
   skip: !connectionString,
   timeout: 30000,
 }, async (t) => {
@@ -372,7 +372,7 @@ test('CHAT-MIGRATION-003A: Given a CRLF-era recorded 007 checksum When migrating
   const ledger = await pool.query(
     "SELECT checksum FROM athletetime_migrations WHERE name = 'migration-007-chat.sql'",
   );
-  assert.equal(ledger.rows[0].checksum.trim(), checksum(sql));
+  assert.equal(ledger.rows[0].checksum.trim(), historicChecksum);
   await assertChatReportsReady(pool);
 });
 

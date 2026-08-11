@@ -2,9 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 
+const cacheDir = process.env.VITE_CACHE_DIR?.trim()
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  cacheDir: cacheDir || undefined,
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

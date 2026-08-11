@@ -1,4 +1,4 @@
-const fs = require('node:fs'), http = require('node:http'), net = require('node:net'), path = require('node:path');
+const fs = require('node:fs'), http = require('node:http'), net = require('node:net'), os = require('node:os'), path = require('node:path');
 const { spawn } = require('node:child_process'), assert = require('node:assert/strict'), { chromium } = require('playwright');
 const express = require('express');
 const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
@@ -10,6 +10,8 @@ const FRONTEND = path.join(ROOT, 'frontend');
 const VITE_BIN = path.join(FRONTEND, 'node_modules', 'vite', 'bin', 'vite.js');
 const EVIDENCE_DIR = process.env.RECORDS_E2E_EVIDENCE_DIR || path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
 const viewport = { width: 375, height: 667 };
+let viteCacheDir;
+let isViteCacheCleanupRegistered = false;
 
 
 async function withRecordsPage(runScenario, evidence = {}) {
@@ -122,22 +124,34 @@ async function fulfillJson(route, data) {
 
 async function startViteServer(port) {
   assert.ok(fs.existsSync(VITE_BIN), `Vite binary not found at ${VITE_BIN}`);
+  const cacheDir = getViteCacheDir();
   const child = spawn(process.execPath, [VITE_BIN, '--host', '127.0.0.1', '--port', String(port), '--strictPort'], {
     cwd: FRONTEND,
-    env: { ...process.env, BROWSER: 'none', VITE_API_BASE_URL: '' },
+    env: { ...process.env, BROWSER: 'none', VITE_API_BASE_URL: '', VITE_CACHE_DIR: cacheDir },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   const output = [];
   child.stdout.on('data', (chunk) => output.push(chunk.toString()));
   child.stderr.on('data', (chunk) => output.push(chunk.toString()));
   try {
-    await waitForHttp(`http://127.0.0.1:${port}/records`, 30_000);
+    await waitForHttp(`http://127.0.0.1:${port}/records`, 45_000);
   } catch (error) {
     await stopServer({ child });
     error.message = `${error.message}\nVite output:\n${output.join('')}`;
     throw error;
   }
   return { child };
+}
+
+function getViteCacheDir() {
+  if (!viteCacheDir) {
+    viteCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), `athletetime-records-e2e-vite-worker-${process.pid}-`));
+  }
+  if (!isViteCacheCleanupRegistered) {
+    isViteCacheCleanupRegistered = true;
+    process.once('exit', () => fs.rmSync(viteCacheDir, { force: true, recursive: true }));
+  }
+  return viteCacheDir;
 }
 
 async function getFreePort() {
@@ -181,18 +195,19 @@ function requestStatus(url) {
 
 async function stopServer(server) {
   const child = server.child;
-  if (!child || child.exitCode !== null) return;
-  child.kill();
-  await new Promise((resolve) => {
-    const timer = setTimeout(() => {
-      child.kill('SIGKILL');
-      resolve();
-    }, 5_000);
-    child.once('exit', () => {
-      clearTimeout(timer);
-      resolve();
+  if (child && child.exitCode === null) {
+    child.kill();
+    await new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        child.kill('SIGKILL');
+        resolve();
+      }, 5_000);
+      child.once('exit', () => {
+        clearTimeout(timer);
+        resolve();
+      });
     });
-  });
+  }
 }
 
 function writeEvidence(state, evidence) {
@@ -228,7 +243,7 @@ async function navigateToReady(page, url, readyLocator) {
   await page.waitForFunction(
     () => document.readyState === 'complete' && !document.body?.textContent?.includes('화면을 불러오는 중...'),
     undefined,
-    { timeout: 10_000 },
+    { timeout: 30_000 },
   );
   await expectVisible(readyLocator);
 }
