@@ -1,117 +1,123 @@
-import React, { useCallback } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useCallback, useState } from 'react';
 import { log } from '@/lib/log';
 
+type ExportFormat = 'png' | 'pdf';
+
 interface ChartDownloadButtonsProps {
-  chartId: string;
-  filename: string;
+  readonly chartId: string;
+  readonly filename: string;
 }
 
-export const ChartDownloadButtons: React.FC<ChartDownloadButtonsProps> = ({ 
-  chartId, 
-  filename 
-}) => {
-  const downloadChart = useCallback(async (format: 'png' | 'pdf') => {
+export const ChartDownloadButtons: React.FC<ChartDownloadButtonsProps> = ({ chartId, filename }) => {
+  const [activeFormat, setActiveFormat] = useState<ExportFormat | null>(null);
+  const [error, setError] = useState('');
+
+  const downloadChart = useCallback(async (format: ExportFormat) => {
     const element = document.getElementById(chartId);
-    if (!element) return;
-    
+    if (!element) {
+      setError('표를 찾지 못해 파일을 만들 수 없어요. 화면을 새로고침한 뒤 다시 시도해 주세요.');
+      return;
+    }
+
+    setError('');
+    setActiveFormat(format);
     try {
-      // html2canvas 동적 import
       const html2canvas = (await import('html2canvas')).default;
-      
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
       });
-      
+
       if (format === 'png') {
         const link = document.createElement('a');
         link.download = `${filename}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-      } else if (format === 'pdf') {
-        // jsPDF 동적 import
-        const { jsPDF } = await import('jspdf');
-        
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-          orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-          unit: 'px',
-          format: [canvas.width, canvas.height]
-        });
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save(`${filename}.pdf`);
+        return;
       }
-    } catch (error) {
-      log.error('Download failed:', error);
-      alert('다운로드 중 오류가 발생했습니다.');
+
+      const { jsPDF } = await import('jspdf');
+      const image = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height],
+      });
+      pdf.addImage(image, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save(`${filename}.pdf`);
+    } catch (caughtError) {
+      log.error('Chart download failed:', caughtError);
+      setError('파일을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+    } finally {
+      setActiveFormat(null);
     }
   }, [chartId, filename]);
-  
+
   const printChart = useCallback(() => {
     const element = document.getElementById(chartId);
-    if (!element) return;
-    
+    if (!element) {
+      setError('표를 찾지 못해 인쇄할 수 없어요. 화면을 새로고침한 뒤 다시 시도해 주세요.');
+      return;
+    }
+
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    
+    if (!printWindow) {
+      setError('인쇄 창을 열지 못했어요. 브라우저의 팝업 차단을 확인해 주세요.');
+      return;
+    }
+
+    setError('');
     printWindow.document.write(`
       <html>
         <head>
           <title>${filename}</title>
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
           <style>
-            body { padding: 20px; }
+            body { padding: 20px; color: #111827; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #d1d5db; padding: 6px; }
             @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
           </style>
         </head>
-        <body>
-          ${element.outerHTML}
-        </body>
+        <body>${element.outerHTML}</body>
       </html>
     `);
     printWindow.document.close();
-    
-    setTimeout(() => {
+    window.setTimeout(() => {
       printWindow.print();
       printWindow.close();
     }, 500);
   }, [chartId, filename]);
 
   return (
-    <div className="download-btn no-print flex gap-2 flex-wrap">
-      <Button
-        type="button"
-        size="sm"
-        onClick={() => downloadChart('png')}
-        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white !ring-blue-500/30 hover:from-blue-600 hover:to-blue-700"
-      >
-        <i className="fas fa-image mr-1"></i>
-        <span className="hidden md:inline">PNG</span>
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        onClick={() => downloadChart('pdf')}
-        className="bg-gradient-to-r from-red-500 to-red-600 text-white !ring-red-500/30 hover:from-red-600 hover:to-red-700"
-      >
-        <i className="fas fa-file-pdf mr-1"></i>
-        <span className="hidden md:inline">PDF</span>
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        onClick={printChart}
-        className="bg-gradient-to-r from-gray-500 to-gray-600 text-white !ring-gray-500/30 hover:from-gray-600 hover:to-gray-700"
-      >
-        <i className="fas fa-print mr-1"></i>
-        <span className="hidden md:inline">인쇄</span>
-      </Button>
+    <div className="no-print">
+      <div className="flex flex-wrap gap-2">
+        <ExportButton label="PNG 저장" onClick={() => downloadChart('png')} disabled={activeFormat !== null} />
+        <ExportButton label="PDF 저장" onClick={() => downloadChart('pdf')} disabled={activeFormat !== null} />
+        <ExportButton label="인쇄" onClick={printChart} disabled={activeFormat !== null} />
+      </div>
+      {activeFormat && <p className="mt-2 text-caption text-ink-3">{activeFormat.toUpperCase()} 파일을 준비하고 있어요.</p>}
+      {error && <p role="alert" className="mt-2 text-body-sm text-err">{error}</p>}
     </div>
   );
 };
+
+function ExportButton({ label, onClick, disabled }: {
+  readonly label: string;
+  readonly onClick: () => void;
+  readonly disabled: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="h-9 border border-line bg-surface px-3 font-mono text-[10px] font-medium tracking-widest-1 text-ink transition-colors hover:bg-surface-2 disabled:cursor-wait disabled:text-ink-4"
+    >
+      {label}
+    </button>
+  );
+}
 
 export default ChartDownloadButtons;

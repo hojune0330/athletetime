@@ -188,3 +188,16 @@ test('PACE-UX-011: calculator tabs support compact keyboard navigation', () => {
   assert.match(index, /event\.key === 'End'/, 'End moves to the last tab');
   assert.match(index, /tabIndex=\{activeTab === tab\.id \? 0 : -1\}/, 'only the active tab enters the tab order');
 });
+
+test('PACE-DS-006: chart surfaces keep the numeric-first visual language and in-page export feedback', () => {
+  const downloads = readSource(`${PACE_DIR}/components/ChartDownloadButtons.tsx`);
+  const paceChart = readSource(`${PACE_DIR}/components/PaceChartTable.tsx`);
+  const targetChart = readSource(`${PACE_DIR}/components/TargetPaceTable.tsx`);
+
+  assert.match(downloads, /role="alert"/, 'export failures stay in the page');
+  assert.doesNotMatch(downloads, /\balert\(/, 'browser alerts do not interrupt export recovery');
+  assert.doesNotMatch(downloads, /bg-gradient-to|font-awesome|fas /, 'export controls remove legacy decoration');
+  assert.match(paceChart, /PACE TABLE/, 'pace table has a compact technical label');
+  assert.match(targetChart, /TARGET TABLE/, 'target table has a compact technical label');
+  assert.doesNotMatch(`${paceChart}\n${targetChart}`, /제작:\s*박호준|font-awesome|fas /, 'charts remove old creator and icon decoration');
+});

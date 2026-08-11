@@ -1,154 +1,117 @@
 import React from 'react';
-import { 
-  formatTime, 
-  formatPace, 
-  calculatePaceFromTarget,
-  calculate400mLap,
-  calculate100mTime,
-  calculateSpeed,
+import {
   TARGETS_5KM,
   TARGETS_10KM,
-  TARGETS_HALF,
   TARGETS_FULL,
-  type TargetRecord 
+  TARGETS_HALF,
+  calculate100mTime,
+  calculate400mLap,
+  calculatePaceFromTarget,
+  calculateSpeed,
+  formatPace,
+  formatTime,
+  type TargetRecord,
 } from '../utils/paceCalculations';
 import { ChartDownloadButtons } from './ChartDownloadButtons';
 
-interface TargetTableProps {
-  title: string;
-  distance: number;
-  targets: TargetRecord[];
-  showColumns: string[];
-}
+type Checkpoint = '100m' | '5km' | '10km' | 'half' | '30km';
 
-const TargetTable: React.FC<TargetTableProps> = ({ title, distance, targets, showColumns }) => {
+type TargetTableProps = {
+  readonly title: string;
+  readonly distance: number;
+  readonly targets: readonly TargetRecord[];
+  readonly checkpoints: readonly Checkpoint[];
+};
+
+const TARGET_SECTIONS: readonly TargetTableProps[] = [
+  { title: '5km 목표 기록', distance: 5000, targets: TARGETS_5KM, checkpoints: ['100m'] },
+  { title: '10km 목표 기록', distance: 10000, targets: TARGETS_10KM, checkpoints: ['5km'] },
+  { title: '하프마라톤 목표 기록', distance: 21097.5, targets: TARGETS_HALF, checkpoints: ['5km', '10km'] },
+  { title: '풀코스 목표 기록', distance: 42195, targets: TARGETS_FULL, checkpoints: ['10km', 'half', '30km'] },
+];
+
+const CHECKPOINT_LABELS: Readonly<Record<Checkpoint, string>> = {
+  '100m': '100m',
+  '5km': '5km 통과',
+  '10km': '10km 통과',
+  half: '하프 통과',
+  '30km': '30km 통과',
+};
+
+export const TargetPaceTable: React.FC<{ readonly id?: string }> = ({ id = 'chart2' }) => (
+  <section className="border border-line bg-surface p-5 sm:p-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">TARGET TABLE</p>
+        <h3 className="mt-1 text-h3 font-semibold tracking-tight text-ink">목표 기록별 페이스</h3>
+        <p className="mt-2 max-w-xl text-body-sm leading-relaxed text-ink-3">
+          목표 기록을 정할 때 필요한 페이스와 주요 통과 시간을 비교해요. 실제 레이스 운영은 코스와 컨디션에 맞춰 조절해 주세요.
+        </p>
+      </div>
+      <ChartDownloadButtons chartId={id} filename="목표_기록별_페이스" />
+    </div>
+
+    <div id={id} className="mt-5 space-y-5">
+      {TARGET_SECTIONS.map((section) => <TargetTable key={section.title} {...section} />)}
+    </div>
+  </section>
+);
+
+function TargetTable({ title, distance, targets, checkpoints }: TargetTableProps) {
   return (
-    <div className="mb-4">
-      <h4 className="font-bold text-sm mb-2 text-gray-700">{title}</h4>
-      <div className="table-container">
-        <table className="pace-table w-full">
-          <thead>
+    <section className="border border-line bg-surface">
+      <h4 className="border-b border-line bg-surface-2 px-3 py-2.5 text-body-sm font-semibold text-ink">{title}</h4>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[620px] border-collapse text-body-sm" aria-label={title}>
+          <thead className="border-b border-line text-left font-mono text-[10px] uppercase tracking-widest-2 text-ink-3">
             <tr>
-              <th>목표 기록</th>
-              <th>km 페이스</th>
-              <th>400m 랩</th>
-              {showColumns.includes('100m') && <th>100m</th>}
-              {showColumns.includes('5km') && <th>5km 통과</th>}
-              {showColumns.includes('10km') && <th>10km 통과</th>}
-              {showColumns.includes('half') && <th>하프 통과</th>}
-              {showColumns.includes('30km') && <th>30km 통과</th>}
-              <th>속도(km/h)</th>
-              <th>비고</th>
+              <th scope="col" className="px-3 py-2.5 font-medium">목표</th>
+              <th scope="col" className="px-3 py-2.5 text-right font-medium">km 페이스</th>
+              <th scope="col" className="px-3 py-2.5 text-right font-medium">400m</th>
+              {checkpoints.map((checkpoint) => (
+                <th key={checkpoint} scope="col" className="px-3 py-2.5 text-right font-medium">{CHECKPOINT_LABELS[checkpoint]}</th>
+              ))}
+              <th scope="col" className="px-3 py-2.5 text-right font-medium">속도</th>
+              <th scope="col" className="px-3 py-2.5 font-medium">메모</th>
             </tr>
           </thead>
           <tbody>
-            {targets.map((target, idx) => {
-              const pacePerKm = calculatePaceFromTarget(target.time, distance);
-              const pace400m = calculate400mLap(pacePerKm);
-              const pace100m = calculate100mTime(pacePerKm);
-              const speed = calculateSpeed(distance, target.time);
-              
-              // 중간 통과 시간 계산
-              const time5km = (pacePerKm / 1000) * 5000;
-              const time10km = (pacePerKm / 1000) * 10000;
-              const timeHalf = (pacePerKm / 1000) * 21097.5;
-              const time30km = (pacePerKm / 1000) * 30000;
-              
-              return (
-                <tr key={idx} className={target.highlight ? 'highlight-row' : ''}>
-                  <td className="font-bold">{formatTime(target.time)}</td>
-                  <td>{formatPace(pacePerKm)}</td>
-                  <td>{formatTime(pace400m)}</td>
-                  {showColumns.includes('100m') && <td>{formatTime(pace100m)}</td>}
-                  {showColumns.includes('5km') && <td>{formatTime(time5km)}</td>}
-                  {showColumns.includes('10km') && <td>{formatTime(time10km)}</td>}
-                  {showColumns.includes('half') && <td>{formatTime(timeHalf)}</td>}
-                  {showColumns.includes('30km') && <td>{formatTime(time30km)}</td>}
-                  <td>{speed.toFixed(1)}</td>
-                  <td className="text-xs">{target.label}</td>
-                </tr>
-              );
-            })}
+            {targets.map((target) => <TargetRow key={`${title}-${target.time}`} target={target} distance={distance} checkpoints={checkpoints} />)}
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
-};
+}
 
-export const TargetPaceTable: React.FC<{ id?: string }> = ({ id = 'chart2' }) => {
+function TargetRow({ target, distance, checkpoints }: {
+  readonly target: TargetRecord;
+  readonly distance: number;
+  readonly checkpoints: readonly Checkpoint[];
+}) {
+  const pacePerKm = calculatePaceFromTarget(target.time, distance);
+  const checkpointTimes: Readonly<Record<Checkpoint, number>> = {
+    '100m': calculate100mTime(pacePerKm),
+    '5km': pacePerKm * 5,
+    '10km': pacePerKm * 10,
+    half: pacePerKm * 21.0975,
+    '30km': pacePerKm * 30,
+  };
+
   return (
-    <div className="card chart-container p-4 md:p-6 mb-6" id={id}>
-      {/* 다운로드 버튼 */}
-      <ChartDownloadButtons chartId={id} filename="목표_기록별_페이스" />
-      
-      {/* 제목 */}
-      <h3 className="text-xl font-bold mb-3 text-center">
-        <i className="fas fa-trophy text-accent-500 mr-2"></i>
-        목표 기록별 필요 페이스 분석
-      </h3>
-      
-      {/* 제작 정보 */}
-      <div className="text-center mb-4 pb-3 border-b-2 border-gray-200">
-        <div className="inline-block">
-          <div className="text-[22px] font-black tracking-tight text-gray-800">
-            <span className="italic">ATHLETE</span> <span>TIME</span>
-          </div>
-          <div className="text-sm text-gray-600 mt-1">제작: 장호준 코치</div>
-        </div>
-      </div>
-      
-      {/* 설명 박스 */}
-      <div className="info-box info-box-orange mb-4">
-        <h4 className="font-bold text-accent-700 text-sm mb-1">🎯 이 차트는 언제 사용하나요?</h4>
-        <p className="text-xs text-accent-700 leading-relaxed">
-          <strong>"5km를 20분에 완주하려면..."</strong> 이라고 생각할 때 사용합니다.<br />
-          • 대회 목표 기록을 설정하고 필요한 페이스를 확인할 때<br />
-          • 인기 목표 시간별로 km 페이스, 400m 랩타임, 속도를 한눈에 확인 가능
-        </p>
-      </div>
-      
-      {/* 5km 목표 기록 */}
-      <TargetTable 
-        title="🏃 5km 목표 기록"
-        distance={5000}
-        targets={TARGETS_5KM}
-        showColumns={['100m']}
-      />
-      
-      {/* 10km 목표 기록 */}
-      <TargetTable 
-        title="🏃 10km 목표 기록"
-        distance={10000}
-        targets={TARGETS_10KM}
-        showColumns={['5km']}
-      />
-      
-      {/* 하프마라톤 목표 기록 */}
-      <TargetTable 
-        title="🏃 하프마라톤 목표 기록"
-        distance={21097.5}
-        targets={TARGETS_HALF}
-        showColumns={['5km', '10km']}
-      />
-      
-      {/* 풀마라톤 목표 기록 */}
-      <TargetTable 
-        title="🏃 풀마라톤 목표 기록"
-        distance={42195}
-        targets={TARGETS_FULL}
-        showColumns={['10km', 'half', '30km']}
-      />
-      
-      {/* 제작 정보 푸터 */}
-      <div className="mt-4 pt-3 border-t border-gray-200 text-center">
-        <p className="text-xs text-gray-600">
-          <span className="font-bold">© ATHLETE TIME</span> · 제작: 장호준 코치 · 
-          <span className="text-gray-500">목표 달성을 위한 정확한 페이스 가이드</span>
-        </p>
-      </div>
-    </div>
+    <tr className={`border-b border-hair last:border-b-0 ${target.highlight ? 'bg-surface-2' : ''}`}>
+      <th scope="row" className="px-3 py-2.5 text-left font-mono font-semibold text-ink [font-variant-numeric:tabular-nums]">{formatTime(target.time)}</th>
+      <td className="px-3 py-2.5 text-right font-mono text-ink [font-variant-numeric:tabular-nums]">{formatPace(pacePerKm)}</td>
+      <td className="px-3 py-2.5 text-right font-mono text-ink [font-variant-numeric:tabular-nums]">{formatTime(calculate400mLap(pacePerKm))}</td>
+      {checkpoints.map((checkpoint) => (
+        <td key={checkpoint} className="px-3 py-2.5 text-right font-mono text-ink [font-variant-numeric:tabular-nums]">
+          {formatTime(checkpointTimes[checkpoint])}
+        </td>
+      ))}
+      <td className="px-3 py-2.5 text-right font-mono text-ink-3 [font-variant-numeric:tabular-nums]">{calculateSpeed(distance, target.time).toFixed(1)}km/h</td>
+      <td className="px-3 py-2.5 text-caption text-ink-3">{target.label}</td>
+    </tr>
   );
-};
+}
 
 export default TargetPaceTable;
