@@ -115,7 +115,7 @@
 
   body {
     @apply antialiased bg-bg text-ink;
-    font-family: "Inter", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-size: 14.5px;
     line-height: 1.55;
     letter-spacing: -0.005em;

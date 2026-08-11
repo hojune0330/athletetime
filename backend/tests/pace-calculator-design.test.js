@@ -7,11 +7,20 @@ const ROOT = path.join(__dirname, '..', '..');
 const PACE_DIR = 'frontend/src/pages/PaceCalculatorPage';
 const DEFAULT_SURFACE_FILES = [
   `${PACE_DIR}/index.tsx`,
-  `${PACE_DIR}/components/TargetPaceCalculator.tsx`,
+  `${PACE_DIR}/components/TargetPaceInputs.tsx`,
+  `${PACE_DIR}/components/TargetPaceResult.tsx`,
 ];
 
 function readSource(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
+}
+
+function readTargetPaceSurface() {
+  return [
+    `${PACE_DIR}/components/TargetPaceCalculator.tsx`,
+    `${PACE_DIR}/components/TargetPaceInputs.tsx`,
+    `${PACE_DIR}/components/TargetPaceResult.tsx`,
+  ].map(readSource).join('\n');
 }
 
 test('PACE-DS-001: default pace surface removes old decorative UI', () => {
@@ -24,8 +33,14 @@ test('PACE-DS-001: default pace surface removes old decorative UI', () => {
   }
 });
 
+test('PACE-UX-012: calculator surface does not depend on unavailable external fonts', () => {
+  const document = readSource('frontend/index.html');
+
+  assert.doesNotMatch(document, /fonts\.googleapis\.com|fonts\.gstatic\.com/, 'calculator loading must not depend on an external font request');
+});
+
 test('PACE-DS-002: target pace result uses TRAINORACLE numeric primitives', () => {
-  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+  const target = readTargetPaceSurface();
 
   assert.match(target, /MetricCell/, 'target pace results use MetricCell strip');
   assert.match(target, /PACE OUTPUT/, 'result section has a mono technical label');
@@ -34,7 +49,7 @@ test('PACE-DS-002: target pace result uses TRAINORACLE numeric primitives', () =
 });
 
 test('PACE-SC-001: track events 800m/1500m/3000mSC with water-jump placement are supported', () => {
-  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+  const target = readTargetPaceSurface();
   const calc = readSource(`${PACE_DIR}/utils/paceCalculations.ts`);
 
   // 800m / 1500m quick distances on the target calculator
@@ -59,7 +74,7 @@ test('PACE-SC-001: track events 800m/1500m/3000mSC with water-jump placement are
 
 test('PACE-DS-003: pace page copy is direct and not a training-plan duplicate', () => {
   const index = readSource(`${PACE_DIR}/index.tsx`);
-  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+  const target = readTargetPaceSurface();
 
   assert.match(index, /페이스 계산기/);
   assert.match(index, /목표 기록으로 페이스를 바로 확인해요/);
@@ -98,7 +113,7 @@ test('PACE-DS-004: track event splits expose steeplechase water-jump variants', 
 });
 
 test('PACE-UX-005: invalid custom input stays in-page and cannot reuse a prior distance', () => {
-  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+  const target = readTargetPaceSurface();
 
   // Given a runner clears a custom distance after selecting another distance.
   // When they ask to calculate a pace.
@@ -169,11 +184,11 @@ test('PACE-UX-009: calculator tabs stay compact on mobile and identify their pan
 });
 
 test('PACE-UX-010: target pace rejects invalid clock values and clears stale output', () => {
-  const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
+  const target = readTargetPaceSurface();
 
   assert.match(target, /hasValidFinishTime/, 'target time has an explicit validity boundary');
-  assert.match(target, /minutes < 60/, 'target minutes stay within a clock hour');
-  assert.match(target, /seconds < 60/, 'target seconds stay within a clock minute');
+  assert.match(target, /isOptionalClockValue\(minutes, 59\)/, 'target minutes stay within a clock hour');
+  assert.match(target, /isOptionalClockValue\(seconds, 59\)/, 'target seconds stay within a clock minute');
   assert.match(target, /id="target-time-error" role="alert"/, 'invalid target time is announced in context');
   assert.match(target, /setResult\(null\)/, 'an invalid input cannot leave a stale pace result visible');
   assert.match(target, /aria-pressed=\{isSteeple\}/, 'distance mode selection exposes its current state');

@@ -1,99 +1,85 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { MetricCell } from '../../../components/ui/trainoracle';
 import {
-  formatTime,
-  formatPace,
-  calculatePaceFromTarget,
-  calculate400mLap,
   calculate100mTime,
+  calculate400mLap,
+  calculatePaceFromTarget,
   calculateSpeed,
+  formatPace,
+  formatTime,
   STEEPLECHASE_SPECS,
 } from '../utils/paceCalculations';
+import { TargetPaceInputs } from './TargetPaceInputs';
+import { TargetPaceResult } from './TargetPaceResult';
+import type { PaceResult, SteepleSplitDetails, TimeValue, WaterJumpPlacement } from './targetPaceTypes';
 
-type PaceResult = {
-  readonly pacePerKm: string;
-  readonly pace400m: string;
-  readonly pace100m: string;
-  readonly speedKmh: string;
-  readonly finishTime: string;
-};
-
-const QUICK_DISTANCES = [
-  { label: '800m', value: 800 },
-  { label: '1500m', value: 1500 },
-  { label: '5km', value: 5000 },
-  { label: '10km', value: 10000 },
-  { label: '하프', value: 21097.5 },
-  { label: '풀코스', value: 42195 },
-] as const;
-
-/** 3000mSC 물웅덩이 위치 — 경기장마다 달라 랩 거리와 스타트 위치가 바뀐다 */
-type WaterJumpPlacement = 'INSIDE' | 'OUTSIDE';
-
-const numberInputClass =
-  'h-11 rounded-sm border border-line bg-surface px-3 text-center font-mono text-base text-ink [font-variant-numeric:tabular-nums] transition-colors focus:border-ink focus:outline-none';
+const isOptionalClockValue = (value: TimeValue, max: number): boolean => (
+  value === null || (Number.isInteger(value) && value >= 0 && value <= max)
+);
 
 export const TargetPaceCalculator: React.FC = () => {
-  const [distance, setDistance] = useState<number>(5000);
-  const [customDistance, setCustomDistance] = useState<string>('5');
+  const [distance, setDistance] = useState<number>(0);
+  const [customDistance, setCustomDistance] = useState<string>('');
   const [isCustom, setIsCustom] = useState(false);
-  // 3000m 장애물(steeplechase) 모드 — 물웅덩이 안쪽/바깥쪽에 따라 랩 구성이 다르다
   const [isSteeple, setIsSteeple] = useState(false);
   const [waterJump, setWaterJump] = useState<WaterJumpPlacement>('INSIDE');
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(20);
-  const [seconds, setSeconds] = useState(0);
+  const [hours, setHours] = useState<TimeValue>(null);
+  const [minutes, setMinutes] = useState<TimeValue>(null);
+  const [seconds, setSeconds] = useState<TimeValue>(null);
   const [result, setResult] = useState<PaceResult | null>(null);
-  const [validationError, setValidationError] = useState('');
 
-  const hasValidFinishTime = Number.isInteger(hours)
-    && hours >= 0
-    && hours <= 12
-    && Number.isInteger(minutes)
-    && minutes >= 0
-    && minutes < 60
-    && Number.isInteger(seconds)
-    && seconds >= 0
-    && seconds < 60
-    && hours * 3600 + minutes * 60 + seconds > 0;
+  const hasEnteredFinishTime = [hours, minutes, seconds].some((value) => value !== null);
+  const hasValidFinishTime = hasEnteredFinishTime
+    && isOptionalClockValue(hours, 12)
+    && isOptionalClockValue(minutes, 59)
+    && isOptionalClockValue(seconds, 59)
+    && (hours ?? 0) * 3600 + (minutes ?? 0) * 60 + (seconds ?? 0) > 0;
+  const hasValidDistance = Number.isFinite(distance) && distance > 0;
+  const canCalculate = hasValidDistance && hasValidFinishTime;
+  const validationError = !hasEnteredFinishTime || hasValidFinishTime
+    ? ''
+    : '완주 시간은 0보다 커야 하고, 분과 초는 0부터 59까지 입력해 주세요.';
   const targetTimeSeconds = useMemo(
-    () => (hasValidFinishTime ? hours * 3600 + minutes * 60 + seconds : 0),
+    () => (hasValidFinishTime ? (hours ?? 0) * 3600 + (minutes ?? 0) * 60 + (seconds ?? 0) : 0),
     [hasValidFinishTime, hours, minutes, seconds],
   );
   const distanceKm = (distance / 1000).toFixed(3);
 
   useEffect(() => {
-    if (!hasValidFinishTime || !Number.isFinite(distance) || distance <= 0) {
+    if (!canCalculate) {
       setResult(null);
     }
-  }, [distance, hasValidFinishTime]);
+  }, [canCalculate]);
 
   const handleDistanceSelect = (selectedDistance: number) => {
     setDistance(selectedDistance);
+    setCustomDistance('');
     setIsCustom(false);
     setIsSteeple(false);
   };
 
   const handleSteepleSelect = () => {
     setDistance(3000);
+    setCustomDistance('');
     setIsCustom(false);
     setIsSteeple(true);
+  };
+
+  const handleStartCustomDistance = () => {
+    setDistance(0);
+    setCustomDistance('');
+    setIsCustom(true);
+    setIsSteeple(false);
   };
 
   const handleCustomDistanceChange = (value: string) => {
     setCustomDistance(value);
     const nextDistanceKm = Number.parseFloat(value);
-    if (Number.isFinite(nextDistanceKm) && nextDistanceKm > 0) {
-      setDistance(nextDistanceKm * 1000);
-    } else {
-      setDistance(0);
-    }
+    setDistance(Number.isFinite(nextDistanceKm) && nextDistanceKm > 0 ? nextDistanceKm * 1000 : 0);
     setIsCustom(true);
     setIsSteeple(false);
   };
 
-  // 3000mSC 랩 스플릿 — 스타트 구간 + 7랩 누적 통과 타임 (균등 페이스)
-  const steepleSplits = useMemo(() => {
+  const steepleSplits = useMemo<SteepleSplitDetails | null>(() => {
     if (!isSteeple || !result || targetTimeSeconds <= 0) return null;
     const spec = STEEPLECHASE_SPECS[waterJump];
     const pacePerMeter = targetTimeSeconds / 3000;
@@ -113,13 +99,11 @@ export const TargetPaceCalculator: React.FC = () => {
   }, [isSteeple, result, targetTimeSeconds, waterJump]);
 
   const calculate = () => {
-    if (!hasValidFinishTime || distance <= 0) {
-      setValidationError('거리와 올바른 완주 시간을 입력해 주세요.');
+    if (!canCalculate) {
       setResult(null);
       return;
     }
 
-    setValidationError('');
     const pacePerKm = calculatePaceFromTarget(targetTimeSeconds, distance);
     setResult({
       pacePerKm: formatPace(pacePerKm),
@@ -131,264 +115,61 @@ export const TargetPaceCalculator: React.FC = () => {
   };
 
   const reset = () => {
+    setDistance(0);
+    setCustomDistance('');
+    setIsCustom(false);
+    setIsSteeple(false);
+    setWaterJump('INSIDE');
+    setHours(null);
+    setMinutes(null);
+    setSeconds(null);
     setResult(null);
   };
 
   return (
     <div className="space-y-6">
-      <section className="border border-line bg-surface p-5 md:p-6">
-        <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
-              PACE INPUT
-            </p>
-            <h2 className="mt-1 text-h3 font-semibold tracking-tight text-ink">목표 페이스 계산기</h2>
-          </div>
-          <p className="max-w-md text-body-sm leading-relaxed text-ink-3">
-            목표 거리와 완주 시간을 넣으면 km·400m·100m 기준 페이스를 바로 계산해요.
-          </p>
-          </div>
-
-          {validationError && (
-            <div
-              role="alert"
-              className="mt-4 border border-err/40 border-l-2 border-l-err bg-surface px-3 py-2 text-body-sm text-err"
-            >
-              {validationError}
-            </div>
-          )}
-
-          <div className="grid gap-6 md:grid-cols-[1fr_1.1fr]">
-          <div>
-            <label className="mb-2 block font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
-              Distance
-            </label>
-            <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
-              {QUICK_DISTANCES.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => handleDistanceSelect(option.value)}
-                  aria-pressed={!isCustom && !isSteeple && distance === option.value}
-                  className={`h-11 font-mono text-[12px] font-medium transition-colors ${
-                    !isCustom && !isSteeple && distance === option.value
-                      ? 'bg-ink text-bg'
-                      : 'bg-surface text-ink-2 hover:bg-surface-2'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={handleSteepleSelect}
-                aria-pressed={isSteeple}
-                className={`h-11 font-mono text-[12px] font-medium transition-colors ${
-                  isSteeple ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
-                }`}
-              >
-                3000mSC
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsCustom(true);
-                  setIsSteeple(false);
-                }}
-                aria-pressed={isCustom}
-                className={`h-11 font-mono text-[12px] font-medium transition-colors ${
-                  isCustom ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
-                }`}
-              >
-                직접
-              </button>
-            </div>
-
-            {isSteeple && (
-              <div className="mt-3 border border-line bg-surface-2 p-3">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-3">
-                  Water jump · 물웅덩이 위치
-                </p>
-                <div className="mt-2 grid grid-cols-2 gap-px border border-line bg-line">
-                  {(['INSIDE', 'OUTSIDE'] as const).map((placement) => (
-                    <button
-                      key={placement}
-                      type="button"
-                      onClick={() => setWaterJump(placement)}
-                      aria-pressed={waterJump === placement}
-                      className={`flex h-12 flex-col items-center justify-center font-mono text-[11px] transition-colors ${
-                        waterJump === placement ? 'bg-ink text-bg' : 'bg-surface text-ink-2 hover:bg-surface-2'
-                      }`}
-                    >
-                      <span className="font-semibold">{placement === 'INSIDE' ? '트랙 안쪽' : '트랙 바깥쪽'}</span>
-                      <span className="text-[10px] opacity-70 [font-variant-numeric:tabular-nums]">
-                        랩 {STEEPLECHASE_SPECS[placement].lapDistance.toFixed(1)}m
-                      </span>
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-2 text-[11px] leading-4 text-ink-4">
-                  안쪽({STEEPLECHASE_SPECS.INSIDE.description}): 스타트 {STEEPLECHASE_SPECS.INSIDE.startDistance.toFixed(1)}m + 7랩 × {STEEPLECHASE_SPECS.INSIDE.lapDistance.toFixed(1)}m ·
-                  바깥쪽({STEEPLECHASE_SPECS.OUTSIDE.description}): 스타트 {STEEPLECHASE_SPECS.OUTSIDE.startDistance.toFixed(1)}m + 7랩 × {STEEPLECHASE_SPECS.OUTSIDE.lapDistance.toFixed(1)}m
-                </p>
-              </div>
-            )}
-
-            {isCustom && (
-              <div className="mt-3 flex items-center gap-2">
-                <input
-                  type="number"
-                  value={customDistance}
-                  onChange={(event) => handleCustomDistanceChange(event.target.value)}
-                  min="0.1"
-                    step="0.1"
-                    className={`${numberInputClass} w-28`}
-                    aria-label="직접 거리 (km)"
-                    placeholder="거리"
-                />
-                <span className="text-body-sm text-ink-3">km</span>
-              </div>
-            )}
-            <p className="mt-2 font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
-              SELECTED {isSteeple ? '3000M STEEPLECHASE' : `${distanceKm}KM`}
-            </p>
-          </div>
-
-          <div>
-            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-widest-2 text-ink-3">
-              Finish time
-            </p>
-            <div className="flex items-start gap-1.5">
-              <TimeField label="시간" value={hours} max={12} invalid={!hasValidFinishTime} onChange={setHours} />
-              <Separator />
-              <TimeField label="분" value={minutes} max={59} invalid={!hasValidFinishTime} onChange={setMinutes} />
-              <Separator />
-              <TimeField label="초" value={seconds} max={59} invalid={!hasValidFinishTime} onChange={setSeconds} />
-            </div>
-            {!hasValidFinishTime && (
-              <p id="target-time-error" role="alert" className="mt-2 text-body-sm text-err">
-                완주 시간은 0보다 커야 하고, 분과 초는 0부터 59까지 입력해 주세요.
-              </p>
-            )}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={calculate}
-          className="mt-6 h-12 w-full bg-ink font-mono text-[12px] font-semibold uppercase tracking-widest-2 text-bg transition-colors hover:bg-brand-ink"
-        >
-          페이스 계산하기
-        </button>
-      </section>
+      <TargetPaceInputs
+        canCalculate={canCalculate}
+        customDistance={customDistance}
+        distance={distance}
+        distanceKm={distanceKm}
+        hasValidDistance={hasValidDistance}
+        hours={hours}
+        isCustom={isCustom}
+        isSteeple={isSteeple}
+        minutes={minutes}
+        onCalculate={calculate}
+        onCustomDistanceChange={handleCustomDistanceChange}
+        onDistanceSelect={handleDistanceSelect}
+        onHoursChange={setHours}
+        onMinutesChange={setMinutes}
+        onSecondsChange={setSeconds}
+        onStartCustomDistance={handleStartCustomDistance}
+        onSteepleSelect={handleSteepleSelect}
+        onWaterJumpChange={setWaterJump}
+        seconds={seconds}
+        validationError={validationError}
+        waterJump={waterJump}
+      />
 
       {result ? (
-        <section className="border border-line bg-surface p-5 md:p-6">
-          <div className="mb-4 flex items-baseline justify-between">
-            <h3 className="text-h3 font-semibold tracking-tight text-ink">계산 결과</h3>
-            <span className="font-mono text-[10px] uppercase tracking-widest-2 text-ink-4">PACE OUTPUT</span>
-          </div>
-
-          <div className="grid border-y border-ink bg-surface sm:grid-cols-2 lg:grid-cols-3">
-            <MetricCell label="km 페이스" value={result.pacePerKm} unit="/km" />
-            {steepleSplits ? (
-              <MetricCell
-                label={`SC 랩 (${steepleSplits.spec.lapDistance.toFixed(1)}m)`}
-                value={formatTime(steepleSplits.lapTime)}
-                unit="초"
-              />
-            ) : (
-              <MetricCell label="400m 랩" value={result.pace400m} unit="초" />
-            )}
-            <MetricCell label="100m" value={result.pace100m} unit="초" />
-            <MetricCell label="속도" value={result.speedKmh} unit="km/h" />
-            <MetricCell label="거리" value={distanceKm} unit="km" />
-            <MetricCell label="완주 시간" value={result.finishTime} />
-          </div>
-
-          {steepleSplits && (
-            <div className="mt-4 border border-line">
-              <div className="flex items-baseline justify-between border-b border-line bg-surface-2 px-3 py-2">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-3">
-                  SC LAP SPLITS · {waterJump === 'INSIDE' ? '트랙 안쪽' : '트랙 바깥쪽'}
-                </p>
-                <p className="font-mono text-[10px] text-ink-4 [font-variant-numeric:tabular-nums]">
-                  스타트 {steepleSplits.spec.startDistance.toFixed(1)}m · 랩 {steepleSplits.spec.lapDistance.toFixed(1)}m
-                </p>
-              </div>
-              <div className="divide-y divide-hair">
-                {steepleSplits.rows.map((row) => (
-                  <div key={row.label} className="grid grid-cols-[1fr_auto_auto] items-baseline gap-3 px-3 py-1.5">
-                    <span className="text-body-sm text-ink-2">{row.label}</span>
-                    <span className="font-mono text-[11px] text-ink-4 [font-variant-numeric:tabular-nums]">
-                      {row.distance.toFixed(1)}m
-                    </span>
-                    <span className="font-mono text-body-sm font-semibold text-ink [font-variant-numeric:tabular-nums]">
-                      {formatTime(row.cumulative)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 border-l-2 border-ink pl-3 text-body-sm leading-relaxed text-ink-3">
-            {steepleSplits
-              ? '균등 페이스 기준 참고값이에요. 장애물 넘기·물웅덩이 감속은 반영되지 않았으니 실제 랩은 조금 느려질 수 있어요. 경기장의 물웅덩이 위치를 꼭 확인하세요.'
-              : '균등 페이스 기준 참고값이에요. 실제 레이스에서는 코스, 날씨, 급수 지점에 따라 달라질 수 있어요.'}
-          </div>
-
-          <button
-            type="button"
-            onClick={reset}
-            className="mt-4 h-11 w-full border border-line bg-surface font-mono text-[11px] font-semibold uppercase tracking-widest-2 text-ink transition-colors hover:bg-surface-2"
-          >
-            Reset
-          </button>
-        </section>
+        <TargetPaceResult
+          distanceKm={distanceKm}
+          isSteeple={isSteeple}
+          onReset={reset}
+          result={result}
+          steepleSplits={steepleSplits}
+          waterJump={waterJump}
+        />
       ) : (
         <section className="border border-dashed border-line bg-surface p-6 text-center">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
-            WAITING INPUT
-          </p>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">WAITING INPUT</p>
           <h3 className="mt-2 text-body font-semibold text-ink">목표 기록을 넣으면 바로 계산해요.</h3>
-          <p className="mt-1 text-body-sm text-ink-3">거리와 완주 시간을 입력한 뒤 계산 버튼을 누르세요.</p>
+          <p className="mt-1 text-body-sm text-ink-3">거리와 목표 시간을 입력하면 계산할 수 있어요.</p>
         </section>
       )}
     </div>
   );
 };
-
-type TimeFieldProps = {
-  readonly label: string;
-  readonly value: number;
-  readonly max: number;
-  readonly invalid: boolean;
-  readonly onChange: (value: number) => void;
-};
-
-const TimeField: React.FC<TimeFieldProps> = ({ label, value, max, invalid, onChange }) => (
-  <div className="flex flex-1 flex-col items-center">
-    <input
-      type="number"
-      value={Number.isFinite(value) ? value : ''}
-      onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
-      aria-label={label}
-      aria-describedby={invalid ? 'target-time-error' : undefined}
-      min="0"
-      max={max}
-      step="1"
-      inputMode="numeric"
-      className={`${numberInputClass} w-full`}
-    />
-    <span className="mt-1 text-caption text-ink-4">{label}</span>
-  </div>
-);
-
-const Separator: React.FC = () => (
-  <span className="pt-2.5 font-mono text-lg text-ink-4" aria-hidden>
-    :
-  </span>
-);
 
 export default TargetPaceCalculator;
