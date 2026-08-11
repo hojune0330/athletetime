@@ -9,8 +9,8 @@ row-level record actions, and editorial publication.
 
 ## Baseline
 
-- Current branch baseline: `main` at `00f5acf` after public-route error
-  hardening.
+- Current branch baseline: `main` at `829bd0e` after public-route error
+  hardening and Korean recovery-copy normalization.
 - The record workspace keeps same-name candidates separate and stores its
   helper selections only in the browser.
 - The team surface is aggregate-only, but sparse aggregate disclosure is not
@@ -19,6 +19,35 @@ row-level record actions, and editorial publication.
   fail-closed with `503` and `Cache-Control: no-store`.
 - PaceRise resolves malformed or stale competition links to an available
   competition instead of presenting a blank detail area.
+
+## Persona Review Summary (2026-08-12)
+
+Thirty browser, code-boundary, and adversarial review cases were consolidated
+through the release matrix. The following fixes are now part of the baseline,
+so a later worker must not re-open or duplicate them:
+
+- Invalid or stale PaceRise links recover to a real competition instead of a
+  blank panel.
+- Same-name candidates remain separate; the last selected candidate can be
+  removed and returns to a fresh record search.
+- Browser-local record cleanup never claims success when storage could not be
+  cleared, and provides one retry action.
+- Desktop "more" navigation restores focus after Escape or backdrop close.
+- Registration has bounded email and IP attempts; public route failures do not
+  disclose internal exception text; public record errors use Korean recovery
+  language.
+- Direct chat, community-write, marketplace-write, upload-write, and chat
+  WebSocket access remain closed with `503` and `Cache-Control: no-store`.
+
+The remaining high-value findings split into two kinds:
+
+1. **Safe UX maintenance:** no-example first use for calculators, short
+   recovery-first copy on long help/request views, accessibility/focus checks,
+   and broken-link or empty-state recovery.
+2. **Owner-only expansion:** small-team numbers, account/minor policy,
+   private vaults, row-level data actions, member interaction, and editorial
+   publishing. These are not implementation backlog items until their gate is
+   explicitly decided.
 
 ## Gate Index
 
@@ -43,6 +72,7 @@ the current closed boundary remains in force.
 | S3 | Read-only team navigation and wording | Existing aggregate-only labels, source-range wording, correction-link reachability, browser routing | Any new numeric aggregate, chart point, athlete count, team roster wording, person link, or granular filter | `backend/tests/team-public-dto-boundary.test.js` and `backend/tests/records-flow-e2e.test.js`. |
 | S4 | Closed-surface truthfulness | Preparation-page copy, recovery links, no-store headers, server gates, configuration documentation | Removing a gate or adding any write-capable UI, API, WebSocket, upload, or environment flag | `backend/tests/launch-interaction-safety.test.js` and `backend/tests/deployment-wiring.test.js`. |
 | S5 | Accessibility and responsive recovery | Keyboard focus return, tap targets, headings, contrast, no-console-error route recovery | New data collection, tracking identifiers, or user-behavior analytics | Browser checks at 390px and 1280px with console/page errors captured. |
+| S6 | Direct-input calculator first use | Start calculator time/distance fields empty, keep calculation disabled until a valid direct entry, and make reset return to the same empty state | Sample athlete data, example performance values, saved calculator identity, training-log/account linking | Focused component tests plus a 390px browser check prove no result appears before valid input and a valid manually entered value produces a result. |
 
 ## Execution Tasks
 
@@ -166,6 +196,32 @@ the current closed boundary remains in force.
   `/community`, `/chat`, `/admin/operator-guide`, and an unknown route.
 - The release matrix retains all six owner-decision boundaries.
 
+### 6. Keep calculators direct-input only
+
+**Files and scope**
+- `frontend/src/pages/PaceCalculatorPage/components/TargetPaceCalculator.tsx`
+- `frontend/src/pages/PaceCalculatorPage/components/TargetPaceInputs.tsx`
+- `frontend/src/pages/TrainingCalculatorPage/hooks/useTrainingCalculator.ts`
+- Existing focused calculator tests under `frontend/src/pages/*CalculatorPage/`
+
+**Implementation**
+1. Start every performance field with an empty value rather than a plausible
+   runner record or a computed result.
+2. Keep the calculate action unavailable until required direct values are
+   valid; use short field-level Korean recovery text rather than an example
+   athlete or performance.
+3. Make reset restore exactly the first-use empty state.
+4. Do not write calculator values to account, workspace, URL, analytics, or
+   training-log storage as part of this task.
+
+**Acceptance criteria**
+- Initial render contains no calculated pace, VDOT, training prescription, or
+  plausible sample performance.
+- A blank or zero-only performance cannot produce a result.
+- A manually entered valid distance and time produces the existing calculation
+  result without a console or page error at `390x844`.
+- Reset returns fields and output to the same empty state.
+
 ## Required Verification
 
 Run these before merging any safe-wave change:
@@ -209,6 +265,9 @@ page errors. The team path may not reveal a person list or raw result rows.
 - Do not enable `NAVER_NEWS_COLLECTOR_ENABLED` or
   `EDITORIAL_SCHEDULER_ENABLED`; do not create background editorial jobs.
 - Do not use public upload helpers for any private or account-bound content.
+- Do not turn calculator fields into a profile, training log, or record
+  collection. The safe direct-input task is deliberately browser-session UI
+  only.
 
 ## Decision Queue
 
