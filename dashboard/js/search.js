@@ -33,7 +33,7 @@ const search = {
 
   async loadCompetitions() {
     try {
-      const result = await api.get('/api/card-studio/search/competitions');
+      const result = await api.getPublic('/search/competitions');
       if (!result.success) return;
 
       const sel = document.getElementById('search-comp');
@@ -80,7 +80,7 @@ const search = {
       const qs = new URLSearchParams({ q, type });
       if (comp) qs.set('comp', comp);
 
-      const result = await api.get(`/api/card-studio/search?${qs.toString()}`);
+      const result = await api.getPublic(`/search?${qs.toString()}`);
       if (!result.success) {
         this.renderEmpty(result.error || '검색 실패');
         return;
@@ -264,7 +264,7 @@ const search = {
         limit: '30',
       });
       if (searchState.comp) params.set('comp', searchState.comp);
-      const result = await api.get(`/api/card-studio/search/section?${params.toString()}`);
+      const result = await api.getPublic(`/search/section?${params.toString()}`);
       if (!result.success || !Array.isArray(result.data?.rows)) throw new Error('search section unavailable');
 
       const rows = this.renderSearchRows(result.data.rows);
