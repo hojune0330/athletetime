@@ -10,6 +10,7 @@ import AdminRoute from './components/layout/AdminRoute'
 import RequireAuth from './components/layout/RequireAuth'
 import ScrollToTop from './components/ScrollToTop'
 import FeaturePreparingPage from './components/common/FeaturePreparingPage'
+import { RouteFailureBoundary } from './components/common/RouteFailureBoundary'
 
 const MainPage = lazy(() => import('./pages/MainPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
@@ -66,9 +67,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <Router basename={basename}>
-        <ScrollToTop />
-        <AuthProvider>
+      <RouteFailureBoundary>
+        <Router basename={basename}>
+          <ScrollToTop />
+          <AuthProvider>
           <Routes>
             {/* 인증 페이지 (레이아웃 없음) */}
             <Route path="/register" element={lazyPage(<RegisterPage />)} />
@@ -196,8 +198,9 @@ function App() {
               <Route path="*" element={lazyPage(<NotFoundPage />)} />
             </Route>
           </Routes>
-        </AuthProvider>
-      </Router>
+          </AuthProvider>
+        </Router>
+      </RouteFailureBoundary>
     </div>
   )
 }
