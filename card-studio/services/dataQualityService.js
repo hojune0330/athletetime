@@ -178,8 +178,8 @@ function checkRecord(issues, context, record, direction) {
   const parsed = parseRecord(raw, direction);
   if (!parsed) {
     const statusKind = classifyRecordStatus(raw);
-    addIssue(issues.invalidRecord, { ...context, record: raw, statusKind });
     if (statusKind === 'malformed') {
+      addIssue(issues.invalidRecord, { ...context, record: raw, statusKind });
       addIssue(issues.malformedRecord, { ...context, record: raw });
     } else {
       addIssue(issues.statusOnlyRecord, { ...context, record: raw, statusKind });
@@ -286,7 +286,7 @@ function scanDuplicateRows(issues, context, results) {
 
 function createIssueBuckets() {
   return {
-    invalidRecord: bucket('Record cannot be parsed into a positive numeric mark.'),
+    invalidRecord: bucket('Non-status record cannot be parsed into a positive numeric mark.'),
     nonPositiveRecord: bucket('Record parsed to zero or a negative value.'),
     invalidDate: bucket('Event date cannot be parsed.'),
     futureDate: bucket('Event date is more than one day in the future.'),
@@ -520,5 +520,6 @@ function clean(value, max = 500) {
 
 module.exports = {
   getDataQualityReport,
+  checkRecord,
   scanDuplicateRows,
 };
