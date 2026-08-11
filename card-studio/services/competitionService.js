@@ -112,11 +112,25 @@ function getServiceDateString(date = new Date()) {
 }
 
 function getCompetitionStableKey(competition) {
-  if (competition.kaafSeq) {
+  if (competition.kaafSeq !== undefined && competition.kaafSeq !== null && competition.kaafSeq !== '') {
     return `${competition.id}-kaaf-${competition.kaafSeq}`;
+  }
+  if (competition.toCd) {
+    return `${competition.id}-result-${competition.toCd}`;
   }
   const startDate = competition.period && competition.period.start ? competition.period.start : 'unknown-date';
   return `${competition.id}-${startDate}-${competition.name}`;
+}
+
+function getCompetitionSourceUrl(competition) {
+  return competition.sourceUrl || competition.kaafUrl || competition.resultUrl || '';
+}
+
+function getCompetitionSourceIdentifier(competition) {
+  if (competition.kaafSeq !== undefined && competition.kaafSeq !== null && competition.kaafSeq !== '') {
+    return String(competition.kaafSeq);
+  }
+  return String(competition.toCd || '');
 }
 
 /**
@@ -213,19 +227,19 @@ function generateShortName(name) {
 
 /**
  * ⚠️ 데이터 무결성 검증: 필수 필드 확인
- * 모든 대회 데이터에 source와 kaafUrl이 있는지 확인합니다.
+ * 모든 대회 데이터에 source, 원출처 URL, 안정 식별자가 있는지 확인합니다.
  */
 function validateDataIntegrity(competitions) {
   const warnings = [];
   for (const comp of competitions) {
-    if (!comp.kaafUrl) {
-      warnings.push(`[무결성 경고] "${comp.name}" — kaafUrl 누락 (출처 추적 불가)`);
+    if (!getCompetitionSourceUrl(comp)) {
+      warnings.push(`[무결성 경고] "${comp.name}" — 원출처 URL 누락 (출처 추적 불가)`);
     }
     if (!comp.source) {
       warnings.push(`[무결성 경고] "${comp.name}" — source 필드 누락`);
     }
-    if (!comp.kaafSeq && comp.kaafSeq !== 0) {
-      warnings.push(`[무결성 경고] "${comp.name}" — kaafSeq 누락 (검증 불가)`);
+    if (!getCompetitionSourceIdentifier(comp)) {
+      warnings.push(`[무결성 경고] "${comp.name}" — 원출처 식별자 누락 (검증 불가)`);
     }
   }
   if (warnings.length > 0) {

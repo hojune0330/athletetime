@@ -119,7 +119,7 @@ function _toRawShape(year, comp) {
       period,
       venue: comp.venue || '',
       source: comp.source || 'kaaf',
-      source_url: comp.sourceUrl || comp.kaafUrl || '',
+      source_url: comp.sourceUrl || comp.kaafUrl || comp.resultUrl || '',
       crawled_at: comp.crawledAt || comp.collectedAt || '',
       competition_id: comp.competitionId != null ? String(comp.competitionId) : '',
       to_cd: comp.toCd || '',

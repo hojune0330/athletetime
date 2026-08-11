@@ -25,4 +25,22 @@ for (const { label, module: service } of services) {
     assert.equal(new Set(stableKeys).size, competitions.length);
     assert.ok(stableKeys.every((key) => typeof key === 'string' && key.length > 0));
   });
+
+  test(`${label}: direct result references count as traceable source metadata`, () => {
+    // A result page can be the source even when the schedule-page sequence is absent.
+    const directResultCompetition = {
+      id: '2026-road-fixture',
+      name: '검증용 도로 대회',
+      period: { start: '2026-02-22', end: '2026-02-22' },
+      source: 'kaaf_result_fixture',
+      toCd: 'E000000001',
+      resultUrl: 'https://example.test/result/E000000001',
+    };
+
+    assert.deepEqual(service.validateDataIntegrity([directResultCompetition]), []);
+    assert.equal(
+      service.getCompetitions(2026).some((competition) => competition.stableKey === '2026-road-001-result-E014030185'),
+      true,
+    );
+  });
 }
