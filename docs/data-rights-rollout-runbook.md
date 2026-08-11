@@ -84,6 +84,18 @@ npm run data:rights:roundtrip -- \
 
 This creates one clearly synthetic `ROLLOUT-CHECK-*` correction request without contact data, immediately looks it up, and never prints its ticket. Mark the synthetic request `corrected` in the admin console after recording the aggregate pass result. Do not run this command before Fable approval or against an unapproved deployment.
 
+## Fail closed recovery and migration rehearsal
+
+A health, readiness, or managed migration failure is intentional fail closed behavior. A non-200 or degraded `/health` result, `services.dataRights` other than `ready`, a rejected schema contract, or a migration-ledger mismatch means the rollout remains stopped.
+
+Use this recovery sequence:
+
+1. Preserve the verified backup, dry-run evidence, migration output, and legacy JSON evidence; keep traffic off the affected deployment.
+2. Inspect the aggregate health status or safe command error, then compare the approved migration files and schema contract with the deployed revision. Do not collect raw request data, connection details, or sensitive runtime values as rollout evidence.
+3. Run the disposable migration rehearsal: `node --test backend/tests/data-rights-pglite.test.js`. It uses temporary PGlite state and copied migration files, then cleans them up. A failing rehearsal is evidence to correct the approved revision and repeat the rehearsal.
+4. After the rehearsal passes, restart at backup verification and the existing dry-run and managed-migration steps. Run `npm run data:rights:shadow` after the migration and record aggregate counts only; shadow proof requires `equal: true`, zero missing rows, and zero unexpected rows.
+5. Deploy the corrected approved revision and repeat the existing readiness check. Proceed only when it reports HTTP 200, overall `healthy`, and `services.dataRights` as `ready`; otherwise return to inspection.
+
 ## Stop conditions
 
 - Backup verification fails or the manifest is stale.

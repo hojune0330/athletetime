@@ -53,6 +53,16 @@ $frontend = Start-Process -FilePath "npm.cmd" -ArgumentList @("--prefix","fronte
 
 Always record PIDs and stop them after QA.
 
+### Windows browser-test startup lock
+
+The records browser-test fixture already serializes only its Vite startup through `backend/tests/records-flow-e2e-startup-lock.js`. `records-flow-e2e-fixture.js` calls `startViteWithLock()` before it starts Vite; on Windows the helper uses a workspace-specific named pipe, waits for contention to clear, and releases the lock as soon as the local server is ready. Separate workspaces do not block one another.
+
+For a startup-lock timeout, use this safe sequence:
+
+1. Let the currently running browser-test invocation finish or stop normally, then inspect its test output for the startup-lock timeout or Vite startup error.
+2. Run the lock-only proof: `node --test --test-name-pattern=RECORDS-E2E-STARTUP-LOCK backend/tests/records-recovery-e2e.test.js`.
+3. Re-run the browser test normally. The fixture acquires and releases the lock itself; do not create, rename, or remove manual lock artifacts.
+
 ### Frontend dev mode — API baseURL & remote backend (`.env.development` / `.env.development.remote`)
 
 기본 로컬 개발(권장):
