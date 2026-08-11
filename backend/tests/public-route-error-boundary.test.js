@@ -6,6 +6,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const insightService = require('../../card-studio/services/insightService');
+const recordAnalyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
 
 const ROOT = path.join(__dirname, '..', '..');
 const PUBLIC_SERVICE_ERROR = '요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.';
@@ -59,5 +60,33 @@ test('PUBLIC-ROUTE-ERROR-002 Given public route handlers When their source is re
   for (const relativePath of publicRouteFiles) {
     const source = fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
     assert.doesNotMatch(source, /error:\s*(?:error|err)\.message/u, relativePath);
+  }
+});
+
+test('PUBLIC-ROUTE-COPY-001 Given a visitor makes an invalid public record request When the route responds Then it uses the same Korean recovery vocabulary', async () => {
+  const app = express();
+  app.use('/api/card-studio', require('../../card-studio/routes/publicRoutes'));
+  app.use('/api/card-studio/analytics', recordAnalyticsRoutes);
+  const server = app.listen(0, '127.0.0.1');
+  await new Promise((resolve) => server.once('listening', resolve));
+
+  try {
+    const responses = await Promise.all([
+      request(server, '/api/card-studio/insights/search?q=x'),
+      request(server, '/api/card-studio/analytics/records/search?q=x'),
+      request(server, '/api/card-studio/analytics/teams/search?q=x'),
+      request(server, '/api/card-studio/insights/athlete/not-found'),
+      request(server, '/api/card-studio/analytics/athletes/not-found'),
+    ]);
+
+    assert.deepEqual(responses.map(({ statusCode, body }) => ({ statusCode, ...JSON.parse(body) })), [
+      { statusCode: 400, success: false, error: '검색어는 2글자 이상 입력해주세요.' },
+      { statusCode: 400, success: false, error: '검색어는 2글자 이상 입력해주세요.' },
+      { statusCode: 400, success: false, error: '검색어는 2글자 이상 입력해주세요.' },
+      { statusCode: 404, success: false, error: '선수 기록을 찾을 수 없습니다.' },
+      { statusCode: 404, success: false, error: '선수 기록을 찾을 수 없습니다.' },
+    ]);
+  } finally {
+    await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 });

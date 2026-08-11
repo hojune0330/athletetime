@@ -80,7 +80,7 @@ router.get('/records/search', searchLimiter, async (req, res) => {
       .replace(/[\x00-\x1f\x7f]/g, '')
       .slice(0, 100);
     if (query.length < 2) {
-      return res.status(400).json({ success: false, error: 'Search query must be at least 2 characters.' });
+      return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해주세요.' });
     }
     const athletes = recordAnalyticsService.searchAthletes(query, req.query.limit);
     if (athletes.length === 0) await tryRecordZeroResultSearch(query);
@@ -102,7 +102,7 @@ router.get('/teams/search', searchLimiter, (req, res) => {
       .replace(/[\x00-\x1f\x7f]/g, '')
       .slice(0, 100);
     if (query.length < 2) {
-      return res.status(400).json({ success: false, error: 'Search query must be at least 2 characters.' });
+      return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해주세요.' });
     }
     const category = cleanQuery(req.query.category, 30).toLowerCase();
     if (category && !TEAM_CATEGORIES.includes(category)) {
@@ -178,7 +178,7 @@ router.get('/athletes/:athleteKey', publicLimiter, (req, res) => {
   try {
     const profile = recordAnalyticsService.getAthleteSummary(req.params.athleteKey);
     if (!profile) {
-      return res.status(404).json({ success: false, error: 'Athlete analytics profile not found.' });
+      return res.status(404).json({ success: false, error: '선수 기록을 찾을 수 없습니다.' });
     }
     return res.json({ success: true, data: profile, dataRights: dataRightsPolicy.RESPONSE_NOTICE });
   } catch {

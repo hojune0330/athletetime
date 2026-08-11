@@ -59,7 +59,7 @@ router.get('/insights/search', searchLimiter, (req, res) => {
   try {
     const query = String(req.query.q || '').trim().replace(/[\x00-\x1f\x7f]/g, '').slice(0, 100);
     if (query.length < 2) {
-      return res.status(400).json({ success: false, error: 'Search query must be at least 2 characters.' });
+      return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해주세요.' });
     }
     const profiles = insightService.searchProfiles(query, req.query.limit);
     return res.json({ success: true, data: profiles, total: profiles.length });
@@ -71,7 +71,7 @@ router.get('/insights/search', searchLimiter, (req, res) => {
 router.get('/insights/athlete/:id', publicLimiter, (req, res) => {
   try {
     const profile = insightService.getProfileById(req.params.id);
-    if (!profile) return res.status(404).json({ success: false, error: 'Athlete insight profile not found.' });
+    if (!profile) return res.status(404).json({ success: false, error: '선수 기록을 찾을 수 없습니다.' });
     return res.json({ success: true, data: profile });
   } catch (error) {
     return sendPublicServiceError(res);
