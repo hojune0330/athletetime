@@ -5,7 +5,7 @@
  * - UX-DISCLOSE-001: 선수 패널의 발자취/전체 기록은 눌러야 열리는 DisclosureSection
  * - UX-MYREC-001: 사용자가 고른 카드만 localStorage에 저장 → 모아 보는 기록 카드는 버튼 없이 항상 표시(접기만 가능)
  * - UX-COLLECT-001: 추정 묶음은 자동 병합하지 않으며, 선택한 카드만 이 기기에서 함께 본다
- * - UX-TRAINLOG-001: 훈련 일지 라이트 — 로컬 저장, 주간 요약, TRAINORACLE 기대감 카드
+ * - UX-TRAINLOG-001: 훈련 일지 라이트 — 로컬 저장, 주간 요약, 복구 가능한 저장 상태
  * - UX-TONE-001: 신규 표면에 공식/랭킹/예측/평가 표현 금지
  */
 
@@ -75,8 +75,11 @@ test('UX-COLLECT-001: local collection is opt-in, reversible, and never auto-mer
   assert.doesNotMatch(estimated, /onCombine/, 'estimated clusters must not trigger automatic collection');
   assert.doesNotMatch(estimated, /모두 내 기록으로 합치기/);
 
+  const candidateSurface = readSource('frontend/src/features/record-workspace/components/RecordCandidatesSurface.tsx');
+  assert.match(candidateSurface, /navigate\('\/records\/workspaces\/new'/, 'selected candidates enter explicit review');
+  assert.match(candidateSurface, /workspaceDraftQuery/, 'returning to the candidate screen keeps only the current query in navigation state');
+
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
-  assert.match(page, /navigate\('\/records\/workspaces\/new'\)/, 'selected candidates enter explicit review');
   assert.match(page, /clearWorkspaceDraft/, 'cancel clears the general selection draft');
   assert.doesNotMatch(page, /<MyRecordsCard|<RecordSearchResults/, 'the instant aggregate path stays removed');
   assert.doesNotMatch(page, /<EstimatedSameAthleteCard[\s\S]*onCombine/, 'estimated candidates require individual review');
@@ -90,9 +93,12 @@ test('UX-COMBINE-002: search candidates require explicit collect mode and review
   assert.match(results, /<WorkspaceDraftTray/, 'review is reached through one action bar');
   assert.doesNotMatch(results, /onToggleMine|isMine|비교에 담기/, 'ownership and comparison stay outside browse selection');
 
+  const candidateSurface = readSource('frontend/src/features/record-workspace/components/RecordCandidatesSurface.tsx');
+  assert.match(candidateSurface, /onReviewDraft=/, 'selection review is triggered from the candidate surface');
+  assert.match(candidateSurface, /workspaceDraftQuery/, 'review can return to the visible candidate selection state');
+
   const page = readSource('frontend/src/pages/RecordsPage.tsx');
   assert.match(page, /draftSubjectKeys=\{workspaceDraftKeys\}/, 'candidate selection comes from the isolated draft');
-  assert.match(page, /onReviewDraft=\{\(\) => navigate\('\/records\/workspaces\/new'\)\}/, 'selection opens review');
   assert.doesNotMatch(page, /onToggleMine=\{|onViewMyRecords=\{/, 'general search cannot write the self collection');
 });
 
@@ -101,7 +107,9 @@ test('UX-COMBINE-003: workspace editing is unambiguous and record details stay o
   assert.match(review, /같은 이름이어도 같은 사람으로 확인됐다는 뜻은 아니에요/);
   assert.match(review, /한 기록 모음으로 저장할 수 없어요/);
   assert.doesNotMatch(review, /한 사람의 기록 모음/);
-  assert.match(review, /선수 비교로 옮기기/);
+  assert.match(review, /선택 계속 고치기/, 'mixed names can return to the visible candidate selection');
+  assert.match(review, /선택 모두 비우고 새로 찾기/, 'mixed names can explicitly erase the current draft');
+  assert.doesNotMatch(review, /선수 비교로 옮기기/, 'a mixed-name draft must not promise a comparison handoff');
 
   const workspace = readSource('frontend/src/features/record-workspace/pages/WorkspaceRecordTab.tsx');
   assert.match(workspace, /이 모음에서 숨기기/);
@@ -139,12 +147,15 @@ test('UX-COLLECT-004: the guided collection flow never defaults an identity or a
   assert.doesNotMatch(candidates, /내 기록을 고르세요|내 것만 고르세요/);
 });
 
-test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and TRAINORACLE teaser', () => {
+test('UX-TRAINLOG-001: training log lite stores locally with weekly summary and recoverable storage', () => {
   const log = readSource('frontend/src/pages/TrainingCalculatorPage/components/TrainingLogLite.tsx');
-  assert.match(log, /athletetime\.training-log\.v1/, 'stable storage key');
+  const storage = readSource('frontend/src/pages/TrainingCalculatorPage/components/trainingLogStorage.ts');
+  assert.match(storage, /athletetime\.training-log\.v1/, 'stable storage key');
+  assert.match(storage, /MAX_TRAINING_LOG_ENTRIES = 60/, 'local history has a bounded size');
+  assert.match(storage, /readTrainingLog|saveTrainingLog|clearTrainingLog/, 'storage supports safe read, save, and removal');
   assert.match(log, /localStorage/);
+  assert.match(log, /readTrainingLog|saveTrainingLog|clearTrainingLog/, 'the UI uses the safe storage boundary');
   assert.match(log, /최근 7일 훈련/, 'weekly summary');
-  assert.match(log, /TRAINORACLE|트레인오라클/, 'TRAINORACLE anticipation');
   assert.match(log, /이 기기에만 저장/, 'local-only storage disclosure');
 
   const calculator = readSource('frontend/src/pages/TrainingCalculatorPage/index.tsx');

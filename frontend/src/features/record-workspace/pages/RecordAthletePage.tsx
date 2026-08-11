@@ -141,7 +141,7 @@ export default function RecordAthletePage() {
           </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
-              <Link to="/records/workspaces/new">선택한 선수 보기 · {draftCount}명</Link>
+              <Link state={{ workspaceDraftQuery: subject.name }} to="/records/workspaces/new">선택한 선수 보기 · {draftCount}명</Link>
             </Button>
           )}
           <Button asChild type="button" variant="ghost">

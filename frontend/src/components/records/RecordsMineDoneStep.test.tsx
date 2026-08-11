@@ -22,11 +22,14 @@ describe('record collection completion empty state', () => {
     expect(markup).not.toContain('선수 기록 자세히 보기');
   });
 
-  it('puts the selected public record detail ahead of optional follow-up actions', () => {
+  it('keeps each selected candidate separate instead of choosing the first candidate', () => {
     const markup = renderToStaticMarkup(
       <MemoryRouter>
         <DoneStep
-          entries={[{ athleteKey: 'candidate-1', name: '선수 1', team: '테스트고', savedAt: '2026-08-09T00:00:00.000Z' }]}
+          entries={[
+            { athleteKey: 'candidate-1', name: '선수 1', team: '테스트고', savedAt: '2026-08-09T00:00:00.000Z' },
+            { athleteKey: 'candidate-2', name: '선수 2', team: '테스트대', savedAt: '2026-08-09T00:00:00.000Z' },
+          ]}
           onAddMore={() => undefined}
           onRemoveMyAthlete={() => undefined}
           onSeasonForMine={() => undefined}
@@ -34,9 +37,11 @@ describe('record collection completion empty state', () => {
       </MemoryRouter>,
     );
 
-    expect(markup).toContain('선수 기록 보기');
+    expect(markup).toContain('이 기기에서 고른 선수 후보');
     expect(markup).toContain('href="/records/athletes/candidate-1"');
-    expect(markup).toContain('bg-primary');
-    expect(markup).not.toContain('선수 기록 자세히 보기');
+    expect(markup).toContain('href="/records/athletes/candidate-2"');
+    expect(markup).toContain('선수 1');
+    expect(markup).toContain('선수 2');
+    expect(markup).not.toContain('선수 기록 보기');
   });
 });
