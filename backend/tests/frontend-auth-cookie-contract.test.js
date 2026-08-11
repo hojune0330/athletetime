@@ -70,14 +70,28 @@ test('frontend treats an anonymous me response as a quiet unauthenticated state'
 });
 
 test('password recovery keeps its account-existence response truthful and non-enumerating', () => {
-  // 2C-2B에서 로그인/비밀번호 찾기 모달이 HeaderLoginModal.tsx로 분리되었다.
-  // 문구 검증은 모달 소스에서 수행한다 (3D 정합).
-  const loginModal = read('frontend/src/components/layout/HeaderLoginModal.tsx');
+  const passwordRecovery = read('frontend/src/components/auth/PasswordRecoveryPanel.tsx');
   const routes = read('backend/auth/routes.js');
 
-  assert.match(loginModal, /등록된 이메일이라면 인증 코드를 보냈어요/);
-  assert.doesNotMatch(loginModal, /인증 코드가 발송되었습니다\. 이메일을 확인해주세요\./);
-  assert.match(loginModal, /등록된 이메일이라면 받은 6자리 인증 코드를 입력해주세요/);
-  assert.doesNotMatch(loginModal, /발송된 6자리 인증 코드를 입력해주세요/);
+  assert.match(passwordRecovery, /등록된 이메일이라면 인증 코드를 보냈어요/);
+  assert.doesNotMatch(passwordRecovery, /인증 코드가 발송되었습니다\. 이메일을 확인해주세요\./);
+  assert.match(passwordRecovery, /이메일로 받은 6자리 인증 코드를 입력해 주세요/);
+  assert.doesNotMatch(passwordRecovery, /발송된 6자리 인증 코드를 입력해주세요/);
   assert.match(routes, /등록된 이메일이라면 인증 코드를 보냈습니다\./);
+});
+
+test('password recovery keeps its own canonical login URL through entry and return', () => {
+  const loginPage = read('frontend/src/pages/LoginPage.tsx');
+  const loginModal = read('frontend/src/components/layout/HeaderLoginModal.tsx');
+  const header = read('frontend/src/components/layout/Header.tsx');
+
+  assert.match(loginPage, /useSearchParams/);
+  assert.match(loginPage, /searchParams\.get\('mode'\) === 'reset'/);
+  assert.match(loginPage, /setSearchParams\(\{ mode: 'reset' \}\)/);
+  assert.match(loginPage, /<PasswordRecoveryPanel onReturnToLogin=\{returnToLogin\} \/>/);
+  assert.doesNotMatch(loginPage, /sessionStorage\.setItem\('showLoginModal'/);
+  assert.match(loginModal, /to="\/login\?mode=reset"/);
+  assert.doesNotMatch(loginModal, /authApi\.forgotPassword/);
+  assert.doesNotMatch(loginModal, /type LoginModalMode/);
+  assert.doesNotMatch(header, /flag === 'forgotPassword'/);
 });

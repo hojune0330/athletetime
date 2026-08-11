@@ -8,7 +8,7 @@ import {
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { BusySpinner } from '@/components/ui/loading-state'
-import HeaderLoginModal, { type LoginModalMode } from './HeaderLoginModal'
+import HeaderLoginModal from './HeaderLoginModal'
 import HeaderMobileDrawer from './HeaderMobileDrawer'
 import HeaderSearchBar from './HeaderSearchBar'
 import { OPEN_MOBILE_MENU_EVENT } from './MobileTabBar'
@@ -19,7 +19,6 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const mobileMenuButtonRef = useRef<HTMLButtonElement>(null)
   const [showLoginModal, setShowLoginModal] = useState(false)
-  const [loginInitialMode, setLoginInitialMode] = useState<LoginModalMode>('login')
 
   // AuthContext에서 로그인 상태 가져오기 (전체 앱과 동기화)
   // login/closeLoginPrompt는 HeaderLoginModal 내부에서 직접 사용한다.
@@ -39,12 +38,10 @@ export default function Header() {
       searchParams.delete('showLogin')
       setSearchParams(searchParams, { replace: true })
     }
-    // sessionStorage 확인 (RegisterPage/LoginPage에서 뒤로가기 시)
-    // 'true' → 로그인, 'forgotPassword' → 비밀번호 찾기 단계로 바로 진입
+    // sessionStorage 확인 (RegisterPage에서 뒤로가기 시)
     const flag = sessionStorage.getItem('showLoginModal')
-    if (flag === 'true' || flag === 'forgotPassword') {
+    if (flag === 'true') {
       setShowLoginModal(true)
-      if (flag === 'forgotPassword') setLoginInitialMode('forgotPassword')
       sessionStorage.removeItem('showLoginModal')
     }
   }, [searchParams, setSearchParams])
@@ -53,7 +50,6 @@ export default function Header() {
   useEffect(() => {
     if (loginPromptOpen) {
       setShowLoginModal(true)
-      setLoginInitialMode('login')
     }
   }, [loginPromptOpen])
 
@@ -78,7 +74,6 @@ export default function Header() {
 
   const handleCloseLoginModal = () => {
     setShowLoginModal(false)
-    setLoginInitialMode('login')
     closeLoginPrompt()
   }
 
@@ -307,7 +302,6 @@ export default function Header() {
       {/* 로그인/비밀번호 찾기 모달 — HeaderLoginModal로 분리 (2C-2B) */}
       <HeaderLoginModal
         open={showLoginModal}
-        initialMode={loginInitialMode}
         onClose={handleCloseLoginModal}
       />
     </>

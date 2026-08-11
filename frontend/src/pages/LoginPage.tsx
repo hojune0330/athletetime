@@ -5,12 +5,14 @@
 import { useState } from 'react';
 import { BusySpinner } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router-dom';
+import { PasswordRecoveryPanel } from '@/components/auth/PasswordRecoveryPanel';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -19,6 +21,17 @@ export default function LoginPage() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const isPasswordRecovery = searchParams.get('mode') === 'reset';
+
+  const openPasswordRecovery = () => {
+    setSearchParams({ mode: 'reset' });
+  };
+
+  const returnToLogin = (email = '') => {
+    setSearchParams({});
+    setFormData({ email, password: '' });
+    setError('');
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,8 +52,8 @@ export default function LoginPage() {
 
     try {
       await login(formData.email, formData.password);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }
@@ -51,39 +64,43 @@ export default function LoginPage() {
       <div className="max-w-md w-full animate-fadeIn">
         <div className="card shadow-card-hover">
           <div className="card-body p-8">
-            {/* 뒤로가기 버튼 */}
-            <button
-              onClick={() => navigate(-1)}
-              className="mb-6 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="text-sm font-medium">뒤로가기</span>
-            </button>
+            {isPasswordRecovery ? (
+              <PasswordRecoveryPanel onReturnToLogin={returnToLogin} />
+            ) : (
+              <>
+                {/* 뒤로가기 버튼 */}
+                <button
+                  onClick={() => navigate(-1)}
+                  className="mb-6 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors min-h-[44px]"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="text-sm font-medium">뒤로가기</span>
+                </button>
 
-            {/* 헤더 */}
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-glow-primary">
-                <span className="text-4xl">🏃</span>
-              </div>
-              <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-                로그인
-              </h1>
-              <p className="text-neutral-500">
-                Every Second Counts ⏱️
-              </p>
-            </div>
+                {/* 헤더 */}
+                <div className="text-center mb-8">
+                  <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center shadow-glow-primary">
+                    <span className="text-4xl">🏃</span>
+                  </div>
+                  <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+                    로그인
+                  </h1>
+                  <p className="text-neutral-500">
+                    Every Second Counts ⏱️
+                  </p>
+                </div>
 
-            {/* 에러 메시지 */}
-            {error && (
-              <div className="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-xl text-danger-700 text-sm animate-fadeIn">
-                {error}
-              </div>
-            )}
+                {/* 에러 메시지 */}
+                {error && (
+                  <div className="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-xl text-danger-700 text-sm animate-fadeIn">
+                    {error}
+                  </div>
+                )}
 
-            {/* 폼 */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+                {/* 폼 */}
+                <form onSubmit={handleSubmit} className="space-y-4">
               {/* 이메일 */}
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -131,18 +148,14 @@ export default function LoginPage() {
                   '로그인'
                 )}
               </Button>
-            </form>
+                </form>
 
-            {/* 링크들 */}
-            <div className="mt-6 space-y-3">
+                {/* 링크들 */}
+                <div className="mt-6 space-y-3">
               <div className="text-center">
                 <button
                   type="button"
-                  onClick={() => {
-                    // Header 로그인 모달을 비밀번호 찾기 단계로 열도록 트리거
-                    sessionStorage.setItem('showLoginModal', 'forgotPassword');
-                    navigate('/');
-                  }}
+                  onClick={openPasswordRecovery}
                   className="text-neutral-500 hover:text-neutral-800 text-sm transition-colors"
                 >
                   비밀번호를 잊으셨나요?
@@ -156,16 +169,18 @@ export default function LoginPage() {
                   </Link>
                 </p>
               </div>
-            </div>
+                </div>
 
-            {/* 게스트로 둘러보기 */}
-            <div className="mt-8 pt-6 border-t border-neutral-100">
-              <Button asChild variant="secondary" className="w-full justify-center">
-                <Link to="/">
-                  게스트로 둘러보기
-                </Link>
-              </Button>
-            </div>
+                {/* 게스트로 둘러보기 */}
+                <div className="mt-8 pt-6 border-t border-neutral-100">
+                  <Button asChild variant="secondary" className="w-full justify-center">
+                    <Link to="/">
+                      게스트로 둘러보기
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

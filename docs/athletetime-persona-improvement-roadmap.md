@@ -43,6 +43,63 @@ return the preparation state together.
 Registration must always send an existing member to the canonical `/login`
 page. Browser history is not a reliable login destination.
 
+## Review Update: Safe Next Wave
+
+The latest review combined 36 persona checks with focused accessibility,
+identity, team-privacy, first-use, and adversarial-path reviews. The following
+order deliberately separates reversible product improvements from choices that
+change the public privacy boundary.
+
+### Ready to implement without a policy decision
+
+1. **Recovery and account navigation:** password recovery now uses
+   `/login?mode=reset`; retain browser coverage for direct entry, return,
+   refresh, and the header entry point.
+2. **Route failure recovery:** add one error boundary with retry, records, and
+   home actions for failed lazy imports and page rendering failures.
+3. **Truthful device storage:** make the training log report a save failure,
+   isolate malformed local entries, and give shared-device users a clear
+   removal action. This remains browser-only and must not become private cloud
+   storage.
+4. **Record-collection completion:** after a visitor explicitly chooses
+   multiple candidates, open the existing collection detail with the complete
+   selected scope. Never substitute the first candidate or merge identities.
+5. **First-use compression:** keep the home page's first visible choices to
+   record search, upcoming competitions, and a device-local continuation when
+   one exists. Keep explanatory material behind the primary action.
+
+Every item needs a behavior test, a 375px browser pass, and a console-error
+check before release.
+
+### Must remain on hold for an owner decision
+
+1. **Team small-group disclosure:** set the server-side minimum cohort and
+   whether school teams need a stricter rule before changing any team count,
+   chart, filter, or athlete-count response.
+2. **Row-level correction and hiding:** define a narrow source-record
+   identifier, review evidence, retention, and a PostgreSQL repair rehearsal
+   before enabling a request to affect live public rows.
+3. **Private notes or photos:** design account-bound storage, signed access,
+   deletion, retention, and cross-account tests before any upload. The public
+   Cloudinary endpoint is never a substitute.
+4. **Chat or open community:** approve server-issued identity, throttling,
+   origin checks, moderation, retention, and escalation policy before reopening
+   the route, API, or websocket.
+5. **Automated editorial output:** approve a human publication gate, source
+   receipt, correction route, and competition-cycle cadence before publishing
+   generated news or athlete narratives.
+
+### Release sequence
+
+```text
+safe recovery/navigation -> route and storage resilience -> complete record
+collection -> first-use compression -> owner-approved privacy-boundary work
+```
+
+No task in the first four stages may silently introduce account linkage,
+identity resolution, new public record fields, private uploads, or a public
+interaction surface.
+
 ## Ordered Work
 
 ### P0: Keep false promises and unsafe public paths closed
