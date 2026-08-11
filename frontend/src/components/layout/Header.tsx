@@ -11,6 +11,7 @@ import { BusySpinner } from '@/components/ui/loading-state'
 import HeaderLoginModal from './HeaderLoginModal'
 import HeaderMobileDrawer from './HeaderMobileDrawer'
 import HeaderSearchBar from './HeaderSearchBar'
+import { DesktopMoreMenu, type DesktopMoreNavItem } from './DesktopMoreMenu'
 import { OPEN_MOBILE_MENU_EVENT } from './MobileTabBar'
 
 export default function Header() {
@@ -79,9 +80,6 @@ export default function Header() {
 
   // 관리자 드롭다운 상태
   const [adminMenuOpen, setAdminMenuOpen] = useState(false)
-  // '더보기' 드롭다운 상태 (데스크톱)
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
-
   /**
    * 네비게이션 IA — 단계적 공개(staged launch) 원칙.
    * 1차 네비: 서비스의 핵심 루프(기록 검색 → 대회 확인 → 기록카드 공유 → 커뮤니티)만 노출.
@@ -103,7 +101,7 @@ export default function Header() {
     { path: '/marketplace', label: '중고 마켓', note: '준비 중' },
     { path: '/community', label: '커뮤니티', note: '준비 중' },
     { path: '/chat', label: '오픈 채팅', note: '준비 중' },
-  ]
+  ] satisfies readonly DesktopMoreNavItem[]
 
   // 모바일 드로어용 전체 목록(그룹 라벨로 구분 렌더)
   const navItems = primaryNavItems
@@ -151,47 +149,7 @@ export default function Header() {
                   </Link>
                 ))}
 
-                {/* 더보기 — 보조 도구·부가 기능 드롭다운 */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                    aria-expanded={moreMenuOpen}
-                    aria-haspopup="menu"
-                    className={`relative flex items-center gap-1 px-3 py-2 text-body-sm font-medium transition-colors ${
-                      moreNavItems.some((item) => isActive(item.path))
-                        ? 'text-brand'
-                        : 'text-ink-2 hover:text-ink'
-                    }`}
-                  >
-                    더보기
-                    <svg className={`w-3 h-3 transition-transform ${moreMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {moreMenuOpen && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setMoreMenuOpen(false)} />
-                      <div role="menu" className="absolute right-0 top-full mt-1 w-56 rounded-sm border border-line bg-surface py-1 z-50 shadow-subtle animate-fadeIn">
-                        <div className="px-3 py-2 font-mono text-mono-xs uppercase tracking-widest-2 text-ink-4 border-b border-hair">도구·부가 기능</div>
-                        {moreNavItems.map((item) => (
-                          <Link
-                            key={item.path}
-                            to={item.path}
-                            role="menuitem"
-                            onClick={() => setMoreMenuOpen(false)}
-                            className={`flex items-baseline justify-between gap-2 px-3 py-2 text-body-sm transition-colors hover:bg-surface-2 ${
-                              isActive(item.path) ? 'text-brand' : 'text-ink-2 hover:text-ink'
-                            }`}
-                          >
-                            <span>{item.label}</span>
-                            <span className="text-mono-xs text-ink-4">{item.note}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
+                <DesktopMoreMenu items={moreNavItems} isActive={isActive} />
               </nav>
 
               {/* 기록 검색 — HeaderSearchBar로 분리 (2C-4) */}
