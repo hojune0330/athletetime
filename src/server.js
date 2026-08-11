@@ -406,8 +406,9 @@ async function startServer() {
       console.log(`    Card Studio: http://localhost:${PORT}/api/card-studio/`);
       console.log(`    Health:      http://localhost:${PORT}/health`);
       if (HAS_DATABASE) {
-        console.log(`    Community:   http://localhost:${PORT}/api/posts`);
-        console.log(`    Categories:  http://localhost:${PORT}/api/categories`);
+        // These routes are deliberately closed until the verified-member release is approved.
+        console.log('    Community:   preparing (closed)');
+        console.log('    Categories:  preparing (closed)');
       }
       console.log('');
       console.log('  Auth: JWT (이메일 로그인 + is_admin 관리자 구분)');

@@ -133,6 +133,10 @@ test('Given launch preparation mode When interaction routes are mounted Then ser
   assert.match(source, /app\.use\('\/api\/flash-polls', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/feed\/shortform', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/upload', rejectPreparingFeature\);/);
+  assert.match(source, /Community:\s+preparing \(closed\)/);
+  assert.match(source, /Categories:\s+preparing \(closed\)/);
+  assert.doesNotMatch(source, /Community:\s+http:\/\/localhost/);
+  assert.doesNotMatch(source, /Categories:\s+http:\/\/localhost/);
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(requireCsrfForCookieAuth)'), 'write gate must run before CSRF');
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(express.json'), 'write gate must run before parsing');
 });
