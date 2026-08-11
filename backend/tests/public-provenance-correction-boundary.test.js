@@ -168,6 +168,34 @@ test('PUBLIC-PROVENANCE-001C Given a visitor opens the legacy athlete detail rou
   assert.equal(publicJson.includes('birthDate'), false);
 });
 
+test('PUBLIC-PROVENANCE-001D Given a visitor uses the legacy record search When result provenance is serialized Then it keeps the public receipt without an internal source identifier', async (t) => {
+  const profile = insightService.getFeaturedProfiles(1)[0];
+  assert.ok(profile, 'the public insight fixture must have a profile');
+
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(publicRoutes);
+  const server = await new Promise((resolve) => {
+    const instance = app.listen(0, '127.0.0.1', () => resolve(instance));
+  });
+  t.after(() => new Promise((resolve) => server.close(resolve)));
+
+  const response = await fetch(
+    `http://127.0.0.1:${server.address().port}/search?q=${encodeURIComponent(profile.name)}&type=name`,
+  );
+  const body = await response.json();
+  const publicJson = JSON.stringify(body);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.totalMatches > 0, 'the fixture name must yield a public search result');
+  assert.equal(publicJson.includes('sourceId'), false);
+  assert.equal(publicJson.includes('person_no'), false);
+  assert.equal(publicJson.includes('birthDate'), false);
+  assert.equal(publicJson.includes('rawExternalId'), false);
+  assert.match(publicJson, /sourceLabel/u);
+});
+
 test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a public record When the link is built Then it carries only typed intent and the visible name', () => {
   // Given every public record-detail entry point that constructs a correction link.
   const workspaceTab = readSource('frontend/src/features/record-workspace/pages/WorkspaceRecordTab.tsx');

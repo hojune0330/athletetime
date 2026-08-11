@@ -124,7 +124,6 @@ class SearchService {
           provider: 'KAAF',
           sourceType: 'public_result',
           sourceTier: 'L',
-          sourceId: file,
           sourceUrl: meta.source_url || '',
           capturedAt: meta.crawled_at || '',
           sourceLabel: '대한육상연맹 공개 경기결과',
