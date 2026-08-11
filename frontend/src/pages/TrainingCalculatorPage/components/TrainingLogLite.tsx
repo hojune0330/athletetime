@@ -1,36 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import {
+  clearTrainingLog,
+  readTrainingLog,
+  saveTrainingLog,
+  type TrainingLogEntry,
+  type TrainingLogStorage,
+} from './trainingLogStorage';
+import { TrainingLogStorageStatus } from './TrainingLogStorageStatus';
 
-const STORAGE_KEY = 'athletetime.training-log.v1';
-const MAX_ENTRIES = 60;
-
-type LogEntry = {
-  id: string;
-  date: string; // YYYY-MM-DD
-  kind: string;
-  distanceKm: number | null;
-  feel: 1 | 2 | 3 | 4 | 5;
-  memo: string;
-};
+type LogEntry = TrainingLogEntry;
+type StorageNotice = 'saved' | 'unavailable' | 'recovered' | 'corrupt' | 'cleared' | null;
 
 const KINDS = ['조깅', '인터벌', '템포런', 'LSD', '트랙 훈련', '근력/보강', '휴식'] as const;
 const FEEL_LABELS: Record<number, string> = { 1: '힘들었어요', 2: '무거웠어요', 3: '보통', 4: '좋았어요', 5: '최고였어요' };
 
-function readEntries(): LogEntry[] {
+function getBrowserStorage(): TrainingLogStorage | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return window.localStorage;
   } catch {
-    return [];
-  }
-}
-
-function writeEntries(entries: LogEntry[]) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
-  } catch {
-    // storage 불가 환경 무시
+    return null;
   }
 }
 
@@ -50,10 +38,22 @@ export const TrainingLogLite: React.FC = () => {
   const [distance, setDistance] = useState('');
   const [feel, setFeel] = useState<1 | 2 | 3 | 4 | 5>(3);
   const [memo, setMemo] = useState('');
-  const [savedFlash, setSavedFlash] = useState(false);
+  const [storageNotice, setStorageNotice] = useState<StorageNotice>(null);
+  const [discardedCount, setDiscardedCount] = useState(0);
 
   useEffect(() => {
-    setEntries(readEntries());
+    const storage = getBrowserStorage();
+    if (!storage) {
+      setStorageNotice('unavailable');
+      return;
+    }
+
+    const result = readTrainingLog(storage);
+    setEntries(result.entries);
+    setDiscardedCount(result.discardedCount);
+    if (result.status !== 'ready') {
+      setStorageNotice(result.status);
+    }
   }, []);
 
   const weekSummary = useMemo(() => {
@@ -76,19 +76,45 @@ export const TrainingLogLite: React.FC = () => {
       feel,
       memo: memo.trim().slice(0, 120),
     };
+    const storage = getBrowserStorage();
     const next = [entry, ...entries];
-    setEntries(next);
-    writeEntries(next);
+    if (!storage) {
+      setStorageNotice('unavailable');
+      return;
+    }
+
+    const result = saveTrainingLog(storage, next);
+    if (!result.saved) {
+      setStorageNotice('unavailable');
+      return;
+    }
+
+    setEntries(result.entries);
     setMemo('');
     setDistance('');
-    setSavedFlash(true);
-    window.setTimeout(() => setSavedFlash(false), 2000);
+    setStorageNotice('saved');
+    window.setTimeout(() => setStorageNotice((current) => current === 'saved' ? null : current), 2000);
   };
 
   const handleDelete = (id: string) => {
+    const storage = getBrowserStorage();
     const next = entries.filter((entry) => entry.id !== id);
+    if (!storage || !saveTrainingLog(storage, next).saved) {
+      setStorageNotice('unavailable');
+      return;
+    }
     setEntries(next);
-    writeEntries(next);
+  };
+
+  const handleClear = () => {
+    const storage = getBrowserStorage();
+    if (!storage || !clearTrainingLog(storage)) {
+      setStorageNotice('unavailable');
+      return;
+    }
+    setEntries([]);
+    setDiscardedCount(0);
+    setStorageNotice('cleared');
   };
 
   return (
@@ -153,9 +179,10 @@ export const TrainingLogLite: React.FC = () => {
           onClick={handleSave}
           className="h-11 rounded-sm bg-ink px-6 text-body-sm font-semibold text-bg transition-colors hover:bg-ink-2"
         >
-          {savedFlash ? '저장됨' : '기록'}
+          {storageNotice === 'saved' ? '저장됨' : '기록'}
         </button>
       </div>
+
 
       {/* 컨디션 선택 */}
       <div className="mt-3 flex flex-wrap items-center gap-1.5">
@@ -213,15 +240,12 @@ export const TrainingLogLite: React.FC = () => {
         </div>
       )}
 
-      <div className="mt-6 border-l-2 border-brand bg-surface-2 p-4">
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-brand">
-          TRAINORACLE · LOCAL ONLY
-        </p>
-        <p className="mt-1.5 text-body-sm font-semibold text-ink">현재는 이 기기 안에서만</p>
-        <p className="mt-1 text-body-sm leading-relaxed text-ink-2">
-          훈련 일지는 서버, 계정, 분석 기능과 연결되지 않아요. 저장한 기록은 이 기기에서만 보고 삭제할 수 있어요.
-        </p>
-      </div>
+      <TrainingLogStorageStatus
+        notice={storageNotice}
+        discardedCount={discardedCount}
+        canClear={entries.length > 0 || storageNotice === 'corrupt'}
+        onClear={handleClear}
+      />
     </section>
   );
 };
