@@ -282,7 +282,7 @@ export default function DataRequestPage() {
           </Field>
 
           <p id="request-sensitive-guidance" className="-mt-2 text-caption leading-relaxed text-ink-4">
-            주민등록번호, 생년월일, 연락처, 사진, 진단서처럼 공개 기록 확인에 필요 없는 개인정보는 적지 마세요.
+            요청 사유에는 주민등록번호·전화번호·이메일을 적을 수 없어요. 회신이 필요하면 아래 연락처 칸에만 적어 주세요. 사진·진단서도 보내지 마세요.
           </p>
 
           <Field label="회신용 연락처 (선택)">
