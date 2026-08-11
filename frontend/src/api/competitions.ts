@@ -260,15 +260,19 @@ export async function getCompetitionsCalendar(year?: number): Promise<{
 
 // 대회 등록/수정/삭제는 Card Studio 관리자가 원본 데이터에서 import하므로
 // 프론트엔드에서 직접 생성하지 않음. 아래 함수들은 호환성을 위해 유지.
-export async function createCompetition(_data: any): Promise<Competition> {
+export async function createCompetition(data: unknown): Promise<Competition> {
+  void data;
   throw new Error('대회 등록은 Card Studio 관리자 기능을 사용해주세요.');
 }
 
-export async function updateCompetition(_id: string, _data: Partial<Competition>): Promise<Competition> {
+export async function updateCompetition(id: string, data: Partial<Competition>): Promise<Competition> {
+  void id;
+  void data;
   throw new Error('대회 수정은 Card Studio 관리자 기능을 사용해주세요.');
 }
 
-export async function deleteCompetition(_id: string): Promise<void> {
+export async function deleteCompetition(id: string): Promise<void> {
+  void id;
   throw new Error('대회 삭제는 Card Studio 관리자 기능을 사용해주세요.');
 }
 
@@ -376,7 +380,6 @@ export interface SearchSubSection {
 export interface ProvenanceMeta {
   provider?: string;
   sourceType?: 'public_result' | 'live_result' | 'collected_public_record' | string;
-  sourceId?: string;
   sourceUrl?: string;
   capturedAt?: string;
   sourceLabel?: string;

@@ -17,7 +17,7 @@ function collectSources(records: readonly PublicRecord[]): readonly SourceItem[]
   const sources = new Map<string, SourceItem>()
   for (const record of records) {
     const source = record.source
-    const key = source.sourceId || `${source.provider}:${source.sourceUrl}:${source.capturedAt}`
+    const key = sourceKey(source)
     const current = sources.get(key)
     sources.set(key, {
       ...source,
@@ -27,8 +27,13 @@ function collectSources(records: readonly PublicRecord[]): readonly SourceItem[]
   return [...sources.values()].sort((left, right) => (
     right.capturedAt.localeCompare(left.capturedAt)
     || left.provider.localeCompare(right.provider, 'ko')
-    || left.sourceId.localeCompare(right.sourceId)
+    || left.sourceUrl.localeCompare(right.sourceUrl)
+    || left.sourceType.localeCompare(right.sourceType)
   ))
+}
+
+function sourceKey(source: PublicRecord['source']) {
+  return [source.provider, source.sourceType, source.sourceUrl, source.capturedAt].join('\u0000')
 }
 
 export function RecordSourceList({ records }: RecordSourceListProps) {
@@ -51,7 +56,7 @@ export function RecordSourceList({ records }: RecordSourceListProps) {
           {sources.map((source) => {
             const url = safeSourceUrl(source.sourceUrl)
             return (
-              <li key={`${source.sourceId}-${source.capturedAt}`} className="border-b border-hair px-4 py-3 last:border-b-0">
+              <li key={sourceKey(source)} className="border-b border-hair px-4 py-3 last:border-b-0">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p className="break-words text-body-sm font-semibold text-ink">

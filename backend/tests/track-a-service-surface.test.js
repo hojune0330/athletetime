@@ -37,6 +37,8 @@ test('TRACK-A-SERVICE-002 promoted rows are searchable in athlete analytics as p
 
   assert.ok(yecheon);
   assert.equal(yecheon.source.sourceType, 'public_result');
+  assert.equal(Object.hasOwn(yecheon.source, 'sourceId'), false, 'public athlete records exclude internal source IDs');
+  assert.ok(yecheon.source.sourceUrl || yecheon.source.capturedAt, 'public athlete records retain usable provenance');
 });
 
 test('TRACK-A-SERVICE-003 records page states that the collection has gaps without implying a continuous date range', () => {

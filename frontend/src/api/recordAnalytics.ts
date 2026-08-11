@@ -116,9 +116,9 @@ export type PublicRecord = {
   source: {
     provider: string;
     sourceType: string;
-    sourceId: string;
     sourceUrl: string;
     capturedAt: string;
+    reviewStatus?: string;
   };
 };
 

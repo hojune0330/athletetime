@@ -1052,7 +1052,6 @@ function toTrailPoint(record) {
     eventLabel: record.eventLabel,
     competitionName: record.competitionName,
     isComparable: record.isComparable,
-    source: record.source,
   };
 }
 
@@ -1083,7 +1082,18 @@ function toPublicRecord(record) {
     windLegal: record.windLegal,
     isComparable: record.isComparable,
     note: record.note,
-    source: record.source,
+    source: toPublicSource(record.source),
+  };
+}
+
+function toPublicSource(source = {}) {
+  const reviewStatus = clean(source.reviewStatus, 80);
+  return {
+    provider: clean(source.provider, 80),
+    sourceType: clean(source.sourceType, 80),
+    sourceUrl: clean(source.sourceUrl, 300),
+    capturedAt: clean(source.capturedAt, 40),
+    ...(reviewStatus ? { reviewStatus } : {}),
   };
 }
 

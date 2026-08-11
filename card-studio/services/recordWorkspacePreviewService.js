@@ -201,7 +201,6 @@ function toPublicRecord(record) {
     source: {
       provider: cleanText(record.source?.provider, 80),
       sourceType: cleanText(record.source?.sourceType, 80),
-      sourceId: cleanText(record.source?.sourceId, 160),
       sourceUrl: cleanText(record.source?.sourceUrl, 300),
       capturedAt: cleanText(record.source?.capturedAt, 40),
     },

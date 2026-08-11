@@ -62,7 +62,6 @@ function fixtureRecord(eventIndex: number, recordIndex: number): PublicRecord {
     source: {
       provider: 'KAAF',
       sourceType: 'result-file',
-      sourceId: `source-${season}`,
       sourceUrl: `https://example.com/${season}/${event.eventKey}`,
       capturedAt: '2026-07-30T00:00:00.000Z',
     },

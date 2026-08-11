@@ -22,6 +22,7 @@ The following completed changes are already on `main` and have focused browser, 
 - [x] Record selections stored in this browser can be inspected and cleared with one scoped confirmation. The cleanup preserves authentication, home shortcuts, and unrelated browser data.
 - [x] The training log warns shared-device users and keeps its separate delete action in the training screen. It is deliberately not erased by the record-selection control.
 - [x] Core layouts now provide one main landmark and a keyboard-visible skip link. Record-list removal actions have an individual accessible name.
+- [x] Public record responses now omit internal source IDs. Provenance still includes the provider, original public link, and collection date; correction links carry only the public athlete name needed to prefill the form.
 
 Verification completed for this snapshot: backend core suite 351 passed / 5 skipped, focused frontend tests 10 passed, type check passed, production build passed, and the four record-flow browser suites passed 19/19.
 

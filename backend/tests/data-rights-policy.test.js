@@ -150,6 +150,7 @@ test('record APIs expose public provenance and no restricted identifiers', async
   assert.equal(body.includes('person_no'), false);
   assert.equal(body.includes('birthdate'), false);
   assert.equal(body.includes('birthDate'), false);
+  assert.equal(body.includes('"sourceId"'), false, 'public record responses expose provenance links, not internal source identifiers');
 });
 
 test('public data request status redacts contact and reason', async () => {

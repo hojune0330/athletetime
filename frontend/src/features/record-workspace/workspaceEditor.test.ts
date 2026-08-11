@@ -54,7 +54,6 @@ function record(id: string): PublicRecord {
     source: {
       provider: 'fixture',
       sourceType: 'qa_fixture',
-      sourceId: `source-${id}`,
       sourceUrl: '',
       capturedAt: '2026-07-31T01:00:00.000Z',
     },

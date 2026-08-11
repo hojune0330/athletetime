@@ -36,7 +36,6 @@ function record(index: number): PublicRecord {
     source: {
       provider: 'KAAF',
       sourceType: 'result-file',
-      sourceId: `source-${season}`,
       sourceUrl: `https://example.com/${season}`,
       capturedAt: '2026-07-31T00:00:00.000Z',
     },
@@ -159,5 +158,38 @@ describe('dedicated athlete record page', () => {
 
     // Then the rendered record list keeps 2025 rather than falling back to 2026.
     expect(markup).toContain('2025 시즌 · 25개')
+  })
+
+  it('asks for more records when a selected event exists outside the loaded page', () => {
+    // Given an event index that knows about 400m while the first returned page only has 100m rows.
+    const firstPage = preview([record(0)], 2, true)
+    const athletePreview: RecordWorkspacePreview = {
+      ...firstPage,
+      events: [
+        ...firstPage.events,
+        { eventKey: '400m', eventLabel: '400m', recordCount: 1, best: null },
+      ],
+    }
+
+    // When the visitor selects the later-page event.
+    const markup = renderToStaticMarkup(
+      <RecordAthleteRecordTab
+        isLoadingMore={false}
+        onCloseRecord={() => undefined}
+        onLoadMore={() => undefined}
+        onOpenRecord={() => undefined}
+        onSelectEvent={() => undefined}
+        onSelectSeason={() => undefined}
+        preview={athletePreview}
+        selectedEventKey="400m"
+        selectedRecordId={null}
+        selectedSeason={null}
+      />,
+    )
+
+    // Then it does not call an unloaded result an empty season and offers the next page.
+    expect(markup).toContain('이 종목의 기록은 나머지 목록에 있어요.')
+    expect(markup).toContain('나머지 기록 불러오기')
+    expect(markup).not.toContain('0 시즌 · 0개')
   })
 })

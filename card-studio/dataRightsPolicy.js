@@ -68,12 +68,11 @@ const PROHIBITED_PUBLIC_CLAIMS = [
   'person_no_storage',
 ];
 
-function publicResultProvenance({ provider = 'KAAF', sourceId = '', sourceUrl = '', capturedAt = '' } = {}) {
+function publicResultProvenance({ provider = 'KAAF', sourceUrl = '', capturedAt = '' } = {}) {
   return {
     provider,
     sourceType: 'public_result',
     sourceTier: 'L',
-    sourceId,
     sourceUrl,
     capturedAt,
     sourceLabel: provider === 'KAAF' ? '대한육상연맹 공개 경기결과' : `${provider} 공개 경기결과`,

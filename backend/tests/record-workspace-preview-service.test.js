@@ -92,6 +92,8 @@ test('Given visible records for two same-name public profiles When a workspace p
   assert.deepEqual(preview.records.map((record) => record.athleteKey), ['1111111111111111', '2222222222222222']);
   assert.equal(JSON.stringify(preview).includes('restricted-person-no'), false);
   assert.equal(JSON.stringify(preview).includes('internal-only'), false);
+  assert.equal(JSON.stringify(preview).includes('source-a-1'), false, 'internal source IDs never leave the public workspace DTO');
+  assert.equal(preview.records[0].source.sourceUrl, 'https://example.test/result', 'the public source link remains available for provenance');
 });
 
 test('Given 125 visible records When each cursor page is requested Then date and id ordering yields every record exactly once', () => {

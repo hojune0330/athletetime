@@ -47,15 +47,16 @@ export function WorkspaceRecordTab({
 }: WorkspaceRecordTabProps) {
   const groups = useMemo(() => groupRecords(records), [records])
   const selectedGroup = groups.find((group) => group.eventKey === selectedEventKey) ?? null
-  const [selectedSeason, setSelectedSeason] = useState(selectedGroup?.seasons[0]?.season ?? 0)
+  const selectedGroupFirstSeason = selectedGroup?.seasons[0]?.season ?? 0
+  const [selectedSeason, setSelectedSeason] = useState(selectedGroupFirstSeason)
   const [sortOrder, setSortOrder] = useState<RecordSortOrder>('newest')
   const [visibleCount, setVisibleCount] = useState(10)
   const selectedRecord = records.find((record) => record.id === selectedRecordId) ?? null
 
   useEffect(() => {
-    setSelectedSeason(selectedGroup?.seasons[0]?.season ?? 0)
+    setSelectedSeason(selectedGroupFirstSeason)
     setVisibleCount(10)
-  }, [selectedEventKey, selectedGroup?.eventKey, selectedGroup?.seasons[0]?.season])
+  }, [selectedEventKey, selectedGroup?.eventKey, selectedGroupFirstSeason])
 
   if (records.length === 0) {
     return (
@@ -136,8 +137,7 @@ export function WorkspaceRecordTab({
 function correctionHref(record: PublicRecord) {
   return `/data-request?${new URLSearchParams({
     type: 'correction',
-    recordId: record.id,
-    sourceId: record.source.sourceId,
+    athlete: record.name,
   }).toString()}`
 }
 

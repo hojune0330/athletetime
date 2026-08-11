@@ -39,7 +39,6 @@ function record(): PublicRecord {
     source: {
       provider: 'KAAF',
       sourceType: 'result-file',
-      sourceId: 'source-1',
       sourceUrl: 'https://example.com/result',
       capturedAt: '2026-07-31T01:00:00.000Z',
     },
