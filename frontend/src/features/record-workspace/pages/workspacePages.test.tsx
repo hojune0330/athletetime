@@ -108,6 +108,7 @@ describe('record workspace pages', () => {
         busy={false}
         notice=""
         onClearSelection={emptyAction}
+        onContinueSelection={emptyAction}
         onConfirm={emptyAction}
         onRemoveSubject={emptyAction}
         onTitleChange={emptyAction}
@@ -123,13 +124,14 @@ describe('record workspace pages', () => {
     expect(markup).not.toContain('현 소속')
   })
 
-  it('keeps a mixed-name selection visible and offers an explicit reset', () => {
+  it('keeps a mixed-name selection recoverable with explicit continue and reset actions', () => {
     // Given two public profile fragments with different names.
     const markup = renderToStaticMarkup(
       <WorkspaceReviewContent
         busy={false}
         notice=""
         onClearSelection={emptyAction}
+        onContinueSelection={emptyAction}
         onConfirm={emptyAction}
         onRemoveSubject={emptyAction}
         onTitleChange={emptyAction}
@@ -143,6 +145,7 @@ describe('record workspace pages', () => {
     expect(markup).toContain('한 기록 모음으로 저장할 수 없어요')
     expect(markup).not.toContain('한 사람의 기록 모음')
     expect(markup).toContain('위 선택 목록에서 다른 이름의 선수를 빼거나')
+    expect(markup).toContain('선택 계속 고치기')
     expect(markup).toContain('선택 모두 비우고 새로 찾기')
     expect(markup).not.toContain('선수 비교로 옮기기')
     expect(markup).not.toContain('기록 모음 만들기')

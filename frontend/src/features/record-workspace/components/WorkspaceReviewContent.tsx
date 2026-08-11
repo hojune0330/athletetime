@@ -8,6 +8,7 @@ type WorkspaceReviewContentProps = {
   readonly busy: boolean
   readonly notice: string
   readonly onClearSelection: () => void
+  readonly onContinueSelection: () => void
   readonly onConfirm: () => void
   readonly onRemoveSubject: (subjectKey: string) => void
   readonly onTitleChange: (title: string) => void
@@ -20,6 +21,7 @@ export function WorkspaceReviewContent({
   busy,
   notice,
   onClearSelection,
+  onContinueSelection,
   onConfirm,
   onRemoveSubject,
   onTitleChange,
@@ -72,7 +74,10 @@ export function WorkspaceReviewContent({
             <p className="mt-1 text-body-sm leading-5 text-ink-3">
               서로 다른 이름은 한 기록 모음으로 저장하지 않아요. 위 선택 목록에서 다른 이름의 선수를 빼거나, 선택을 모두 비우고 새로 찾아 주세요.
             </p>
-            <Button className="mt-4 min-h-11" type="button" variant="outline" onClick={onClearSelection}>선택 모두 비우고 새로 찾기</Button>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button className="min-h-11" type="button" onClick={onContinueSelection}>선택 계속 고치기</Button>
+              <Button className="min-h-11" type="button" variant="outline" onClick={onClearSelection}>선택 모두 비우고 새로 찾기</Button>
+            </div>
           </>
         ) : (
           <>

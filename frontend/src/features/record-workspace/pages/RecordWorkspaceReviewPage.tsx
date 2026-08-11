@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceReviewContent } from '../components/WorkspaceReviewContent'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
@@ -8,6 +8,7 @@ import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { workspaceCreatedNavigation } from '../workspaceNavigation'
 
 export default function RecordWorkspaceReviewPage() {
+  const location = useLocation()
   const navigate = useNavigate()
   const store = useRecordWorkspaceStore()
   const draft = store.workspaceDraft
@@ -16,6 +17,7 @@ export default function RecordWorkspaceReviewPage() {
   const [title, setTitle] = useState('기록 모음')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
+  const workspaceDraftQuery = readWorkspaceDraftQuery(location.state)
 
   if (!draft || subjectKeys.length === 0) {
     return (
@@ -70,6 +72,14 @@ export default function RecordWorkspaceReviewPage() {
       state: { focusSearch: true },
     })
   }
+  const continueSelection = () => {
+    const params = new URLSearchParams({ flow: 'browse', browse: 'athlete' })
+    if (workspaceDraftQuery) params.set('q', workspaceDraftQuery)
+    navigate(`/records?${params.toString()}`, {
+      replace: true,
+      state: { focusSearch: true, workspaceSelection: true },
+    })
+  }
 
   return (
     <ReviewShell>
@@ -77,6 +87,7 @@ export default function RecordWorkspaceReviewPage() {
         busy={busy}
         notice={notice}
         onClearSelection={clearSelectionAndSearch}
+        onContinueSelection={continueSelection}
         onConfirm={confirmWorkspace}
         onRemoveSubject={removeSubject}
         onTitleChange={setTitle}
@@ -91,6 +102,12 @@ export default function RecordWorkspaceReviewPage() {
       )}
     </ReviewShell>
   )
+}
+
+function readWorkspaceDraftQuery(state: unknown): string {
+  if (typeof state !== 'object' || state === null) return ''
+  const value = Reflect.get(state, 'workspaceDraftQuery')
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 function ReviewShell({ children }: { readonly children: ReactNode }) {

@@ -54,6 +54,10 @@ export function RecordCandidateList({
 }: RecordCandidateListProps) {
   const [notice, setNotice] = useState('')
   const selectedKeys = new Set(draftSubjectKeys)
+  const selectedAffiliations = [...new Set(athletes
+    .filter((athlete) => selectedKeys.has(athlete.athleteKey))
+    .map((athlete) => athlete.team.trim())
+    .filter(Boolean))]
 
   const activateCandidate = (athlete: AthleteSearchCard) => {
     if (!selectionMode) {
@@ -118,6 +122,7 @@ export function RecordCandidateList({
         <WorkspaceDraftTray
           notice={notice}
           selectedCount={selectedKeys.size}
+          selectedAffiliations={selectedAffiliations}
           onCancel={() => {
             setNotice('')
             onExitSelectionMode()

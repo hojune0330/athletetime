@@ -142,6 +142,7 @@ describe('record candidate browsing', () => {
       <WorkspaceDraftTray
         notice="한 모음에는 6명까지 담을 수 있어요."
         selectedCount={6}
+        selectedAffiliations={['서울고', '부산고']}
         onCancel={() => undefined}
         onContinue={() => undefined}
       />,
@@ -149,6 +150,7 @@ describe('record candidate browsing', () => {
 
     // Then the count, live notice, and safe-area offset remain visible.
     expect(markup).toContain('선수 6명 선택')
+    expect(markup).toContain('서울고 · 부산고')
     expect(markup).toContain('한 모음에는 6명까지')
     expect(markup).toContain('aria-live="polite"')
     expect(markup).toContain('safe-area-inset-bottom')

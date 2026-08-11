@@ -92,8 +92,9 @@ export default function RecordsPage() {
   };
 
   useEffect(() => {
-    const state = location.state as { focusSearch?: boolean } | null;
+    const state = location.state as { focusSearch?: boolean; workspaceSelection?: boolean } | null;
     if (state?.focusSearch) searchInputRef.current?.focus();
+    if (state?.workspaceSelection) setWorkspaceSelectionMode(true);
   }, [location.key, location.state]);
 
   useEffect(() => {
@@ -628,7 +629,6 @@ export default function RecordsPage() {
             workspaceStore.clearWorkspaceDraft();
             setWorkspaceSelectionMode(false);
           }}
-          onReviewDraft={() => navigate('/records/workspaces/new')}
         />
       )}
 

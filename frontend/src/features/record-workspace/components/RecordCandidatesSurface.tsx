@@ -9,7 +9,6 @@ type RecordCandidatesSurfaceProps = {
   readonly onDraftChange: (subjectKeys: readonly string[]) => void
   readonly onEnterSelectionMode: () => void
   readonly onExitSelectionMode: () => void
-  readonly onReviewDraft: () => void
   readonly selectionMode: boolean
 }
 
@@ -19,7 +18,6 @@ export function RecordCandidatesSurface({
   onDraftChange,
   onEnterSelectionMode,
   onExitSelectionMode,
-  onReviewDraft,
   selectionMode,
 }: RecordCandidatesSurfaceProps) {
   const location = useLocation()
@@ -35,7 +33,10 @@ export function RecordCandidatesSurface({
       onEnterSelectionMode={onEnterSelectionMode}
       onExitSelectionMode={onExitSelectionMode}
       onOpenAthlete={(athleteKey) => navigate(`/records/athletes/${athleteKey}`, { state: returnState })}
-      onReviewDraft={onReviewDraft}
+      onReviewDraft={() => {
+        const query = new URLSearchParams(location.search).get('q')?.trim() ?? ''
+        navigate('/records/workspaces/new', { state: { workspaceDraftQuery: query } })
+      }}
     />
   )
 }

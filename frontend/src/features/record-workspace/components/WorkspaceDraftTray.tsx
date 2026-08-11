@@ -2,6 +2,7 @@ type WorkspaceDraftTrayProps = {
   readonly notice: string
   readonly onCancel: () => void
   readonly onContinue: () => void
+  readonly selectedAffiliations: readonly string[]
   readonly selectedCount: number
 }
 
@@ -9,8 +10,12 @@ export function WorkspaceDraftTray({
   notice,
   onCancel,
   onContinue,
+  selectedAffiliations,
   selectedCount,
 }: WorkspaceDraftTrayProps) {
+  const visibleAffiliations = selectedAffiliations.slice(0, 2)
+  const moreAffiliationCount = selectedAffiliations.length - visibleAffiliations.length
+
   return (
     <section
       aria-label="선택한 선수"
@@ -21,6 +26,11 @@ export function WorkspaceDraftTray({
           <p className="font-mono text-[12px] font-semibold text-ink [font-variant-numeric:tabular-nums]">
             선수 {selectedCount}명 선택
           </p>
+          {visibleAffiliations.length > 0 && (
+            <p className="mt-0.5 truncate text-caption text-ink-3">
+              선택한 후보의 소속: {visibleAffiliations.join(' · ')}{moreAffiliationCount > 0 ? ` 외 ${moreAffiliationCount}곳` : ''}
+            </p>
+          )}
           <p
             aria-live="polite"
             className="mt-0.5 min-h-4 truncate text-caption font-medium text-warn"
