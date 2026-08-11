@@ -40,14 +40,19 @@ upload storage for private material, or reopen a public interaction surface.
 
 As of 2026-08-12, the competition catalogue has 284 traceable entries across
 2018--2026 and its integrity check reports zero missing source URL or source
-identifier warnings. The service result files currently cover 2015--2026.
+identifier warnings. Result files contain records from 2015--2026, but their
+coverage is not uniform: 2015--2017 currently have result bundles without the
+matching catalogue metadata, and the 2026 catalogue has 60 listed competitions
+while only 6 have local result bundles.
 
 Those are different datasets and neither statement means that every Korean or
 overseas meet since 2005 is present. A year, competition, or athlete record
 outside that verified range must remain a visible collection gap until its
 source receipt, parsing result, and search result have each been reviewed.
 No UI, SEO text, or editorial copy may describe the collection as a complete
-career-history or all-results database.
+career-history or all-results database. Before each release, regenerate the
+coverage matrix for the intended date range and review the partial/orphan rows
+instead of relying on this dated snapshot.
 
 ### Risks found by the review
 
