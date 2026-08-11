@@ -253,7 +253,6 @@ function getStatus() {
     available: data.available,
     reason: data.reason,
     rowCount: data.rowCount || 0,
-    csvPath: CSV_PATH,
     source: SOURCE,
   };
 }
