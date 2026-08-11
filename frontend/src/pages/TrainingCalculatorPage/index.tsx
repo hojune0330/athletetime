@@ -34,6 +34,8 @@ const TrainingCalculatorPage: React.FC = () => {
     updateDistance,
     updateTime,
     calculate,
+    canCalculate,
+    reset,
   } = useTrainingCalculator();
 
   const handleCalculate = () => {
@@ -58,6 +60,11 @@ const TrainingCalculatorPage: React.FC = () => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
+  };
+
+  const handleReset = () => {
+    reset();
+    requestAnimationFrame(() => timeInputRef.current?.focus());
   };
 
   return (
@@ -117,7 +124,8 @@ const TrainingCalculatorPage: React.FC = () => {
           <button
             type="button"
             onClick={handleCalculate}
-            className="h-14 w-full rounded-sm bg-ink text-base font-semibold text-bg transition-colors hover:bg-ink-2"
+            disabled={!canCalculate}
+            className="h-14 w-full rounded-sm bg-ink text-base font-semibold text-bg transition-colors hover:bg-ink-2 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-ink-4"
           >
             훈련 계획 생성
           </button>
@@ -154,6 +162,14 @@ const TrainingCalculatorPage: React.FC = () => {
 
             {/* Recommendations */}
             <RecommendationsView />
+
+            <button
+              type="button"
+              onClick={handleReset}
+              className="mt-6 h-11 w-full border border-line bg-surface text-body-sm font-semibold text-ink transition-colors hover:bg-surface-2"
+            >
+              다시 입력하기
+            </button>
           </div>
         )}
 

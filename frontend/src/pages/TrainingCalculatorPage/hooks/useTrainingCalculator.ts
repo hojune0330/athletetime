@@ -15,12 +15,15 @@ import type {
   WeekPlan,
   Workout,
 } from '../utils/trainingPlans';
+import {
+  EMPTY_TIME,
+  getPerformanceSeconds,
+  hasDirectPerformanceInput,
+  hasSelectedDistance,
+  type TimeInput,
+} from './trainingCalculatorInput';
 
-export interface TimeInput {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
+export type { TimeInput } from './trainingCalculatorInput';
 
 export interface TrainingResults {
   vdot: number;
@@ -58,7 +61,7 @@ export function useTrainingCalculator() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [conditions, setConditions] = useState<Conditions>(DEFAULT_CONDITIONS);
   const [distance, setDistance] = useState<string>('');
-  const [time, setTime] = useState<TimeInput>({ hours: 0, minutes: 0, seconds: 0 });
+  const [time, setTime] = useState<TimeInput>(EMPTY_TIME);
   const [results, setResults] = useState<TrainingResults | null>(null);
   const [error, setError] = useState<string>('');
 
@@ -86,11 +89,13 @@ export function useTrainingCalculator() {
     setError('');
   }, []);
 
-  const updateTime = useCallback(<K extends keyof TimeInput>(key: K, value: number) => {
+  const updateTime = useCallback(<K extends keyof TimeInput>(key: K, value: TimeInput[K]) => {
     setTime(prev => ({ ...prev, [key]: value }));
     setResults(null);
     setError('');
   }, []);
+
+  const canCalculate = profile.gender !== null && hasSelectedDistance(distance) && hasDirectPerformanceInput(time);
 
   const calculate = useCallback((): CalculationOutcome => {
     setError('');
@@ -101,25 +106,17 @@ export function useTrainingCalculator() {
       return { kind: 'error', errorType: 'gender' };
     }
     
-    if (!distance || !Number.isFinite(Number(distance)) || Number(distance) <= 0) {
+    if (!hasSelectedDistance(distance)) {
       setError('종목을 선택해주세요.');
       return { kind: 'error', errorType: 'distance' };
     }
-    
-    const isValidTime = Number.isInteger(time.hours)
-      && time.hours >= 0
-      && time.hours <= 23
-      && Number.isInteger(time.minutes)
-      && time.minutes >= 0
-      && time.minutes < 60
-      && Number.isFinite(time.seconds)
-      && time.seconds >= 0
-      && time.seconds < 60;
-    const totalSeconds = time.hours * 3600 + time.minutes * 60 + time.seconds;
-    if (!isValidTime || totalSeconds <= 0) {
+
+    if (!hasDirectPerformanceInput(time)) {
       setError('기록을 다시 확인해주세요. 시는 0~23, 분과 초는 0~59 범위예요.');
       return { kind: 'error', errorType: 'time' };
     }
+
+    const totalSeconds = getPerformanceSeconds(time);
 
     // 조정 계수 계산
     const adjustments = calculateAdjustments(profile, conditions);
@@ -158,7 +155,7 @@ export function useTrainingCalculator() {
     setProfile(DEFAULT_PROFILE);
     setConditions(DEFAULT_CONDITIONS);
     setDistance('');
-    setTime({ hours: 0, minutes: 0, seconds: 0 });
+    setTime(EMPTY_TIME);
     setResults(null);
     setError('');
   }, []);
@@ -169,6 +166,7 @@ export function useTrainingCalculator() {
     conditions,
     distance,
     time,
+    canCalculate,
     results,
     error,
     // Actions

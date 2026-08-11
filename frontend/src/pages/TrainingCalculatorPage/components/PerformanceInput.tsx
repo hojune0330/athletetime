@@ -1,13 +1,13 @@
 import React from 'react';
 import { DISTANCE_OPTIONS } from '../utils/vdotCalculations';
-import type { TimeInput } from '../hooks/useTrainingCalculator';
+import { parseOptionalClockValue, type TimeInput } from '../hooks/trainingCalculatorInput';
 import { CalcSection, FieldLabel, selectClass } from './CalcSection';
 
 interface PerformanceInputProps {
   distance: string;
   time: TimeInput;
   onDistanceChange: (value: string) => void;
-  onTimeChange: <K extends keyof TimeInput>(key: K, value: number) => void;
+  onTimeChange: <K extends keyof TimeInput>(key: K, value: TimeInput[K]) => void;
   distanceSelectRef?: React.RefObject<HTMLSelectElement | null>;
   timeInputRef?: React.RefObject<HTMLInputElement | null>;
 }
@@ -51,8 +51,8 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
               placeholder="0"
               min={0}
               max={23}
-              value={time.hours || ''}
-              onChange={(e) => onTimeChange('hours', parseInt(e.target.value) || 0)}
+              value={time.hours ?? ''}
+              onChange={(e) => onTimeChange('hours', parseOptionalClockValue(e.target.value))}
               aria-label="시"
               className={timeInputClass}
             />
@@ -62,8 +62,8 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
               placeholder="00"
               min={0}
               max={59}
-              value={time.minutes || ''}
-              onChange={(e) => onTimeChange('minutes', parseInt(e.target.value) || 0)}
+              value={time.minutes ?? ''}
+              onChange={(e) => onTimeChange('minutes', parseOptionalClockValue(e.target.value))}
               aria-label="분"
               className={timeInputClass}
             />
@@ -74,8 +74,8 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({
               min={0}
               max={59}
               step={0.1}
-              value={time.seconds || ''}
-              onChange={(e) => onTimeChange('seconds', parseFloat(e.target.value) || 0)}
+              value={time.seconds ?? ''}
+              onChange={(e) => onTimeChange('seconds', parseOptionalClockValue(e.target.value))}
               aria-label="초"
               className={timeInputClass}
             />

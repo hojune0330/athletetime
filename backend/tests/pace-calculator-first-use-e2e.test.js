@@ -29,3 +29,37 @@ test('PACE-CALCULATOR-FIRST-USE-E2E Given a first visit When a runner enters and
     visited.push(page.url());
   }, { fileName: 'pace-calculator-first-use-e2e-results.json', scenario: 'pace calculator first-use and reset' });
 });
+
+test('TRAINING-CALCULATOR-FIRST-USE-E2E Given a first visit When a runner has not entered a real performance Then generation stays unavailable until direct input and reset returns to empty', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/training-calculator`, page.getByRole('heading', { name: '훈련 페이스 계산기' }));
+
+    const createButton = page.getByRole('button', { name: '훈련 계획 생성', exact: true });
+    const hourInput = page.getByRole('spinbutton', { name: '시', exact: true });
+    const minuteInput = page.getByRole('spinbutton', { name: '분', exact: true });
+    const secondInput = page.getByRole('spinbutton', { name: '초', exact: true });
+
+    assert.equal(await createButton.isDisabled(), true);
+    assert.equal(await hourInput.inputValue(), '');
+    assert.equal(await minuteInput.inputValue(), '');
+    assert.equal(await secondInput.inputValue(), '');
+    assert.equal(await page.getByText('분석 결과', { exact: true }).count(), 0);
+
+    await page.getByRole('button', { name: '남성', exact: true }).click();
+    await page.getByLabel('종목').selectOption('5000');
+    await minuteInput.fill('20');
+    assert.equal(await createButton.isDisabled(), false);
+
+    await createButton.click();
+    await expectVisible(page.getByText('분석 결과', { exact: true }));
+
+    await page.getByRole('button', { name: '다시 입력하기', exact: true }).click();
+    await expectVisible(page.getByRole('heading', { name: '훈련 페이스 계산기' }));
+    assert.equal(await createButton.isDisabled(), true);
+    assert.equal(await hourInput.inputValue(), '');
+    assert.equal(await minuteInput.inputValue(), '');
+    assert.equal(await secondInput.inputValue(), '');
+    assert.equal(await page.getByText('분석 결과', { exact: true }).count(), 0);
+    visited.push(page.url());
+  }, { fileName: 'training-calculator-first-use-e2e-results.json', scenario: 'training calculator direct input and reset' });
+});
