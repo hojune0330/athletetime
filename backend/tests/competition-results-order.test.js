@@ -32,6 +32,18 @@ function findLifeSportFixture() {
   return { year, competition };
 }
 
+function allStoredResults() {
+  const resultDirectory = path.join(ROOT, 'data', 'results');
+  return fs.readdirSync(resultDirectory)
+    .filter((file) => /^\d{4}\.json$/u.test(file))
+    .sort()
+    .flatMap((file) => {
+      const year = file.slice(0, 4);
+      const competitions = JSON.parse(fs.readFileSync(path.join(resultDirectory, file), 'utf8'));
+      return competitions.map((competition) => ({ year, competition }));
+    });
+}
+
 test('result competitions are listed newest first for the results tab default', () => {
   const competitions = searchService.getCompetitions().filter((competition) => sortDateFromPeriod(competition.period));
 
@@ -49,6 +61,28 @@ test('result competitions public index excludes life-sport competitions', () => 
 
   assert.ok(competitions.length > 1);
   assert.deepEqual(surfaced.map((competition) => competition.competition), []);
+});
+
+test('stored result bundles reconcile exactly with the public index and intentional life-sport exclusions', () => {
+  const stored = allStoredResults();
+  const storedFilenames = stored.map(({ year, competition }) => syntheticFilename(year, competition));
+  const publicFilenames = resultsStore.listFilenames();
+  const publicSet = new Set(publicFilenames);
+  const excluded = stored.filter(({ year, competition }) => (
+    !publicSet.has(syntheticFilename(year, competition))
+  ));
+  const resultIndex = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'results', 'index.json'), 'utf8'));
+
+  assert.equal(new Set(storedFilenames).size, storedFilenames.length, 'every stored competition needs one stable synthetic filename');
+  assert.equal(publicFilenames.length + excluded.length, stored.length);
+  assert.deepEqual(
+    [...publicSet].filter((filename) => !storedFilenames.includes(filename)),
+    [],
+    'the public result index must never refer to a missing bundle',
+  );
+  assert.ok(excluded.length > 0, 'the retained life-sport boundary must be explicit');
+  assert.ok(excluded.every(({ competition }) => LIFE_SPORT_PATTERN.test(competition.competitionName)));
+  assert.equal(resultIndex.length, stored.length, 'the source index must list every stored result bundle');
 });
 
 test('life-sport result originals stay stored while public filename index excludes them', () => {
