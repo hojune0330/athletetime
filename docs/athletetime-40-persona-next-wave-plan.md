@@ -101,6 +101,8 @@ release regression contracts, not as future feature promises:
 - Frontend and API responses deny unused camera, microphone, location,
   payment, and USB permissions. A future feature must add a reviewed reason
   before any one of these browser capabilities can be requested.
+- The production content-security policy also blocks external form submission,
+  page framing, plugin objects, and unexpected document base URLs.
 
 The regression set for these items includes route recovery, device-storage
 failure, public-provenance, data-request sensitive-input, and closed-surface

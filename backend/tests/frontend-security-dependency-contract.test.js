@@ -56,5 +56,5 @@ test('web and API responses deny browser capabilities that AthleteTime does not 
 
   const netlifyConfig = fs.readFileSync(path.join(__dirname, '..', '..', 'netlify.toml'), 'utf8');
   assert.match(netlifyConfig, /Permissions-Policy = "camera=\(\), microphone=\(\), geolocation=\(\), payment=\(\), usb=\(\)"/u);
-  assert.match(netlifyConfig, /Content-Security-Policy = /u);
+  assert.match(netlifyConfig, /Content-Security-Policy = "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none';/u);
 });
