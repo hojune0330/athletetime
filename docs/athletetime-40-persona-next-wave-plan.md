@@ -117,6 +117,11 @@ for both the repository root and `frontend` package trees using
 guarantee: repeat it before each deployment and treat any production advisory
 as a repair task rather than a release exception.
 
+After the frontend lockfile's patch-level security update, the full dependency
+audits also reported zero vulnerabilities for both package trees. The update
+did not force a framework major-version change; type checking, the production
+build, and the frontend test command completed successfully afterward.
+
 ### Wave A: Keep the core journey calm and recoverable
 
 Scope: reversible UI, routing, and test improvements only.
