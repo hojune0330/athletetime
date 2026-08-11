@@ -95,9 +95,10 @@ release regression contracts, not as future feature promises:
 - Public collection-health reporting exposes only aggregate counts and issue
   categories. Raw review samples, internal file names, source identifiers,
   and identity-analysis output remain server-only.
-- Preparation-only community, chat, marketplace, and upload paths are closed
-  at the page, HTTP, and websocket boundaries. Their unavailable response is
-  `503` with `Cache-Control: no-store`.
+- Preparation-only community, chat, marketplace, upload, reaction, poll, and
+  editorial-feed paths are closed at the page, HTTP, and websocket boundaries.
+  Their unavailable response is `503` with `Cache-Control: no-store`; no
+  closed surface returns a misleading empty-success payload.
 - Frontend and API responses deny unused camera, microphone, location,
   payment, and USB permissions. A future feature must add a reviewed reason
   before any one of these browser capabilities can be requested.

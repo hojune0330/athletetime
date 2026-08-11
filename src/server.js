@@ -289,29 +289,12 @@ console.log('  Community API: closed until launch approval');
 // 숏폼·트렌드·빠른 반응 API
 // ============================================
 
-app.get('/api/trending/topics', (req, res) => {
-  res.json({ topics: [], updatedAt: new Date(0).toISOString() });
-});
-
-app.get('/api/trending/hot-records', (req, res) => {
-  res.json({ records: [], total: 0 });
-});
-
-app.post('/api/reactions', rejectPreparingFeature);
-
-app.get('/api/reactions/:targetType/:targetId', (req, res) => {
-  res.json({ reactions: {} });
-});
-
-app.get('/api/flash-polls', (req, res) => {
-  res.json({ polls: [] });
-});
-
-app.post('/api/flash-polls/:pollId/vote', rejectPreparingFeature);
-
-app.get('/api/feed/shortform', (req, res) => {
-  res.json({ items: [], total: 0, updatedAt: new Date(0).toISOString() });
-});
+// Editorial, reaction, and poll surfaces are not live yet. Do not present an
+// empty successful response as if content simply happens to be unavailable.
+app.use('/api/trending', rejectPreparingFeature);
+app.use('/api/reactions', rejectPreparingFeature);
+app.use('/api/flash-polls', rejectPreparingFeature);
+app.use('/api/feed/shortform', rejectPreparingFeature);
 
 // ============================================
 // WebSocket 설정

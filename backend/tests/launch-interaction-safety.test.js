@@ -128,6 +128,10 @@ test('Given launch preparation mode When interaction routes are mounted Then ser
   assert.match(source, /app\.use\('\/api\/marketplace', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/posts', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/categories', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/trending', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/reactions', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/flash-polls', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/feed\/shortform', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/upload', rejectPreparingFeature\);/);
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(requireCsrfForCookieAuth)'), 'write gate must run before CSRF');
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(express.json'), 'write gate must run before parsing');
@@ -159,7 +163,18 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     assert.deepEqual(response.body, expected);
   }
 
-  for (const requestPath of ['/api/categories', '/api/posts', '/api/posts/1', '/api/marketplace', '/api/marketplace/1']) {
+  for (const requestPath of [
+    '/api/categories',
+    '/api/posts',
+    '/api/posts/1',
+    '/api/marketplace',
+    '/api/marketplace/1',
+    '/api/trending/topics',
+    '/api/trending/hot-records',
+    '/api/reactions/record/example',
+    '/api/flash-polls',
+    '/api/feed/shortform',
+  ]) {
     const response = await request(port, 'GET', requestPath);
     assert.equal(response.status, 503, `${requestPath} must stay closed while its public page is preparing`);
     assert.match(response.headers['cache-control'] || '', /no-store/);
@@ -182,9 +197,10 @@ test('Given chat is preparing When a /ws/chat upgrade is requested Then the serv
 test('Given unreleased social interactions When a direct write request is sent Then it is rejected instead of returning fake success', () => {
   const source = readSource('src/server.js');
 
-  assert.match(source, /app\.post\('\/api\/reactions', rejectPreparingFeature\);/);
-  assert.match(source, /app\.post\('\/api\/flash-polls\/:pollId\/vote', rejectPreparingFeature\);/);
-  assert.doesNotMatch(source, /app\.post\('\/api\/reactions', \(req, res\) => \{\s*res\.json/);
+  assert.match(source, /app\.use\('\/api\/reactions', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/flash-polls', rejectPreparingFeature\);/);
+  assert.doesNotMatch(source, /res\.json\(\{ topics: \[\], updatedAt: new Date\(0\)\.toISOString\(\) \}\)/);
+  assert.doesNotMatch(source, /res\.json\(\{ records: \[\], total: 0 \}\)/);
 });
 
 test('Given the local-only card studio When a retired public renderer is called Then server-side image and HTML generation are fail-closed', () => {
