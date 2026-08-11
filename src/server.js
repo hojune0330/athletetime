@@ -30,6 +30,7 @@ const http = require('http');
 const path = require('path');
 const { requestLogPath } = require('./requestLogPath');
 const { assertRecoveryCodeEnvironment } = require('../backend/auth/recoveryCodes');
+const { normalizePostListPagination } = require('../backend/utils/postListPagination');
 
 // 프로젝트 루트 (src/ 의 상위)
 const ROOT = path.join(__dirname, '..');
@@ -296,8 +297,7 @@ if (HAS_DATABASE) {
   // Standalone 모드: DB 미연결 — 커뮤니티 API 미활성
   // 실제 데이터는 PostgreSQL 연결 시에만 제공
   app.get('/api/posts', (req, res) => {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 20;
+    const { limit, page } = normalizePostListPagination(req.query);
     res.json({
       success: true,
       posts: [],

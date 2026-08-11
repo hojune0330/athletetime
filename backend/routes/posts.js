@@ -16,6 +16,7 @@ const { uploadToCloudinary } = require('../utils/cloudinary');
 const { broadcastToClients } = require('../utils/websocket');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { redactPostListRow } = require('../utils/postRedaction');
+const { normalizePostListPagination } = require('../utils/postListPagination');
 const { createViewDedup } = require('../utils/viewDedup');
 const { logger } = require('../utils/privacyGuardLogger');
 
@@ -36,15 +37,14 @@ router.get('/', async (req, res) => {
   try {
     const { 
       category, 
-      limit = 20, 
-      offset = 0,
-      page = 1,
       sort = 'latest' // 'latest' | 'hot' | 'comment'
     } = req.query;
     
-    const actualLimit = parseInt(limit);
-    const actualPage = parseInt(page);
-    const actualOffset = (actualPage - 1) * actualLimit;
+    const {
+      limit: actualLimit,
+      offset: actualOffset,
+      page: actualPage,
+    } = normalizePostListPagination(req.query);
     
     // 기본 쿼리 (password_hash 제외, comments 배열 포함)
     // '자유' 카테고리는 null로 반환 (프론트에서 뱃지 표시 안함)
