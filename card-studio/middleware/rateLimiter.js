@@ -24,6 +24,18 @@
 // IP별 요청 카운터 저장소
 const stores = {};
 
+// Express calculates req.ip from the configured proxy trust chain. Do not read
+// X-Forwarded-For here: outside that chain it is a caller-controlled header.
+function getClientIp(req = {}) {
+  const trustedIp = typeof req.ip === 'string' ? req.ip.trim() : '';
+  if (trustedIp) return trustedIp;
+
+  const socketIp = typeof req.socket?.remoteAddress === 'string'
+    ? req.socket.remoteAddress.trim()
+    : '';
+  return socketIp || 'unknown';
+}
+
 /**
  * Rate limiter 팩토리
  * @param {Object} options
@@ -68,8 +80,8 @@ function createRateLimiter({
       return next();
     }
     
-    // IP 추출 (프록시 뒤에서도 동작)
-    const ip = req.ip || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+    // Express가 proxy trust 설정에 따라 확정한 IP만 제한 키로 사용한다.
+    const ip = getClientIp(req);
     const key = `${keyPrefix}:${ip}`;
     const store = stores[keyPrefix];
     const now = Date.now();
@@ -157,6 +169,7 @@ const workspacePreviewLimiter = createRateLimiter({
 
 module.exports = {
   createRateLimiter,
+  getClientIp,
   searchLimiter,
   generateLimiter,
   competitionLimiter,

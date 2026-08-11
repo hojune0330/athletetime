@@ -71,3 +71,19 @@ test('Given repeated data-rights submissions When the sixth request arrives Then
   assert.equal(publicRead.nextCalled, true);
   assert.equal(publicRead.headers['x-ratelimit-limit'], '60');
 });
+
+test('Given a caller-supplied forwarding header When Express has not resolved req.ip Then the limiter does not trust that header', () => {
+  const { getClientIp } = require('../../card-studio/middleware/rateLimiter');
+
+  const directRequest = {
+    headers: { 'x-forwarded-for': '198.51.100.99' },
+    socket: { remoteAddress: '203.0.113.14' },
+  };
+  const proxiedRequest = {
+    ...directRequest,
+    ip: '192.0.2.40',
+  };
+
+  assert.equal(getClientIp(directRequest), '203.0.113.14');
+  assert.equal(getClientIp(proxiedRequest), '192.0.2.40');
+});
