@@ -98,3 +98,25 @@ test('LEGACY-SEARCH-PAGE-004 Given the legacy dashboard expands a result section
   assert.doesNotMatch(dashboardSearch, /data-all=/u);
   assert.doesNotMatch(dashboardSearch, /expandSubSection\(/u);
 });
+
+test('LEGACY-SEARCH-PAGE-005 Given a caller inflates the legacy context parameter When the initial search returns Then it remains at the normal bounded context size', async (t) => {
+  const profile = insightService.getFeaturedProfiles(1)[0];
+  assert.ok(profile);
+
+  await withPublicRoutes(t, async (baseUrl) => {
+    const standard = await fetch(`${baseUrl}/search?q=${encodeURIComponent(profile.name)}&type=name`)
+      .then((response) => response.json());
+    const inflated = await fetch(`${baseUrl}/search?q=${encodeURIComponent(profile.name)}&type=name&context=999`)
+      .then((response) => response.json());
+
+    const standardRows = standard.data.sections
+      .flatMap((section) => section.subSections)
+      .map((subsection) => subsection.results.length);
+    const inflatedRows = inflated.data.sections
+      .flatMap((section) => section.subSections)
+      .map((subsection) => subsection.results.length);
+
+    assert.deepEqual(inflatedRows, standardRows);
+    assert.equal(containsKey(inflated, 'allResults'), false);
+  });
+});
