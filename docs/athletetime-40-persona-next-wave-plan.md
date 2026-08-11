@@ -221,6 +221,7 @@ UX preferences.
 | Row-level data rights | Keep current requests; narrowly scoped lifecycle after rehearsal | No public-row change from a request |
 | Verified community/chat | Keep closed; approved authenticated/moderated system | Route, API, and websocket remain unavailable |
 | Magazine publication | Keep internal drafts; human-approved periodic magazine | No automatic athlete narrative or news publication |
+| Minor-record amplification | Keep ordinary direct links; restrict active amplification; owner-defined youth sharing policy | No share cards, automatic recommendation, or editorial reuse |
 
 See the individual packets in `docs/decisions/` before any one of these
 boundaries is changed.
@@ -258,7 +259,7 @@ single happy-path page visit:
 ## Next checkpoint
 
 The immediate safe priority is to keep Wave A through C continuously verified
-while the owner considers the six boundary decisions. The next code feature
+while the owner considers the seven boundary decisions. The next code feature
 should be selected only after one of those decisions is written down; until
 then, the best improvement is reliability, clarity, provenance, and recovery
 rather than another data-collection or social feature.
