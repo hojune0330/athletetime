@@ -50,8 +50,6 @@ function scanQuarantine() {
             filename,
             competition: competitionName,
             event: eventLabel,
-            name: String(row.name || ''),
-            affiliation: String(row.affiliation || ''),
             reason: rowAssessment.reason,
           });
         }
@@ -60,11 +58,10 @@ function scanQuarantine() {
   }
 
   const sortedRowCandidates = rowCandidates.sort((a, b) => (
-      Number(!/\s/.test(a.name)) - Number(!/\s/.test(b.name))
-      || a.filename.localeCompare(b.filename)
+      a.filename.localeCompare(b.filename)
       || a.competition.localeCompare(b.competition)
       || a.event.localeCompare(b.event)
-      || a.name.localeCompare(b.name)
+      || a.reason.localeCompare(b.reason)
   ));
   const reasonSamples = [...new Map(sortedRowCandidates.map((sample) => [sample.reason, sample])).values()];
   const rowSamples = [...reasonSamples, ...sortedRowCandidates]

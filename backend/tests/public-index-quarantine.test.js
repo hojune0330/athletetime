@@ -217,7 +217,12 @@ test('G003 report is deterministic, reasoned, read-only, and enforceable', () =>
   assert.ok(report.reasons.unrecognized_event > 0);
   assert.ok(report.reasons.team_event > 0);
   assert.ok(report.samples.events.some((sample) => sample.event === '남자 박지현 결승'));
-  assert.ok(report.samples.rows.some((sample) => sample.name === '정현석 김국영'));
+  assert.ok(report.samples.rows.some((sample) => sample.event === '남자 4x100mR 결승'));
+  assert.equal(
+    report.samples.rows.some((sample) => Object.hasOwn(sample, 'name') || Object.hasOwn(sample, 'affiliation')),
+    false,
+    'quality reports must not print athlete identifiers when counts and reasons are sufficient',
+  );
   assert.ok(report.exposures.search);
   assert.ok(report.exposures.insights);
   assert.equal(report.exposures.search.quarantinedRowCount, 0);
