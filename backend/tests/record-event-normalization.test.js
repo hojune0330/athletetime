@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+require('./test-cleanup-boundary.test');
+
 const { normalizeEvent } = require('../../card-studio/services/recordAnalyticsService');
 
 test('Given vault and high-jump labels When public events are normalized Then their distinct event keys and labels are preserved', () => {

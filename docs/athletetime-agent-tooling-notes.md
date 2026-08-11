@@ -63,6 +63,12 @@ For a startup-lock timeout, use this safe sequence:
 2. Run the lock-only proof: `node --test --test-name-pattern=RECORDS-E2E-STARTUP-LOCK backend/tests/records-recovery-e2e.test.js`.
 3. Re-run the browser test normally. The fixture acquires and releases the lock itself; do not create, rename, or remove manual lock artifacts.
 
+### Full-test workspace integrity
+
+Before a long `npm test` run, confirm that the current folder has `.git`, `package.json`, `src`, `backend`, and `frontend/src`. Run the suite from an isolated clone or worktree, never from the only local copy of unpushed work.
+
+The `TEST-CLEANUP-BOUNDARY-001` contract rejects test commands and test cleanup helpers that directly target the repository root. Test cleanup may remove only a purpose-built temporary directory or a narrowly named test artifact. If the required project markers disappear during a run, stop immediately, preserve the command context, and restore from the last pushed commit before doing any further work. Do not try to continue in a partially removed folder.
+
 ### Frontend dev mode — API baseURL & remote backend (`.env.development` / `.env.development.remote`)
 
 기본 로컬 개발(권장):
