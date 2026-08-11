@@ -16,16 +16,19 @@ function readFrontendSource(directory) {
   });
 }
 
-test('frontend toolchain keeps the patched Vite and DOMPurify versions', () => {
+test('frontend toolchain keeps the patched Vite, DOMPurify, and router versions', () => {
   assert.equal(frontendManifest.devDependencies.vite, '^8.1.5');
   assert.equal(frontendManifest.devDependencies['@vitejs/plugin-react'], '^6.0.4');
-  assert.equal(frontendManifest.overrides.dompurify, '^3.4.12');
+  assert.equal(frontendManifest.dependencies['react-router-dom'], '^7.18.2');
+  assert.equal(frontendManifest.overrides.dompurify, '^3.4.13');
   for (const buildOnlyPackage of ['autoprefixer', 'postcss', 'tailwindcss', 'tailwindcss-animate']) {
     assert.equal(frontendManifest.dependencies[buildOnlyPackage], undefined, `${buildOnlyPackage} must not ship to the browser runtime`);
     assert.ok(frontendManifest.devDependencies[buildOnlyPackage], `${buildOnlyPackage} must remain available to the build`);
   }
   assert.equal(frontendLockfile.packages['node_modules/vite'].version, '8.1.5');
-  assert.equal(frontendLockfile.packages['node_modules/dompurify'].version, '3.4.12');
+  assert.equal(frontendLockfile.packages['node_modules/dompurify'].version, '3.4.13');
+  assert.equal(frontendLockfile.packages['node_modules/react-router-dom'].version, '7.18.2');
+  assert.equal(frontendLockfile.packages['node_modules/react-router'].version, '7.18.2');
 });
 
 test('frontend stays on BrowserRouter and does not opt into unstable React Router RSC APIs', () => {

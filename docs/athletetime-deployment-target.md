@@ -97,12 +97,13 @@
 - 배포 SHA가 Netlify와 Render에서 다름
 - 운영 DB 백업 또는 복원이 확인되지 않음
 
-## 남은 보안 관찰
+## 의존성 보안 확인
 
-프론트 의존성 검사에는 React Router의 RSC 모드 관련 고등급 경고가 남아 있다. 현재 앱은 `BrowserRouter` 기반 SPA이고 React Server Components나 서버 액션을 사용하지 않아 해당 공격 경로는 사용하지 않는다. 다만 경고를 해결한 것은 아니므로, 배포 직전 현재 권고 버전을 다시 확인하고 RSC·서버 액션을 도입할 때는 반드시 먼저 업데이트한다.
+배포 직전 아래 두 운영 의존성 검사를 실행한다. 두 명령 모두 취약점 `0건`이어야 하며, 경고를 예외로 두고 배포하지 않는다.
 
-### Release exception: React Router audit
+```powershell
+npm.cmd audit --omit=dev
+npm.cmd --prefix frontend audit --omit=dev
+```
 
-- `npm audit --omit=dev`는 React Router 관련 high 2건으로 여전히 red다. 이 예외는 경고를 해소했다는 의미가 아니다.
-- 근거: `GHSA-qwww-vcr4-c8h2`는 unstable RSC API에만 적용된다. 현재 프론트는 `BrowserRouter`와 Vite 기반 SPA이며 unstable RSC, React Server Components, 서버 액션을 사용하지 않는다.
-- 금지 조건: unstable RSC를 도입하거나 React Router 메이저 마이그레이션을 시작하기 전에는 이 예외를 사용할 수 없다. 먼저 공식 수정 경로인 React Router v8+로 해소하고, `npm audit --omit=dev`를 다시 실행해 결과를 릴리스 기록에 남긴다.
+2026-08-12 기준으로 프론트는 React Router `7.18.2`와 DOMPurify `3.4.13`을 사용한다. 현재 앱은 `BrowserRouter` 기반 SPA이며 React Server Components나 서버 액션을 사용하지 않는다. 이후 라우팅 방식이나 HTML 정화 경로를 바꾸면, 배포 전 감사와 브라우저 회귀 검사를 다시 실행한다.

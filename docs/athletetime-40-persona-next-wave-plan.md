@@ -94,9 +94,12 @@ Scope: safe backend and verification work; no new public data fields.
    workspace.
 4. Keep a release preflight that checks repository identity, static contracts,
    type/build checks, and test isolation before an optional full browser run.
+5. Require a clean production-dependency audit for both the API and frontend;
+   a known security warning is a repair task, not a release exception.
 
 Done means: the public response tests, no-store contract, no-private-upload
-contract, and isolated browser suite all pass from a clean checkout.
+contract, production-dependency audits, and isolated browser suite all pass
+from a clean checkout.
 
 ### Wave D: Operating preparation without turning features on
 
