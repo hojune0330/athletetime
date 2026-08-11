@@ -178,3 +178,13 @@ test('PACE-UX-010: target pace rejects invalid clock values and clears stale out
   assert.match(target, /setResult\(null\)/, 'an invalid input cannot leave a stale pace result visible');
   assert.match(target, /aria-pressed=\{isSteeple\}/, 'distance mode selection exposes its current state');
 });
+
+test('PACE-UX-011: calculator tabs support compact keyboard navigation', () => {
+  const index = readSource(`${PACE_DIR}/index.tsx`);
+
+  assert.match(index, /event\.key === 'ArrowRight'/, 'right arrow advances the focused tab');
+  assert.match(index, /event\.key === 'ArrowLeft'/, 'left arrow returns to the previous tab');
+  assert.match(index, /event\.key === 'Home'/, 'Home moves to the first tab');
+  assert.match(index, /event\.key === 'End'/, 'End moves to the last tab');
+  assert.match(index, /tabIndex=\{activeTab === tab\.id \? 0 : -1\}/, 'only the active tab enters the tab order');
+});
