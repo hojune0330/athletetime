@@ -69,6 +69,12 @@ Before a long `npm test` run, confirm that the current folder has `.git`, `packa
 
 The `TEST-CLEANUP-BOUNDARY-001` contract rejects test commands and test cleanup helpers that directly target the repository root. Test cleanup may remove only a purpose-built temporary directory or a narrowly named test artifact. If the required project markers disappear during a run, stop immediately, preserve the command context, and restore from the last pushed commit before doing any further work. Do not try to continue in a partially removed folder.
 
+Use `powershell -ExecutionPolicy Bypass -File scripts/run-release-preflight.ps1`
+for the safe focused check. It verifies the repository markers, runs the
+cleanup, public-boundary, type, and build checks, and never removes files. Add
+`-IncludeBrowser` only from an isolated worktree after the focused check is
+green; that is the one deliberate opt-in to the longer serial browser suite.
+
 ### Frontend dev mode — API baseURL & remote backend (`.env.development` / `.env.development.remote`)
 
 기본 로컬 개발(권장):

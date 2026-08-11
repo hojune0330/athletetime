@@ -6,6 +6,8 @@ const test = require('node:test');
 const ROOT = path.join(__dirname, '..', '..');
 const TEST_DIRECTORY = path.join(ROOT, 'backend', 'tests');
 
+require('./release-preflight-contract.test');
+
 function listTestFiles(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const filePath = path.join(directory, entry.name);
