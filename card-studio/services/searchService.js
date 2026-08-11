@@ -95,7 +95,13 @@ class SearchService {
    * @returns {{ query, type, competitions: [], totalMatches, totalEvents, sections: [] }}
    */
   search(params = {}) {
-    const { query, type = 'all', competition, contextRows = 3 } = params;
+    const {
+      query,
+      type = 'all',
+      competition,
+      contextRows = 3,
+      includeAllResults = true,
+    } = params;
 
     if (!query || query.trim().length < 2) {
       return { query, type, competitions: [], totalMatches: 0, totalEvents: 0, sections: [] };
@@ -240,7 +246,8 @@ class SearchService {
       // BUG4: hasMore 판정에서 separator 행 제외
       const visibleDataCount = visibleResults.filter(r => !r.isSeparator).length;
 
-      sectionMap[m.pureEvent].subSections.push({
+      const subsection = {
+        sectionKey: this._searchSectionKey(m),
         label: `${m.gender} ${m.round}`,
         gender: m.gender,
         round: m.round,
@@ -252,9 +259,10 @@ class SearchService {
         provenance: m.results.find(r => r.provenance)?.provenance,
         totalAthletes: publicResults.length,
         results: visibleResults,
-        allResults: publicResults,
         hasMore: visibleDataCount < publicResults.length,
-      });
+      };
+      if (includeAllResults) subsection.allResults = publicResults;
+      sectionMap[m.pureEvent].subSections.push(subsection);
     }
 
     // 섹션 정렬: 매칭 선수의 최고 순위가 높은 종목이 위로
@@ -281,6 +289,53 @@ class SearchService {
       totalEvents: sections.length,
       sections,
     };
+  }
+
+  getSearchSectionPage(params = {}) {
+    const {
+      query,
+      type = 'all',
+      competition,
+      sectionKey,
+      offset = 0,
+      limit = 30,
+    } = params;
+    const result = this.search({
+      query,
+      type,
+      competition,
+      contextRows: 0,
+      includeAllResults: true,
+    });
+    const subsection = result.sections
+      .flatMap((section) => section.subSections)
+      .find((item) => item.sectionKey === sectionKey);
+    if (!subsection) return null;
+
+    const rows = subsection.allResults || [];
+    const pageRows = rows.slice(offset, offset + limit);
+    return {
+      sectionKey,
+      totalAthletes: subsection.totalAthletes,
+      offset,
+      limit,
+      rows: pageRows,
+      hasMore: offset + pageRows.length < rows.length,
+    };
+  }
+
+  _searchSectionKey(match) {
+    return crypto.createHash('sha256')
+      .update([
+        match.compFile,
+        match.eventFull,
+        match.gender,
+        match.round,
+        match.division,
+        match.date,
+      ].join('\u0000'))
+      .digest('hex')
+      .slice(0, 24);
   }
 
   // ── 내부 헬퍼 ──

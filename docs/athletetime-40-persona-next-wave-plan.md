@@ -96,6 +96,11 @@ release regression contracts, not as future feature promises:
   legacy record search, and competition-result HTTP responses. Those routes
   retain a source label, public URL, and collection date, but never serialize
   an internal source file key or identity-assistance field.
+- Legacy record search now sends only nearby result context in its first
+  response. A person who expands one result section receives at most 30 rows
+  at a time through the existing rate-limited, non-cacheable search boundary.
+  This preserves normal inspection while avoiding a hidden full-result payload
+  on every name or affiliation search.
 - Public collection-health reporting exposes only aggregate counts and issue
   categories. Raw review samples, internal file names, source identifiers,
   and identity-analysis output remain server-only.

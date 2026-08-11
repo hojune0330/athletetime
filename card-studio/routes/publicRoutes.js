@@ -25,12 +25,41 @@ router.get('/search/competitions', publicLimiter, (req, res) => {
   return res.json({ success: true, data: searchService.getCompetitions() });
 });
 
+router.get('/search/section', searchLimiter, (req, res) => {
+  const query = sanitizeSearchQuery(req.query.q);
+  if (query.length < 2) {
+    return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해 주세요.' });
+  }
+  const sectionKey = String(req.query.section || '').trim().toLowerCase();
+  if (!/^[a-f0-9]{24}$/u.test(sectionKey)) {
+    return res.status(400).json({ success: false, error: '결과 위치가 올바르지 않아요.' });
+  }
+  const offset = parseBoundedInteger(req.query.offset, 0, 0, 10_000);
+  const limit = parseBoundedInteger(req.query.limit, 30, 1, 30);
+  if (offset === null || limit === null) {
+    return res.status(400).json({ success: false, error: '한 번에 1명부터 30명까지만 볼 수 있어요.' });
+  }
+  const validTypes = ['name', 'affiliation', 'all'];
+  const page = searchService.getSearchSectionPage({
+    query,
+    type: validTypes.includes(req.query.type) ? req.query.type : 'all',
+    competition: sanitizeSearchCompetition(req.query.comp),
+    sectionKey,
+    offset,
+    limit,
+  });
+  if (!page) {
+    return res.status(404).json({ success: false, error: '이 검색 결과를 다시 찾지 못했어요. 다시 검색해 주세요.' });
+  }
+  return res.json({ success: true, data: page });
+});
+
 router.get('/search', searchLimiter, (req, res) => {
   const { q, type, comp, context } = req.query;
-  if (!q || q.trim().length < 2) {
+  if (typeof q !== 'string' || q.trim().length < 2) {
     return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해주세요.' });
   }
-  const sanitizedQuery = q.trim().replace(/[\x00-\x1f\x7f]/g, '').slice(0, 100);
+  const sanitizedQuery = sanitizeSearchQuery(q);
   if (sanitizedQuery.length < 2) {
     return res.status(400).json({ success: false, error: '검색어는 2글자 이상 입력해주세요.' });
   }
@@ -40,11 +69,29 @@ router.get('/search', searchLimiter, (req, res) => {
     data: searchService.search({
       query: sanitizedQuery,
       type: validTypes.includes(type) ? type : 'all',
-      competition: comp || undefined,
-      contextRows: parseInt(context, 10) || 3,
+      competition: sanitizeSearchCompetition(comp),
+      contextRows: parseBoundedInteger(context, 3, 0, 3) ?? 3,
+      includeAllResults: false,
     }),
   });
 });
+
+function sanitizeSearchQuery(value) {
+  return String(value || '').trim().replace(/[\x00-\x1f\x7f]/g, '').slice(0, 100);
+}
+
+function sanitizeSearchCompetition(value) {
+  const competition = String(value || '').trim().replace(/[\x00-\x1f\x7f]/g, '').slice(0, 200);
+  return competition || undefined;
+}
+
+function parseBoundedInteger(value, fallback, min, max) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const normalized = String(value).trim();
+  if (!/^\d+$/u.test(normalized)) return null;
+  const parsed = Number(normalized);
+  return Number.isSafeInteger(parsed) && parsed >= min && parsed <= max ? parsed : null;
+}
 
 router.get('/insights/featured', publicLimiter, (req, res) => {
   try {

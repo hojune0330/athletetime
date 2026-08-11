@@ -7,6 +7,7 @@
 const search = {
   debounceTimer: null,
   currentQuery: '',
+  currentSearch: null,
   expandedSections: new Set(),
 
   // ── 초기화 ──
@@ -71,6 +72,7 @@ const search = {
 
     this.currentQuery = q;
     const comp = (document.getElementById('search-comp') || {}).value || '';
+    this.currentSearch = { q, type, comp };
 
     this.renderLoading();
 
@@ -180,7 +182,7 @@ const search = {
               <tr class="search-table__sep">
                 <td colspan="5">
                   <span class="search-table__sep-dots">...</span>
-                  <button class="search-table__expand-btn" onclick="search.expandSubSection(this, '${sectionId}')">전체 ${sub.totalAthletes}명 보기</button>
+                  <button class="search-table__expand-btn" onclick="search.loadSearchResultPage(this, true)">전체 ${sub.totalAthletes}명 보기</button>
                 </td>
               </tr>
             `;
@@ -204,9 +206,9 @@ const search = {
 
         html += '</tbody></table>';
 
-        // "전체 보기" 데이터를 숨겨놓기 (allResults)
+        // The public API keeps the expandable result set separate from the initial response.
         if (sub.hasMore) {
-          html += `<div class="search-allresults" style="display:none;" data-all='${JSON.stringify(sub.allResults).replace(/'/g, "&#39;")}'></div>`;
+          html += `<div class="search-allresults" style="display:none;" data-section-key="${this.esc(sub.sectionKey || '')}"></div>`;
         }
 
         html += '</div>';  // subsection
@@ -239,32 +241,55 @@ const search = {
     }
   },
 
-  expandSubSection(btn, sectionId) {
-    // "전체 보기" 버튼 클릭 → 숨겨진 allResults로 교체
+  async loadSearchResultPage(btn, replace) {
     const subsection = btn.closest('.search-subsection');
-    if (!subsection) return;
+    const hiddenData = subsection?.querySelector('.search-allresults');
+    const tbody = subsection?.querySelector('tbody');
+    const sectionKey = hiddenData?.dataset.sectionKey;
+    const searchState = this.currentSearch;
+    if (!subsection || !tbody || !sectionKey || !searchState) return;
 
-    const hiddenData = subsection.querySelector('.search-allresults');
-    if (!hiddenData) return;
+    const offset = replace ? 0 : Number(btn.dataset.nextOffset || 0);
+    if (!Number.isSafeInteger(offset) || offset < 0) return;
 
-    let allResults;
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '불러오는 중...';
     try {
-      allResults = JSON.parse(hiddenData.dataset.all);
-    } catch (e) { return; }
+      const params = new URLSearchParams({
+        q: searchState.q,
+        type: searchState.type,
+        section: sectionKey,
+        offset: String(offset),
+        limit: '30',
+      });
+      if (searchState.comp) params.set('comp', searchState.comp);
+      const result = await api.get(`/api/card-studio/search/section?${params.toString()}`);
+      if (!result.success || !Array.isArray(result.data?.rows)) throw new Error('search section unavailable');
 
-    const tbody = subsection.querySelector('tbody');
-    if (!tbody) return;
+      const rows = this.renderSearchRows(result.data.rows);
+      if (replace) {
+        tbody.innerHTML = rows;
+      } else {
+        btn.closest('tr')?.remove();
+        tbody.insertAdjacentHTML('beforeend', rows);
+      }
+      if (result.data.hasMore) {
+        const nextOffset = result.data.offset + result.data.rows.length;
+        tbody.insertAdjacentHTML('beforeend', this.renderNextPageRow(nextOffset));
+      }
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = label || '다시 시도';
+    }
+  },
 
-    const sub = subsection.querySelector('.search-subsection__header .search-subsection__wind');
-    const hasWind = !!sub;
-
-    let rows = '';
-    for (const r of allResults) {
+  renderSearchRows(rows) {
+    return rows.map((r) => {
       const matchClass = r.isMatch ? ' search-table__row--match' : '';
       const rankIcon = r.rank === 1 ? ' search-rank--gold' : r.rank === 2 ? ' search-rank--silver' : r.rank === 3 ? ' search-rank--bronze' : '';
       const newRecordBadge = r.newRecord ? `<span class="search-badge--record" title="${this.esc(r.newRecord)}">NR</span>` : '';
-
-      rows += `
+      return `
         <tr class="search-table__row${matchClass}">
           <td class="search-table__rank"><span class="search-rank${rankIcon}">${r.rank || '-'}</span></td>
           <td class="search-table__name">${r.isMatch ? '<strong>' : ''}${this.esc(r.name)}${r.isMatch ? '</strong>' : ''}</td>
@@ -273,9 +298,17 @@ const search = {
           <td class="search-table__note">${this.esc(r.note || '')}</td>
         </tr>
       `;
-    }
+    }).join('');
+  },
 
-    tbody.innerHTML = rows;
+  renderNextPageRow(nextOffset) {
+    return `
+      <tr class="search-table__sep">
+        <td colspan="5">
+          <button class="search-table__expand-btn" data-next-offset="${nextOffset}" onclick="search.loadSearchResultPage(this, false)">다음 30명 보기</button>
+        </td>
+      </tr>
+    `;
   },
 
   // ── 유틸리티 ──
