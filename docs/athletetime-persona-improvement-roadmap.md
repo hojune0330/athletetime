@@ -267,6 +267,8 @@ surface or redoing an already completed, reversible fix.
   email addresses in the free-text reason before storing it. Public requests
   accept visible context only, never a client-supplied internal record or
   source identifier.
+- Anonymous public insight callers may request a stricter aggregation rule but
+  cannot lower the five-record minimum cohort through a query parameter.
 - The test preflight rejects cleanup helpers and test commands that explicitly
   target the repository root. Browser fixtures must use their own temporary
   directories instead.
@@ -277,6 +279,7 @@ surface or redoing an already completed, reversible fix.
 npm.cmd run pretest
 node --test backend/tests/launch-interaction-safety.test.js
 node --test backend/tests/data-request-sensitive-input.test.js
+node --test backend/tests/anonymous-insights-boundary.test.js
 npm.cmd --prefix frontend run type-check
 npm.cmd --prefix frontend run build:check
 ```

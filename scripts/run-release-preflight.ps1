@@ -46,7 +46,7 @@ try {
     node --test backend/tests/test-cleanup-boundary.test.js
   }
   Invoke-PreflightStep 'data and public-boundary checks' {
-    node --test backend/tests/data-request-sensitive-input.test.js backend/tests/record-event-normalization.test.js backend/tests/launch-interaction-safety.test.js
+    node --test backend/tests/anonymous-insights-boundary.test.js backend/tests/data-request-sensitive-input.test.js backend/tests/record-event-normalization.test.js backend/tests/launch-interaction-safety.test.js
   }
   Invoke-PreflightStep 'frontend type check' {
     npm.cmd --prefix frontend run type-check

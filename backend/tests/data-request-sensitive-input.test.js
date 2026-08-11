@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+require('./anonymous-insights-boundary.test');
+
 const { validateRequest } = require('../../card-studio/services/dataRequestValidation');
 
 function validateReason(reason) {

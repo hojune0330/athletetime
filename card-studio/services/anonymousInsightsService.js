@@ -48,7 +48,8 @@ const REGION_LABELS = {
 function getAnonymousInsights(options = {}) {
   const idx = recordAnalyticsService.getIndex();
   const safeLimit = clampInt(options.limit, DEFAULT_LIMIT, 1, 24);
-  const minGroupSize = clampInt(options.minGroupSize, DEFAULT_MIN_GROUP_SIZE, 2, 50);
+  // The client may ask for stricter aggregation, never a smaller cohort.
+  const minGroupSize = clampInt(options.minGroupSize, DEFAULT_MIN_GROUP_SIZE, DEFAULT_MIN_GROUP_SIZE, 50);
   const windowDays = clampInt(options.windowDays, DEFAULT_WINDOW_DAYS, 7, 730);
   const season = Number.parseInt(options.season, 10) || idx.latestSeason;
 

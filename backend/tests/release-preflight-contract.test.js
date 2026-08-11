@@ -12,6 +12,7 @@ test('RELEASE-PREFLIGHT-001: the release helper verifies an intact repository an
   assert.match(source, /\$requiredPaths/u);
   assert.match(source, /git -C \$repositoryRoot rev-parse --show-toplevel/u);
   assert.match(source, /backend\/tests\/test-cleanup-boundary\.test\.js/u);
+  assert.match(source, /backend\/tests\/anonymous-insights-boundary\.test\.js/u);
   assert.match(source, /backend\/tests\/launch-interaction-safety\.test\.js/u);
   assert.match(source, /npm\.cmd --prefix frontend run type-check/u);
   assert.match(source, /npm\.cmd --prefix frontend run build:check/u);
