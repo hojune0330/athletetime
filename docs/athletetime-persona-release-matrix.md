@@ -117,3 +117,18 @@ adds four release facts that change implementation order.
 - Do not expose a private-note control as an active feature until the private
   storage gate is completed. A disabled teaser is safer than collecting data
   that the service is not prepared to protect.
+
+### Latest verification record
+
+On 2026-08-11, the following checks passed from a local clean browser fixture:
+
+- 2 record and team routing scenarios, including latest-season team opening.
+- 12 recovery scenarios, including slow search, stale links, same-name
+  comparison, correction intent, and mobile drawer focus restoration.
+- 3 record-collection scenarios, including blocked browser storage recovery.
+- 2 mobile selection and comparison-tray scenarios at a narrow viewport.
+- 14 team API and DTO boundary scenarios, including the absence of personal,
+  raw-record, workspace, and source fields in public team responses.
+
+These checks prove the current public UX boundary. They do not approve new
+storage, new identity linking, or a production migration.
