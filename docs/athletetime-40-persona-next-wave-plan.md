@@ -32,6 +32,22 @@ upload storage for private material, or reopen a public interaction surface.
   associated APIs remain fail-closed while they are not ready.
 - The public search response is not cacheable, reducing accidental storage of
   a visitor's name or affiliation query in shared caches.
+- A direct result-page URL and its result identifier count as provenance when
+  a schedule-page sequence is absent. This prevents a real source from being
+  mislabeled as missing without inventing any new data.
+
+### Coverage facts that must not be overstated
+
+As of 2026-08-12, the competition catalogue has 284 traceable entries across
+2018--2026 and its integrity check reports zero missing source URL or source
+identifier warnings. The service result files currently cover 2015--2026.
+
+Those are different datasets and neither statement means that every Korean or
+overseas meet since 2005 is present. A year, competition, or athlete record
+outside that verified range must remain a visible collection gap until its
+source receipt, parsing result, and search result have each been reviewed.
+No UI, SEO text, or editorial copy may describe the collection as a complete
+career-history or all-results database.
 
 ### Risks found by the review
 
