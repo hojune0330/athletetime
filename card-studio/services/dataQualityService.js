@@ -261,11 +261,13 @@ function scanDuplicateRows(issues, context, results) {
   for (const result of results) {
     const name = clean(result.name, 100).toLowerCase();
     if (!name) continue;
+    const affiliation = clean(result.affiliation, 100).toLowerCase();
     const key = [
       context.competitionId,
       context.event,
       context.division,
       name,
+      affiliation,
       clean(result.record, 40),
     ].join('|');
     seen.set(key, (seen.get(key) || 0) + 1);
@@ -293,7 +295,7 @@ function createIssueBuckets() {
     invalidRank: bucket('Rank is missing, non-numeric, or zero.'),
     duplicateRank: bucket('Same rank appears more than once in one event.'),
     missingRank: bucket('Rank sequence has a gap.'),
-    duplicateAthleteEventRow: bucket('Same competition, event, athlete, and record appears more than once.'),
+    duplicateAthleteEventRow: bucket('Same competition, event, athlete, affiliation, and record appears more than once.'),
     nonIndexableAthleteName: bucket('Athlete name is numeric, blank, broken, or otherwise unsafe for search indexing.'),
     codedEventLabel: bucket('Event label starts with a source-specific numeric class code.'),
     nonStandardEvent: bucket('Normalized event key is outside the standard dictionary.'),
@@ -518,4 +520,5 @@ function clean(value, max = 500) {
 
 module.exports = {
   getDataQualityReport,
+  scanDuplicateRows,
 };
