@@ -92,6 +92,10 @@ release regression contracts, not as future feature promises:
 - Public workspace provenance keeps a useful source label, source URL, and
   collection date while omitting internal source IDs, person numbers,
   birthdates, and raw external identifiers.
+- The same public-provenance allowlist now covers legacy athlete profiles,
+  legacy record search, and competition-result HTTP responses. Those routes
+  retain a source label, public URL, and collection date, but never serialize
+  an internal source file key or identity-assistance field.
 - Public collection-health reporting exposes only aggregate counts and issue
   categories. Raw review samples, internal file names, source identifiers,
   and identity-analysis output remain server-only.
@@ -106,9 +110,9 @@ release regression contracts, not as future feature promises:
   page framing, plugin objects, and unexpected document base URLs.
 
 The regression set for these items includes route recovery, device-storage
-failure, public-provenance, data-request sensitive-input, and closed-surface
-tests. It must run before any work that changes the related UI or API
-contracts.
+failure, public-provenance across both current and legacy record endpoints,
+data-request sensitive-input, and closed-surface tests. It must run before any
+work that changes the related UI or API contracts.
 
 ### 2026-08-12 runtime dependency check
 
