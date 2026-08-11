@@ -48,14 +48,17 @@ test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build without a chat
   assert.match(toml, /\/api\/\*/);
 });
 
-test('DEPLOY-NETLIFY-002: production CSP does not permit the dormant chat websocket origin', () => {
+test('DEPLOY-NETLIFY-002: production config and runbook keep every dormant interaction surface closed', () => {
   const toml = readSource('netlify.toml');
   const envExample = readSource('frontend/.env.example');
   const deploymentTarget = readSource('docs/athletetime-deployment-target.md');
 
   assert.doesNotMatch(toml, /wss:\/\/athletetime-backend\.onrender\.com/);
   assert.doesNotMatch(envExample, /VITE_WS_URL/);
-  assert.match(deploymentTarget, /\/api\/chat\/\*.*\/ws\/chat.*503/);
+  for (const route of ['/api/posts*', '/api/marketplace*', '/api/chat/*', '/ws/chat']) {
+    assert.ok(deploymentTarget.includes(route), `${route} must be listed in the closed-surface deployment check`);
+  }
+  assert.match(deploymentTarget, /Cache-Control: no-store/);
 });
 
 test('DEPLOY-CI-001: every pull request runs the full repository verification gate', () => {

@@ -120,16 +120,13 @@ test('Given launch preparation mode When interaction routes are mounted Then ser
   const source = readSource('src/server.js');
 
   for (const route of [
-    '/api/posts',
-    '/api/posts/:postId/comments',
-    '/api/posts/:postId/vote',
-    '/api/posts/:postId/poll',
-    '/api/marketplace',
     '/api/competitions',
     '/api/match-results',
   ]) {
     assert.match(source, new RegExp(`app\\.use\\('${route.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}', requireReadOnlyLaunchFeature\\(`));
   }
+  assert.match(source, /app\.use\('\/api\/marketplace', rejectPreparingFeature\);/);
+  assert.match(source, /app\.use\('\/api\/posts', rejectPreparingFeature\);/);
   assert.match(source, /app\.use\('\/api\/upload', rejectPreparingFeature\);/);
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(requireCsrfForCookieAuth)'), 'write gate must run before CSRF');
   assert.ok(source.indexOf('app.use(rejectUnavailableInteractionWrite)') < source.indexOf('app.use(express.json'), 'write gate must run before parsing');
@@ -161,8 +158,12 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     assert.deepEqual(response.body, expected);
   }
 
-  assert.equal((await request(port, 'GET', '/api/posts')).status, 200);
-  assert.equal((await request(port, 'GET', '/api/marketplace')).status, 200);
+  for (const requestPath of ['/api/posts', '/api/posts/1', '/api/marketplace', '/api/marketplace/1']) {
+    const response = await request(port, 'GET', requestPath);
+    assert.equal(response.status, 503, `${requestPath} must stay closed while its public page is preparing`);
+    assert.match(response.headers['cache-control'] || '', /no-store/);
+    assert.deepEqual(response.body, expected);
+  }
   assert.notEqual((await request(port, 'GET', '/api/upload/image')).status, 503);
   const chatRead = await request(port, 'GET', '/api/chat/check-nickname');
   assert.equal(chatRead.status, 503);
@@ -316,6 +317,8 @@ test('Given direct chat and write transports When no request body or upload fixt
 
   for (const [method, requestPath] of [
     ['GET', '/api/chat/check-nickname'],
+    ['GET', '/api/posts'],
+    ['GET', '/api/marketplace'],
     ['POST', '/api/chat/reports'],
     ['POST', '/api/posts'],
     ['POST', '/api/posts/1/comments'],

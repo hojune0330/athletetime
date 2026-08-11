@@ -83,7 +83,7 @@
 4. 운영 DB에서 스키마 마이그레이션을 실행하고, 운영 API의 직접 HTTPS 주소로 `npm run data:rights:readiness -- --base-url https://athletetime-backend.onrender.com`를 실행한다. 이 확인은 Netlify 경유 주소가 아니라 Render API 원본 주소를 사용한다. 실패하면 배포하지 않는다.
 5. Render와 Netlify에 같은 SHA를 배포한다.
 6. 공개 주소에서 `/health`, `/records`, `/competitions`, `/data-request`, 가입·로그인·비밀번호 재설정을 확인한다.
-7. 직접 요청으로 커뮤니티·거래·업로드·채팅 쓰기가 거절되는지 확인하고, `/api/chat/*`와 `/ws/chat`이 `503`으로 닫혀 있는지 확인한다.
+7. 직접 요청으로 커뮤니티·거래·업로드·채팅 API가 읽기와 쓰기 모두 `503`으로 닫혀 있는지 확인한다. 특히 `/api/posts*`, `/api/marketplace*`, `/api/chat/*`, `/ws/chat`은 `Cache-Control: no-store`를 함께 반환해야 한다.
 8. 배포 SHA, 시각, 백업 식별자, 스모크 결과, 롤백 담당자를 릴리스 기록에 남긴다.
 
 ## 롤백 기준

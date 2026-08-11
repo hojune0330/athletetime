@@ -30,7 +30,6 @@ const http = require('http');
 const path = require('path');
 const { requestLogPath } = require('./requestLogPath');
 const { assertRecoveryCodeEnvironment } = require('../backend/auth/recoveryCodes');
-const { normalizePostListPagination } = require('../backend/utils/postListPagination');
 
 // 프로젝트 루트 (src/ 의 상위)
 const ROOT = path.join(__dirname, '..');
@@ -199,7 +198,7 @@ app.get(['/health', '/api/health'], async (req, res) => {
     mode: HAS_DATABASE ? 'production' : 'standalone',
     services: {
       cardStudio: 'active',
-      community: HAS_DATABASE ? 'active' : 'mock',
+      community: 'preparing',
       auth: 'active',
       database: HAS_DATABASE ? 'connected' : 'mock-memory',
       email: process.env.RESEND_API_KEY ? 'configured' : 'console-only',
@@ -268,54 +267,25 @@ app.use('/api/public-data', publicLimiter, publicDataRouter);
 // ============================================
 
 const categoriesRouter = require(path.join(ROOT, 'backend/routes/categories'));
-const marketplaceRouter = require(path.join(ROOT, 'backend/routes/marketplace'));
 
 app.use('/api/categories', categoriesRouter);
-app.use('/api/marketplace', requireReadOnlyLaunchFeature(), marketplaceRouter);
-
+// Community and marketplace stay unavailable until their member-safety rules are implemented.
+// Close reads too: a preparation screen must not have a bypass through its public API.
+app.use('/api/marketplace', rejectPreparingFeature);
+app.use('/api/posts', rejectPreparingFeature);
 app.use('/api/chat', rejectPreparingFeature);
 
 if (HAS_DATABASE) {
-  const postsRouter = require(path.join(ROOT, 'backend/routes/posts'));
-  const commentsRouter = require(path.join(ROOT, 'backend/routes/comments'));
-  const votesRouter = require(path.join(ROOT, 'backend/routes/votes'));
-  const pollsRouter = require(path.join(ROOT, 'backend/routes/polls'));
   const competitionsRouter = require(path.join(ROOT, 'backend/routes/competitions'));
   const matchResultsRouter = require(path.join(ROOT, 'backend/routes/matchResults'));
   const uploadRouter = require(path.join(ROOT, 'backend/routes/upload'));
 
-  app.use('/api/posts', requireReadOnlyLaunchFeature(), postsRouter);
-  app.use('/api/posts/:postId/comments', requireReadOnlyLaunchFeature(), commentsRouter);
-  app.use('/api/posts/:postId/vote', requireReadOnlyLaunchFeature(), votesRouter);
-  app.use('/api/posts/:postId/poll', requireReadOnlyLaunchFeature(), pollsRouter);
   app.use('/api/competitions', requireReadOnlyLaunchFeature(), competitionsRouter);
   app.use('/api/match-results', requireReadOnlyLaunchFeature(), matchResultsRouter);
   app.use('/api/upload', rejectPreparingFeature);
-
-  console.log('  Community API: active (PostgreSQL)');
-} else {
-  // Standalone 모드: DB 미연결 — 커뮤니티 API 미활성
-  // 실제 데이터는 PostgreSQL 연결 시에만 제공
-  app.get('/api/posts', (req, res) => {
-    const { limit, page } = normalizePostListPagination(req.query);
-    res.json({
-      success: true,
-      posts: [],
-      count: 0,
-      page,
-      limit,
-    });
-  });
-
-  app.post('/api/posts', (req, res) => {
-    res.status(503).json({
-      success: false,
-      error: '커뮤니티 글쓰기는 데이터베이스 연결 후 사용할 수 있습니다.',
-    });
-  });
-
-  console.log('  Community API: public read routes active, write routes disabled (no DATABASE_URL configured)');
 }
+
+console.log('  Community API: closed until launch approval');
 
 // ============================================
 // 숏폼·트렌드·빠른 반응 API
