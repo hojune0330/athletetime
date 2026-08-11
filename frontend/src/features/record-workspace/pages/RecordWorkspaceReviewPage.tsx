@@ -5,6 +5,7 @@ import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceReviewContent } from '../components/WorkspaceReviewContent'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
+import { workspaceCreatedNavigation } from '../workspaceNavigation'
 
 export default function RecordWorkspaceReviewPage() {
   const navigate = useNavigate()
@@ -60,7 +61,7 @@ export default function RecordWorkspaceReviewPage() {
       return
     }
     store.clearWorkspaceDraft()
-    navigate(`/records/workspaces/${result.value.id}`)
+    navigate(`/records/workspaces/${result.value.id}`, workspaceCreatedNavigation)
   }
   const moveToComparison = () => {
     if (subjectKeys.length > 4) {
