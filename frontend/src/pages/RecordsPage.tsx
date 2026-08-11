@@ -18,7 +18,7 @@ import { resolveRecordDisplay } from '../lib/recordStatus';
 import { AnonymousInsightCards } from '../components/record-insights/AnonymousInsightCards';
 import { EstimatedSameAthleteCard } from '../components/record-insights/EstimatedSameAthleteCard';
 import { useRecordDetailPref, detailToggleLabel } from '../components/record-insights/useRecordDetailPref';
-import { useMyAthlete } from '../components/record-insights/useMyAthlete';
+import { MAX_MY_ATHLETE_ENTRIES, useMyAthlete } from '../components/record-insights/useMyAthlete';
 import { AthleteEventTrail } from '../components/record-insights/AthleteEventTrail';
 import { AthleteHighlightBadges } from '../components/record-insights/AthleteHighlightBadges';
 import { CompareTray } from '../components/record-insights/CompareTray';
@@ -28,7 +28,8 @@ import { useCompareTray } from '../components/record-insights/useCompareTray';
 import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
 import { RecordsHub } from '../components/records/RecordsHub';
 import { RecordSearchForm } from '../components/records/RecordSearchForm';
-import { RecordsMineFlow, normalizeMineStep, type MineStep } from '../components/records/RecordsMineFlow';
+import { RecordsMineFlow } from '../components/records/RecordsMineFlow';
+import { normalizeMineStep, type MineStep } from '../components/records/RecordsMineTypes';
 import { RecordDeviceDataControls } from '../components/records/RecordDeviceDataControls';
 import { TeamStatisticsResults } from '../components/records/TeamStatisticsResults';
 import { TeamCategoryFilter } from '../features/team-performance/TeamCategoryFilter';
@@ -80,7 +81,8 @@ export default function RecordsPage() {
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
   const teamCategory = parseTeamCategory(searchParams.get('category'));
-  const mineDraftKeys = parseKeyList(searchParams.get('mineDraft'));
+  const mineAvailableSlots = Math.max(0, MAX_MY_ATHLETE_ENTRIES - myEntries.length);
+  const mineDraftKeys = parseKeyList(searchParams.get('mineDraft')).slice(0, mineAvailableSlots);
   const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
   const deviceDraftCount = workspaceDraftKeys.length + (workspaceStore.selfClaimDraft?.subjectKeys.length ?? 0);
 
@@ -407,7 +409,7 @@ export default function RecordsPage() {
     const selected = new Set(mineDraftKeys);
     if (selected.has(athlete.athleteKey)) {
       selected.delete(athlete.athleteKey);
-    } else if (selected.size < 6) {
+    } else if (selected.size < mineAvailableSlots) {
       selected.add(athlete.athleteKey);
     }
     const nextKeys = Array.from(selected);

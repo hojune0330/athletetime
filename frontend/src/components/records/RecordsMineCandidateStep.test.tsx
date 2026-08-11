@@ -25,6 +25,7 @@ describe('record collection empty search state', () => {
         onResetSearch={() => undefined}
         onToggleDraft={() => undefined}
         selectedKeys={[]}
+        savedEntryCount={0}
         state="ready"
       />,
     )
@@ -42,6 +43,7 @@ describe('record collection empty search state', () => {
         onResetSearch={() => undefined}
         onToggleDraft={() => undefined}
         selectedKeys={selectionLimitCandidates.slice(0, 6).map((athlete) => athlete.athleteKey)}
+        savedEntryCount={0}
         state="ready"
       />,
     )
@@ -59,6 +61,7 @@ describe('record collection empty search state', () => {
         onResetSearch={() => undefined}
         onToggleDraft={() => undefined}
         selectedKeys={[selectionLimitCandidates[0].athleteKey]}
+        savedEntryCount={0}
         state="ready"
       />,
     )
@@ -75,6 +78,7 @@ describe('record collection empty search state', () => {
         onResetSearch={() => undefined}
         onToggleDraft={() => undefined}
         selectedKeys={[]}
+        savedEntryCount={0}
         state="ready"
       />,
     )
@@ -97,6 +101,7 @@ describe('record collection empty search state', () => {
         onResetSearch={() => undefined}
         onToggleDraft={() => undefined}
         selectedKeys={[]}
+        savedEntryCount={0}
         state="ready"
       />,
     )
@@ -104,5 +109,26 @@ describe('record collection empty search state', () => {
     // When the candidate row is rendered.
     // Then keyboard users receive the same clear selection boundary as touch users.
     expect(markup).toMatch(/<button(?=[^>]*aria-label="선수 1 기록 선택 안 됨")(?=[^>]*focus-visible:ring-2)[^>]*>/)
+  })
+
+  it('only allows the remaining record collection space when prior candidates are already saved', () => {
+    // Given: five candidates are already saved on this device.
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={selectionLimitCandidates.slice(0, 2)}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[selectionLimitCandidates[0].athleteKey]}
+        savedEntryCount={5}
+        state="ready"
+      />,
+    )
+
+    // When: the user selects the one remaining candidate slot.
+    // Then: the limit is explicit and further candidates cannot be silently dropped.
+    expect(markup).toContain('기록 모음 5명 · 지금 1명 더 선택 가능')
+    expect(markup).toContain('기록 모음은 총 6명까지예요.')
+    expect(markup).toContain('disabled=""')
   })
 })

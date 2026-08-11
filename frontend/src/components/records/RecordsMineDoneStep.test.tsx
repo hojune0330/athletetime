@@ -44,4 +44,30 @@ describe('record collection completion empty state', () => {
     expect(markup).toContain('선수 2');
     expect(markup).not.toContain('선수 기록 보기');
   });
+
+  it('does not offer another selection flow once the device collection reaches its limit', () => {
+    // Given: this device already holds the maximum six separate athlete candidates.
+    const entries = Array.from({ length: 6 }, (_, index) => ({
+      athleteKey: `candidate-${index + 1}`,
+      name: `선수 ${index + 1}`,
+      team: '테스트고',
+      savedAt: '2026-08-09T00:00:00.000Z',
+    }));
+    const markup = renderToStaticMarkup(
+      <MemoryRouter>
+        <DoneStep
+          entries={entries}
+          onAddMore={() => undefined}
+          onRemoveMyAthlete={() => undefined}
+          onSeasonForMine={() => undefined}
+        />
+      </MemoryRouter>,
+    );
+
+    // When: the completion screen opens.
+    // Then: it explains how to make space instead of leading to a silently capped action.
+    expect(markup).toContain('기록 모음은 6명까지예요.')
+    expect(markup).toContain('목록에서 먼저 한 명을 빼 주세요.')
+    expect(markup).not.toContain('후보 더 고르기')
+  });
 });

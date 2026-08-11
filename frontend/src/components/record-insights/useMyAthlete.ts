@@ -13,7 +13,7 @@ import { RECORD_DEVICE_DATA_CLEARED_EVENT } from '../../features/record-workspac
 
 const STORAGE_KEY = 'athletetime.my-athlete.v2';
 const LEGACY_STORAGE_KEY = 'athletetime.my-athlete.v1';
-const MAX_ENTRIES = 6;
+export const MAX_MY_ATHLETE_ENTRIES = 6;
 
 export type MyAthleteEntry = {
   athleteKey: string;
@@ -28,7 +28,7 @@ function sanitize(list: unknown): MyAthleteEntry[] {
     .filter((item): item is MyAthleteEntry =>
       Boolean(item && typeof (item as MyAthleteEntry).athleteKey === 'string' && (item as MyAthleteEntry).athleteKey),
     )
-    .slice(0, MAX_ENTRIES);
+    .slice(0, MAX_MY_ATHLETE_ENTRIES);
 }
 
 function readStored(): MyAthleteEntry[] {
@@ -54,7 +54,7 @@ function readStored(): MyAthleteEntry[] {
 
 function writeStored(entries: MyAthleteEntry[]) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_ENTRIES)));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, MAX_MY_ATHLETE_ENTRIES)));
   } catch {
     // storage 불가 환경에서도 세션 내에서는 동작
   }
@@ -79,7 +79,7 @@ export function useMyAthlete() {
   const add = useCallback((athlete: { athleteKey: string; name: string; team: string }) => {
     setEntries((prev) => {
       if (prev.some((entry) => entry.athleteKey === athlete.athleteKey)) return prev;
-      const next = [...prev, { ...athlete, savedAt: new Date().toISOString() }].slice(0, MAX_ENTRIES);
+      const next = [...prev, { ...athlete, savedAt: new Date().toISOString() }].slice(0, MAX_MY_ATHLETE_ENTRIES);
       writeStored(next);
       return next;
     });
@@ -94,7 +94,7 @@ export function useMyAthlete() {
         .filter((athlete) => athlete.athleteKey && !seen.has(athlete.athleteKey))
         .map((athlete) => ({ ...athlete, savedAt: now }));
       if (additions.length === 0) return prev;
-      const next = [...prev, ...additions].slice(0, MAX_ENTRIES);
+      const next = [...prev, ...additions].slice(0, MAX_MY_ATHLETE_ENTRIES);
       writeStored(next);
       return next;
     });
@@ -115,7 +115,7 @@ export function useMyAthlete() {
       const exists = prev.some((entry) => entry.athleteKey === athlete.athleteKey);
       const next = exists
         ? prev.filter((entry) => entry.athleteKey !== athlete.athleteKey)
-        : [...prev, { ...athlete, savedAt: new Date().toISOString() }].slice(0, MAX_ENTRIES);
+        : [...prev, { ...athlete, savedAt: new Date().toISOString() }].slice(0, MAX_MY_ATHLETE_ENTRIES);
       writeStored(next);
       return next;
     });

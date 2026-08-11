@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../ui/button';
-import type { MyAthleteEntry } from '../record-insights/useMyAthlete';
+import { MAX_MY_ATHLETE_ENTRIES, type MyAthleteEntry } from '../record-insights/useMyAthlete';
 import { createRecordAthleteMineReturnState } from '../../features/record-workspace/recordAthleteNavigationState';
 
 export function DoneStep({
@@ -15,6 +15,7 @@ export function DoneStep({
   readonly onRemoveMyAthlete: (athleteKey: string) => void;
 }) {
   const hasEntries = entries.length > 0;
+  const canAddMore = entries.length < MAX_MY_ATHLETE_ENTRIES;
 
   return (
     <div className="space-y-4" data-records-step="mine-done">
@@ -29,14 +30,20 @@ export function DoneStep({
       </div>
 
       {hasEntries ? (
-        <div className="grid gap-2 sm:grid-cols-2" data-records-sticky-cta="mine-done">
-          <Button type="button" onClick={onAddMore}>후보 더 고르기</Button>
+        <div className={`grid gap-2 ${canAddMore ? 'sm:grid-cols-2' : ''}`} data-records-sticky-cta="mine-done">
+          {canAddMore && <Button type="button" onClick={onAddMore}>후보 더 고르기</Button>}
           <Button type="button" variant="outline" onClick={onSeasonForMine}>시즌 기록표 보기</Button>
         </div>
       ) : (
         <div data-records-sticky-cta="mine-done">
           <Button type="button" onClick={onAddMore}>기록 담기</Button>
         </div>
+      )}
+
+      {hasEntries && !canAddMore && (
+        <p role="status" className="border border-line bg-surface-2 p-4 text-sm text-ink-3">
+          기록 모음은 {MAX_MY_ATHLETE_ENTRIES}명까지예요. 새 후보를 담으려면 목록에서 먼저 한 명을 빼 주세요.
+        </p>
       )}
 
       {hasEntries ? (

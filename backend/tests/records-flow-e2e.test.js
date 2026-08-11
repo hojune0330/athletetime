@@ -144,6 +144,17 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(await limitCandidateButtons.nth(6).isDisabled(), true, 'the seventh candidate is disabled at capacity');
     visited.push(page.url());
 
+    await page.locator('[data-records-sticky-cta="mine-candidates"] button').click();
+    await page.waitForURL(/step=confirm/);
+    await page.locator('[data-records-sticky-cta="mine-confirm"] button').last().click();
+    await page.waitForURL(/step=done/);
+    await expectVisible(page.getByText('기록 모음은 6명까지예요.', { exact: false }));
+    assert.equal(
+      await page.getByRole('button', { name: '후보 더 고르기', exact: true }).count(),
+      0,
+      'a full device collection explains how to make space instead of opening a silently capped selection flow',
+    );
+
     await navigateToReady(page, `${baseUrl}/records?flow=browse`, page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.locator('[data-records-flow="browse"]'));
     await expectVisible(page.getByRole('button', { name: /팀 성과 보기/ }));

@@ -1,12 +1,12 @@
 import type { AthleteSearchCard } from '../../api/recordAnalytics';
 import { Button } from '../ui/button';
+import { MAX_MY_ATHLETE_ENTRIES } from '../record-insights/useMyAthlete';
 import { CandidateContextFacts } from './CandidateContextFacts';
 import type { RecordsLoadState } from './RecordsMineTypes';
 
-const MAX_MINE_SELECTION = 6;
-
 export function CandidateStep({
   athletes,
+  savedEntryCount,
   state,
   selectedKeys,
   onResetSearch,
@@ -14,6 +14,7 @@ export function CandidateStep({
   onNext,
 }: {
   readonly athletes: readonly AthleteSearchCard[];
+  readonly savedEntryCount: number;
   readonly state: RecordsLoadState;
   readonly selectedKeys: readonly string[];
   readonly onResetSearch: () => void;
@@ -22,7 +23,14 @@ export function CandidateStep({
 }) {
   const selectedCount = selectedKeys.length;
   const needsNewSearch = state === 'error' || (state === 'ready' && athletes.length === 0);
-  const selectionLimitReached = selectedCount >= MAX_MINE_SELECTION;
+  const selectableCount = Math.max(0, MAX_MY_ATHLETE_ENTRIES - savedEntryCount);
+  const selectionLimitReached = selectedCount >= selectableCount;
+  const selectionStatus = savedEntryCount === 0
+    ? `${selectedCount}명 선택됨 / 최대 ${MAX_MY_ATHLETE_ENTRIES}명`
+    : `기록 모음 ${savedEntryCount}명 · 지금 ${selectableCount}명 더 선택 가능`;
+  const selectionLimitNotice = savedEntryCount === 0
+    ? `한 번에 ${MAX_MY_ATHLETE_ENTRIES}명까지 함께 볼 수 있어요. 선택을 빼고 다시 골라주세요.`
+    : `기록 모음은 총 ${MAX_MY_ATHLETE_ENTRIES}명까지예요. 더 담으려면 4단계에서 기존 후보를 빼고 다시 골라주세요.`;
 
   return (
     <div className="flex min-h-[32rem] flex-col" data-records-step="mine-candidates">
@@ -34,11 +42,11 @@ export function CandidateStep({
         </p>
         <p className="mt-1 text-xs text-ink-4">선택해도 목록 위치는 바뀌지 않아요.</p>
         <p className="mt-2 text-sm font-medium text-ink" role="status" aria-live="polite">
-          {selectedCount}명 선택됨 / 최대 {MAX_MINE_SELECTION}명
+          {selectionStatus}
         </p>
         {selectionLimitReached && (
           <p className="mt-2 text-sm font-medium text-brand" role="status">
-            한 번에 6명까지 함께 볼 수 있어요. 선택을 빼고 다시 골라주세요.
+            {selectionLimitNotice}
           </p>
         )}
       </div>

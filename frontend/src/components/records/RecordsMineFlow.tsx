@@ -8,8 +8,6 @@ import { WizardFrame } from './RecordsMineFrame';
 import { NameStep } from './RecordsMineNameStep';
 import type { MineStep, RecordsLoadState } from './RecordsMineTypes';
 
-export type { MineStep } from './RecordsMineTypes';
-
 type RecordsMineFlowProps = {
   readonly step: MineStep;
   readonly query: string;
@@ -27,11 +25,6 @@ type RecordsMineFlowProps = {
   readonly onRemoveMyAthlete: (athleteKey: string) => void;
   readonly onSeasonForMine: () => void;
 };
-
-export function normalizeMineStep(value: string | null): MineStep {
-  if (value === 'candidates' || value === 'confirm' || value === 'done') return value;
-  return 'name';
-}
 
 export function RecordsMineFlow({
   step,
@@ -65,6 +58,7 @@ export function RecordsMineFlow({
         {step === 'candidates' && (
           <CandidateStep
             athletes={athletes}
+            savedEntryCount={myEntries.length}
             state={searchState}
             selectedKeys={selectedDraftKeys}
             onResetSearch={() => onGoToStep('name')}
