@@ -197,7 +197,7 @@ test('PACE-DS-006: chart surfaces keep the numeric-first visual language and in-
   assert.match(downloads, /role="alert"/, 'export failures stay in the page');
   assert.doesNotMatch(downloads, /\balert\(/, 'browser alerts do not interrupt export recovery');
   assert.doesNotMatch(downloads, /bg-gradient-to|font-awesome|fas /, 'export controls remove legacy decoration');
-  assert.match(paceChart, /PACE TABLE/, 'pace table has a compact technical label');
+  assert.match(paceChart, /DISTANCE TABLE/, 'distance table has a compact technical label');
   assert.match(targetChart, /TARGET TABLE/, 'target table has a compact technical label');
   assert.doesNotMatch(`${paceChart}\n${targetChart}`, /제작:\s*박호준|font-awesome|fas /, 'charts remove old creator and icon decoration');
 });
