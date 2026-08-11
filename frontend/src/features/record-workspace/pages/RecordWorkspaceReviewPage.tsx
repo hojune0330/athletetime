@@ -53,7 +53,10 @@ export default function RecordWorkspaceReviewPage() {
     const next = subjectKeys.filter((key) => key !== subjectKey)
     if (next.length === 0) {
       store.clearWorkspaceDraft()
-      navigate('/records')
+      navigate(workspaceResetToSearchNavigation.to, {
+        replace: workspaceResetToSearchNavigation.replace,
+        state: workspaceResetToSearchNavigation.state,
+      })
       return
     }
     const result = store.saveWorkspaceDraft(next)

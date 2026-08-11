@@ -71,6 +71,39 @@ test('RECORDS-WORKSPACE-RESET-E2E Given selected candidates When the user clears
   });
 });
 
+test('RECORDS-WORKSPACE-FINAL-SUBJECT-E2E Given one selected candidate When it is removed Then the draft clears and a fresh search replaces review', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('athletetime.recordWorkspaceDraft.v1', JSON.stringify({
+        version: 1,
+        subjectKeys: ['aaaaaaaaaaaaaaaa'],
+        updatedAt: '2026-08-12T00:00:00.000Z',
+      }));
+    });
+
+    await navigateToReady(
+      page,
+      `${baseUrl}/records/workspaces/new`,
+      page.getByRole('button', { name: '이 묶음에서 빼기', exact: true }),
+    );
+    const removeFinalSubject = page.getByRole('button', { name: '이 묶음에서 빼기', exact: true });
+    assert.equal(await removeFinalSubject.isEnabled(), true, 'the last selected candidate should remain removable');
+    await removeFinalSubject.click();
+
+    await page.waitForURL(/\/records\?flow=browse&browse=athlete$/u);
+    await expectVisible(page.locator('#records-search'));
+    assert.equal(
+      await page.evaluate(() => window.sessionStorage.getItem('athletetime.recordWorkspaceDraft.v1')),
+      null,
+    );
+    visited.push(page.url());
+  }, {
+    fileName: 'workspace-final-subject-e2e-results.json',
+    scenario: 'removing the final record workspace candidate returns to a cleared search',
+    invocation: 'node --test backend/tests/records-workspace-e2e.test.js',
+  });
+});
+
 test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens without an event Then its loaded records appear immediately', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript((savedWorkspaces) => {

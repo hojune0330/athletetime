@@ -36,7 +36,6 @@ export function WorkspaceSubjectList({
               className="min-h-11 shrink-0"
               type="button"
               variant="outline"
-              disabled={subjectKeys.length <= 1}
               onClick={() => onRemove(subject.athleteKey)}
             >
               이 묶음에서 빼기
@@ -53,7 +52,6 @@ export function WorkspaceSubjectList({
               className="min-h-11 shrink-0"
               type="button"
               variant="outline"
-              disabled={subjectKeys.length <= 1}
               onClick={() => onRemove(subjectKey)}
             >
               이 묶음에서 빼기
@@ -63,7 +61,7 @@ export function WorkspaceSubjectList({
       </ul>
       {subjectKeys.length <= 1 && (
         <p className="border-t border-line px-4 py-3 text-caption leading-5 text-ink-3">
-          마지막 선수는 모음을 유지하기 위해 남겨둬요.
+          마지막 선수를 빼면 이 묶음은 취소되고 새 검색으로 돌아가요.
         </p>
       )}
     </section>
