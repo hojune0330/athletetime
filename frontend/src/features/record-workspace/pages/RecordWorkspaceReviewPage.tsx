@@ -5,7 +5,7 @@ import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceReviewContent } from '../components/WorkspaceReviewContent'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
-import { workspaceCreatedNavigation } from '../workspaceNavigation'
+import { workspaceCreatedNavigation, workspaceResetToSearchNavigation } from '../workspaceNavigation'
 
 export default function RecordWorkspaceReviewPage() {
   const location = useLocation()
@@ -18,20 +18,27 @@ export default function RecordWorkspaceReviewPage() {
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const workspaceDraftQuery = readWorkspaceDraftQuery(location.state)
+  const clearSelectionAndSearch = () => {
+    store.clearWorkspaceDraft()
+    navigate(workspaceResetToSearchNavigation.to, {
+      replace: workspaceResetToSearchNavigation.replace,
+      state: workspaceResetToSearchNavigation.state,
+    })
+  }
 
   if (!draft || subjectKeys.length === 0) {
     return (
-      <ReviewShell>
+      <ReviewShell onClearSelection={clearSelectionAndSearch}>
         <WorkspaceRecoveryState kind="corrupt" onBack={() => navigate('/records')} />
       </ReviewShell>
     )
   }
   if (previewQuery.isPending && !previewQuery.preview) {
-    return <ReviewShell><WorkspaceRecoveryState kind="loading" /></ReviewShell>
+    return <ReviewShell onClearSelection={clearSelectionAndSearch}><WorkspaceRecoveryState kind="loading" /></ReviewShell>
   }
   if (previewQuery.isError || !previewQuery.preview) {
     return (
-      <ReviewShell>
+      <ReviewShell onClearSelection={clearSelectionAndSearch}>
         <WorkspaceRecoveryState
           kind="network"
           onBack={() => navigate('/records')}
@@ -65,13 +72,6 @@ export default function RecordWorkspaceReviewPage() {
     store.clearWorkspaceDraft()
     navigate(`/records/workspaces/${result.value.id}`, workspaceCreatedNavigation)
   }
-  const clearSelectionAndSearch = () => {
-    store.clearWorkspaceDraft()
-    navigate('/records?flow=browse&browse=athlete', {
-      replace: true,
-      state: { focusSearch: true },
-    })
-  }
   const continueSelection = () => {
     const params = new URLSearchParams({ flow: 'browse', browse: 'athlete' })
     if (workspaceDraftQuery) params.set('q', workspaceDraftQuery)
@@ -82,7 +82,7 @@ export default function RecordWorkspaceReviewPage() {
   }
 
   return (
-    <ReviewShell>
+    <ReviewShell onClearSelection={clearSelectionAndSearch}>
       <WorkspaceReviewContent
         busy={busy}
         notice={notice}
@@ -110,13 +110,19 @@ function readWorkspaceDraftQuery(state: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function ReviewShell({ children }: { readonly children: ReactNode }) {
+function ReviewShell({
+  children,
+  onClearSelection,
+}: {
+  readonly children: ReactNode
+  readonly onClearSelection: () => void
+}) {
   return (
     <div className="mx-auto w-full max-w-4xl space-y-4 pb-24">
       <div className="flex items-center justify-between gap-3">
-        <Link className="inline-flex min-h-11 items-center font-semibold text-brand" to="/records">
-          선택으로 돌아가기
-        </Link>
+        <button className="inline-flex min-h-11 items-center font-semibold text-brand" type="button" onClick={onClearSelection}>
+          선택을 비우고 새로 찾기
+        </button>
         <Link className="inline-flex min-h-11 items-center text-body-sm font-semibold text-brand" to="/records/workspaces">
           기록 모음 목록
         </Link>
