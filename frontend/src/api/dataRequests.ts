@@ -24,8 +24,6 @@ export interface DataRequestInput {
   affiliation?: string;
   competition?: string;
   event?: string;
-  recordKey?: string;
-  sourceId?: string;
   reason: string;
   contact?: string;
 }

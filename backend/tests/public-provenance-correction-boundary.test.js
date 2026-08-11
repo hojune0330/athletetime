@@ -116,3 +116,12 @@ test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a 
   assert.doesNotMatch(receipt, /\b(?:sourceId|recordKey|athleteName|affiliation|competition|event)\b/u);
   assert.match(receipt, /receipt\.ticketId/u);
 });
+
+test('CORRECTION-BOUNDARY-002 Given the browser prepares a public request When its input contract is inspected Then it cannot carry an internal record or source identifier', () => {
+  const client = readSource('frontend/src/api/dataRequests.ts');
+  const inputContract = client.match(/export interface DataRequestInput \{[\s\S]*?\n\}/u)?.[0] || '';
+
+  assert.match(inputContract, /athleteName: string;/u);
+  assert.match(inputContract, /reason: string;/u);
+  assert.doesNotMatch(inputContract, /\b(?:recordKey|sourceId)\b/u);
+});
