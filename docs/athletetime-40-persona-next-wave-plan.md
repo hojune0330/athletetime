@@ -101,6 +101,14 @@ failure, public-provenance, data-request sensitive-input, and closed-surface
 tests. It must run before any work that changes the related UI or API
 contracts.
 
+### 2026-08-12 runtime dependency check
+
+The production dependency audit completed with zero reported vulnerabilities
+for both the repository root and `frontend` package trees using
+`npm audit --omit=dev`. This is a dated check, not a permanent security
+guarantee: repeat it before each deployment and treat any production advisory
+as a repair task rather than a release exception.
+
 ### Wave A: Keep the core journey calm and recoverable
 
 Scope: reversible UI, routing, and test improvements only.
