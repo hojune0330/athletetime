@@ -31,7 +31,7 @@ const TrainingCalculatorPage: React.FC = () => {
     updateGender,
     updateProfile,
     updateCondition,
-    setDistance,
+    updateDistance,
     updateTime,
     calculate,
   } = useTrainingCalculator();
@@ -39,7 +39,7 @@ const TrainingCalculatorPage: React.FC = () => {
   const handleCalculate = () => {
     const result = calculate();
     
-    if (!result.success) {
+    if (result.kind === 'error') {
       if (result.errorType === 'gender') {
         genderSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else if (result.errorType === 'distance') {
@@ -100,7 +100,7 @@ const TrainingCalculatorPage: React.FC = () => {
         <PerformanceInput
           distance={distance}
           time={time}
-          onDistanceChange={setDistance}
+          onDistanceChange={updateDistance}
           onTimeChange={updateTime}
           distanceSelectRef={distanceSelectRef}
           timeInputRef={timeInputRef}

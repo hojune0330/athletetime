@@ -34,6 +34,12 @@ export interface TrainingResults {
   adjustmentNote: string;
 }
 
+type InputErrorType = 'gender' | 'distance' | 'time';
+
+type CalculationOutcome =
+  | { readonly kind: 'success' }
+  | { readonly kind: 'error'; readonly errorType: InputErrorType };
+
 const DEFAULT_PROFILE: UserProfile = {
   gender: null,
   ageGroup: 'senior',
@@ -58,45 +64,68 @@ export function useTrainingCalculator() {
 
   const updateGender = useCallback((gender: Gender) => {
     setProfile(prev => ({ ...prev, gender }));
+    setResults(null);
+    setError('');
   }, []);
 
   const updateProfile = useCallback(<K extends keyof UserProfile>(key: K, value: UserProfile[K]) => {
     setProfile(prev => ({ ...prev, [key]: value }));
+    setResults(null);
+    setError('');
   }, []);
 
   const updateCondition = useCallback((key: keyof Conditions, value: boolean) => {
     setConditions(prev => ({ ...prev, [key]: value }));
+    setResults(null);
+    setError('');
+  }, []);
+
+  const updateDistance = useCallback((value: string) => {
+    setDistance(value);
+    setResults(null);
+    setError('');
   }, []);
 
   const updateTime = useCallback(<K extends keyof TimeInput>(key: K, value: number) => {
     setTime(prev => ({ ...prev, [key]: value }));
+    setResults(null);
+    setError('');
   }, []);
 
-  const calculate = useCallback((): { success: boolean; errorType?: 'gender' | 'distance' | 'time' } => {
+  const calculate = useCallback((): CalculationOutcome => {
     setError('');
     
     // 유효성 검사
     if (!profile.gender) {
       setError('성별을 선택해주세요.');
-      return { success: false, errorType: 'gender' };
+      return { kind: 'error', errorType: 'gender' };
     }
     
-    if (!distance) {
+    if (!distance || !Number.isFinite(Number(distance)) || Number(distance) <= 0) {
       setError('종목을 선택해주세요.');
-      return { success: false, errorType: 'distance' };
+      return { kind: 'error', errorType: 'distance' };
     }
     
+    const isValidTime = Number.isInteger(time.hours)
+      && time.hours >= 0
+      && time.hours <= 23
+      && Number.isInteger(time.minutes)
+      && time.minutes >= 0
+      && time.minutes < 60
+      && Number.isFinite(time.seconds)
+      && time.seconds >= 0
+      && time.seconds < 60;
     const totalSeconds = time.hours * 3600 + time.minutes * 60 + time.seconds;
-    if (totalSeconds === 0) {
-      setError('기록을 입력해주세요.');
-      return { success: false, errorType: 'time' };
+    if (!isValidTime || totalSeconds <= 0) {
+      setError('기록을 다시 확인해주세요. 시는 0~23, 분과 초는 0~59 범위예요.');
+      return { kind: 'error', errorType: 'time' };
     }
 
     // 조정 계수 계산
     const adjustments = calculateAdjustments(profile, conditions);
     
     // VDOT 계산
-    const distanceMeters = parseFloat(distance);
+    const distanceMeters = Number(distance);
     const vdot = calculateVDOT(distanceMeters, totalSeconds);
     
     // 성별 보정 적용된 표시용 VDOT
@@ -122,7 +151,7 @@ export function useTrainingCalculator() {
       adjustmentNote: profile.gender === 'female' ? '여성 보정 적용됨' : '',
     });
 
-    return { success: true };
+    return { kind: 'success' };
   }, [profile, conditions, distance, time]);
 
   const reset = useCallback(() => {
@@ -146,7 +175,7 @@ export function useTrainingCalculator() {
     updateGender,
     updateProfile,
     updateCondition,
-    setDistance,
+    updateDistance,
     updateTime,
     calculate,
     reset,
