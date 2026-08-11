@@ -30,6 +30,7 @@ import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import { Button, buttonVariants } from '../components/ui/button';
 import { cn } from '../lib/utils';
+import { PaceRiseLoadingState } from './pacerise/PaceRiseLoadingState';
 
 // ============================================
 // 토큰 기반 색상 매핑 (하드컬러 제거)
@@ -733,7 +734,7 @@ export default function PaceRisePage() {
     return (
       <div className="min-h-screen bg-bg px-4 py-8">
         <div className="mx-auto max-w-6xl">
-          <LoadingState text="실업 대회 데이터 연결 중..." />
+          <PaceRiseLoadingState />
         </div>
       </div>
     );
