@@ -31,8 +31,10 @@ describe('workspace storage status notice', () => {
 
     // When the storage notice renders.
     // Then it names the reason, the loss boundary, and one safe recovery action.
-    expect(markup).toContain('기기 저장이 일시적으로 안 돼요')
+    expect(markup).toContain('이 기기에 저장한 기록 모음을 지금은 유지할 수 없어요')
     expect(markup).toContain(explanation)
+    expect(markup).toContain('이 기기에 저장한 기록 모음이 아니며')
+    expect(markup).toContain('임시 선택도 함께 사라질 수 있어요')
     expect(markup).toContain('새로 고치거나 브라우저를 닫으면 사라질 수 있어요.')
     expect(markup).toContain('기록 다시 찾기')
     expect(markup).toContain('href="/records"')

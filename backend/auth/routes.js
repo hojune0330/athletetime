@@ -14,6 +14,8 @@ const {
   forgotPasswordIpLimiter,
   loginAttemptLimiter,
   loginAttemptIpLimiter,
+  registrationLimiter,
+  registrationIpLimiter,
   resetCodeAttemptLimiter,
   resetCodeAttemptIpLimiter,
   verificationCodeAttemptIpLimiter,
@@ -345,7 +347,7 @@ router.post('/check-nickname', async (req, res) => {
  * POST /api/auth/register
  * 회원가입
  */
-router.post('/register', async (req, res) => {
+router.post('/register', registrationIpLimiter, registrationLimiter, async (req, res) => {
   const client = await db.getClient();
   let transactionOpen = false;
   try {

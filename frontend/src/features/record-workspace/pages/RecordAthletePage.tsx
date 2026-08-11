@@ -86,13 +86,21 @@ export default function RecordAthletePage() {
     const current = store.workspaceDraft?.subjectKeys ?? []
     const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
     if (next.kind === 'limit') {
-      setActionNotice(`한 모음에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
+      setActionNotice(`임시 선택에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
       return
     }
     const result = store.saveWorkspaceDraft(next.subjectKeys)
-    setActionNotice(result.ok
-      ? next.kind === 'already_added' ? '이미 이 선수가 기록 모음에 담겨 있어요.' : '이 선수를 기록 모음에 담았어요.'
-      : '이 기기에 기록 모음을 저장하지 못했어요.')
+    if (!result.ok) {
+      setActionNotice('임시 선택을 바꾸지 못했어요.')
+      return
+    }
+    if (result.persistence !== 'persistent') {
+      setActionNotice('이 선수는 임시 선택에만 담겼어요. 기기 저장이 막혀 이 기기에 저장한 기록 모음은 아직 만들지 않았어요. 이 화면을 닫거나 새로 고치면 사라질 수 있어요.')
+      return
+    }
+    setActionNotice(next.kind === 'already_added'
+      ? '이 선수는 현재 임시 선택에 이미 담겨 있어요.'
+      : '이 선수를 현재 임시 선택에 담았어요. 이 기기에 저장한 기록 모음은 다음 단계에서 만들 수 있어요.')
   }
   const findAnotherAthlete = () => {
     navigate(`/records?flow=browse&browse=athlete&q=${encodeURIComponent(subject.name)}`, {
@@ -133,7 +141,7 @@ export default function RecordAthletePage() {
           {sameNameCaution}
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="button" onClick={addToDraft}>이 선수 담기</Button>
+          <Button type="button" onClick={addToDraft}>이 선수 임시 선택하기</Button>
           <Button type="button" variant="outline" onClick={findAnotherAthlete}>다른 선수 찾기</Button>
           <Button type="button" variant="outline" onClick={shareRecord}>
             <ShareIcon className="h-4 w-4" aria-hidden="true" />
@@ -141,11 +149,11 @@ export default function RecordAthletePage() {
           </Button>
           {draftCount > 0 && (
             <Button asChild type="button" variant="outline">
-              <Link state={{ workspaceDraftQuery: subject.name }} to="/records/workspaces/new">선택한 선수 보기 · {draftCount}명</Link>
+              <Link state={{ workspaceDraftQuery: subject.name }} to="/records/workspaces/new">임시 선택한 선수 보기 · {draftCount}명</Link>
             </Button>
           )}
           <Button asChild type="button" variant="ghost">
-            <Link to="/records/workspaces">기록 모음 목록</Link>
+            <Link to="/records/workspaces">이 기기에 저장한 기록 모음 목록</Link>
           </Button>
         </div>
         {actionNotice && <p className="mt-3 text-body-sm text-ink-3" role="status">{actionNotice}</p>}

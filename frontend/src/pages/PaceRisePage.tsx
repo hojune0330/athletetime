@@ -11,7 +11,7 @@
  *         인라인 style 제거, any 제거, 공용 Badge/Skeleton 사용, 스퀘어 코너(4px).
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   getPrCompetitions,
@@ -31,6 +31,11 @@ import { Skeleton } from '../components/ui/skeleton';
 import { Button, buttonVariants } from '../components/ui/button';
 import { cn } from '../lib/utils';
 import { PaceRiseLoadingState } from './pacerise/PaceRiseLoadingState';
+import {
+  createPaceRiseSearchParams,
+  resolvePaceRiseUrl,
+  type PaceRiseTab,
+} from './pacerise/paceriseUrlState';
 
 // ============================================
 // 토큰 기반 색상 매핑 (하드컬러 제거)
@@ -666,9 +671,7 @@ function AthletesView({ competitionId }: { competitionId: number }) {
 // Main Page Component
 // ============================================
 
-type TabType = 'results' | 'schedule' | 'athletes';
-
-const TABS: { key: TabType; label: string; icon: string }[] = [
+const TABS: readonly { readonly key: PaceRiseTab; readonly label: string; readonly icon: string }[] = [
   { key: 'results', label: '경기 결과', icon: '🏅' },
   { key: 'schedule', label: '시간표', icon: '📋' },
   { key: 'athletes', label: '선수 명단', icon: '👥' },
@@ -677,14 +680,23 @@ const TABS: { key: TabType; label: string; icon: string }[] = [
 export default function PaceRisePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [competitions, setCompetitions] = useState<PrCompetition[]>([]);
-  const [selectedCompId, setSelectedCompId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('results');
   const [liveData, setLiveData] = useState<PrLiveCompetition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasStaleCompetitionNotice, setHasStaleCompetitionNotice] = useState(false);
+  const hasStartedInitialLoadRef = useRef(false);
+  const recoveredSearchRef = useRef<string | null>(null);
+  const resolvedUrl = resolvePaceRiseUrl(searchParams, competitions);
+  const selectedCompId = resolvedUrl.competitionId;
+  const activeTab = resolvedUrl.tab;
+  const currentSearch = searchParams.toString();
+  const canonicalSearch = resolvedUrl.canonicalSearch.toString();
 
   // Initial load
   useEffect(() => {
+    if (hasStartedInitialLoadRef.current) return;
+    hasStartedInitialLoadRef.current = true;
+
     (async () => {
       setLoading(true);
       try {
@@ -695,18 +707,6 @@ export default function PaceRisePage() {
         setCompetitions(compData.competitions);
         setLiveData(liveResult.competitions || []);
 
-        const paramId = searchParams.get('id');
-        if (paramId) {
-          setSelectedCompId(Number(paramId));
-        } else if (compData.competitions.length > 0) {
-          const active = compData.competitions.find(c => c.status === 'active');
-          setSelectedCompId(active ? active.id : compData.competitions[0].id);
-        }
-
-        const paramTab = searchParams.get('tab') as TabType;
-        if (paramTab && ['results', 'schedule', 'athletes'].includes(paramTab)) {
-          setActiveTab(paramTab);
-        }
       } catch (err: unknown) {
         setError(getErrorMessage(err, '데이터를 불러올 수 없습니다'));
       } finally {
@@ -716,15 +716,36 @@ export default function PaceRisePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!resolvedUrl.needsCanonicalUrl) {
+      if (recoveredSearchRef.current !== currentSearch) {
+        setHasStaleCompetitionNotice(false);
+      }
+      return;
+    }
+
+    if (resolvedUrl.hasStaleCompetitionLink) {
+      setHasStaleCompetitionNotice(true);
+      recoveredSearchRef.current = canonicalSearch;
+    } else {
+      setHasStaleCompetitionNotice(false);
+      recoveredSearchRef.current = null;
+    }
+
+    setSearchParams(new URLSearchParams(canonicalSearch), { replace: true });
+  }, [canonicalSearch, currentSearch, resolvedUrl.hasStaleCompetitionLink, resolvedUrl.needsCanonicalUrl, setSearchParams]);
+
   const handleSelectComp = (id: number) => {
-    setSelectedCompId(id);
-    setSearchParams({ id: String(id), tab: activeTab });
+    setHasStaleCompetitionNotice(false);
+    recoveredSearchRef.current = null;
+    setSearchParams(createPaceRiseSearchParams(searchParams, id, activeTab));
   };
 
-  const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
-    if (selectedCompId) {
-      setSearchParams({ id: String(selectedCompId), tab });
+  const handleTabChange = (tab: PaceRiseTab) => {
+    if (selectedCompId !== null) {
+      setHasStaleCompetitionNotice(false);
+      recoveredSearchRef.current = null;
+      setSearchParams(createPaceRiseSearchParams(searchParams, selectedCompId, tab));
     }
   };
 
@@ -806,6 +827,12 @@ export default function PaceRisePage() {
         {/* Live Section */}
         <LiveSection data={liveData} />
 
+        {hasStaleCompetitionNotice && (
+          <div role="status" aria-live="polite" className="mb-6 rounded-lg border border-warn/30 bg-warn/5 px-4 py-3 text-body-sm text-ink-2">
+            요청하신 대회를 찾을 수 없어 현재 선택 가능한 대회로 표시했어요.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
           {/* Sidebar - Competition list */}
           <div className="lg:col-span-1">
@@ -866,9 +893,9 @@ export default function PaceRisePage() {
                 </div>
 
                 {/* Tab content */}
-                {activeTab === 'results' && <ResultsView competitionId={selectedCompId!} />}
-                {activeTab === 'schedule' && <ScheduleView competitionId={selectedCompId!} />}
-                {activeTab === 'athletes' && <AthletesView competitionId={selectedCompId!} />}
+                {activeTab === 'results' && <ResultsView competitionId={selectedComp.id} />}
+                {activeTab === 'schedule' && <ScheduleView competitionId={selectedComp.id} />}
+                {activeTab === 'athletes' && <AthletesView competitionId={selectedComp.id} />}
               </>
             ) : (
               <div className="py-20 text-center">

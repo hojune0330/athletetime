@@ -198,12 +198,18 @@ function toPublicRecord(record) {
     windLegal: Boolean(record.windLegal),
     isComparable: Boolean(record.isComparable),
     note: cleanText(record.note, 120),
-    source: {
-      provider: cleanText(record.source?.provider, 80),
-      sourceType: cleanText(record.source?.sourceType, 80),
-      sourceUrl: cleanText(record.source?.sourceUrl, 300),
-      capturedAt: cleanText(record.source?.capturedAt, 40),
-    },
+    source: toPublicSource(record.source),
+  };
+}
+
+function toPublicSource(source = {}) {
+  const sourceLabel = cleanText(source.sourceLabel, 160);
+  return {
+    provider: cleanText(source.provider, 80),
+    sourceType: cleanText(source.sourceType, 80),
+    ...(sourceLabel ? { sourceLabel } : {}),
+    sourceUrl: cleanText(source.sourceUrl, 300),
+    capturedAt: cleanText(source.capturedAt, 40),
   };
 }
 

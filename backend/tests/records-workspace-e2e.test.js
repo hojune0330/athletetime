@@ -28,7 +28,7 @@ test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening s
     });
     assert.equal(blockedStorageResult, 'SecurityError');
     await expectVisible(page.locator('[data-workspace-storage-status="volatile"]'));
-    await expectVisible(page.getByRole('heading', { name: '기기 저장이 일시적으로 안 돼요' }));
+    await expectVisible(page.getByRole('heading', { name: '이 기기에 저장한 기록 모음을 지금은 유지할 수 없어요' }));
     await expectVisible(page.getByText('브라우저가 이 기기의 저장을 허용하지 않았어요.', { exact: true }));
     await page.getByRole('link', { name: '기록 다시 찾기', exact: true }).click();
     await page.waitForURL(/\/records$/u);

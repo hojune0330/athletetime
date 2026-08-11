@@ -17,6 +17,14 @@ const recoveryLinks = [
   { to: '/community', label: '커뮤니티', description: '기록과 훈련 이야기' },
 ]
 
+type RouterHistoryState = Readonly<{
+  idx: number
+}>
+
+function hasInAppHistoryEntry(state: unknown): state is RouterHistoryState {
+  return typeof state === 'object' && state !== null && 'idx' in state && typeof state.idx === 'number' && state.idx > 0
+}
+
 export default function NotFoundPage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -29,6 +37,14 @@ export default function NotFoundPage() {
       return
     }
     navigate('/records')
+  }
+
+  const handlePreviousScreen = () => {
+    if (hasInAppHistoryEntry(window.history.state)) {
+      navigate(-1)
+      return
+    }
+    navigate('/records', { replace: true })
   }
 
   return (
@@ -88,7 +104,7 @@ export default function NotFoundPage() {
           </Link>
           <button
             type="button"
-            onClick={() => window.history.back()}
+            onClick={handlePreviousScreen}
             className="rounded-sm px-4 py-2 text-sm font-medium text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
           >
             이전 화면으로

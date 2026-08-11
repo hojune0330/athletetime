@@ -180,7 +180,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
 
     await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.locator('[data-record-row]').first());
     await expectVisible(page.locator('[data-record-row]').first());
-    await expectVisible(page.getByRole('button', { name: '이 선수 담기', exact: true }));
+    await expectVisible(page.getByRole('button', { name: '이 선수 임시 선택하기', exact: true }));
     await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
     assert.equal(
       await page.getByRole('button', { name: '이 선수 후보 담기', exact: true }).count(),

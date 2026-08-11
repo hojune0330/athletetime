@@ -35,3 +35,51 @@ test('DATA-RIGHTS-REASON-003 Given a normal correction explanation When validati
   assert.equal(result.ok, true);
   assert.equal(result.request.reason, '2024년 대회 소속 표기가 현재와 달라 정정을 요청합니다.');
 });
+
+test('DATA-RIGHTS-PUBLIC-IDENTIFIER-001 Given a public request carrying an internal record or source identifier When validating Then it is rejected without echoing the identifier', () => {
+  const { validatePublicRequest } = require('../../card-studio/services/dataRequestValidation');
+  const maliciousIdentifier = 'SRC-INTERNAL-ONLY';
+
+  const result = validatePublicRequest({
+    type: 'deletion',
+    athleteName: '테스트 선수',
+    affiliation: '테스트고',
+    competition: '테스트 대회',
+    event: '100m',
+    sourceId: maliciousIdentifier,
+    recordKey: 'rk_attacker_supplied',
+    reason: '공개 식별자 주입을 시도합니다.',
+  }, () => 'rk_derived');
+
+  assert.equal(result.ok, false);
+  assert.equal(result.error.includes(maliciousIdentifier), false);
+  assert.equal(result.error.includes('rk_attacker_supplied'), false);
+});
+
+test('DATA-RIGHTS-PUBLIC-IDENTIFIER-002 Given a public request with only visible context When submitting Then it derives its scope and stores no supplied source identifier', async () => {
+  const servicePath = '../../card-studio/services/dataRequestService';
+  const { MemoryDataRightsRepository } = require('../../card-studio/repositories/memoryDataRightsRepository');
+  delete require.cache[require.resolve(servicePath)];
+  const service = require(servicePath);
+  const repository = new MemoryDataRightsRepository();
+
+  try {
+    await service.initialize({ repository });
+    const receipt = await service.submitPublicRequest({
+      type: 'deletion',
+      athleteName: '테스트 선수',
+      affiliation: '테스트고',
+      competition: '테스트 대회',
+      event: '100m',
+      reason: '공개 문맥만으로 정정을 요청합니다.',
+    });
+
+    assert.equal(receipt.ok, true);
+    const [stored] = repository.requests;
+    assert.equal(stored.sourceId, '');
+    assert.match(stored.recordKey, /^rk_[a-f0-9]{64}$/u);
+  } finally {
+    await service.shutdown();
+    delete require.cache[require.resolve(servicePath)];
+  }
+});

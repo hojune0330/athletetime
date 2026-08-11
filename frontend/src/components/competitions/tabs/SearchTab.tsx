@@ -132,7 +132,7 @@ export function SearchTab({ searchParams, setSearchParams }: { searchParams: URL
           <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl p-4 mb-4 text-white flex items-center justify-between flex-wrap gap-3">
             <div>
               <div className="text-sm font-bold">🪪 프로필 카드를 만들어보세요!</div>
-              <div className="text-xs opacity-80 mt-0.5">검색된 기록으로 나만의 선수 프로필 카드를 제작할 수 있습니다</div>
+              <div className="text-xs opacity-80 mt-0.5">검색한 이름만 카드에 전달됩니다. 카드는 직접 입력한 정보로 시작합니다.</div>
             </div>
             <Link to={`/profile-card?name=${encodeURIComponent(searchResult.query)}`}
               className="px-4 py-2 bg-white text-primary-700 text-sm font-bold rounded-lg hover:bg-primary-50 transition-colors shrink-0">

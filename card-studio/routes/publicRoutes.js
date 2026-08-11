@@ -167,7 +167,7 @@ router.get('/data-policy', publicLimiter, (req, res) => {
 router.post('/data-requests', dataRequestLimiter, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   try {
-    const result = await dataRequestService.submitRequest(req.body || {});
+    const result = await dataRequestService.submitPublicRequest(req.body || {});
     if (!result.ok) return res.status(400).json({ success: false, error: result.error });
     return res.status(201).json({
       success: true,

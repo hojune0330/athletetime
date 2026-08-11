@@ -25,10 +25,10 @@ export function StorageStatusNotice({ status }: StorageStatusNoticeProps) {
       data-workspace-storage-status="volatile"
       role="status"
     >
-      <h2 className="text-body font-semibold text-ink">기기 저장이 일시적으로 안 돼요</h2>
+      <h2 className="text-body font-semibold text-ink">이 기기에 저장한 기록 모음을 지금은 유지할 수 없어요</h2>
       <p className="mt-1 text-body-sm leading-5 text-ink-2">{reasonCopy}</p>
       <p className="mt-1 text-body-sm leading-5 text-ink-2">
-        지금 만든 기록 모음은 이 화면에서만 유지돼요. 새로 고치거나 브라우저를 닫으면 사라질 수 있어요.
+        지금 만든 기록 모음은 이 화면에서만 유지돼요. 이 기기에 저장한 기록 모음이 아니며, 임시 선택도 함께 사라질 수 있어요. 새로 고치거나 브라우저를 닫으면 사라질 수 있어요.
       </p>
       <Link
         className="mt-3 inline-flex min-h-11 items-center font-semibold text-brand underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"

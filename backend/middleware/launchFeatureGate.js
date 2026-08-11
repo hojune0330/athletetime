@@ -54,7 +54,7 @@ function rejectPreparingFeature(_req, res) {
 }
 
 function rejectPreparingWebSocket(socket) {
-  socket.write('HTTP/1.1 503 Service Unavailable\r\nConnection: close\r\n\r\n');
+  socket.write('HTTP/1.1 503 Service Unavailable\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n');
   socket.destroy();
 }
 

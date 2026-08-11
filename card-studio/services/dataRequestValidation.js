@@ -1,6 +1,7 @@
 const REQUEST_TYPES = ['correction', 'deletion', 'objection'];
 const STATUSES = ['received', 'under_review', 'search_hidden', 'corrected', 'restored', 'removed'];
 const RESTRICTED_REASON_ERROR = '요청 사유에는 주민등록번호·전화번호·이메일을 적을 수 없습니다. 해당 내용은 지우고 다시 접수해 주세요.';
+const RESTRICTED_PUBLIC_IDENTIFIER_ERROR = '공개 요청에는 기록 또는 출처 식별 정보를 넣을 수 없습니다. 화면에 보이는 선수·소속·대회·종목 정보만 입력해 주세요.';
 
 const RESTRICTED_REASON_PERSONAL_DATA_PATTERNS = [
   /(?:^|[^\d])\d{6}[-\s]?[1-4]\d{6}(?:$|[^\d])/u,
@@ -45,10 +46,19 @@ function validateRequest(input, buildRecordKey) {
   return { ok: true, request };
 }
 
+function validatePublicRequest(input = {}, buildRecordKey) {
+  if (sanitize(input.recordKey, 200) || sanitize(input.sourceId, 200)) {
+    return { ok: false, error: RESTRICTED_PUBLIC_IDENTIFIER_ERROR };
+  }
+  return validateRequest(input, buildRecordKey);
+}
+
 module.exports = {
   REQUEST_TYPES,
   STATUSES,
   RESTRICTED_REASON_ERROR,
+  RESTRICTED_PUBLIC_IDENTIFIER_ERROR,
   sanitize,
   validateRequest,
+  validatePublicRequest,
 };

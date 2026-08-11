@@ -34,8 +34,8 @@ test('RECORDS-DEVICE-CLEAR-E2E Given one protected local record choice When clea
     const warning = page.getByRole('alert');
     await expectVisible(warning);
     assert.match(await warning.textContent() || '', /저장 기능이 막혀/u);
-    assert.match(await warning.textContent() || '', /이 기기와 브라우저에 선택이 남아 있을 수 있어요/u);
-    assert.equal(await page.getByText('이 기기의 기록 모음, 후보 선택, 비교 준비를 모두 지웠어요.', { exact: true }).count(), 0);
+    assert.match(await warning.textContent() || '', /이 기기에 저장한 기록 모음 또는 브라우저의 임시 선택이 남아 있을 수 있어요/u);
+    assert.equal(await page.getByText('이 기기의 선수 후보와 저장한 기록 모음, 비교를 위한 임시 선택, 진행 중인 임시 선택을 모두 지웠어요.', { exact: true }).count(), 0);
 
     const retryButton = page.getByRole('button', { name: '다시 정리하기', exact: true });
     await expectVisible(retryButton);

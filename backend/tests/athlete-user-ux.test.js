@@ -345,6 +345,37 @@ test('competition search keeps dense result scope compact and repeats same-name 
   assert.doesNotMatch(source, /searchResult\.competitions\.join\(', '\)/);
 });
 
+test('competition search profile-card CTA passes only the searched name and does not imply record import', () => {
+  // Given: two distinct public-result rows share the searched Korean name.
+  const sameNameCandidates = [
+    { name: '김민수', team: '서울고', event: '100m', rank: 1, record: '10.32', athleteId: 'athlete-a' },
+    { name: '김민수', team: '부산체고', event: '200m', rank: 4, record: '21.17', athleteId: 'athlete-b' },
+  ];
+  const searchedName = '김민수';
+  const source = readSource('frontend/src/components/competitions/tabs/SearchTab.tsx');
+  const ctaStart = source.indexOf('{/* 프로필 카드 CTA 배너 */}');
+  const ctaEnd = source.indexOf('{/* 종목별 섹션 */}', ctaStart);
+
+  assert.equal(sameNameCandidates.filter((candidate) => candidate.name === searchedName).length, 2);
+  assert.ok(ctaStart >= 0, 'CTA banner is present');
+  assert.ok(ctaEnd > ctaStart, 'CTA banner ends before the result sections');
+
+  // When: the CTA builds its profile-card destination from the search state.
+  const cta = source.slice(ctaStart, ctaEnd);
+  const hrefTemplate = cta.match(/to=\{`([^`]+)`\}/)?.[1] ?? '';
+  const href = hrefTemplate.replace('${encodeURIComponent(searchResult.query)}', encodeURIComponent(searchedName));
+  const destination = new URL(href, 'https://athletetime.test');
+
+  // Then: only the name is handed off; no ambiguous result row is claimed or imported.
+  assert.match(cta, /검색한 이름만 카드에 전달됩니다/);
+  assert.match(cta, /카드는 직접 입력한 정보로 시작합니다/);
+  assert.doesNotMatch(cta, /검색된 기록으로/);
+  assert.equal(hrefTemplate, '/profile-card?name=${encodeURIComponent(searchResult.query)}');
+  assert.deepEqual([...destination.searchParams.keys()], ['name']);
+  assert.equal(destination.searchParams.get('name'), searchedName);
+  assert.doesNotMatch(hrefTemplate, /(?:record|team|event|rank|source|athlete(?:Id|_id)|id)=/i);
+});
+
 test('competition results route blocks direct access to public-index-excluded files', () => {
   const source = readSource('card-studio/routes/publicRoutes.js') + readSource('card-studio/routes/resultEventsRoute.js');
 

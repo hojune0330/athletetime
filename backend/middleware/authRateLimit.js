@@ -83,6 +83,12 @@ const verificationCodeAttemptLimiter = createEmailRateLimiter({
   message: AUTH_RATE_LIMIT_MESSAGE,
 });
 
+const registrationLimiter = createEmailRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: AUTH_RATE_LIMIT_MESSAGE,
+});
+
 const forgotPasswordIpLimiter = createIpRateLimiter({
   windowMs: 60 * 60 * 1000,
   max: 20,
@@ -113,6 +119,12 @@ const verificationCodeAttemptIpLimiter = createIpRateLimiter({
   message: AUTH_RATE_LIMIT_MESSAGE,
 });
 
+const registrationIpLimiter = createIpRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  message: AUTH_RATE_LIMIT_MESSAGE,
+});
+
 module.exports = {
   createIpRateLimiter,
   createEmailRateLimiter,
@@ -120,6 +132,8 @@ module.exports = {
   forgotPasswordIpLimiter,
   loginAttemptLimiter,
   loginAttemptIpLimiter,
+  registrationLimiter,
+  registrationIpLimiter,
   resetCodeAttemptLimiter,
   resetCodeAttemptIpLimiter,
   verificationCodeAttemptIpLimiter,

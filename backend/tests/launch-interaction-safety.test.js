@@ -4,6 +4,11 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const test = require('node:test');
+const {
+  expectVisible,
+  navigateToReady,
+  withRecordsPage,
+} = require('./records-flow-e2e-fixture');
 
 const ROOT = path.resolve(__dirname, '../..');
 
@@ -37,6 +42,33 @@ function request(port, method, requestPath, body, contentType = 'application/jso
     });
     req.on('error', reject);
     req.end(payload);
+  });
+}
+
+function websocketHandshake(port) {
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      host: '127.0.0.1',
+      port,
+      path: '/ws/chat',
+      method: 'GET',
+      headers: {
+        Connection: 'Upgrade',
+        Upgrade: 'websocket',
+        'Sec-WebSocket-Version': '13',
+        'Sec-WebSocket-Key': 'dGhlIHNhbXBsZSBub25jZQ==',
+      },
+    });
+    req.on('response', (res) => {
+      res.resume();
+      resolve({ status: res.statusCode, headers: res.headers });
+    });
+    req.on('upgrade', (_res, socket) => {
+      socket.destroy();
+      reject(new Error('The public chat websocket must not upgrade while it is preparing.'));
+    });
+    req.on('error', reject);
+    req.end();
   });
 }
 
@@ -233,4 +265,97 @@ test('Given a production database When an operator looks for legacy scripts Then
   ]) {
     assert.equal(fs.existsSync(path.join(ROOT, retiredPath)), false, `${retiredPath} must stay removed`);
   }
+});
+
+test('Given preparation routes and public configuration When unfinished interactions are inspected Then they expose no public connection settings', () => {
+  const app = readSource('frontend/src/App.tsx');
+  const community = readSource('frontend/src/pages/CommunityPage.tsx');
+  const netlify = readSource('netlify.toml');
+  const frontendEnv = readSource('frontend/.env.example');
+
+  assert.match(app, /path="\/chat"[\s\S]*?FeaturePreparingPage title="오픈 채팅은 준비 중이에요"/);
+  assert.match(community, /title="커뮤니티는 준비 중이에요"/);
+  assert.doesNotMatch(app, /const ChatPage = lazy\(/);
+  assert.doesNotMatch(community, /CommunityQuickPostForm|CommunityImagePicker|api\/upload/);
+
+  for (const publicConfig of [netlify, frontendEnv]) {
+    assert.doesNotMatch(publicConfig, /\bVITE_WS_URL\b/);
+    assert.doesNotMatch(publicConfig, /\bVITE_(?:PRIVATE|PERSONAL)_(?:NOTE|NOTES|PHOTO|PHOTOS|STORAGE)\b/i);
+  }
+});
+
+test('Given no approved private vault When personal notes and photos are inspected Then they cannot reuse the public upload route', () => {
+  const app = readSource('frontend/src/App.tsx');
+  const profileCard = readSource('frontend/src/pages/ProfileCardStudio/index.tsx');
+  const uploadConsumers = [];
+
+  function collect(relativeDirectory) {
+    for (const entry of fs.readdirSync(path.join(ROOT, relativeDirectory), { withFileTypes: true })) {
+      const relativePath = path.join(relativeDirectory, entry.name);
+      if (entry.isDirectory()) {
+        collect(relativePath);
+      } else if (/\.(?:ts|tsx)$/.test(entry.name) && /(?:from\s+['"][^'"]*api\/upload|import\(['"][^'"]*api\/upload)/.test(readSource(relativePath))) {
+        uploadConsumers.push(relativePath.replace(/\\/g, '/'));
+      }
+    }
+  }
+
+  collect('frontend/src');
+
+  assert.deepEqual(uploadConsumers, ['frontend/src/pages/MarketplaceFormPage.tsx']);
+  assert.doesNotMatch(app, /MarketplaceFormPage/);
+  assert.doesNotMatch(app, /path="\/(?:private-notes|private-photos|personal-notes|personal-photos|notes|photos)"/);
+  assert.doesNotMatch(profileCard, /api\/upload/);
+  assert.match(profileCard, /서버로 보내지 않아요/);
+});
+
+test('Given direct chat and write transports When no request body or upload fixture is supplied Then every unfinished surface fails closed', async (t) => {
+  const { port, processRef } = startAuditServer(t);
+  await waitForServer(port, processRef);
+  const expected = { success: false, error: '이 기능은 준비 중이에요.' };
+
+  for (const [method, requestPath] of [
+    ['GET', '/api/chat/check-nickname'],
+    ['POST', '/api/chat/reports'],
+    ['POST', '/api/posts'],
+    ['POST', '/api/posts/1/comments'],
+    ['POST', '/api/posts/1/vote'],
+    ['POST', '/api/posts/1/poll'],
+    ['POST', '/api/marketplace'],
+    ['POST', '/api/upload/image'],
+    ['POST', '/api/competitions'],
+    ['POST', '/api/match-results'],
+    ['POST', '/api/reactions'],
+    ['POST', '/api/flash-polls/1/vote'],
+  ]) {
+    const response = await request(port, method, requestPath);
+    assert.equal(response.status, 503, `${method} ${requestPath} must stay closed`);
+    assert.match(response.headers['cache-control'] || '', /no-store/);
+    assert.deepEqual(response.body, expected);
+  }
+
+  const websocket = await websocketHandshake(port);
+  assert.equal(websocket.status, 503, 'the public chat websocket must stay closed');
+  assert.match(websocket.headers['cache-control'] || '', /no-store/, 'the closed websocket response must not be cacheable');
+});
+
+test('Given a guest on preparation routes When mobile and desktop widths are used Then recovery links replace interaction forms', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await navigateToReady(page, `${baseUrl}/community`, page.getByRole('heading', { name: '커뮤니티는 준비 중이에요', exact: true }));
+    await expectVisible(page.getByRole('link', { name: '기록 찾아보기', exact: true }));
+    await expectVisible(page.getByRole('link', { name: '대회 결과 보기', exact: true }));
+    assert.equal(await page.locator('textarea, input[type="file"]').count(), 0, 'the closed community page must not expose a post or photo form');
+    visited.push(page.url());
+
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await navigateToReady(page, `${baseUrl}/chat`, page.getByRole('heading', { name: '오픈 채팅은 준비 중이에요', exact: true }));
+    await expectVisible(page.getByText('안전한 운영 기준과 신고·검토 절차를 먼저 갖춘 뒤 열겠습니다.', { exact: true }));
+    assert.equal(await page.locator('textarea, input[type="file"]').count(), 0, 'the closed chat page must not expose a message or photo form');
+    visited.push(page.url());
+  }, {
+    fileName: 'closed-interaction-surfaces-e2e-results.json',
+    scenario: 'guest preparation surfaces at 390px mobile and desktop widths',
+    invocation: 'node --test backend/tests/launch-interaction-safety.test.js',
+  });
 });

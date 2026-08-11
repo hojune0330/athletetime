@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -55,30 +55,50 @@ function getLatestWorkspace(workspaces: readonly RecordWorkspace[]): RecordWorks
   );
 }
 
+type CurrentCompetitionsResponse = Awaited<ReturnType<typeof getCompetitionsCurrent>>;
+
+export type CurrentCompetitionsState =
+  | { readonly status: 'loading' }
+  | {
+    readonly status: 'ready';
+    readonly liveComps: readonly Competition[];
+    readonly nextComp: Competition | null;
+  }
+  | { readonly status: 'failed' };
+
+export async function loadCurrentCompetitions(
+  request: () => Promise<CurrentCompetitionsResponse> = getCompetitionsCurrent,
+): Promise<CurrentCompetitionsState> {
+  try {
+    const data = await request();
+    return { status: 'ready', liveComps: data.live, nextComp: data.next };
+  } catch {
+    return { status: 'failed' };
+  }
+}
+
 export default function MainPage() {
   const navigate = useNavigate();
   const { workspaces } = useRecordWorkspaceStore();
   const [query, setQuery] = useState('');
   const [shortcutIds, setShortcutIds] = useState<readonly string[]>(readShortcutIds);
-  const [liveComps, setLiveComps] = useState<readonly Competition[]>([]);
-  const [nextComp, setNextComp] = useState<Competition | null>(null);
+  const [currentCompetitionsState, setCurrentCompetitionsState] = useState<CurrentCompetitionsState>({ status: 'loading' });
+  const [currentCompetitionsRequest, setCurrentCompetitionsRequest] = useState(0);
+  const [isCurrentCompetitionsRetryPending, setIsCurrentCompetitionsRetryPending] = useState(false);
+  const currentCompetitionsRetryPendingRef = useRef(false);
 
   useEffect(() => {
     let active = true;
-    void getCompetitionsCurrent()
-      .then((data) => {
-        if (!active) return;
-        setLiveComps(data.live ?? []);
-        setNextComp(data.next ?? null);
-      })
-      .catch((error: unknown) => {
-        if (error instanceof Error) return;
-        throw error;
-      });
+    void loadCurrentCompetitions().then((state) => {
+      if (!active) return;
+      currentCompetitionsRetryPendingRef.current = false;
+      setIsCurrentCompetitionsRetryPending(false);
+      setCurrentCompetitionsState(state);
+    });
     return () => {
       active = false;
     };
-  }, []);
+  }, [currentCompetitionsRequest]);
 
   useEffect(() => {
     try {
@@ -89,8 +109,18 @@ export default function MainPage() {
     }
   }, [shortcutIds]);
 
+  const liveComps = currentCompetitionsState.status === 'ready' ? currentCompetitionsState.liveComps : [];
+  const nextComp = currentCompetitionsState.status === 'ready' ? currentCompetitionsState.nextComp : null;
   const featuredComps = (liveComps.length > 0 ? liveComps : nextComp === null ? [] : [nextComp]).slice(0, 3);
   const firstUseActions = buildFirstUseActions(getLatestWorkspace(workspaces));
+
+  const handleCurrentCompetitionsRetry = () => {
+    if (currentCompetitionsRetryPendingRef.current) return;
+
+    currentCompetitionsRetryPendingRef.current = true;
+    setIsCurrentCompetitionsRetryPending(true);
+    setCurrentCompetitionsRequest((request) => request + 1);
+  };
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -147,6 +177,18 @@ export default function MainPage() {
               </h2>
               <Link to="/competitions" className="text-body-sm font-medium text-ink-2 underline underline-offset-[3px] hover:text-ink">전체 일정</Link>
             </div>
+            {currentCompetitionsState.status === 'loading' ? (
+              <div className="px-5 py-8 text-body-sm text-ink-3" aria-live="polite">현재 대회 일정을 불러오는 중이에요.</div>
+            ) : currentCompetitionsState.status === 'failed' ? (
+              <div className="space-y-4 px-5 py-8 text-body-sm text-ink-3" role="alert" aria-live="polite">
+                <p>현재 대회 일정을 불러오지 못했어요. 잠시 후 다시 시도하거나 전체 일정을 확인해 주세요.</p>
+                <div className="flex items-center gap-3">
+                  <Button type="button" size="sm" variant="outline" disabled={isCurrentCompetitionsRetryPending} onClick={handleCurrentCompetitionsRetry}>다시 불러오기</Button>
+                  <Link to="/competitions" className="font-medium text-brand underline underline-offset-[3px] hover:text-brand-700">전체 일정 보기</Link>
+                </div>
+              </div>
+            ) : (
+              <>
             {featuredComps.length > 0 ? (
               <div className="divide-y divide-hair">
                 {featuredComps.map((competition) => (
@@ -170,6 +212,8 @@ export default function MainPage() {
               </div>
             ) : (
               <div className="px-5 py-8 text-body-sm text-ink-3">확인된 다음 대회가 아직 없어요. 전체 일정을 확인해 주세요.</div>
+            )}
+              </>
             )}
           </Card>
         </div>

@@ -15,6 +15,7 @@ const {
   REQUEST_TYPES,
   STATUSES,
   sanitize,
+  validatePublicRequest,
   validateRequest,
 } = require('./dataRequestValidation');
 const { findSuppressionMode, freezeSuppressions } = require('./dataSuppressionMatcher');
@@ -101,6 +102,15 @@ async function ensureRepository() {
 
 async function submitRequest(input = {}) {
   const validated = validateRequest(input, buildRecordKey);
+  return saveValidatedRequest(validated);
+}
+
+async function submitPublicRequest(input = {}) {
+  const validated = validatePublicRequest(input, buildRecordKey);
+  return saveValidatedRequest(validated);
+}
+
+async function saveValidatedRequest(validated) {
   if (!validated.ok) return validated;
 
   const storage = await ensureRepository();
@@ -262,5 +272,6 @@ module.exports = {
   refreshSuppressions,
   shutdown,
   submitRequest,
+  submitPublicRequest,
   updateStatus,
 };

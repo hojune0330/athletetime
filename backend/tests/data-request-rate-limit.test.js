@@ -39,6 +39,8 @@ test('Given a data-rights submission route When its middleware is read Then only
   // Then a write uses its dedicated limiter and a status read remains generally readable.
   assert.match(source, /\{[^}]*dataRequestLimiter[^}]*\}\s*=\s*require\('\.\.\/middleware\/rateLimiter'\)/s);
   assert.match(source, /router\.post\('\/data-requests', dataRequestLimiter, async \(req, res\)/);
+  assert.match(source, /dataRequestService\.submitPublicRequest\(req\.body \|\| \{\}\)/);
+  assert.doesNotMatch(source, /dataRequestService\.submitRequest\(req\.body \|\| \{\}\)/);
   assert.match(source, /router\.get\('\/data-requests\/:ticketId', publicLimiter, async \(req, res\)/);
 });
 

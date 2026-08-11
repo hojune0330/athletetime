@@ -109,6 +109,44 @@ test('RECORDS-E2E-READINESS-CONTRACT Given no route locator When navigation star
   assert.equal(gotoCalled, false);
 });
 
+test('NOT-FOUND-RECOVERY-E2E Given a direct unknown URL When returning Then it opens records without leaving the app', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(
+      page,
+      `${baseUrl}/stale-route-%25?next=%2Fcommunity`,
+      page.getByRole('button', { name: '이전 화면으로', exact: true }),
+    );
+
+    assert.equal(await page.evaluate(() => window.history.state?.idx), 0, 'a direct route should not have an in-app back entry');
+    await page.getByRole('button', { name: '이전 화면으로', exact: true }).click();
+    await page.waitForURL(`${baseUrl}/records`, { timeout: 3_000 });
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+  }, {
+    fileName: 'not-found-recovery-e2e-results.json',
+    scenario: 'direct unknown route returns to records',
+    invocation: 'node --test backend/tests/records-recovery-e2e.test.js',
+  });
+});
+
+test('NOT-FOUND-RECOVERY-E2E Given an in-app records entry When returning from an unknown URL Then it goes back once', { timeout: 90_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(page, `${baseUrl}/records`, page.locator('[data-records-flow="hub"]'));
+    await page.evaluate(() => {
+      const previousState = window.history.state;
+      window.history.pushState({ ...previousState, idx: (previousState?.idx ?? 0) + 1 }, '', '/stale-route-%25');
+      window.dispatchEvent(new PopStateEvent('popstate', { state: window.history.state }));
+    });
+    await expectVisible(page.getByRole('button', { name: '이전 화면으로', exact: true }));
+
+    assert.equal(await page.evaluate(() => window.history.state?.idx), 1, 'the unknown route should retain one in-app entry');
+    await page.getByRole('button', { name: '이전 화면으로', exact: true }).click();
+    await page.waitForURL(`${baseUrl}/records`);
+    await expectVisible(page.locator('[data-records-flow="hub"]'));
+    visited.push(page.url());
+  });
+});
+
 test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When retrying Then the current query runs again', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     let requestCount = 0;

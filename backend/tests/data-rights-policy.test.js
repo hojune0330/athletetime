@@ -170,3 +170,22 @@ test('public data request status redacts contact and reason', async () => {
   assert.equal(body.includes('private@example.com'), false);
   assert.equal(body.includes('연락처 비공개 확인'), false);
 });
+
+test('public data requests reject supplied internal record and source identifiers before they can be stored', async () => {
+  const response = await request('POST', '/api/card-studio/data-requests', {
+    type: 'deletion',
+    athleteName: '테스트선수',
+    affiliation: '테스트고',
+    competition: '테스트 대회',
+    event: '100m',
+    recordKey: 'rk_attacker_supplied',
+    sourceId: 'SRC-INTERNAL-ONLY',
+    reason: '식별자 주입 차단 확인',
+  });
+
+  assert.equal(response.status, 400);
+  assert.equal(response.body.success, false);
+  assert.equal(response.body.error.includes('rk_attacker_supplied'), false);
+  assert.equal(response.body.error.includes('SRC-INTERNAL-ONLY'), false);
+  assert.equal(response.body.data, undefined);
+});
