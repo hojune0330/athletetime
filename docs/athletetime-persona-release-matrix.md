@@ -73,3 +73,47 @@ npm.cmd test
 4. Resolve D3 and D5 as separately reviewed operating changes, not as UI-only work.
 
 This order protects the core promise: find collected public athletics records clearly, correct them when needed, and avoid turning ambiguous data into claims about a person.
+
+## 2026-08-11 Review Consolidation
+
+The 30-case matrix remains the baseline: ten roles, each checked for first use,
+ambiguous data, and small-screen or recovery use. The latest hands-on review
+adds four release facts that change implementation order.
+
+### Safe to improve without a policy decision
+
+1. Keep refining public, read-only surfaces: direct search instructions, one
+   recovery action after a failed request, keyboard and touch navigation, and
+   numeric calculator output. These changes must not add identity fields,
+   retention, or new storage.
+2. Keep the calculator tables as in-page tools. Download or print failure must
+   remain visible in the page instead of a blocking browser dialog. Downloaded
+   output must contain only the calculation table, never a saved record
+   collection or account detail.
+3. Improve browser test readiness before treating a timeout as a product fault:
+   wait for the loading fallback to disappear, the route heading to exist, and
+   the initial API state to settle together. This distinguishes a lazy-route or
+   hot-reload timing race from a real page failure.
+
+### Stop conditions that require an owner decision
+
+| Gate | Why implementation must stop | Minimum evidence before release |
+| --- | --- | --- |
+| Team small-group rule | A season, event, or division slice can reveal a child or a single athlete. | Owner-set minimum group size, server-side suppression, and API plus UI regression tests. |
+| Team terminology | A numeric count can be mistaken for an official roster or medal table. | Approved wording and a proof that source range, last observed date, and exclusions are visible. |
+| Private note or photo | The current public upload route returns a public Cloudinary URL. Reusing it for private material is a privacy breach. | Separate account-bound storage, signed access, deletion and retention rules, and cross-account access tests. |
+| Data-rights migration | A deployed database that already recorded migration 007 can skip its replacement table after a later compatibility migration renames the legacy table. | Disposable PostgreSQL test covering the recorded-007 state, rollback proof, and a reviewed forward-only repair. |
+| Verified-member chat | Replacing anonymous sessions changes identity, moderation, reporting, and migration behavior. | Membership, moderation, retention, and migration contracts approved together. |
+
+### Current release posture
+
+- Public record search, separate same-name candidates, device-local record
+  collections, correction entry, team aggregate boundaries, and calculator
+  tools can continue to receive reversible UX fixes.
+- Do not merge or run the data-rights migration against production until the
+  recorded-007 migration scenario is proven. Passing static tests alone is not
+  sufficient because the current database integration suite is skipped without
+  a disposable `TEST_DATABASE_URL`.
+- Do not expose a private-note control as an active feature until the private
+  storage gate is completed. A disabled teaser is safer than collecting data
+  that the service is not prepared to protect.
