@@ -104,7 +104,8 @@ test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a 
   const receipt = readSource('frontend/src/pages/data-request/DataRequestReceipt.tsx');
 
   // When the client prepares the correction request and receipt surfaces.
-  const correctionFunctions = [workspaceTab, athleteTab].map((source) => source.match(/function correctionHref\([\s\S]*?\n\}\n/u)?.[0] || '');
+  const correctionFunctions = [workspaceTab, athleteTab]
+    .map((source) => source.match(/function correctionHref\([\s\S]*?\r?\n\}\r?\n/u)?.[0] || '');
 
   // Then no public URL, browser storage action, or receipt takes a record/source identifier forward.
   for (const correctionFunction of correctionFunctions) {
