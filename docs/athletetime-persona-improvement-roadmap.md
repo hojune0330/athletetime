@@ -47,10 +47,16 @@ page. Browser history is not a reliable login destination.
 
 ### P0: Keep false promises and unsafe public paths closed
 
+Completed in the current release:
+
+- The chat route, API, and websocket are closed together.
+- The dedicated athlete page now says `다른 선수 찾기` and opens a focused
+  candidate search. It does not save an incomplete comparison state.
+
 1. Keep the chat route, `/api/chat/*`, and `/ws/chat` closed together.
 2. Keep the chat websocket origin out of the production CSP and build settings.
-3. Do not say a comparison has started unless the next selection consumes the
-   stored first subject and reaches a real comparison view.
+3. Do not reintroduce comparison-start language unless the next selection
+   consumes the first subject and reaches a real comparison view.
 4. Do not enable row-level correction, hiding, or deletion until the request
    path preserves a narrow source record identifier end-to-end.
 

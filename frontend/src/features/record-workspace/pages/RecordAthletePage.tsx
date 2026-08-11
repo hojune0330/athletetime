@@ -6,7 +6,7 @@ import { AffiliationHistory } from '../components/AffiliationHistory'
 import { RecordCoverageReceipt } from '../components/RecordCoverageReceipt'
 import { RecordIdentityHeader } from '../components/RecordIdentityHeader'
 import { WORKSPACE_LIMITS } from '../model'
-import { addAthleteToWorkspaceDraft, buildAthleteComparisonSetup } from '../recordAthleteActions'
+import { addAthleteToWorkspaceDraft } from '../recordAthleteActions'
 import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { resolveRecordAthleteReturnPath } from '../recordAthleteNavigationState'
 import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
@@ -94,13 +94,7 @@ export default function RecordAthletePage() {
       ? next.kind === 'already_added' ? '이미 이 선수가 기록 모음에 담겨 있어요.' : '이 선수를 기록 모음에 담았어요.'
       : '이 기기에 기록 모음을 저장하지 못했어요.')
   }
-  const startComparison = () => {
-    const comparison = buildAthleteComparisonSetup(athleteKey, crypto.randomUUID(), new Date().toISOString())
-    const result = store.saveComparison(comparison)
-    if (!result.ok) {
-      setActionNotice('비교 준비를 저장하지 못했어요.')
-      return
-    }
+  const findAnotherAthlete = () => {
     navigate(`/records?flow=browse&browse=athlete&q=${encodeURIComponent(subject.name)}`, {
       state: { focusSearch: true },
     })
@@ -140,7 +134,7 @@ export default function RecordAthletePage() {
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
           <Button type="button" onClick={addToDraft}>이 선수 담기</Button>
-          <Button type="button" variant="outline" onClick={startComparison}>다른 선수와 비교</Button>
+          <Button type="button" variant="outline" onClick={findAnotherAthlete}>다른 선수 찾기</Button>
           <Button type="button" variant="outline" onClick={shareRecord}>
             <ShareIcon className="h-4 w-4" aria-hidden="true" />
             공유

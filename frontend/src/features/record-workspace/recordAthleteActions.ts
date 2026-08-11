@@ -22,21 +22,3 @@ export function addAthleteToWorkspaceDraft(
   if (subjectKeys.length >= maximum) return { kind: 'limit', subjectKeys }
   return { kind: 'updated', subjectKeys: [...subjectKeys, athleteKey] }
 }
-
-export function buildAthleteComparisonSetup(
-  athleteKey: string,
-  comparisonId: string,
-  updatedAt: string,
-) {
-  return {
-    id: comparisonId,
-    state: 'setup',
-    subjectKeys: [athleteKey],
-    returnContext: {
-      kind: 'athlete',
-      id: athleteKey,
-      focusToken: 'compare-action',
-    },
-    updatedAt,
-  }
-}

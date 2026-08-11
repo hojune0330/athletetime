@@ -23,7 +23,7 @@ test('Given athlete page contracts When the focused Vitest suite runs Then pagin
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
 
-test('Given the public athlete route When source contracts are scanned Then self ownership stays outside the page', () => {
+test('Given the public athlete route When source contracts are scanned Then self ownership and incomplete comparison setup stay outside the page', () => {
   // Given the app route and dedicated athlete page sources.
   const app = fs.readFileSync(path.join(FRONTEND, 'src/App.tsx'), 'utf8');
   const page = fs.readFileSync(
@@ -31,11 +31,11 @@ test('Given the public athlete route When source contracts are scanned Then self
     'utf8',
   );
 
-  // When route, comparison setup, and ownership language are inspected.
-  // Then the route is public, comparison starts with one subject, and no self card is injected.
+  // When route, search continuation, and ownership language are inspected.
+  // Then the route is public, incomplete comparison state is not stored, and no self card is injected.
   assert.match(app, /path="athletes\/:athleteKey"/);
-  assert.match(page, /saveComparison/);
   assert.match(page, /focusSearch:\s*true/);
+  assert.match(page, />\s*다른 선수 찾기\s*</);
   assert.match(page, /useSearchParams/);
   assert.match(page, /pageParams\.get\('event'\)/);
   assert.match(page, /pageParams\.get\('record'\)/);
@@ -47,6 +47,7 @@ test('Given the public athlete route When source contracts are scanned Then self
   assert.match(page, />\s*이 선수 담기\s*</);
   assert.ok((page.match(/focus-visible:ring-2/g) || []).length >= 2);
   assert.ok((page.match(/min-h-11/g) || []).length >= 2);
+  assert.doesNotMatch(page, /saveComparison|다른 선수와 비교/);
   assert.doesNotMatch(page, /이 선수 후보 담기/);
   assert.doesNotMatch(page, /내 기록|selfClaim|MyRecords|onToggleMine|isMine/);
 });
