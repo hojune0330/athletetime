@@ -59,17 +59,17 @@ const PaceCalculatorPage: React.FC = () => {
     <div>
       <div>
         <div className="no-print">
-          <PageHeader
-            title="페이스 계산기"
-            description="목표 기록으로 km·400m·100m 페이스를 바로 확인해요"
-          />
+            <PageHeader
+              title="페이스 계산기"
+              description="목표 기록으로 페이스를 바로 확인해요"
+            />
         </div>
 
         <div className="mb-4 border border-line bg-surface px-4 py-3 text-body-sm text-ink-2 sm:hidden no-print">
           표가 넓으면 좌우로 밀어서 확인하세요.
         </div>
 
-        <section className="mb-6 border border-line bg-surface p-4 md:p-6 no-print">
+        <section className="mb-6 hidden border border-line bg-surface p-4 md:block md:p-6 no-print">
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">
@@ -82,7 +82,7 @@ const PaceCalculatorPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2 md:grid-cols-3">
             {QUICK_ACTIONS.map((action) => (
               <button
                 key={action.tab}
@@ -105,25 +105,26 @@ const PaceCalculatorPage: React.FC = () => {
         </section>
 
         <nav className="mb-6 no-print" role="tablist" aria-label="페이스 계산기 메뉴">
-          <div className="grid border border-line bg-surface sm:grid-cols-5">
+          <div className="grid grid-cols-5 border border-line bg-surface">
             {TABS.map((tab, index) => (
               <button
                 key={tab.id}
+                id={`tab-${tab.id}`}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-left transition-colors ${
-                  index > 0 ? 'border-t border-hair sm:border-l sm:border-t-0' : ''
+                className={`px-1.5 py-2.5 text-center transition-colors sm:px-4 sm:py-3 sm:text-left ${
+                  index > 0 ? 'border-l border-hair' : ''
                 } ${activeTab === tab.id ? 'bg-ink text-bg' : 'bg-surface text-ink hover:bg-surface-2'}`}
                 role="tab"
                 aria-selected={activeTab === tab.id}
                 aria-controls={`${tab.id}-content`}
               >
-                <span className={`block font-mono text-[9.5px] font-semibold uppercase tracking-widest-2 ${
+                <span className={`block font-mono text-[8px] font-semibold uppercase tracking-widest-1 sm:text-[9.5px] sm:tracking-widest-2 ${
                   activeTab === tab.id ? 'text-bg/65' : 'text-ink-4'
                 }`}>
                   {tab.eyebrow}
                 </span>
-                <span className="mt-1 block text-body-sm font-semibold">{tab.label}</span>
+                <span className="mt-1 block text-[10px] font-semibold leading-tight sm:text-body-sm">{tab.label}</span>
               </button>
             ))}
           </div>

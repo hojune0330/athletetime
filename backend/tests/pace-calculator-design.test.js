@@ -62,7 +62,7 @@ test('PACE-DS-003: pace page copy is direct and not a training-plan duplicate', 
   const target = readSource(`${PACE_DIR}/components/TargetPaceCalculator.tsx`);
 
   assert.match(index, /페이스 계산기/);
-  assert.match(index, /목표 기록으로 km·400m·100m 페이스를 바로 확인해요/);
+  assert.match(index, /목표 기록으로 페이스를 바로 확인해요/);
   assert.doesNotMatch(index, /훈련 계획 도구/);
   assert.doesNotMatch(index, /페이스 계산기 & 차트/);
   assert.match(target, /페이스 계산하기/);
@@ -147,5 +147,23 @@ test('PACE-UX-008: lane calculator rejects zero target time before lane math run
   assert.match(hook, /if \(!hasValidTargetTime\) return \[\]/, 'invalid lane time produces no lane data');
   assert.match(lane, /role="alert"/, 'invalid lane time receives an in-page explanation');
   assert.match(lane, /aria-label="400m 목표 시간 \(초\)"/, 'lane target-time input has an accessible label');
-  assert.match(lane, /!hasValidTargetTime/, 'the visual result area is gated by valid input');
+  assert.match(lane, /hasValidTargetTime && selectedLaneData/, 'the visual result area is gated by valid input and a computed lane');
+});
+
+test('PACE-DS-005: lane calculator keeps the current numeric-first calculator language', () => {
+  const lane = readSource(`${PACE_DIR}/components/TrackLaneCalculator.tsx`);
+
+  assert.match(lane, /TRACK LANE/, 'lane view has a compact technical label');
+  assert.match(lane, /MetricCell/, 'lane output uses the shared numeric strip');
+  assert.match(lane, /aria-pressed=\{selected\}/, 'lane selection exposes its state');
+  assert.doesNotMatch(lane, /bg-gradient-to|linearGradient|font-awesome|fas /, 'legacy decorative effects are removed');
+  assert.doesNotMatch(lane, /🏟️|🎯|🏃|🚀|⏱️|📏|📐|💡/, 'emoji decoration is removed');
+});
+
+test('PACE-UX-009: calculator tabs stay compact on mobile and identify their panels', () => {
+  const index = readSource(`${PACE_DIR}/index.tsx`);
+
+  assert.match(index, /hidden border border-line bg-surface p-4 md:block/, 'duplicate quick actions are hidden on small screens');
+  assert.match(index, /grid grid-cols-5 border border-line bg-surface/, 'five calculator tabs stay in one mobile row');
+  assert.match(index, /id=\{`tab-\$\{tab\.id\}`\}/, 'tab panel labels point to real tab ids');
 });
