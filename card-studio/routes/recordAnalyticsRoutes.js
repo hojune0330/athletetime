@@ -58,7 +58,7 @@ router.get('/insights', publicLimiter, (req, res) => {
 
 router.get('/data-quality', publicLimiter, (req, res) => {
   try {
-    res.json({ success: true, data: dataQualityService.getDataQualityReport() });
+    res.json({ success: true, data: toPublicDataQualitySummary(dataQualityService.getDataQualityReport()) });
   } catch {
     return internalAnalyticsError(res);
   }
@@ -224,6 +224,32 @@ function toPublicTeamSearchSummary(team) {
   };
 }
 
+function toPublicDataQualitySummary(report = {}) {
+  const totals = report.totals || {};
+  const summary = report.summary || {};
+
+  // Keep collection-health transparency without publishing internal file names,
+  // review samples, or identity-analysis details through a public endpoint.
+  return {
+    generatedAt: cleanQuery(report.generatedAt, 40),
+    scope: 'collected_public_results',
+    totals: {
+      competitions: nonNegativeInteger(totals.competitions),
+      events: nonNegativeInteger(totals.events),
+      resultRows: nonNegativeInteger(totals.resultRows),
+      resultSets: nonNegativeInteger(totals.resultSets),
+    },
+    summary: Object.fromEntries(
+      Object.entries(summary).map(([key, value]) => [cleanQuery(key, 80), nonNegativeInteger(value)])
+    ),
+  };
+}
+
+function nonNegativeInteger(value) {
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed >= 0 ? parsed : 0;
+}
+
 function cleanQuery(value, max) {
   return String(value || '')
     .trim()
@@ -252,3 +278,4 @@ function internalAnalyticsError(res, error = '기록 정보를 불러오지 못�
 }
 
 module.exports = router;
+module.exports.toPublicDataQualitySummary = toPublicDataQualitySummary;

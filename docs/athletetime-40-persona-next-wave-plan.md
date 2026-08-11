@@ -92,6 +92,9 @@ release regression contracts, not as future feature promises:
 - Public workspace provenance keeps a useful source label, source URL, and
   collection date while omitting internal source IDs, person numbers,
   birthdates, and raw external identifiers.
+- Public collection-health reporting exposes only aggregate counts and issue
+  categories. Raw review samples, internal file names, source identifiers,
+  and identity-analysis output remain server-only.
 - Preparation-only community, chat, marketplace, and upload paths are closed
   at the page, HTTP, and websocket boundaries. Their unavailable response is
   `503` with `Cache-Control: no-store`.
