@@ -272,9 +272,7 @@ const marketplaceRouter = require(path.join(ROOT, 'backend/routes/marketplace'))
 app.use('/api/categories', categoriesRouter);
 app.use('/api/marketplace', requireReadOnlyLaunchFeature(), marketplaceRouter);
 
-// 채팅「자유수다」— 익명 채팅 + 신고/운영자 큐 (Mock DB에서도 check-nickname·신고 접수 동작)
-const chatRouter = require(path.join(ROOT, 'backend/routes/chat'));
-app.use('/api/chat', chatRouter);
+app.use('/api/chat', rejectPreparingFeature);
 
 if (HAS_DATABASE) {
   const postsRouter = require(path.join(ROOT, 'backend/routes/posts'));
@@ -360,41 +358,17 @@ try {
   console.log('  WebSocket (Card Studio): skipped -', e.message);
 }
 
-// 채팅「자유수다」WebSocket (경로: /ws/chat — noServer 모드, 자기 경로만 처리)
-// wsManager(/ws — 카드스튜디오)와 공존한다: wsManager는 /ws 외 upgrade를 통과시키고,
-// 이 핸들러는 /ws/chat만 받아 채팅 WSS에 연결한다.
-try {
-  const { WebSocketServer } = require('ws');
-  const { setupWebSocket } = require(path.join(ROOT, 'backend/utils/websocket'));
-  const chatWss = new WebSocketServer({ noServer: true });
-  setupWebSocket(chatWss);
-  server.on('upgrade', (req, socket, head) => {
-    const pathname = (req.url || '').split('?')[0];
-    if (pathname === '/ws/chat') {
-      chatWss.handleUpgrade(req, socket, head, (ws) => {
-        chatWss.emit('connection', ws, req);
-      });
-      return;
-    }
-    if (pathname === '/ws') return;
-    socket.write('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n');
-    socket.destroy();
-  });
-  console.log('  WebSocket (Chat): active (/ws/chat)');
-} catch (e) {
-  // ws 의존성이 없거나 websocket.js 로드 실패 시 — 기존처럼 준비 중으로 닫는다.
-  console.log('  WebSocket (Chat): skipped -', e.message);
-  server.on('upgrade', (req, socket) => {
-    const pathname = (req.url || '').split('?')[0];
-    if (pathname === '/ws/chat') {
-      rejectPreparingWebSocket(socket);
-      return;
-    }
-    if (pathname === '/ws') return;
-    socket.write('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n');
-    socket.destroy();
-  });
-}
+server.on('upgrade', (req, socket) => {
+  const pathname = (req.url || '').split('?')[0];
+  if (pathname === '/ws/chat') {
+    rejectPreparingWebSocket(socket);
+    return;
+  }
+  if (pathname === '/ws') return;
+  socket.write('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n');
+  socket.destroy();
+});
+console.log('  WebSocket (Chat): preparing (public connection closed)');
 
 // ============================================
 // SPA Fallback (React Router — HTML5 History API)

@@ -49,6 +49,8 @@ test('frontend auth client uses cookie credentials and CSRF instead of auth loca
   assert.doesNotMatch(authContext, /if \(!token\)\s*\{/);
   assert.doesNotMatch(authApi, /logout\(refreshToken/);
   assert.doesNotMatch(authApi, /\b(?:accessToken|refreshToken)\?:/);
+  assert.match(registerPage, /<Link\s+to="\/login"/);
+  assert.doesNotMatch(registerPage, /sessionStorage\.setItem\('showLoginModal'/);
 });
 
 test('frontend treats an anonymous me response as a quiet unauthenticated state', () => {

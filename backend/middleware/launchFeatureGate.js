@@ -8,6 +8,7 @@ const UNAVAILABLE_INTERACTION_PREFIXES = [
   '/api/match-results',
   '/api/reactions',
   '/api/flash-polls',
+  '/api/chat',
 ];
 
 function sendPreparingResponse(res) {

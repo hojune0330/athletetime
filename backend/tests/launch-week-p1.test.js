@@ -39,7 +39,8 @@ test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out o
 
   assert.match(app, /import \{ Suspense, lazy, useEffect \} from 'react'/);
   assert.match(app, /const RecordsPage = lazy\(\(\) => import\('\.\/pages\/RecordsPage'\)\)/);
-  assert.match(app, /const ChatPage = lazy\(\(\) => import\('\.\/pages\/ChatPage'\)\)/);
+  assert.match(app, /오픈 채팅은 준비 중이에요/);
+  assert.equal(app.includes("const ChatPage = lazy(() => import('./pages/ChatPage'))"), false);
   assert.equal(app.includes("import ChatPage from './pages/ChatPage'"), false);
   assert.equal(app.includes("import MarketplacePage from './pages/MarketplacePage'"), false);
   assert.match(vite, /manualChunks\(id\)/);
@@ -70,7 +71,8 @@ test('P1-FIX-W4: Migration execution plan exists before migration code and cover
   assert.match(plan, /P2-SHARE-001/);
   assert.match(plan, /redirect map|리다이렉트 맵/);
   assert.match(plan, /legacy ws chat|레거시 ws 채팅/);
-  assert.match(plan, /VITE_WS_URL/);
+  assert.match(plan, /WebSocket Chat Integration \(deferred\)/);
+  assert.match(plan, /\/api\/chat\/\*.*503/);
   assert.match(plan, /검증[\s\S]*도메인 전환[\s\S]*레거시 백엔드 종료/);
   assert.match(plan, /rollback|롤백/i);
   for (const secretName of ['JWT_SECRET', 'ZERO_RESULT_SEARCH_SECRET', 'DATABASE_URL', 'Cloudinary']) {

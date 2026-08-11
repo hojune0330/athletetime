@@ -2,7 +2,7 @@
 
 > Status: execution plan only. No migration code before this document.
 > Source decision: `docs/athletetime-deployment-target.md` section 4.
-> Goal: move the production service from the legacy `athletetime` stack to the new unified AthleteTime service without losing community data, shared links, chat continuity, or production secrets discipline.
+> Goal: move the production service from the legacy `athletetime` stack to the new unified AthleteTime service without losing approved records, shared links, or production secrets discipline. Community and chat remain closed preparation surfaces.
 
 ## 1. Legacy PostgreSQL Data Mapping
 
@@ -43,24 +43,22 @@ Verification:
 2. Add redirect rules in the production hosting layer or Express fallback.
 3. Test at least 20 representative old links before and after domain switch.
 
-## 3. WebSocket Chat Integration
+## 3. WebSocket Chat Integration (deferred)
 
-Legacy ws chat uses `ws`. The new production shape is a unified Express server that serves frontend and API from the same origin.
+The legacy ws chat implementation uses `ws`. Public chat is currently deferred because the previous
+browser-provided identity and report keys are not safe for production.
 
 Transition plan:
 
-1. Preserve the legacy room names: `main`, `training`, `race`, `injury`.
-2. Move the legacy ws chat handler into the new Express server startup path.
-3. Configure `frontend/src/pages/ChatPage/hooks/useWebSocket.ts` through `VITE_WS_URL`.
-4. During staging, set `VITE_WS_URL` to the staging WebSocket endpoint.
-5. At production cutover, set `VITE_WS_URL` to the new production endpoint, or remove the override only after same-origin WebSocket is confirmed.
+1. Keep the legacy chat implementation out of the public release path.
+2. Keep `/api/chat/*` and `/ws/chat` closed until a separate, approved redesign.
+3. Do not configure a public chat WebSocket environment value.
 
 Verification:
 
-1. Browser opens `/chat`.
-2. WebSocket handshake returns 101.
-3. Two clients in the same room receive the same message.
-4. A client in another room does not receive the message.
+1. Browser opens the chat preparation page.
+2. Direct HTTP requests to `/api/chat/*` return `503` with `no-store`.
+3. A direct `/ws/chat` handshake returns `503`.
 
 ## 4. Deployment Transition And Rollback
 
@@ -71,7 +69,7 @@ Korean operator shorthand: 검증 → 도메인 전환 → 레거시 백엔드 �
 1. Pre-switch verification
    - Deploy the new service to a staging Render service.
    - Attach a staging database loaded from the legacy PostgreSQL snapshot.
-   - Verify auth, records search, community read/write, marketplace read/write, chat, data-request, and operator guide.
+   - Verify auth, records search, the community·marketplace·chat preparation pages, data-request, and operator guide.
    - Confirm zero-result analytics uses `ZERO_RESULT_SEARCH_SECRET`.
 2. Domain switch
    - Point production frontend/domain traffic to the new service only after staging checks pass.
@@ -85,8 +83,7 @@ Rollback:
 
 1. Restore domain routing to the legacy Netlify/Render service.
 2. Stop write traffic to the new database if data divergence is suspected.
-3. Export any new community writes made during the failed window.
-4. Reconcile those writes into legacy PostgreSQL or rerun the migration plan after fixing the blocker.
+3. Keep the closed community, marketplace, and chat write surfaces closed through the rollback window.
 
 ## 5. Production Secrets Migration
 
@@ -104,7 +101,6 @@ Required secret inventory:
 | `CLOUDINARY_API_SECRET` | Cloudinary signing | secret manager only |
 | `EMAIL_USER` / `EMAIL_PASS` | password reset and verification email | verify outbound email before cutover |
 | `VITE_API_BASE_URL` | frontend API base | should be empty for same-origin unified server |
-| `VITE_WS_URL` | chat WebSocket endpoint | staging first, production after 101 handshake test |
 | `PACERISE_API_KEY` or equivalent PaceRise secret | PaceRise result integration | keep server-side if used |
 
 Verification:
@@ -120,7 +116,7 @@ Go only when all are true:
 - Legacy PostgreSQL snapshot count matches staging import counts.
 - Shared redirect map covers the known old URL families.
 - `/records`, `/competitions`, `/profile-card`, `/community`, `/chat`, `/marketplace`, `/data-request`, and `/admin/operator-guide` pass smoke checks.
-- WebSocket chat works with `VITE_WS_URL`.
+- Chat preparation returns `503` for direct HTTP and WebSocket access.
 - Rollback route is documented and still available.
 - Owner approves the final switch.
 
@@ -128,6 +124,6 @@ No-Go if any are true:
 
 - Unknown data loss in posts, comments, or market data.
 - Shared links fall into raw 404 without record-search recovery.
-- Chat handshake fails.
+- Chat handshake unexpectedly opens.
 - Secrets are missing or visible in repository/build output.
 - New production writes cannot be separated for rollback.

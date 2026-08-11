@@ -60,7 +60,7 @@ These need more design, data, or security work before production:
 - Admin-only zero-result analytics dashboard.
 - Shared URL redirect map expansion after real traffic URL samples are available.
 - Community/marketplace legacy data migration from production PostgreSQL.
-- Same-origin WebSocket consolidation and `VITE_WS_URL` cutover.
+- Public chat activation or WebSocket cutover before its separate safety gate is approved.
 
 ## 5. Internal Only
 

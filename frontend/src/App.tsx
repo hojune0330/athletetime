@@ -15,7 +15,6 @@ const MainPage = lazy(() => import('./pages/MainPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
 const PaceCalculatorPage = lazy(() => import('./pages/PaceCalculatorPage'))
 const TrainingCalculatorPage = lazy(() => import('./pages/TrainingCalculatorPage'))
-const ChatPage = lazy(() => import('./pages/ChatPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const RegisterPage = lazy(() => import('./pages/RegisterPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
@@ -137,9 +136,8 @@ function App() {
               <Route index element={lazyPage(<TrainingCalculatorPage />)} />
             </Route>
 
-            {/* 채팅 페이지 */}
             <Route path="/chat" element={<Layout />}>
-              <Route index element={lazyPage(<ChatPage />)} />
+              <Route index element={<FeaturePreparingPage title="오픈 채팅은 준비 중이에요" description="기록과 대회 결과는 지금 바로 확인할 수 있어요." />} />
             </Route>
 
             {/* 커뮤니티 페이지 */}

@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { BusySpinner } from '@/components/ui/loading-state';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import * as authApi from '../api/auth';
 
@@ -456,17 +456,12 @@ export default function RegisterPage() {
             <div className="mt-6 text-center">
               <p className="text-neutral-600 text-sm">
                 이미 계정이 있으신가요?{' '}
-                <button
-                  onClick={() => {
-                    // sessionStorage에 로그인 모달 트리거 플래그 설정
-                    sessionStorage.setItem('showLoginModal', 'true');
-                    // 히스토리 백
-                    navigate(-1);
-                  }}
+                <Link
+                  to="/login"
                   className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
                 >
                   로그인하기 →
-                </button>
+                </Link>
               </p>
             </div>
           </div>

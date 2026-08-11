@@ -25,7 +25,7 @@ For each remediation pull request, use a current advisory source that can inspec
 | Work item | Scope | Decision and required check |
 | --- | --- | --- |
 | jsPDF 4 | frontend PDF export | Dedicated PR upgrades `jspdf` to `4.2.1`; verify chart capture, PDF download, Korean text, and generated-file opening. |
-| ws patch | backend chat transport | Update only `ws` to a current compatible patch; verify `/ws` and `/ws/chat`, malformed frames, disconnects, and room isolation. |
+| ws patch | backend transport | Update only `ws` to a current compatible patch; verify `/ws`, malformed frames, disconnects, and that dormant `/ws/chat` stays closed. |
 | Axios, React Router, PostCSS | frontend network, navigation, build | Keep one small runtime-refresh PR; verify auth cookie flow, 401/400 handling, upload/error handling, protected redirects, 404, and browser back/forward. |
 
 Completed on the baseline date:
@@ -64,7 +64,7 @@ These merged P0 changes still require ongoing production observation; completion
 ## 4. Current Boundaries
 
 - The frontend PDF export uses jsPDF through a dynamic import in `frontend/src/pages/PaceCalculatorPage/components/ChartDownloadButtons.tsx`.
-- The backend chat paths use `ws` and need production WebSocket QA after an update.
+- The backend card-studio path uses `ws`; dormant `/ws/chat` must remain closed after an update.
 - Spreadsheet parsing may handle downloaded or operator-provided files. Treat every file as untrusted until the P3 decision is complete.
 - Dependency fixes do not authorize changes to the frozen legacy collector, automated news collection, draft generation, approval, or publication.
 

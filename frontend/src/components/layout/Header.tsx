@@ -107,7 +107,7 @@ export default function Header() {
     { path: '/training-calculator', label: '훈련 계산기', note: '훈련 보조' },
     { path: '/marketplace', label: '중고 마켓', note: '준비 중' },
     { path: '/community', label: '커뮤니티', note: '준비 중' },
-    { path: '/chat', label: '오픈 채팅', note: '' },
+    { path: '/chat', label: '오픈 채팅', note: '준비 중' },
   ]
 
   // 모바일 드로어용 전체 목록(그룹 라벨로 구분 렌더)

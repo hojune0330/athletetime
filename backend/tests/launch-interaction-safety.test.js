@@ -112,6 +112,7 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     ['/api/posts', '{"title":"direct write","content":"must not persist"}', 'application/json'],
     ['/api/marketplace', '{"title":"direct listing","price":1000}', 'application/json'],
     ['/api/upload/image', '--audit-boundary\r\ncontent-disposition: form-data; name="image"\r\n\r\nbytes\r\n--audit-boundary--', 'multipart/form-data; boundary=audit-boundary'],
+    ['/api/chat/reports', '{"messageId":"1","reasonCode":"기타"}', 'application/json'],
   ];
 
   for (const [requestPath, payload, contentType] of writes) {
@@ -131,17 +132,17 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
   assert.equal((await request(port, 'GET', '/api/posts')).status, 200);
   assert.equal((await request(port, 'GET', '/api/marketplace')).status, 200);
   assert.notEqual((await request(port, 'GET', '/api/upload/image')).status, 503);
+  const chatRead = await request(port, 'GET', '/api/chat/check-nickname');
+  assert.equal(chatRead.status, 503);
+  assert.match(chatRead.headers['cache-control'] || '', /no-store/);
+  assert.deepEqual(chatRead.body, expected);
 });
 
-test('Given chat is live When a /ws/chat upgrade is requested Then server routes it to the chat WebSocketServer', () => {
+test('Given chat is preparing When a /ws/chat upgrade is requested Then the server rejects it', () => {
   const source = readSource('src/server.js');
 
-  // 활성 브랜치: /ws/chat → 채팅 WSS로 업그레이드
-  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*chatWss\.handleUpgrade\(req, socket, head/);
-  // 준비 모드 폴백(rejectPreparingWebSocket)은 ws 로드 실패 catch 브랜치에만 남는다 (활성보다 뒤)
-  const activeIdx = source.indexOf('chatWss.handleUpgrade(');
-  const fallbackIdx = source.indexOf('rejectPreparingWebSocket(socket)');
-  assert.ok(activeIdx > -1 && fallbackIdx > activeIdx, 'chat upgrade must activate before the preparing fallback');
+  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*rejectPreparingWebSocket\(socket\)/);
+  assert.doesNotMatch(source, /chatWss\.handleUpgrade\(/);
 });
 
 test('Given unreleased social interactions When a direct write request is sent Then it is rejected instead of returning fake success', () => {

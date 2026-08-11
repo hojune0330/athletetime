@@ -10,13 +10,11 @@ function readSource(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
 }
 
-test('DEPLOY-WS-001: chat upgrades are served by the dedicated /ws/chat websocket', () => {
+test('DEPLOY-WS-001: chat upgrades stay closed until the security redesign is complete', () => {
   const server = readSource('src/server.js');
 
-  assert.match(server, /chatWss\.handleUpgrade\(/);
-  assert.match(server, /setupWebSocket\(chatWss\)/);
-  // 준비 모드 폴백(rejectPreparingWebSocket)은 활성 핸들러보다 뒤(실패 시에만)에 위치해야 한다
-  assert.ok(server.indexOf('rejectPreparingWebSocket(socket)') > server.indexOf('chatWss.handleUpgrade('));
+  assert.match(server, /if \(pathname === '\/ws\/chat'\) \{\s*rejectPreparingWebSocket\(socket\)/);
+  assert.doesNotMatch(server, /chatWss\.handleUpgrade\(/);
 });
 
 test('DEPLOY-WS-002: card-studio websocket keeps its scoped no-server attachment', () => {
@@ -27,37 +25,37 @@ test('DEPLOY-WS-002: card-studio websocket keeps its scoped no-server attachment
   assert.match(wsManager, /!== '\/ws'/);
 });
 
-test('DEPLOY-WS-003: chat nickname API is served by the live chat router', () => {
+test('DEPLOY-WS-003: chat API is closed with the preparing gate', () => {
   const server = readSource('src/server.js');
 
-  assert.doesNotMatch(server, /app\.get\('\/api\/chat\/check-nickname', rejectPreparingFeature\)/);
-  assert.match(server, /app\.use\('\/api\/chat', chatRouter\)/);
+  assert.match(server, /app\.use\('\/api\/chat', rejectPreparingFeature\)/);
+  assert.doesNotMatch(server, /const chatRouter/);
 });
 
-test('DEPLOY-WS-004: the chat page wires the live websocket chat', () => {
-  const page = readSource('frontend/src/pages/ChatPage/index.tsx');
+test('DEPLOY-WS-004: the chat route renders the preparing surface', () => {
+  const app = readSource('frontend/src/App.tsx');
 
-  assert.doesNotMatch(page, /FeaturePreparingPage/);
-  assert.match(page, /useChat\(\)/);
-  assert.match(page, /MessageList/);
+  assert.match(app, /오픈 채팅은 준비 중이에요/);
+  assert.equal(app.includes("const ChatPage = lazy(() => import('./pages/ChatPage'))"), false);
 });
 
-test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build and no retired chat websocket endpoint', () => {
+test('DEPLOY-NETLIFY-001: Netlify uses the checked frontend build without a chat websocket endpoint', () => {
   const toml = readSource('netlify.toml');
 
   assert.match(toml, /publish = "community"/);
   assert.match(toml, /cd frontend && npm ci && npm run build:check/);
-  assert.match(toml, /VITE_WS_URL\s*=\s*"wss:\/\/athletetime-backend\.onrender\.com\/ws\/chat"/);
+  assert.doesNotMatch(toml, /VITE_WS_URL/);
   assert.match(toml, /\/api\/\*/);
 });
 
-test('DEPLOY-NETLIFY-002: production CSP permits the Render websocket origin', () => {
+test('DEPLOY-NETLIFY-002: production CSP does not permit the dormant chat websocket origin', () => {
   const toml = readSource('netlify.toml');
+  const envExample = readSource('frontend/.env.example');
+  const deploymentTarget = readSource('docs/athletetime-deployment-target.md');
 
-  assert.match(
-    toml,
-    /connect-src[^;]*wss:\/\/athletetime-backend\.onrender\.com/,
-  );
+  assert.doesNotMatch(toml, /wss:\/\/athletetime-backend\.onrender\.com/);
+  assert.doesNotMatch(envExample, /VITE_WS_URL/);
+  assert.match(deploymentTarget, /\/api\/chat\/\*.*\/ws\/chat.*503/);
 });
 
 test('DEPLOY-CI-001: every pull request runs the full repository verification gate', () => {
@@ -95,7 +93,7 @@ test('DEPLOY-RUNBOOK-001: data-rights readiness uses the direct backend URL requ
   assert.match(runbook, /npm run data:rights:readiness -- --base-url https:\/\/athletetime-backend\.onrender\.com/);
 });
 
-test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake upgrades to 101', async () => {
+test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake returns 503 while preparing', async () => {
   const { spawn } = require('node:child_process');
   const WebSocket = require(path.join(ROOT, 'node_modules', 'ws'));
 
@@ -137,23 +135,22 @@ test('DEPLOY-RUNTIME-001: a direct /ws/chat handshake upgrades to 101', async ()
       if (child.exitCode !== null) throw new Error(`server exited early: ${logs}`);
     }
 
-    const { client } = await new Promise((resolve, reject) => {
+    const status = await new Promise((resolve, reject) => {
       const client = new WebSocket(`ws://127.0.0.1:${port}/ws/chat`);
       const timer = setTimeout(() => reject(new Error('chat handshake timeout')), 5000);
       client.on('open', () => {
         clearTimeout(timer);
-        resolve({ client });
+        client.terminate();
+        reject(new Error('chat must remain unavailable'));
       });
       client.on('unexpected-response', (_request, response) => {
         clearTimeout(timer);
-        reject(new Error(`expected 101 got ${response.statusCode}`));
+        response.resume();
+        resolve(response.statusCode);
       });
       client.on('error', reject);
     });
-    assert.ok(true);
-    // 웹소켓 클라이언트를 닫아 서버가 keep-alive 홀드하지 않게 하고,
-    // 프로세스가 남는 것을 방지한다.
-    client.terminate();
+    assert.equal(status, 503);
   } finally {
     if (child.exitCode === null) {
       child.kill('SIGKILL');
