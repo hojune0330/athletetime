@@ -90,6 +90,17 @@ test('DEPLOY-HTTP-002: production does not serve the obsolete dashboard or its l
   assert.match(server, /res\.status\(503\)\.send\('서비스 화면을 준비하지 못했습니다\.'/);
 });
 
+test('DEPLOY-HTTP-003: public rate limits use Express-resolved addresses and document the multi-instance gate', () => {
+  const limiter = readSource('card-studio/middleware/rateLimiter.js');
+  const runbook = readSource('docs/athletetime-deployment-target.md');
+
+  assert.match(limiter, /function getClientIp\(/);
+  assert.match(limiter, /const trustedIp = typeof req\.ip === 'string'/);
+  assert.doesNotMatch(limiter, /req\.headers\[['"]x-forwarded-for['"]\]/i);
+  assert.match(runbook, /여러 인스턴스에는 승인된 CDN\/WAF 또는 공유\s*제한 저장소가 별도로 필요/u);
+  assert.match(runbook, /프록시 체인을 확인/u);
+});
+
 test('DEPLOY-RUNBOOK-001: data-rights readiness uses the direct backend URL required by the CLI', () => {
   const runbook = readSource('docs/athletetime-deployment-target.md');
 
