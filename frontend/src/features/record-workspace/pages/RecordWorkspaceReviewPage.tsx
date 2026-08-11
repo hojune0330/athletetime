@@ -63,22 +63,7 @@ export default function RecordWorkspaceReviewPage() {
     store.clearWorkspaceDraft()
     navigate(`/records/workspaces/${result.value.id}`, workspaceCreatedNavigation)
   }
-  const moveToComparison = () => {
-    if (subjectKeys.length > 4) {
-      const excessCount = subjectKeys.length - 4
-      setNotice(`선수 비교는 4명까지 가능해요. 선택에서 ${excessCount}명 빼고 다시 시도해 주세요.`)
-      return
-    }
-    const result = store.saveComparison({
-      id: crypto.randomUUID(),
-      state: 'setup',
-      subjectKeys,
-      updatedAt: new Date().toISOString(),
-    })
-    if (!result.ok) {
-      setNotice('비교 준비로 옮기지 못했어요.')
-      return
-    }
+  const returnToSelection = () => {
     navigate('/records?flow=browse&browse=athlete', { state: { focusSearch: true } })
   }
 
@@ -87,7 +72,7 @@ export default function RecordWorkspaceReviewPage() {
       <WorkspaceReviewContent
         busy={busy}
         notice={notice}
-        onCompare={moveToComparison}
+        onReturnToSelection={returnToSelection}
         onConfirm={confirmWorkspace}
         onRemoveSubject={removeSubject}
         onTitleChange={setTitle}

@@ -107,7 +107,7 @@ describe('record workspace pages', () => {
       <WorkspaceReviewContent
         busy={false}
         notice=""
-        onCompare={emptyAction}
+        onReturnToSelection={emptyAction}
         onConfirm={emptyAction}
         onRemoveSubject={emptyAction}
         onTitleChange={emptyAction}
@@ -123,13 +123,13 @@ describe('record workspace pages', () => {
     expect(markup).not.toContain('현 소속')
   })
 
-  it('blocks a mixed-name workspace and offers comparison instead', () => {
+  it('blocks a mixed-name workspace and returns to direct selection', () => {
     // Given two public profile fragments with different names.
     const markup = renderToStaticMarkup(
       <WorkspaceReviewContent
         busy={false}
         notice=""
-        onCompare={emptyAction}
+        onReturnToSelection={emptyAction}
         onConfirm={emptyAction}
         onRemoveSubject={emptyAction}
         onTitleChange={emptyAction}
@@ -139,10 +139,11 @@ describe('record workspace pages', () => {
       />,
     )
 
-    // Then save is absent and the comparison route is the only forward action.
+    // Then save is absent and the user is not promised an unfinished comparison view.
     expect(markup).toContain('한 기록 모음으로 저장할 수 없어요')
     expect(markup).not.toContain('한 사람의 기록 모음')
-    expect(markup).toContain('선수 비교로 옮기기')
+    expect(markup).toContain('다시 선택하기')
+    expect(markup).not.toContain('선수 비교로 옮기기')
     expect(markup).not.toContain('기록 모음 만들기')
   })
 
