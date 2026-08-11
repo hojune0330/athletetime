@@ -4,6 +4,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const { createRecordWorkspacePreviewService } = require('../../card-studio/services/recordWorkspacePreviewService');
+const recordAnalyticsService = require('../../card-studio/services/recordAnalyticsService');
 
 const ROOT = path.join(__dirname, '..', '..');
 
@@ -94,6 +95,21 @@ test('PUBLIC-PROVENANCE-001 Given a public record with a source receipt When the
   ]) {
     assert.equal(publicJson.includes(restrictedValue), false, `public preview must not disclose ${restrictedValue}`);
   }
+});
+
+test('PUBLIC-PROVENANCE-001A Given an indexed athlete row with an internal source id When a public athlete summary is built Then the internal id never crosses the profile boundary', () => {
+  const indexedAthlete = recordAnalyticsService.getIndex().athletes.find((athlete) => (
+    athlete.records.some((record) => record.source?.sourceId)
+  ));
+  assert.ok(indexedAthlete, 'the indexed fixture must contain a source id to prove the public boundary');
+
+  const profile = recordAnalyticsService.getAthleteSummary(indexedAthlete.athleteKey);
+  const profileJson = JSON.stringify(profile);
+  assert.ok(profile);
+  assert.equal(profileJson.includes('sourceId'), false);
+  assert.equal(profileJson.includes('person_no'), false);
+  assert.equal(profileJson.includes('birthDate'), false);
+  assert.equal(profileJson.includes('rawExternalId'), false);
 });
 
 test('CORRECTION-BOUNDARY-001 Given a visitor opens a correction request from a public record When the link is built Then it carries only typed intent and the visible name', () => {
