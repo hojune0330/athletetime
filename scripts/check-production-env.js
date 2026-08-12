@@ -29,6 +29,23 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+/**
+ * PostgreSQL 연결 문자열 형식 검증
+ * postgres://user:pass@host:port/db (또는 postgresql://) 형태.
+ * Render의 내부/외부 URL 모두 이 형식을 따른다.
+ */
+function isValidPostgresUrl(value) {
+  if (typeof value !== 'string' || value.trim().length === 0) return false;
+  try {
+    const url = new URL(value.trim());
+    const okScheme = url.protocol === 'postgres:' || url.protocol === 'postgresql:';
+    const okHost = !!url.hostname;
+    return okScheme && okHost;
+  } catch {
+    return false;
+  }
+}
+
 const REQUIRED_ENV = [
   {
     key: 'AUTH_CODE_PEPPER',
@@ -37,8 +54,8 @@ const REQUIRED_ENV = [
   },
   {
     key: 'DATABASE_URL',
-    validate: (v) => typeof v === 'string' && v.trim().length > 0,
-    message: 'DATABASE_URL (PostgreSQL 연결 문자열) — 미설정 시 backend/utils/db.js:28에서 즉시 exit 1.',
+    validate: isValidPostgresUrl,
+    message: 'DATABASE_URL (PostgreSQL 연결 문자열, 예: postgres://user:pass@host:5432/db) — 미설정/형식 오류 시 backend/utils/db.js:28에서 즉시 exit 1.',
   },
   {
     key: 'JWT_SECRET',
@@ -118,6 +135,25 @@ function main() {
     } else {
       console.log(`  ⚠️  [권장] ${item.key} — ${item.message}`);
     }
+  }
+
+  // Render PostgreSQL TLS 연결 옵션 검증
+  // - DATABASE_CA_CERT_BASE64가 있으면 CA 검증 모드 (rejectUnauthorized: true)
+  // - 없으면 Render는 RENDER=true + DATABASE_TLS_ALLOW_SELF_SIGNED=true 조합으로 자체서명 허용 (c6c8982)
+  //   두 조건 모두 없으면 DB TLS 연결은 기본값 rejectUnauthorized:true (Render 내부 DB는 이걸로 커넥션 실패 가능)
+  const hasDbCa = typeof env.DATABASE_CA_CERT_BASE64 === 'string' && env.DATABASE_CA_CERT_BASE64.trim().length > 0;
+  const renderTlsOk = env.RENDER === 'true' && env.DATABASE_TLS_ALLOW_SELF_SIGNED === 'true';
+  const tlsWarned = (!hasDbCa && !renderTlsOk) && !!env.DATABASE_URL;
+  if (hasDbCa) {
+    console.log('  ✅ [TLS] DATABASE_CA_CERT_BASE64 — CA 검증 모드 (rejectUnauthorized: true)');
+  } else if (renderTlsOk) {
+    console.log('  ✅ [TLS] RENDER + DATABASE_TLS_ALLOW_SELF_SIGNED — Render 내부 DB 자체서명 허용');
+  } else if (tlsWarned) {
+    console.log('  ⚠️  [TLS] DATABASE_CA_CERT_BASE64 없음 + (RENDER=true & DATABASE_TLS_ALLOW_SELF_SIGNED=true) 아님');
+    console.log('        → postgres-ssl.js가 rejectUnauthorized:true 기본값을 사용해');
+    console.log('          Render 내부(private) DB 주소면 TLS 핸드셰이크 실패로 연결이 막힐 수 있습니다.');
+    console.log('          해결: 대시보드 DB 탭의 CA 인증서를 DATABASE_CA_CERT_BASE64로 넣거나,');
+    console.log('          RENDER=true 와 DATABASE_TLS_ALLOW_SELF_SIGNED=true 를 함께 설정하세요.');
   }
 
   console.log('──────────────────────────────────────────────');
