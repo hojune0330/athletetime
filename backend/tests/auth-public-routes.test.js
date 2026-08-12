@@ -172,13 +172,13 @@ test('refresh rotates valid tokens and rejects malformed tokens', async () => {
   assert.equal(malformed.status, 401);
 });
 
-test('serves public categories but keeps the marketplace closed without DATABASE_URL', async () => {
+test('keeps community categories and the marketplace closed without DATABASE_URL', async () => {
   const categories = await request('GET', '/api/categories');
   const marketplace = await request('GET', '/api/marketplace');
 
-  assert.equal(categories.status, 200);
-  assert.ok(Array.isArray(categories.body));
-  assert.ok(categories.body.length > 0);
+  assert.equal(categories.status, 503);
+  assert.match(categories.headers['cache-control'] || '', /no-store/);
+  assert.deepEqual(categories.body, { success: false, error: '이 기능은 준비 중이에요.' });
   assert.equal(marketplace.status, 503);
   assert.match(marketplace.headers['cache-control'] || '', /no-store/);
   assert.deepEqual(marketplace.body, { success: false, error: '이 기능은 준비 중이에요.' });

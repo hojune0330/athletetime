@@ -96,6 +96,10 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
   }
   if (pathname.endsWith('/analytics/season-records')) return fulfillJson(route, { success: true, data: seasonTable });
   if (pathname.endsWith('/analytics/insights')) return fulfillJson(route, { success: true, data: makeInsights() });
+  // 채팅「자유수다」— 라이브 기능: 닉네임 검증 API는 useChat이 response.data.available을 기대한다.
+  if (pathname.endsWith('/api/chat/check-nickname')) {
+    return fulfillJson(route, { success: true, available: true, message: '사용할 수 있는 닉네임이에요.' });
+  }
   return fulfillJson(route, { success: true, data: null });
 }
 

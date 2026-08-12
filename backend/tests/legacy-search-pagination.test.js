@@ -94,7 +94,10 @@ test('LEGACY-SEARCH-PAGE-004 Given the legacy dashboard expands a result section
 
   assert.match(dashboardSearch, /data-section-key/u);
   assert.match(dashboardSearch, /loadSearchResultPage\(this, true\)/u);
-  assert.match(dashboardSearch, /\/api\/card-studio\/search\/section\?/u);
+  // dashboard/search.js는 api.getPublic('/search/section?...') 호출에 api.js의
+  // publicBaseUrl('/api/card-studio')가 결합되어 canonical 경로 /api/card-studio/search/...가 된다.
+  assert.match(dashboardSearch, /api\.getPublic\(`\/search\/section\?/u);
+  assert.equal(dashboardSearch.includes('/api/search'), false);
   assert.doesNotMatch(dashboardSearch, /data-all=/u);
   assert.doesNotMatch(dashboardSearch, /expandSubSection\(/u);
 });

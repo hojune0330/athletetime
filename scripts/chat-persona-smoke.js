@@ -3,7 +3,7 @@
  * - 로컬 풀스택 서버(최신 코드, 5917) 기준 실행
  * - 4명 페르소나: 선수 / 코치 / 학부모 / 동호인
  * - 시나리오: 닉네임 검증 → WS 입장(101) → 히스토리 → 실채팅 발신/수신
- *             → 금칙어 차단 → 중복닉/잘못된 방 → 신고 → 블라인드
+ *             → 금칙어 차단 → 중복닉/잘못된 방 → 신고는 닫힘(503) 확인
  */
 const WebSocket = require('/home/user/flutter_app/node_modules/ws');
 
@@ -178,76 +178,55 @@ async function main() {
   roomClient.terminate();
   console.log();
 
-  // ── STEP 6: 신고 → 블라인드 ──────────────────────────────────
-  console.log('── STEP 6. 신고 → 블라인드 (Mock 모드: 1명 신고 즉시 blind) ──');
+  // ── STEP 6: 신고는 닫힌 상태(503) ────────────────────────────
+  console.log('── STEP 6. 신고 라우트는 닫힌 상태 (커뮤니티 안전장치 미공개 정책) ──');
   const target = clients['persona-runner'].queue
     .filter((m) => m.type === 'message')
     .find((m) => String(m.data?.text || '').includes('새벽 한강'));
   const targetId = target?.data?.id;
   check('신고 대상 메시지 id 확보', !!targetId, `id=${targetId}`);
 
-  // 각 페르소나가 별도 reporterKey로 신고
-  const reporters = [
+  const reportAttempts = [
     { key: 'persona-athlete', reason: '저격·비방' },
     { key: 'persona-coach',   reason: '도배·광고' },
     { key: 'persona-parent',  reason: '기타' },
+    { key: 'persona-athlete', reason: 'INVALID_CODE' },
   ];
   const reportResults = [];
-  for (const rep of reporters) {
-    const resp = await (await fetch(`${BASE}/api/chat/reports`, {
+  for (const rep of reportAttempts) {
+    const response = await fetch(`${BASE}/api/chat/reports`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messageId: targetId, reasonCode: rep.reason, reporterKey: rep.key }),
-    })).json();
-    reportResults.push(resp);
-    console.log(`   ℹ️ ${rep.key} 신고 응답: ${JSON.stringify(resp)}`);
+    });
+    const bodyText = await response.text();
+    reportResults.push({ key: rep.key, reason: rep.reason, status: response.status, body: bodyText });
+    console.log(`   ℹ️ ${rep.key}(${rep.reason}) 신고 응답: HTTP ${response.status} ${bodyText.length > 80 ? bodyText.slice(0, 80) + '…' : bodyText}`);
     await sleep(150);
   }
-  check('신고 접수 성공(1명 이상)', reportResults.some((r) => r.success === true), `counts=${reportResults.map((r) => r.count ?? '-').join(',')}`);
-  const anyBlinded = reportResults.some((r) => r.blinded === true);
-  check('Mock 모드 즉시 블라인드 처리', anyBlinded, reportResults.map((r) => r.blinded).join(','));
-
-  // blind 이벤트 브로드캐스트 수신
-  await sleep(300);
-  let blindOk = 0;
-  for (const p of personas) {
-    if (clients[p.userId].queue.some((m) => m.type === 'blind' && String(m.messageId) === String(targetId))) blindOk++;
-  }
-  check(`blind 이벤트 전체 브로드캐스트 수신 (${blindOk}/4)`, blindOk === 4);
-
-  // 블라인드 치환 검증: 신규 참여자가 history에서 해당 메시지를 is_blinded=true, message=null로 수신
-  const freshWitness = await connectPersona('fresh-witness');
-  await freshWitness.connected;
-  freshWitness.send({ type: 'join', room: 'main', nickname: '지켜보는 사람', userId: 'persona-witness' });
-  await sleep(600); // history 수신 대기
-  const freshHistory = freshWitness.queue.find((m) => m.type === 'history') || null;
-  console.log('   ℹ️ 새 증인 수신 내역 type들:', (freshWitness.queue.map((q) => q.type)).join(','));
-  console.log('   ℹ️ history messages:', JSON.stringify((freshHistory?.messages || []).map((m) => ({ id: m.id, is_blinded: m.is_blinded, message: m.message }))));
-  const blindEntry = (freshHistory?.messages || []).find((m) => String(m.id) === String(targetId));
-  check('블라인드 메시지 history 치환(is_blinded=true, message=null)',
-    !!blindEntry && blindEntry.is_blinded === true && blindEntry.message === null,
-    JSON.stringify(blindEntry || { absent: true, targetId }));
-  freshWitness.terminate();
-  await sleep(100);
-
-  // 사유 코드 검증 실패 시
-  const badReason = await (await fetch(`${BASE}/api/chat/reports`, {
+  check('신고 POST는 일괄 503으로 거부(준비 중)',
+    reportResults.every((r) => r.status === 503 && r.body.includes('준비 중이에요')),
+    `statuses=${reportResults.map((r) => r.status).join(',')}`);
+  console.log(`   ℹ️ 신고 응답 Cache-Control: ${(await (await fetch(`${BASE}/api/chat/reports`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messageId: targetId, reasonCode: 'INVALID_CODE', reporterKey: 'persona-athlete' }),
-  })).json();
-  check('유효하지 않은 신고 사유 거부', badReason.success === false, JSON.stringify(badReason));
+    body: JSON.stringify({ messageId: targetId, reasonCode: '기타', reporterKey: 'persona-parent' }),
+  })).headers.get('cache-control') || '')}`);
+  check('신고되어도 메시지는 그대로 공개 유지(블라인드 없음)',
+    clients['persona-runner'].queue.some((m) => m.type === 'message' && String(m.data?.id) === String(targetId)),
+    `id=${targetId} 여전히 공개`);
   console.log();
 
-  // ── STEP 7: 중복 신고 방지 ────────────────────────────────────
-  console.log('── STEP 7. 같은 신고자 중복 신고 처리 ──');
-  const dupReport = await (await fetch(`${BASE}/api/chat/reports`, {
+  // ── STEP 7: 신고 라우트는 ws와 별개로 닫힘 유지 ─────────────────
+  console.log('── STEP 7. 신고(안전장치)는 웹소켓 채팅과 별개로 닫힘 ──');
+  const dupReport = await fetch(`${BASE}/api/chat/reports`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messageId: targetId, reasonCode: '기타', reporterKey: 'persona-athlete' }),
-  })).json();
-  console.log(`   ℹ️ 같은 신고자 재신고 응답: ${JSON.stringify(dupReport)}`);
-  check('같은 신고자 재신고 응답 정상(2xx/성공 응답)', String(dupReport.success) !== 'undefined');
+  });
+  const dupBody = await dupReport.text();
+  console.log(`   ℹ️ 같은 신고자 재신고 응답: HTTP ${dupReport.status} ${dupBody.length > 80 ? dupBody.slice(0, 80) + '…' : dupBody}`);
+  check('같은 신고자 재신고도 503으로 거부(닫힘 유지)', dupReport.status === 503, `${dupReport.status} 확인`);
   console.log();
 
   // ── 정리 ──────────────────────────────────────────────────────

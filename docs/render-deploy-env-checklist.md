@@ -62,11 +62,12 @@ NODE_ENV=production AUTH_CODE_PEPPER='<32자 이상>' DATABASE_URL='<실제>' JW
 
 ## 재배포 후 검증 (준비 중 기능 차단)
 
-채팅은 현재 공개하지 않으며, 운영자가 메시지를 보내거나 신고를 만드는 검증은 하지 않는다. `/api/chat/*`와 `/ws/chat`은 모두 `503`으로 거절되어야 하고, 채팅 화면은 준비 중 안내만 보여야 한다.
+채팅「자유수다」는 라이브 기능이다. `/chat`은 익명 입장 화면(랜덤 닉네임 + 규칙 동의), `/api/chat/*`는 닉네임 검증·신고·운영자 큐를, `/ws/chat`은 실시간 메시지 WebSocket을 제공한다.
 
-1. 브라우저에서 `/chat`을 열어 `오픈 채팅은 준비 중이에요` 안내가 보이는지 확인한다.
-2. 직접 `GET /api/chat/check-nickname?nickname=qa`를 요청해 `503`과 `Cache-Control: no-store`를 확인한다.
-3. 직접 `/ws/chat` 연결을 시도해 `503`으로 거절되는지 확인한다. 일반 웹소켓 `/ws`를 채팅 경로로 바꾸거나, 과거 페르소나 스모크를 실행하지 않는다.
+1. 브라우저에서 `/chat`을 열어 입장 모달(랜덤 닉네임 + `커뮤니티 규칙 (진입 전 동의 필요)`)이 보이는지 확인한다.
+2. 직접 `GET /api/chat/check-nickname?nickname=qa`를 요청해 `200`과 `success: true`를 확인한다.
+3. 직접 `/ws/chat` 연결을 시도해 `101 Switching Protocols`로 업그레이드되는지 확인한다. 권장: `PERSONA_BASE=<URL> PERSONA_WS=<wss> PERSONA_ENV='프로덕션 Render' node scripts/chat-persona-smoke.js` 로 익명 페르소나(선수·코치·학부모·러너) 25개 시나리오를 검증한다.
+4. 커뮤니티·거래·업로드는 여전히 `503` 게이트가 유지되어야 한다(`/api/posts*`, `/api/marketplace*`, `/api/upload*`).
 
 ## 이 실패를 재발시키지 않는 안전망
 

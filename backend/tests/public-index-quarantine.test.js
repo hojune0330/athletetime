@@ -143,12 +143,17 @@ test('G003 report detects recognized relay and zero-record analytics filters', (
 });
 
 test('G003 reports only canonical card-studio search exposure', () => {
+  const dashboardApi = fs.readFileSync(path.join(ROOT, 'dashboard', 'js', 'api.js'), 'utf8');
   const dashboardSearch = fs.readFileSync(path.join(ROOT, 'dashboard', 'js', 'search.js'), 'utf8');
   const quarantineReport = fs.readFileSync(path.join(ROOT, 'scripts', 'report-public-index-quarantine.js'), 'utf8');
 
-  assert.match(dashboardSearch, /\/api\/card-studio\/search\/competitions/);
-  assert.match(dashboardSearch, /\/api\/card-studio\/search/);
+  // canonical 경로 /api/card-studio/search/... 은 dashboard/js/api.js의 publicBaseUrl과
+  // search.js의 getPublic('/search/...') 조합으로 구성된다. 어느 쪽도 /api/search 직접 노출이 없어야 한다.
+  assert.match(dashboardApi, /publicBaseUrl:\s*'\/api\/card-studio'/);
+  assert.match(dashboardSearch, /getPublic\('\/search\/competitions'\)/);
+  assert.match(dashboardSearch, /getPublic\(`\/search\??/);
   assert.doesNotMatch(dashboardSearch, /\/api\/search(?:[/?`'\"]|$)/);
+  assert.doesNotMatch(dashboardApi, /\/api\/search(?:[/?`'\"]|$)/);
   assert.doesNotMatch(quarantineReport, /src\/services\/searchService/);
   assert.doesNotMatch(quarantineReport, /compatibilitySearchService/);
 });

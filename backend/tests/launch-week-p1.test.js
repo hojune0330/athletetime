@@ -39,9 +39,12 @@ test('P1-CHUNK-001: Frontend routing and Vite config split secondary pages out o
 
   assert.match(app, /import \{ Suspense, lazy, useEffect \} from 'react'/);
   assert.match(app, /const RecordsPage = lazy\(\(\) => import\('\.\/pages\/RecordsPage'\)\)/);
-  assert.match(app, /오픈 채팅은 준비 중이에요/);
-  assert.equal(app.includes("const ChatPage = lazy(() => import('./pages/ChatPage'))"), false);
+  // 채팅「자유수다」는 라이브 — ChatPage가 lazy-chunk로 분할되어 메인 번들에 포함된다.
+  assert.match(app, /const ChatPage = lazy\(\(\) => import\('\.\/pages\/ChatPage'\)\)/);
   assert.equal(app.includes("import ChatPage from './pages/ChatPage'"), false);
+  assert.equal(app.includes('오픈 채팅은 준비 중이에요'), false);
+  // 커뮤니티/마켓 등 미완 기능은 여전히 준비 중 — 진입점 번들에 실려서는 안 된다.
+  assert.equal(app.includes("import CommunityPage from './pages/CommunityPage'"), false);
   assert.equal(app.includes("import MarketplacePage from './pages/MarketplacePage'"), false);
   assert.match(vite, /manualChunks\(id\)/);
   assert.match(vite, /page-records/);

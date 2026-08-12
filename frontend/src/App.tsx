@@ -14,6 +14,7 @@ import { RouteFailureBoundary } from './components/common/RouteFailureBoundary'
 
 const MainPage = lazy(() => import('./pages/MainPage'))
 const CommunityPage = lazy(() => import('./pages/CommunityPage'))
+const ChatPage = lazy(() => import('./pages/ChatPage'))
 const PaceCalculatorPage = lazy(() => import('./pages/PaceCalculatorPage'))
 const TrainingCalculatorPage = lazy(() => import('./pages/TrainingCalculatorPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
@@ -139,7 +140,7 @@ function App() {
             </Route>
 
             <Route path="/chat" element={<Layout />}>
-              <Route index element={<FeaturePreparingPage title="오픈 채팅은 준비 중이에요" description="기록과 대회 결과는 지금 바로 확인할 수 있어요." />} />
+              <Route index element={lazyPage(<ChatPage />)} />
             </Route>
 
             {/* 커뮤니티 페이지 */}

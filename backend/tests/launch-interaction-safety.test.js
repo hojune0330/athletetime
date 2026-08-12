@@ -65,7 +65,7 @@ function websocketHandshake(port) {
     });
     req.on('upgrade', (_res, socket) => {
       socket.destroy();
-      reject(new Error('The public chat websocket must not upgrade while it is preparing.'));
+      resolve({ status: 101, headers: _res.headers });
     });
     req.on('error', reject);
     req.end();
@@ -150,7 +150,6 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     ['/api/posts', '{"title":"direct write","content":"must not persist"}', 'application/json'],
     ['/api/marketplace', '{"title":"direct listing","price":1000}', 'application/json'],
     ['/api/upload/image', '--audit-boundary\r\ncontent-disposition: form-data; name="image"\r\n\r\nbytes\r\n--audit-boundary--', 'multipart/form-data; boundary=audit-boundary'],
-    ['/api/chat/reports', '{"messageId":"1","reasonCode":"기타"}', 'application/json'],
   ];
 
   for (const [requestPath, payload, contentType] of writes) {
@@ -185,17 +184,21 @@ test('Given unavailable interaction surfaces When direct normal or malformed wri
     assert.deepEqual(response.body, expected);
   }
   assert.notEqual((await request(port, 'GET', '/api/upload/image')).status, 503);
-  const chatRead = await request(port, 'GET', '/api/chat/check-nickname');
-  assert.equal(chatRead.status, 503);
-  assert.match(chatRead.headers['cache-control'] || '', /no-store/);
-  assert.deepEqual(chatRead.body, expected);
+  // 채팅「자유수다」는 라이브 — check-nickname은 닉네임 검증 200을 반환한다.
+  const chatRead = await request(port, 'GET', `/api/chat/check-nickname?nickname=${encodeURIComponent('달리는치타12')}`);
+  assert.equal(chatRead.status, 200);
+  assert.equal(chatRead.body?.success, true);
 });
 
-test('Given chat is preparing When a /ws/chat upgrade is requested Then the server rejects it', () => {
+test('Given chat is live When a /ws/chat upgrade is requested Then the server routes it to the chat WebSocketServer', () => {
   const source = readSource('src/server.js');
 
-  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*rejectPreparingWebSocket\(socket\)/);
-  assert.doesNotMatch(source, /chatWss\.handleUpgrade\(/);
+  // 활성 브랜치: /ws/chat → 채팅 WSS로 업그레이드
+  assert.match(source, /if \(pathname === '\/ws\/chat'\) \{\s*chatWss\.handleUpgrade\(req, socket, head/);
+  // 준비 모드 폴백(rejectPreparingWebSocket)은 ws 로드 실패 catch 브랜치에만 남는다 (활성보다 뒤)
+  const activeIdx = source.indexOf('chatWss.handleUpgrade(');
+  const fallbackIdx = source.indexOf('rejectPreparingWebSocket(socket)');
+  assert.ok(activeIdx > -1 && fallbackIdx > activeIdx, 'chat upgrade must activate before the preparing fallback');
 });
 
 test('Given unreleased social interactions When a direct write request is sent Then it is rejected instead of returning fake success', () => {
@@ -289,21 +292,25 @@ test('Given a production database When an operator looks for legacy scripts Then
   }
 });
 
-test('Given preparation routes and public configuration When unfinished interactions are inspected Then they expose no public connection settings', () => {
+test('Given live chat and preparation routes When public configuration is inspected Then chat is wired and unfinished interactions stay closed', () => {
   const app = readSource('frontend/src/App.tsx');
   const community = readSource('frontend/src/pages/CommunityPage.tsx');
   const netlify = readSource('netlify.toml');
   const frontendEnv = readSource('frontend/.env.example');
 
-  assert.match(app, /path="\/chat"[\s\S]*?FeaturePreparingPage title="오픈 채팅은 준비 중이에요"/);
+  // 채팅「자유수다」는 라이브 — lazy ChatPage 라우트가 연결되어 있어야 한다.
+  assert.match(app, /const ChatPage = lazy\(/);
+  assert.doesNotMatch(app, /path="\/chat"[\s\S]*?FeaturePreparingPage title="오픈 채팅은 준비 중이에요"/);
+  // 커뮤니티(게시판)는 여전히 준비 화면 — 미출시 UI를 노출하지 않는다.
   assert.match(community, /title="커뮤니티는 준비 중이에요"/);
-  assert.doesNotMatch(app, /const ChatPage = lazy\(/);
   assert.doesNotMatch(community, /CommunityQuickPostForm|CommunityImagePicker|api\/upload/);
 
+  // 프라이빗 볼트 계열 설정은 어떤 환경에서도 설정되어선 안 된다.
   for (const publicConfig of [netlify, frontendEnv]) {
-    assert.doesNotMatch(publicConfig, /\bVITE_WS_URL\b/);
     assert.doesNotMatch(publicConfig, /\bVITE_(?:PRIVATE|PERSONAL)_(?:NOTE|NOTES|PHOTO|PHOTOS|STORAGE)\b/i);
   }
+  // 채팅 WS는 명시적으로 연결(wss://athletetime-backend)되므로 연결 설정이 존재해야 한다.
+  assert.match(netlify, /VITE_WS_URL\s*=\s*"wss:\/\/athletetime-backend\.onrender\.com\/ws\/chat"/);
 });
 
 test('Given no approved private vault When personal notes and photos are inspected Then they cannot reuse the public upload route', () => {
@@ -337,10 +344,8 @@ test('Given direct chat and write transports When no request body or upload fixt
   const expected = { success: false, error: '이 기능은 준비 중이에요.' };
 
   for (const [method, requestPath] of [
-    ['GET', '/api/chat/check-nickname'],
     ['GET', '/api/posts'],
     ['GET', '/api/marketplace'],
-    ['POST', '/api/chat/reports'],
     ['POST', '/api/posts'],
     ['POST', '/api/posts/1/comments'],
     ['POST', '/api/posts/1/vote'],
@@ -358,9 +363,9 @@ test('Given direct chat and write transports When no request body or upload fixt
     assert.deepEqual(response.body, expected);
   }
 
+  // 채팅「자유수다」는 라이브 — /ws/chat 업그레이드가 101로 응답해야 한다.
   const websocket = await websocketHandshake(port);
-  assert.equal(websocket.status, 503, 'the public chat websocket must stay closed');
-  assert.match(websocket.headers['cache-control'] || '', /no-store/, 'the closed websocket response must not be cacheable');
+  assert.equal(websocket.status, 101, 'the live chat websocket must upgrade');
 });
 
 test('Given a guest on preparation routes When mobile and desktop widths are used Then recovery links replace interaction forms', { timeout: 90_000 }, async () => {
@@ -373,13 +378,16 @@ test('Given a guest on preparation routes When mobile and desktop widths are use
     visited.push(page.url());
 
     await page.setViewportSize({ width: 1280, height: 800 });
-    await navigateToReady(page, `${baseUrl}/chat`, page.getByRole('heading', { name: '오픈 채팅은 준비 중이에요', exact: true }));
-    await expectVisible(page.getByText('안전한 운영 기준과 신고·검토 절차를 먼저 갖춘 뒤 열겠습니다.', { exact: true }));
-    assert.equal(await page.locator('textarea, input[type="file"]').count(), 0, 'the closed chat page must not expose a message or photo form');
+    // 채팅「자유수다」는 라이브 — /chat은 입장 모달(닉네임 + 규칙 동의)을 렌더한다.
+    await page.goto(`${baseUrl}/chat`, { waitUntil: 'networkidle' });
+    // NicknameModal의 h2에는 <span>💬</span>가 있어 accessible name이 "💬 자유수다에 오신 걸 환영해요"가 되므로
+    // exact:true 대신 정규식 로케이터를 사용한다 (chat-e2e-probe.js로 count=1 검증 완료).
+    await expectVisible(page.getByRole('heading', { name: /자유수다에 오신 걸 환영해요/ }));
+    await expectVisible(page.getByText('커뮤니티 규칙 (진입 전 동의 필요)', { exact: true }));
     visited.push(page.url());
   }, {
-    fileName: 'closed-interaction-surfaces-e2e-results.json',
-    scenario: 'guest preparation surfaces at 390px mobile and desktop widths',
+    fileName: 'interaction-surfaces-e2e-results.json',
+    scenario: 'guest community preparation surface and live chat at 390px mobile and desktop widths',
     invocation: 'node --test backend/tests/launch-interaction-safety.test.js',
   });
 });
