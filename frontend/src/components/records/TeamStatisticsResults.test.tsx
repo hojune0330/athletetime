@@ -18,6 +18,10 @@ describe('team statistics search results', () => {
 
     // Then the card exposes useful totals and a shareable team destination without athlete controls.
     expect(html).toContain('진도군청')
+    expect(html).toContain('실업·기관 소속')
+    expect(html).toContain('class="min-w-0"')
+    expect(html).toContain('class="shrink-0 whitespace-nowrap font-mono text-xs text-ink-4"')
+    expect(html).toContain('break-keep [text-wrap:pretty]')
     expect(html).toContain('출전 대회')
     expect(html).toContain('36개')
     expect(html).toContain('1~3위 확인')
@@ -25,7 +29,9 @@ describe('team statistics search results', () => {
     expect(html).toContain('43건')
     expect(html).toContain('모은 전체 기간 2019-2026 시즌')
     expect(html).toContain('열면 최근 확인 시즌 통계부터 보여줘요.')
-    expect(html).toContain('공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
+    expect(html).toContain('소속 유형은 수집된 기록의 소속 표기를 바탕으로 추정하며 경기 부문과 다를 수 있어요.')
+    expect(html).toContain('공개 기록을 소속·시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
+    expect(html).toContain('진도군청 소속 통계 보기')
     expect(html).toContain('/records/teams/1234567890abcdef?category=corporate&amp;from=')
     expect(html).not.toContain('scope=all')
     expect(html).not.toContain('19명')
@@ -48,7 +54,8 @@ describe('team statistics search results', () => {
 
     // Then the link preserves the complete aggregate instead of injecting the primary category.
     expect(html).toContain('전체')
-    expect(html).toContain('공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
+    expect(html).toContain('소속 유형은 수집된 기록의 소속 표기를 바탕으로 추정하며 경기 부문과 다를 수 있어요.')
+    expect(html).toContain('공개 기록을 소속·시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.')
     expect(html).toContain('/records/teams/1234567890abcdef?from=')
     expect(html).not.toContain('scope=all')
     expect(html).not.toContain('category=corporate')

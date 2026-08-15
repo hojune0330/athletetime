@@ -17,6 +17,7 @@ type RecordDetailSheetProps = {
 }
 
 type DetailItemProps = {
+  readonly description?: string
   readonly label: string
   readonly value: string
 }
@@ -30,11 +31,48 @@ function sourceLink(value: string) {
   return /^https?:\/\//i.test(value) ? value : null
 }
 
-function DetailItem({ label, value }: DetailItemProps) {
+function resolveDivisionSourceDescription(
+  record: Pick<PublicRecord, 'divisionDetail' | 'divisionLabel' | 'rawDivision'>,
+) {
+  const rawDivision = record.rawDivision.trim()
+  const divisionLabel = record.divisionLabel.trim()
+  if (!rawDivision || !divisionLabel) return undefined
+
+  const compact = (value: string) => value.replace(/\s+/gu, '')
+  const canonicalLabels = [divisionLabel, record.divisionDetail?.trim() || '']
+  if (canonicalLabels.some((label) => label && compact(rawDivision) === compact(label))) {
+    return undefined
+  }
+  if (divisionLabel.includes('세부부문 없음')) {
+    return '원문 표기: "' + rawDivision + '" — 대회 결과에 세부 부문이 없어요'
+  }
+  return '원문 표기: "' + rawDivision + '"'
+}
+
+function divisionValue(record: PublicRecord) {
+  const label = detailValue(record.divisionLabel)
+  const detail = record.divisionDetail?.trim()
+  if (!detail || detail.replace(/\s+/gu, '') === label.replace(/\s+/gu, '')) return label
+  return label + ' · ' + detail
+}
+
+function DetailItem({ description, label, value }: DetailItemProps) {
   return (
     <div className="border-b border-hair py-3 last:border-b-0">
       <dt className="text-caption font-medium text-ink-3">{label}</dt>
-      <dd className="mt-1 break-words text-body-sm font-semibold leading-5 text-ink">{value}</dd>
+      <dd className="mt-1 break-words text-body-sm font-semibold leading-5 text-ink">
+        <span className="block">{value}</span>
+        {description && (
+          <span
+            className="mt-1 block text-caption font-normal leading-5 text-ink-3"
+            role="note"
+            aria-label={description}
+            title={description}
+          >
+            {description}
+          </span>
+        )}
+      </dd>
     </div>
   )
 }
@@ -47,6 +85,9 @@ export function RecordDetailSheet({
 }: RecordDetailSheetProps) {
   const display = record ? resolveRecordDisplay(record.record, record.note) : null
   const url = record ? sourceLink(record.source.sourceUrl) : null
+  const divisionDescription = record
+    ? resolveDivisionSourceDescription(record)
+    : undefined
 
   return (
     <Sheet open={open && record !== null} onOpenChange={onOpenChange}>
@@ -68,13 +109,17 @@ export function RecordDetailSheet({
 
           <dl className="mt-3">
             <DetailItem label="기록" value={display.text} />
-            <DetailItem label="순위" value={record.rank === null ? '확인 안 됨' : `${record.rank}위`} />
+            <DetailItem label="순위" value={record.rank === null ? '확인 안 됨' : String(record.rank) + '위'} />
             <DetailItem label="경기 단계" value={detailValue(record.phase)} />
-            <DetailItem label="부문" value={detailValue(record.divisionDetail ?? record.divisionLabel)} />
+            <DetailItem
+              description={divisionDescription}
+              label="부문"
+              value={divisionValue(record)}
+            />
             <DetailItem
               label="풍속"
               value={record.wind
-                ? `${record.wind}${record.windLegal ? ' · 허용 범위로 표기됨' : ''}`
+                ? record.wind + (record.windLegal ? ' · 허용 범위로 표기됨' : '')
                 : '확인 안 됨'}
             />
             <DetailItem label="장소" value={detailValue(record.venue)} />

@@ -75,15 +75,15 @@ export function RecordCandidateList({
 
   return (
     <section className={selectionMode ? 'pb-28' : undefined}>
-      <header className="mb-4 flex items-end justify-between gap-4 border-b border-line pb-4">
-        <div>
+      <header className="mb-4 flex flex-col items-stretch gap-3 border-b border-line pb-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <p className="font-mono text-[11px] font-semibold tracking-wide text-brand">
             SEARCH RESULTS
           </p>
           <h2 className="mt-1 text-h3 font-semibold text-ink">
             {selectionMode ? '함께 볼 선수를 선택하세요' : `선수 ${athletes.length}명`}
           </h2>
-          <p className="mt-1 text-body-sm text-ink-3">
+          <p className="mt-1 break-keep text-body-sm text-ink-3">
             {selectionMode
               ? `소속과 시즌을 확인하고 최대 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`
               : '카드를 누르면 이 선수 후보의 기록을 열어요.'}
@@ -92,7 +92,7 @@ export function RecordCandidateList({
         {!selectionMode && athletes.length > 0 && (
           <button
             type="button"
-            className="min-h-11 shrink-0 border border-line px-4 text-body-sm font-semibold text-ink hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="min-h-11 w-full sm:w-auto shrink-0 border border-line px-4 text-body-sm font-semibold text-ink hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             onClick={onEnterSelectionMode}
           >
             선수 기록 모아 보기

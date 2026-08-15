@@ -4,13 +4,11 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import {
   getAnalyticsFilters,
   getAthleteAnalytics,
-  getSeasonRecordTable,
   searchRecordAthletes,
   type AnalyticsFilters,
   type AthleteAnalyticsProfile,
   type AthleteSearchCard,
   type PublicRecord,
-  type SeasonRecordTable,
 } from '../api/recordAnalytics';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -37,8 +35,16 @@ import { searchTeamPerformance } from '../features/team-performance/teamPerforma
 import { parseTeamCategory } from '../features/team-performance/teamPerformanceContracts';
 import type { TeamCategory, TeamSearchSummary } from '../features/team-performance/teamPerformanceContracts';
 import { RecordCandidatesSurface } from '../features/record-workspace/components/RecordCandidatesSurface';
+import { SeasonRecordsPanel } from '../features/record-workspace/season-navigation/SeasonRecordsPanel';
+import {
+  resolveAthleteSeasonSelection,
+  resolveSeasonSelection,
+  updateSeasonSelectionParams,
+  type SeasonSelection,
+} from '../features/record-workspace/season-navigation/seasonNavigation';
+import { useSeasonRecordsController } from '../features/record-workspace/season-navigation/useSeasonRecordsController';
 import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
-import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, scopeCount, SHARE_POLICY } from '../config/dataPolicy';
+import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, SHARE_POLICY } from '../config/dataPolicy';
 
 type Mode = 'athlete' | 'season';
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
@@ -63,13 +69,12 @@ export default function RecordsPage() {
   const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
   const [profileState, setProfileState] = useState<LoadState>('idle');
   const [filters, setFilters] = useState<AnalyticsFilters | null>(null);
-  const [season, setSeason] = useState<number | undefined>();
-  const [eventKey, setEventKey] = useState('');
-  const [genderKey, setGenderKey] = useState('men');
-  const [divisionLevel, setDivisionLevel] = useState('all');
-  const [divisionKey, setDivisionKey] = useState('');
-  const [seasonTable, setSeasonTable] = useState<SeasonRecordTable | null>(null);
-  const [seasonState, setSeasonState] = useState<LoadState>('idle');
+  const filtersRef = useRef<AnalyticsFilters | null>(null);
+  const filtersRequestRef = useRef<Promise<AnalyticsFilters> | null>(null);
+  const seasonController = useSeasonRecordsController({
+    filters,
+    athleteKey: selectedAthleteKey,
+  });
   const [workspaceSelectionMode, setWorkspaceSelectionMode] = useState(false);
   const [compareNotice, setCompareNotice] = useState('');
   const compareTray = useCompareTray();
@@ -103,27 +108,23 @@ export default function RecordsPage() {
 
   useEffect(() => {
     let active = true;
-    getAnalyticsFilters()
+    const filtersRequest = getAnalyticsFilters();
+    filtersRequestRef.current = filtersRequest;
+    filtersRequest
       .then((nextFilters) => {
         if (!active) return;
-        const defaultSelection = nextFilters.defaultSeasonSelection;
+        filtersRef.current = nextFilters;
         setFilters(nextFilters);
-        setSeason(defaultSelection?.season || nextFilters.seasons[0]);
-        setEventKey(defaultSelection?.eventKey || nextFilters.events[0]?.key || '');
-        const nextGenderKey = defaultSelection?.genderKey || nextFilters.genderOptions[0]?.key || 'men';
-        const nextDivisionLevel = defaultSelection?.divisionLevel || nextFilters.levelOptions[0]?.key || 'all';
-        setGenderKey(nextGenderKey);
-        setDivisionLevel(nextDivisionLevel);
-        setDivisionKey(defaultSelection?.divisionKey || toDivisionKey(nextGenderKey, nextDivisionLevel));
       })
       .catch(() => {
         if (active) {
-          setFilters({
+          const fallbackFilters: AnalyticsFilters = {
             seasons: [],
             events: [],
             divisions: [],
             genderOptions: [],
             levelOptions: [],
+            availableSeasonCombinations: [],
             defaultSeasonSelection: {
               season: new Date().getFullYear(),
               eventKey: '',
@@ -134,7 +135,9 @@ export default function RecordsPage() {
               divisionLevel: 'all',
               rowCount: 0,
             },
-          });
+          };
+          filtersRef.current = fallbackFilters;
+          setFilters(fallbackFilters);
         }
       });
     return () => {
@@ -220,30 +223,6 @@ export default function RecordsPage() {
     };
   }, [submittedQuery, selectedAthleteParam, isTeamBrowse, teamCategory]);
 
-  useEffect(() => {
-    if (!season || !eventKey || !divisionKey) return;
-    let active = true;
-    setSeasonState('loading');
-    getSeasonRecordTable({
-      season,
-      eventKey,
-      divisionKey,
-      athleteKey: selectedAthleteKey || undefined,
-      limit: 100,
-    })
-      .then((table) => {
-        if (!active) return;
-        setSeasonTable(table);
-        setSeasonState('ready');
-      })
-      .catch(() => {
-        if (active) setSeasonState('error');
-      });
-    return () => {
-      active = false;
-    };
-  }, [season, eventKey, divisionKey, selectedAthleteKey]);
-
   const compareKeys = useMemo(() => {
     const raw = (searchParams.get('compare') || '').trim();
     if (!raw) return [] as string[];
@@ -257,8 +236,8 @@ export default function RecordsPage() {
   };
 
   const highlightedRow = useMemo(
-    () => seasonTable?.rows.find((row) => row.highlighted) || null,
-    [seasonTable],
+    () => seasonController.table?.rows.find((row) => row.highlighted) || null,
+    [seasonController.table],
   );
   const shouldShowAthletePanel = mode === 'athlete' && (profile || profileState !== 'idle');
   const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean(selectedAthleteParam);
@@ -272,31 +251,33 @@ export default function RecordsPage() {
     setSearchParams(next);
   };
 
-  const handleSelectAthlete = async (athleteKey: string, options: { syncUrl?: boolean } = {}) => {
-    const { syncUrl = true } = options;
+  const handleSelectAthlete = async (
+    athleteKey: string,
+    options: { syncUrl?: boolean; deferSelection?: boolean } = {},
+  ): Promise<PublicRecord | null> => {
+    const { syncUrl = true, deferSelection = false } = options;
     if (syncUrl) {
       const next = new URLSearchParams(searchParams);
       next.set('athlete', athleteKey);
       setSearchParams(next);
     }
-    setSelectedAthleteKey(athleteKey);
+    if (!deferSelection) setSelectedAthleteKey(athleteKey);
     setProfileState('loading');
     try {
       const nextProfile = await getAthleteAnalytics(athleteKey);
       setProfile(nextProfile);
       setProfileState('ready');
 
-      const mainRecord = nextProfile.summary.latest || nextProfile.summary.indexedBest || nextProfile.records[0];
-      if (mainRecord) {
-        setSeason(mainRecord.season);
-        setEventKey(mainRecord.eventKey);
-        const parsed = parseDivisionKey(mainRecord.divisionKey);
-        setGenderKey(parsed.genderKey);
-        setDivisionLevel(parsed.divisionLevel);
-        setDivisionKey(toDivisionKey(parsed.genderKey, parsed.divisionLevel));
+      const mainRecord = nextProfile.summary.latest || nextProfile.summary.indexedBest || nextProfile.records[0] || null;
+      const activeFilters = filtersRef.current;
+      if (mainRecord && activeFilters && !deferSelection) {
+        const nextSelection = resolveAthleteSeasonSelection(activeFilters, mainRecord);
+        if (nextSelection) seasonController.setTransientSelection(nextSelection);
       }
+      return mainRecord;
     } catch {
       setProfileState('error');
+      return null;
     }
   };
 
@@ -345,8 +326,12 @@ export default function RecordsPage() {
     setSearchParams(next);
   };
 
-  const openBrowseChoice = (choice: BrowseChoice) => {
-    const next = new URLSearchParams(searchParams);
+  const openBrowseChoice = (
+    choice: BrowseChoice,
+    requestedEventKey?: string,
+    selectionOverride?: SeasonSelection | null,
+  ) => {
+    let next = new URLSearchParams(searchParams);
     next.set('flow', 'browse');
     next.set('browse', choice);
     next.delete('step');
@@ -354,6 +339,19 @@ export default function RecordsPage() {
     next.delete('athlete');
     next.delete('compare');
     next.delete('category');
+
+    const activeFilters = filtersRef.current;
+    if (choice === 'season' && activeFilters) {
+      const resolved = selectionOverride ?? resolveSeasonSelection(activeFilters, {
+        season: seasonController.selection?.season ?? null,
+        eventKey: requestedEventKey ?? seasonController.selection?.eventKey ?? null,
+        divisionKey: seasonController.selection?.divisionKey ?? null,
+      });
+      if (resolved) {
+        next = updateSeasonSelectionParams(next, resolved);
+      }
+    }
+
     setMode(choice === 'season' ? 'season' : 'athlete');
     setSearchParams(next);
   };
@@ -440,10 +438,19 @@ export default function RecordsPage() {
     setSearchParams(next);
   };
 
-  const showSeasonForMine = () => {
+  const showSeasonForMine = async () => {
     const firstEntry = myEntries[0];
-    if (firstEntry) void handleSelectAthlete(firstEntry.athleteKey, { syncUrl: false });
-    openBrowseChoice('season');
+    const mainRecord = firstEntry
+      ? await handleSelectAthlete(firstEntry.athleteKey, { syncUrl: false, deferSelection: true })
+      : null;
+    if (!filtersRef.current) await filtersRequestRef.current?.catch(() => undefined);
+    const activeFilters = filtersRef.current;
+    const selection = mainRecord && activeFilters
+      ? resolveAthleteSeasonSelection(activeFilters, mainRecord)
+      : null;
+    if (selection) seasonController.setTransientSelection(selection);
+    openBrowseChoice('season', undefined, selection);
+    if (firstEntry) setSelectedAthleteKey(firstEntry.athleteKey);
   };
 
   const isDirectRecordsLink = Boolean(selectedAthleteParam) || compareKeys.length >= 2;
@@ -470,10 +477,7 @@ export default function RecordsPage() {
             onClear={workspaceStore.clearRecordDeviceData}
           />
           <AnonymousInsightCards
-            onPickEvent={(key) => {
-              setEventKey(key);
-              openBrowseChoice('season');
-            }}
+            onPickEvent={(key) => openBrowseChoice('season', key)}
           />
         </RecordsHub>
       )}
@@ -593,10 +597,7 @@ export default function RecordsPage() {
         <div className="space-y-6">
           <StartPanel onSeasonMode={() => openBrowseChoice('season')} />
           <AnonymousInsightCards
-            onPickEvent={(key) => {
-              setEventKey(key);
-              openBrowseChoice('season');
-            }}
+            onPickEvent={(key) => openBrowseChoice('season', key)}
           />
         </div>
       )}
@@ -679,38 +680,34 @@ export default function RecordsPage() {
       )}
 
       {shouldShowRecordsSurface && mode === 'season' && (
-        <SeasonPanel
-          filters={filters}
-          season={season}
-          eventKey={eventKey}
-          genderKey={genderKey}
-          divisionLevel={divisionLevel}
-          table={seasonTable}
-          state={seasonState}
-          highlightedRow={highlightedRow}
-          onSeasonChange={setSeason}
-          onEventChange={setEventKey}
-          onGenderChange={(nextGenderKey) => {
-            const nextDivisionLevel =
-              divisionLevel === 'unspecified' &&
-              !filters?.divisions.some((division) => division.gender === nextGenderKey && division.level === 'unspecified')
-                ? 'all'
-                : divisionLevel;
-            setGenderKey(nextGenderKey);
-            setDivisionLevel(nextDivisionLevel);
-            setDivisionKey(toDivisionKey(nextGenderKey, nextDivisionLevel));
-          }}
-          onDivisionLevelChange={(nextDivisionLevel) => {
-            setDivisionLevel(nextDivisionLevel);
-            setDivisionKey(toDivisionKey(genderKey, nextDivisionLevel));
-          }}
-          onRetry={() => navigate(0)}
-        />
+        filters && seasonController.selection ? (
+          <SeasonRecordsPanel
+            filters={filters}
+            selection={seasonController.selection}
+            table={seasonController.table}
+            state={seasonController.state}
+            highlightedRow={highlightedRow}
+            onSelectionChange={seasonController.replaceSelection}
+            onRetry={() => navigate(0)}
+          />
+        ) : (
+          <NoticeCard
+            role={filters ? 'alert' : 'status'}
+            title={filters ? '시즌 조건을 준비하지 못했습니다' : '시즌 조건을 불러오는 중입니다'}
+            description={filters ? '잠시 후 다시 시도해 주세요.' : '기록이 있는 조건을 확인하고 있습니다.'}
+            action={filters ? (
+              <Button type="button" variant="outline" onClick={() => navigate(0)}>
+                다시 시도
+              </Button>
+            ) : undefined}
+          />
+        )
       )}
 
       {/* 안내·신뢰 문구는 페이지 맨 아래 한 줄로 */}
-      <p className="text-[11px] leading-4 text-ink-4">
-        자료가 있는 대회 기록만 보여드려요. 연도와 대회별로 빠진 기록이 있을 수 있어요. {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
+      <p className="break-keep [text-wrap:pretty] text-[11px] leading-4 text-ink-4">
+        자료가 있는 대회 기록만 보여드려요. 연도와 대회별로{' '}
+        <span className="whitespace-nowrap">빠진 기록이 있을 수 있어요.</span> {DATA_NOTICE} {TRUST_POINTS.join(' · ')} ·{' '}
         <Link to="/about-data" className="font-medium text-brand-500 underline-offset-2 hover:underline">
           데이터 안내 보기
         </Link>
@@ -1011,168 +1008,6 @@ function DisclosureSection({
   );
 }
 
-function SeasonPanel({
-  filters,
-  season,
-  eventKey,
-  genderKey,
-  divisionLevel,
-  table,
-  state,
-  highlightedRow,
-  onSeasonChange,
-  onEventChange,
-  onGenderChange,
-  onDivisionLevelChange,
-  onRetry,
-}: {
-  filters: AnalyticsFilters | null;
-  season?: number;
-  eventKey: string;
-  genderKey: string;
-  divisionLevel: string;
-  table: SeasonRecordTable | null;
-  state: LoadState;
-  highlightedRow: SeasonRecordTable['rows'][number] | null;
-  onSeasonChange: (season: number) => void;
-  onEventChange: (eventKey: string) => void;
-  onGenderChange: (genderKey: string) => void;
-  onDivisionLevelChange: (divisionLevel: string) => void;
-  onRetry: () => void;
-}) {
-  const visibleLevelOptions = (filters?.levelOptions || []).filter((item) => {
-    if (item.key !== 'unspecified') return true;
-    return (filters?.divisions || []).some((division) => division.gender === genderKey && division.level === 'unspecified');
-  });
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-brand">시즌 기록표</p>
-            <CardTitle className="mt-2">시즌 기록 모음</CardTitle>
-            <p className="mt-2 text-sm text-ink-3">모은 기록 기준 정렬이라 실제와 다를 수 있어요.</p>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(120px,160px)_minmax(160px,220px)_minmax(160px,220px)]">
-            <SelectBox value={String(season || '')} onChange={(value) => onSeasonChange(Number(value))}>
-              {(filters?.seasons || []).map((item) => (
-                <option key={item} value={item}>{item}</option>
-              ))}
-            </SelectBox>
-            <SelectBox value={eventKey} onChange={onEventChange}>
-              {(filters?.events || []).map((item) => (
-                <option key={item.key} value={item.key}>{item.label}</option>
-              ))}
-            </SelectBox>
-            <div className="flex flex-col gap-2 sm:col-span-2 lg:col-span-1">
-              <div className="flex border border-line" aria-label="성별 선택">
-                {(filters?.genderOptions || []).map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => onGenderChange(item.key)}
-                    className={`h-10 flex-1 px-3 text-sm font-semibold ${genderKey === item.key ? 'bg-ink text-white' : 'bg-surface text-ink-3'}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-              <SelectBox value={divisionLevel} onChange={onDivisionLevelChange} ariaLabel="층위 선택: 전체(부 통합)">
-                {visibleLevelOptions.map((item) => (
-                  <option key={item.key} value={item.key}>{item.label}</option>
-                ))}
-              </SelectBox>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {highlightedRow && (
-          <div className="mb-4 border border-brand bg-brand/5 p-4">
-            <p className="text-xs font-semibold text-brand">선택한 선수 표시</p>
-            <p className="mt-1 text-sm text-ink">
-              {highlightedRow.name} · {highlightedRow.rank}번째 기록 · {highlightedRow.record}
-            </p>
-          </div>
-        )}
-
-        {state === 'loading' && <NoticeCard role="status" title="시즌 기록표를 불러오는 중입니다" description="모은 기록을 정렬하고 있습니다." />}
-        {state === 'error' && <NoticeCard role="alert" title="시즌 기록표를 불러오지 못했습니다" description="필터를 바꾸거나 다시 시도해 주세요." action={<Button type="button" variant="outline" onClick={onRetry}>다시 시도</Button>} />}
-
-        {table && state !== 'loading' && (
-          <>
-            <div className="mb-3 flex flex-col gap-1 text-xs text-ink-4 sm:flex-row sm:items-center sm:justify-between">
-              <span>{table.season} · {table.eventLabel} · {table.divisionLabel}</span>
-              <span>{scopeCount(table.totalIndexedAthletes, '명')}</span>
-            </div>
-            {/* 데스크탑: 표 — 기록/일자는 줄바꿈 없이 모노 폰트로 선명하게 */}
-            <div className="hidden overflow-x-auto border border-line sm:block">
-              <table className="w-full min-w-[640px] border-collapse text-sm">
-                <thead className="bg-surface-2 text-left text-xs text-ink-4">
-                  <tr>
-                    <th className="w-12 p-2.5">순서</th>
-                    <th className="p-2.5">선수</th>
-                    <th className="w-28 p-2.5">기록</th>
-                    <th className="w-20 p-2.5">층위 배지</th>
-                    <th className="p-2.5">대회</th>
-                    <th className="w-28 p-2.5">일자</th>
-                    <th className="w-16 p-2.5">풍속</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {table.rows.map((row) => (
-                    <tr
-                      key={`${row.rank}-${row.athleteKey}`}
-                      className={row.highlighted ? 'bg-brand/5' : 'border-t border-line'}
-                    >
-                      <td className="w-12 p-2.5 font-mono tabular-nums text-ink-3">{row.rank}</td>
-                      <td className="max-w-[180px] p-2.5">
-                        <p className="truncate font-semibold text-ink">{row.name}</p>
-                        <p className="truncate text-xs text-ink-4">{row.team || '소속 미상'}</p>
-                      </td>
-                      <td className="w-28 whitespace-nowrap p-2.5 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</td>
-                      <td className="w-20 p-2.5">
-                        <DivisionBadge label={row.divisionLabel} detail={row.divisionDetail} />
-                      </td>
-                      <td className="max-w-[220px] truncate p-2.5 text-ink-3">{row.competitionName}</td>
-                      <td className="w-28 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.date}</td>
-                      <td className="w-16 whitespace-nowrap p-2.5 font-mono text-xs tabular-nums text-ink-3">{row.wind || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* 모바일: 가로 스크롤 없는 카드 행 — 기록·대회·일자가 한눈에 */}
-            <div className="space-y-1.5 sm:hidden">
-              {table.rows.map((row) => (
-                <div
-                  key={`m-${row.rank}-${row.athleteKey}`}
-                  className={`border p-3 ${row.highlighted ? 'border-brand bg-brand/5' : 'border-line bg-surface'}`}
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <p className="min-w-0 truncate text-sm font-semibold text-ink">
-                      <span className="mr-1.5 font-mono text-xs tabular-nums text-ink-4">{row.rank}</span>
-                      {row.name}
-                    </p>
-                    <p className="shrink-0 font-mono text-base font-semibold tabular-nums text-ink">{row.record}</p>
-                  </div>
-                  <div className="mt-1 flex items-baseline justify-between gap-2 text-xs text-ink-4">
-                    <p className="min-w-0 truncate">{row.team || '소속 미상'} · {row.divisionLabel} · {row.competitionName}</p>
-                    <p className="shrink-0 font-mono tabular-nums">{row.date}{row.wind ? ` · ${row.wind}` : ''}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="mt-3 text-xs leading-5 text-ink-4">{table.disclaimer}</p>
-          </>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
 function ModeButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
   return (
     <button
@@ -1185,52 +1020,6 @@ function ModeButton({ active, onClick, children }: { active: boolean; onClick: (
       {children}
     </button>
   );
-}
-
-function SelectBox({
-  value,
-  onChange,
-  children,
-  ariaLabel,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  children: ReactNode;
-  ariaLabel?: string;
-}) {
-  return (
-    <select
-      value={value}
-      aria-label={ariaLabel}
-      onChange={(event) => onChange(event.target.value)}
-      className="h-10 border border-line bg-surface px-3 text-sm text-ink"
-    >
-      {children}
-    </select>
-  );
-}
-
-function DivisionBadge({ label, detail }: { label: string; detail?: string | null }) {
-  return (
-    <span
-      title={detail || label}
-      className="inline-flex max-w-[5.5rem] items-center border border-line bg-surface-2 px-2 py-1 text-[11px] font-semibold text-ink-3"
-    >
-      <span className="truncate">{label.replace(/^남자 |^여자 |^혼성 /, '')}</span>
-    </span>
-  );
-}
-
-function toDivisionKey(genderKey: string, divisionLevel: string) {
-  return `${genderKey || 'men'}-${divisionLevel || 'all'}`;
-}
-
-function parseDivisionKey(divisionKey: string) {
-  const [genderKey = 'men', ...levelParts] = String(divisionKey || '').split('-');
-  return {
-    genderKey,
-    divisionLevel: levelParts.join('-') || 'all',
-  };
 }
 
 function normalizeRecordsFlow(value: string | null): RecordsFlow | '' {

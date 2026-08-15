@@ -25,7 +25,7 @@ test('DIVISION-HIERARCHY-001 maps source labels to one canonical hierarchy key',
   assert.equal(middleGrade.divisionDetail, '남자중학교 2학년부');
 
   assert.equal(menOnly.divisionKey, 'men-unspecified');
-  assert.equal(menOnly.divisionLabel, '남자 층위 미상');
+  assert.equal(menOnly.divisionLabel, '남자 (세부부문 없음)');
 
   assert.equal(masters.divisionKey, 'men-masters');
   assert.equal(masters.divisionLabel, '남자 마스터즈');
@@ -36,9 +36,9 @@ test('DIVISION-HIERARCHY-001 maps source labels to one canonical hierarchy key',
   assert.equal(compositeElementary.gender, 'mixed');
 
   assert.equal(gradeOnlyHigh.divisionKey, 'unknown-high');
-  assert.equal(gradeOnlyHigh.divisionLabel, '성별 미상 고등부');
+  assert.equal(gradeOnlyHigh.divisionLabel, '고등부 (남녀 통합)');
   assert.equal(gradeOnlyMiddle.divisionKey, 'unknown-middle');
-  assert.equal(gradeOnlyMiddle.divisionLabel, '성별 미상 중학부');
+  assert.equal(gradeOnlyMiddle.divisionLabel, '중학부 (남녀 통합)');
 });
 
 test('DIVISION-HIERARCHY-002 analytics filters remove kaaf-kind keys and keep TOP100 counts stable', () => {
@@ -109,14 +109,32 @@ test('DIVISION-HIERARCHY-003 season records expose gender rollup and fixed level
 
 test('DIVISION-HIERARCHY-004 records page uses two-step gender and level controls', () => {
   const page = fs.readFileSync(path.join(ROOT, 'frontend', 'src', 'pages', 'RecordsPage.tsx'), 'utf8');
+  const panel = fs.readFileSync(
+    path.join(ROOT, 'frontend', 'src', 'features', 'record-workspace', 'season-navigation', 'SeasonRecordsPanel.tsx'),
+    'utf8',
+  );
+  const rows = fs.readFileSync(
+    path.join(ROOT, 'frontend', 'src', 'features', 'record-workspace', 'season-navigation', 'SeasonRecordRows.tsx'),
+    'utf8',
+  );
   const api = fs.readFileSync(path.join(ROOT, 'frontend', 'src', 'api', 'recordAnalytics.ts'), 'utf8');
 
   assert.match(api, /genderOptions/);
   assert.match(api, /levelOptions/);
   assert.match(api, /defaultSeasonSelection/);
-  assert.match(page, /genderKey/);
-  assert.match(page, /divisionLevel/);
   assert.match(page, /defaultSeasonSelection/);
-  assert.match(page, /전체\(부 통합\)/);
-  assert.match(page, /층위 배지/);
+  assert.match(page, /<SeasonRecordsPanel/);
+  assert.match(panel, /getSeasonNavigationOptions/);
+  assert.match(panel, /options\.genderKey/);
+  assert.match(panel, /options\.divisionLevel/);
+  assert.match(panel, /성별 구분/);
+  assert.match(panel, /경기 부문/);
+  assert.match(panel, /<fieldset/);
+  assert.match(panel, /<legend/);
+  assert.match(panel, /aria-pressed=/);
+  assert.match(panel, /htmlFor="season-records-season"/);
+  assert.match(panel, /htmlFor="season-records-event"/);
+  assert.match(panel, /htmlFor="season-records-division"/);
+  assert.match(panel, /aria-controls="season-record-results"/);
+  assert.match(rows, /<DivisionBadge/);
 });

@@ -26,7 +26,7 @@ function candidate(index: number): AthleteSearchCard {
 const CANDIDATES = Array.from({ length: 7 }, (_, index) => candidate(index + 1))
 
 describe('record candidate browsing', () => {
-  it('keeps browse cards to one action, four visible facts, and one identity caution', () => {
+  it('keeps browse cards to one action, five visible facts, and one identity caution', () => {
     // Given a candidate with multiple teams, events, and divisions.
     const athlete = candidate(1)
 
@@ -45,12 +45,43 @@ describe('record candidate browsing', () => {
     expect(markup).toContain(athlete.name)
     expect(markup).toContain(athlete.team)
     expect(markup).toContain('2024-2026 시즌')
+    expect(markup).toContain(
+      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 기록 보기. 같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요."`,
+    )
     expect(markup).toContain(`기록 ${athlete.recordCount}건`)
     expect(markup).not.toContain('100m')
-    expect(markup).not.toContain('남자 중등부')
+    expect(markup).toContain('부문 · 남자 중등부')
     expect(markup).not.toContain('비교')
     expect(markup).not.toContain('내 기록')
     expect(markup).toContain('같은 이름의 다른 선수일 수 있어요')
+    expect(markup).toContain('pl-2 break-keep [text-wrap:pretty] text-caption')
+  })
+
+
+  it("summarizes multiple normalized divisions without hiding the full labels from assistive context", () => {
+    // Given a candidate whose indexed records span two competition divisions.
+    const athlete = {
+      ...candidate(1),
+      divisions: ["남자 중등부", "남자 고등부"],
+    }
+
+    // When its browse card is rendered.
+    const markup = renderToStaticMarkup(
+      <RecordCandidateCard
+        athlete={athlete}
+        mode="browse"
+        selected={false}
+        onActivate={() => undefined}
+      />,
+    )
+
+    // Then the compact line names the first division and the additional division count.
+    expect(markup).toContain("부문 · 남자 중등부 외 1개")
+    expect(markup).toContain("title=")
+    expect(markup).toContain("남자 고등부")
+    expect(markup).toContain(
+      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 외 1개 기록 보기.`,
+    )
   })
 
   it('keeps the API same-name caution visible on each search candidate', () => {
@@ -72,7 +103,7 @@ describe('record candidate browsing', () => {
 
     // Then the API caution remains visible as user-facing copy.
     expect(markup).toContain(athlete.note)
-    expect(markup).toContain(`aria-label="${athlete.name} 기록 보기. ${athlete.note}"`)
+    expect(markup).toContain(`aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 기록 보기. ${athlete.note}"`)
   })
 
   it('shows a safe same-name fallback even when one candidate has no caution note', () => {
@@ -118,6 +149,10 @@ describe('record candidate browsing', () => {
     expect(browse).toContain('선수 기록 모아 보기')
     expect(browse).not.toContain('선택한 선수')
     expect(collect).not.toContain('선수 기록 모아 보기')
+    expect(browse).toContain('flex-col')
+    expect(browse).toContain('sm:flex-row')
+    expect(browse).toContain('w-full sm:w-auto')
+    expect(browse).toContain('mt-1 break-keep text-body-sm')
     expect(collect.match(/aria-pressed="false"/g)).toHaveLength(7)
     expect(collect.match(/aria-label="선택한 선수"/g)).toHaveLength(1)
   })

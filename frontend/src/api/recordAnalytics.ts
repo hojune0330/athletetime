@@ -23,6 +23,12 @@ export type DivisionFilterOption = AnalyticsFilterOption & {
   level: string;
 };
 
+export type AvailableSeasonCombination = {
+  season: number;
+  eventKey: string;
+  divisionKey: string;
+};
+
 export type DefaultSeasonSelection = {
   season: number;
   eventKey: string;
@@ -41,6 +47,7 @@ export type AnalyticsFilters = {
   genderOptions: AnalyticsFilterOption[];
   levelOptions: AnalyticsFilterOption[];
   defaultSeasonSelection: DefaultSeasonSelection;
+  availableSeasonCombinations: AvailableSeasonCombination[];
 };
 
 export type AthleteSearchCard = {
@@ -189,7 +196,7 @@ export type SeasonRecordTable = {
   divisionLabel: string;
   totalIndexedAthletes: number;
   rows: SeasonRecordRow[];
-  filters: AnalyticsFilters;
+  filters: Omit<AnalyticsFilters, 'availableSeasonCombinations'>;
   disclaimer: string;
 };
 

@@ -4,7 +4,7 @@ const GENDER_LABELS = {
   men: '남자',
   women: '여자',
   mixed: '혼성',
-  unknown: '성별 미상',
+  unknown: '남녀 통합·기타',
 };
 
 const LEVEL_LABELS = {
@@ -17,7 +17,7 @@ const LEVEL_LABELS = {
   u20: 'U20',
   u18: 'U18',
   masters: '마스터즈',
-  unspecified: '층위 미상',
+  unspecified: '부문 통합·기타',
 };
 
 const LEVEL_ORDER = ['all', 'general', 'high', 'university', 'middle', 'elementary', 'u20', 'u18', 'masters', 'unspecified'];
@@ -68,6 +68,9 @@ function detailOf(rawLabel, level) {
 function optionLabel(gender, level) {
   const genderLabel = GENDER_LABELS[gender] || GENDER_LABELS.unknown;
   const levelLabel = LEVEL_LABELS[level] || LEVEL_LABELS.unspecified;
+  if (gender === 'unknown' && level === 'unspecified') return '부문 정보 없음';
+  if (gender === 'unknown') return `${levelLabel} (남녀 통합)`;
+  if (level === 'unspecified') return `${genderLabel} (세부부문 없음)`;
   return `${genderLabel} ${levelLabel}`;
 }
 

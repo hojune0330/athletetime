@@ -136,14 +136,14 @@ function getSeasonRecords({ season, eventKey, divisionKey, athleteKey, limit = 1
     divisionLabel: idx.divisionLabelByKey.get(safeDivisionKey) || safeDivisionKey,
     totalIndexedAthletes: rows.length,
     rows: limitedRows,
-    filters: getFilters(),
+    filters: getFilters(false),
     disclaimer: '모은 기록을 빠른 순으로 정렬했어요. 빠진 대회가 있으면 실제와 다를 수 있어요.',
   };
 }
 
-function getFilters() {
+function getFilters(includeAvailability = true) {
   const idx = getIndex();
-  return {
+  const filters = {
     seasons: idx.seasons,
     events: idx.events,
     divisions: idx.divisions,
@@ -151,6 +151,10 @@ function getFilters() {
     levelOptions: idx.levelOptions,
     defaultSeasonSelection: idx.defaultSeasonSelection,
   };
+  if (includeAvailability) {
+    filters.availableSeasonCombinations = idx.availableSeasonCombinations;
+  }
+  return filters;
 }
 
 // 종목별 "보유 기록량" 집계 — 개인 식별 정보(이름/소속/식별자)는 반환하지 않는다.
@@ -474,6 +478,12 @@ function buildIndex() {
     eventLabelByKey,
     divisionLabelByKey,
   });
+  const availableSeasonCombinations = buildAvailableSeasonCombinations({
+    seasons,
+    events,
+    divisions,
+    seasonTableByKey,
+  });
 
   return {
     records,
@@ -492,6 +502,7 @@ function buildIndex() {
     genderOptions: divisionFilters.genderOptions,
     levelOptions: divisionFilters.levelOptions,
     defaultSeasonSelection,
+    availableSeasonCombinations,
     manualTopRecordStats,
   };
 }
@@ -680,6 +691,35 @@ function addRecordToSeasonBuckets(seasonBuckets, record) {
   const rollupKey = seasonTableKey(record.season, record.eventKey, rollupDivisionKey);
   if (!seasonBuckets.has(rollupKey)) seasonBuckets.set(rollupKey, []);
   seasonBuckets.get(rollupKey).push(record);
+}
+
+function buildAvailableSeasonCombinations({ seasons, events, divisions, seasonTableByKey }) {
+  const seasonSet = new Set(seasons);
+  const eventOrder = new Map(events.map((event, index) => [event.key, index]));
+  const divisionOrder = new Map(divisions.map((division, index) => [division.key, index]));
+
+  return [...seasonTableByKey.entries()]
+    .map(([key, rows]) => {
+      const [rawSeason, eventKey, divisionKey] = String(key).split('|');
+      return {
+        season: Number.parseInt(rawSeason, 10),
+        eventKey,
+        divisionKey,
+        rowCount: rows.length,
+      };
+    })
+    .filter(({ season, eventKey, divisionKey, rowCount }) =>
+      seasonSet.has(season) &&
+      eventOrder.has(eventKey) &&
+      divisionOrder.has(divisionKey) &&
+      rowCount > 0
+    )
+    .sort((a, b) =>
+      b.season - a.season ||
+      eventOrder.get(a.eventKey) - eventOrder.get(b.eventKey) ||
+      divisionOrder.get(a.divisionKey) - divisionOrder.get(b.divisionKey)
+    )
+    .map(({ season, eventKey, divisionKey }) => ({ season, eventKey, divisionKey }));
 }
 
 function pickDefaultSeasonSelection({ seasons, events, divisions, seasonTableByKey, eventLabelByKey, divisionLabelByKey }) {
