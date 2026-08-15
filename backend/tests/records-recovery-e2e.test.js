@@ -164,7 +164,7 @@ test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When r
     await expectVisible(page.getByRole('button', { name: '다시 시도', exact: true }));
     await page.getByRole('button', { name: '다시 시도', exact: true }).click();
     await page.waitForURL(/q=Alpha/u);
-    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/u }));
+    await expectVisible(page.locator('[data-candidate-key="alpha-2016"]'));
     assert.equal(requestCount, 2);
     visited.push(page.url());
   }, {
@@ -202,7 +202,7 @@ test('RECORDS-SEARCH-BUSY-E2E Given a slow public-record search When it waits Th
       assert.equal(await page.getByRole('button', { name: '검색 중', exact: true }).isDisabled(), true);
 
       releaseResponse();
-      await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/u }));
+      await expectVisible(page.locator('[data-candidate-key="alpha-2016"]'));
       visited.push(page.url());
     } finally {
       releaseResponse();

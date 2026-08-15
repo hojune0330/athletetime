@@ -2,6 +2,7 @@ const athletes = [
   athlete('alpha-2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7),
   athlete('alpha-2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4),
   athlete('beta-2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
+  athlete('mine-race-2016', 'Race Runner', 'Race High', [2026], ['200m'], 2),
 ];
 
 const savedWorkspaceAthlete = athlete('aaaaaaaaaaaaaaaa', 'Workspace Kim', 'Saved High', [2026], ['100m'], 2);
@@ -13,47 +14,150 @@ const limitAthletes = Array.from({ length: 7 }, (_, index) => (
 const filters = {
   seasons: [2026, 2025],
   events: [{ key: '100m', label: '100m' }, { key: '200m', label: '200m' }],
-  divisions: [{ key: 'men-high', label: 'Men High', gender: 'men', level: 'high' }, { key: 'men-all', label: 'Men All', gender: 'men', level: 'all' }],
-  genderOptions: [{ key: 'men', label: 'Men' }],
-  levelOptions: [{ key: 'all', label: 'All' }, { key: 'high', label: 'High' }],
-  defaultSeasonSelection: { season: 2026, eventKey: '100m', eventLabel: '100m', divisionKey: 'men-high', divisionLabel: 'Men High', genderKey: 'men', divisionLevel: 'high', rowCount: 18 },
-};
-
-const seasonTable = {
-  season: 2026, eventKey: '100m', divisionKey: 'men-high', eventLabel: '100m', divisionLabel: 'Men High', totalIndexedAthletes: 2,
-  rows: athletes.slice(0, 2).map((item, index) => ({
-    rank: index + 1, athleteKey: item.athleteKey, name: item.name, team: item.team,
-    record: index === 0 ? '10.91' : '11.04', recordValue: index === 0 ? 10.91 : 11.04,
-    date: '2026-04-10', competitionName: 'Fixture Invitational', divisionKey: 'men-high',
-    divisionLabel: 'Men High', divisionLevel: 'high', divisionDetail: null,
-    wind: '+0.7', windLegal: true, highlighted: index === 0,
-  })),
-  filters,
-  disclaimer: 'QA fixture',
+  divisions: [
+    { key: 'men-all', label: '남자 전체(부 통합)', gender: 'men', level: 'all' },
+    { key: 'men-high', label: '남자 고등부', gender: 'men', level: 'high' },
+    { key: 'women-high', label: '여자 고등부', gender: 'women', level: 'high' },
+  ],
+  genderOptions: [{ key: 'men', label: '남자' }, { key: 'women', label: '여자' }],
+  levelOptions: [{ key: 'all', label: '전체(부 통합)' }, { key: 'high', label: '고등부' }],
+  availableSeasonCombinations: [
+    { season: 2026, eventKey: '100m', divisionKey: 'men-high' },
+    { season: 2026, eventKey: '100m', divisionKey: 'women-high' },
+    { season: 2026, eventKey: '200m', divisionKey: 'men-all' },
+    { season: 2025, eventKey: '100m', divisionKey: 'men-high' },
+  ],
+  defaultSeasonSelection: { season: 2026, eventKey: '100m', eventLabel: '100m', divisionKey: 'men-high', divisionLabel: '남자 고등부', genderKey: 'men', divisionLevel: 'high', rowCount: 2 },
 };
 
 function athlete(athleteKey, name, team, years, events, recordCount) {
-  return { athleteKey, name, team, teams: [team], years, events, divisions: ['Men High'], recordCount, ambiguity: 'name_team', note: '' };
+  return { athleteKey, name, team, teams: [team], years, events, divisions: ['남자 고등부'], recordCount, ambiguity: 'name_team', note: '' };
 }
 
 function makeRecord(item, index) {
-  const record = index === 0 ? '10.91' : '11.04';
-  const recordValue = index === 0 ? 10.91 : 11.04;
+  const isMineRaceFixture = item.athleteKey === 'mine-race-2016';
+  const record = isMineRaceFixture
+    ? (index === 0 ? '22.45' : '22.78')
+    : (index === 0 ? '10.91' : '11.04');
+  const recordValue = Number(record);
   return {
     id: `${item.athleteKey}-${index}`, athleteKey: item.athleteKey, name: item.name, team: item.team,
     season: 2026, competitionName: 'Fixture Invitational',
     date: `2026-04-${String(index + 10).padStart(2, '0')}`,
-    venue: 'Fixture Stadium', eventKey: '100m', eventLabel: '100m',
-    divisionKey: 'men-high', divisionLabel: 'Men High', gender: 'men', divisionLevel: 'high',
-    divisionDetail: null, rawDivision: 'Men High', phase: 'final', record, recordValue,
+    venue: 'Fixture Stadium', eventKey: isMineRaceFixture ? '200m' : '100m', eventLabel: isMineRaceFixture ? '200m' : '100m',
+    divisionKey: isMineRaceFixture ? 'men-all' : 'men-high', divisionLabel: isMineRaceFixture ? '남자 전체(부 통합)' : '남자 고등부', gender: 'men', divisionLevel: isMineRaceFixture ? 'all' : 'high',
+    divisionDetail: null, rawDivision: isMineRaceFixture ? '남자부' : '남고', phase: 'final', record, recordValue,
     direction: 'lower', rank: index + 1, wind: '+0.7', windLegal: true, isComparable: true, note: '',
     source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceId: `qa-${item.athleteKey}`, sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
   };
 }
 
 function getSearchResults(query) {
-  if (query.includes('missing')) return [];
-  return query.includes('limit') ? limitAthletes : athletes;
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return [];
+  const candidates = normalizedQuery.includes('limit') ? limitAthletes : athletes;
+  return candidates.filter((candidate) => (
+    [candidate.name, candidate.team, ...candidate.teams]
+      .some((value) => value.toLowerCase().includes(normalizedQuery))
+  ));
+}
+
+function getSeasonRecordsResponse(params) {
+  const season = Number(params.get('season'));
+  const eventKey = params.get('eventKey') || '';
+  const divisionKey = params.get('divisionKey') || '';
+  const combination = filters.availableSeasonCombinations.find((candidate) => (
+    candidate.season === season
+    && candidate.eventKey === eventKey
+    && candidate.divisionKey === divisionKey
+  ));
+  if (!combination) {
+    return {
+      status: 400,
+      body: {
+        success: false,
+        code: 'INVALID_SEASON_COMBINATION',
+        error: '기록이 있는 시즌·종목·경기 부문 조합을 선택해 주세요.',
+      },
+    };
+  }
+
+  const eventLabel = filters.events.find((event) => event.key === eventKey)?.label || eventKey;
+  const division = filters.divisions.find((candidate) => candidate.key === divisionKey);
+  const isValidEmpty = season === 2025 && eventKey === '100m' && divisionKey === 'men-high';
+  const rows = isValidEmpty ? [] : athletes.slice(0, 2).map((item, index) => ({
+    rank: index + 1,
+    athleteKey: item.athleteKey,
+    name: item.name,
+    team: item.team,
+    record: eventKey === '200m'
+      ? (index === 0 ? '22.45' : '22.78')
+      : (index === 0 ? '10.91' : '11.04'),
+    recordValue: eventKey === '200m'
+      ? (index === 0 ? 22.45 : 22.78)
+      : (index === 0 ? 10.91 : 11.04),
+    date: season + '-04-10',
+    competitionName: 'Fixture Invitational',
+    divisionKey,
+    divisionLabel: division?.label || divisionKey,
+    divisionLevel: division?.level || 'unspecified',
+    divisionDetail: null,
+    wind: '+0.7',
+    windLegal: true,
+    highlighted: params.get('athleteKey') === item.athleteKey,
+  }));
+  const { availableSeasonCombinations, ...tableFilters } = filters;
+  return {
+    status: 200,
+    body: {
+      success: true,
+      data: {
+        season,
+        eventKey,
+        divisionKey,
+        eventLabel,
+        divisionLabel: division?.label || divisionKey,
+        totalIndexedAthletes: rows.length,
+        rows,
+        filters: tableFilters,
+        disclaimer: 'QA fixture',
+      },
+    },
+  };
+}
+
+function getTeamSearchResponse(params) {
+  const query = (params.get('q') || '').trim();
+  if (!query.includes('예시')) return null;
+  const selectedCategory = params.get('category') === 'corporate' ? 'corporate' : null;
+  const evidence = {
+    category: 'corporate',
+    resultCount: 12,
+    confidence: 0.92,
+    reasons: ['team_signature:corporate'],
+  };
+  const data = [{
+    teamKey: '0123456789abcdef',
+    teamLabel: '예시군청',
+    selectedCategory,
+    primaryCategory: 'corporate',
+    categoryEvidence: selectedCategory ? evidence : null,
+    categoryBreakdown: [evidence],
+    athleteCount: 5,
+    resultCount: 12,
+    competitionCount: 3,
+    eventCount: 2,
+    confirmedPodiumCount: 4,
+    indexedImprovementCount: 2,
+    firstSeason: 2025,
+    latestSeason: 2026,
+    latestDate: '2026-04-10',
+    coverageDisclaimer: '개인을 식별하지 않는 QA 집계 fixture입니다.',
+  }];
+  return {
+    status: 200,
+    body: { success: true, contractVersion: 1, total: data.length, data },
+  };
 }
 
 function makeProfile(key) {
@@ -111,4 +215,12 @@ function makeInsights() {
   };
 }
 
-module.exports = { filters, getSearchResults, makeInsights, makeProfile, makeWorkspacePreview, seasonTable };
+module.exports = {
+  filters,
+  getSearchResults,
+  getSeasonRecordsResponse,
+  getTeamSearchResponse,
+  makeInsights,
+  makeProfile,
+  makeWorkspacePreview,
+};

@@ -225,13 +225,13 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
 
     // Then teams from different inferred categories remain visible in the neutral result set.
     await expectVisible(page.getByText('개인 기록은 보여주지 않아요.', { exact: false }));
-    await expectVisible(page.getByRole('link', { name: '진도군청 팀 통계 보기' }));
-    await expectVisible(page.getByRole('link', { name: '전남진도초등학교 팀 통계 보기' }));
+    await expectVisible(page.getByRole('link', { name: '진도군청 소속 통계 보기' }));
+    await expectVisible(page.getByRole('link', { name: '전남진도초등학교 소속 통계 보기' }));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
     visited.push(page.url());
 
     // When one result is opened, the branch backend supplies its aggregate detail.
-    await page.getByRole('link', { name: '진도군청 팀 통계 보기' }).click();
+    await page.getByRole('link', { name: '진도군청 소속 통계 보기' }).click();
     await page.waitForURL(/\/records\/teams\/[a-f0-9]{16}/u);
     await expectVisible(page.locator('[data-team-performance-page]'));
     await expectVisible(page.getByRole('heading', { name: '진도군청' }));
