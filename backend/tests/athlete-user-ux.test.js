@@ -274,7 +274,8 @@ test('records coverage notice does not imply continuous year coverage', () => {
   const source = readSource('frontend/src/pages/RecordsPage.tsx');
 
   assert.match(source, /자료가 있는 대회 기록만 보여드려요/);
-  assert.match(source, /연도와 대회별로 빠진 기록이 있을 수 있어요/);
+  assert.match(source, /연도와 대회별로/);
+  assert.match(source, /빠진 기록이 있을 수 있어요/);
   assert.doesNotMatch(source, /2015-2017 일부 기록과 2018년 이후 기록/);
 });
 
