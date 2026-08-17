@@ -55,10 +55,43 @@ function athleteFor({ athleteKey, name, team, records }) {
   };
 }
 
-function createFixtureService(athletes) {
+function createFixtureService(athletes, legacyAthleteAliasesByKey = new Map()) {
   const athleteByKey = new Map(athletes.map((athlete) => [athlete.athleteKey, athlete]));
-  return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey }) });
+  return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey, legacyAthleteAliasesByKey }) });
 }
+
+test('Given saved direct, unique-alias, and ambiguous keys When a workspace preview is restored Then only the direct and unique canonical subjects are returned', () => {
+  const firstKey = '1111111111111111';
+  const secondKey = '2222222222222222';
+  const uniqueAlias = 'aaaaaaaaaaaaaaaa';
+  const ambiguousAlias = 'bbbbbbbbbbbbbbbb';
+  const first = athleteFor({
+    athleteKey: firstKey,
+    name: '가람',
+    team: '서울고',
+    records: [recordFor({ id: 'alias-a', athleteKey: firstKey, name: '가람', team: '서울고', date: '2025-06-02', season: 2025 })],
+  });
+  const second = athleteFor({
+    athleteKey: secondKey,
+    name: '나래',
+    team: '부산고',
+    records: [recordFor({ id: 'direct-b', athleteKey: secondKey, name: '나래', team: '부산고', date: '2025-05-02', season: 2025 })],
+  });
+  const service = createFixtureService([first, second], new Map([
+    [uniqueAlias, new Set([firstKey])],
+    [secondKey, new Set([firstKey])],
+    [ambiguousAlias, new Set([firstKey, secondKey])],
+  ]));
+
+  const preview = service.getRecordWorkspacePreview({
+    subjectKeys: [uniqueAlias, secondKey, ambiguousAlias],
+    limit: 50,
+  });
+
+  assert.deepEqual(preview.subjects.map((subject) => subject.athleteKey), [firstKey, secondKey]);
+  assert.deepEqual(preview.unavailableSubjectKeys, [ambiguousAlias]);
+  assert.deepEqual(preview.records.map((record) => record.athleteKey), [firstKey, secondKey]);
+});
 
 test('Given safe and hostile source division labels When workspace records are projected Then raw text is removed and only taxonomy provenance survives', () => {
   const safe = recordFor({

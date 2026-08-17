@@ -4,6 +4,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -31,6 +34,8 @@ jobs:
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
@@ -56,6 +61,8 @@ jobs:
       RECORDS_E2E_EVIDENCE_DIR: .omo/evidence/pr88-integrated-hardening/task-5-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22.17.1'
@@ -91,6 +98,12 @@ jobs:
           set -o pipefail
           echo 'RECORDS_CI_PHASE=browser-gates' >> "$GITHUB_ENV"
           npm run test:division-navigation:browser 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/browser-gates.log"
+      - name: Build frontend bundle
+        id: frontend-build
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=frontend-build' >> "$GITHUB_ENV"
+          npm --prefix frontend run build:check 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/frontend-build.log"
       - name: Run actual-index safety smoke
         id: actual-index
         run: |
@@ -104,6 +117,7 @@ jobs:
           FRONTEND_NPM_CI_OUTCOME: ${{ steps.npm-ci-frontend.outcome }}
           PLAYWRIGHT_INSTALL_OUTCOME: ${{ steps.playwright-install.outcome }}
           BROWSER_GATES_OUTCOME: ${{ steps.browser-gates.outcome }}
+          FRONTEND_BUILD_OUTCOME: ${{ steps.frontend-build.outcome }}
           ACTUAL_INDEX_OUTCOME: ${{ steps.actual-index.outcome }}
         run: |
           node <<'NODE'
@@ -116,6 +130,7 @@ jobs:
             'npm-ci-frontend': process.env.FRONTEND_NPM_CI_OUTCOME,
             'playwright-install': process.env.PLAYWRIGHT_INSTALL_OUTCOME,
             'browser-gates': process.env.BROWSER_GATES_OUTCOME,
+            'frontend-build': process.env.FRONTEND_BUILD_OUTCOME,
             'actual-index': process.env.ACTUAL_INDEX_OUTCOME,
           };
           const failedPhase = Object.entries(outcomes).find(([, outcome]) => outcome === 'failure');

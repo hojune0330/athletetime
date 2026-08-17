@@ -17,7 +17,12 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
       const subjects = [];
       const unavailableSubjectKeys = [];
       for (const subjectKey of request.subjectKeys) {
-        const athlete = athleteByKey.get(subjectKey);
+        const directAthlete = athleteByKey.get(subjectKey);
+        const aliasCandidates = directAthlete ? null : index.legacyAthleteAliasesByKey?.get(subjectKey);
+        const canonicalKey = aliasCandidates instanceof Set && aliasCandidates.size === 1
+          ? [...aliasCandidates][0]
+          : '';
+        const athlete = directAthlete || athleteByKey.get(canonicalKey);
         if (!athlete) {
           unavailableSubjectKeys.push(subjectKey);
           continue;
