@@ -94,8 +94,11 @@ async function assertLoopbackNetworkGuard(state) {
   assert.equal(state.consoleError, false);
   assert.equal(state.pageError, false);
   assert.equal(state.nonLocalWebSocket, false);
-  assert.equal(state.externalAttempted, true);
-  assert.equal(state.externalStylesIntercepted, true);
+  assert.equal(
+    state.externalStylesIntercepted,
+    state.externalAttempted,
+    'any external request must be an intercepted stylesheet; zero external requests is valid',
+  );
 }
 
 async function captureRecoveryNotice(locator, screenshotPath) {

@@ -92,6 +92,33 @@ describe('record collection empty search state', () => {
     expect(markup).toContain('공개 경기 결과')
   })
 
+  it('keeps every canonical division and event visible in a same-name candidate', () => {
+    // Given one candidate spanning several events and competition divisions.
+    const candidate = {
+      ...selectionLimitCandidates[0],
+      events: ['100m', '200m', '400m', '800m'],
+      divisions: ['남자 중등부', '남자 고등부'],
+    };
+
+    // When the candidate selection step renders.
+    const markup = renderToStaticMarkup(
+      <CandidateStep
+        athletes={[candidate]}
+        onNext={() => undefined}
+        onResetSearch={() => undefined}
+        onToggleDraft={() => undefined}
+        selectedKeys={[]}
+        savedEntryCount={0}
+        state="ready"
+      />,
+    );
+
+    // Then no event or canonical division is clipped or summarized away.
+    expect(markup).toContain('경기 부문')
+    expect(markup).toContain('남자 중등부 · 남자 고등부')
+    expect(markup).toContain('100m · 200m · 400m · 800m')
+  })
+
   it('keeps a visible keyboard focus indicator on a selectable athlete', () => {
     // Given a ready candidate search with one selectable athlete.
     const markup = renderToStaticMarkup(

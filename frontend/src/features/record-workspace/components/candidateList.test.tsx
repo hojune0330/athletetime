@@ -40,29 +40,31 @@ describe('record candidate browsing', () => {
       />,
     )
 
-    // Then one whole-card action shows the four candidate facts and the identity caution.
+    // Then one whole-card action shows the candidate facts and the identity caution.
     expect(markup.match(/<button/g)).toHaveLength(1)
     expect(markup).toContain(athlete.name)
     expect(markup).toContain(athlete.team)
     expect(markup).toContain('2024-2026 시즌')
     expect(markup).toContain(
-      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 기록 보기. 같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요."`,
+      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 · 종목 100m · 200m 기록 보기. 같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요."`,
     )
     expect(markup).toContain(`기록 ${athlete.recordCount}건`)
-    expect(markup).not.toContain('100m')
+    expect(markup).toContain('종목 · 100m · 200m')
     expect(markup).toContain('부문 · 남자 중등부')
     expect(markup).not.toContain('비교')
     expect(markup).not.toContain('내 기록')
     expect(markup).toContain('같은 이름의 다른 선수일 수 있어요')
+    expect(markup).toContain('whitespace-nowrap">소속과 시즌을 확인해 주세요.</span>')
     expect(markup).toContain('pl-2 break-keep [text-wrap:pretty] text-caption')
   })
 
 
-  it("summarizes multiple normalized divisions without hiding the full labels from assistive context", () => {
+  it("shows every normalized division and event in the visible candidate context", () => {
     // Given a candidate whose indexed records span two competition divisions.
     const athlete = {
       ...candidate(1),
       divisions: ["남자 중등부", "남자 고등부"],
+      events: ["100m", "200m", "400m"],
     }
 
     // When its browse card is rendered.
@@ -75,12 +77,13 @@ describe('record candidate browsing', () => {
       />,
     )
 
-    // Then the compact line names the first division and the additional division count.
-    expect(markup).toContain("부문 · 남자 중등부 외 1개")
-    expect(markup).toContain("title=")
-    expect(markup).toContain("남자 고등부")
+    // Then no canonical division or event is hidden behind a count or title attribute.
+    expect(markup).toContain("부문 · 남자 중등부 · 남자 고등부")
+    expect(markup).toContain("종목 · 100m · 200m · 400m")
+    expect(markup).not.toContain("외 1개")
+    expect(markup).not.toContain("title=")
     expect(markup).toContain(
-      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 외 1개 기록 보기.`,
+      `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 · 남자 고등부 · 종목 100m · 200m · 400m 기록 보기.`,
     )
   })
 
@@ -103,7 +106,7 @@ describe('record candidate browsing', () => {
 
     // Then the API caution remains visible as user-facing copy.
     expect(markup).toContain(athlete.note)
-    expect(markup).toContain(`aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 기록 보기. ${athlete.note}"`)
+    expect(markup).toContain(`aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 · 종목 100m · 200m 기록 보기. ${athlete.note}"`)
   })
 
   it('shows a safe same-name fallback even when one candidate has no caution note', () => {

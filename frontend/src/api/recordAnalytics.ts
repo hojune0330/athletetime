@@ -1,4 +1,36 @@
 import { apiClient } from './client';
+import {
+  analyticsFiltersSchema,
+  athleteAnalyticsResultSchema,
+  athleteSearchCardsSchema,
+  parseAnalyticsResponse,
+  parseSeasonAvailabilityResponse,
+  seasonRecordTableSchema,
+} from './recordAnalyticsSchemas';
+import type {
+  AnalyticsFilters,
+  AthleteAnalyticsResult,
+  AthleteSearchCard,
+  SeasonAvailability,
+  SeasonRecordTable,
+} from './recordAnalyticsSchemas';
+
+export { AnalyticsApiBoundaryError } from './recordAnalyticsSchemas';
+export type {
+  AnalyticsFilterOption,
+  AnalyticsFilters,
+  AthleteAnalyticsProfile,
+  AthleteAnalyticsResult,
+  AthleteSearchCard,
+  DefaultSeasonSelection,
+  DivisionFilterOption,
+  PublicRecord,
+  RecordDelta,
+  RecordTrailPoint,
+  SeasonAvailability,
+  SeasonRecordRow,
+  SeasonRecordTable,
+} from './recordAnalyticsSchemas';
 
 const BASE = '/api/card-studio/analytics';
 
@@ -11,56 +43,6 @@ type ApiListResponse<T> = {
 type ApiItemResponse<T> = {
   success: boolean;
   data: T;
-};
-
-export type AnalyticsFilterOption = {
-  key: string;
-  label: string;
-};
-
-export type DivisionFilterOption = AnalyticsFilterOption & {
-  gender: string;
-  level: string;
-};
-
-export type AvailableSeasonCombination = {
-  season: number;
-  eventKey: string;
-  divisionKey: string;
-};
-
-export type DefaultSeasonSelection = {
-  season: number;
-  eventKey: string;
-  eventLabel: string;
-  divisionKey: string;
-  divisionLabel: string;
-  genderKey: string;
-  divisionLevel: string;
-  rowCount: number;
-};
-
-export type AnalyticsFilters = {
-  seasons: number[];
-  events: AnalyticsFilterOption[];
-  divisions: DivisionFilterOption[];
-  genderOptions: AnalyticsFilterOption[];
-  levelOptions: AnalyticsFilterOption[];
-  defaultSeasonSelection: DefaultSeasonSelection;
-  availableSeasonCombinations: AvailableSeasonCombination[];
-};
-
-export type AthleteSearchCard = {
-  athleteKey: string;
-  name: string;
-  team: string;
-  teams: string[];
-  years: number[];
-  events: string[];
-  divisions: string[];
-  recordCount: number;
-  ambiguity: string;
-  note: string;
 };
 
 export type TeamSeasonStatistic = {
@@ -94,112 +76,6 @@ export type TeamStatistics = {
   disclaimer: string;
 };
 
-export type PublicRecord = {
-  id: string;
-  athleteKey: string;
-  name: string;
-  team: string;
-  season: number;
-  competitionName: string;
-  date: string;
-  venue: string;
-  eventKey: string;
-  eventLabel: string;
-  divisionKey: string;
-  divisionLabel: string;
-  gender: string;
-  divisionLevel: string;
-  divisionDetail: string | null;
-  rawDivision: string;
-  phase: string;
-  record: string;
-  recordValue: number;
-  direction: 'lower' | 'higher';
-  rank: number | null;
-  wind: string | null;
-  windLegal: boolean;
-  isComparable: boolean;
-  note: string;
-  source: {
-    provider: string;
-    sourceType: string;
-    sourceUrl: string;
-    capturedAt: string;
-    reviewStatus?: string;
-  };
-};
-
-export type RecordDelta = {
-  from: PublicRecord;
-  to: PublicRecord;
-  rawDelta: number;
-  display: string;
-  improved: boolean;
-} | null;
-
-export type RecordTrailPoint = {
-  id: string;
-  date: string;
-  season: number;
-  value: number;
-  record: string;
-  eventLabel: string;
-  competitionName: string;
-  isComparable: boolean;
-};
-
-export type AthleteAnalyticsProfile = {
-  athlete: AthleteSearchCard;
-  summary: {
-    indexedBest: PublicRecord | null;
-    seasonBest: PublicRecord | null;
-    latest: PublicRecord | null;
-    delta: RecordDelta;
-    indexedResultCount: number;
-    comparableResultCount: number;
-    sourceScope: string;
-    disclaimer: string;
-  };
-  events: Array<{
-    eventKey: string;
-    eventLabel: string;
-    recordCount: number;
-    best: PublicRecord | null;
-  }>;
-  recordTrail: RecordTrailPoint[];
-  records: PublicRecord[];
-};
-
-export type SeasonRecordRow = {
-  rank: number;
-  athleteKey: string;
-  name: string;
-  team: string;
-  record: string;
-  recordValue: number;
-  date: string;
-  competitionName: string;
-  divisionKey: string;
-  divisionLabel: string;
-  divisionLevel: string;
-  divisionDetail: string | null;
-  wind: string | null;
-  windLegal: boolean;
-  highlighted: boolean;
-};
-
-export type SeasonRecordTable = {
-  season: number;
-  eventKey: string;
-  divisionKey: string;
-  eventLabel: string;
-  divisionLabel: string;
-  totalIndexedAthletes: number;
-  rows: SeasonRecordRow[];
-  filters: Omit<AnalyticsFilters, 'availableSeasonCombinations'>;
-  disclaimer: string;
-};
-
 export type PopularEvent = {
   key: string;
   label: string;
@@ -214,8 +90,13 @@ export type PopularEvents = {
 };
 
 export async function getAnalyticsFilters(): Promise<AnalyticsFilters> {
-  const { data } = await apiClient.get<ApiItemResponse<AnalyticsFilters>>(`${BASE}/filters`);
-  return data.data;
+  const { data } = await apiClient.get<unknown>(`${BASE}/filters`);
+  return parseAnalyticsResponse(data, analyticsFiltersSchema, '/filters');
+}
+
+export async function getSeasonAvailability(): Promise<SeasonAvailability> {
+  const { data } = await apiClient.get<unknown>(`${BASE}/season-availability`);
+  return parseSeasonAvailabilityResponse(data);
 }
 
 export async function getPopularEvents(params: { season?: number; limit?: number } = {}): Promise<PopularEvents> {
@@ -329,11 +210,26 @@ export async function getShadowCluster(athleteKey: string): Promise<ShadowCluste
   return data.data;
 }
 
+export type SearchAthletesOptions = {
+  readonly limit?: number;
+  readonly divisionKey?: string;
+};
+
+export async function searchAthletes(
+  query: string,
+  options: SearchAthletesOptions = {},
+): Promise<AthleteSearchCard[]> {
+  const params: { q: string; limit: number; divisionKey?: string } = {
+    q: query,
+    limit: options.limit ?? 12,
+  };
+  if (options.divisionKey !== undefined) params.divisionKey = options.divisionKey;
+  const { data } = await apiClient.get<unknown>(`${BASE}/records/search`, { params });
+  return parseAnalyticsResponse(data, athleteSearchCardsSchema, '/records/search');
+}
+
 export async function searchRecordAthletes(query: string, limit = 12): Promise<AthleteSearchCard[]> {
-  const { data } = await apiClient.get<ApiListResponse<AthleteSearchCard>>(`${BASE}/records/search`, {
-    params: { q: query, limit },
-  });
-  return data.data;
+  return searchAthletes(query, { limit });
 }
 
 export async function searchTeamStatistics(query: string, limit = 20): Promise<TeamStatistics[]> {
@@ -343,11 +239,11 @@ export async function searchTeamStatistics(query: string, limit = 20): Promise<T
   return data.data;
 }
 
-export async function getAthleteAnalytics(athleteKey: string): Promise<AthleteAnalyticsProfile> {
-  const { data } = await apiClient.get<ApiItemResponse<AthleteAnalyticsProfile>>(
+export async function getAthleteAnalytics(athleteKey: string): Promise<AthleteAnalyticsResult> {
+  const { data } = await apiClient.get<unknown>(
     `${BASE}/athletes/${encodeURIComponent(athleteKey)}`,
   );
-  return data.data;
+  return parseAnalyticsResponse(data, athleteAnalyticsResultSchema, '/athletes/:athleteKey');
 }
 
 export async function getSeasonRecordTable(params: {
@@ -357,8 +253,8 @@ export async function getSeasonRecordTable(params: {
   athleteKey?: string;
   limit?: number;
 }): Promise<SeasonRecordTable> {
-  const { data } = await apiClient.get<ApiItemResponse<SeasonRecordTable>>(`${BASE}/season-records`, {
+  const { data } = await apiClient.get<unknown>(`${BASE}/season-records`, {
     params,
   });
-  return data.data;
+  return parseAnalyticsResponse(data, seasonRecordTableSchema, '/season-records');
 }

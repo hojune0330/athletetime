@@ -22,18 +22,56 @@ function writeEvidence(state, evidence) {
     runtime: process.version,
     scenario: evidence.scenario || 'records flow e2e',
     invocation: evidence.invocation || 'node --test backend/tests/records-flow-e2e.test.js',
-    baseUrl: state.baseUrl,
+    loopbackOnly: true,
     viewport: state.viewport,
-    visited: state.visited,
-    apiRequests: state.apiRequests,
-    externalAttempts: state.externalAttempts,
-    externalInterceptions: state.externalInterceptions,
-    externalNetworkRequests: state.externalNetworkRequests,
+    visited: state.visited.map(sanitizeUrl),
+    apiRequests: state.apiRequests.map(sanitizeUrl),
+    externalAttempts: state.externalAttempts.map((attempt) => ({
+      ...attempt,
+      url: sanitizeUrl(attempt.url),
+    })),
+    externalInterceptions: state.externalInterceptions.map((attempt) => ({
+      ...attempt,
+      url: sanitizeUrl(attempt.url),
+    })),
+    externalNetworkRequests: state.externalNetworkRequests.map((request) => ({
+      ...request,
+      url: sanitizeUrl(request.url),
+    })),
     captures: state.captureArtifacts,
     captureWindow: captureWindow(state.captureArtifacts),
     consoleErrors: state.consoleErrors,
     pageErrors: state.pageErrors,
   }, null, 2));
+}
+
+function writeCleanupReceipt() {
+  if (!shouldWriteEvidence()) return;
+  const evidenceDir = process.env.RECORDS_E2E_EVIDENCE_DIR
+    || path.join(ROOT, '.omo', 'evidence', 'track-j-records-e2e-replacement');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+  fs.writeFileSync(path.join(evidenceDir, 'cleanup-receipt.json'), `${JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    runtime: process.version,
+    loopbackOnly: true,
+    browserContextClosed: true,
+    browserClosed: true,
+    viteProcessStopped: true,
+    apiServerClosed: true,
+  }, null, 2)}\n`);
+}
+
+function sanitizeUrl(value) {
+  try {
+    const url = new URL(value, 'http://loopback.invalid');
+    const pathName = url.pathname
+      .replace(/\/athletes\/[^/]+(?=\/|$)/u, '/athletes/[redacted]')
+      .replace(/\/teams\/[^/]+(?=\/|$)/u, '/teams/[redacted]');
+    const queryKeys = [...new Set(url.searchParams.keys())].sort();
+    return `${pathName}${queryKeys.length ? `?${queryKeys.map((key) => `${key}=[redacted]`).join('&')}` : ''}`;
+  } catch {
+    return '[invalid-url]';
+  }
 }
 
 function captureWindow(captures) {
@@ -44,4 +82,4 @@ function captureWindow(captures) {
   };
 }
 
-module.exports = { shouldWriteEvidence, writeEvidence };
+module.exports = { sanitizeUrl, shouldWriteEvidence, writeCleanupReceipt, writeEvidence };

@@ -4,7 +4,7 @@ const GENDER_LABELS = {
   men: '남자',
   women: '여자',
   mixed: '혼성',
-  unknown: '남녀 통합·기타',
+  unknown: '성별 구분 없음',
 };
 
 const LEVEL_LABELS = {
@@ -22,6 +22,14 @@ const LEVEL_LABELS = {
 
 const LEVEL_ORDER = ['all', 'general', 'high', 'university', 'middle', 'elementary', 'u20', 'u18', 'masters', 'unspecified'];
 const GENDER_ORDER = ['men', 'women', 'mixed', 'unknown'];
+const PUBLIC_SOURCE_DIVISION_PATTERNS = [
+  /^(?:남자|여자|혼성)(?:부)?$/u,
+  /^(?:(?:남자|여자|혼성)\s*)?(?:일반|실업|대학|고등|고교|중학|초등|마스터즈)(?:학교)?(?:\s*[1-6]\s*학년)?(?:부)?$/u,
+  /^(?:남|여)(?:일|대|고|중|초)$/u,
+  /^(?:고|중|초)\s*[1-6](?:\s*학년)?(?:부)?$/u,
+  /^(?:U(?:18|20)|(?:M|W)(?:A|\d{2})?)$/iu,
+  /^(?:통합부|공통|전체|구분\s*미상)$/u,
+];
 
 function compact(value) {
   return String(value || '').trim().replace(/\s+/gu, ' ');
@@ -31,13 +39,25 @@ function normalizeCompact(value) {
   return compact(value).replace(/\s+/gu, '');
 }
 
+function toPublicSourceDivisionLabel(value) {
+  if (typeof value !== 'string') return null;
+  const label = compact(value);
+  if (!label || label.length > 40) return null;
+  const segments = label.split(/\s*[,/·]\s*/u);
+  if (segments.length > 3) return null;
+  return segments.every((segment) => (
+    segment && PUBLIC_SOURCE_DIVISION_PATTERNS.some((pattern) => pattern.test(segment))
+  )) ? label : null;
+}
+
 function inferGender(rawLabel) {
+  const label = compact(rawLabel);
   const text = normalizeCompact(rawLabel);
   if (!text || /통합부|공통|전체/u.test(text)) return 'unknown';
   const hasMenMarker = /남자|남고|남중|남초|남대|남일/u.test(text);
   const hasWomenMarker = /여자|여고|여중|여초|여대|여일/u.test(text);
-  if (hasMenMarker && hasWomenMarker) return 'mixed';
-  if (/혼성|mixed/i.test(text)) return 'mixed';
+  if (/혼성/u.test(text) || /(^|[^a-z])mixed(?=$|[^a-z]|u?\d)/iu.test(label)) return 'mixed';
+  if (hasMenMarker && hasWomenMarker) return 'unknown';
   if (/^(M|MA)\d*$/iu.test(text) || /^M\d{2}$/iu.test(text) || hasMenMarker) return 'men';
   if (/^(W|WA)\d*$/iu.test(text) || /^W\d{2}$/iu.test(text) || hasWomenMarker) return 'women';
   return 'unknown';
@@ -69,7 +89,7 @@ function optionLabel(gender, level) {
   const genderLabel = GENDER_LABELS[gender] || GENDER_LABELS.unknown;
   const levelLabel = LEVEL_LABELS[level] || LEVEL_LABELS.unspecified;
   if (gender === 'unknown' && level === 'unspecified') return '부문 정보 없음';
-  if (gender === 'unknown') return `${levelLabel} (남녀 통합)`;
+  if (gender === 'unknown') return `${levelLabel} (성별 구분 없음)`;
   if (level === 'unspecified') return `${genderLabel} (세부부문 없음)`;
   return `${genderLabel} ${levelLabel}`;
 }
@@ -125,7 +145,6 @@ function buildDivisionFilters(divisionMetaByKey) {
   const orderedGenders = GENDER_ORDER.filter((gender) => genders.includes(gender));
   const options = [];
   for (const gender of orderedGenders) {
-    options.push(rollupOptionForGender(gender));
     for (const level of LEVEL_ORDER.filter((item) => item !== 'all')) {
       const existing = present.find((meta) => meta.gender === gender && meta.divisionLevel === level);
       if (existing || level !== 'unspecified') {
@@ -142,7 +161,9 @@ function buildDivisionFilters(divisionMetaByKey) {
   return {
     divisions: options.sort(optionSort),
     genderOptions: orderedGenders.map((gender) => ({ key: gender, label: GENDER_LABELS[gender] })),
-    levelOptions: LEVEL_ORDER.map((level) => ({ key: level, label: LEVEL_LABELS[level] })),
+    levelOptions: LEVEL_ORDER
+      .filter((level) => level !== 'all')
+      .map((level) => ({ key: level, label: LEVEL_LABELS[level] })),
   };
 }
 
@@ -150,6 +171,7 @@ module.exports = {
   LEVEL_ORDER,
   GENDER_ORDER,
   normalizeDivision,
+  toPublicSourceDivisionLabel,
   rollupKeyForGender,
   rollupOptionForGender,
   buildDivisionFilters,

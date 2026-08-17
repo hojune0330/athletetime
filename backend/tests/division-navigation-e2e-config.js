@@ -4,6 +4,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const EVIDENCE_DIR = process.env.RECORDS_E2E_EVIDENCE_DIR
   || path.join(ROOT, '.omo', 'evidence', 'athletetime-division-navigation-improvement');
 const VIEWPORTS = [
+  { width: 320, height: 667 },
   { width: 375, height: 667 },
   { width: 768, height: 900 },
   { width: 1280, height: 900 },
@@ -20,6 +21,9 @@ const SOURCE_FILES = [
   'backend/tests/records-flow-e2e-fixture.js',
   'backend/tests/records-flow-e2e-network.js',
   'backend/tests/records-flow-e2e-runtime.js',
+  'card-studio/routes/recordAnalyticsRoutes.js',
+  'card-studio/services/recordAnalyticsService.js',
+  'data/results/index.json',
   'frontend/src/pages/RecordsPage.tsx',
   'frontend/src/components/records/TeamStatisticsResults.tsx',
   'frontend/src/features/record-workspace/components/RecordCandidateCard.tsx',

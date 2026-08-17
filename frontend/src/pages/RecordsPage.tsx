@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   getAnalyticsFilters,
   getAthleteAnalytics,
-  searchRecordAthletes,
-  type AnalyticsFilters,
+  getSeasonAvailability,
+  searchAthletes,
   type AthleteAnalyticsProfile,
   type AthleteSearchCard,
+  type AnalyticsFilters,
   type PublicRecord,
 } from '../api/recordAnalytics';
 import { Button } from '../components/ui/button';
@@ -25,6 +26,7 @@ import { ShareCard } from '../components/record-insights/ShareCard';
 import { useCompareTray } from '../components/record-insights/useCompareTray';
 import { RecordsBrowseGateway, type BrowseChoice } from '../components/records/RecordsBrowseGateway';
 import { RecordsHub } from '../components/records/RecordsHub';
+import { RecordSearchFilterChips } from '../components/records/RecordSearchFilterChips';
 import { RecordSearchForm } from '../components/records/RecordSearchForm';
 import { RecordsMineFlow } from '../components/records/RecordsMineFlow';
 import { normalizeMineStep, type MineStep } from '../components/records/RecordsMineTypes';
@@ -37,11 +39,17 @@ import type { TeamCategory, TeamSearchSummary } from '../features/team-performan
 import { RecordCandidatesSurface } from '../features/record-workspace/components/RecordCandidatesSurface';
 import { SeasonRecordsPanel } from '../features/record-workspace/season-navigation/SeasonRecordsPanel';
 import {
+  createSeasonNavigationCatalog,
   resolveAthleteSeasonSelection,
   resolveSeasonSelection,
   updateSeasonSelectionParams,
+  type SeasonNavigationCatalog,
   type SeasonSelection,
 } from '../features/record-workspace/season-navigation/seasonNavigation';
+import {
+  useAthleteProfileController,
+  type AthleteProfileLoadState,
+} from '../features/record-workspace/season-navigation/useAthleteProfileController';
 import { useSeasonRecordsController } from '../features/record-workspace/season-navigation/useSeasonRecordsController';
 import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, SHARE_POLICY } from '../config/dataPolicy';
@@ -59,22 +67,23 @@ export default function RecordsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [mode, setMode] = useState<Mode>('athlete');
   const [query, setQuery] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [searchState, setSearchState] = useState<LoadState>('idle');
   const [athletes, setAthletes] = useState<AthleteSearchCard[]>([]);
   const [teamStatistics, setTeamStatistics] = useState<readonly TeamSearchSummary[]>([]);
-  const [selectedAthleteKey, setSelectedAthleteKey] = useState('');
-  const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
-  const [profileState, setProfileState] = useState<LoadState>('idle');
-  const [filters, setFilters] = useState<AnalyticsFilters | null>(null);
-  const filtersRef = useRef<AnalyticsFilters | null>(null);
-  const filtersRequestRef = useRef<Promise<AnalyticsFilters> | null>(null);
-  const seasonController = useSeasonRecordsController({
-    filters,
-    athleteKey: selectedAthleteKey,
-  });
+  const [divisionFilters, setDivisionFilters] = useState<AnalyticsFilters | null>(null);
+  const [divisionFiltersState, setDivisionFiltersState] = useState<LoadState>('idle');
+  const [catalog, setCatalog] = useState<SeasonNavigationCatalog | null>(null);
+  const [catalogState, setCatalogState] = useState<LoadState>('idle');
+  const [seasonAthleteKey, setSeasonAthleteKey] = useState('');
+  const divisionFiltersRef = useRef<AnalyticsFilters | null>(null);
+  const divisionFiltersRequestRef = useRef<Promise<AnalyticsFilters> | null>(null);
+  const catalogRef = useRef<SeasonNavigationCatalog | null>(null);
+  const catalogRequestRef = useRef<Promise<SeasonNavigationCatalog> | null>(null);
+  const mineSeasonIntentRef = useRef(0);
+  const mountedRef = useRef(true);
+  const previousLocationKeyRef = useRef(location.key);
   const [workspaceSelectionMode, setWorkspaceSelectionMode] = useState(false);
   const [compareNotice, setCompareNotice] = useState('');
   const compareTray = useCompareTray();
@@ -84,12 +93,94 @@ export default function RecordsPage() {
   const activeFlow = normalizeRecordsFlow(searchParams.get('flow'));
   const mineStep = normalizeMineStep(searchParams.get('step'));
   const browseChoice = normalizeBrowseChoice(searchParams.get('browse'));
+  const searchDivisionParam = (searchParams.get('divisionFilter') || '').trim();
+  const isSeasonBrowse = activeFlow === 'browse' && browseChoice === 'season';
+  const mode: Mode = isSeasonBrowse ? 'season' : 'athlete';
+  const profileController = useAthleteProfileController(selectedAthleteParam);
+  const profile = profileController.profile?.athlete.athleteKey === selectedAthleteParam
+    ? profileController.profile
+    : null;
+  const profileState: AthleteProfileLoadState = selectedAthleteParam
+    ? profileController.state
+    : 'idle';
+  const seasonController = useSeasonRecordsController({
+    filters: catalog,
+    athleteKey: seasonAthleteKey,
+    enabled: isSeasonBrowse,
+  });
   const isTeamBrowse = activeFlow === 'browse' && browseChoice === 'team';
+  const selectedSearchDivisionKey = activeFlow !== 'mine' && divisionFilters?.divisions.some(
+    (division) => division.key === searchDivisionParam,
+  ) ? searchDivisionParam : '';
+  const waitingForDivisionCatalog = activeFlow !== 'mine'
+    && Boolean(searchDivisionParam)
+    && divisionFiltersState !== 'ready'
+    && divisionFiltersState !== 'error';
   const teamCategory = parseTeamCategory(searchParams.get('category'));
   const mineAvailableSlots = Math.max(0, MAX_MY_ATHLETE_ENTRIES - myEntries.length);
   const mineDraftKeys = parseKeyList(searchParams.get('mineDraft')).slice(0, mineAvailableSlots);
   const workspaceDraftKeys = workspaceStore.workspaceDraft?.subjectKeys ?? [];
   const deviceDraftCount = workspaceDraftKeys.length + (workspaceStore.selfClaimDraft?.subjectKeys.length ?? 0);
+
+  const ensureAnalyticsFilters = useCallback((): Promise<AnalyticsFilters> => {
+    if (divisionFiltersRef.current) return Promise.resolve(divisionFiltersRef.current);
+    if (divisionFiltersRequestRef.current) return divisionFiltersRequestRef.current;
+
+    if (mountedRef.current) setDivisionFiltersState('loading');
+    const request = getAnalyticsFilters()
+      .then((nextFilters) => {
+        divisionFiltersRef.current = nextFilters;
+        if (mountedRef.current) {
+          setDivisionFilters(nextFilters);
+          setDivisionFiltersState('ready');
+        }
+        return nextFilters;
+      })
+      .catch((error: unknown) => {
+        divisionFiltersRequestRef.current = null;
+        if (mountedRef.current) {
+          setDivisionFilters(null);
+          setDivisionFiltersState('error');
+        }
+        throw error;
+      });
+    divisionFiltersRequestRef.current = request;
+    return request;
+  }, []);
+
+  const ensureSeasonCatalog = useCallback((): Promise<SeasonNavigationCatalog> => {
+    if (catalogRef.current) return Promise.resolve(catalogRef.current);
+    if (catalogRequestRef.current) return catalogRequestRef.current;
+
+    if (mountedRef.current) setCatalogState('loading');
+    const request = Promise.all([
+      ensureAnalyticsFilters(),
+      getSeasonAvailability(),
+    ])
+      .then(([filters, availability]) => {
+        const nextCatalog = createSeasonNavigationCatalog(filters, availability);
+        catalogRef.current = nextCatalog;
+        if (mountedRef.current) {
+          setCatalog(nextCatalog);
+          setCatalogState('ready');
+        }
+        return nextCatalog;
+      })
+      .catch((error: unknown) => {
+        catalogRequestRef.current = null;
+        if (mountedRef.current) {
+          setCatalog(null);
+          setCatalogState('error');
+        }
+        throw error;
+      });
+    catalogRequestRef.current = request;
+    return request;
+  }, [ensureAnalyticsFilters]);
+
+  const cancelMineSeasonNavigation = useCallback(() => {
+    mineSeasonIntentRef.current += 1;
+  }, []);
 
   const toggleProfileComparison = (currentProfile: AthleteAnalyticsProfile) => {
     const result = compareTray.toggle({
@@ -107,43 +198,26 @@ export default function RecordsPage() {
   }, [location.key, location.state]);
 
   useEffect(() => {
-    let active = true;
-    const filtersRequest = getAnalyticsFilters();
-    filtersRequestRef.current = filtersRequest;
-    filtersRequest
-      .then((nextFilters) => {
-        if (!active) return;
-        filtersRef.current = nextFilters;
-        setFilters(nextFilters);
-      })
-      .catch(() => {
-        if (active) {
-          const fallbackFilters: AnalyticsFilters = {
-            seasons: [],
-            events: [],
-            divisions: [],
-            genderOptions: [],
-            levelOptions: [],
-            availableSeasonCombinations: [],
-            defaultSeasonSelection: {
-              season: new Date().getFullYear(),
-              eventKey: '',
-              eventLabel: '',
-              divisionKey: 'men-all',
-              divisionLabel: '',
-              genderKey: 'men',
-              divisionLevel: 'all',
-              rowCount: 0,
-            },
-          };
-          filtersRef.current = fallbackFilters;
-          setFilters(fallbackFilters);
-        }
-      });
+    mountedRef.current = true;
     return () => {
-      active = false;
+      mountedRef.current = false;
+      mineSeasonIntentRef.current += 1;
     };
   }, []);
+
+  useEffect(() => {
+    if (previousLocationKeyRef.current === location.key) return;
+    previousLocationKeyRef.current = location.key;
+    cancelMineSeasonNavigation();
+  }, [cancelMineSeasonNavigation, location.key]);
+
+  useEffect(() => {
+    if (!isSeasonBrowse) {
+      setSeasonAthleteKey('');
+      return;
+    }
+    void ensureSeasonCatalog().catch(() => undefined);
+  }, [ensureSeasonCatalog, isSeasonBrowse]);
 
   useEffect(() => {
     const nextQuery = (searchParams.get('q') || '').trim();
@@ -152,27 +226,13 @@ export default function RecordsPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (activeFlow !== 'browse') return;
-    if (browseChoice === 'season') {
-      setMode('season');
-      return;
-    }
-    if (browseChoice === 'athlete' || browseChoice === 'team') setMode('athlete');
-  }, [activeFlow, browseChoice]);
-
-  useEffect(() => {
-    if (!selectedAthleteParam) {
-      if (selectedAthleteKey) {
-        setSelectedAthleteKey('');
-        setProfile(null);
-        setProfileState('idle');
-      }
-      return;
-    }
-
-    if (selectedAthleteParam === selectedAthleteKey) return;
-    void handleSelectAthlete(selectedAthleteParam, { syncUrl: false });
-  }, [selectedAthleteParam, selectedAthleteKey]);
+    const isAthleteBrowse = activeFlow === 'browse' && browseChoice === 'athlete';
+    const hasBrowsableAthleteQuery = activeFlow !== 'mine'
+      && !isTeamBrowse
+      && submittedQuery.trim().length >= 2;
+    if (!isAthleteBrowse && !hasBrowsableAthleteQuery) return;
+    void ensureAnalyticsFilters().catch(() => undefined);
+  }, [activeFlow, browseChoice, ensureAnalyticsFilters, isTeamBrowse, submittedQuery]);
 
   useEffect(() => {
     const trimmed = submittedQuery.trim();
@@ -180,20 +240,11 @@ export default function RecordsPage() {
       setAthletes([]);
       setTeamStatistics([]);
       setSearchState('idle');
-      if (!selectedAthleteParam) {
-        setProfile(null);
-        setSelectedAthleteKey('');
-      }
       return;
     }
 
     let active = true;
     setSearchState('loading');
-    if (!selectedAthleteParam) {
-      setProfile(null);
-      setSelectedAthleteKey('');
-    }
-
     if (isTeamBrowse) {
       setAthletes([]);
       searchTeamPerformance({ query: trimmed, category: teamCategory })
@@ -206,8 +257,11 @@ export default function RecordsPage() {
           if (active) setSearchState('error');
         });
     } else {
+      if (waitingForDivisionCatalog) return;
       setTeamStatistics([]);
-      searchRecordAthletes(trimmed)
+      searchAthletes(trimmed, selectedSearchDivisionKey
+        ? { divisionKey: selectedSearchDivisionKey }
+        : {})
         .then((results) => {
           if (!active) return;
           setAthletes(results);
@@ -221,7 +275,14 @@ export default function RecordsPage() {
     return () => {
       active = false;
     };
-  }, [submittedQuery, selectedAthleteParam, isTeamBrowse, teamCategory]);
+  }, [
+    submittedQuery,
+    selectedAthleteParam,
+    isTeamBrowse,
+    teamCategory,
+    selectedSearchDivisionKey,
+    waitingForDivisionCatalog,
+  ]);
 
   const compareKeys = useMemo(() => {
     const raw = (searchParams.get('compare') || '').trim();
@@ -239,11 +300,22 @@ export default function RecordsPage() {
     () => seasonController.table?.rows.find((row) => row.highlighted) || null,
     [seasonController.table],
   );
-  const shouldShowAthletePanel = mode === 'athlete' && (profile || profileState !== 'idle');
+  const catalogDefaultSelection = useMemo(
+    () => catalog ? resolveSeasonSelection(catalog, {
+      season: null,
+      eventKey: null,
+      divisionKey: null,
+    }) : null,
+    [catalog],
+  );
+  const shouldShowAthletePanel = mode === 'athlete'
+    && profileState !== 'ambiguous'
+    && (profile || profileState !== 'idle');
   const shouldPrioritizeAthletePanel = shouldShowAthletePanel && Boolean(selectedAthleteParam);
   const isSharedLinkFallback = Boolean(selectedAthleteParam) && profileState === 'error';
 
   const handleSearch = (trimmedQuery: string) => {
+    cancelMineSeasonNavigation();
     setSubmittedQuery(trimmedQuery);
     const next = new URLSearchParams(searchParams);
     next.set('q', trimmedQuery);
@@ -251,46 +323,31 @@ export default function RecordsPage() {
     setSearchParams(next);
   };
 
-  const handleSelectAthlete = async (
-    athleteKey: string,
-    options: { syncUrl?: boolean; deferSelection?: boolean } = {},
-  ): Promise<PublicRecord | null> => {
-    const { syncUrl = true, deferSelection = false } = options;
-    if (syncUrl) {
-      const next = new URLSearchParams(searchParams);
-      next.set('athlete', athleteKey);
-      setSearchParams(next);
-    }
-    if (!deferSelection) setSelectedAthleteKey(athleteKey);
-    setProfileState('loading');
-    try {
-      const nextProfile = await getAthleteAnalytics(athleteKey);
-      setProfile(nextProfile);
-      setProfileState('ready');
+  const handleSelectAthlete = (athleteKey: string) => {
+    cancelMineSeasonNavigation();
+    const next = new URLSearchParams(searchParams);
+    next.set('athlete', athleteKey);
+    setSearchParams(next);
+  };
 
-      const mainRecord = nextProfile.summary.latest || nextProfile.summary.indexedBest || nextProfile.records[0] || null;
-      const activeFilters = filtersRef.current;
-      if (mainRecord && activeFilters && !deferSelection) {
-        const nextSelection = resolveAthleteSeasonSelection(activeFilters, mainRecord);
-        if (nextSelection) seasonController.setTransientSelection(nextSelection);
-      }
-      return mainRecord;
-    } catch {
-      setProfileState('error');
-      return null;
-    }
+  const selectSearchDivision = (divisionKey: string) => {
+    cancelMineSeasonNavigation();
+    const next = new URLSearchParams(searchParams);
+    if (divisionKey) next.set('divisionFilter', divisionKey);
+    else next.delete('divisionFilter');
+    next.delete('athlete');
+    setSearchParams(next);
   };
 
   const showSearchCandidates = () => {
+    cancelMineSeasonNavigation();
     const next = new URLSearchParams(searchParams);
     next.delete('athlete');
     setSearchParams(next);
-    setSelectedAthleteKey('');
-    setProfile(null);
-    setProfileState('idle');
   };
 
   const openHub = () => {
+    cancelMineSeasonNavigation();
     setQuery('');
     setSubmittedQuery('');
     const next = new URLSearchParams(searchParams);
@@ -298,10 +355,12 @@ export default function RecordsPage() {
     next.delete('q');
     next.delete('athlete');
     next.delete('compare');
+    next.delete('divisionFilter');
     setSearchParams(next);
   };
 
   const openMineStart = () => {
+    cancelMineSeasonNavigation();
     setQuery('');
     setSubmittedQuery('');
     const next = new URLSearchParams(searchParams);
@@ -312,10 +371,12 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
+    next.delete('divisionFilter');
     setSearchParams(next);
   };
 
   const showMyRecordsHome = () => {
+    cancelMineSeasonNavigation();
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'mine');
     next.set('step', 'done');
@@ -323,6 +384,7 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
+    next.delete('divisionFilter');
     setSearchParams(next);
   };
 
@@ -330,7 +392,12 @@ export default function RecordsPage() {
     choice: BrowseChoice,
     requestedEventKey?: string,
     selectionOverride?: SeasonSelection | null,
+    shouldLoadCatalog = true,
   ) => {
+    cancelMineSeasonNavigation();
+    if (choice === 'season' && shouldLoadCatalog) {
+      void ensureSeasonCatalog().catch(() => undefined);
+    }
     let next = new URLSearchParams(searchParams);
     next.set('flow', 'browse');
     next.set('browse', choice);
@@ -339,10 +406,11 @@ export default function RecordsPage() {
     next.delete('athlete');
     next.delete('compare');
     next.delete('category');
+    if (choice !== 'athlete') next.delete('divisionFilter');
 
-    const activeFilters = filtersRef.current;
-    if (choice === 'season' && activeFilters) {
-      const resolved = selectionOverride ?? resolveSeasonSelection(activeFilters, {
+    const activeCatalog = catalogRef.current;
+    if (choice === 'season' && activeCatalog) {
+      const resolved = selectionOverride ?? resolveSeasonSelection(activeCatalog, {
         season: seasonController.selection?.season ?? null,
         eventKey: requestedEventKey ?? seasonController.selection?.eventKey ?? null,
         divisionKey: seasonController.selection?.divisionKey ?? null,
@@ -352,7 +420,6 @@ export default function RecordsPage() {
       }
     }
 
-    setMode(choice === 'season' ? 'season' : 'athlete');
     setSearchParams(next);
   };
 
@@ -375,10 +442,12 @@ export default function RecordsPage() {
     next.delete('mineDraft');
     next.delete('athlete');
     next.delete('compare');
+    next.delete('divisionFilter');
     setSearchParams(next);
   };
 
   const goMineStep = (step: MineStep) => {
+    cancelMineSeasonNavigation();
     const next = new URLSearchParams(searchParams);
     next.set('flow', 'mine');
     next.set('step', step);
@@ -388,6 +457,7 @@ export default function RecordsPage() {
   };
 
   const handleMineBack = () => {
+    cancelMineSeasonNavigation();
     if (mineStep === 'done') {
       openHub();
       return;
@@ -439,18 +509,40 @@ export default function RecordsPage() {
   };
 
   const showSeasonForMine = async () => {
+    const currentIntent = ++mineSeasonIntentRef.current;
     const firstEntry = myEntries[0];
-    const mainRecord = firstEntry
-      ? await handleSelectAthlete(firstEntry.athleteKey, { syncUrl: false, deferSelection: true })
+    const profileRequest = firstEntry
+      ? getAthleteAnalytics(firstEntry.athleteKey)
+      : Promise.resolve(null);
+    const [profileResult, catalogResult] = await Promise.allSettled([
+      profileRequest,
+      ensureSeasonCatalog(),
+    ]);
+    if (!mountedRef.current || mineSeasonIntentRef.current !== currentIntent) return;
+
+    if (catalogResult.status === 'rejected') {
+      setSeasonAthleteKey('');
+      openBrowseChoice('season', undefined, null, false);
+      return;
+    }
+
+    const analyticsResult = profileResult.status === 'fulfilled'
+      ? profileResult.value
       : null;
-    if (!filtersRef.current) await filtersRequestRef.current?.catch(() => undefined);
-    const activeFilters = filtersRef.current;
-    const selection = mainRecord && activeFilters
-      ? resolveAthleteSeasonSelection(activeFilters, mainRecord)
+    const nextProfile = analyticsResult?.kind === 'profile'
+      ? analyticsResult.profile
       : null;
-    if (selection) seasonController.setTransientSelection(selection);
-    openBrowseChoice('season', undefined, selection);
-    if (firstEntry) setSelectedAthleteKey(firstEntry.athleteKey);
+    const mainRecord = nextProfile
+      ? nextProfile.summary.latest
+        || nextProfile.summary.indexedBest
+        || nextProfile.records[0]
+        || null
+      : null;
+    const selection = mainRecord
+      ? resolveAthleteSeasonSelection(catalogResult.value, mainRecord)
+      : null;
+    setSeasonAthleteKey(nextProfile?.athlete.athleteKey ?? '');
+    openBrowseChoice('season', undefined, selection, false);
   };
 
   const isDirectRecordsLink = Boolean(selectedAthleteParam) || compareKeys.length >= 2;
@@ -514,8 +606,12 @@ export default function RecordsPage() {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold text-brand">{isTeamBrowse ? '소속 통계' : '공개 기록 모아보기'}</p>
-              <h1 className="mt-3 text-2xl font-semibold tracking-tight text-ink sm:text-4xl">
-                {isTeamBrowse ? '소속의 기록을 숫자로 살펴봐요.' : '공개 기록, 이름만 알면 찾아요.'}
+              <h1 className="mt-3 break-keep text-2xl font-semibold tracking-tight text-ink [text-wrap:balance] sm:text-4xl">
+                {isTeamBrowse
+                  ? '소속의 기록을 숫자로 살펴봐요.'
+                  : mode === 'season'
+                    ? '시즌·종목·경기 부문별 기록을 살펴봐요.'
+                    : '공개 기록, 이름만 알면 찾아요.'}
               </h1>
               {activeFlow === 'browse' && browseChoice && (
                 <p className="mt-2 text-sm text-ink-3">
@@ -549,6 +645,17 @@ export default function RecordsPage() {
                 onQueryChange={setQuery}
                 onSubmit={handleSearch}
               />
+              {!isTeamBrowse && divisionFilters && (
+                <RecordSearchFilterChips
+                  title="경기 부문으로 좁히기"
+                  options={divisionFilters.divisions.map((division) => ({
+                    value: division.key,
+                    label: division.label,
+                  }))}
+                  selected={selectedSearchDivisionKey}
+                  onSelect={selectSearchDivision}
+                />
+              )}
               {isTeamBrowse && (
                 <TeamCategoryFilter selected={teamCategory} onSelect={selectTeamCategory} />
               )}
@@ -593,7 +700,7 @@ export default function RecordsPage() {
         />
       )}
 
-      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && !profile && (
+      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && searchState === 'idle' && athletes.length === 0 && profileState === 'idle' && (
         <div className="space-y-6">
           <StartPanel onSeasonMode={() => openBrowseChoice('season')} />
           <AnonymousInsightCards
@@ -626,6 +733,30 @@ export default function RecordsPage() {
             toggleProfileComparison(profile);
           }}
         />
+      )}
+
+      {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete'
+        && profileState === 'ambiguous' && selectedAthleteParam && (
+        <div className="space-y-4">
+          <NoticeCard
+            role="status"
+            title="한 선수를 바로 고를 수 없어요"
+            description="소속과 활동 연도를 확인한 뒤 원하는 선수 후보를 선택해 주세요."
+          />
+          <RecordCandidatesSurface
+            athletes={profileController.candidates}
+            draftSubjectKeys={workspaceDraftKeys}
+            selectionMode={workspaceSelectionMode}
+            onDraftChange={(subjectKeys) => {
+              workspaceStore.saveWorkspaceDraft(subjectKeys);
+            }}
+            onEnterSelectionMode={() => setWorkspaceSelectionMode(true)}
+            onExitSelectionMode={() => {
+              workspaceStore.clearWorkspaceDraft();
+              setWorkspaceSelectionMode(false);
+            }}
+          />
+        </div>
       )}
 
       {shouldShowRecordsSurface && !isTeamBrowse && mode === 'athlete' && athletes.length > 0 && !selectedAthleteParam && (
@@ -672,17 +803,34 @@ export default function RecordsPage() {
         />
       )}
 
-      {shouldShowRecordsSurface && shouldShowAthletePanel && profileState === 'ready' && selectedAthleteKey && (
+      {shouldShowRecordsSurface && shouldShowAthletePanel && profileState === 'ready' && profile && (
         <EstimatedSameAthleteCard
-          athleteKey={selectedAthleteKey}
+          athleteKey={profile.athlete.athleteKey}
           onSelectAthlete={handleSelectAthlete}
         />
       )}
 
       {shouldShowRecordsSurface && mode === 'season' && (
-        filters && seasonController.selection ? (
+        catalogState === 'error' ? (
+          <NoticeCard
+            role="alert"
+            title="시즌 조건을 불러오지 못했습니다"
+            description="기록 조건 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요."
+            action={(
+              <Button type="button" variant="outline" onClick={() => navigate(0)}>
+                다시 시도
+              </Button>
+            )}
+          />
+        ) : catalogState === 'ready' && catalog && !catalogDefaultSelection ? (
+          <NoticeCard
+            role="status"
+            title="표시할 시즌 기록 조건이 없어요"
+            description="조건 목록은 정상적으로 확인했지만 현재 공개된 시즌·종목·경기 부문 조합이 없습니다."
+          />
+        ) : catalog && seasonController.selection ? (
           <SeasonRecordsPanel
-            filters={filters}
+            filters={catalog}
             selection={seasonController.selection}
             table={seasonController.table}
             state={seasonController.state}
@@ -692,14 +840,9 @@ export default function RecordsPage() {
           />
         ) : (
           <NoticeCard
-            role={filters ? 'alert' : 'status'}
-            title={filters ? '시즌 조건을 준비하지 못했습니다' : '시즌 조건을 불러오는 중입니다'}
-            description={filters ? '잠시 후 다시 시도해 주세요.' : '기록이 있는 조건을 확인하고 있습니다.'}
-            action={filters ? (
-              <Button type="button" variant="outline" onClick={() => navigate(0)}>
-                다시 시도
-              </Button>
-            ) : undefined}
+            role="status"
+            title={catalog ? '시즌 주소를 정리하는 중입니다' : '시즌 조건을 불러오는 중입니다'}
+            description={catalog ? '사용할 수 있는 조건으로 주소를 맞추고 있습니다.' : '기록이 있는 조건을 확인하고 있습니다.'}
           />
         )
       )}
@@ -754,7 +897,7 @@ function AthletePanel({
   onToggleCompare,
 }: {
   profile: AthleteAnalyticsProfile | null;
-  state: LoadState;
+  state: AthleteProfileLoadState;
   isSharedLinkFallback?: boolean;
   inTray?: boolean;
   isMyAthlete?: boolean;
@@ -1013,7 +1156,7 @@ function ModeButton({ active, onClick, children }: { active: boolean; onClick: (
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-2 text-sm font-semibold transition-colors ${
+      className={`min-h-11 px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${
         active ? 'bg-primary text-primary-foreground' : 'text-ink-3 hover:bg-surface hover:text-ink'
       }`}
     >

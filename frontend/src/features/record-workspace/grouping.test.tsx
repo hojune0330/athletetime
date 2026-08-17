@@ -49,7 +49,7 @@ function fixtureRecord(eventIndex: number, recordIndex: number): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: '남자 고등부',
-    rawDivision: '남자고등부',
+    sourceDivisionLabel: '남자고등부',
     phase: recordIndex % 2 === 0 ? '예선' : '결승',
     record: isStatus ? '' : `${10 + recordIndex / 100}`,
     recordValue: isStatus ? 0 : 10 + recordIndex / 100,
@@ -184,7 +184,7 @@ describe('record workspace grouping', () => {
         mode="browse"
         record={{
           ...record,
-          rawDivision: "남고",
+          sourceDivisionLabel: "남고",
         }}
         onOpen={() => undefined}
       />,

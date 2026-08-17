@@ -4,6 +4,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   postgres-contract:
     runs-on: ubuntu-latest
@@ -31,6 +35,9 @@ jobs:
         with:
           node-version: '22.17.1'
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
       - run: npm ci
       - run: npm ci --prefix frontend
       - run: npm run test:data-rights
@@ -38,3 +45,117 @@ jobs:
           TEST_DATABASE_URL: postgresql://athletetime_test:test-job-only-password@127.0.0.1:5432/athletetime_rights_test
           TEST_DATABASE_DESTRUCTIVE_OK: 'yes'
       - run: npm run verify
+
+  records-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: test
+      WRITE_E2E_EVIDENCE: '1'
+      RECORDS_BROWSER_TESTS: '1'
+      RECORDS_E2E_EVIDENCE_DIR: .omo/evidence/pr88-integrated-hardening/task-5-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+      - name: Initialize browser evidence directory
+        run: |
+          mkdir -p "$RECORDS_E2E_EVIDENCE_DIR"
+          printf '%s\n' '{"status":"started","runtime":"v22.17.1","phase":"initialize","error":null,"context":{"runId":"${{ github.run_id }}","runAttempt":"${{ github.run_attempt }}"}}' > "$RECORDS_E2E_EVIDENCE_DIR/ci-run-receipt.json"
+      - name: Install root dependencies (npm-ci)
+        id: npm-ci-root
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=npm-ci-root' >> "$GITHUB_ENV"
+          npm ci 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/npm-ci-root.log"
+      - name: Install frontend dependencies (npm-ci)
+        id: npm-ci-frontend
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=npm-ci-frontend' >> "$GITHUB_ENV"
+          npm ci --prefix frontend 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/npm-ci-frontend.log"
+      - name: Install Chromium (Playwright)
+        id: playwright-install
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=playwright-install' >> "$GITHUB_ENV"
+          npx playwright install chromium 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/playwright-install.log"
+      - name: Run Mine race and division navigation browser gates
+        id: browser-gates
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=browser-gates' >> "$GITHUB_ENV"
+          npm run test:division-navigation:browser 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/browser-gates.log"
+      - name: Run actual-index safety smoke
+        id: actual-index
+        run: |
+          set -o pipefail
+          echo 'RECORDS_CI_PHASE=actual-index' >> "$GITHUB_ENV"
+          npm run test:division-navigation:actual-index 2>&1 | tee "$RECORDS_E2E_EVIDENCE_DIR/actual-index.log"
+      - name: Finalize browser CI receipt
+        if: always()
+        env:
+          ROOT_NPM_CI_OUTCOME: ${{ steps.npm-ci-root.outcome }}
+          FRONTEND_NPM_CI_OUTCOME: ${{ steps.npm-ci-frontend.outcome }}
+          PLAYWRIGHT_INSTALL_OUTCOME: ${{ steps.playwright-install.outcome }}
+          BROWSER_GATES_OUTCOME: ${{ steps.browser-gates.outcome }}
+          ACTUAL_INDEX_OUTCOME: ${{ steps.actual-index.outcome }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+
+          const evidenceDir = process.env.RECORDS_E2E_EVIDENCE_DIR;
+          const outcomes = {
+            'npm-ci-root': process.env.ROOT_NPM_CI_OUTCOME,
+            'npm-ci-frontend': process.env.FRONTEND_NPM_CI_OUTCOME,
+            'playwright-install': process.env.PLAYWRIGHT_INSTALL_OUTCOME,
+            'browser-gates': process.env.BROWSER_GATES_OUTCOME,
+            'actual-index': process.env.ACTUAL_INDEX_OUTCOME,
+          };
+          const failedPhase = Object.entries(outcomes).find(([, outcome]) => outcome === 'failure');
+          const incompletePhase = Object.entries(outcomes).find(([, outcome]) => !['success'].includes(outcome));
+          const phase = failedPhase?.[0] || incompletePhase?.[0] || 'complete';
+          const status = Object.values(outcomes).every((outcome) => outcome === 'success') ? 'passed' : 'failed';
+          const logPath = path.join(evidenceDir, `${phase}.log`);
+          const error = status === 'passed'
+            ? null
+            : {
+              message: `${phase} did not complete successfully`,
+              log: fs.existsSync(logPath) ? path.basename(logPath) : null,
+            };
+          const receipt = {
+            generatedAt: new Date().toISOString(),
+            runtime: process.version,
+            status,
+            phase,
+            error,
+            context: {
+              runId: process.env.GITHUB_RUN_ID,
+              runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+              ref: process.env.GITHUB_REF,
+              outcomes,
+            },
+          };
+          fs.mkdirSync(evidenceDir, { recursive: true });
+          fs.writeFileSync(path.join(evidenceDir, 'ci-run-receipt.json'), `${JSON.stringify(receipt, null, 2)}\n`);
+          if (status !== 'passed') process.exitCode = 1;
+          NODE
+      - name: Ensure browser evidence artifact exists
+        if: always()
+        run: |
+          mkdir -p "$RECORDS_E2E_EVIDENCE_DIR"
+          test -f "$RECORDS_E2E_EVIDENCE_DIR/ci-run-receipt.json" || printf '%s\n' '{"status":"failed","runtime":"v22.17.1","phase":"receipt-finalizer","error":{"message":"receipt finalizer did not run"}}' > "$RECORDS_E2E_EVIDENCE_DIR/ci-run-receipt.json"
+      - name: Upload division navigation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: division-navigation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.RECORDS_E2E_EVIDENCE_DIR }}
+          if-no-files-found: error
+          retention-days: 14

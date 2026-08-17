@@ -1,18 +1,22 @@
 import type { AnalyticsFilters, PublicRecord } from '../../../api/recordAnalytics';
 import {
+  getAvailableDivisionKeys,
+  getAvailableEventKeys,
+  getAvailableSeasonOrder,
   getDivisionGender,
   isSameSeasonSelection,
   resolveSeasonSelection,
-  toSeasonSelection,
   type SeasonSelection,
 } from './seasonSelection';
 
 export {
+  createSeasonNavigationCatalog,
   readSeasonSelectionRequest,
   resolveSeasonSelection,
   seasonSelectionParamsNeedRepair,
   updateSeasonSelectionParams,
   type SeasonSelection,
+  type SeasonNavigationCatalog,
   type SeasonSelectionRequest,
 } from './seasonSelection';
 
@@ -44,6 +48,11 @@ export type SeasonNavigationOptions = {
   readonly divisionLevel: string;
 };
 
+export type SeasonRecovery = {
+  readonly kind: 'nearest' | 'default';
+  readonly selection: SeasonSelection;
+};
+
 function assertNever(value: never): never {
   throw new TypeError('Unknown season selection change: ' + JSON.stringify(value));
 }
@@ -52,41 +61,30 @@ export function getSeasonNavigationOptions(
   filters: AnalyticsFilters,
   selection: SeasonSelection,
 ): SeasonNavigationOptions {
-  const combinations = filters.availableSeasonCombinations;
-  const eventCombinations = combinations.filter(
-    (combination) =>
-      combination.season === selection.season
-      && combination.eventKey === selection.eventKey,
+  const eventKeys = getAvailableEventKeys(filters, selection.season);
+  const divisionKeys = getAvailableDivisionKeys(
+    filters,
+    selection.season,
+    selection.eventKey,
   );
   const selectedDivision = filters.divisions.find(
     (division) => division.key === selection.divisionKey,
   );
   const genderKey = selectedDivision?.gender ?? getDivisionGender(filters, selection.divisionKey);
-  const divisionLevel = selectedDivision?.level ?? 'all';
+  const divisionLevel = selectedDivision?.level ?? 'unspecified';
 
   return {
-    seasons: filters.seasons.filter((season) =>
-      combinations.some((combination) => combination.season === season),
-    ),
-    events: filters.events.filter((event) =>
-      combinations.some(
-        (combination) =>
-          combination.season === selection.season
-          && combination.eventKey === event.key,
-      ),
-    ),
+    seasons: getAvailableSeasonOrder(filters),
+    events: filters.events.filter((event) => eventKeys.includes(event.key)),
     genders: filters.genderOptions.filter((gender) =>
-      eventCombinations.some(
-        (combination) => getDivisionGender(filters, combination.divisionKey) === gender.key,
-      ),
+      divisionKeys.some((divisionKey) => getDivisionGender(filters, divisionKey) === gender.key),
     ),
     levels: filters.levelOptions.filter((level) =>
-      eventCombinations.some((combination) =>
-        filters.divisions.some(
-          (division) =>
-            division.key === combination.divisionKey
-            && division.gender === genderKey
-            && division.level === level.key,
+      divisionKeys.some((divisionKey) =>
+        filters.divisions.some((division) =>
+          division.key === divisionKey
+          && division.gender === genderKey
+          && division.level === level.key,
         ),
       ),
     ),
@@ -103,6 +101,11 @@ export function changeSeasonSelection(
   const selectedDivision = filters.divisions.find(
     (division) => division.key === selection.divisionKey,
   );
+  const divisionKeys = getAvailableDivisionKeys(
+    filters,
+    selection.season,
+    selection.eventKey,
+  );
   let divisionKey = selection.divisionKey;
 
   switch (change.kind) {
@@ -113,16 +116,20 @@ export function changeSeasonSelection(
     case 'gender':
       divisionKey = filters.divisions.find(
         (division) =>
-          division.gender === change.genderKey
+          divisionKeys.includes(division.key)
+          && division.gender === change.genderKey
           && division.level === selectedDivision?.level,
       )?.key ?? filters.divisions.find(
-        (division) => division.gender === change.genderKey,
+        (division) =>
+          divisionKeys.includes(division.key)
+          && division.gender === change.genderKey,
       )?.key ?? divisionKey;
       break;
     case 'division':
       divisionKey = filters.divisions.find(
         (division) =>
-          division.gender === selectedDivision?.gender
+          divisionKeys.includes(division.key)
+          && division.gender === selectedDivision?.gender
           && division.level === change.divisionLevel,
       )?.key ?? divisionKey;
       break;
@@ -137,26 +144,35 @@ export function findNearestSeasonSelection(
   filters: AnalyticsFilters,
   selection: SeasonSelection,
 ): SeasonSelection | null {
+  return resolveSeasonRecovery(filters, selection)?.selection ?? null;
+}
+
+export function resolveSeasonRecovery(
+  filters: AnalyticsFilters,
+  selection: SeasonSelection,
+): SeasonRecovery | null {
   let nearest: SeasonSelection | null = null;
-  for (const combination of filters.availableSeasonCombinations) {
+  for (const season of getAvailableSeasonOrder(filters)) {
     if (
-      combination.eventKey !== selection.eventKey
-      || combination.divisionKey !== selection.divisionKey
-      || combination.season === selection.season
+      season === selection.season
+      || !getAvailableDivisionKeys(filters, season, selection.eventKey)
+        .includes(selection.divisionKey)
     ) continue;
-    const candidate = toSeasonSelection(combination);
+    const candidate = { ...selection, season };
     if (
       !nearest
       || Math.abs(candidate.season - selection.season)
         < Math.abs(nearest.season - selection.season)
     ) nearest = candidate;
   }
-  if (nearest) return nearest;
+  if (nearest) return { kind: 'nearest', selection: nearest };
 
   const fallback = resolveSeasonSelection(filters, {
     season: filters.defaultSeasonSelection.season,
     eventKey: filters.defaultSeasonSelection.eventKey,
     divisionKey: filters.defaultSeasonSelection.divisionKey,
   });
-  return fallback && !isSameSeasonSelection(fallback, selection) ? fallback : null;
+  return fallback && !isSameSeasonSelection(fallback, selection)
+    ? { kind: 'default', selection: fallback }
+    : null;
 }

@@ -1,5 +1,5 @@
 const athletes = [
-  athlete('alpha-2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7),
+  athlete('alpha-2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7, ['남자 고등부', '남자 일반부']),
   athlete('alpha-2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4),
   athlete('beta-2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
   athlete('mine-race-2016', 'Race Runner', 'Race High', [2026], ['200m'], 2),
@@ -11,27 +11,38 @@ const limitAthletes = Array.from({ length: 7 }, (_, index) => (
   athlete(`limit-${index + 1}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
 ));
 
+const seasonAvailability = {
+  seasons: {
+    2026: {
+      '100m': ['men-high', 'women-high'],
+      '200m': ['men-high'],
+    },
+    2025: {
+      '100m': ['men-high'],
+    },
+  },
+};
+
 const filters = {
   seasons: [2026, 2025],
   events: [{ key: '100m', label: '100m' }, { key: '200m', label: '200m' }],
   divisions: [
-    { key: 'men-all', label: '남자 전체(부 통합)', gender: 'men', level: 'all' },
     { key: 'men-high', label: '남자 고등부', gender: 'men', level: 'high' },
+    { key: 'men-general', label: '남자 일반부', gender: 'men', level: 'general' },
     { key: 'women-high', label: '여자 고등부', gender: 'women', level: 'high' },
   ],
   genderOptions: [{ key: 'men', label: '남자' }, { key: 'women', label: '여자' }],
-  levelOptions: [{ key: 'all', label: '전체(부 통합)' }, { key: 'high', label: '고등부' }],
-  availableSeasonCombinations: [
-    { season: 2026, eventKey: '100m', divisionKey: 'men-high' },
-    { season: 2026, eventKey: '100m', divisionKey: 'women-high' },
-    { season: 2026, eventKey: '200m', divisionKey: 'men-all' },
-    { season: 2025, eventKey: '100m', divisionKey: 'men-high' },
-  ],
+  levelOptions: [{ key: 'general', label: '일반부' }, { key: 'high', label: '고등부' }],
   defaultSeasonSelection: { season: 2026, eventKey: '100m', eventLabel: '100m', divisionKey: 'men-high', divisionLabel: '남자 고등부', genderKey: 'men', divisionLevel: 'high', rowCount: 2 },
 };
 
-function athlete(athleteKey, name, team, years, events, recordCount) {
-  return { athleteKey, name, team, teams: [team], years, events, divisions: ['남자 고등부'], recordCount, ambiguity: 'name_team', note: '' };
+Object.defineProperty(filters, 'seasonAvailability', {
+  value: seasonAvailability,
+  enumerable: false,
+});
+
+function athlete(athleteKey, name, team, years, events, recordCount, divisions = ['남자 고등부']) {
+  return { athleteKey, name, team, teams: [team], years, events, divisions, recordCount, ambiguity: 'name_team', note: '' };
 }
 
 function makeRecord(item, index) {
@@ -45,33 +56,30 @@ function makeRecord(item, index) {
     season: 2026, competitionName: 'Fixture Invitational',
     date: `2026-04-${String(index + 10).padStart(2, '0')}`,
     venue: 'Fixture Stadium', eventKey: isMineRaceFixture ? '200m' : '100m', eventLabel: isMineRaceFixture ? '200m' : '100m',
-    divisionKey: isMineRaceFixture ? 'men-all' : 'men-high', divisionLabel: isMineRaceFixture ? '남자 전체(부 통합)' : '남자 고등부', gender: 'men', divisionLevel: isMineRaceFixture ? 'all' : 'high',
-    divisionDetail: null, rawDivision: isMineRaceFixture ? '남자부' : '남고', phase: 'final', record, recordValue,
+    divisionKey: 'men-high', divisionLabel: '남자 고등부', gender: 'men', divisionLevel: 'high',
+    divisionDetail: null, sourceDivisionLabel: '남고', phase: 'final', record, recordValue,
     direction: 'lower', rank: index + 1, wind: '+0.7', windLegal: true, isComparable: true, note: '',
-    source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceId: `qa-${item.athleteKey}`, sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
+    source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
   };
 }
 
-function getSearchResults(query) {
+function getSearchResults(query, divisionKey = '') {
   const normalizedQuery = query.trim().toLowerCase();
   if (!normalizedQuery) return [];
   const candidates = normalizedQuery.includes('limit') ? limitAthletes : athletes;
+  const divisionLabel = filters.divisions.find((division) => division.key === divisionKey)?.label;
   return candidates.filter((candidate) => (
     [candidate.name, candidate.team, ...candidate.teams]
       .some((value) => value.toLowerCase().includes(normalizedQuery))
-  ));
+  ) && (!divisionLabel || candidate.divisions.includes(divisionLabel)));
 }
 
 function getSeasonRecordsResponse(params) {
   const season = Number(params.get('season'));
   const eventKey = params.get('eventKey') || '';
   const divisionKey = params.get('divisionKey') || '';
-  const combination = filters.availableSeasonCombinations.find((candidate) => (
-    candidate.season === season
-    && candidate.eventKey === eventKey
-    && candidate.divisionKey === divisionKey
-  ));
-  if (!combination) {
+  const availableDivisions = filters.seasonAvailability.seasons[String(season)]?.[eventKey] || [];
+  if (!availableDivisions.includes(divisionKey)) {
     return {
       status: 400,
       body: {
@@ -102,11 +110,13 @@ function getSeasonRecordsResponse(params) {
     divisionLabel: division?.label || divisionKey,
     divisionLevel: division?.level || 'unspecified',
     divisionDetail: null,
+    source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
     wind: '+0.7',
     windLegal: true,
     highlighted: params.get('athleteKey') === item.athleteKey,
   }));
-  const { availableSeasonCombinations, ...tableFilters } = filters;
+  const tableFilters = { ...filters };
+  delete tableFilters.seasonAvailability;
   return {
     status: 200,
     body: {
@@ -164,10 +174,24 @@ function makeProfile(key) {
   const item = athletes.find((candidate) => candidate.athleteKey === key);
   if (!item) return null;
   const records = [makeRecord(item, 0), makeRecord(item, 1)];
+  const eventsByKey = new Map();
+  for (const record of records) {
+    const existing = eventsByKey.get(record.eventKey);
+    if (existing) {
+      existing.recordCount += 1;
+      continue;
+    }
+    eventsByKey.set(record.eventKey, {
+      eventKey: record.eventKey,
+      eventLabel: record.eventLabel,
+      recordCount: 1,
+      best: record,
+    });
+  }
   return {
     athlete: item,
     summary: { indexedBest: records[0], seasonBest: records[0], latest: records[1], delta: null, indexedResultCount: records.length, comparableResultCount: records.length, sourceScope: 'qa_fixture', disclaimer: 'QA fixture' },
-    events: [{ eventKey: '100m', eventLabel: '100m', recordCount: records.length, best: records[0] }],
+    events: Array.from(eventsByKey.values()),
     recordTrail: records.map((record) => ({
       id: record.id, date: record.date, season: record.season, value: record.recordValue,
       record: record.record, eventLabel: record.eventLabel, competitionName: record.competitionName,

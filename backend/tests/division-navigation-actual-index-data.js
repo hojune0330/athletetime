@@ -13,9 +13,21 @@ function sameSelection(left, right) {
     && left.divisionKey === right.divisionKey;
 }
 
-function findNearestSelection(filters, selection) {
+function getAdvertisedSelections(filters) {
+  return Object.entries(filters.seasonAvailability?.seasons || {}).flatMap(([season, events]) => (
+    Object.entries(events).flatMap(([eventKey, divisionKeys]) => (
+      divisionKeys.map((divisionKey) => ({
+        season: Number(season),
+        eventKey,
+        divisionKey,
+      }))
+    ))
+  ));
+}
+
+function findNearestSelection(advertised, selection) {
   let nearest = null;
-  for (const candidate of filters.availableSeasonCombinations) {
+  for (const candidate of advertised) {
     if (
       candidate.eventKey !== selection.eventKey
       || candidate.divisionKey !== selection.divisionKey
@@ -32,7 +44,7 @@ function findNearestSelection(filters, selection) {
 
 function selectActualIndexScenarios(analytics) {
   const filters = analytics.getFilters();
-  const advertised = filters.availableSeasonCombinations;
+  const advertised = getAdvertisedSelections({ seasonAvailability: analytics.getSeasonAvailability() });
   assert.ok(advertised.length > 0, 'actual availability must not be empty');
   const genuineValidEmptyTuplePresent = advertised.some((selection) => (
     analytics.getSeasonRecords({ ...selection, limit: 100 }).rows.length === 0
@@ -55,7 +67,7 @@ function selectActualIndexScenarios(analytics) {
 
   let recoveryPair = null;
   for (const emptySelection of advertised) {
-    const recoverySelection = findNearestSelection(filters, emptySelection);
+    const recoverySelection = findNearestSelection(advertised, emptySelection);
     if (!recoverySelection) continue;
     const initialRows = analytics.getSeasonRecords({ ...emptySelection, limit: 100 }).rows;
     const recoveredRows = analytics.getSeasonRecords({ ...recoverySelection, limit: 100 }).rows;
@@ -96,6 +108,7 @@ function assertProductionBundleFresh(root, frontendSources) {
 module.exports = {
   assertProductionBundleFresh,
   fingerprintFiles,
+  getAdvertisedSelections,
   sameSelection,
   selectActualIndexScenarios,
   selectionKey,

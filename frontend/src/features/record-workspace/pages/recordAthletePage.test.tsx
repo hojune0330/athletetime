@@ -23,7 +23,7 @@ function record(index: number): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: '남자 고등부',
-    rawDivision: '남자고등부',
+    sourceDivisionLabel: '남자고등부',
     phase: index % 2 === 0 ? '예선' : '결승',
     record: `${10 + index / 100}`,
     recordValue: 10 + index / 100,

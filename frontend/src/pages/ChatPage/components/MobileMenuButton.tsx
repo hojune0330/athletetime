@@ -1,4 +1,5 @@
 import React from 'react';
+import { Menu, X } from 'lucide-react';
 
 interface MobileMenuButtonProps {
   onClick: () => void;
@@ -23,7 +24,7 @@ export const MobileMenuButton: React.FC<MobileMenuButtonProps> = ({
       "
       aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
     >
-      <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-bars'}`} />
+      {isMenuOpen ? <X aria-hidden="true" className="h-5 w-5" /> : <Menu aria-hidden="true" className="h-5 w-5" />}
     </button>
   );
 };

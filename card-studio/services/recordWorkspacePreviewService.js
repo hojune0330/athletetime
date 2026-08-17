@@ -1,4 +1,5 @@
 const recordAnalyticsService = require('./recordAnalyticsService');
+const divisionHierarchyService = require('./divisionHierarchyService');
 const {
   RecordWorkspacePreviewError,
   encodeCursor,
@@ -188,7 +189,7 @@ function toPublicRecord(record) {
     gender: cleanText(record.gender, 20),
     divisionLevel: cleanText(record.divisionLevel, 40),
     divisionDetail: cleanText(record.divisionDetail, 120) || null,
-    rawDivision: cleanText(record.rawDivision, 120),
+    sourceDivisionLabel: divisionHierarchyService.toPublicSourceDivisionLabel(record.sourceDivisionLabel),
     phase: cleanText(record.phase, 60),
     record: cleanText(record.recordDisplay, 40),
     recordValue: Number(record.recordValue) || 0,

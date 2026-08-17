@@ -19,13 +19,6 @@ function seasonLabel(years: readonly number[]) {
   return String(first) + '-' + String(last) + ' 시즌'
 }
 
-function divisionSummary(divisions: readonly string[]) {
-  const first = divisions[0]
-  if (first === undefined) return '확인 안 됨'
-  if (divisions.length === 1) return first
-  return first + ' 외 ' + String(divisions.length - 1) + '개'
-}
-
 export function RecordCandidateCard({
   athlete,
   mode,
@@ -33,17 +26,19 @@ export function RecordCandidateCard({
   selected,
 }: RecordCandidateCardProps) {
   const collecting = mode === 'collect'
-  const sameNameCaution = athlete.note.trim()
+  const suppliedNote = athlete.note.trim()
+  const sameNameCaution = suppliedNote
     || '같은 이름의 다른 선수일 수 있어요. 소속과 시즌을 확인해 주세요.'
   const teamLabel = athlete.team.trim() || '소속 확인 안 됨'
   const seasonText = seasonLabel(athlete.years)
   const divisionLabels = [...new Set(
     athlete.divisions.map((division) => division.trim()).filter(Boolean),
   )]
-  const divisionSummaryLabel = divisionSummary(divisionLabels)
-  const divisionTitle = divisionLabels.length > 1 ? divisionLabels.join(' · ') : undefined
+  const divisionText = divisionLabels.join(' · ') || '확인 안 됨'
+  const eventText = [...new Set(athlete.events.map((event) => event.trim()).filter(Boolean))]
+    .join(' · ') || '확인 안 됨'
   const accessibleContext = athlete.name + ' · ' + teamLabel + ' · ' + seasonText
-    + ' · 부문 ' + divisionSummaryLabel
+    + ' · 부문 ' + divisionText + ' · 종목 ' + eventText
   const actionLabel = collecting
     ? '선수 후보 ' + (selected ? '선택 해제' : '선택')
     : '기록 보기'
@@ -86,17 +81,22 @@ export function RecordCandidateCard({
         )}
       </span>
 
-      <span
-        className="col-span-2 min-w-0 break-words text-caption text-ink-3"
-        title={divisionTitle}
-      >
-        부문 · {divisionSummaryLabel}
+      <span className="col-span-2 min-w-0 break-keep [text-wrap:pretty] text-caption text-ink-3">
+        부문 · {divisionText}
+      </span>
+      <span className="col-span-2 min-w-0 break-keep [text-wrap:pretty] text-caption text-ink-3">
+        종목 · {eventText}
       </span>
       <span className="col-span-2 font-mono text-caption text-ink-3 [font-variant-numeric:tabular-nums]">
         {seasonText}
       </span>
       <span className="col-span-2 border-l-2 border-warn pl-2 break-keep [text-wrap:pretty] text-caption leading-5 text-ink-3" role="note">
-        {sameNameCaution}
+        {suppliedNote ? sameNameCaution : (
+          <>
+            같은 이름의 다른 선수일 수 있어요.{' '}
+            <span className="whitespace-nowrap">소속과 시즌을 확인해 주세요.</span>
+          </>
+        )}
       </span>
     </button>
   )

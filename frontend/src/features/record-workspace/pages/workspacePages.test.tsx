@@ -26,7 +26,7 @@ function record(): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: null,
-    rawDivision: '남자 고등부',
+    sourceDivisionLabel: '남자 고등부',
     phase: '결승',
     record: '11.20',
     recordValue: 11.2,

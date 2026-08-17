@@ -37,9 +37,39 @@ async function captureCandidateSearch(state, captures) {
   assert.equal(new URL(searchRequests[0], baseUrl).searchParams.get('q'), 'Alpha');
   assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 2);
   assert.equal(await page.locator('[data-candidate-key="beta-2016"]').count(), 0);
-  await expectVisible(candidate.getByText('부문 · 남자 고등부', { exact: true }));
-  assert.match(await candidate.getAttribute('aria-label') || '', /부문 남자 고등부/u);
+  await expectVisible(candidate.getByText('부문 · 남자 고등부 · 남자 일반부', { exact: true }));
+  await expectVisible(candidate.getByText('종목 · 100m · 200m', { exact: true }));
+  assert.match(await candidate.getAttribute('aria-label') || '', /부문 남자 고등부 · 남자 일반부/u);
   await assertCjkWrapStyle(candidate.locator('[role="note"]'));
+  await expectVisible(candidate.locator('[role="note"] .whitespace-nowrap'));
+  const divisionFilter = page.getByRole('button', {
+    name: '남자 일반부',
+    exact: true,
+  });
+  await expectVisible(divisionFilter);
+  const filteredRequestStart = apiRequests.length;
+  await divisionFilter.click();
+  await page.waitForURL((url) => url.searchParams.get('divisionFilter') === 'men-general');
+  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="alpha-"]').length === 1);
+  const filteredRequests = apiRequests.slice(filteredRequestStart)
+    .filter((request) => request.includes('/analytics/records/search'));
+  assert.equal(filteredRequests.length, 1);
+  assert.equal(new URL(filteredRequests[0], baseUrl).searchParams.get('divisionKey'), 'men-general');
+  assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 1);
+  assert.equal(await page.locator('[data-candidate-key="beta-2016"]').count(), 0);
+  const resetRequestStart = apiRequests.length;
+  const resetDivisionFilter = page.getByRole('button', {
+    name: '경기 부문으로 좁히기 전체',
+    exact: true,
+  });
+  await expectVisible(resetDivisionFilter);
+  await resetDivisionFilter.click();
+  await page.waitForURL((url) => !url.searchParams.has('divisionFilter'));
+  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="alpha-"]').length === 2);
+  const resetRequests = apiRequests.slice(resetRequestStart)
+    .filter((request) => request.includes('/analytics/records/search'));
+  assert.equal(resetRequests.length, 1);
+  assert.equal(new URL(resetRequests[0], baseUrl).searchParams.has('divisionKey'), false);
   await reachFocusVisible(page, candidate);
   await capturePage(state, { captures, scenario: 'athlete-candidate-search', anchor: candidate });
   await activateFocused(page, candidate);
@@ -121,6 +151,7 @@ async function captureInvalidAndEmptySeason(state, captures) {
   await expectVisible(empty);
   const emptyStatus = page.getByRole('status').filter({ hasText: '이 조합은 아직 정리 중이에요' });
   await assertCjkWrapStyle(emptyStatus.locator('p').nth(1));
+  await expectVisible(emptyStatus.locator('p').first().locator('.whitespace-nowrap'));
   await reachFocusVisible(page, recovery);
   assert.equal(new URL(page.url()).searchParams.get('season'), '2025');
   await capturePage(state, {
@@ -145,6 +176,7 @@ async function captureTeamAffiliation(state, captures) {
     .filter({ hasText: '개인 기록은 보여주지 않아요.' });
   await expectVisible(explanation);
   await assertCjkWrapStyle(explanation);
+  assert.equal(await explanation.locator('.whitespace-nowrap').count(), 2);
   const footer = page.getByText('자료가 있는 대회 기록만 보여드려요.', { exact: false }).last();
   await assertCjkWrapStyle(footer);
   const corporate = page.getByRole('button', { name: '실업·기관 소속', exact: true });
@@ -160,4 +192,4 @@ async function captureTeamAffiliation(state, captures) {
   await page.waitForURL((url) => url.pathname === '/records/teams/0123456789abcdef');
 }
 
-module.exports = { captureViewportMatrix };
+module.exports = { captureRecordProvenance, captureViewportMatrix };

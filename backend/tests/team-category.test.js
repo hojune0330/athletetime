@@ -20,11 +20,11 @@ test('Given a reviewed override When category is resolved Then the override wins
   });
 });
 
-test('Given an explicit school division When category is resolved Then division evidence wins', () => {
+test('Given a school affiliation and conflicting division When category is resolved Then affiliation text wins', () => {
   const result = classifyRecord({ team: '시청처럼보이는고교', divisionLevel: 'high' });
 
   assert.equal(result.category, 'high');
-  assert.deepEqual(result.reasons, ['division_level:high']);
+  assert.deepEqual(result.reasons, ['team_signature:high']);
 });
 
 test('Given general or unspecified divisions When strong team names exist Then education and corporate teams remain findable', () => {
@@ -49,9 +49,9 @@ test('Given general records without strong evidence When category is resolved Th
 
 test('Given mixed-category records When summarized Then no source category is discarded', () => {
   const result = summarizeRecordCategories([
-    { team: '혼합팀', divisionLevel: 'university' },
-    { team: '혼합팀', divisionLevel: 'university' },
-    { team: '혼합팀', divisionLevel: 'general' },
+    { team: '건국대학교', divisionLevel: 'general' },
+    { team: '건국대학교', divisionLevel: 'high' },
+    { team: '지역러닝클럽', divisionLevel: 'university' },
   ]);
 
   assert.equal(result.primaryCategory, 'university');

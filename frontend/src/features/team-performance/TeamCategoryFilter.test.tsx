@@ -16,5 +16,10 @@ describe('team category filter', () => {
     }
     expect(html).toContain('수집된 기록의 소속 표기를 바탕으로 추정하며 경기 부문과 다를 수 있어요.')
     expect(html.match(/aria-pressed="true"/gu)).toHaveLength(1)
+    expect(html).toContain('<fieldset')
+    expect(html).toContain('<legend')
+    expect(html).not.toContain('aria-label="소속 유형 선택"')
+    expect(html.match(/min-h-11/gu)).toHaveLength(7)
+    expect(html.match(/focus-visible:ring-2/gu)).toHaveLength(7)
   })
 })

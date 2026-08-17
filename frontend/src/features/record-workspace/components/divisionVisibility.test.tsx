@@ -39,7 +39,7 @@ function record(overrides: Partial<PublicRecord> = {}): PublicRecord {
     gender: "men",
     divisionLevel: "high",
     divisionDetail: null,
-    rawDivision: "남자 고등부",
+    sourceDivisionLabel: "남자 고등부",
     phase: "결승",
     record: "10.20",
     recordValue: 10.2,
@@ -77,7 +77,7 @@ describe("record division visibility", () => {
       divisionKey: "men-unspecified",
       divisionLabel: "남자 (세부부문 없음)",
       divisionLevel: "unspecified",
-      rawDivision: "남자부",
+      sourceDivisionLabel: "남자부",
     }))
 
     // Then the normalized label remains primary and provenance is explicitly accessible.
@@ -94,7 +94,7 @@ describe("record division visibility", () => {
       divisionLabel: "남자 고등부",
       divisionLevel: "high",
       divisionDetail: null,
-      rawDivision: "남고",
+      sourceDivisionLabel: "남고",
     }))
 
     // Then provenance stays available without claiming that the event omitted sub-divisions.
@@ -111,7 +111,7 @@ describe("record division visibility", () => {
       divisionLabel: "중학부 (남녀 통합)",
       divisionLevel: "middle",
       divisionDetail: "2학년부",
-      rawDivision: "중2",
+      sourceDivisionLabel: "중2",
     }))
 
     // Then the canonical division and source context remain observable without a false explanation.
@@ -123,7 +123,7 @@ describe("record division visibility", () => {
 
   it("does not add a raw-label note when the source and normalized labels are equivalent", () => {
     // Given an ordinary division whose source differs only by spacing.
-    const markup = renderDetail(record({ rawDivision: "남자고등부" }))
+    const markup = renderDetail(record({ sourceDivisionLabel: "남자고등부" }))
 
     // Then the canonical division remains visible without a misleading provenance warning.
     expect(markup).toContain("남자 고등부")
@@ -133,7 +133,7 @@ describe("record division visibility", () => {
 
   it("does not render an empty raw-label note", () => {
     // Given a record with no raw source division.
-    const markup = renderDetail(record({ rawDivision: "" }))
+    const markup = renderDetail(record({ sourceDivisionLabel: null }))
 
     // Then the detail stays concise and does not expose an empty provenance field.
     expect(markup).not.toContain("원문 표기")

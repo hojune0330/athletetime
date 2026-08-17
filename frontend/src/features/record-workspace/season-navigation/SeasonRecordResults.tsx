@@ -3,14 +3,14 @@ import type { SeasonRecordTable } from '../../../api/recordAnalytics';
 import { Button } from '../../../components/ui/button';
 import { CardContent } from '../../../components/ui/card';
 import { scopeCount } from '../../../config/dataPolicy';
-import type { SeasonSelection } from './seasonNavigation';
+import type { SeasonRecovery, SeasonSelection } from './seasonNavigation';
 import { SeasonRecordRows } from './SeasonRecordRows';
 
 type SeasonRecordResultsProps = {
   readonly table: SeasonRecordTable | null;
   readonly state: 'idle' | 'loading' | 'ready' | 'error';
   readonly highlightedRow: SeasonRecordTable['rows'][number] | null;
-  readonly recoverySelection: SeasonSelection | null;
+  readonly recovery: SeasonRecovery | null;
   readonly onRecover: (selection: SeasonSelection) => void;
   readonly onRetry: () => void;
 };
@@ -19,7 +19,7 @@ export function SeasonRecordResults({
   table,
   state,
   highlightedRow,
-  recoverySelection,
+  recovery,
   onRecover,
   onRetry,
 }: SeasonRecordResultsProps) {
@@ -60,7 +60,11 @@ export function SeasonRecordResults({
       {isEmpty && (
         <StatusNotice
           role="status"
-          title="이 조합은 아직 정리 중이에요"
+          title={(
+            <>
+              이 조합은 아직 정리 <span className="whitespace-nowrap">중이에요</span>
+            </>
+          )}
           description={(
             <>
               유효한 경기 부문이지만 지금 보여드릴 공개 기록이 없습니다. 자동으로{' '}
@@ -69,13 +73,13 @@ export function SeasonRecordResults({
           )}
           action={(
             <div className="flex flex-wrap gap-2">
-              {recoverySelection && (
+              {recovery && (
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => onRecover(recoverySelection)}
+                  onClick={() => onRecover(recovery.selection)}
                 >
-                  가장 가까운 시즌 보기
+                  {recovery.kind === 'nearest' ? '가장 가까운 시즌 보기' : '기본 시즌 보기'}
                 </Button>
               )}
               <Button asChild variant="link">
@@ -106,14 +110,14 @@ function StatusNotice({
   role,
   action,
 }: {
-  readonly title: string;
+  readonly title: ReactNode;
   readonly description: ReactNode;
   readonly role: 'status' | 'alert';
   readonly action?: ReactNode;
 }) {
   return (
     <div role={role} aria-live={role === 'alert' ? 'assertive' : 'polite'} className="border border-line bg-surface-2 p-5">
-      <p className="text-lg font-semibold text-ink">{title}</p>
+      <p className="break-keep [text-wrap:pretty] text-lg font-semibold text-ink">{title}</p>
       <p className="mt-2 break-keep [text-wrap:pretty] text-sm leading-6 text-ink-3">{description}</p>
       {action && <div className="mt-4">{action}</div>}
     </div>

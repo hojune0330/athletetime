@@ -1,6 +1,10 @@
 const assert = require('node:assert/strict');
 const { chromium } = require('playwright');
-const { shouldWriteEvidence, writeEvidence } = require('./records-flow-e2e-evidence');
+const {
+  shouldWriteEvidence,
+  writeCleanupReceipt,
+  writeEvidence,
+} = require('./records-flow-e2e-evidence');
 const { installApiMocks, waitForExternalObservations } = require('./records-flow-e2e-network');
 const {
   getFreePort,
@@ -20,10 +24,16 @@ async function withRecordsPage(runScenario, evidence = {}) {
   let browser;
   let context;
   const state = createBrowserState(port, viewport);
+  let succeeded = false;
+  let cleanupSucceeded = true;
 
   try {
     server = await startViteWithLock(() => startViteServer(port));
-    browser = await chromium.launch({ channel: 'chrome' });
+    const executablePath = process.env.RECORDS_E2E_EXECUTABLE_PATH;
+    browser = await chromium.launch({
+      headless: true,
+      ...(executablePath ? { executablePath } : {}),
+    });
     context = await browser.newContext({
       viewport,
       deviceScaleFactor: 1,
@@ -37,13 +47,23 @@ async function withRecordsPage(runScenario, evidence = {}) {
     const result = await runScenario(state);
     await waitForExternalObservations(state);
     assertBrowserErrors(state, evidence.expectedConsoleErrors || []);
+    succeeded = true;
     return result;
   } finally {
-    writeEvidence(state, evidence);
-    if (context) await context.close().catch(() => {});
-    if (browser) await browser.close().catch(() => {});
-    if (server) await stopServer(server);
-    await teamApiServer.close();
+    if (context) {
+      try { await context.close(); } catch { cleanupSucceeded = false; }
+    }
+    if (browser) {
+      try { await browser.close(); } catch { cleanupSucceeded = false; }
+    }
+    if (server) {
+      try { await stopServer(server); } catch { cleanupSucceeded = false; }
+    }
+    try { await teamApiServer.close(); } catch { cleanupSucceeded = false; }
+    if (succeeded && cleanupSucceeded) {
+      writeEvidence(state, evidence);
+      writeCleanupReceipt();
+    }
   }
 }
 

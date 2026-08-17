@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AnalyticsFilters } from '../../../api/recordAnalytics';
+import type { AnalyticsFilters, SeasonAvailability } from '../../../api/recordAnalytics';
 
 const seasonParamSchema = z.coerce.number().int().min(1900).max(2200);
 
@@ -18,14 +18,46 @@ export type SeasonSelectionRequest = {
 
 type SelectionRequest = Pick<SeasonSelectionRequest, 'season' | 'eventKey' | 'divisionKey'>;
 
-export function toSeasonSelection(
-  combination: AnalyticsFilters['availableSeasonCombinations'][number],
-): SeasonSelection {
-  return {
-    season: combination.season,
-    eventKey: combination.eventKey,
-    divisionKey: combination.divisionKey,
-  };
+export type SeasonNavigationCatalog = AnalyticsFilters & {
+  readonly seasonAvailability: SeasonAvailability;
+};
+
+export function createSeasonNavigationCatalog(
+  filters: AnalyticsFilters,
+  seasonAvailability: SeasonAvailability,
+): SeasonNavigationCatalog {
+  return { ...filters, seasonAvailability };
+}
+
+function hasSeasonAvailability(filters: AnalyticsFilters): filters is SeasonNavigationCatalog {
+  return 'seasonAvailability' in filters;
+}
+
+export function getAvailableSeasonOrder(filters: AnalyticsFilters): readonly number[] {
+  if (!hasSeasonAvailability(filters)) return [];
+  return filters.seasonAvailability.seasonOrder.filter((season) =>
+    Object.values(filters.seasonAvailability.seasons[String(season)] ?? {})
+      .some((divisionKeys) => divisionKeys.length > 0),
+  );
+}
+
+export function getAvailableEventKeys(
+  filters: AnalyticsFilters,
+  season: number,
+): readonly string[] {
+  if (!hasSeasonAvailability(filters)) return [];
+  return Object.entries(filters.seasonAvailability.seasons[String(season)] ?? {})
+    .filter(([, divisionKeys]) => divisionKeys.length > 0)
+    .map(([eventKey]) => eventKey);
+}
+
+export function getAvailableDivisionKeys(
+  filters: AnalyticsFilters,
+  season: number,
+  eventKey: string,
+): readonly string[] {
+  if (!hasSeasonAvailability(filters)) return [];
+  return filters.seasonAvailability.seasons[String(season)]?.[eventKey] ?? [];
 }
 
 export function isSameSeasonSelection(
@@ -67,12 +99,7 @@ export function resolveSeasonSelection(
   filters: AnalyticsFilters,
   request: SelectionRequest,
 ): SeasonSelection | null {
-  const combinations = filters.availableSeasonCombinations;
-  if (combinations.length === 0) return null;
-
-  const seasons = filters.seasons.filter((candidate) =>
-    combinations.some((combination) => combination.season === candidate),
-  );
+  const seasons = getAvailableSeasonOrder(filters);
   const firstSeason = seasons[0];
   if (firstSeason === undefined) return null;
 
@@ -82,44 +109,41 @@ export function resolveSeasonSelection(
     if (Math.abs(candidate - desiredSeason) < Math.abs(season - desiredSeason)) season = candidate;
   }
 
-  const seasonCombinations = combinations.filter((combination) => combination.season === season);
-  const firstSeasonCombination = seasonCombinations[0];
-  if (!firstSeasonCombination) return null;
+  const eventKeys = getAvailableEventKeys(filters, season);
+  const firstEventKey = eventKeys[0];
+  if (!firstEventKey) return null;
 
   const requestedEvent = request.eventKey
-    && seasonCombinations.some((combination) => combination.eventKey === request.eventKey)
+    && eventKeys.includes(request.eventKey)
     ? request.eventKey
     : null;
-  const defaultEvent = seasonCombinations.some(
-    (combination) => combination.eventKey === filters.defaultSeasonSelection.eventKey,
-  )
+  const defaultEvent = eventKeys.includes(filters.defaultSeasonSelection.eventKey)
     ? filters.defaultSeasonSelection.eventKey
     : null;
-  const eventKey = requestedEvent ?? defaultEvent ?? firstSeasonCombination.eventKey;
-  const eventCombinations = seasonCombinations.filter(
-    (combination) => combination.eventKey === eventKey,
-  );
-  const firstEventCombination = eventCombinations[0];
-  if (!firstEventCombination) return null;
+  const eventKey = requestedEvent ?? defaultEvent ?? firstEventKey;
+  const divisionKeys = getAvailableDivisionKeys(filters, season, eventKey);
+  const firstDivisionKey = divisionKeys[0];
+  if (!firstDivisionKey) return null;
 
   const exactDivision = request.divisionKey
-    ? eventCombinations.find((combination) => combination.divisionKey === request.divisionKey)
+    && divisionKeys.includes(request.divisionKey)
+    ? request.divisionKey
     : undefined;
   const requestedGender = request.divisionKey
     ? getDivisionGender(filters, request.divisionKey)
     : '';
   const sameGenderDivision = requestedGender
-    ? eventCombinations.find(
-      (combination) => getDivisionGender(filters, combination.divisionKey) === requestedGender,
-    )
+    ? divisionKeys.find((divisionKey) => getDivisionGender(filters, divisionKey) === requestedGender)
     : undefined;
-  const defaultDivision = eventCombinations.find(
-    (combination) => combination.divisionKey === filters.defaultSeasonSelection.divisionKey,
-  );
+  const defaultDivision = divisionKeys.includes(filters.defaultSeasonSelection.divisionKey)
+    ? filters.defaultSeasonSelection.divisionKey
+    : undefined;
 
-  return toSeasonSelection(
-    exactDivision ?? sameGenderDivision ?? defaultDivision ?? firstEventCombination,
-  );
+  return {
+    season,
+    eventKey,
+    divisionKey: exactDivision ?? sameGenderDivision ?? defaultDivision ?? firstDivisionKey,
+  };
 }
 
 export function updateSeasonSelectionParams(

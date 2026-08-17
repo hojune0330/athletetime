@@ -22,6 +22,7 @@ function recordFor({ id, athleteKey, name, team, date, season, sourceUrl = 'http
     divisionLevel: 'all',
     divisionDetail: null,
     rawDivision: '남자부',
+    sourceDivisionLabel: '남자부',
     phase: 'final',
     recordDisplay: '10.50',
     recordValue: 10.5,
@@ -58,6 +59,37 @@ function createFixtureService(athletes) {
   const athleteByKey = new Map(athletes.map((athlete) => [athlete.athleteKey, athlete]));
   return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey }) });
 }
+
+test('Given safe and hostile source division labels When workspace records are projected Then raw text is removed and only taxonomy provenance survives', () => {
+  const safe = recordFor({
+    id: 'safe-division',
+    athleteKey: '8888888888888888',
+    name: '마루',
+    team: '광주고',
+    date: '2025-06-02',
+    season: 2025,
+  });
+  const hostile = recordFor({
+    id: 'hostile-division',
+    athleteKey: '8888888888888888',
+    name: '마루',
+    team: '광주고',
+    date: '2024-06-02',
+    season: 2024,
+  });
+  hostile.sourceDivisionLabel = '남고 athlete@example.test';
+  hostile.rawDivision = '남고 athlete@example.test';
+  const service = createFixtureService([
+    athleteFor({ athleteKey: '8888888888888888', name: '마루', team: '광주고', records: [safe, hostile] }),
+  ]);
+
+  const preview = service.getRecordWorkspacePreview({ subjectKeys: ['8888888888888888'] });
+
+  assert.equal(JSON.stringify(preview).includes('rawDivision'), false);
+  assert.deepEqual(preview.records.map((record) => record.sourceDivisionLabel), ['남자부', null]);
+  assert.equal(JSON.stringify(preview).includes('athlete@example.test'), false);
+  assert.equal(preview.records.some((record) => Object.prototype.hasOwnProperty.call(record.source, 'sourceId')), false);
+});
 
 test('Given visible records for two same-name public profiles When a workspace preview is requested Then it keeps profile boundaries and aggregates only visible records', () => {
   const firstRecords = [

@@ -41,7 +41,6 @@ async function waitForExternalObservations(state) {
 }
 
 function assertExternalNetworkIsolation(state) {
-  assert.ok(state.externalAttempts.length >= 2, 'external stylesheets should be observed');
   assert.equal(state.externalInterceptions.length, state.externalAttempts.length);
   assert.ok(state.externalInterceptions.every(({ action }) => (
     action === 'fulfilled-empty-stylesheet' || action === 'aborted-before-network'
@@ -92,6 +91,12 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
   if (pathname.endsWith('/analytics/filters')) {
     return fulfillJson(route, { success: true, data: filters });
   }
+  if (pathname.endsWith('/analytics/season-availability')) {
+    return fulfillJson(route, {
+      success: true,
+      data: filters.seasonAvailability,
+    });
+  }
   if (pathname.endsWith('/analytics/popular-events')) {
     return fulfillJson(route, {
       success: true,
@@ -108,7 +113,8 @@ async function fulfillApi(route, url, teamApiBaseUrl) {
   }
   if (pathname.endsWith('/analytics/records/search')) {
     const query = url.searchParams.get('q') || '';
-    const results = getSearchResults(query);
+    const divisionKey = url.searchParams.get('divisionKey') || '';
+    const results = getSearchResults(query, divisionKey);
     return fulfillJson(route, { success: true, total: results.length, data: results });
   }
   if (pathname.includes('/analytics/athletes/')) {

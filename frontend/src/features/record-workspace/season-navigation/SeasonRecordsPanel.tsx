@@ -1,16 +1,18 @@
-import type { AnalyticsFilters, SeasonRecordTable } from '../../../api/recordAnalytics';
+import { useRef } from 'react';
+import type { SeasonRecordTable } from '../../../api/recordAnalytics';
 import { Card, CardHeader, CardTitle } from '../../../components/ui/card';
 import { SeasonRecordResults } from './SeasonRecordResults';
 import {
   changeSeasonSelection,
-  findNearestSeasonSelection,
   getSeasonNavigationOptions,
+  resolveSeasonRecovery,
+  type SeasonNavigationCatalog,
   type SeasonSelection,
   type SeasonSelectionChange,
 } from './seasonNavigation';
 
 export type SeasonRecordsPanelProps = {
-  readonly filters: AnalyticsFilters;
+  readonly filters: SeasonNavigationCatalog;
   readonly selection: SeasonSelection;
   readonly table: SeasonRecordTable | null;
   readonly state: 'idle' | 'loading' | 'ready' | 'error';
@@ -20,7 +22,7 @@ export type SeasonRecordsPanelProps = {
 };
 
 const selectClassName =
-  'h-10 w-full border border-line bg-surface px-3 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
+  'h-11 w-full border border-line bg-surface px-3 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand';
 
 export function SeasonRecordsPanel({
   filters,
@@ -31,8 +33,9 @@ export function SeasonRecordsPanel({
   onSelectionChange,
   onRetry,
 }: SeasonRecordsPanelProps) {
+  const seasonSelectRef = useRef<HTMLSelectElement>(null);
   const options = getSeasonNavigationOptions(filters, selection);
-  const recoverySelection = findNearestSeasonSelection(filters, selection);
+  const recovery = resolveSeasonRecovery(filters, selection);
   const changeSelection = (change: SeasonSelectionChange) => {
     onSelectionChange(changeSeasonSelection(filters, selection, change));
   };
@@ -43,8 +46,8 @@ export function SeasonRecordsPanel({
         <div className="space-y-5">
           <div>
             <p className="text-sm font-semibold text-brand">시즌 기록표</p>
-            <CardTitle className="mt-2">시즌 기록 모음</CardTitle>
-            <p id="season-records-description" className="mt-2 text-sm text-ink-3">
+            <CardTitle className="mt-2 break-keep [text-wrap:balance]">시즌 기록 모음</CardTitle>
+            <p id="season-records-description" className="mt-2 break-keep [text-wrap:pretty] text-sm text-ink-3">
               시즌부터 차례로 고르면 실제 기록이 있는 종목과 경기 부문만 보여요.
             </p>
           </div>
@@ -59,6 +62,7 @@ export function SeasonRecordsPanel({
             >
               <span>시즌</span>
               <select
+                ref={seasonSelectRef}
                 id="season-records-season"
                 value={String(selection.season)}
                 onChange={(event) => {
@@ -95,7 +99,7 @@ export function SeasonRecordsPanel({
 
             <fieldset className="space-y-1.5">
               <legend className="text-xs font-semibold text-ink-3">성별 구분</legend>
-              <div className="flex h-10 border border-line">
+              <div className="flex h-11 border border-line">
                 {options.genders.map((gender) => (
                   <button
                     key={gender.key}
@@ -145,8 +149,11 @@ export function SeasonRecordsPanel({
         table={table}
         state={state}
         highlightedRow={highlightedRow}
-        recoverySelection={recoverySelection}
-        onRecover={onSelectionChange}
+        recovery={recovery}
+        onRecover={(nextSelection) => {
+          onSelectionChange(nextSelection);
+          window.requestAnimationFrame(() => seasonSelectRef.current?.focus());
+        }}
         onRetry={onRetry}
       />
     </Card>

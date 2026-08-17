@@ -41,7 +41,7 @@ function record(id: string): PublicRecord {
     gender: 'men',
     divisionLevel: 'middle',
     divisionDetail: null,
-    rawDivision: '남자 중등부',
+    sourceDivisionLabel: '남자 중등부',
     phase: 'final',
     record: '11.20',
     recordValue: 11.2,

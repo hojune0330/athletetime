@@ -64,7 +64,7 @@ export function SeasonRecordRows({ table }: SeasonRecordRowsProps) {
             <div className="flex items-baseline justify-between gap-2">
               <p className="min-w-0 text-sm font-semibold text-ink">
                 <span className="mr-2 font-mono text-xs tabular-nums text-ink-4">
-                  {row.rank}
+                  순서 {row.rank}
                 </span>
                 {row.name}
               </p>

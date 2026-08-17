@@ -61,19 +61,19 @@ test('Given public workspace routes When source contracts are scanned Then ident
 });
 
 test('Given a records browse page When display modes change Then the address owns the visible mode', () => {
-  // Given the records page can switch between athlete and season browsing.
-  const recordsPage = fs.readFileSync(path.join(FRONTEND, 'src/pages/RecordsPage.tsx'), 'utf8');
-  const seasonController = fs.readFileSync(path.join(
-    FRONTEND,
-    'src/features/record-workspace/season-navigation/useSeasonRecordsController.ts',
-  ), 'utf8');
+  // Given the records page's mounted season controller and browser history.
+  const result = spawnSync(
+    process.execPath,
+    [
+      VITEST_CLI,
+      '--run',
+      'src/features/record-workspace/season-navigation/useSeasonRecordsController.integration.test.tsx',
+    ],
+    { cwd: FRONTEND, encoding: 'utf8' },
+  );
 
-  // When mode controls and contextual season actions are inspected.
-  // Then they use the browse-route transition instead of local-only state.
-  assert.match(recordsPage, /onClick=\{\(\) => openBrowseChoice\('athlete'\)\}/u);
-  assert.match(recordsPage, /onClick=\{\(\) => openBrowseChoice\('season'\)\}/u);
-  assert.match(recordsPage, /onSeasonMode=\{\(\) => openBrowseChoice\('season'\)\}/u);
-  assert.match(recordsPage, /onSelectionChange=\{seasonController\.replaceSelection\}/u);
-  assert.match(seasonController, /updateSeasonSelectionParams\(searchParams, nextSelection\)/u);
-  assert.doesNotMatch(recordsPage, /onClick=\{\(\) => setMode\(/u);
+  // When mode and URL-backed tuple changes are replayed.
+  // Then the mounted controller keeps the address as the visible mode source.
+  assert.ifError(result.error);
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });

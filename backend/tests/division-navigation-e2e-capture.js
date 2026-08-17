@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { EVIDENCE_DIR, ROOT } = require('./division-navigation-e2e-config');
 const { expectVisible } = require('./records-flow-e2e-fixture');
+const { sanitizeUrl } = require('./records-flow-e2e-evidence');
 
 async function capturePage(state, captureSpec) {
   const { anchor, captures, scenario } = captureSpec;
@@ -38,7 +39,7 @@ async function capturePage(state, captureSpec) {
   const capture = {
     scenario,
     viewport,
-    url: page.url(),
+    url: sanitizeUrl(page.url()),
     screenshot,
     geometry,
     capturedAt,

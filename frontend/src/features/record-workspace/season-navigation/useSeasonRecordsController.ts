@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   getSeasonRecordTable,
-  type AnalyticsFilters,
   type SeasonRecordTable,
 } from '../../../api/recordAnalytics';
 import {
@@ -10,15 +9,16 @@ import {
   resolveSeasonSelection,
   seasonSelectionParamsNeedRepair,
   updateSeasonSelectionParams,
+  type SeasonNavigationCatalog,
   type SeasonSelection,
 } from './seasonNavigation';
-import { isSameSeasonSelection } from './seasonSelection';
 
 export type SeasonRecordsLoadState = 'idle' | 'loading' | 'ready' | 'error';
 
 export type SeasonRecordsControllerOptions = {
-  readonly filters: AnalyticsFilters | null;
+  readonly filters: SeasonNavigationCatalog | null;
   readonly athleteKey: string;
+  readonly enabled: boolean;
 };
 
 export type SeasonRecordsController = {
@@ -26,53 +26,58 @@ export type SeasonRecordsController = {
   readonly table: SeasonRecordTable | null;
   readonly state: SeasonRecordsLoadState;
   readonly replaceSelection: (selection: SeasonSelection) => void;
-  readonly setTransientSelection: (selection: SeasonSelection) => void;
 };
 
 export function useSeasonRecordsController({
   filters,
   athleteKey,
+  enabled,
 }: SeasonRecordsControllerOptions): SeasonRecordsController {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selection, setSelection] = useState<SeasonSelection | null>(null);
+  const search = searchParams.toString();
   const [table, setTable] = useState<SeasonRecordTable | null>(null);
   const [state, setState] = useState<SeasonRecordsLoadState>('idle');
+  const requestId = useRef(0);
+
+  const resolution = useMemo(() => {
+    if (!enabled || !filters) return null;
+    const params = new URLSearchParams(search);
+    const requested = readSeasonSelectionRequest(params);
+    const resolved = resolveSeasonSelection(filters, requested);
+    if (!resolved) return null;
+    return {
+      requested,
+      resolved,
+      needsCanonicalUrl: !requested.hasSelectionParams
+        || seasonSelectionParamsNeedRepair(params, resolved),
+    };
+  }, [enabled, filters, search]);
 
   useEffect(() => {
-    if (!filters) return;
-    const request = readSeasonSelectionRequest(searchParams);
-    const resolved = resolveSeasonSelection(filters, request);
-    if (!resolved) {
-      setSelection(null);
-      return;
-    }
+    if (!resolution?.needsCanonicalUrl) return;
+    setSearchParams(
+      updateSeasonSelectionParams(
+        new URLSearchParams(search),
+        resolution.resolved,
+      ),
+      { replace: true },
+    );
+  }, [resolution, search, setSearchParams]);
 
-    if (
-      request.hasSelectionParams
-      && seasonSelectionParamsNeedRepair(searchParams, resolved)
-    ) {
-      setSelection(null);
-      setSearchParams(updateSeasonSelectionParams(searchParams, resolved), {
-        replace: true,
-      });
-      return;
-    }
-
-    setSelection((current) => {
-      if (!request.hasSelectionParams && current) return current;
-      if (current && isSameSeasonSelection(current, resolved)) return current;
-      return resolved;
-    });
-  }, [filters, searchParams, setSearchParams]);
+  const selection = resolution && !resolution.needsCanonicalUrl
+    ? resolution.resolved
+    : null;
 
   useEffect(() => {
-    if (!selection) {
+    const currentRequestId = ++requestId.current;
+    if (!enabled || !selection) {
       setTable(null);
       setState('idle');
       return;
     }
 
     let active = true;
+    setTable(null);
     setState('loading');
     const request = {
       season: selection.season,
@@ -83,30 +88,32 @@ export function useSeasonRecordsController({
     };
     void getSeasonRecordTable(request)
       .then((nextTable) => {
-        if (!active) return;
+        if (!active || requestId.current !== currentRequestId) return;
         setTable(nextTable);
         setState('ready');
       })
       .catch(() => {
-        if (active) setState('error');
+        if (!active || requestId.current !== currentRequestId) return;
+        setTable(null);
+        setState('error');
       });
     return () => {
       active = false;
     };
-  }, [selection, athleteKey]);
+  }, [athleteKey, enabled, selection]);
 
   return {
     selection,
-    table,
-    state,
+    table: enabled && selection ? table : null,
+    state: enabled && selection ? state : 'idle',
     replaceSelection(nextSelection) {
       setSearchParams(
-        updateSeasonSelectionParams(searchParams, nextSelection),
+        updateSeasonSelectionParams(
+          new URLSearchParams(search),
+          nextSelection,
+        ),
         { replace: true },
       );
-    },
-    setTransientSelection(nextSelection) {
-      setSelection(nextSelection);
     },
   };
 }

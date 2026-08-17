@@ -290,7 +290,7 @@ function renderReport(manifest) {
 
 function isTrackedByGit(targetPath) {
   const relative = path.relative(ROOT, targetPath);
-  if (relative.startsWith('..')) return false;
+  if (path.isAbsolute(relative) || relative === '..' || relative.startsWith(`..${path.sep}`)) return false;
   const result = spawnSync('git', ['check-ignore', '-q', relative], { cwd: ROOT });
   return result.status !== 0;
 }
@@ -346,4 +346,6 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { isTrackedByGit };

@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const analytics = require('../../card-studio/services/recordAnalyticsService');
+const { writeCleanupReceipt } = require('./records-flow-e2e-evidence');
 const { activateFocused, reachFocusVisible } = require('./division-navigation-e2e-keyboard');
 const {
   assertProductionBundleFresh,
@@ -19,7 +20,8 @@ const {
 } = require('./division-navigation-actual-index-runtime');
 
 const ROOT = path.join(__dirname, '..', '..');
-const EVIDENCE_DIR = path.join(ROOT, '.omo', 'evidence', 'athletetime-division-navigation-improvement');
+const EVIDENCE_DIR = process.env.RECORDS_E2E_EVIDENCE_DIR
+  || path.join(ROOT, '.omo', 'evidence', 'athletetime-division-navigation-improvement');
 const VIEWPORTS = [
   { width: 375, height: 667 },
   { width: 768, height: 900 },
@@ -38,6 +40,11 @@ const HARNESS_SOURCES = [
   'backend/tests/division-navigation-actual-index-runtime.js',
   'backend/tests/division-navigation-actual-index-smoke.js',
   'backend/tests/division-navigation-e2e-keyboard.js',
+];
+const BACKEND_SOURCES = [
+  'card-studio/routes/recordAnalyticsRoutes.js',
+  'card-studio/services/recordAnalyticsService.js',
+  'data/results/index.json',
 ];
 
 function requestSelection(url) {
@@ -188,7 +195,7 @@ async function runViewport(browser, serverState, scenarios, viewport) {
       pageErrors: false,
       failedLocalRequests: false,
       externalNetworkObserved: false,
-      externalStylesIntercepted: true,
+      externalStylesIntercepted: network.externalStylesIntercepted,
       unexpectedExternalRequest: false,
       nonLocalWebSocket: false,
       ...screenshot,
@@ -205,10 +212,21 @@ async function main() {
   const scenarios = selectActualIndexScenarios(analytics);
   assert.equal(scenarios.genuineValidEmptyTuplePresent, false);
   const bundleFingerprint = assertProductionBundleFresh(ROOT, FRONTEND_SOURCES);
-  const sourceFingerprint = fingerprintFiles(ROOT, [...FRONTEND_SOURCES, ...HARNESS_SOURCES]);
-  const serverState = await startActualIndexServer(ROOT);
-  const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  const sourceFingerprint = fingerprintFiles(ROOT, [
+    ...FRONTEND_SOURCES,
+    ...HARNESS_SOURCES,
+    ...BACKEND_SOURCES,
+  ]);
+  let serverState;
+  let browser;
+  let succeeded = false;
   try {
+    serverState = await startActualIndexServer(ROOT);
+    const executablePath = process.env.RECORDS_E2E_EXECUTABLE_PATH;
+    browser = await chromium.launch({
+      headless: true,
+      ...(executablePath ? { executablePath } : {}),
+    });
     const results = [];
     for (const viewport of VIEWPORTS) {
       results.push(await runViewport(browser, serverState, scenarios, viewport));
@@ -236,9 +254,14 @@ async function main() {
       path.join(EVIDENCE_DIR, 'task-5-actual-index-smoke.json'),
       `${JSON.stringify(evidence, null, 2)}\n`,
     );
+    succeeded = true;
   } finally {
-    await browser.close();
-    await stopActualIndexServer(serverState.server);
+    if (browser) await browser.close();
+    if (serverState) await stopActualIndexServer(serverState.server);
+    if (succeeded) writeCleanupReceipt();
+    if (!succeeded && process.env.RECORDS_E2E_EVIDENCE_DIR) {
+      fs.rmSync(EVIDENCE_DIR, { recursive: true, force: true });
+    }
   }
 }
 

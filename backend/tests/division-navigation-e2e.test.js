@@ -13,7 +13,7 @@ const { withRecordsPage } = require('./records-flow-e2e-fixture');
 const { assertExternalNetworkIsolation } = require('./records-flow-e2e-network');
 
 test('DIVISION-NAV-FIXTURE Given valid, invalid, and valid-empty selections Then the fake API distinguishes each state', () => {
-  assert.ok(filters.availableSeasonCombinations.length > 0);
+  assert.ok(Object.keys(filters.seasonAvailability.seasons).length > 0);
   const valid = getSeasonRecordsResponse(new URLSearchParams({
     season: '2026',
     eventKey: '100m',
@@ -21,6 +21,18 @@ test('DIVISION-NAV-FIXTURE Given valid, invalid, and valid-empty selections Then
   }));
   assert.equal(valid.status, 200);
   assert.ok(valid.body.data.rows.length > 0);
+  const validRow = valid.body.data.rows[0];
+  assert.deepEqual(Object.keys(validRow.source).sort(), ['capturedAt', 'provider', 'sourceType', 'sourceUrl']);
+  assert.equal(JSON.stringify(valid.body.data).includes('sourceId'), false);
+  assert.equal(JSON.stringify(valid.body.data).includes('rawDivision'), false);
+  assert.equal(filters.divisions.some((division) => division.key.endsWith('-all')), false);
+  assert.equal(
+    Object.values(filters.seasonAvailability.seasons)
+      .flatMap((events) => Object.values(events).flat())
+      .some((divisionKey) => divisionKey.endsWith('-all')),
+    false,
+  );
+  assert.equal(filters.levelOptions.some((level) => level.key === 'all'), false);
   const validEmpty = getSeasonRecordsResponse(new URLSearchParams({
     season: '2025',
     eventKey: '100m',
@@ -43,21 +55,39 @@ test('DIVISION-NAV-FIXTURE Given valid, invalid, and valid-empty selections Then
   assert.equal(teamSearch.body.data[0].teamLabel, '예시군청');
 });
 
-test('DIVISION-NAV-E2E Given five records states When rendered at three viewports Then division and affiliation boundaries stay usable', { timeout: 360_000 }, async () => {
+test('DIVISION-NAV-E2E Given five records states When rendered at four viewports Then division and affiliation boundaries stay usable', { timeout: 360_000 }, async () => {
   fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
   const captures = [];
   const networkSummaries = [];
-  for (const viewport of VIEWPORTS) {
-    const state = await withRecordsPage(async (browserState) => {
-      await captureViewportMatrix(browserState, captures);
-      return browserState;
-    }, {
-      viewport,
-      fileName: `task-5-${viewport.width}x${viewport.height}-browser-results.json`,
-      scenario: 'division navigation five-state browser matrix',
-      invocation: 'exact Node 22.17.1 --test backend/tests/division-navigation-e2e.test.js',
-    });
-    networkSummaries.push(assertExternalNetworkIsolation(state));
+  try {
+    for (const viewport of VIEWPORTS) {
+      const state = await withRecordsPage(async (browserState) => {
+        await captureViewportMatrix(browserState, captures);
+        return browserState;
+      }, {
+        viewport,
+        fileName: `task-5-${viewport.width}x${viewport.height}-browser-results.json`,
+        scenario: 'division navigation five-state browser matrix',
+        invocation: 'exact Node 22.17.1 --test backend/tests/division-navigation-e2e.test.js',
+      });
+      networkSummaries.push(assertExternalNetworkIsolation(state));
+    }
+    writeMatrixManifest(captures, networkSummaries);
+  } catch (error) {
+    if (process.env.RECORDS_E2E_EVIDENCE_DIR) {
+      fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+      fs.writeFileSync(
+        `${EVIDENCE_DIR}/task-5-browser-matrix-failure.json`,
+        `${JSON.stringify({
+          generatedAt: new Date().toISOString(),
+          runtime: process.version,
+          invocation: 'exact Node 22.17.1 --test backend/tests/division-navigation-e2e.test.js',
+          status: 'failed',
+          errorName: error instanceof Error ? error.name : 'UnknownError',
+          errorMessage: error instanceof Error ? error.message : String(error),
+        }, null, 2)}\n`,
+      );
+    }
+    throw error;
   }
-  writeMatrixManifest(captures, networkSummaries);
 });

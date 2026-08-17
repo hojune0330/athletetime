@@ -20,6 +20,8 @@ export function RecordSearchResultCard({
   onToggleMine,
 }: RecordSearchResultCardProps) {
   const isHomonym = athlete.ambiguity === 'name_team' || athlete.ambiguity === 'name';
+  const divisions = [...new Set(athlete.divisions.map((division) => division.trim()).filter(Boolean))];
+  const events = [...new Set(athlete.events.map((event) => event.trim()).filter(Boolean))];
 
   return (
     <div
@@ -53,12 +55,16 @@ export function RecordSearchResultCard({
           <span className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">
             {formatYearRange(athlete.years)}
           </span>
-          {athlete.events.slice(0, 3).map((event) => (
+          {events.map((event) => (
             <span key={event} className="border border-line bg-surface-2 px-2 py-1 text-xs text-ink-3">
               {event}
             </span>
           ))}
         </div>
+
+        <p className="mt-3 break-keep text-xs leading-5 text-ink-3 [text-wrap:pretty]">
+          경기 부문 · {divisions.join(' · ') || '부문 미상'}
+        </p>
 
         {isHomonym ? (
           <p className="mt-3 text-xs text-warn">

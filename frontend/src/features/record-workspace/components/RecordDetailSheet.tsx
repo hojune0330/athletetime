@@ -32,21 +32,21 @@ function sourceLink(value: string) {
 }
 
 function resolveDivisionSourceDescription(
-  record: Pick<PublicRecord, 'divisionDetail' | 'divisionLabel' | 'rawDivision'>,
+  record: Pick<PublicRecord, 'divisionDetail' | 'divisionLabel' | 'sourceDivisionLabel'>,
 ) {
-  const rawDivision = record.rawDivision.trim()
+  const sourceDivisionLabel = record.sourceDivisionLabel?.trim()
   const divisionLabel = record.divisionLabel.trim()
-  if (!rawDivision || !divisionLabel) return undefined
+  if (!sourceDivisionLabel || !divisionLabel) return undefined
 
   const compact = (value: string) => value.replace(/\s+/gu, '')
   const canonicalLabels = [divisionLabel, record.divisionDetail?.trim() || '']
-  if (canonicalLabels.some((label) => label && compact(rawDivision) === compact(label))) {
+  if (canonicalLabels.some((label) => label && compact(sourceDivisionLabel) === compact(label))) {
     return undefined
   }
   if (divisionLabel.includes('세부부문 없음')) {
-    return '원문 표기: "' + rawDivision + '" — 대회 결과에 세부 부문이 없어요'
+    return '원문 표기: "' + sourceDivisionLabel + '" — 대회 결과에 세부 부문이 없어요'
   }
-  return '원문 표기: "' + rawDivision + '"'
+  return '원문 표기: "' + sourceDivisionLabel + '"'
 }
 
 function divisionValue(record: PublicRecord) {
@@ -102,7 +102,7 @@ export function RecordDetailSheet({
           </SheetHeader>
 
           {!display.hasMark && (
-            <p className="mt-4 border-l-2 border-warn bg-[#F7EDE0] px-3 py-2 text-body-sm font-medium leading-5 text-ink-2">
+            <p className="mt-4 border-l-2 border-warn bg-warn/10 px-3 py-2 text-body-sm font-medium leading-5 text-ink-2">
               숫자 기록이 아니라 경기 상태로 확인된 결과예요.
             </p>
           )}
