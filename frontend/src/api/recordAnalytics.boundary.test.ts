@@ -115,13 +115,12 @@ describe('record analytics API boundary', () => {
     api.get.mockReset();
   });
 
-  it('Given current filters When the 200 envelope is parsed Then removed availability stays absent', async () => {
+  it('Given current filters When the 200 envelope is parsed Then the typed filter contract is returned', async () => {
     api.get.mockResolvedValue(response(filters));
 
     const parsed = await getAnalyticsFilters();
 
-    expect(parsed.defaultSeasonSelection.divisionKey).toBe('men-high');
-    expect('availableSeasonCombinations' in parsed).toBe(false);
+    expect(parsed).toEqual(filters);
   });
 
   it('Given legacy filters with embedded availability When parsed Then a typed boundary error rejects them', async () => {

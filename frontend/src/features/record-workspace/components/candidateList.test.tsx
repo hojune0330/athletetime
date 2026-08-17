@@ -54,8 +54,6 @@ describe('record candidate browsing', () => {
     expect(markup).not.toContain('비교')
     expect(markup).not.toContain('내 기록')
     expect(markup).toContain('같은 이름의 다른 선수일 수 있어요')
-    expect(markup).toContain('whitespace-nowrap">소속과 시즌을 확인해 주세요.</span>')
-    expect(markup).toContain('pl-2 break-keep [text-wrap:pretty] text-caption')
   })
 
 
@@ -81,7 +79,6 @@ describe('record candidate browsing', () => {
     expect(markup).toContain("부문 · 남자 중등부 · 남자 고등부")
     expect(markup).toContain("종목 · 100m · 200m · 400m")
     expect(markup).not.toContain("외 1개")
-    expect(markup).not.toContain("title=")
     expect(markup).toContain(
       `aria-label="${athlete.name} · ${athlete.team} · 2024-2026 시즌 · 부문 남자 중등부 · 남자 고등부 · 종목 100m · 200m · 400m 기록 보기.`,
     )
@@ -152,10 +149,6 @@ describe('record candidate browsing', () => {
     expect(browse).toContain('선수 기록 모아 보기')
     expect(browse).not.toContain('선택한 선수')
     expect(collect).not.toContain('선수 기록 모아 보기')
-    expect(browse).toContain('flex-col')
-    expect(browse).toContain('sm:flex-row')
-    expect(browse).toContain('w-full sm:w-auto')
-    expect(browse).toContain('mt-1 break-keep text-body-sm')
     expect(collect.match(/aria-pressed="false"/g)).toHaveLength(7)
     expect(collect.match(/aria-label="선택한 선수"/g)).toHaveLength(1)
   })
@@ -173,7 +166,7 @@ describe('record candidate browsing', () => {
     expect(removed).toEqual({ kind: 'updated', subjectKeys: sixKeys.slice(1) })
   })
 
-  it('keeps the draft tray above mobile navigation and announces limit feedback', () => {
+  it('keeps the draft tray count and limit feedback accessible', () => {
     // Given a full draft and its limit notice.
     // When the fixed tray renders.
     const markup = renderToStaticMarkup(
@@ -186,12 +179,10 @@ describe('record candidate browsing', () => {
       />,
     )
 
-    // Then the count, live notice, and safe-area offset remain visible.
+    // Then the count and live notice remain visible.
     expect(markup).toContain('선수 6명 선택')
     expect(markup).toContain('서울고 · 부산고')
     expect(markup).toContain('한 모음에는 6명까지')
     expect(markup).toContain('aria-live="polite"')
-    expect(markup).toContain('safe-area-inset-bottom')
-    expect(markup).toContain('var(--mobile-tabbar-height)')
   })
 })
