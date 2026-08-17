@@ -148,6 +148,65 @@ test('Given an unexpected availability query When the endpoint is requested Then
   });
 });
 
+test('Given an advertised season tuple with no rows When season records are requested Then it stays 200 while an unadvertised tuple returns a typed 400', async (t) => {
+  const originalAvailability = analytics.getSeasonAvailability;
+  const originalRecords = analytics.getSeasonRecords;
+  const validEmptySelection = { season: 2025, eventKey: '100m', divisionKey: 'men-high' };
+  const invalidSelection = { season: 2025, eventKey: '200m', divisionKey: 'women-high' };
+  const serviceCalls = [];
+
+  analytics.getSeasonAvailability = () => ({
+    seasons: { '2025': { '100m': ['men-high'] } },
+  });
+  analytics.getSeasonRecords = (selection) => {
+    serviceCalls.push(selection);
+    return {
+      ...selection,
+      eventLabel: selection.eventKey,
+      divisionLabel: selection.divisionKey,
+      totalIndexedAthletes: 0,
+      rows: [],
+      filters: {},
+      disclaimer: 'test fixture',
+    };
+  };
+  t.after(() => {
+    analytics.getSeasonAvailability = originalAvailability;
+    analytics.getSeasonRecords = originalRecords;
+  });
+
+  const baseUrl = await startAnalyticsServer(t);
+  const [validResponse, invalidResponse, malformedSeasonResponse, malformedEventResponse, malformedDivisionResponse] = await Promise.all([
+    fetch(`${baseUrl}/season-records?season=2025&eventKey=100m&divisionKey=men-high`),
+    fetch(`${baseUrl}/season-records?season=2025&eventKey=200m&divisionKey=women-high`),
+    fetch(`${baseUrl}/season-records?season=2025junk&eventKey=100m&divisionKey=men-high`),
+    fetch(`${baseUrl}/season-records?season=2025&eventKey=100m%00junk&divisionKey=men-high`),
+    fetch(`${baseUrl}/season-records?season=2025&eventKey=100m&divisionKey=men-high%00junk`),
+  ]);
+  const [validBody, invalidBody, malformedSeasonBody, malformedEventBody, malformedDivisionBody] = await Promise.all([
+    validResponse.json(),
+    invalidResponse.json(),
+    malformedSeasonResponse.json(),
+    malformedEventResponse.json(),
+    malformedDivisionResponse.json(),
+  ]);
+
+  assert.equal(validResponse.status, 200);
+  assert.equal(validBody.success, true);
+  assert.deepEqual(validBody.data.rows, []);
+  assert.equal(invalidResponse.status, 400);
+  assert.deepEqual(invalidBody, {
+    success: false,
+    code: 'INVALID_SEASON_COMBINATION',
+    error: '기록이 있는 시즌·종목·경기 부문 조합을 선택해 주세요.',
+  });
+  assert.deepEqual(
+    [malformedSeasonResponse.status, malformedEventResponse.status, malformedDivisionResponse.status],
+    [400, 400, 400],
+  );
+  assert.deepEqual([malformedSeasonBody, malformedEventBody, malformedDivisionBody], [invalidBody, invalidBody, invalidBody]);
+  assert.deepEqual(serviceCalls.map(({ season, eventKey, divisionKey }) => ({ season, eventKey, divisionKey })), [validEmptySelection]);
+});
 test('Given a canonical division key When athletes are searched Then filtering happens before the public result limit', async (t) => {
   const index = analytics.getIndex();
   const fixture = index.athletes.find((athlete) => (

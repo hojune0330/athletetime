@@ -224,10 +224,28 @@ router.get('/athletes/:athleteKey', publicLimiter, (req, res) => {
 
 router.get('/season-records', publicLimiter, (req, res) => {
   try {
+    const rawSeason = typeof req.query.season === 'string' ? req.query.season.trim() : '';
+    const season = /^(?:19|20)\d{2}$/u.test(rawSeason)
+      ? parseBoundedInteger(rawSeason, null, 1900, new Date().getFullYear() + 1)
+      : null;
+    const eventKey = typeof req.query.eventKey === 'string' ? req.query.eventKey : '';
+    const divisionKey = typeof req.query.divisionKey === 'string' ? req.query.divisionKey : '';
+    const availableDivisions = season === null
+      ? null
+      : recordAnalyticsService.getSeasonAvailability()?.seasons?.[String(season)]?.[eventKey];
+    if (
+      season === null
+      || !eventKey
+      || !divisionKey
+      || !Array.isArray(availableDivisions)
+      || !availableDivisions.includes(divisionKey)
+    ) {
+      return invalidSeasonCombination(res);
+    }
     const table = recordAnalyticsService.getSeasonRecords({
-      season: req.query.season,
-      eventKey: req.query.eventKey,
-      divisionKey: req.query.divisionKey,
+      season,
+      eventKey,
+      divisionKey,
       athleteKey: req.query.athleteKey,
       limit: req.query.limit,
     });
@@ -303,6 +321,14 @@ function parseBoundedInteger(value, fallback, min, max) {
 
 function invalidTeamRequest(res, code, error) {
   return res.status(400).json({ success: false, code, error });
+}
+
+function invalidSeasonCombination(res) {
+  return res.status(400).json({
+    success: false,
+    code: 'INVALID_SEASON_COMBINATION',
+    error: '기록이 있는 시즌·종목·경기 부문 조합을 선택해 주세요.',
+  });
 }
 
 function internalTeamError(res) {
