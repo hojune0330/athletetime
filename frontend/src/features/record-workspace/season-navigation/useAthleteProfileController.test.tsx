@@ -1,5 +1,6 @@
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
+import { MemoryRouter, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   AthleteAnalyticsProfile,
@@ -10,6 +11,7 @@ import {
   useAthleteProfileController,
   type AthleteProfileController,
 } from './useAthleteProfileController';
+import { useCanonicalAthleteProfileParam } from './useCanonicalAthleteProfileParam';
 
 type GetAthleteAnalytics = typeof import('../../../api/recordAnalytics').getAthleteAnalytics;
 
@@ -104,6 +106,12 @@ function profile(athleteKey: string): AthleteAnalyticsProfile {
 
 type MutableCell<T> = { current: T };
 
+type CanonicalParamControl = {
+  readonly locationSearch: string;
+  readonly navigateBack: () => void;
+  readonly profileKey: string | null;
+};
+
 function ProfileBoundary({
   athleteKey,
   control,
@@ -115,10 +123,37 @@ function ProfileBoundary({
   return null;
 }
 
+function CanonicalParamBoundary({
+  control,
+  controller,
+}: {
+  readonly control: MutableCell<CanonicalParamControl | null>;
+  readonly controller: AthleteProfileController;
+}) {
+  const [params] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const selectedAthleteParam = (params.get('athlete') || '').trim();
+  const selectedProfile = useCanonicalAthleteProfileParam(selectedAthleteParam, controller);
+  control.current = {
+    locationSearch: location.search,
+    navigateBack: () => void navigate(-1),
+    profileKey: selectedProfile?.athlete.athleteKey ?? null,
+  };
+  return null;
+}
+
 function requireController(
   control: MutableCell<AthleteProfileController | null>,
 ): AthleteProfileController {
   if (!control.current) throw new Error('Profile controller has not rendered');
+  return control.current;
+}
+
+function requireCanonicalParamControl(
+  control: MutableCell<CanonicalParamControl | null>,
+): CanonicalParamControl {
+  if (!control.current) throw new Error('Canonical parameter boundary has not rendered');
   return control.current;
 }
 
@@ -196,7 +231,7 @@ describe('athlete profile controller', () => {
     api.getAthleteAnalytics.mockImplementation((athleteKey) =>
       athleteKey === 'athlete-a' ? requestA.promise : requestB.promise,
     );
-    const control = { current: null };
+    const control: MutableCell<AthleteProfileController | null> = { current: null };
     const root = createRoot(installMinimalDom());
     await act(async () => {
       root.render(<ProfileBoundary athleteKey="athlete-a" control={control} />);
@@ -221,6 +256,7 @@ describe('athlete profile controller', () => {
     expect(requireController(control).state).toBe('ready');
     expect(requireController(control).profile?.athlete.athleteKey).toBe('athlete-b');
     expect(requireController(control).candidates).toEqual([]);
+    expect(requireController(control).requestedAthleteKey).toBe('athlete-b');
 
     await act(async () => root.unmount());
   });
@@ -229,7 +265,7 @@ describe('athlete profile controller', () => {
     // Given an ambiguous profile response.
     const candidates = [candidate('athlete-a'), candidate('athlete-b')];
     api.getAthleteAnalytics.mockResolvedValue({ kind: 'ambiguous', candidates });
-    const control = { current: null };
+    const control: MutableCell<AthleteProfileController | null> = { current: null };
     const root = createRoot(installMinimalDom());
 
     // When the response settles.
@@ -243,6 +279,7 @@ describe('athlete profile controller', () => {
     expect(requireController(control).state).toBe('ambiguous');
     expect(requireController(control).profile).toBeNull();
     expect(requireController(control).candidates).toEqual(candidates);
+    expect(requireController(control).requestedAthleteKey).toBe('legacy-name');
 
     await act(async () => root.unmount());
   });
@@ -269,6 +306,142 @@ describe('athlete profile controller', () => {
     expect(requireController(control).state).toBe('idle');
     expect(requireController(control).profile).toBeNull();
     expect(requireController(control).candidates).toEqual([]);
+    expect(requireController(control).requestedAthleteKey).toBe('');
+
+    await act(async () => root.unmount());
+  });
+
+  it('accepts a canonical profile for a unique legacy alias and replaces its URL entry', async () => {
+    // Given a legacy URL whose completed request uniquely resolved to a canonical athlete key.
+    const legacyKey = 'at_legacy_runner';
+    const canonicalKey = 'aaaaaaaaaaaaaaaa';
+    const controller: AthleteProfileController = {
+      candidates: [],
+      profile: profile(canonicalKey),
+      requestedAthleteKey: legacyKey,
+      state: 'ready',
+    };
+    const control: MutableCell<CanonicalParamControl | null> = { current: null };
+    const root = createRoot(installMinimalDom());
+
+    // When the canonical profile is consumed by the URL boundary.
+    await act(async () => {
+      root.render(
+        <MemoryRouter
+          initialEntries={[
+            '/records?flow=browse',
+            `/records?athlete=${legacyKey}&flow=browse`,
+          ]}
+          initialIndex={1}
+        >
+          <CanonicalParamBoundary control={control} controller={controller} />
+        </MemoryRouter>,
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    // Then unrelated params survive and Back skips the replaced legacy entry.
+    expect(requireCanonicalParamControl(control).locationSearch).toBe(`?athlete=${canonicalKey}&flow=browse`);
+    expect(requireCanonicalParamControl(control).profileKey).toBe(canonicalKey);
+    await act(async () => {
+      requireCanonicalParamControl(control).navigateBack();
+      await Promise.resolve();
+    });
+    expect(requireCanonicalParamControl(control).locationSearch).toBe('?flow=browse');
+
+    await act(async () => root.unmount());
+  });
+
+  it('does not let a late legacy response override Back navigation', async () => {
+    // Given a legacy request that is still loading at a URL with a previous clean entry.
+    const legacyKey = 'at_legacy_runner';
+    const canonicalKey = 'aaaaaaaaaaaaaaaa';
+    const loadingController: AthleteProfileController = {
+      candidates: [],
+      profile: null,
+      requestedAthleteKey: legacyKey,
+      state: 'loading',
+    };
+    const control: MutableCell<CanonicalParamControl | null> = { current: null };
+    const root = createRoot(installMinimalDom());
+    await act(async () => {
+      root.render(
+        <MemoryRouter
+          initialEntries={[
+            '/records?flow=browse',
+            `/records?athlete=${legacyKey}&flow=browse`,
+          ]}
+          initialIndex={1}
+        >
+          <CanonicalParamBoundary control={control} controller={loadingController} />
+        </MemoryRouter>,
+      );
+      await Promise.resolve();
+    });
+
+    // When Back clears the athlete before the legacy response is presented.
+    await act(async () => {
+      requireCanonicalParamControl(control).navigateBack();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      root.render(
+        <MemoryRouter
+          initialEntries={[
+            '/records?flow=browse',
+            `/records?athlete=${legacyKey}&flow=browse`,
+          ]}
+          initialIndex={1}
+        >
+          <CanonicalParamBoundary
+            control={control}
+            controller={{
+              candidates: [],
+              profile: profile(canonicalKey),
+              requestedAthleteKey: legacyKey,
+              state: 'ready',
+            }}
+          />
+        </MemoryRouter>,
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    // Then the clean URL remains authoritative.
+    expect(requireCanonicalParamControl(control).locationSearch).toBe('?flow=browse');
+    expect(requireCanonicalParamControl(control).profileKey).toBeNull();
+
+    await act(async () => root.unmount());
+  });
+
+  it('keeps an ambiguous legacy alias in the URL without choosing a candidate', async () => {
+    // Given an ambiguous legacy response with explicit candidates only.
+    const legacyKey = 'at_ambiguous_runner';
+    const controller: AthleteProfileController = {
+      candidates: [candidate('athlete-a'), candidate('athlete-b')],
+      profile: null,
+      requestedAthleteKey: legacyKey,
+      state: 'ambiguous',
+    };
+    const control: MutableCell<CanonicalParamControl | null> = { current: null };
+    const root = createRoot(installMinimalDom());
+
+    // When the ambiguity reaches the URL boundary.
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={[`/records?athlete=${legacyKey}&flow=browse`]}>
+          <CanonicalParamBoundary control={control} controller={controller} />
+        </MemoryRouter>,
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    // Then neither the URL nor selected profile is rewritten.
+    expect(requireCanonicalParamControl(control).locationSearch).toBe(`?athlete=${legacyKey}&flow=browse`);
+    expect(requireCanonicalParamControl(control).profileKey).toBeNull();
 
     await act(async () => root.unmount());
   });

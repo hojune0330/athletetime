@@ -50,6 +50,7 @@ import {
   useAthleteProfileController,
   type AthleteProfileLoadState,
 } from '../features/record-workspace/season-navigation/useAthleteProfileController';
+import { useCanonicalAthleteProfileParam } from '../features/record-workspace/season-navigation/useCanonicalAthleteProfileParam';
 import { useSeasonRecordsController } from '../features/record-workspace/season-navigation/useSeasonRecordsController';
 import { useRecordWorkspaceStore } from '../features/record-workspace/useRecordWorkspaceStore';
 import { TRUST_NOTICE, TRUST_POINTS as POLICY_TRUST_POINTS, resolveProviderLabel, SHARE_POLICY } from '../config/dataPolicy';
@@ -97,9 +98,7 @@ export default function RecordsPage() {
   const isSeasonBrowse = activeFlow === 'browse' && browseChoice === 'season';
   const mode: Mode = isSeasonBrowse ? 'season' : 'athlete';
   const profileController = useAthleteProfileController(selectedAthleteParam);
-  const profile = profileController.profile?.athlete.athleteKey === selectedAthleteParam
-    ? profileController.profile
-    : null;
+  const profile = useCanonicalAthleteProfileParam(selectedAthleteParam, profileController);
   const profileState: AthleteProfileLoadState = selectedAthleteParam
     ? profileController.state
     : 'idle';

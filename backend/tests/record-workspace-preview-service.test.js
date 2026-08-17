@@ -60,10 +60,11 @@ function createFixtureService(athletes, legacyAthleteAliasesByKey = new Map()) {
   return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey, legacyAthleteAliasesByKey }) });
 }
 
-test('Given saved direct, unique-alias, and ambiguous keys When a workspace preview is restored Then only the direct and unique canonical subjects are returned', () => {
+test('Given saved direct, duplicate unique-alias, and ambiguous keys When a workspace preview is restored Then subjects dedupe and each successful request is reconciled', () => {
   const firstKey = '1111111111111111';
   const secondKey = '2222222222222222';
   const uniqueAlias = 'aaaaaaaaaaaaaaaa';
+  const sameCanonicalAlias = 'cccccccccccccccc';
   const ambiguousAlias = 'bbbbbbbbbbbbbbbb';
   const first = athleteFor({
     athleteKey: firstKey,
@@ -80,15 +81,21 @@ test('Given saved direct, unique-alias, and ambiguous keys When a workspace prev
   const service = createFixtureService([first, second], new Map([
     [uniqueAlias, new Set([firstKey])],
     [secondKey, new Set([firstKey])],
+    [sameCanonicalAlias, new Set([firstKey])],
     [ambiguousAlias, new Set([firstKey, secondKey])],
   ]));
 
   const preview = service.getRecordWorkspacePreview({
-    subjectKeys: [uniqueAlias, secondKey, ambiguousAlias],
+    subjectKeys: [uniqueAlias, secondKey, sameCanonicalAlias, ambiguousAlias],
     limit: 50,
   });
 
   assert.deepEqual(preview.subjects.map((subject) => subject.athleteKey), [firstKey, secondKey]);
+  assert.deepEqual(preview.resolvedSubjectKeys, [
+    { requestedSubjectKey: uniqueAlias, athleteKey: firstKey },
+    { requestedSubjectKey: secondKey, athleteKey: secondKey },
+    { requestedSubjectKey: sameCanonicalAlias, athleteKey: firstKey },
+  ]);
   assert.deepEqual(preview.unavailableSubjectKeys, [ambiguousAlias]);
   assert.deepEqual(preview.records.map((record) => record.athleteKey), [firstKey, secondKey]);
 });

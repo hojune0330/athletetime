@@ -56,6 +56,10 @@ function preview(records: readonly PublicRecord[], total: number, hasMore: boole
       ambiguity: 'name_team',
       note: '',
     }],
+    resolvedSubjectKeys: [{
+      requestedSubjectKey: '1111111111111111',
+      athleteKey: '1111111111111111',
+    }],
     unavailableSubjectKeys: [],
     identity: { displayName: '김선수', distinctNames: ['김선수'], warning: 'none' },
     affiliations: [{

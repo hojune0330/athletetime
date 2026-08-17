@@ -16,6 +16,11 @@ export type RecordWorkspacePreviewRequest = {
 
 export type RecordWorkspaceSubject = AthleteSearchCard
 
+export type RecordWorkspaceResolvedSubjectKey = {
+  readonly requestedSubjectKey: string
+  readonly athleteKey: string
+}
+
 export type RecordWorkspaceAffiliation = {
   readonly label: string
   readonly firstObservedSeason: number
@@ -51,6 +56,7 @@ export type RecordWorkspaceIdentity = {
 
 export type RecordWorkspacePreview = {
   readonly subjects: readonly RecordWorkspaceSubject[]
+  readonly resolvedSubjectKeys: readonly RecordWorkspaceResolvedSubjectKey[]
   readonly unavailableSubjectKeys: readonly string[]
   readonly identity: RecordWorkspaceIdentity
   readonly affiliations: readonly RecordWorkspaceAffiliation[]

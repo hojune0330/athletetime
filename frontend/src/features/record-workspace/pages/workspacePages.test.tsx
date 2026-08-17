@@ -75,6 +75,10 @@ function preview(warning: RecordWorkspacePreview['identity']['warning']): Record
         note: '',
       },
     ],
+    resolvedSubjectKeys: [
+      { requestedSubjectKey: KEY_A, athleteKey: KEY_A },
+      { requestedSubjectKey: KEY_B, athleteKey: KEY_B },
+    ],
     unavailableSubjectKeys: [],
     identity: { displayName: names.join(' · '), distinctNames: names, warning },
     affiliations: [

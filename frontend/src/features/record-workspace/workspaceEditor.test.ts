@@ -4,6 +4,7 @@ import { RecordWorkspaceSchema } from './model'
 import {
   createWorkspaceEditorState,
   hideSelectedWorkspaceRecords,
+  reconcileWorkspaceEditorSubjectKeys,
   removeWorkspaceSubject,
   restoreAllWorkspaceRecords,
   toggleWorkspaceRecordSelection,
@@ -114,5 +115,24 @@ describe('record workspace editor state', () => {
     expect(restored.excludedRecordIds).toEqual([])
     expect(restored.undo).not.toBeNull()
     expect(records).toHaveLength(2)
+  })
+
+  it('removes a canonical subject after reconciling a saved legacy key', () => {
+    // Given a saved workspace with one uniquely resolved legacy alias and one unresolved alias.
+    const legacyWorkspace = RecordWorkspaceSchema.parse({
+      ...workspace,
+      subjectKeys: ['at_legacy_runner', 'at_ambiguous_runner'],
+    })
+    const initial = createWorkspaceEditorState(legacyWorkspace)
+
+    // When successful preview mappings reconcile storage and the canonical row is removed.
+    const reconciled = reconcileWorkspaceEditorSubjectKeys(initial, [
+      { requestedSubjectKey: 'at_legacy_runner', athleteKey: KEY_A },
+    ])
+    const removed = removeWorkspaceSubject(reconciled, KEY_A)
+
+    // Then canonical removal works while the unresolved alias was never auto-selected.
+    expect(reconciled.subjectKeys).toEqual([KEY_A, 'at_ambiguous_runner'])
+    expect(removed.subjectKeys).toEqual(['at_ambiguous_runner'])
   })
 })

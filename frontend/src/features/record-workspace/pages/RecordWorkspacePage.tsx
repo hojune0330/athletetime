@@ -53,12 +53,18 @@ function LoadedWorkspacePage({
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
   const editor = useRecordWorkspaceEditor({ workspace, onPersist: onUpdate })
+  const { clearFocusRecord, reconcileSubjectKeys } = editor
   const previewQuery = useRecordWorkspacePreview(editor.state.subjectKeys)
   const preview = previewQuery.preview
   const tab = normalizeTab(params.get('tab'))
   const requestedEventKey = params.get('event')?.trim() || null
   const showEventIndex = params.get('eventIndex') === 'true'
   const selectedRecordId = params.get('record')?.trim() || null
+
+  useEffect(() => {
+    if (!preview) return
+    reconcileSubjectKeys(preview.resolvedSubjectKeys)
+  }, [preview, reconcileSubjectKeys])
 
   const updatePageState = (updates: Readonly<Record<string, string | null>>) => {
     const next = new URLSearchParams(params)
@@ -76,8 +82,8 @@ function LoadedWorkspacePage({
     const target = [...document.querySelectorAll<HTMLElement>('[data-record-row]')]
       .find((element) => element.dataset.recordRow === focusRecordId)
     target?.focus({ preventScroll: true })
-    editor.clearFocusRecord()
-  }, [focusRecordId])
+    clearFocusRecord()
+  }, [clearFocusRecord, focusRecordId])
 
   if (previewQuery.isPending && !preview) {
     return <WorkspaceShell title={workspace.title}><WorkspaceRecoveryState kind="loading" /></WorkspaceShell>
@@ -159,7 +165,7 @@ function LoadedWorkspacePage({
         <div className="space-y-3">
           <AffiliationHistory context="workspace" items={preview.affiliations} />
           <WorkspaceSubjectList
-            onRemove={editor.removeSubject}
+            onRemove={(subjectKey) => editor.removeSubject(subjectKey, preview.resolvedSubjectKeys)}
             subjectKeys={editor.state.subjectKeys}
             subjects={preview.subjects}
             unavailableSubjectKeys={preview.unavailableSubjectKeys}

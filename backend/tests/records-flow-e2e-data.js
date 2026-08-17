@@ -202,8 +202,13 @@ function makeProfile(key) {
 }
 
 function makeWorkspacePreview(subjectKeys) {
-  const subjects = subjectKeys
-    .map((subjectKey) => [...athletes, savedWorkspaceAthlete].find((athlete) => athlete.athleteKey === subjectKey))
+  const fixtureSubjects = [...athletes, savedWorkspaceAthlete];
+  const resolvedSubjectKeys = subjectKeys.flatMap((requestedSubjectKey) => {
+    const subject = fixtureSubjects.find((athlete) => athlete.athleteKey === requestedSubjectKey);
+    return subject ? [{ requestedSubjectKey, athleteKey: subject.athleteKey }] : [];
+  });
+  const subjects = resolvedSubjectKeys
+    .map(({ athleteKey }) => fixtureSubjects.find((athlete) => athlete.athleteKey === athleteKey))
     .filter(Boolean);
   const records = subjects.flatMap((subject) => [makeRecord(subject, 0), makeRecord(subject, 1)]);
   const affiliationCounts = new Map();
@@ -218,6 +223,7 @@ function makeWorkspacePreview(subjectKeys) {
   const names = [...new Set(subjects.map((subject) => subject.name))];
   return {
     subjects,
+    resolvedSubjectKeys,
     unavailableSubjectKeys: subjectKeys.filter((subjectKey) => !subjects.some((subject) => subject.athleteKey === subjectKey)),
     identity: { displayName: names.join(' · ') || '선수 후보', distinctNames: names, warning: names.length > 1 ? 'different_names' : 'none' },
     affiliations: Array.from(affiliationCounts.entries()).map(([label, recordCount]) => ({ label, firstObservedSeason: 2024, lastObservedSeason: 2026, recordCount, status: 'latest_observed' })),

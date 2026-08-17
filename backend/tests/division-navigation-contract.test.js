@@ -6,7 +6,7 @@ const express = require('express');
 const analytics = require('../../card-studio/services/recordAnalyticsService');
 const divisionHierarchy = require('../../card-studio/services/divisionHierarchyService');
 const analyticsRoutes = require('../../card-studio/routes/recordAnalyticsRoutes');
-const { getSearchResults } = require('./records-flow-e2e-data');
+const { getSearchResults, makeWorkspacePreview } = require('./records-flow-e2e-data');
 
 const FORBIDDEN_AVAILABILITY_KEYS = new Set([
   'athleteCount',
@@ -72,6 +72,16 @@ test('Given the fixture search boundary When Beta, no-match, and empty queries r
   assert.deepEqual(getSearchResults('Beta').map((candidate) => candidate.athleteKey), ['beta-2016']);
   assert.deepEqual(getSearchResults('no such athlete'), []);
   assert.deepEqual(getSearchResults('   '), []);
+});
+
+test('Given canonical and unavailable workspace fixture keys When a preview is built Then resolved subjects retain requested-to-canonical mapping', () => {
+  const preview = makeWorkspacePreview(['alpha-2016', 'aaaaaaaaaaaaaaaa', 'missing-key']);
+
+  assert.deepEqual(preview.resolvedSubjectKeys, [
+    { requestedSubjectKey: 'alpha-2016', athleteKey: 'alpha-2016' },
+    { requestedSubjectKey: 'aaaaaaaaaaaaaaaa', athleteKey: 'aaaaaaaaaaaaaaaa' },
+  ]);
+  assert.deepEqual(preview.unavailableSubjectKeys, ['missing-key']);
 });
 
 test('Given the real public index When availability is projected Then it is deterministic, count-free, and level-specific', () => {

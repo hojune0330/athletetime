@@ -15,6 +15,8 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
       if (!(athleteByKey instanceof Map)) throw new Error('Public analytics index is unavailable.');
 
       const subjects = [];
+      const resolvedAthleteKeys = new Set();
+      const resolvedSubjectKeys = [];
       const unavailableSubjectKeys = [];
       for (const subjectKey of request.subjectKeys) {
         const directAthlete = athleteByKey.get(subjectKey);
@@ -27,6 +29,9 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
           unavailableSubjectKeys.push(subjectKey);
           continue;
         }
+        resolvedSubjectKeys.push({ requestedSubjectKey: subjectKey, athleteKey: athlete.athleteKey });
+        if (resolvedAthleteKeys.has(athlete.athleteKey)) continue;
+        resolvedAthleteKeys.add(athlete.athleteKey);
         subjects.push(toSubject(athlete));
       }
 
@@ -39,6 +44,7 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
 
       return {
         subjects,
+        resolvedSubjectKeys,
         unavailableSubjectKeys,
         identity: buildIdentity(subjects),
         affiliations: buildAffiliations(records),

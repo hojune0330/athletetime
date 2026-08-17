@@ -15,52 +15,71 @@ export type AthleteProfileLoadState =
 export type AthleteProfileController = {
   readonly profile: AthleteAnalyticsProfile | null;
   readonly candidates: readonly AthleteSearchCard[];
+  readonly requestedAthleteKey: string;
   readonly state: AthleteProfileLoadState;
 };
 
 export function useAthleteProfileController(
   athleteKey: string,
 ): AthleteProfileController {
-  const [profile, setProfile] = useState<AthleteAnalyticsProfile | null>(null);
-  const [candidates, setCandidates] = useState<readonly AthleteSearchCard[]>([]);
-  const [state, setState] = useState<AthleteProfileLoadState>('idle');
+  const [controller, setController] = useState<AthleteProfileController>({
+    candidates: [],
+    profile: null,
+    requestedAthleteKey: '',
+    state: 'idle',
+  });
   const requestId = useRef(0);
 
   useEffect(() => {
     const currentRequestId = ++requestId.current;
     const trimmedKey = athleteKey.trim();
     if (!trimmedKey) {
-      setProfile(null);
-      setCandidates([]);
-      setState('idle');
+      setController({
+        candidates: [],
+        profile: null,
+        requestedAthleteKey: '',
+        state: 'idle',
+      });
       return;
     }
 
     let active = true;
-    setProfile(null);
-    setCandidates([]);
-    setState('loading');
+    setController({
+      candidates: [],
+      profile: null,
+      requestedAthleteKey: trimmedKey,
+      state: 'loading',
+    });
     void getAthleteAnalytics(trimmedKey)
       .then((result) => {
         if (!active || requestId.current !== currentRequestId) return;
         switch (result.kind) {
           case 'profile':
-            setProfile(result.profile);
-            setCandidates([]);
-            setState('ready');
+            setController({
+              candidates: [],
+              profile: result.profile,
+              requestedAthleteKey: trimmedKey,
+              state: 'ready',
+            });
             return;
           case 'ambiguous':
-            setProfile(null);
-            setCandidates(result.candidates);
-            setState('ambiguous');
+            setController({
+              candidates: result.candidates,
+              profile: null,
+              requestedAthleteKey: trimmedKey,
+              state: 'ambiguous',
+            });
             return;
         }
       })
       .catch(() => {
         if (!active || requestId.current !== currentRequestId) return;
-        setProfile(null);
-        setCandidates([]);
-        setState('error');
+        setController({
+          candidates: [],
+          profile: null,
+          requestedAthleteKey: trimmedKey,
+          state: 'error',
+        });
       });
 
     return () => {
@@ -68,5 +87,5 @@ export function useAthleteProfileController(
     };
   }, [athleteKey]);
 
-  return { profile, candidates, state };
+  return controller;
 }
