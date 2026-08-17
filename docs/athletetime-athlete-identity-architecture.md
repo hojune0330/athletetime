@@ -2,6 +2,10 @@
 
 > 작성: Claude (신뢰/인문 도메인) · 갱신: 2026-07-29
 > 상태: **안전 게이트 구현, 매핑 데이터 0건**
+>
+> 현재 production fallback은 성별+부문 층위별로 분리한다. 레거시 별칭은
+> 유일할 때만 canonicalize하고, 모호하면 `multiple_candidates`를 명시하며
+> `*-all` identity rollup은 사용하지 않는다.
 > 🧭 **상위 기준 문서:** `athletetime-data-strategy-master.md` (전략 전체의 단일 기준점)
 > 전제: 실제 매핑 투입은 마스터 문서 §7 Go 조건과 별도 승인을 모두 충족한 뒤 진행
 > **확정사항(2026-06-07):** person_no는 **B안(판단 후 폐기)** — 저장하지 않고 난수 canonicalId만 보유.
@@ -52,6 +56,14 @@ graceful fallback 한다.
 
 ## 3. 데이터 모델
 
+### 3.0 현재 production fallback과 레거시 별칭
+
+- 매핑이 없으면 legacyAthleteKey를 별칭으로만 보존하고, 실제 athleteKey는
+  성별+부문 층위별로 분리한 안정 키로 만든다.
+- 유일한 레거시 별칭만 canonicalize한다. 후보가 둘 이상이면
+  `ambiguity: "multiple_candidates"`와 후보 목록을 반환하고 자동 선택하지 않는다.
+- `*-all` identity rollup은 만들지 않는다.
+
 ### 3.1 매핑 테이블 — B안: person_no 저장 안 함
 `data/identity/athlete-map.json` (현재 런타임 스키마)
 ```jsonc
@@ -96,11 +108,11 @@ graceful fallback 한다.
 // 현재 (c9ff4e7)
 const athleteKey = stableId(`${name}|${normalizeTeam(team)}`);
 ```
-제안 (Layer 3 lookup 추가, fallback 보존):
+현행 (verified mapping then segmented fallback):
 ```js
 // 제안 — identityResolver는 외부데이터 없으면 null 반환
-const baseKey = stableId(`${name}|${normalizeTeam(team)}`);
-const athleteKey = identityResolver.resolve({ athleteKey: baseKey }) || baseKey;
+const legacyAthleteKey = stableId(nameTeamAlias);
+const athleteKey = identityResolver.resolve({ athleteKey: legacyAthleteKey }) || segmentedFallback;
 ```
 - `identityResolver`는 매핑 테이블만 읽고 외부 호출을 하지 않는다.
 - 집계/검색은 `canonicalId` 기준으로 묶되, 매핑 없으면 `athleteKey`와 동일하게 동작.
@@ -146,3 +158,9 @@ const athleteKey = identityResolver.resolve({ athleteKey: baseKey }) || baseKey;
 ---
 
 *현재 코드는 안전 게이트까지만 구현되어 있으며 실제 canonical 매핑은 0건이다.*
+
+## Current production contract (2026-08-18)
+
+Fallback identity is segmented by gender+division level. Unique legacy aliases
+canonicalize; ambiguous aliases return `multiple_candidates` explicitly, with no
+silent selection and no `*-all` identity rollup.

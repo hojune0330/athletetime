@@ -306,3 +306,11 @@ GET 쿼리 대신 JSON POST 본문을 사용한다. 요청 본문은 4KB를 넘�
 
 새 구현은 이 계약과 충돌할 경우 구현을 우선하지 않는다. 충돌 이유와 대안을
 문서화한 뒤 별도 결정으로 계약을 바꾼다.
+
+## Current production contract (2026-08-18)
+
+- Fallback `athleteKey` is segmented by gender+division level.
+- Unique legacy aliases canonicalize; ambiguous aliases return
+  `multiple_candidates` explicitly, without silent selection or a `*-all` rollup.
+- Public records omit `rawDivision`; only safe `sourceDivisionLabel` may appear,
+  and only as detail-level provenance.
