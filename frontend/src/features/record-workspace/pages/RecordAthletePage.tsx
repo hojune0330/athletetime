@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ShareIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { addAthleteToWorkspaceDraft } from '../recordAthleteActions'
 import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { resolveRecordAthleteReturnPath } from '../recordAthleteNavigationState'
 import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
+import { reconcileRecordWorkspaceSubjectKeys } from '../recordWorkspacePreviewPages'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
@@ -32,6 +33,20 @@ export default function RecordAthletePage() {
   const selectedRecordId = pageParams.get('record')?.trim() || null
   const selectedSeason = parseRecordAthleteSeason(pageParams)
   const returnPath = resolveRecordAthleteReturnPath(location.state)
+  const reconciledAthleteKey = preview
+    ? reconcileRecordWorkspaceSubjectKeys([athleteKey], preview.resolvedSubjectKeys)[0] ?? athleteKey
+    : athleteKey
+  const resolvedAthleteKey = preview?.subjects.some((subject) => subject.athleteKey === reconciledAthleteKey)
+    ? reconciledAthleteKey
+    : null
+
+  useEffect(() => {
+    if (!preview || athlete.isPending || athlete.isError || !resolvedAthleteKey || resolvedAthleteKey === athleteKey) return
+    navigate({
+      pathname: `/records/athletes/${encodeURIComponent(resolvedAthleteKey)}`,
+      search: location.search,
+    }, { replace: true })
+  }, [athlete.isError, athlete.isPending, athleteKey, location.search, navigate, preview, resolvedAthleteKey])
 
   const updatePageState = (updates: Record<string, string | null>) => {
     const next = new URLSearchParams(pageParams)
@@ -65,7 +80,11 @@ export default function RecordAthletePage() {
   const sameNameCaution = subject.note.trim()
     || '같은 이름의 다른 선수일 수 있어요. 소속·연도·종목을 확인해 주세요.'
   const shareRecord = async () => {
-    const url = new URL(createRecordAthleteSharePath(athleteKey, pageParams), window.location.origin).toString()
+    if (!resolvedAthleteKey) {
+      setActionNotice('이 선수의 고유 기록 키를 확인하지 못했어요. 임시 선택과 공유를 할 수 없어요.')
+      return
+    }
+    const url = new URL(createRecordAthleteSharePath(resolvedAthleteKey, pageParams), window.location.origin).toString()
     const title = `${subject.name} 선수 기록`
     if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       try {
@@ -83,8 +102,12 @@ export default function RecordAthletePage() {
     }
   }
   const addToDraft = () => {
+    if (!resolvedAthleteKey) {
+      setActionNotice('이 선수의 고유 기록 키를 확인하지 못했어요. 임시 선택과 공유를 할 수 없어요.')
+      return
+    }
     const current = store.workspaceDraft?.subjectKeys ?? []
-    const next = addAthleteToWorkspaceDraft(current, athleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
+    const next = addAthleteToWorkspaceDraft(current, resolvedAthleteKey, WORKSPACE_LIMITS.workspaceDraftSubjects)
     if (next.kind === 'limit') {
       setActionNotice(`임시 선택에는 ${WORKSPACE_LIMITS.workspaceDraftSubjects}명까지 담을 수 있어요.`)
       return
