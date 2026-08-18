@@ -1,14 +1,14 @@
 const athletes = [
-  athlete('alpha-2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7, ['남자 고등부', '남자 일반부']),
-  athlete('alpha-2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4),
-  athlete('beta-2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
-  athlete('mine-race-2016', 'Race Runner', 'Race High', [2026], ['200m'], 2),
+  athlete('at_alpha_2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7, ['남자 고등부', '남자 일반부']),
+  athlete('at_alpha_2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4),
+  athlete('at_beta_2016', 'Beta Park', 'Busan High', [2024, 2026], ['100m'], 5),
+  athlete('at_mine_race_2016', 'Race Runner', 'Race High', [2026], ['200m'], 2),
 ];
 
 const savedWorkspaceAthlete = athlete('aaaaaaaaaaaaaaaa', 'Workspace Kim', 'Saved High', [2026], ['100m'], 2);
 
 const limitAthletes = Array.from({ length: 7 }, (_, index) => (
-  athlete(`limit-${index + 1}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
+  athlete(`at_limit_${index + 1}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
 ));
 
 const seasonAvailability = {
@@ -46,7 +46,7 @@ function athlete(athleteKey, name, team, years, events, recordCount, divisions =
 }
 
 function makeRecord(item, index) {
-  const isMineRaceFixture = item.athleteKey === 'mine-race-2016';
+  const isMineRaceFixture = item.athleteKey === 'at_mine_race_2016';
   const record = isMineRaceFixture
     ? (index === 0 ? '22.45' : '22.78')
     : (index === 0 ? '10.91' : '11.04');

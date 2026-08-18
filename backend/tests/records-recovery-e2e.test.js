@@ -164,7 +164,7 @@ test('RECORDS-SEARCH-RECOVERY-E2E Given a temporary record-search failure When r
     await expectVisible(page.getByRole('button', { name: '다시 시도', exact: true }));
     await page.getByRole('button', { name: '다시 시도', exact: true }).click();
     await page.waitForURL(/q=Alpha/u);
-    await expectVisible(page.locator('[data-candidate-key="alpha-2016"]'));
+    await expectVisible(page.locator('[data-candidate-key="at_alpha_2016"]'));
     assert.equal(requestCount, 2);
     visited.push(page.url());
   }, {
@@ -202,7 +202,7 @@ test('RECORDS-SEARCH-BUSY-E2E Given a slow public-record search When it waits Th
       assert.equal(await page.getByRole('button', { name: '검색 중', exact: true }).isDisabled(), true);
 
       releaseResponse();
-      await expectVisible(page.locator('[data-candidate-key="alpha-2016"]'));
+      await expectVisible(page.locator('[data-candidate-key="at_alpha_2016"]'));
       visited.push(page.url());
     } finally {
       releaseResponse();
@@ -299,7 +299,7 @@ test('STALE-ATHLETE-LINK-E2E Given an unavailable athlete link When it opens The
 
 test('SAME-NAME-COMPARE-E2E Given separate same-name candidates When their comparison link opens Then both remain renderable without browser errors', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
-    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,alpha-2020`, page.locator('text=기록 나란히 보기'));
+    await navigateToReady(page, `${baseUrl}/records?compare=at_alpha_2016,at_alpha_2020`, page.locator('text=기록 나란히 보기'));
     await expectVisible(page.locator('text=기록 나란히 보기'));
     await expectVisible(page.getByText(/Seoul High/u));
     await expectVisible(page.getByText(/Seoul Track Club/u));
@@ -311,7 +311,7 @@ test('PARTIAL-COMPARE-LINK-E2E Given one unavailable comparison profile When the
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(
       page,
-      `${baseUrl}/records?compare=alpha-2016,alpha-2020,missing-one`,
+      `${baseUrl}/records?compare=at_alpha_2016,at_alpha_2020,missing-one`,
       page.getByText('일부 기록을 불러오지 못했어요', { exact: true }),
     );
     await expectVisible(page.getByText('일부 기록을 불러오지 못했어요', { exact: true }));
@@ -336,7 +336,7 @@ test('ONE-AVAILABLE-COMPARE-LINK-E2E Given one available comparison profile When
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await navigateToReady(
       page,
-      `${baseUrl}/records?compare=alpha-2016,missing-one`,
+      `${baseUrl}/records?compare=at_alpha_2016,missing-one`,
       page.getByText('한 명의 기록만 불러왔어요', { exact: true }),
     );
     await expectVisible(page.getByText('한 명의 기록만 불러왔어요', { exact: true }));

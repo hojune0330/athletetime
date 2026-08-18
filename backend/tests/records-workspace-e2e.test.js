@@ -134,16 +134,16 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
 test('RECORDS-ATHLETE-RETURN-E2E Given an in-app candidate When its detail closes Then the original result context returns without entering the share URL', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     const resultsUrl = `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`;
-    const alphaCandidate = page.locator('button[data-candidate-key="alpha-2016"]');
+    const alphaCandidate = page.locator('button[data-candidate-key="at_alpha_2016"]');
     await navigateToReady(page, resultsUrl, alphaCandidate);
     await expectVisible(alphaCandidate);
     await alphaCandidate.click();
-    await page.waitForURL(/\/records\/athletes\/alpha-2016/u);
+    await page.waitForURL(/\/records\/athletes\/at_alpha_2016/u);
     await expectVisible(page.getByRole('button', { name: '결과로 돌아가기', exact: true }));
     await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).click();
     await page.waitForURL(/\/records\?flow=browse&browse=athlete&q=Alpha/u);
     await expectVisible(alphaCandidate);
-    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.getByRole('button', { name: '기록 찾기', exact: true }));
+    await navigateToReady(page, `${baseUrl}/records/athletes/at_alpha_2016`, page.getByRole('button', { name: '기록 찾기', exact: true }));
     await expectVisible(page.getByRole('button', { name: '기록 찾기', exact: true }));
     assert.equal(await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).count(), 0);
     visited.push(page.url());
