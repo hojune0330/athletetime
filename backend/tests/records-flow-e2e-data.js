@@ -294,7 +294,8 @@ function getTeamSearchResponse(params) {
 function makeProfile(key) {
   const item = athletes.find((candidate) => candidate.athleteKey === key);
   if (!item) return null;
-  const records = [makeRecord(item, 0), makeRecord(item, 1)];
+  const records = [makeRecord(item, 0), makeRecord(item, 1)]
+    .map(({ recordIdAliases: _recordIdAliases, ...record }) => record);
   const eventsByKey = new Map();
   for (const record of records) {
     const existing = eventsByKey.get(record.eventKey);
