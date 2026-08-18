@@ -8,7 +8,7 @@ const athletes = [
 const savedWorkspaceAthlete = athlete('aaaaaaaaaaaaaaaa', 'Workspace Kim', 'Saved High', [2026], ['100m'], 2);
 
 const limitAthletes = Array.from({ length: 7 }, (_, index) => (
-  athlete(`at_limit_${index + 1}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
+  athlete(`at_limit_${String(index + 1).padStart(2, '0')}`, `Limit Athlete ${index + 1}`, 'Limit High', [2026], ['100m'], 1)
 ));
 
 const seasonAvailability = {
