@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { PublicRecord } from '@/api/recordAnalytics'
-import type { RecordWorkspaceResolvedSubjectKey } from '@/api/recordWorkspace'
+import type { RecordWorkspaceRecord, RecordWorkspaceResolvedSubjectKey } from '@/api/recordWorkspace'
 import { reconcileRecordWorkspaceSubjectKeys } from './recordWorkspacePreviewPages'
 import type { RecordWorkspace, WorkspaceUpdate } from './storage'
 
@@ -137,11 +136,14 @@ export function restoreAllWorkspaceRecords(state: WorkspaceEditorState): Workspa
 }
 
 export function visibleWorkspaceRecords(
-  records: readonly PublicRecord[],
+  records: readonly RecordWorkspaceRecord[],
   excludedRecordIds: readonly string[],
-): readonly PublicRecord[] {
+): readonly RecordWorkspaceRecord[] {
   const excluded = new Set(excludedRecordIds)
-  return records.filter((record) => !excluded.has(record.id))
+  return records.filter((record) => (
+    !excluded.has(record.id)
+    && !record.recordIdAliases.some((recordId) => excluded.has(recordId))
+  ))
 }
 
 type UseRecordWorkspaceEditorOptions = {

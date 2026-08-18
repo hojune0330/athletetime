@@ -10,7 +10,7 @@ import { addAthleteToWorkspaceDraft } from '../recordAthleteActions'
 import { selectInitialRecordEventKey } from '../recordAthleteDefaultEvent'
 import { resolveRecordAthleteReturnPath } from '../recordAthleteNavigationState'
 import { createRecordAthleteSharePath, parseRecordAthleteSeason, updateRecordAthleteSeason } from '../recordAthleteUrlState'
-import { reconcileRecordWorkspaceSubjectKeys } from '../recordWorkspacePreviewPages'
+import { reconcileRecordWorkspaceSubjectKeys, recordMatchesId } from '../recordWorkspacePreviewPages'
 import { useRecordAthletePreview } from '../useRecordAthletePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
@@ -27,18 +27,43 @@ export default function RecordAthletePage() {
   const store = useRecordWorkspaceStore()
   const athlete = useRecordAthletePreview(athleteKey || null)
   const preview = athlete.preview
+  const fetchNextAthletePage = athlete.fetchNextPage
+  const hasNextAthletePage = athlete.hasNextPage
+  const isFetchingNextAthletePage = athlete.isFetchingNextPage
   const draftCount = store.workspaceDraft?.subjectKeys.length ?? 0
   const activeTab = normalizeTab(pageParams.get('tab'))
   const requestedEventKey = pageParams.get('event')?.trim() || null
   const selectedRecordId = pageParams.get('record')?.trim() || null
   const selectedSeason = parseRecordAthleteSeason(pageParams)
   const returnPath = resolveRecordAthleteReturnPath(location.state)
-  const reconciledAthleteKey = preview
-    ? reconcileRecordWorkspaceSubjectKeys([athleteKey], preview.resolvedSubjectKeys)[0] ?? athleteKey
-    : athleteKey
-  const resolvedAthleteKey = preview?.subjects.some((subject) => subject.athleteKey === reconciledAthleteKey)
-    ? reconciledAthleteKey
-    : null
+  const reconciledAthleteKeys = preview
+    ? reconcileRecordWorkspaceSubjectKeys([athleteKey], preview.resolvedSubjectKeys)
+    : [athleteKey]
+  const selectedRecord = preview?.records.find((record) => recordMatchesId(record, selectedRecordId)) ?? null
+  const resolvedAthleteKey = reconciledAthleteKeys.length === 1
+    && preview?.subjects.some((subject) => subject.athleteKey === reconciledAthleteKeys[0])
+    ? reconciledAthleteKeys[0] ?? null
+    : selectedRecord && reconciledAthleteKeys.includes(selectedRecord.athleteKey)
+      ? selectedRecord.athleteKey
+      : null
+
+  useEffect(() => {
+    if (
+      !selectedRecordId
+      || reconciledAthleteKeys.length < 2
+      || selectedRecord
+      || !hasNextAthletePage
+      || isFetchingNextAthletePage
+    ) return
+    void fetchNextAthletePage()
+  }, [
+    fetchNextAthletePage,
+    hasNextAthletePage,
+    isFetchingNextAthletePage,
+    reconciledAthleteKeys.length,
+    selectedRecord,
+    selectedRecordId,
+  ])
 
   useEffect(() => {
     if (!preview || athlete.isPending || athlete.isError || !resolvedAthleteKey || resolvedAthleteKey === athleteKey) return

@@ -117,8 +117,9 @@ function LoadedWorkspacePage({
           subjectCount={editor.state.subjectKeys.length}
           visibleRecordCount={visibleRecords.length}
         />
-        <p className="mt-4 text-body-sm leading-6 text-ink-3">
-          숨긴 기록은 이 기기의 이 모음에서만 보이지 않아요. 원본 공개 기록은 바뀌지 않아요.
+        <p className="mt-4 break-keep text-body-sm leading-6 text-ink-3">
+          숨긴 기록은 이 기기의 이 모음에서만 <span className="whitespace-nowrap">보이지 않아요.</span>{' '}
+          원본 공개 기록은 <span className="whitespace-nowrap">바뀌지 않아요.</span>
         </p>
       </section>
 

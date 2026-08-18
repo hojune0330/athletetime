@@ -14,6 +14,10 @@ export type RecordWorkspacePreviewRequest = {
 
 export type RecordWorkspaceSubject = AthleteSearchCard
 
+export type RecordWorkspaceRecord = PublicRecord & {
+  readonly recordIdAliases: readonly string[]
+}
+
 export type RecordWorkspaceResolvedSubjectKey = {
   readonly requestedSubjectKey: string
   readonly athleteKey: string
@@ -31,7 +35,7 @@ export type RecordWorkspaceEvent = {
   readonly eventKey: string
   readonly eventLabel: string
   readonly recordCount: number
-  readonly best: PublicRecord | null
+  readonly best: RecordWorkspaceRecord | null
 }
 
 export type RecordWorkspaceCoverage = {
@@ -60,7 +64,7 @@ export type RecordWorkspacePreview = {
   readonly affiliations: readonly RecordWorkspaceAffiliation[]
   readonly coverage: RecordWorkspaceCoverage
   readonly events: readonly RecordWorkspaceEvent[]
-  readonly records: readonly PublicRecord[]
+  readonly records: readonly RecordWorkspaceRecord[]
 }
 
 const resolvedSubjectKeySchema = z.strictObject({
@@ -74,6 +78,7 @@ const recordWorkspaceSubjectSchema = athleteSearchCardSchema.extend({
 
 const recordWorkspacePublicRecordSchema = publicRecordSchema.extend({
   athleteKey: AthleteKeySchema,
+  recordIdAliases: z.array(z.string().regex(/^[a-f0-9]{16}$/u)).max(1),
 }).strict()
 
 const recordWorkspacePreviewSchema = z.strictObject({
@@ -153,37 +158,45 @@ function parseRecordWorkspaceResponse(
   ))
   const submitted = new Set(requestedSubjectKeys)
   const subjectKeys = new Set(preview.data.subjects.map((subject) => subject.athleteKey))
-  const seenRequested = new Set<string>()
+  const resolvedRequested = new Set<string>()
+  const seenMappings = new Set<string>()
   const seenUnavailable = new Set<string>()
   const mappedCanonicalKeys = new Set<string>()
   const mappingIssues: string[] = []
   if (requestIssues.length > 0) mappingIssues.push(...requestIssues)
   if (subjectKeys.size !== preview.data.subjects.length) mappingIssues.push('subjects contained duplicate athlete keys')
   for (const mapping of preview.data.resolvedSubjectKeys) {
+    const mappingKey = JSON.stringify([mapping.requestedSubjectKey, mapping.athleteKey])
     if (!submitted.has(mapping.requestedSubjectKey)) mappingIssues.push('resolved requested key was not submitted')
     if (!subjectKeys.has(mapping.athleteKey)) mappingIssues.push('resolved athlete key was not returned as a subject')
-    if (seenRequested.has(mapping.requestedSubjectKey)) mappingIssues.push('resolved requested key was duplicated')
+    if (seenMappings.has(mappingKey)) mappingIssues.push('resolved requested-to-athlete mapping was duplicated')
     if (subjectKeys.has(mapping.requestedSubjectKey) && mapping.requestedSubjectKey !== mapping.athleteKey) {
       mappingIssues.push('direct requested key was mapped to a different athlete key')
     }
-    seenRequested.add(mapping.requestedSubjectKey)
+    seenMappings.add(mappingKey)
+    resolvedRequested.add(mapping.requestedSubjectKey)
     mappedCanonicalKeys.add(mapping.athleteKey)
   }
   for (const unavailableSubjectKey of preview.data.unavailableSubjectKeys) {
     if (!submitted.has(unavailableSubjectKey)) mappingIssues.push('unavailable requested key was not submitted')
-    if (seenRequested.has(unavailableSubjectKey)) mappingIssues.push('requested key was both resolved and unavailable')
+    if (resolvedRequested.has(unavailableSubjectKey)) mappingIssues.push('requested key was both resolved and unavailable')
     if (seenUnavailable.has(unavailableSubjectKey)) mappingIssues.push('unavailable requested key was duplicated')
     seenUnavailable.add(unavailableSubjectKey)
   }
-  const representedRequestedKeys = new Set([...seenRequested, ...seenUnavailable])
+  const representedRequestedKeys = new Set([...resolvedRequested, ...seenUnavailable])
   for (const submittedSubjectKey of submitted) {
     if (!representedRequestedKeys.has(submittedSubjectKey)) mappingIssues.push('submitted requested key was not resolved or unavailable')
   }
   for (const subjectKey of subjectKeys) {
     if (!mappedCanonicalKeys.has(subjectKey)) mappingIssues.push('returned subject was not mapped from a request')
   }
+  const seenRecordIds = new Set<string>()
   for (const record of preview.data.records) {
     if (!subjectKeys.has(record.athleteKey)) mappingIssues.push('record athlete key was not returned as a subject')
+    for (const recordId of [record.id, ...record.recordIdAliases]) {
+      if (seenRecordIds.has(recordId)) mappingIssues.push('record ID or alias was duplicated')
+      seenRecordIds.add(recordId)
+    }
   }
   if (mappingIssues.length > 0) throw new RecordWorkspaceApiBoundaryError(endpoint, mappingIssues)
   return preview.data

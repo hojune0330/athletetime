@@ -60,7 +60,7 @@ function createFixtureService(athletes, legacyAthleteAliasesByKey = new Map()) {
   return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey, legacyAthleteAliasesByKey }) });
 }
 
-test('Given saved direct, duplicate unique-alias, and ambiguous keys When a workspace preview is restored Then subjects dedupe and each successful request is reconciled', () => {
+test('Given a saved ambiguous legacy key When a workspace preview is restored Then every candidate expands without selecting one', () => {
   const firstKey = '1111111111111111';
   const secondKey = '2222222222222222';
   const uniqueAlias = 'aaaaaaaaaaaaaaaa';
@@ -74,9 +74,9 @@ test('Given saved direct, duplicate unique-alias, and ambiguous keys When a work
   });
   const second = athleteFor({
     athleteKey: secondKey,
-    name: '나래',
+    name: '가람',
     team: '부산고',
-    records: [recordFor({ id: 'direct-b', athleteKey: secondKey, name: '나래', team: '부산고', date: '2025-05-02', season: 2025 })],
+    records: [recordFor({ id: 'direct-b', athleteKey: secondKey, name: '가람', team: '부산고', date: '2025-05-02', season: 2025 })],
   });
   const service = createFixtureService([first, second], new Map([
     [uniqueAlias, new Set([firstKey])],
@@ -95,12 +95,15 @@ test('Given saved direct, duplicate unique-alias, and ambiguous keys When a work
     { requestedSubjectKey: uniqueAlias, athleteKey: firstKey },
     { requestedSubjectKey: secondKey, athleteKey: secondKey },
     { requestedSubjectKey: sameCanonicalAlias, athleteKey: firstKey },
+    { requestedSubjectKey: ambiguousAlias, athleteKey: firstKey },
+    { requestedSubjectKey: ambiguousAlias, athleteKey: secondKey },
   ]);
-  assert.deepEqual(preview.unavailableSubjectKeys, [ambiguousAlias]);
+  assert.deepEqual(preview.unavailableSubjectKeys, []);
+  assert.equal(preview.identity.warning, 'same_name');
   assert.deepEqual(preview.records.map((record) => record.athleteKey), [firstKey, secondKey]);
 });
 
-test('Given safe and hostile source division labels When workspace records are projected Then raw text is removed and only taxonomy provenance survives', () => {
+test('Given safe and hostile public metadata When workspace records are projected Then only opaque IDs and taxonomy provenance survive', () => {
   const safe = recordFor({
     id: 'safe-division',
     athleteKey: '8888888888888888',
@@ -117,8 +120,10 @@ test('Given safe and hostile source division labels When workspace records are p
     date: '2024-06-02',
     season: 2024,
   });
+  safe.recordIdAliases = ['0123456789abcdef'];
   hostile.sourceDivisionLabel = '남고 athlete@example.test';
   hostile.rawDivision = '남고 athlete@example.test';
+  hostile.recordIdAliases = ['athlete@example.test'];
   const service = createFixtureService([
     athleteFor({ athleteKey: '8888888888888888', name: '마루', team: '광주고', records: [safe, hostile] }),
   ]);
@@ -127,6 +132,7 @@ test('Given safe and hostile source division labels When workspace records are p
 
   assert.equal(JSON.stringify(preview).includes('rawDivision'), false);
   assert.deepEqual(preview.records.map((record) => record.sourceDivisionLabel), ['남자부', null]);
+  assert.deepEqual(preview.records.map((record) => record.recordIdAliases), [['0123456789abcdef'], []]);
   assert.equal(JSON.stringify(preview).includes('athlete@example.test'), false);
   assert.equal(preview.records.some((record) => Object.prototype.hasOwnProperty.call(record.source, 'sourceId')), false);
 });

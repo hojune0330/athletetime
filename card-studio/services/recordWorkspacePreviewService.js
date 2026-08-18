@@ -6,6 +6,8 @@ const {
   parseRecordWorkspacePreviewInput,
 } = require('./recordWorkspacePreviewInput');
 
+const OPAQUE_RECORD_ID_PATTERN = /^[a-f0-9]{16}$/u;
+
 function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService.getIndex } = {}) {
   return {
     getRecordWorkspacePreview(input) {
@@ -21,18 +23,22 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
       for (const subjectKey of request.subjectKeys) {
         const directAthlete = athleteByKey.get(subjectKey);
         const aliasCandidates = directAthlete ? null : index.legacyAthleteAliasesByKey?.get(subjectKey);
-        const canonicalKey = aliasCandidates instanceof Set && aliasCandidates.size === 1
-          ? [...aliasCandidates][0]
-          : '';
-        const athlete = directAthlete || athleteByKey.get(canonicalKey);
-        if (!athlete) {
+        const athletes = directAthlete
+          ? [directAthlete]
+          : [...(aliasCandidates instanceof Set ? aliasCandidates : [])]
+            .sort()
+            .map((candidateKey) => athleteByKey.get(candidateKey))
+            .filter(Boolean);
+        if (athletes.length === 0) {
           unavailableSubjectKeys.push(subjectKey);
           continue;
         }
-        resolvedSubjectKeys.push({ requestedSubjectKey: subjectKey, athleteKey: athlete.athleteKey });
-        if (resolvedAthleteKeys.has(athlete.athleteKey)) continue;
-        resolvedAthleteKeys.add(athlete.athleteKey);
-        subjects.push(toSubject(athlete));
+        for (const athlete of athletes) {
+          resolvedSubjectKeys.push({ requestedSubjectKey: subjectKey, athleteKey: athlete.athleteKey });
+          if (resolvedAthleteKeys.has(athlete.athleteKey)) continue;
+          resolvedAthleteKeys.add(athlete.athleteKey);
+          subjects.push(toSubject(athlete));
+        }
       }
 
       if (subjects.length === 0) throw new RecordWorkspacePreviewError('WORKSPACE_NOT_AVAILABLE', 404);
@@ -186,6 +192,14 @@ function pickBest(records) {
 function toPublicRecord(record) {
   return {
     id: record.id,
+    recordIdAliases: [...new Set(
+      (Array.isArray(record.recordIdAliases) ? record.recordIdAliases : [])
+        .filter((recordId) => (
+          typeof recordId === 'string'
+          && recordId !== record.id
+          && OPAQUE_RECORD_ID_PATTERN.test(recordId)
+        )),
+    )].slice(0, 1),
     athleteKey: record.athleteKey,
     name: cleanText(record.name, 100),
     team: cleanText(record.team, 100),

@@ -1,3 +1,12 @@
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const recordAnalyticsService = require('../../card-studio/services/recordAnalyticsService');
+
+const LEGACY_ALIAS = 'd934d8233cd8738c';
+const LEGACY_CANDIDATE_KEYS = ['8eb35cc0308c0194', '9c745971ccf10908'];
+const LEGACY_TARGET_RECORD_ID = '2b39c9e1c6caeaba';
+let cachedLegacyAliasFixture;
+
 const athletes = [
   athlete('at_alpha_2016', 'Alpha Kim', 'Seoul High', [2024, 2025, 2026], ['100m', '200m'], 7, ['남자 고등부', '남자 일반부']),
   athlete('at_alpha_2020', 'Alpha Kim', 'Seoul Track Club', [2025, 2026], ['100m'], 4),
@@ -53,6 +62,7 @@ function makeRecord(item, index) {
   const recordValue = Number(record);
   return {
     id: `${item.athleteKey}-${index}`, athleteKey: item.athleteKey, name: item.name, team: item.team,
+    recordIdAliases: [],
     season: 2026, competitionName: 'Fixture Invitational',
     date: `2026-04-${String(index + 10).padStart(2, '0')}`,
     venue: 'Fixture Stadium', eventKey: isMineRaceFixture ? '200m' : '100m', eventLabel: isMineRaceFixture ? '200m' : '100m',
@@ -60,6 +70,117 @@ function makeRecord(item, index) {
     divisionDetail: null, sourceDivisionLabel: '남고', phase: 'final', record, recordValue,
     direction: 'lower', rank: index + 1, wind: '+0.7', windLegal: true, isComparable: true, note: '',
     source: { provider: 'athletetime_fixture', sourceType: 'qa_fixture', sourceUrl: '', capturedAt: '2026-07-13T00:00:00.000Z' },
+  };
+}
+
+function stableId(value) {
+  return crypto.createHash('sha1').update(String(value)).digest('hex').slice(0, 16);
+}
+
+function getLegacyAliasFixture() {
+  if (cachedLegacyAliasFixture) return cachedLegacyAliasFixture;
+  const index = recordAnalyticsService.getIndex();
+  const candidateKeys = [...(index.legacyAthleteAliasesByKey.get(LEGACY_ALIAS) || [])].sort();
+  assert.deepEqual(candidateKeys, LEGACY_CANDIDATE_KEYS);
+  const targetRecord = index.records.find((record) => record.id === LEGACY_TARGET_RECORD_ID);
+  assert.ok(targetRecord && candidateKeys.includes(targetRecord.athleteKey));
+  const candidateRecords = candidateKeys.map((athleteKey, candidateIndex) => {
+    const source = athleteKey === targetRecord.athleteKey
+      ? targetRecord
+      : index.athleteByKey.get(athleteKey)?.records.slice().sort((left, right) => left.id.localeCompare(right.id))[0];
+    assert.ok(source);
+    return {
+      id: source.id,
+      recordIdAliases: [],
+      athleteKey,
+      name: 'Legacy Alias Fixture',
+      team: `Candidate ${candidateIndex + 1}`,
+      season: source.season || 2026,
+      competitionName: `Recovery Fixture ${candidateIndex + 1}`,
+      date: source.date || '2026-04-10',
+      venue: 'Fixture Stadium',
+      eventKey: source.eventKey || '100m',
+      eventLabel: source.eventLabel || '100m',
+      divisionKey: 'men-high',
+      divisionLabel: '남자 고등부',
+      gender: 'men',
+      divisionLevel: 'high',
+      divisionDetail: null,
+      sourceDivisionLabel: '남고',
+      phase: source.phase || 'final',
+      record: source.recordDisplay,
+      recordValue: source.recordValue,
+      direction: source.direction === 'higher' ? 'higher' : 'lower',
+      rank: Number.isInteger(source.rank) ? source.rank : null,
+      wind: null,
+      windLegal: true,
+      isComparable: Boolean(source.isComparable),
+      note: '',
+      source: {
+        provider: 'athletetime_fixture',
+        sourceType: 'qa_fixture',
+        sourceUrl: '',
+        capturedAt: '2026-08-18T00:00:00.000Z',
+      },
+    };
+  });
+  const directRecord = candidateRecords.find((record) => record.id === targetRecord.id);
+  const excludedRecord = candidateRecords.find((record) => record.id !== targetRecord.id);
+  assert.ok(directRecord && excludedRecord);
+  const directRecordIdAlias = stableId(`mapped-base-history|${directRecord.id}`);
+  const excludedRecordIdAlias = stableId(`legacy-base-history|${excludedRecord.id}`);
+  directRecord.recordIdAliases = [directRecordIdAlias];
+  excludedRecord.recordIdAliases = [excludedRecordIdAlias];
+  const records = [
+    excludedRecord,
+    ...Array.from({ length: 49 }, (_, index) => ({
+      ...excludedRecord,
+      id: stableId(`legacy-pagination-decoy|${index}`),
+      recordIdAliases: [],
+      competitionName: `Recovery Pagination ${index + 1}`,
+      date: `2025-${String(Math.floor(index / 28) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}`,
+      rank: index + 2,
+    })),
+    directRecord,
+  ];
+  const subjects = candidateKeys.map((athleteKey, candidateIndex) => {
+    const candidateRecordsForSubject = records.filter((record) => record.athleteKey === athleteKey);
+    return athlete(
+      athleteKey,
+      'Legacy Alias Fixture',
+      `Candidate ${candidateIndex + 1}`,
+      [...new Set(candidateRecordsForSubject.map((record) => record.season))],
+      [...new Set(candidateRecordsForSubject.map((record) => record.eventLabel))],
+      candidateRecordsForSubject.length,
+    );
+  });
+  cachedLegacyAliasFixture = {
+    candidateKeys,
+    directRecordIdAlias,
+    excludedRecordId: excludedRecord.id,
+    excludedRecordIdAlias,
+    legacyAlias: LEGACY_ALIAS,
+    records,
+    subjects,
+    targetAthleteKey: targetRecord.athleteKey,
+    targetRecordId: targetRecord.id,
+  };
+  return cachedLegacyAliasFixture;
+}
+
+function getLegacyAliasFixtureMetadata() {
+  const fixture = getLegacyAliasFixture();
+  const target = fixture.records.find((record) => record.id === fixture.targetRecordId);
+  return {
+    candidateKeys: fixture.candidateKeys,
+    directRecordIdAlias: fixture.directRecordIdAlias,
+    excludedRecordId: fixture.excludedRecordId,
+    excludedRecordIdAlias: fixture.excludedRecordIdAlias,
+    legacyAlias: fixture.legacyAlias,
+    targetAthleteKey: fixture.targetAthleteKey,
+    targetEventLabel: target.eventLabel,
+    targetRecord: target.record,
+    targetRecordId: fixture.targetRecordId,
   };
 }
 
@@ -201,22 +322,38 @@ function makeProfile(key) {
   };
 }
 
-function makeWorkspacePreview(subjectKeys) {
-  const fixtureSubjects = [...athletes, savedWorkspaceAthlete];
+function makeWorkspacePreview(subjectKeys, { cursor = '', limit } = {}) {
+  const usesLegacyFixture = subjectKeys.some((subjectKey) => (
+    subjectKey === LEGACY_ALIAS || LEGACY_CANDIDATE_KEYS.includes(subjectKey)
+  ));
+  const legacyFixture = usesLegacyFixture ? getLegacyAliasFixture() : null;
+  const fixtureSubjects = usesLegacyFixture
+    ? legacyFixture.subjects
+    : [...athletes, savedWorkspaceAthlete];
   const resolvedSubjectKeys = subjectKeys.flatMap((requestedSubjectKey) => {
+    if (legacyFixture && requestedSubjectKey === legacyFixture.legacyAlias) {
+      return legacyFixture.candidateKeys.map((athleteKey) => ({ requestedSubjectKey, athleteKey }));
+    }
     const subject = fixtureSubjects.find((athlete) => athlete.athleteKey === requestedSubjectKey);
     return subject ? [{ requestedSubjectKey, athleteKey: subject.athleteKey }] : [];
   });
-  const subjects = resolvedSubjectKeys
+  const subjects = [...new Map(resolvedSubjectKeys
     .map(({ athleteKey }) => fixtureSubjects.find((athlete) => athlete.athleteKey === athleteKey))
-    .filter(Boolean);
-  const records = subjects.flatMap((subject) => [makeRecord(subject, 0), makeRecord(subject, 1)]);
+    .filter(Boolean)
+    .map((subject) => [subject.athleteKey, subject])).values()];
+  const allRecords = legacyFixture
+    ? subjects.flatMap((subject) => legacyFixture.records.filter((record) => record.athleteKey === subject.athleteKey))
+    : subjects.flatMap((subject) => [makeRecord(subject, 0), makeRecord(subject, 1)]);
+  const offset = /^\d+$/u.test(cursor) ? Number(cursor) : 0;
+  const pageLimit = Number.isInteger(limit) && limit > 0 ? limit : allRecords.length;
+  const records = allRecords.slice(offset, offset + pageLimit);
+  const nextOffset = offset + records.length;
   const affiliationCounts = new Map();
   for (const subject of subjects) {
     affiliationCounts.set(subject.team, (affiliationCounts.get(subject.team) || 0) + 2);
   }
   const eventCounts = new Map();
-  for (const record of records) {
+  for (const record of allRecords) {
     const previous = eventCounts.get(record.eventKey) || [];
     eventCounts.set(record.eventKey, [...previous, record]);
   }
@@ -224,10 +361,12 @@ function makeWorkspacePreview(subjectKeys) {
   return {
     subjects,
     resolvedSubjectKeys,
-    unavailableSubjectKeys: subjectKeys.filter((subjectKey) => !subjects.some((subject) => subject.athleteKey === subjectKey)),
-    identity: { displayName: names.join(' · ') || '선수 후보', distinctNames: names, warning: names.length > 1 ? 'different_names' : 'none' },
+    unavailableSubjectKeys: subjectKeys.filter((subjectKey) => (
+      !resolvedSubjectKeys.some(({ requestedSubjectKey }) => requestedSubjectKey === subjectKey)
+    )),
+    identity: { displayName: names.join(' · ') || '선수 후보', distinctNames: names, warning: names.length > 1 ? 'different_names' : subjects.length > 1 ? 'same_name' : 'none' },
     affiliations: Array.from(affiliationCounts.entries()).map(([label, recordCount]) => ({ label, firstObservedSeason: 2024, lastObservedSeason: 2026, recordCount, status: 'latest_observed' })),
-    coverage: { totalMatched: records.length, returned: records.length, hasMore: false, nextCursor: null, observedSeasons: [2026], competitionCount: records.length, sourceCount: subjects.length, lastCapturedAt: '2026-07-13T00:00:00.000Z', qualityState: 'visible_index' },
+    coverage: { totalMatched: allRecords.length, returned: records.length, hasMore: nextOffset < allRecords.length, nextCursor: nextOffset < allRecords.length ? String(nextOffset) : null, observedSeasons: [2026], competitionCount: allRecords.length, sourceCount: subjects.length, lastCapturedAt: '2026-07-13T00:00:00.000Z', qualityState: 'visible_index' },
     events: Array.from(eventCounts.entries()).map(([eventKey, eventRecords]) => ({ eventKey, eventLabel: eventRecords[0].eventLabel, recordCount: eventRecords.length, best: eventRecords[0] })),
     records,
   };
@@ -248,6 +387,7 @@ function makeInsights() {
 module.exports = {
   filters,
   getSearchResults,
+  getLegacyAliasFixtureMetadata,
   getSeasonRecordsResponse,
   getTeamSearchResponse,
   makeInsights,

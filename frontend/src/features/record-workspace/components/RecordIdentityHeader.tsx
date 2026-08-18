@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import {
   RecordContextBadge,
@@ -17,9 +18,14 @@ type RecordIdentityHeaderProps = {
   readonly visibleRecordCount?: number
 }
 
-const WARNING_COPY: Readonly<Record<Exclude<IdentityWarning, 'none'>, string>> = {
+const WARNING_COPY: Readonly<Record<Exclude<IdentityWarning, 'none'>, ReactNode>> = {
   different_names: '서로 다른 이름의 기록이 포함되어 있어요. 한 사람의 기록으로 볼 수 없어요.',
-  same_name: '같은 이름의 기록을 함께 보고 있습니다. 같은 사람으로 확인된 것은 아닙니다.',
+  same_name: (
+    <>
+      같은 이름의 기록을 함께 보고 있습니다.{' '}
+      <span className="whitespace-nowrap">같은 사람으로 확인된 것은 아닙니다.</span>
+    </>
+  ),
 }
 
 export function RecordIdentityHeader({
@@ -60,7 +66,7 @@ export function RecordIdentityHeader({
       )}
       {identityWarning !== 'none' && (
         <p
-          className="mt-4 border-l-2 border-warn bg-[#F7EDE0] px-3 py-2 text-body-sm font-medium leading-5 text-ink-2"
+          className="mt-4 break-keep border-l-2 border-warn bg-[#F7EDE0] px-3 py-2 text-body-sm font-medium leading-5 text-ink-2"
           role="note"
         >
           {WARNING_COPY[identityWarning]}

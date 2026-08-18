@@ -346,19 +346,19 @@ function buildIndex() {
           divisionLevel: eventMeta.divisionLevel,
         });
         const athleteKey = identity.athleteKey;
-        const recordId = stableId([
-          identity.legacyAthleteKey,
+        const recordIds = buildRecordIds([
+          '',
           competitionId,
           eventLabel,
           result.rank,
           result.record,
           event.date || competitionDate,
-        ].join('|'));
-        if (publicResultRecordIds.has(recordId)) continue;
-        publicResultRecordIds.add(recordId);
+        ], 0, identity);
+        if (publicResultRecordIds.has(recordIds.id)) continue;
+        publicResultRecordIds.add(recordIds.id);
 
         const record = {
-          id: recordId,
+          ...recordIds,
           athleteKey,
           name,
           team,
@@ -390,7 +390,7 @@ function buildIndex() {
           source: {
             provider: 'KAAF',
             sourceType: 'public_result',
-            sourceId: `${filename}:${recordId}`,
+            sourceId: `${filename}:${recordIds.id}`,
             sourceUrl: clean(meta.source_url, 300),
             capturedAt: clean(meta.crawled_at, 40),
           },
@@ -577,13 +577,13 @@ function appendManualTopRecordCandidates(context) {
       divisionLevel: eventMeta.divisionLevel,
     });
     const athleteKey = identity.athleteKey;
-    const recordId = stableId([
+    const recordIds = buildRecordIds([
       'manual-top100',
       candidate.batch,
       candidate.sourceRowId,
-      identity.legacyAthleteKey,
+      '',
       candidate.record,
-    ].join('|'));
+    ], 3, identity);
     const dedupKey = buildManualTopRecordDedupKey({
       name,
       eventKey: eventMeta.eventKey,
@@ -597,7 +597,7 @@ function appendManualTopRecordCandidates(context) {
     if (dedupKey) context.manualTopRecordDedupKeys.add(dedupKey);
 
     const record = {
-      id: recordId,
+      ...recordIds,
       athleteKey,
       name,
       team,
@@ -1338,6 +1338,16 @@ function isIndexableAthleteName(name) {
 
 function stableId(value) {
   return crypto.createHash('sha1').update(String(value)).digest('hex').slice(0, 16);
+}
+
+function buildRecordIds(parts, athleteKeyIndex, identity) {
+  const currentParts = parts.slice();
+  currentParts[athleteKeyIndex] = identity.legacyAthleteKey;
+  const id = stableId(currentParts.join('|'));
+  if (!identity.manuallyVerified) return { id, recordIdAliases: [] };
+  currentParts[athleteKeyIndex] = identity.athleteKey;
+  const historicalId = stableId(currentParts.join('|'));
+  return { id, recordIdAliases: historicalId === id ? [] : [historicalId] };
 }
 
 function stableSlug(value) {

@@ -15,20 +15,24 @@ const LEGACY_KEY = 'at_legacy_runner'
 const CANONICAL_KEY = 'aaaaaaaaaaaaaaaa'
 const OTHER_CANONICAL_KEY = 'bbbbbbbbbbbbbbbb'
 
+function workspaceSubject(athleteKey = CANONICAL_KEY, team = '서울고'): Record<string, unknown> {
+  return {
+    athleteKey,
+    name: '가람',
+    team,
+    teams: [team],
+    years: [2026],
+    events: ['100m'],
+    divisions: ['남자 고등부'],
+    recordCount: 1,
+    ambiguity: 'name_team',
+    note: '',
+  }
+}
+
 function previewPayload(changes: Record<string, unknown> = {}): Record<string, unknown> {
   return {
-    subjects: [{
-      athleteKey: CANONICAL_KEY,
-      name: '가람',
-      team: '서울고',
-      teams: ['서울고'],
-      years: [2026],
-      events: ['100m'],
-      divisions: ['남자 고등부'],
-      recordCount: 1,
-      ambiguity: 'name_team',
-      note: '',
-    }],
+    subjects: [workspaceSubject()],
     resolvedSubjectKeys: [{ requestedSubjectKey: LEGACY_KEY, athleteKey: CANONICAL_KEY }],
     unavailableSubjectKeys: [],
     identity: { displayName: '가람', distinctNames: ['가람'], warning: 'none' },
@@ -57,6 +61,7 @@ function response(data: unknown): { readonly data: unknown } {
 function workspaceRecord(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 'record-1',
+    recordIdAliases: [],
     athleteKey: CANONICAL_KEY,
     name: '가람',
     team: '서울고',
@@ -170,7 +175,25 @@ describe('record workspace API boundary', () => {
     await expect(previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })).rejects.toBeInstanceOf(RecordWorkspaceApiBoundaryError)
   })
 
-  it('rejects duplicate requested-to-canonical mappings', async () => {
+  it('accepts one requested legacy key expanding to every canonical candidate', async () => {
+    api.post.mockResolvedValue(response(previewPayload({
+      subjects: [
+        workspaceSubject(),
+        workspaceSubject(OTHER_CANONICAL_KEY, '부산고'),
+      ],
+      resolvedSubjectKeys: [
+        { requestedSubjectKey: LEGACY_KEY, athleteKey: CANONICAL_KEY },
+        { requestedSubjectKey: LEGACY_KEY, athleteKey: OTHER_CANONICAL_KEY },
+      ],
+      identity: { displayName: '가람', distinctNames: ['가람'], warning: 'same_name' },
+    })))
+
+    const parsed = await previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })
+
+    expect(parsed.resolvedSubjectKeys).toHaveLength(2)
+  })
+
+  it('rejects a duplicate requested-to-canonical mapping pair', async () => {
     api.post.mockResolvedValue(response(previewPayload({
       resolvedSubjectKeys: [
         { requestedSubjectKey: LEGACY_KEY, athleteKey: CANONICAL_KEY },
@@ -211,6 +234,20 @@ describe('record workspace API boundary', () => {
 
     expect(parsed.records[0]?.divisionKey).toBe('men-high')
     expect(parsed.records[0]?.sourceDivisionLabel).toBe('남고')
+  })
+
+  it('strictly parses opaque record ID aliases', async () => {
+    api.post.mockResolvedValue(response(previewPayload({
+      records: [workspaceRecord({ recordIdAliases: ['0123456789abcdef'] })],
+    })))
+
+    const parsed = await previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })
+    expect(parsed.records[0]?.recordIdAliases).toEqual(['0123456789abcdef'])
+
+    api.post.mockResolvedValue(response(previewPayload({
+      records: [workspaceRecord({ recordIdAliases: ['athlete@example.test'] })],
+    })))
+    await expect(previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })).rejects.toBeInstanceOf(RecordWorkspaceApiBoundaryError)
   })
 
   it('rejects an invalid athlete key in an event best record while accepting a valid one', async () => {

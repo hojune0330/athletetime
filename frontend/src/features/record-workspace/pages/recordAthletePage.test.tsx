@@ -1,14 +1,14 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { PublicRecord } from '@/api/recordAnalytics'
-import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
+import type { RecordWorkspacePreview, RecordWorkspaceRecord } from '@/api/recordWorkspace'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
 import { mergeRecordAthletePreviewPages } from '../useRecordAthletePreview'
 
-function record(index: number): PublicRecord {
+function record(index: number): RecordWorkspaceRecord {
   const season = index < 25 ? 2026 : 2025
   return {
     id: `record-${String(index).padStart(3, '0')}`,
+    recordIdAliases: [],
     athleteKey: '1111111111111111',
     name: '김선수',
     team: '서울고',
@@ -42,7 +42,7 @@ function record(index: number): PublicRecord {
   }
 }
 
-function preview(records: readonly PublicRecord[], total: number, hasMore: boolean): RecordWorkspacePreview {
+function preview(records: readonly RecordWorkspaceRecord[], total: number, hasMore: boolean): RecordWorkspacePreview {
   return {
     subjects: [{
       athleteKey: '1111111111111111',

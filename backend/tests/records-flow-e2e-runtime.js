@@ -33,7 +33,13 @@ async function startTeamApiServer() {
     const subjectKeys = Array.isArray(req.body?.subjectKeys)
       ? req.body.subjectKeys.filter((subjectKey) => typeof subjectKey === 'string')
       : [];
-    return res.json({ success: true, data: makeWorkspacePreview(subjectKeys) });
+    return res.json({
+      success: true,
+      data: makeWorkspacePreview(subjectKeys, {
+        cursor: typeof req.body?.cursor === 'string' ? req.body.cursor : '',
+        limit: Number.isInteger(req.body?.limit) ? req.body.limit : undefined,
+      }),
+    });
   });
   app.use('/api/card-studio/analytics', recordAnalyticsRoutes);
   const server = await new Promise((resolve) => {

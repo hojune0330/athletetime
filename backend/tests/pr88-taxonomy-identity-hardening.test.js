@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const test = require('node:test');
 
 const analytics = require('../../card-studio/services/recordAnalyticsService');
@@ -17,6 +18,31 @@ function recordFactKey(record) {
     record.rank,
     record.recordDisplay,
   ].join('|');
+}
+
+function stableId(value) {
+  return crypto.createHash('sha1').update(String(value)).digest('hex').slice(0, 16);
+}
+
+function historicalRecordId(record, athleteKey) {
+  if (record.source?.sourceType === 'public_top_record_candidate') {
+    const sourceRowId = String(record.source.sourceId || '').split(':').at(-1);
+    return stableId([
+      'manual-top100',
+      record.source.batch,
+      sourceRowId,
+      athleteKey,
+      record.recordDisplay,
+    ].join('|'));
+  }
+  return stableId([
+    athleteKey,
+    record.competitionId,
+    record.rawEvent,
+    record.rank,
+    record.recordDisplay,
+    record.date,
+  ].join('|'));
 }
 
 test('Given an explicit male high-school division and school affiliation When normalized Then established taxonomy remains stable', () => {
@@ -197,6 +223,16 @@ test('Given a real legacy key with multiple canonical candidates When its profil
   assert.equal(result.ambiguity, 'multiple_candidates');
   assert.ok(result.candidates.length > 1);
   assert.equal(result.candidates.every((candidate) => candidate.athleteKey !== ambiguousAlias), true);
+
+  const preview = createRecordWorkspacePreviewService({ getIndex: () => index })
+    .getRecordWorkspacePreview({ subjectKeys: [ambiguousAlias], limit: 50 });
+  assert.deepEqual(
+    preview.resolvedSubjectKeys.map(({ athleteKey }) => athleteKey).sort(),
+    result.candidates.map(({ athleteKey }) => athleteKey).sort(),
+  );
+  assert.equal(preview.resolvedSubjectKeys.every(({ requestedSubjectKey }) => requestedSubjectKey === ambiguousAlias), true);
+  assert.equal(preview.identity.warning, 'same_name');
+  assert.deepEqual(preview.unavailableSubjectKeys, []);
 });
 
 test('Given the identity map signature changes When the cached index is read Then the index is rebuilt', () => {
@@ -220,7 +256,7 @@ test('Given the identity map signature changes When the cached index is read The
   }
 });
 
-test('Given saved public record IDs When athlete keys are remapped Then exclusions and record deep links still resolve', () => {
+test('Given mapped and unmapped base histories When records are rebuilt Then both opaque IDs resolve', () => {
   const originalResolve = identityResolver.resolve;
   const originalGetStatus = identityResolver.getStatus;
   const originalStatus = originalGetStatus();
@@ -241,10 +277,15 @@ test('Given saved public record IDs When athlete keys are remapped Then exclusio
         && baseIndex.athleteByKey.get(candidate.athleteKey)?.records.length === 1
       ));
       assert.ok(record, `${sourceType} stability fixture is required`);
+      const legacyAthleteKey = [...baseIndex.legacyAthleteAliasesByKey.entries()]
+        .find(([, candidates]) => candidates.has(record.athleteKey))?.[0];
+      assert.equal(typeof legacyAthleteKey, 'string');
+      assert.equal(record.id, historicalRecordId(record, legacyAthleteKey));
       return {
         athleteKey: record.athleteKey,
         factKey: recordFactKey(record),
         id: record.id,
+        legacyAthleteKey,
         sourceType,
       };
     });
@@ -264,19 +305,27 @@ test('Given saved public record IDs When athlete keys are remapped Then exclusio
         saved.id,
         `${saved.sourceType} public ID changed even though its record facts did not`,
       );
+      const mappedHistoricalId = historicalRecordId(remappedRecord, remappedRecord.athleteKey);
+      assert.notEqual(mappedHistoricalId, saved.id);
+      assert.deepEqual(remappedRecord.recordIdAliases, [mappedHistoricalId]);
 
       const preview = previewService.getRecordWorkspacePreview({
         subjectKeys: [remappedRecord.athleteKey],
         limit: 50,
       });
       assert.equal(
-        preview.records.find((record) => record.id === saved.id)?.id,
-        saved.id,
+        preview.records.find((record) => (
+          record.id === mappedHistoricalId || record.recordIdAliases.includes(mappedHistoricalId)
+        ))?.id,
+        remappedRecord.id,
         `${saved.sourceType} record deep link no longer resolves after identity remapping`,
       );
-      const excludedRecordIds = new Set([saved.id]);
+      const excludedRecordIds = new Set([mappedHistoricalId]);
       assert.equal(
-        preview.records.filter((record) => !excludedRecordIds.has(record.id)).some((record) => (
+        preview.records.filter((record) => (
+          !excludedRecordIds.has(record.id)
+          && !record.recordIdAliases.some((recordId) => excludedRecordIds.has(recordId))
+        )).some((record) => (
           recordFactKey(record) === saved.factKey
         )),
         false,

@@ -2,8 +2,20 @@ import { describe, expect, it } from 'vitest'
 import { reconcileRecordWorkspaceSubjectKeys } from './recordWorkspacePreviewPages'
 
 describe('record workspace preview subject reconciliation', () => {
+  it('expands one ambiguous legacy key to every canonical candidate', () => {
+    const reconciled = reconcileRecordWorkspaceSubjectKeys(
+      ['at_ambiguous_runner'],
+      [
+        { requestedSubjectKey: 'at_ambiguous_runner', athleteKey: '1111111111111111' },
+        { requestedSubjectKey: 'at_ambiguous_runner', athleteKey: '2222222222222222' },
+      ],
+    )
+
+    expect(reconciled).toEqual(['1111111111111111', '2222222222222222'])
+  })
+
   it('canonicalizes successful legacy aliases, dedupes them, and preserves unresolved keys', () => {
-    // Given two successful legacy aliases for one athlete and one ambiguous alias.
+    // Given two successful legacy aliases for one athlete and one unresolved alias.
     const canonicalKey = 'aaaaaaaaaaaaaaaa'
     const ambiguousKey = 'at_ambiguous_runner'
 
@@ -17,7 +29,7 @@ describe('record workspace preview subject reconciliation', () => {
       ],
     )
 
-    // Then only successful mappings change; ambiguity is not auto-selected.
+    // Then only successful mappings change; the unavailable alias stays available for recovery.
     expect(reconciled).toEqual([canonicalKey, ambiguousKey])
   })
 })
