@@ -107,7 +107,7 @@ const recordWorkspacePreviewSchema = z.strictObject({
     eventKey: z.string().min(1),
     eventLabel: z.string(),
     recordCount: z.number().int().nonnegative(),
-    best: publicRecordSchema.nullable(),
+    best: recordWorkspacePublicRecordSchema.nullable(),
   })),
   records: z.array(recordWorkspacePublicRecordSchema),
 })

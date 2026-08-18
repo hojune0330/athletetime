@@ -213,6 +213,27 @@ describe('record workspace API boundary', () => {
     expect(parsed.records[0]?.sourceDivisionLabel).toBe('남고')
   })
 
+  it('rejects an invalid athlete key in an event best record while accepting a valid one', async () => {
+    const validBest = workspaceRecord()
+    api.post.mockResolvedValue(response(previewPayload({
+      events: [{ eventKey: '100m', eventLabel: '100m', recordCount: 1, best: validBest }],
+    })))
+
+    const parsed = await previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })
+    expect(parsed.events[0]?.best?.athleteKey).toBe(CANONICAL_KEY)
+
+    api.post.mockResolvedValue(response(previewPayload({
+      events: [{
+        eventKey: '100m',
+        eventLabel: '100m',
+        recordCount: 1,
+        best: { ...validBest, athleteKey: 'not-a-key' },
+      }],
+    })))
+
+    await expect(previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })).rejects.toBeInstanceOf(RecordWorkspaceApiBoundaryError)
+  })
+
   it.each([
     ['aggregate division key', { divisionKey: 'men-all' }],
     ['arbitrary division key', { divisionKey: 'men-open-invitational' }],
