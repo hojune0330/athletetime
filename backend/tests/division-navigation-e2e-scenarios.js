@@ -25,7 +25,7 @@ async function assertCjkWrapStyle(locator) {
 async function captureCandidateSearch(state, captures) {
   const { apiRequests, baseUrl, page } = state;
   const requestStart = apiRequests.length;
-  const candidate = page.locator('[data-candidate-key="alpha-2016"]');
+  const candidate = page.locator('[data-candidate-key="at_alpha_2016"]');
   await navigateToReady(
     page,
     `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`,
@@ -36,7 +36,7 @@ async function captureCandidateSearch(state, captures) {
   assert.equal(searchRequests.length, 1);
   assert.equal(new URL(searchRequests[0], baseUrl).searchParams.get('q'), 'Alpha');
   assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 2);
-  assert.equal(await page.locator('[data-candidate-key="beta-2016"]').count(), 0);
+  assert.equal(await page.locator('[data-candidate-key="at_beta_2016"]').count(), 0);
   await expectVisible(candidate.getByText('부문 · 남자 고등부 · 남자 일반부', { exact: true }));
   await expectVisible(candidate.getByText('종목 · 100m · 200m', { exact: true }));
   assert.match(await candidate.getAttribute('aria-label') || '', /부문 남자 고등부 · 남자 일반부/u);
@@ -56,7 +56,7 @@ async function captureCandidateSearch(state, captures) {
   assert.equal(filteredRequests.length, 1);
   assert.equal(new URL(filteredRequests[0], baseUrl).searchParams.get('divisionKey'), 'men-general');
   assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 1);
-  assert.equal(await page.locator('[data-candidate-key="beta-2016"]').count(), 0);
+  assert.equal(await page.locator('[data-candidate-key="at_beta_2016"]').count(), 0);
   const resetRequestStart = apiRequests.length;
   const resetDivisionFilter = page.getByRole('button', {
     name: '경기 부문으로 좁히기 전체',
@@ -73,13 +73,13 @@ async function captureCandidateSearch(state, captures) {
   await reachFocusVisible(page, candidate);
   await capturePage(state, { captures, scenario: 'athlete-candidate-search', anchor: candidate });
   await activateFocused(page, candidate);
-  await page.waitForURL((url) => url.pathname === '/records/athletes/alpha-2016');
+  await page.waitForURL((url) => url.pathname === '/records/athletes/at_alpha_2016');
 }
 
 async function captureRecordProvenance(state, captures) {
   const { baseUrl, page } = state;
   const row = page.locator('[data-record-row]').first();
-  await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, row);
+  await navigateToReady(page, `${baseUrl}/records/athletes/at_alpha_2016`, row);
   assert.match(await row.getAttribute('aria-label') || '', /부문 남자 고등부/u);
   await reachFocusVisible(page, row);
   await activateFocused(page, row);

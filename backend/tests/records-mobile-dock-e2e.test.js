@@ -10,7 +10,7 @@ test('RECORDS-MOBILE-DOCK-E2E Given a saved comparison When workspace selection 
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('athletetime.compareTray.v1', JSON.stringify([{
-        athleteKey: 'alpha-2016',
+        athleteKey: 'at_alpha_2016',
         name: 'Alpha Kim',
         team: 'Seoul High',
       }]));
@@ -31,8 +31,8 @@ test('MOBILE-COMPARE-TRAY-E2E Given two saved candidates When the comparison tra
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('athletetime.compareTray.v1', JSON.stringify([
-        { athleteKey: 'alpha-2016', name: 'Alpha Kim', team: 'Seoul High' },
-        { athleteKey: 'alpha-2020', name: 'Alpha Kim', team: 'Seoul Track Club' },
+        { athleteKey: 'at_alpha_2016', name: 'Alpha Kim', team: 'Seoul High' },
+        { athleteKey: 'at_alpha_2020', name: 'Alpha Kim', team: 'Seoul Track Club' },
       ]));
     });
 

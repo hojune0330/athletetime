@@ -69,16 +69,16 @@ test('Given the public filter contract When filters are requested Then availabil
 });
 
 test('Given the fixture search boundary When Beta, no-match, and empty queries run Then each observable state stays distinct', () => {
-  assert.deepEqual(getSearchResults('Beta').map((candidate) => candidate.athleteKey), ['beta-2016']);
+  assert.deepEqual(getSearchResults('Beta').map((candidate) => candidate.athleteKey), ['at_beta_2016']);
   assert.deepEqual(getSearchResults('no such athlete'), []);
   assert.deepEqual(getSearchResults('   '), []);
 });
 
 test('Given canonical and unavailable workspace fixture keys When a preview is built Then resolved subjects retain requested-to-canonical mapping', () => {
-  const preview = makeWorkspacePreview(['alpha-2016', 'aaaaaaaaaaaaaaaa', 'missing-key']);
+  const preview = makeWorkspacePreview(['at_alpha_2016', 'aaaaaaaaaaaaaaaa', 'missing-key']);
 
   assert.deepEqual(preview.resolvedSubjectKeys, [
-    { requestedSubjectKey: 'alpha-2016', athleteKey: 'alpha-2016' },
+    { requestedSubjectKey: 'at_alpha_2016', athleteKey: 'at_alpha_2016' },
     { requestedSubjectKey: 'aaaaaaaaaaaaaaaa', athleteKey: 'aaaaaaaaaaaaaaaa' },
   ]);
   assert.deepEqual(preview.unavailableSubjectKeys, ['missing-key']);

@@ -14,7 +14,7 @@ function deferred() {
 }
 
 test('MINE-FIXTURE Given profile records When event summaries are built Then each summary uses the record event', () => {
-  const profile = makeProfile('mine-race-2016');
+  const profile = makeProfile('at_mine_race_2016');
   assert.ok(profile);
   assert.deepEqual(profile.events.map((event) => ({
     eventKey: event.eventKey,
@@ -25,7 +25,7 @@ test('MINE-FIXTURE Given profile records When event summaries are built Then eac
 
 test('ATHLETE-FILTER Given athlete browse When the division catalog loads Then only filters are fetched before search', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, apiRequests }) => {
-    const candidate = page.locator('[data-candidate-key="alpha-2016"]');
+    const candidate = page.locator('[data-candidate-key="at_alpha_2016"]');
     await navigateToReady(
       page,
       `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`,
@@ -48,7 +48,7 @@ test('MINE-SEASON-RACE Given profile resolves before filters When season view op
     // Given a saved synthetic candidate and independently gated profile/filter responses.
     await page.addInitScript(() => {
       localStorage.setItem('athletetime.my-athlete.v2', JSON.stringify([{
-        athleteKey: 'mine-race-2016',
+        athleteKey: 'at_mine_race_2016',
         name: 'Race Runner',
         team: 'Race High',
         savedAt: '2026-08-15T00:00:00.000Z',
@@ -63,7 +63,7 @@ test('MINE-SEASON-RACE Given profile resolves before filters When season view op
       await releaseFilters.promise;
       await route.fallback();
     });
-    await page.route('**/api/card-studio/analytics/athletes/mine-race-2016', async (route) => {
+    await page.route('**/api/card-studio/analytics/athletes/at_mine_race_2016', async (route) => {
       profileSeen.resolve();
       await releaseProfile.promise;
       await route.fallback();
@@ -92,7 +92,7 @@ test('MINE-SEASON-RACE Given profile resolves before filters When season view op
       await profileSeen.promise;
       assert.equal(new URL(page.url()).searchParams.get('flow'), 'mine');
       const profileResponse = page.waitForResponse((response) => (
-        response.url().includes('/analytics/athletes/mine-race-2016')
+        response.url().includes('/analytics/athletes/at_mine_race_2016')
       ));
       releaseProfile.resolve();
       await profileResponse;
