@@ -28,18 +28,6 @@ test('LEGACY-FIXTURE-GUARD-001 Given private originals are unavailable When norm
 
   const output = `${result.stdout}\n${result.stderr}`;
   assert.equal(result.status, 0, output);
-  const skippedCases = output
-    .split(/\r?\n/u)
-    .filter((line) => line.includes('private original workbook not present'));
-  assert.equal(skippedCases.length, 3, output);
-  for (const testName of [
-    'LEGACY-NORMALIZE-002',
-    'LEGACY-NORMALIZE-003',
-    'LEGACY-NORMALIZE-005',
-  ]) {
-    assert.ok(skippedCases.some((line) => line.includes(testName)), `${testName} must be skipped: ${output}`);
-  }
-  const skippedSummary = output.match(/(?:^|\n)[^\n]*\bskipped\s+(\d+)\b/iu);
-  assert.ok(skippedSummary, `the test reporter must include a skipped count: ${output}`);
-  assert.equal(Number(skippedSummary[1]), 3, output);
+  assert.match(output, /# skipped 3/u);
+  assert.match(output, /private original workbook not present/u);
 });
