@@ -72,6 +72,10 @@ const recordWorkspaceSubjectSchema = athleteSearchCardSchema.extend({
   athleteKey: AthleteKeySchema,
 }).strict()
 
+const recordWorkspacePublicRecordSchema = publicRecordSchema.extend({
+  athleteKey: AthleteKeySchema,
+}).strict()
+
 const recordWorkspacePreviewSchema = z.strictObject({
   subjects: z.array(recordWorkspaceSubjectSchema),
   resolvedSubjectKeys: z.array(resolvedSubjectKeySchema),
@@ -105,7 +109,7 @@ const recordWorkspacePreviewSchema = z.strictObject({
     recordCount: z.number().int().nonnegative(),
     best: publicRecordSchema.nullable(),
   })),
-  records: z.array(publicRecordSchema),
+  records: z.array(recordWorkspacePublicRecordSchema),
 })
 
 const recordWorkspaceEnvelopeSchema = z.strictObject({
