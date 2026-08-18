@@ -250,7 +250,7 @@ describe('record workspace API boundary', () => {
     await expect(previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })).rejects.toBeInstanceOf(RecordWorkspaceApiBoundaryError)
   })
 
-  it('rejects an invalid athlete key in an event best record while accepting a valid one', async () => {
+  it('rejects invalid or foreign athlete keys in an event best record while accepting an owned one', async () => {
     const validBest = workspaceRecord()
     api.post.mockResolvedValue(response(previewPayload({
       events: [{ eventKey: '100m', eventLabel: '100m', recordCount: 1, best: validBest }],
@@ -265,6 +265,17 @@ describe('record workspace API boundary', () => {
         eventLabel: '100m',
         recordCount: 1,
         best: { ...validBest, athleteKey: 'not-a-key' },
+      }],
+    })))
+
+    await expect(previewRecordWorkspace({ subjectKeys: [LEGACY_KEY] })).rejects.toBeInstanceOf(RecordWorkspaceApiBoundaryError)
+
+    api.post.mockResolvedValue(response(previewPayload({
+      events: [{
+        eventKey: '100m',
+        eventLabel: '100m',
+        recordCount: 1,
+        best: { ...validBest, athleteKey: OTHER_CANONICAL_KEY },
       }],
     })))
 

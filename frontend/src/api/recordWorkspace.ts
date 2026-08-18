@@ -190,6 +190,11 @@ function parseRecordWorkspaceResponse(
   for (const subjectKey of subjectKeys) {
     if (!mappedCanonicalKeys.has(subjectKey)) mappingIssues.push('returned subject was not mapped from a request')
   }
+  for (const event of preview.data.events) {
+    if (event.best && !subjectKeys.has(event.best.athleteKey)) {
+      mappingIssues.push('event best athlete key was not returned as a subject')
+    }
+  }
   const seenRecordIds = new Set<string>()
   for (const record of preview.data.records) {
     if (!subjectKeys.has(record.athleteKey)) mappingIssues.push('record athlete key was not returned as a subject')
