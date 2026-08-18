@@ -1,4 +1,5 @@
 const { spawnSync } = require('node:child_process');
+const { EVIDENCE_DIR } = require('../backend/tests/division-navigation-e2e-config');
 
 const pr88BrowserTests = [
   'backend/tests/records-mine-season-race-e2e.test.js',
@@ -39,6 +40,11 @@ if (legacyStatus !== 0) {
 } else {
   process.exitCode = runTests(
     pr88BrowserTests,
-    { ...process.env, RECORDS_BROWSER_TESTS: '1' },
+    {
+      ...process.env,
+      RECORDS_BROWSER_TESTS: '1',
+      RECORDS_E2E_EVIDENCE_DIR: process.env.RECORDS_E2E_EVIDENCE_DIR || EVIDENCE_DIR,
+      WRITE_E2E_EVIDENCE: '1',
+    },
   );
 }
