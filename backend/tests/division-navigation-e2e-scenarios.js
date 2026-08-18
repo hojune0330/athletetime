@@ -35,7 +35,7 @@ async function captureCandidateSearch(state, captures) {
     .filter((request) => request.includes('/analytics/records/search'));
   assert.equal(searchRequests.length, 1);
   assert.equal(new URL(searchRequests[0], baseUrl).searchParams.get('q'), 'Alpha');
-  assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 2);
+  assert.equal(await page.locator('[data-candidate-key^="at_alpha_"]').count(), 2);
   assert.equal(await page.locator('[data-candidate-key="at_beta_2016"]').count(), 0);
   await expectVisible(candidate.getByText('부문 · 남자 고등부 · 남자 일반부', { exact: true }));
   await expectVisible(candidate.getByText('종목 · 100m · 200m', { exact: true }));
@@ -50,12 +50,12 @@ async function captureCandidateSearch(state, captures) {
   const filteredRequestStart = apiRequests.length;
   await divisionFilter.click();
   await page.waitForURL((url) => url.searchParams.get('divisionFilter') === 'men-general');
-  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="alpha-"]').length === 1);
+  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="at_alpha_"]').length === 1);
   const filteredRequests = apiRequests.slice(filteredRequestStart)
     .filter((request) => request.includes('/analytics/records/search'));
   assert.equal(filteredRequests.length, 1);
   assert.equal(new URL(filteredRequests[0], baseUrl).searchParams.get('divisionKey'), 'men-general');
-  assert.equal(await page.locator('[data-candidate-key^="alpha-"]').count(), 1);
+  assert.equal(await page.locator('[data-candidate-key^="at_alpha_"]').count(), 1);
   assert.equal(await page.locator('[data-candidate-key="at_beta_2016"]').count(), 0);
   const resetRequestStart = apiRequests.length;
   const resetDivisionFilter = page.getByRole('button', {
@@ -65,7 +65,7 @@ async function captureCandidateSearch(state, captures) {
   await expectVisible(resetDivisionFilter);
   await resetDivisionFilter.click();
   await page.waitForURL((url) => !url.searchParams.has('divisionFilter'));
-  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="alpha-"]').length === 2);
+  await page.waitForFunction(() => document.querySelectorAll('[data-candidate-key^="at_alpha_"]').length === 2);
   const resetRequests = apiRequests.slice(resetRequestStart)
     .filter((request) => request.includes('/analytics/records/search'));
   assert.equal(resetRequests.length, 1);
