@@ -3,7 +3,21 @@ const test = require('node:test');
 
 const analytics = require('../../card-studio/services/recordAnalyticsService');
 const identityResolver = require('../../card-studio/services/identityResolver');
+const { createRecordWorkspacePreviewService } = require('../../card-studio/services/recordWorkspacePreviewService');
 const { classifyRecord } = require('../../card-studio/services/teamCategoryService');
+
+function recordFactKey(record) {
+  return [
+    record.source?.sourceType,
+    record.name,
+    record.team,
+    record.competitionId,
+    record.date,
+    record.rawEvent,
+    record.rank,
+    record.recordDisplay,
+  ].join('|');
+}
 
 test('Given an explicit male high-school division and school affiliation When normalized Then established taxonomy remains stable', () => {
   // Given
@@ -203,5 +217,75 @@ test('Given the identity map signature changes When the cached index is read The
     assert.equal(refreshedIndex === firstIndex, false);
   } finally {
     identityResolver.getStatus = originalGetStatus;
+  }
+});
+
+test('Given saved public record IDs When athlete keys are remapped Then exclusions and record deep links still resolve', () => {
+  const originalResolve = identityResolver.resolve;
+  const originalGetStatus = identityResolver.getStatus;
+  const originalStatus = originalGetStatus();
+  let identityGeneration = Date.now();
+  let canonicalGroups = 0;
+  identityResolver.resolve = () => null;
+  identityResolver.getStatus = () => ({
+    ...originalStatus,
+    canonicalGroups,
+    mtimeMs: identityGeneration,
+  });
+
+  try {
+    const baseIndex = analytics.getIndex();
+    const savedRecords = ['public_result', 'public_top_record_candidate'].map((sourceType) => {
+      const record = baseIndex.records.find((candidate) => (
+        candidate.source?.sourceType === sourceType
+        && baseIndex.athleteByKey.get(candidate.athleteKey)?.records.length === 1
+      ));
+      assert.ok(record, `${sourceType} stability fixture is required`);
+      return {
+        athleteKey: record.athleteKey,
+        factKey: recordFactKey(record),
+        id: record.id,
+        sourceType,
+      };
+    });
+
+    identityResolver.resolve = ({ athleteKey }) => `at_${athleteKey}`;
+    identityGeneration += 1;
+    canonicalGroups = 1;
+    const remappedIndex = analytics.getIndex();
+    const previewService = createRecordWorkspacePreviewService({ getIndex: () => remappedIndex });
+
+    for (const saved of savedRecords) {
+      const remappedRecord = remappedIndex.records.find((record) => recordFactKey(record) === saved.factKey);
+      assert.ok(remappedRecord, `${saved.sourceType} record facts must survive identity remapping`);
+      assert.notEqual(remappedRecord.athleteKey, saved.athleteKey);
+      assert.equal(
+        remappedRecord.id,
+        saved.id,
+        `${saved.sourceType} public ID changed even though its record facts did not`,
+      );
+
+      const preview = previewService.getRecordWorkspacePreview({
+        subjectKeys: [remappedRecord.athleteKey],
+        limit: 50,
+      });
+      assert.equal(
+        preview.records.find((record) => record.id === saved.id)?.id,
+        saved.id,
+        `${saved.sourceType} record deep link no longer resolves after identity remapping`,
+      );
+      const excludedRecordIds = new Set([saved.id]);
+      assert.equal(
+        preview.records.filter((record) => !excludedRecordIds.has(record.id)).some((record) => (
+          recordFactKey(record) === saved.factKey
+        )),
+        false,
+        `${saved.sourceType} saved exclusion no longer hides the remapped record`,
+      );
+    }
+  } finally {
+    identityResolver.resolve = originalResolve;
+    identityResolver.getStatus = originalGetStatus;
+    analytics.getIndex();
   }
 });

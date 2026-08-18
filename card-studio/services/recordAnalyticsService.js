@@ -347,7 +347,7 @@ function buildIndex() {
         });
         const athleteKey = identity.athleteKey;
         const recordId = stableId([
-          athleteKey,
+          identity.legacyAthleteKey,
           competitionId,
           eventLabel,
           result.rank,
@@ -581,7 +581,7 @@ function appendManualTopRecordCandidates(context) {
       'manual-top100',
       candidate.batch,
       candidate.sourceRowId,
-      athleteKey,
+      identity.legacyAthleteKey,
       candidate.record,
     ].join('|'));
     const dedupKey = buildManualTopRecordDedupKey({
