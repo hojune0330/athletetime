@@ -133,8 +133,8 @@ function getLegacyAliasFixture() {
   excludedRecord.recordIdAliases = [excludedRecordIdAlias];
   const records = [
     excludedRecord,
-    ...Array.from({ length: 49 }, (_, index) => ({
-      ...excludedRecord,
+    ...Array.from({ length: 50 }, (_, index) => ({
+      ...directRecord,
       id: stableId(`legacy-pagination-decoy|${index}`),
       recordIdAliases: [],
       competitionName: `Recovery Pagination ${index + 1}`,

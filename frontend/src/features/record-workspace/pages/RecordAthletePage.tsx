@@ -50,7 +50,6 @@ export default function RecordAthletePage() {
   useEffect(() => {
     if (
       !selectedRecordId
-      || reconciledAthleteKeys.length < 2
       || selectedRecord
       || !hasNextAthletePage
       || isFetchingNextAthletePage
@@ -60,7 +59,6 @@ export default function RecordAthletePage() {
     fetchNextAthletePage,
     hasNextAthletePage,
     isFetchingNextAthletePage,
-    reconciledAthleteKeys.length,
     selectedRecord,
     selectedRecordId,
   ])
