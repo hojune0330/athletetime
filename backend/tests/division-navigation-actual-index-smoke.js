@@ -259,9 +259,6 @@ async function main() {
     if (browser) await browser.close();
     if (serverState) await stopActualIndexServer(serverState.server);
     if (succeeded) writeCleanupReceipt();
-    if (!succeeded && process.env.RECORDS_E2E_EVIDENCE_DIR) {
-      fs.rmSync(EVIDENCE_DIR, { recursive: true, force: true });
-    }
   }
 }
 
