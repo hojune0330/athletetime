@@ -75,13 +75,13 @@ test('Given the fixture search boundary When Beta, no-match, and empty queries r
 });
 
 test('Given canonical and unavailable workspace fixture keys When a preview is built Then resolved subjects retain requested-to-canonical mapping', () => {
-  const preview = makeWorkspacePreview(['at_alpha_2016', 'aaaaaaaaaaaaaaaa', 'missing-key']);
+  const preview = makeWorkspacePreview(['at_alpha_2016', 'aaaaaaaaaaaaaaaa', 'at_missing_0001']);
 
   assert.deepEqual(preview.resolvedSubjectKeys, [
     { requestedSubjectKey: 'at_alpha_2016', athleteKey: 'at_alpha_2016' },
     { requestedSubjectKey: 'aaaaaaaaaaaaaaaa', athleteKey: 'aaaaaaaaaaaaaaaa' },
   ]);
-  assert.deepEqual(preview.unavailableSubjectKeys, ['missing-key']);
+  assert.deepEqual(preview.unavailableSubjectKeys, ['at_missing_0001']);
 });
 
 test('Given the real public index When availability is projected Then it is deterministic, count-free, and level-specific', () => {

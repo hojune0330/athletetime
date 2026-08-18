@@ -12,7 +12,7 @@ function listTestFiles(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const filePath = path.join(directory, entry.name);
     if (entry.isDirectory()) return listTestFiles(filePath);
-    return entry.name.endsWith('.test.js') ? [filePath] : [];
+    return entry.name.endsWith('.js') ? [filePath] : [];
   });
 }
 
