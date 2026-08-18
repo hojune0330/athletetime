@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { apiClient } from './client'
 import type { AthleteSearchCard, PublicRecord } from './recordAnalytics'
-import { athleteSearchCardSchema } from './recordAnalyticsSchemas'
+import { athleteSearchCardSchema, publicRecordSchema } from './recordAnalyticsSchemas'
 import { AthleteKeySchema } from '../features/record-workspace/model'
 
 const BASE = '/api/card-studio/analytics/record-workspaces'
@@ -71,41 +71,6 @@ const resolvedSubjectKeySchema = z.strictObject({
 const recordWorkspaceSubjectSchema = athleteSearchCardSchema.extend({
   athleteKey: AthleteKeySchema,
 }).strict()
-
-const publicRecordSchema = z.strictObject({
-  id: z.string().min(1),
-  athleteKey: AthleteKeySchema,
-  name: z.string(),
-  team: z.string(),
-  season: z.number().int(),
-  competitionName: z.string(),
-  date: z.string(),
-  venue: z.string(),
-  eventKey: z.string().min(1),
-  eventLabel: z.string(),
-  divisionKey: z.string().min(1),
-  divisionLabel: z.string(),
-  gender: z.string().min(1),
-  divisionLevel: z.string().min(1),
-  divisionDetail: z.string().nullable(),
-  sourceDivisionLabel: z.string().nullable(),
-  phase: z.string(),
-  record: z.string(),
-  recordValue: z.number(),
-  direction: z.enum(['lower', 'higher']),
-  rank: z.number().int().nullable(),
-  wind: z.string().nullable(),
-  windLegal: z.boolean(),
-  isComparable: z.boolean(),
-  note: z.string(),
-  source: z.strictObject({
-    provider: z.string(),
-    sourceType: z.string(),
-    sourceUrl: z.string(),
-    capturedAt: z.string(),
-    sourceLabel: z.string().optional(),
-  }),
-})
 
 const recordWorkspacePreviewSchema = z.strictObject({
   subjects: z.array(recordWorkspaceSubjectSchema),

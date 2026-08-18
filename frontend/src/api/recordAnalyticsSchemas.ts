@@ -87,6 +87,7 @@ const publicSourceSchema = z.strictObject({
   sourceType: z.string(),
   sourceUrl: z.string(),
   capturedAt: z.string(),
+  sourceLabel: z.string().optional(),
   reviewStatus: z.string().optional(),
 });
 
@@ -96,7 +97,7 @@ const publicSourceDivisionLabelSchema = z.string().max(40).refine((label) => {
   return segments.length <= 3 && segments.every((segment) => publicSourceDivisionPatterns.some((pattern) => pattern.test(segment)));
 });
 
-const publicRecordSchema = z.strictObject({
+export const publicRecordSchema = z.strictObject({
   id: z.string().min(1),
   athleteKey: z.string().min(1),
   name: z.string(),
