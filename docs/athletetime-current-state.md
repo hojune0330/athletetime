@@ -1,13 +1,14 @@
 # AthleteTime 현재 상태 정본
 
-> 기준일: 2026-07-14
+> 운영 기준일: 2026-08-19
 > 기준 브랜치: `main`
-> 기준 SHA: `dddb3da2709e7376e7d5406067b190a7ed9c5079`
+> 기준 SHA: `ad1c963c8ab2835413e38763fb211bb5eae6e875`
+> 데이터 실측 기준일: 2026-07-14
 > 상세 커버리지: [`athletetime-coverage-matrix.md`](./athletetime-coverage-matrix.md)
 > 후속 작업 순서: [`20260714-system-trust-and-stopped-work-handoff.md`](./work-orders/20260714-system-trust-and-stopped-work-handoff.md)
-> 검증 증거: [`20260714-g002-verification.md`](./evidence/20260714-g002-verification.md)
+> 최근 운영 변경: [PR #88](https://github.com/hojune0330/athletetime/pull/88)
 
-이 문서는 위 SHA의 저장소와 2026-07-14 로컬 데이터 실측을 기준으로 한 운영 정본이다. 다른 문서의 수치나 상태가 이 문서 또는 같은 시점에 생성한 coverage 산출물과 다르면 **이 문서와 생성 coverage를 정본**으로 본다. PR이 머지되거나 데이터가 승격되면 같은 PR에서 이 문서와 생성 coverage를 함께 갱신한다.
+데이터 스냅샷과 커버리지 수치는 2026-07-14 실측을 유지하고, 운영·검증 상태는 2026-08-19 PR #88 병합과 배포를 반영한다. PR #88은 `data/results`, `data/competitions`, package/lock을 변경하지 않았으므로 아래 데이터 수치는 재산출 없이 유지한다. 다른 문서의 수치나 상태가 이 문서 또는 같은 시점에 생성한 coverage 산출물과 다르면 **이 문서와 생성 coverage를 정본**으로 본다.
 
 ## 데이터 스냅샷
 
@@ -30,16 +31,19 @@
 
 ## 검증 기준선
 
-- focused test는 `node --test backend/tests/coverage-matrix.test.js`로 실행해 6개 중 6개가 통과했다.
-- 2026-07-14 실측에서 root와 frontend 각각 `npm ci` 후 root `npm test`를 실행했으며, 243개 테스트 중 238개가 통과하고 실패 0개, 5개가 skip됐다.
-- 같은 설치 상태에서 `npm --prefix frontend run build`가 통과했다.
-- 설치 전 첫 실행은 의존성 미설치로 실패했다. root `npm ci`와 `npm --prefix frontend ci`로 환경을 복구한 뒤 focused test, full suite, frontend build를 다시 실행해 위 기준선을 얻었다.
-- 실행 명령, 독립 카운트, audit, no-go diff와 임시 파일 정리 결과는 [`docs/evidence/20260714-g002-verification.md`](./evidence/20260714-g002-verification.md)에 기록한다.
-- 위 테스트와 빌드 통과는 현재 동작의 회귀 기준선일 뿐, 아래 dependency 취약점이 해소됐다는 뜻은 아니다. 기능 검증 결과와 `npm audit` 보안 부채는 별개의 상태로 함께 추적한다.
+- PR #88 exact head `07e32261fe5876bd1fbcadb58fb72a8cf6dc1f21`에서 PostgreSQL contract와 records browser GitHub Actions가 통과했다.
+- 같은 head의 Netlify deploy preview, header 규칙, redirect 규칙이 통과했다.
+- 포괄 검증 후보 `6edff5f`에서 Node 22.17.1, frontend 209/209, non-browser 414 pass와 6 expected skips, browser 50/50, 4개 viewport 20/20, actual-index 3/3, TypeScript, scoped lint, production build가 통과했다.
+- PR #88은 2026-08-19 `main`에 `ad1c963c8ab2835413e38763fb211bb5eae6e875`로 squash-merge됐다.
+- Render backend deployment `5979115260`과 Netlify production deployment `6a856dc1eec76900080927c1`이 같은 merge SHA로 성공했다.
+- 운영 확인에서 `/health`는 HTTP 200, database `connected`, dataRights `ready`였고, season availability는 HTTP 200과 `Cache-Control: public, max-age=60, stale-while-revalidate=300`을 반환했다.
+- 이 검증은 현재 기록 탐색 계약의 회귀 기준선이다. 데이터 완전성, 출처 권리 승인, 인증 정책 승인을 대신하지 않는다.
 
 ## 보안 부채
 
-| 범위 | `npm audit` 실측 | 주요 직접·간접 취약점 |
+아래 표는 2026-07-14 당시의 역사적 실측이다. 2026-08-12 후속 production/full audit은 root와 frontend 모두 0건을 보고했지만, 의존성 작업 전에는 현재 advisory 기준으로 다시 측정한다.
+
+| 범위 | 2026-07-14 `npm audit` 실측 | 당시 주요 직접·간접 취약점 |
 |---|---:|---|
 | root | 총 12개: moderate 8, high 4, critical 0 | high: `basic-ftp`(transitive), `cloudinary`(direct, major update 필요), `path-to-regexp`(transitive), `ws`(direct) |
 | frontend | 총 18개: low 1, moderate 6, high 10, critical 1 | critical: `jspdf`(direct, 수정에 major `4.2.1` 필요). high에는 `axios`, `react-router-dom`, `vite` 직접 의존성과 transitive packages가 포함된다. |
@@ -47,13 +51,14 @@
 - `npm audit fix --force`는 자동 적용하지 않는다. major update와 transitive dependency 변화를 영향 분석하고 회귀 테스트하는 별도 PR로 처리한다.
 - 특히 `jspdf` critical은 데이터 승격이나 광범위한 출시 전에 해소해야 하는 P0이며, 패키지 변경과 검증 범위는 인계 문서의 dependency security 작업을 따른다.
 
-## 열린 PR
+## 최근 PR 상태
 
-| PR | 2026-07-14 상태 | 현재 판단 | 다음 조치 |
-|---|---|---|---|
-| [#47](https://github.com/hojune0330/athletetime/pull/47) A-3 Step 2 | Open, base `main` | 2015-2017 `.xls` 후보 dry-run이다. 서비스 승격 PR이 아니며 `data/results` 변경은 0이다. | Fable이 후보 수치, 차단 목록, 개인정보·경로 비노출, TOP100 dedup 불변을 검수한 뒤 머지 여부를 결정한다. 실제 승격은 별도 PR에서 진행한다. |
-| [#46](https://github.com/hojune0330/athletetime/pull/46) records UX | Open, base `main` | 단계형 records UX PR이다. PR 기록의 full suite는 당시 기존 KAAF 테스트 2건 때문에 실패 상태였다. | 최신 `main`에 rebase하고 full suite와 frontend build/browser QA를 다시 통과시킨 뒤 검수한다. |
-| [#8](https://github.com/hojune0330/athletetime/pull/8) launch surface | Open Draft, base `main` | 이후 main 작업들로 대체된 오래된 launch-surface 초안이다. | `superseded` 사유를 남기고 닫는다. 이 PR을 현재 main에 머지하지 않는다. |
+| PR | 현재 상태 | 운영 판단 |
+|---|---|---|
+| [#88](https://github.com/hojune0330/athletetime/pull/88) records division navigation | 2026-08-19 merged and deployed | 현재 기록 탐색·시즌 조합·legacy identity·public DTO 회귀 기준선이다. |
+| [#47](https://github.com/hojune0330/athletetime/pull/47) A-3 Step 2 | 2026-07-15 merged | dry-run 후보 생성만 완료했다. 서비스 승격은 trust gate 이후 별도 PR이다. |
+| [#46](https://github.com/hojune0330/athletetime/pull/46) records UX | 2026-07-15 merged | 단계형 records UX는 #88의 종속 필터·복구 계약으로 이어졌다. |
+| [#8](https://github.com/hojune0330/athletetime/pull/8) launch surface | Open Draft, superseded | 대체된 `main` 근거를 남기고 닫는다. 머지하거나 재구현하지 않는다. |
 
 ## 정본 운영 규칙
 
