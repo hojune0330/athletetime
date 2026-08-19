@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { teamCategoryLabel } from '../../features/team-performance/TeamCategoryFilter'
+import { teamCategoryLabel } from '../../features/team-performance/teamCategoryLabels'
 import type { TeamSearchSummary } from '../../features/team-performance/teamPerformanceContracts'
 
 type Props = {
@@ -12,11 +12,16 @@ export function TeamStatisticsResults({ teams, query }: Props) {
   return (
     <section className="space-y-3" aria-label={`${query} 소속 검색 결과`}>
       <div className="flex items-baseline justify-between gap-4 px-1">
-        <div>
+        <div className="min-w-0">
           <h2 className="text-lg font-semibold text-ink">소속 {teams.length}곳을 찾았어요</h2>
-          <p className="mt-1 text-xs leading-5 text-ink-4">공개 기록을 소속 시기별로 모은 통계예요. 개인 기록은 보여주지 않아요.</p>
+          <p className="mt-1 break-keep [text-wrap:pretty] text-xs leading-5 text-ink-4">
+            소속 유형은 수집된 기록의 소속 표기를 바탕으로 추정하며 경기 부문과{' '}
+            <span className="whitespace-nowrap">다를 수 있어요.</span>{' '}
+            공개 기록을 소속·시기별로 모은 통계예요.{' '}
+            <span className="whitespace-nowrap">개인 기록은 보여주지 않아요.</span>
+          </p>
         </div>
-        <span className="font-mono text-xs text-ink-4">{query}</span>
+        <span className="shrink-0 whitespace-nowrap font-mono text-xs text-ink-4">{query}</span>
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
@@ -38,7 +43,7 @@ function TeamResultCard({ team, query }: { readonly team: TeamSearchSummary; rea
     <Link
       to={destination}
       className="group border border-line bg-surface p-5 transition duration-200 hover:-translate-y-0.5 hover:border-ink hover:shadow-[0_12px_30px_rgba(25,33,38,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-      aria-label={`${team.teamLabel} 팀 통계 보기`}
+      aria-label={`${team.teamLabel} 소속 통계 보기`}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

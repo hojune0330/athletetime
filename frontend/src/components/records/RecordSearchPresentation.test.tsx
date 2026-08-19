@@ -100,4 +100,29 @@ describe('record search presentation', () => {
     expect(html).toContain('같은 이름의 다른 선수일 수 있어요.');
     expect(html).toContain('이 선수 담기');
   });
+
+  it('Given every canonical division when the filter renders Then the fieldset exposes all choices and a scoped reset', () => {
+    // Given more than eight canonical division choices.
+    const options = Array.from({ length: 10 }, (_, index) => ({
+      value: `division-${index + 1}`,
+      label: `경기 부문 ${index + 1}`,
+    }));
+
+    // When the search division filter renders with one selected choice.
+    const html = renderToStaticMarkup(
+      <RecordSearchFilterChips
+        title="경기 부문으로 좁히기"
+        options={options}
+        selected="division-2"
+        onSelect={() => undefined}
+      />,
+    );
+
+    // Then native group semantics, every option, and one directly named reset remain available.
+    expect(html).toContain('<fieldset')
+    expect(html).toContain('<legend')
+    expect(html).toContain('경기 부문 10')
+    expect(html).toContain('aria-label="경기 부문으로 좁히기 전체"')
+    expect(html.match(/aria-pressed="true"/g)).toHaveLength(1)
+  });
 });

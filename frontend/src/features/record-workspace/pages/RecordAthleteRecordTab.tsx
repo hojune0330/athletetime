@@ -3,6 +3,7 @@ import type { PublicRecord } from '@/api/recordAnalytics'
 import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
 import { groupRecords, type RecordEventGroup, type RecordSortOrder } from '../groupRecords'
 import { resolveRecordAthleteSeason } from '../recordAthleteUrlState'
+import { recordMatchesId } from '../recordWorkspacePreviewPages'
 import { RecordDetailSheet } from '../components/RecordDetailSheet'
 import { RecordEventFilter } from '../components/RecordEventFilter'
 import { RecordGroupList } from '../components/RecordGroupList'
@@ -54,7 +55,7 @@ export function RecordAthleteRecordTab({
   const selectedGroup = loadedGroups.find((group) => group.eventKey === selectedEventKey) ?? null
   const [sortOrder, setSortOrder] = useState<RecordSortOrder>('newest')
   const [visibleCount, setVisibleCount] = useState(10)
-  const selectedRecord = preview.records.find((record) => record.id === selectedRecordId) ?? null
+  const selectedRecord = preview.records.find((record) => recordMatchesId(record, selectedRecordId)) ?? null
   const activeSeason = resolveRecordAthleteSeason(
     selectedSeason,
     selectedGroup?.seasons.map((season) => season.season) ?? [],

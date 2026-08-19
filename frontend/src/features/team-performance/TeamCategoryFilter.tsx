@@ -1,14 +1,6 @@
 import { TEAM_CATEGORIES } from './teamPerformanceContracts'
+import { teamCategoryLabel } from './teamCategoryLabels'
 import type { TeamCategory } from './teamPerformanceContracts'
-
-const LABELS: Readonly<Record<TeamCategory, string>> = {
-  corporate: '실업팀',
-  university: '대학팀',
-  high: '고등부',
-  middle: '중등부',
-  elementary: '초등부',
-  unclassified: '분류 확인 중',
-}
 
 type Props = {
   readonly selected: TeamCategory | null
@@ -17,9 +9,10 @@ type Props = {
 
 export function TeamCategoryFilter({ selected, onSelect }: Props) {
   return (
-    <fieldset className="mt-6">
+    <fieldset className="mt-6 min-w-0">
       <legend className="text-xs font-semibold text-ink-4">소속 유형</legend>
-      <div className="mt-2 flex gap-2 overflow-x-auto pb-1" aria-label="소속 유형 선택">
+      <p className="mt-1 text-xs leading-5 text-ink-4">수집된 기록의 소속 표기를 바탕으로 추정하며 경기 부문과 다를 수 있어요.</p>
+      <div className="mt-2 flex flex-wrap gap-2">
         <button
           type="button"
           aria-pressed={selected === null}
@@ -36,7 +29,7 @@ export function TeamCategoryFilter({ selected, onSelect }: Props) {
             onClick={() => onSelect(category)}
             className={categoryClass(selected === category)}
           >
-            {LABELS[category]}
+            {teamCategoryLabel(category)}
           </button>
         ))}
       </div>
@@ -44,12 +37,8 @@ export function TeamCategoryFilter({ selected, onSelect }: Props) {
   )
 }
 
-export function teamCategoryLabel(category: TeamCategory): string {
-  return LABELS[category]
-}
-
 function categoryClass(active: boolean): string {
   return active
-    ? 'shrink-0 border border-ink bg-ink px-4 py-2.5 text-sm font-semibold text-white'
-    : 'shrink-0 border border-line bg-surface-2 px-4 py-2.5 text-sm font-semibold text-ink-3 transition hover:border-ink hover:text-ink'
+    ? 'min-h-11 shrink-0 border border-ink bg-ink px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
+    : 'min-h-11 shrink-0 border border-line bg-surface-2 px-4 py-2.5 text-sm font-semibold text-ink-3 transition hover:border-ink hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2'
 }

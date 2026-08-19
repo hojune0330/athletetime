@@ -1,4 +1,5 @@
 import React from 'react';
+import { List, X } from 'lucide-react';
 import { type RoomId, CHAT_ROOMS } from '../types';
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
@@ -64,7 +65,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         className="md:hidden py-2 px-4 bg-[#00ffa3] text-black rounded-lg text-sm font-medium hover:bg-[#00e694] transition-colors flex items-center gap-2"
         aria-label={isMenuOpen ? '메뉴 닫기' : '채팅방 목록'}
       >
-        <i className={`fas ${isMenuOpen ? 'fa-times' : 'fa-list'}`} />
+        {isMenuOpen ? <X aria-hidden="true" className="h-4 w-4" /> : <List aria-hidden="true" className="h-4 w-4" />}
         채팅방
       </button>
     </div>

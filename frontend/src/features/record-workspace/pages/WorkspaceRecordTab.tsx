@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { PublicRecord } from '@/api/recordAnalytics'
-import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
+import type { RecordWorkspacePreview, RecordWorkspaceRecord } from '@/api/recordWorkspace'
 import { Button } from '@/components/ui/button'
 import { RecordDetailSheet } from '../components/RecordDetailSheet'
 import { RecordEventFilter } from '../components/RecordEventFilter'
 import { RecordGroupList } from '../components/RecordGroupList'
 import { RecordSelectionBar } from '../components/RecordSelectionBar'
 import { groupRecords, type RecordSortOrder } from '../groupRecords'
+import { recordMatchesId } from '../recordWorkspacePreviewPages'
 
 type WorkspaceRecordTabProps = {
   readonly isLoadingMore: boolean
@@ -20,7 +20,7 @@ type WorkspaceRecordTabProps = {
   readonly onStartSelection: () => void
   readonly onToggleRecord: (recordId: string) => void
   readonly preview: RecordWorkspacePreview
-  readonly records: readonly PublicRecord[]
+  readonly records: readonly RecordWorkspaceRecord[]
   readonly selectedEventKey: string | null
   readonly selectedRecordId: string | null
   readonly selectedRecordIds: readonly string[]
@@ -51,7 +51,7 @@ export function WorkspaceRecordTab({
   const [selectedSeason, setSelectedSeason] = useState(selectedGroupFirstSeason)
   const [sortOrder, setSortOrder] = useState<RecordSortOrder>('newest')
   const [visibleCount, setVisibleCount] = useState(10)
-  const selectedRecord = records.find((record) => record.id === selectedRecordId) ?? null
+  const selectedRecord = records.find((record) => recordMatchesId(record, selectedRecordId)) ?? null
 
   useEffect(() => {
     setSelectedSeason(selectedGroupFirstSeason)
@@ -134,7 +134,7 @@ export function WorkspaceRecordTab({
   )
 }
 
-function correctionHref(record: PublicRecord) {
+function correctionHref(record: RecordWorkspaceRecord) {
   return `/data-request?${new URLSearchParams({
     type: 'correction',
     athlete: record.name,

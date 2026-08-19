@@ -55,6 +55,10 @@ function fixturePreview(input) {
   if (availableKeys.length === 0) return null;
   return {
     subjects: [{ athleteKey: '1111111111111111', name: '가람', team: '서울고', teams: ['서울고'], years: [2025], events: ['100m'], divisions: ['남자부'], recordCount: 1, ambiguity: 'name_team', note: '' }],
+    resolvedSubjectKeys: availableKeys.map((requestedSubjectKey) => ({
+      requestedSubjectKey,
+      athleteKey: '1111111111111111',
+    })),
     unavailableSubjectKeys: input.subjectKeys.filter((key) => key !== '1111111111111111'),
     identity: { displayName: '가람', distinctNames: ['가람'], warning: 'none' },
     affiliations: [],
@@ -85,6 +89,10 @@ test('Given the workspace preview route When a valid JSON POST is received Then 
   assert.equal(post.status, 200);
   assert.equal(post.headers['cache-control'], 'no-store');
   assert.equal(post.body.data.coverage.totalMatched, 1);
+  assert.deepEqual(post.body.data.resolvedSubjectKeys, [{
+    requestedSubjectKey: '1111111111111111',
+    athleteKey: '1111111111111111',
+  }]);
   assert.equal(get.status, 404);
 });
 

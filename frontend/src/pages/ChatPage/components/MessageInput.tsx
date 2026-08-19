@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Send } from 'lucide-react';
 
 interface MessageInputProps {
   onSendMessage: (text: string) => void;
@@ -52,7 +53,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
             }
           `}
         >
-          <i className="fas fa-paper-plane text-sm" />
+          <Send aria-hidden="true" className="h-4 w-4" />
         </button>
       </div>
     </div>

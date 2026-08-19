@@ -1,9 +1,17 @@
 # 업무지시 트랙 I: 부문(division) 층위 정규화 — 시즌 기록표 중복·순서 결함 수정
 
+> **Historical work order (2026-07-08; superseded current contract 2026-08-18):**
+> The design and evidence below are retained as an audit record. References to
+> gender rollups, `*-all`, or internal `rawDivision` are historical-only and do
+> not describe current production. Current production uses segmented
+> gender+division-level fallback keys, unique-only alias canonicalization, an
+> explicit `multiple_candidates` ambiguity result, and detail-only
+> `sourceDivisionLabel` (never public `rawDivision`).
+
 > 발행: 2026-07-08 · 발행자: Claude (총괄) · 승인: 사장님(hojune0330)
 > 우선순위: **P1 (최우선)** — 시즌 최고기록이 잘못 보이는 사용자 노출 결함.
-> 사장님이 직접 발견·정책을 확정한 사안이므로 이 문서의 층위 모델을 **그대로** 구현한다.
-> 임의 변경 금지. 애매하면 PR 코멘트로 질문.
+> 사장님이 직접 발견·정책을 확정한 사안이므로 당시에는 이 문서의 층위 모델을
+> **그대로** 구현하는 기준으로 사용했다. 임의 변경 금지. 애매하면 PR 코멘트로 질문.
 
 ---
 
@@ -34,7 +42,11 @@
 
 ---
 
-## 2. 층위 모델 (사장님 확정 정책 — 그대로 구현)
+## 2. 층위 모델 (역사적 설계 — 현재 계약에서 superseded)
+
+> The following subsection records the historical rollup model. It is not a
+> current implementation contract; in particular, `men-all`/`women-all` and
+> other `*-all` rollups are not used now.
 
 핵심 원칙: **"층위는 살리되, 무분별하게 묶거나 순서 매기지 않는다."**
 
@@ -83,7 +95,7 @@
   divisionKey: `${gender}-${divisionLevel}`,   // 통일된 단일 키 체계
   divisionLabel: '남자 일반부',                  // 표준 표시명
   divisionDetail: '남자중학교 2학년부' | 'M45' | null,  // 원본 보존
-  rawDivision: '<원천 라벨 그대로>',             // 감사 추적용
+  rawDivision: '<원천 라벨 그대로>',             // historical internal field; never public
 }
 ```
 
@@ -119,11 +131,14 @@
   툴팁/보조 텍스트로.
 - '층위 미상' 필터는 데이터가 있을 때만 노출.
 - 표시명 표준화: `남자고등학교부` → `남자 고등부`, `남자일반부` →
-  `남자 일반부` 등. 상세 화면에는 rawDivision 병기 가능.
+  `남자 일반부` 등. 상세 화면에는 안전한 sourceDivisionLabel만 제한적으로 병기한다.
 
 ---
 
-## 3. 계약 테스트 (`backend/tests/division-hierarchy.test.js` 신설)
+## 3. 계약 테스트 (역사적 체크리스트 — 현재 계약에서 superseded)
+
+> The following assertions document the historical run; they are not a current
+> requirement for `*-all` rollups or public `rawDivision`.
 
 1. 부문 필터 목록에 **동일 라벨 중복 키 0건**.
 2. `kaaf-kind-` 접두 divisionKey가 인덱스에 존재하지 않음.
@@ -141,7 +156,7 @@
    dedup 키(name|eventKey|date|record)와 무관하므로 delta 0이어야 정상.
    0이 아니면 중단하고 질문).
 
-## 4. 완료 기준 (DoD)
+## 4. 완료 기준 (역사적 DoD — 현재 계약에서 superseded)
 
 - [ ] divisionHierarchyService 신설 + 양 경로 공용화, kaaf-kind 폐기
 - [ ] 매핑 테이블: data/results 56종 + TOP100 category 14종 전수 커버
@@ -165,3 +180,6 @@
   재작업이 없다.
 - 트랙 H(커뮤니티)와는 코드 영역 비겹침, 병행 가능.
 - 우선순위 갱신: **P1 = I(최우선) → A 후속 → H-1 → F → G**, P2 이하 동일.
+
+
+> Historical contract notice (2026-08-18): this work order preserves the 2026-07-08 design and evidence. Current production uses neutral gender/level keys only, with no *-all rollups. rawDivision is not public; safe sourceDivisionLabel is detail-only. Read conflicting rollup/raw-field text above as superseded, not as a rewrite of the historical record.

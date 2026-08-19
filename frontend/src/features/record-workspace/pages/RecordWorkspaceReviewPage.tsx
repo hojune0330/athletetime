@@ -1,23 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { WorkspaceRecoveryState } from '../components/WorkspaceRecoveryState'
 import { WorkspaceReviewContent } from '../components/WorkspaceReviewContent'
+import { reconcileRecordWorkspaceSubjectKeys } from '../recordWorkspacePreviewPages'
 import { useRecordWorkspacePreview } from '../useRecordWorkspacePreview'
 import { useRecordWorkspaceStore } from '../useRecordWorkspaceStore'
 import { workspaceCreatedNavigation, workspaceResetToSearchNavigation } from '../workspaceNavigation'
+
+const EMPTY_SUBJECT_KEYS: readonly string[] = []
 
 export default function RecordWorkspaceReviewPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const store = useRecordWorkspaceStore()
   const draft = store.workspaceDraft
-  const subjectKeys = draft?.subjectKeys ?? []
+  const subjectKeys = draft?.subjectKeys ?? EMPTY_SUBJECT_KEYS
+  const saveWorkspaceDraft = store.saveWorkspaceDraft
   const previewQuery = useRecordWorkspacePreview(subjectKeys)
+  const preview = previewQuery.preview
+  const reconciledSubjectKeys = useMemo(
+    () => preview
+      ? reconcileRecordWorkspaceSubjectKeys(subjectKeys, preview.resolvedSubjectKeys)
+      : subjectKeys,
+    [preview, subjectKeys],
+  )
   const [title, setTitle] = useState('기록 모음')
   const [notice, setNotice] = useState('')
   const [busy, setBusy] = useState(false)
   const workspaceDraftQuery = readWorkspaceDraftQuery(location.state)
+
+  useEffect(() => {
+    if (!preview || reconciledSubjectKeys === subjectKeys) return
+    saveWorkspaceDraft(reconciledSubjectKeys)
+  }, [preview, reconciledSubjectKeys, saveWorkspaceDraft, subjectKeys])
+
   const clearSelectionAndSearch = () => {
     store.clearWorkspaceDraft()
     navigate(workspaceResetToSearchNavigation.to, {
@@ -33,10 +50,10 @@ export default function RecordWorkspaceReviewPage() {
       </ReviewShell>
     )
   }
-  if (previewQuery.isPending && !previewQuery.preview) {
+  if (previewQuery.isPending && !preview) {
     return <ReviewShell onClearSelection={clearSelectionAndSearch}><WorkspaceRecoveryState kind="loading" /></ReviewShell>
   }
-  if (previewQuery.isError || !previewQuery.preview) {
+  if (previewQuery.isError || !preview) {
     return (
       <ReviewShell onClearSelection={clearSelectionAndSearch}>
         <WorkspaceRecoveryState
@@ -48,9 +65,8 @@ export default function RecordWorkspaceReviewPage() {
     )
   }
 
-  const preview = previewQuery.preview
   const removeSubject = (subjectKey: string) => {
-    const next = subjectKeys.filter((key) => key !== subjectKey)
+    const next = reconciledSubjectKeys.filter((key) => key !== subjectKey)
     if (next.length === 0) {
       store.clearWorkspaceDraft()
       navigate(workspaceResetToSearchNavigation.to, {
@@ -59,12 +75,12 @@ export default function RecordWorkspaceReviewPage() {
       })
       return
     }
-    const result = store.saveWorkspaceDraft(next)
+    const result = saveWorkspaceDraft(next)
     setNotice(result.ok ? '선택에서 뺐어요.' : '선택을 바꾸지 못했어요.')
   }
   const confirmWorkspace = () => {
     setBusy(true)
-    const result = store.createWorkspace({ subjectKeys, title: title.trim() })
+    const result = store.createWorkspace({ subjectKeys: reconciledSubjectKeys, title: title.trim() })
     setBusy(false)
     if (!result.ok) {
       setNotice(result.reason === 'workspace_limit'
@@ -95,7 +111,7 @@ export default function RecordWorkspaceReviewPage() {
         onRemoveSubject={removeSubject}
         onTitleChange={setTitle}
         preview={preview}
-        subjectKeys={subjectKeys}
+        subjectKeys={reconciledSubjectKeys}
         title={title}
       />
       {notice.includes('20개') && (

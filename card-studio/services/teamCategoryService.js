@@ -9,13 +9,6 @@ const CATEGORY_ORDER = [
   'unclassified',
 ];
 
-const LEVEL_CATEGORIES = new Map([
-  ['university', 'university'],
-  ['high', 'high'],
-  ['middle', 'middle'],
-  ['elementary', 'elementary'],
-]);
-
 const TEAM_SIGNATURES = [
   ['elementary', /초등학교|초등|초교/u],
   ['middle', /중학교|중학|중등/u],
@@ -31,19 +24,8 @@ function classifyRecord(record, overrides = overrideConfig, normalizedTeamLabel 
     return classification(override.category, 1, ['operator_override:reviewed']);
   }
 
-  const divisionLevel = clean(record.divisionLevel).toLowerCase();
-  const divisionCategory = LEVEL_CATEGORIES.get(divisionLevel);
-  if (divisionCategory) return classification(divisionCategory, 1, [`division_level:${divisionLevel}`]);
-
   const teamSignature = TEAM_SIGNATURES.find(([, pattern]) => pattern.test(teamLabel));
   if (teamSignature) return classification(teamSignature[0], 0.9, [`team_signature:${teamSignature[0]}`]);
-
-  const competitionEvidence = [record.rawDivision, record.divisionLabel, record.competitionName]
-    .map(clean)
-    .join(' ');
-  if (divisionLevel === 'general' && /실업/u.test(competitionEvidence)) {
-    return classification('corporate', 0.75, ['general_division_with_corporate_evidence']);
-  }
 
   return classification('unclassified', 0, ['insufficient_evidence']);
 }

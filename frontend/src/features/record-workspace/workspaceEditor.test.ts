@@ -4,6 +4,7 @@ import { RecordWorkspaceSchema } from './model'
 import {
   createWorkspaceEditorState,
   hideSelectedWorkspaceRecords,
+  reconcileWorkspaceEditorSubjectKeys,
   removeWorkspaceSubject,
   restoreAllWorkspaceRecords,
   toggleWorkspaceRecordSelection,
@@ -24,9 +25,10 @@ const workspace = RecordWorkspaceSchema.parse({
   updatedAt: '2026-07-31T01:00:00.000Z',
 })
 
-function record(id: string): PublicRecord {
+function record(id: string, recordIdAliases: readonly string[] = []): PublicRecord & { readonly recordIdAliases: readonly string[] } {
   return {
     id,
+    recordIdAliases,
     athleteKey: KEY_A,
     name: '김선수',
     team: '서울중',
@@ -41,7 +43,7 @@ function record(id: string): PublicRecord {
     gender: 'men',
     divisionLevel: 'middle',
     divisionDetail: null,
-    rawDivision: '남자 중등부',
+    sourceDivisionLabel: '남자 중등부',
     phase: 'final',
     record: '11.20',
     recordValue: 11.2,
@@ -114,5 +116,46 @@ describe('record workspace editor state', () => {
     expect(restored.excludedRecordIds).toEqual([])
     expect(restored.undo).not.toBeNull()
     expect(records).toHaveLength(2)
+  })
+
+  it('keeps a record hidden when storage contains either historical opaque ID', () => {
+    const records = [record('0123456789abcdef', ['fedcba9876543210'])]
+
+    const visible = visibleWorkspaceRecords(records, ['fedcba9876543210'])
+
+    expect(visible).toEqual([])
+  })
+
+  it('removes a canonical subject after reconciling a saved legacy key', () => {
+    // Given a saved workspace with one uniquely resolved legacy alias and one unresolved alias.
+    const legacyWorkspace = RecordWorkspaceSchema.parse({
+      ...workspace,
+      subjectKeys: ['at_legacy_runner', 'at_ambiguous_runner'],
+    })
+    const initial = createWorkspaceEditorState(legacyWorkspace)
+
+    // When successful preview mappings reconcile storage and the canonical row is removed.
+    const reconciled = reconcileWorkspaceEditorSubjectKeys(initial, [
+      { requestedSubjectKey: 'at_legacy_runner', athleteKey: KEY_A },
+    ])
+    const removed = removeWorkspaceSubject(reconciled, KEY_A)
+
+    // Then canonical removal works while the unresolved alias was never auto-selected.
+    expect(reconciled.subjectKeys).toEqual([KEY_A, 'at_ambiguous_runner'])
+    expect(removed.subjectKeys).toEqual(['at_ambiguous_runner'])
+  })
+
+  it('persists every canonical candidate after reconciling an ambiguous saved legacy key', () => {
+    const legacyWorkspace = RecordWorkspaceSchema.parse({
+      ...workspace,
+      subjectKeys: ['at_ambiguous_runner'],
+    })
+
+    const reconciled = reconcileWorkspaceEditorSubjectKeys(createWorkspaceEditorState(legacyWorkspace), [
+      { requestedSubjectKey: 'at_ambiguous_runner', athleteKey: KEY_A },
+      { requestedSubjectKey: 'at_ambiguous_runner', athleteKey: KEY_B },
+    ])
+
+    expect(reconciled.subjectKeys).toEqual([KEY_A, KEY_B])
   })
 })

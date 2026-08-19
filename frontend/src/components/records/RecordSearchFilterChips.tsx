@@ -1,6 +1,7 @@
 export type RecordSearchFilterOption = {
   readonly label: string;
-  readonly count: number;
+  readonly value?: string;
+  readonly count?: number;
 };
 
 type RecordSearchFilterChipsProps = {
@@ -19,31 +20,37 @@ export function RecordSearchFilterChips({
   if (options.length === 0) return null;
 
   return (
-    <div className="mt-4">
-      <p className="text-xs font-semibold text-ink-3">{title}</p>
+    <fieldset className="mt-4 min-w-0">
+      <legend className="text-xs font-semibold text-ink-3">{title}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         <button
           type="button"
+          aria-label={`${title} 전체`}
           aria-pressed={!selected}
           onClick={() => onSelect('')}
           className={filterClass(!selected)}
         >
           전체
         </button>
-        {options.slice(0, 8).map((option) => (
+        {options.map((option) => {
+          const value = option.value ?? option.label;
+          return (
           <button
-            key={option.label}
+            key={value}
             type="button"
-            aria-pressed={selected === option.label}
-            onClick={() => onSelect(option.label)}
-            className={filterClass(selected === option.label)}
+            aria-pressed={selected === value}
+            onClick={() => onSelect(value)}
+            className={filterClass(selected === value)}
           >
             {option.label}
-            <span className="ml-1 font-mono text-[10px] opacity-65">{option.count}</span>
+            {option.count !== undefined && (
+              <span className="ml-1 font-mono text-[10px] opacity-65">{option.count}</span>
+            )}
           </button>
-        ))}
+          );
+        })}
       </div>
-    </div>
+    </fieldset>
   );
 }
 

@@ -368,7 +368,12 @@ test('Given direct chat and write transports When no request body or upload fixt
   assert.equal(websocket.status, 101, 'the live chat websocket must upgrade');
 });
 
-test('Given a guest on preparation routes When mobile and desktop widths are used Then recovery links replace interaction forms', { timeout: 90_000 }, async () => {
+test('Given a guest on preparation routes When mobile and desktop widths are used Then recovery links replace interaction forms', {
+  timeout: 90_000,
+  skip: process.env.RECORDS_BROWSER_TESTS !== '1'
+    ? 'browser-only launch interaction gate; set RECORDS_BROWSER_TESTS=1'
+    : false,
+}, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await navigateToReady(page, `${baseUrl}/community`, page.getByRole('heading', { name: '커뮤니티는 준비 중이에요', exact: true }));

@@ -42,10 +42,10 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await expectVisible(page.getByText('확인된 기간', { exact: true }).first());
     await expectVisible(page.getByText('출처 범위', { exact: true }).first());
     await candidateButtons.filter({ hasText: 'Seoul High' }).click();
-    await expectUrlParam(page, 'mineDraft', 'alpha-2016');
+    await expectUrlParam(page, 'mineDraft', 'at_alpha_2016');
     await waitForSelectedCandidateCount(page, 1);
     await candidateButtons.filter({ hasText: 'Seoul Track Club' }).click();
-    await expectUrlParam(page, 'mineDraft', 'alpha-2020');
+    await expectUrlParam(page, 'mineDraft', 'at_alpha_2020');
     await waitForSelectedCandidateCount(page, 2);
     assert.equal(await selectedCandidateCount(page), 2, 'selected draft candidates are reflected in the DOM');
     visited.push(page.url());
@@ -57,7 +57,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.goForward();
     await page.waitForURL(/step=candidates/);
     await expectVisible(page.locator('[data-records-step="mine-candidates"]'));
-    await expectUrlParam(page, 'mineDraft', 'alpha-2016');
+    await expectUrlParam(page, 'mineDraft', 'at_alpha_2016');
     assert.equal(await selectedCandidateCount(page), 2, 'browser Forward restores selected draft candidates');
 
     await page.locator('[data-records-sticky-cta="mine-candidates"] button').click();
@@ -97,9 +97,9 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
       'each saved candidate keeps its own record destination',
     );
     assert.equal(await doneActions.count(), 2, 'completion keeps only collection-wide actions in the sticky area');
-    assert.equal(await viewSelectedAthlete.getAttribute('href'), '/records/athletes/alpha-2016');
+    assert.equal(await viewSelectedAthlete.getAttribute('href'), '/records/athletes/at_alpha_2016');
     await viewSelectedAthlete.click();
-    await page.waitForURL(/\/records\/athletes\/alpha-2016/u);
+    await page.waitForURL(/\/records\/athletes\/at_alpha_2016/u);
     await expectVisible(page.getByRole('button', { name: '결과로 돌아가기', exact: true }));
     visited.push(page.url());
     await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).click();
@@ -162,7 +162,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     assert.equal(await page.getByRole('button', { name: /시즌 기록표/ }).count(), 0);
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?athlete=alpha-2016`, page.locator('text=기록 한눈에'));
+    await navigateToReady(page, `${baseUrl}/records?athlete=at_alpha_2016`, page.locator('text=기록 한눈에'));
     await expectVisible(page.locator('text=Alpha Kim'));
     await expectVisible(page.locator('text=기록 한눈에'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'athlete shared link bypasses the hub');
@@ -175,10 +175,10 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     await page.getByRole('button', { name: '기록 링크 공유', exact: true }).click();
     await expectVisible(page.getByText('공유 링크를 복사했어요.', { exact: true }));
     const copiedRecordLink = await page.evaluate(() => window.__copiedRecordLink);
-    assert.equal(copiedRecordLink, `${baseUrl}/records/athletes/alpha-2016`, 'legacy panel shares the canonical athlete page');
+    assert.equal(copiedRecordLink, `${baseUrl}/records/athletes/at_alpha_2016`, 'legacy panel shares the canonical athlete page');
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.locator('[data-record-row]').first());
+    await navigateToReady(page, `${baseUrl}/records/athletes/at_alpha_2016`, page.locator('[data-record-row]').first());
     await expectVisible(page.locator('[data-record-row]').first());
     await expectVisible(page.getByRole('button', { name: '이 선수 임시 선택하기', exact: true }));
     await expectVisible(page.getByText('같은 이름의 다른 선수일 수 있어요.', { exact: false }));
@@ -203,7 +203,7 @@ test('RECORDS-FLOW-E2E Given /records When using Mine, Browse, and shared links 
     );
     visited.push(page.url());
 
-    await navigateToReady(page, `${baseUrl}/records?compare=alpha-2016,beta-2016`, page.locator('text=기록 나란히 보기'));
+    await navigateToReady(page, `${baseUrl}/records?compare=at_alpha_2016,at_beta_2016`, page.locator('text=기록 나란히 보기'));
     await expectVisible(page.locator('text=기록 나란히 보기'));
     assert.equal(await page.locator('[data-records-flow="hub"]').count(), 0, 'compare shared link bypasses the hub');
     visited.push(page.url());
@@ -225,13 +225,13 @@ test('TEAM-FLOW-E2E Given neutral team browse When searching and opening a team 
 
     // Then teams from different inferred categories remain visible in the neutral result set.
     await expectVisible(page.getByText('개인 기록은 보여주지 않아요.', { exact: false }));
-    await expectVisible(page.getByRole('link', { name: '진도군청 팀 통계 보기' }));
-    await expectVisible(page.getByRole('link', { name: '전남진도초등학교 팀 통계 보기' }));
+    await expectVisible(page.getByRole('link', { name: '진도군청 소속 통계 보기' }));
+    await expectVisible(page.getByRole('link', { name: '전남진도초등학교 소속 통계 보기' }));
     assert.equal(new URL(page.url()).searchParams.get('category'), null);
     visited.push(page.url());
 
     // When one result is opened, the branch backend supplies its aggregate detail.
-    await page.getByRole('link', { name: '진도군청 팀 통계 보기' }).click();
+    await page.getByRole('link', { name: '진도군청 소속 통계 보기' }).click();
     await page.waitForURL(/\/records\/teams\/[a-f0-9]{16}/u);
     await expectVisible(page.locator('[data-team-performance-page]'));
     await expectVisible(page.getByRole('heading', { name: '진도군청' }));

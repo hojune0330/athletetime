@@ -1,5 +1,7 @@
 # Division Hierarchy Track I Evidence
 
+> Historical evidence; current production contract is recorded below.
+
 Date: 2026-07-09
 
 ## Scope
@@ -8,7 +10,7 @@ Track I prerequisite for legacy 2005-2014 data expansion:
 
 - Replace source-specific division keys such as `kaaf-kind-*` with canonical gender/level hierarchy keys.
 - Preserve manual TOP100 ingestion counts.
-- Add gender rollups such as `men-all` and `women-all`.
+- Historical capture includes men-all and women-all; current production has no all rollups and uses neutral level-specific keys.
 - Keep composite labels such as `남초,여초` out of one-sided gender rollups.
 - Preserve grade-only levels such as `고 1학년부` and `중 1학년부` as high/middle hierarchy rows even when gender is absent.
 - Expose fixed division level order to the records UI.
@@ -32,7 +34,8 @@ Track I prerequisite for legacy 2005-2014 data expansion:
   - `/api/card-studio/analytics/season-records` 200
   - `/records` 200
   - no `kaaf-kind-*` keys
-  - default selection: `2026 / marathon / men-all`, `rowCount: 84`
+  - default selection: `2026 / marathon / men-all`, `rowCount: 84` (historical capture; superseded)
+  - current default selection: `2026 / marathon / men-unspecified`, `rowCount: 84`
 - Browser QA: `.omo/evidence/division-hierarchy/browser-qa-summary-final.json`
   - opened `/records`
   - clicked `시즌 기록표 보기`
@@ -57,3 +60,38 @@ Track I prerequisite for legacy 2005-2014 data expansion:
 
 - No source originals or raw private data were added.
 - 2016 held workbook and 2005-2014 `.xls` conversion remain follow-up data expansion tracks after this prerequisite is reviewed/merged.
+
+
+## Current contract note (2026-08-18)
+
+Historical artifacts below remain unchanged evidence of the 2026-07-09 run. Current
+production fallback is segmented by gender+division level, with no `*-all` rollups.
+Public records omit `rawDivision`; safe `sourceDivisionLabel` is detail-only.
+Legacy aliases canonicalize only when unique; ambiguous aliases return
+`multiple_candidates` explicitly.
+
+### Documentation refresh gate (2026-08-18)
+
+- Scenario: four-document contract scan; invocation: PowerShell per-file required-term assertions; observable: `CONTRACT_TERMS=PASS`, `EVIDENCE_LINKS=PASS`, `PARENT_DOC_LINKS=PASS`, exit 0.
+- Scenario: stale-term/history and scope scan; invocation: `rg` plus `git diff --check` on the four owned paths; observable: `STALE_TERMS_REPORTED_FOR_HISTORICAL_CONTEXT=PASS`, `OWNED_FILES_ONLY=PASS`, `DIFF_CHECK=PASS`, exit 0.
+- Captured artifact: this summary (`.omo/evidence/division-hierarchy/summary.md`); referenced evidence artifacts above were present and non-empty.
+
+### Stop-hook verification (2026-08-18)
+
+Invocation: PowerShell contract-term assertions, evidence/link existence checks,
+`git diff --name-only`, `git diff --check`, and `rg` stale-term scan over the
+four owned paths. Direct output:
+
+```text
+CONTRACT_TERMS=PASS
+EVIDENCE_ARTIFACTS_NONEMPTY=PASS
+PARENT_DOC_LINKS=PASS
+OWNED_FILES_ONLY=PASS
+DIFF_CHECK=PASS
+STALE_MATCH_COUNT=16
+STALE_MATCHES_ARE_IN_HISTORICAL_OR_CURRENT-CONTRACT-NOTES=PASS
+EXIT_CODE=0
+```
+
+Judgment: all 16 stale-term matches are historical or current-contract notes;
+no current contract claims `*-all` or public `rawDivision`.

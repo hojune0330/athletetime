@@ -12,7 +12,7 @@ function listTestFiles(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const filePath = path.join(directory, entry.name);
     if (entry.isDirectory()) return listTestFiles(filePath);
-    return entry.name.endsWith('.test.js') ? [filePath] : [];
+    return entry.name.endsWith('.js') ? [filePath] : [];
   });
 }
 
@@ -23,8 +23,10 @@ test('TEST-CLEANUP-BOUNDARY-001: test commands and cleanup helpers never target 
   assert.doesNotMatch(testCommand, /\bgit\s+clean\b|\bgit\s+worktree\s+remove\b|\bRemove-Item\b|\brm\s+-rf\b/u);
 
   const directRepositoryDeletion = /(?:fs\.rmSync|fs\.promises\.rm|fs\.rmdirSync)\(\s*(?:process\.cwd\(\)|ROOT|FRONTEND|path\.resolve\(\s*process\.cwd\(\)\s*\))/u;
+  const configuredEvidenceDeletion = /(?:fs\.rmSync|fs\.promises\.rm|fs\.rmdirSync)\(\s*EVIDENCE_DIR/u;
   for (const filePath of listTestFiles(TEST_DIRECTORY)) {
     const source = fs.readFileSync(filePath, 'utf8');
     assert.doesNotMatch(source, directRepositoryDeletion, `${path.relative(ROOT, filePath)} must only clean an isolated test artifact`);
+    assert.doesNotMatch(source, configuredEvidenceDeletion, `${path.relative(ROOT, filePath)} must not delete a caller-configured evidence directory`);
   }
 });

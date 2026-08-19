@@ -58,10 +58,14 @@ export function MyRecordsCard({ entries, onClose, onRemove }: Props) {
     if (keys.length === 0) return;
     let cancelled = false;
     setState('loading');
-    Promise.all(keys.map((key) => getAthleteAnalytics(key).catch(() => null)))
+    Promise.allSettled(keys.map((key) => getAthleteAnalytics(key)))
       .then((results) => {
         if (cancelled) return;
-        const loaded = results.filter((p): p is AthleteAnalyticsProfile => p !== null);
+        const loaded: AthleteAnalyticsProfile[] = results.flatMap((result) => (
+          result.status === 'fulfilled' && result.value.kind === 'profile'
+            ? [result.value.profile]
+            : []
+        ));
         setProfiles(loaded);
         setState(loaded.length > 0 ? 'ready' : 'error');
       });

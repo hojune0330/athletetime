@@ -14,8 +14,9 @@ type RecordRowProps = {
 }
 
 function rankLabel(rank: number | null) {
-  return rank === null ? '순위 미상' : `${rank}위`
+  return rank === null ? '순위 미상' : String(rank) + '위'
 }
+
 
 export function RecordRow({
   mode,
@@ -27,6 +28,11 @@ export function RecordRow({
 }: RecordRowProps) {
   const display = resolveRecordDisplay(record.record, record.note)
   const selectionMode = mode === 'select'
+  const divisionLabel = record.divisionLabel.trim() || '확인 안 됨'
+  const actionLabel = selectionMode
+    ? record.competitionName + ' 기록 ' + (selected ? '선택 해제' : '선택')
+    : record.competitionName + ' 기록 상세 보기'
+  const ariaLabel = actionLabel + '. 부문 ' + divisionLabel
   const onClick = () => {
     if (selectionMode) {
       onToggleSelection?.(record)
@@ -38,9 +44,7 @@ export function RecordRow({
   return (
     <button
       type="button"
-      aria-label={selectionMode
-        ? `${record.competitionName} 기록 ${selected ? '선택 해제' : '선택'}`
-        : `${record.competitionName} 기록 상세 보기`}
+      aria-label={ariaLabel}
       aria-pressed={selectionMode ? selected : undefined}
       className={cn(
         'grid min-h-11 w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 px-4 py-3 text-left',
@@ -56,11 +60,7 @@ export function RecordRow({
       <span className="min-w-0 truncate text-body-sm font-semibold text-ink">
         {record.competitionName}
       </span>
-      <span className={cn(
-        showSubjectContext ? 'row-span-3' : 'row-span-2',
-        'flex shrink-0 flex-col items-end justify-center font-mono',
-        '[font-variant-numeric:tabular-nums]',
-      )}>
+      <span className="row-span-3 flex shrink-0 flex-col items-end justify-center font-mono [font-variant-numeric:tabular-nums]">
         {!display.hasMark && (
           <span className="mb-0.5 border border-line bg-surface-2 px-1.5 py-0.5 text-[10px] font-semibold text-ink-3">
             경기 상태
@@ -72,6 +72,11 @@ export function RecordRow({
         )}>
           {display.text}
         </span>
+      </span>
+      <span
+        className="min-w-0 break-words text-caption text-ink-3"
+      >
+        부문 · {divisionLabel}
       </span>
       {showSubjectContext && (
         <span className="min-w-0 truncate text-caption text-ink-3">

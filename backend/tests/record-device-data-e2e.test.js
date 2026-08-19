@@ -6,7 +6,7 @@ test('RECORDS-DEVICE-CLEAR-E2E Given one protected local record choice When clea
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('athletetime.my-athlete.v2', JSON.stringify([{
-        athleteKey: 'alpha-2016',
+        athleteKey: 'at_alpha_2016',
         name: 'Alpha Kim',
         team: 'Seoul High',
         savedAt: '2026-08-11T00:00:00.000Z',

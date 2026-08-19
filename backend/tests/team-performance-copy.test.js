@@ -7,6 +7,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const TEAM_SURFACE_FILES = [
   'frontend/src/components/records/TeamStatisticsResults.tsx',
   'frontend/src/features/team-performance/TeamCategoryFilter.tsx',
+  'frontend/src/features/team-performance/teamCategoryLabels.ts',
   'frontend/src/features/team-performance/TeamPerformancePage.tsx',
   'frontend/src/features/team-performance/TeamPerformanceSummary.tsx',
 ];
@@ -54,10 +55,10 @@ test('Given public team statistics When claims and actions are scanned Then pers
 test('Given the shared records layout When the team page is inspected Then landmarks and filters remain accessible', () => {
   // Given a page nested inside the application main landmark.
   const page = read('frontend/src/features/team-performance/TeamPerformancePage.tsx');
-  const filter = read('frontend/src/features/team-performance/TeamCategoryFilter.tsx');
+  const filter = [read('frontend/src/features/team-performance/TeamCategoryFilter.tsx'), read('frontend/src/features/team-performance/teamCategoryLabels.ts')].join('\n');
 
   // When landmark and filter contracts are inspected.
-  const categories = ['전체', '실업팀', '대학팀', '고등부', '중등부', '초등부', '분류 확인 중'];
+  const categories = ['전체', '실업·기관 소속', '대학 소속', '고교 소속', '중학교 소속', '초등학교 소속', '소속 유형 미확인'];
 
   // Then the page adds no nested main and every fixed category remains keyboard-readable.
   assert.doesNotMatch(page, /<main\b/u);

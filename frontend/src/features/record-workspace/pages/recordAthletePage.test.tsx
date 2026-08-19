@@ -1,14 +1,14 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { PublicRecord } from '@/api/recordAnalytics'
-import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
+import type { RecordWorkspacePreview, RecordWorkspaceRecord } from '@/api/recordWorkspace'
 import { RecordAthleteRecordTab } from './RecordAthleteRecordTab'
 import { mergeRecordAthletePreviewPages } from '../useRecordAthletePreview'
 
-function record(index: number): PublicRecord {
+function record(index: number): RecordWorkspaceRecord {
   const season = index < 25 ? 2026 : 2025
   return {
     id: `record-${String(index).padStart(3, '0')}`,
+    recordIdAliases: [],
     athleteKey: '1111111111111111',
     name: '김선수',
     team: '서울고',
@@ -23,7 +23,7 @@ function record(index: number): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: '남자 고등부',
-    rawDivision: '남자고등부',
+    sourceDivisionLabel: '남자고등부',
     phase: index % 2 === 0 ? '예선' : '결승',
     record: `${10 + index / 100}`,
     recordValue: 10 + index / 100,
@@ -42,7 +42,7 @@ function record(index: number): PublicRecord {
   }
 }
 
-function preview(records: readonly PublicRecord[], total: number, hasMore: boolean): RecordWorkspacePreview {
+function preview(records: readonly RecordWorkspaceRecord[], total: number, hasMore: boolean): RecordWorkspacePreview {
   return {
     subjects: [{
       athleteKey: '1111111111111111',
@@ -55,6 +55,10 @@ function preview(records: readonly PublicRecord[], total: number, hasMore: boole
       recordCount: total,
       ambiguity: 'name_team',
       note: '',
+    }],
+    resolvedSubjectKeys: [{
+      requestedSubjectKey: '1111111111111111',
+      athleteKey: '1111111111111111',
     }],
     unavailableSubjectKeys: [],
     identity: { displayName: '김선수', distinctNames: ['김선수'], warning: 'none' },

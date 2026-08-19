@@ -78,10 +78,16 @@ export function CompareView({
     setLoaded([]);
     setOutcome({ kind: 'loading' });
     Promise.allSettled(
-      keys.map((athleteKey) => getAthleteAnalytics(athleteKey).then((profile): Loaded => ({ athleteKey, profile }))),
+      keys.map((athleteKey) => getAthleteAnalytics(athleteKey).then((result): Loaded | null => (
+        result.kind === 'profile'
+          ? { athleteKey, profile: result.profile }
+          : null
+      ))),
     ).then((results) => {
       if (!active) return;
-      const availableProfiles = results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []));
+      const availableProfiles = results.flatMap((result) => (
+        result.status === 'fulfilled' && result.value ? [result.value] : []
+      ));
       setLoaded(availableProfiles);
       setOutcome(resolveComparisonRequestOutcome(keys.length, availableProfiles.length));
     });

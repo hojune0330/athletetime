@@ -1,9 +1,12 @@
 const recordAnalyticsService = require('./recordAnalyticsService');
+const divisionHierarchyService = require('./divisionHierarchyService');
 const {
   RecordWorkspacePreviewError,
   encodeCursor,
   parseRecordWorkspacePreviewInput,
 } = require('./recordWorkspacePreviewInput');
+
+const OPAQUE_RECORD_ID_PATTERN = /^[a-f0-9]{16}$/u;
 
 function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService.getIndex } = {}) {
   return {
@@ -14,14 +17,28 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
       if (!(athleteByKey instanceof Map)) throw new Error('Public analytics index is unavailable.');
 
       const subjects = [];
+      const resolvedAthleteKeys = new Set();
+      const resolvedSubjectKeys = [];
       const unavailableSubjectKeys = [];
       for (const subjectKey of request.subjectKeys) {
-        const athlete = athleteByKey.get(subjectKey);
-        if (!athlete) {
+        const directAthlete = athleteByKey.get(subjectKey);
+        const aliasCandidates = directAthlete ? null : index.legacyAthleteAliasesByKey?.get(subjectKey);
+        const athletes = directAthlete
+          ? [directAthlete]
+          : [...(aliasCandidates instanceof Set ? aliasCandidates : [])]
+            .sort()
+            .map((candidateKey) => athleteByKey.get(candidateKey))
+            .filter(Boolean);
+        if (athletes.length === 0) {
           unavailableSubjectKeys.push(subjectKey);
           continue;
         }
-        subjects.push(toSubject(athlete));
+        for (const athlete of athletes) {
+          resolvedSubjectKeys.push({ requestedSubjectKey: subjectKey, athleteKey: athlete.athleteKey });
+          if (resolvedAthleteKeys.has(athlete.athleteKey)) continue;
+          resolvedAthleteKeys.add(athlete.athleteKey);
+          subjects.push(toSubject(athlete));
+        }
       }
 
       if (subjects.length === 0) throw new RecordWorkspacePreviewError('WORKSPACE_NOT_AVAILABLE', 404);
@@ -33,6 +50,7 @@ function createRecordWorkspacePreviewService({ getIndex = recordAnalyticsService
 
       return {
         subjects,
+        resolvedSubjectKeys,
         unavailableSubjectKeys,
         identity: buildIdentity(subjects),
         affiliations: buildAffiliations(records),
@@ -174,6 +192,14 @@ function pickBest(records) {
 function toPublicRecord(record) {
   return {
     id: record.id,
+    recordIdAliases: [...new Set(
+      (Array.isArray(record.recordIdAliases) ? record.recordIdAliases : [])
+        .filter((recordId) => (
+          typeof recordId === 'string'
+          && recordId !== record.id
+          && OPAQUE_RECORD_ID_PATTERN.test(recordId)
+        )),
+    )].slice(0, 1),
     athleteKey: record.athleteKey,
     name: cleanText(record.name, 100),
     team: cleanText(record.team, 100),
@@ -188,7 +214,7 @@ function toPublicRecord(record) {
     gender: cleanText(record.gender, 20),
     divisionLevel: cleanText(record.divisionLevel, 40),
     divisionDetail: cleanText(record.divisionDetail, 120) || null,
-    rawDivision: cleanText(record.rawDivision, 120),
+    sourceDivisionLabel: divisionHierarchyService.toPublicSourceDivisionLabel(record.sourceDivisionLabel),
     phase: cleanText(record.phase, 60),
     record: cleanText(record.recordDisplay, 40),
     recordValue: Number(record.recordValue) || 0,

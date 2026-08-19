@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:check": "tsc -b && vite build",
     "lint": "eslint .",
+    "lint:division-navigation": "eslint src/api/recordAnalytics.ts src/api/recordAnalyticsSchemas.ts src/api/recordAnalytics.boundary.test.ts src/components/record-insights src/components/records src/features/record-workspace/season-navigation src/features/record-workspace/components/RecordCandidateCard.tsx src/features/record-workspace/components/RecordCandidateList.tsx src/features/record-workspace/components/RecordDetailSheet.tsx src/features/record-workspace/components/RecordRow.tsx src/features/record-workspace/components/candidateList.test.tsx src/features/record-workspace/components/divisionVisibility.test.tsx src/features/record-workspace/grouping.test.tsx src/features/record-workspace/pages/recordAthletePage.test.tsx src/features/record-workspace/pages/workspacePages.test.tsx src/features/record-workspace/workspaceEditor.test.ts src/features/team-performance src/pages/RecordsPage.tsx src/pages/ChatPage/components/ChatHeader.tsx src/pages/ChatPage/components/MessageInput.tsx src/pages/ChatPage/components/MobileMenuButton.tsx --rule \"react-refresh/only-export-components: off\" --rule \"no-case-declarations: off\"",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

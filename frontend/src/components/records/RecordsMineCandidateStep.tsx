@@ -101,7 +101,7 @@ function CandidateRow({
       aria-pressed={selected}
       aria-label={`${athlete.name} 기록 ${selected ? '선택됨' : disabled ? '선택 한도 도달' : '선택 안 됨'}`}
       onClick={onToggle}
-      className={`flex w-full items-start justify-between gap-4 border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`flex min-h-11 w-full items-start justify-between gap-4 border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
         selected ? 'border-brand bg-brand/10' : 'border-line bg-surface hover:border-line-2 hover:bg-surface-2'
       }`}
       >

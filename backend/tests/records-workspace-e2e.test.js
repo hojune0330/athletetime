@@ -1,5 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { capturePage } = require('./division-navigation-e2e-capture');
+const { getLegacyAliasFixtureMetadata } = require('./records-flow-e2e-data');
 const { expectVisible, navigateToReady, withRecordsPage } = require('./records-flow-e2e-fixture');
 
 test('RECORDS-WORKSPACE-STORAGE-E2E Given blocked browser storage When opening saved-record management Then temporary storage and recovery stay visible', { timeout: 90_000 }, async () => {
@@ -131,18 +133,75 @@ test('RECORDS-WORKSPACE-E2E Given a saved record collection When it opens withou
   });
 });
 
+test('RECORDS-LEGACY-ALIAS-E2E Given an ambiguous saved subject and historical record ID When workspace and direct links open Then every candidate persists and the exact record recovers', { timeout: 120_000 }, async () => {
+  const fixture = getLegacyAliasFixtureMetadata();
+  const captures = [];
+  await withRecordsPage(async (state) => {
+    const { page, baseUrl, visited } = state;
+    await page.addInitScript(({ excludedRecordIdAlias, legacyAlias }) => {
+      window.localStorage.setItem('athletetime.recordWorkspaces.v1', JSON.stringify({
+        version: 1,
+        items: [{
+          id: '22222222-2222-4222-8222-222222222222',
+          title: 'Legacy recovery fixture',
+          subjectKeys: [legacyAlias],
+          excludedRecordIds: [excludedRecordIdAlias],
+          filter: {},
+          createdAt: '2026-08-18T00:00:00.000Z',
+          updatedAt: '2026-08-18T00:00:00.000Z',
+        }],
+      }));
+    }, fixture);
+
+    const sameNameWarning = page.getByText('같은 이름의 기록을 함께 보고 있습니다.', { exact: false });
+    await navigateToReady(
+      page,
+      `${baseUrl}/records/workspaces/22222222-2222-4222-8222-222222222222`,
+      sameNameWarning,
+    );
+    await page.waitForFunction((candidateKeys) => {
+      const saved = JSON.parse(window.localStorage.getItem('athletetime.recordWorkspaces.v1') || '{}');
+      return JSON.stringify(saved.items?.[0]?.subjectKeys) === JSON.stringify(candidateKeys);
+    }, fixture.candidateKeys);
+    assert.equal(await page.locator(`[data-record-row="${fixture.excludedRecordId}"]`).count(), 0);
+    await expectVisible(page.getByText('현재 49개 표시', { exact: false }));
+    await capturePage(state, {
+      anchor: sameNameWarning,
+      captures,
+      scenario: 'legacy-alias-saved-exclusion',
+    });
+
+    const detailUrl = `${baseUrl}/records/athletes/${fixture.legacyAlias}?record=${fixture.directRecordIdAlias}`;
+    const detailHeading = page.getByRole('heading', { name: `${fixture.targetEventLabel} · ${fixture.targetRecord}` });
+    await navigateToReady(page, detailUrl, detailHeading);
+    await page.waitForURL(new RegExp(`/records/athletes/${fixture.targetAthleteKey}`));
+    await expectVisible(detailHeading);
+    await capturePage(state, {
+      anchor: page.getByRole('dialog'),
+      captures,
+      scenario: 'legacy-alias-direct-detail',
+    });
+    visited.push(page.url());
+  }, {
+    fileName: 'legacy-alias-browser-results.json',
+    invocation: 'Node 22.17.1 --test backend/tests/records-workspace-e2e.test.js',
+    scenario: 'ambiguous legacy workspace exclusion and exact record detail recovery',
+  });
+});
+
 test('RECORDS-ATHLETE-RETURN-E2E Given an in-app candidate When its detail closes Then the original result context returns without entering the share URL', { timeout: 90_000 }, async () => {
   await withRecordsPage(async ({ page, baseUrl, visited }) => {
     const resultsUrl = `${baseUrl}/records?flow=browse&browse=athlete&q=Alpha`;
-    await navigateToReady(page, resultsUrl, page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
-    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
-    await page.getByRole('button', { name: /Alpha Kim 기록 보기/ }).first().click();
-    await page.waitForURL(/\/records\/athletes\/alpha-2016/u);
+    const alphaCandidate = page.locator('button[data-candidate-key="at_alpha_2016"]');
+    await navigateToReady(page, resultsUrl, alphaCandidate);
+    await expectVisible(alphaCandidate);
+    await alphaCandidate.click();
+    await page.waitForURL(/\/records\/athletes\/at_alpha_2016/u);
     await expectVisible(page.getByRole('button', { name: '결과로 돌아가기', exact: true }));
     await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).click();
     await page.waitForURL(/\/records\?flow=browse&browse=athlete&q=Alpha/u);
-    await expectVisible(page.getByRole('button', { name: /Alpha Kim 기록 보기/ }));
-    await navigateToReady(page, `${baseUrl}/records/athletes/alpha-2016`, page.getByRole('button', { name: '기록 찾기', exact: true }));
+    await expectVisible(alphaCandidate);
+    await navigateToReady(page, `${baseUrl}/records/athletes/at_alpha_2016`, page.getByRole('button', { name: '기록 찾기', exact: true }));
     await expectVisible(page.getByRole('button', { name: '기록 찾기', exact: true }));
     assert.equal(await page.getByRole('button', { name: '결과로 돌아가기', exact: true }).count(), 0);
     visited.push(page.url());

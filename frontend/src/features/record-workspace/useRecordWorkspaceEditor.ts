@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import type { PublicRecord } from '@/api/recordAnalytics'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { RecordWorkspaceRecord, RecordWorkspaceResolvedSubjectKey } from '@/api/recordWorkspace'
+import { reconcileRecordWorkspaceSubjectKeys } from './recordWorkspacePreviewPages'
 import type { RecordWorkspace, WorkspaceUpdate } from './storage'
 
 type WorkspaceUndo = {
@@ -81,6 +82,28 @@ export function removeWorkspaceSubject(state: WorkspaceEditorState, subjectKey: 
   }
 }
 
+export function reconcileWorkspaceEditorSubjectKeys(
+  state: WorkspaceEditorState,
+  resolvedSubjectKeys: readonly RecordWorkspaceResolvedSubjectKey[],
+): WorkspaceEditorState {
+  const subjectKeys = reconcileRecordWorkspaceSubjectKeys(state.subjectKeys, resolvedSubjectKeys)
+  const previousSubjectKeys = state.undo
+    ? reconcileRecordWorkspaceSubjectKeys(state.undo.previousSubjectKeys, resolvedSubjectKeys)
+    : null
+  if (
+    subjectKeys === state.subjectKeys
+    && (!state.undo || previousSubjectKeys === state.undo.previousSubjectKeys)
+  ) return state
+
+  return {
+    ...state,
+    subjectKeys,
+    undo: state.undo && previousSubjectKeys
+      ? { ...state.undo, previousSubjectKeys }
+      : state.undo,
+  }
+}
+
 export function undoWorkspaceEdit(state: WorkspaceEditorState): WorkspaceEditorState {
   if (!state.undo) return state
   return {
@@ -113,11 +136,14 @@ export function restoreAllWorkspaceRecords(state: WorkspaceEditorState): Workspa
 }
 
 export function visibleWorkspaceRecords(
-  records: readonly PublicRecord[],
+  records: readonly RecordWorkspaceRecord[],
   excludedRecordIds: readonly string[],
-): readonly PublicRecord[] {
+): readonly RecordWorkspaceRecord[] {
   const excluded = new Set(excludedRecordIds)
-  return records.filter((record) => !excluded.has(record.id))
+  return records.filter((record) => (
+    !excluded.has(record.id)
+    && !record.recordIdAliases.some((recordId) => excluded.has(recordId))
+  ))
 }
 
 type UseRecordWorkspaceEditorOptions = {
@@ -127,12 +153,14 @@ type UseRecordWorkspaceEditorOptions = {
 
 export function useRecordWorkspaceEditor({ onPersist, workspace }: UseRecordWorkspaceEditorOptions) {
   const [state, setState] = useState(() => createWorkspaceEditorState(workspace))
+  const latestWorkspaceRef = useRef(workspace)
+  latestWorkspaceRef.current = workspace
 
   useEffect(() => {
-    setState(createWorkspaceEditorState(workspace))
+    setState(createWorkspaceEditorState(latestWorkspaceRef.current))
   }, [workspace.id])
 
-  const persist = (next: WorkspaceEditorState) => {
+  const persist = useCallback((next: WorkspaceEditorState) => {
     if (onPersist({
       excludedRecordIds: next.excludedRecordIds,
       subjectKeys: next.subjectKeys,
@@ -142,7 +170,14 @@ export function useRecordWorkspaceEditor({ onPersist, workspace }: UseRecordWork
     }
     setState((current) => ({ ...current, announcement: '변경을 저장하지 못했어요.' }))
     return false
-  }
+  }, [onPersist])
+
+  const reconcileSubjectKeys = useCallback((
+    resolvedSubjectKeys: readonly RecordWorkspaceResolvedSubjectKey[],
+  ) => {
+    const next = reconcileWorkspaceEditorSubjectKeys(state, resolvedSubjectKeys)
+    return next === state || persist(next)
+  }, [persist, state])
 
   return {
     state,
@@ -154,7 +189,14 @@ export function useRecordWorkspaceEditor({ onPersist, workspace }: UseRecordWork
     })),
     clearFocusRecord: () => setState((current) => ({ ...current, focusRecordId: null })),
     hideSelected: () => persist(hideSelectedWorkspaceRecords(state)),
-    removeSubject: (subjectKey: string) => persist(removeWorkspaceSubject(state, subjectKey)),
+    reconcileSubjectKeys,
+    removeSubject: (
+      subjectKey: string,
+      resolvedSubjectKeys: readonly RecordWorkspaceResolvedSubjectKey[] = [],
+    ) => persist(removeWorkspaceSubject(
+      reconcileWorkspaceEditorSubjectKeys(state, resolvedSubjectKeys),
+      subjectKey,
+    )),
     restoreAll: () => persist(restoreAllWorkspaceRecords(state)),
     startSelection: () => setState((current) => ({ ...current, selectionMode: true })),
     toggleRecord: (recordId: string) => setState((current) => toggleWorkspaceRecordSelection(current, recordId)),

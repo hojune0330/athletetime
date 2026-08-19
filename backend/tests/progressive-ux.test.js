@@ -125,7 +125,8 @@ test('UX-COMBINE-003: workspace editing is unambiguous and record details stay o
   assert.match(page, /record\.rank/, 'per-record rank shown');
   assert.match(page, /간단히 보기|자세히 보기|detailToggleLabel/, 'toggle label');
   assert.match(page, /자료가 있는 대회 기록만 보여드려요/, 'coverage transparency');
-  assert.match(page, /연도와 대회별로 빠진 기록이 있을 수 있어요/, 'no continuous-coverage claim');
+  assert.match(page, /연도와 대회별로/, 'coverage scope stays explicit');
+  assert.match(page, /빠진 기록이 있을 수 있어요/, 'no continuous-coverage claim');
 });
 
 test('UX-COLLECT-004: the guided collection flow never defaults an identity or a merge', () => {

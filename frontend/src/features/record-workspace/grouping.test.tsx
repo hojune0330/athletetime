@@ -49,7 +49,7 @@ function fixtureRecord(eventIndex: number, recordIndex: number): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: '남자 고등부',
-    rawDivision: '남자고등부',
+    sourceDivisionLabel: '남자고등부',
     phase: recordIndex % 2 === 0 ? '예선' : '결승',
     record: isStatus ? '' : `${10 + recordIndex / 100}`,
     recordValue: isStatus ? 0 : 10 + recordIndex / 100,
@@ -177,6 +177,22 @@ describe('record workspace grouping', () => {
     // Then the row has one whole-row action and the bottom bar clears the mobile tab area.
     expect(row.match(/<button/g)).toHaveLength(1)
     expect(row).toContain(record.competitionName)
+    expect(row).toContain('부문 · 남자 고등부')
+
+    const aliasedDivisionRow = renderToStaticMarkup(
+      <RecordRow
+        mode="browse"
+        record={{
+          ...record,
+          sourceDivisionLabel: "남고",
+        }}
+        onOpen={() => undefined}
+      />,
+    )
+    expect(aliasedDivisionRow).toContain("부문 · 남자 고등부")
+    expect(aliasedDivisionRow).not.toContain("원문 표기")
+    expect(aliasedDivisionRow).not.toContain("남고")
+
     expect(row).not.toContain('풍속')
     expect(bar).toContain('2개 선택')
     expect(bar).toContain('safe-area-inset-bottom')

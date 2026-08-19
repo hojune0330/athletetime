@@ -9,7 +9,7 @@ import {
   parseTeamKey,
 } from './teamPerformanceContracts'
 import type { TeamDetailPeriod, TeamPerformanceDetail } from './teamPerformanceContracts'
-import { teamCategoryLabel } from './TeamCategoryFilter'
+import { teamCategoryLabel } from './teamCategoryLabels'
 import { TeamEventBreakdown } from './TeamEventBreakdown'
 import { TeamParticipationList } from './TeamParticipationList'
 import { TeamPerformanceSummary } from './TeamPerformanceSummary'

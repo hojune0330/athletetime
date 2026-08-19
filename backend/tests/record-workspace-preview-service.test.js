@@ -22,6 +22,7 @@ function recordFor({ id, athleteKey, name, team, date, season, sourceUrl = 'http
     divisionLevel: 'all',
     divisionDetail: null,
     rawDivision: '남자부',
+    sourceDivisionLabel: '남자부',
     phase: 'final',
     recordDisplay: '10.50',
     recordValue: 10.5,
@@ -54,10 +55,87 @@ function athleteFor({ athleteKey, name, team, records }) {
   };
 }
 
-function createFixtureService(athletes) {
+function createFixtureService(athletes, legacyAthleteAliasesByKey = new Map()) {
   const athleteByKey = new Map(athletes.map((athlete) => [athlete.athleteKey, athlete]));
-  return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey }) });
+  return createRecordWorkspacePreviewService({ getIndex: () => ({ athleteByKey, legacyAthleteAliasesByKey }) });
 }
+
+test('Given a saved ambiguous legacy key When a workspace preview is restored Then every candidate expands without selecting one', () => {
+  const firstKey = '1111111111111111';
+  const secondKey = '2222222222222222';
+  const uniqueAlias = 'aaaaaaaaaaaaaaaa';
+  const sameCanonicalAlias = 'cccccccccccccccc';
+  const ambiguousAlias = 'bbbbbbbbbbbbbbbb';
+  const first = athleteFor({
+    athleteKey: firstKey,
+    name: '가람',
+    team: '서울고',
+    records: [recordFor({ id: 'alias-a', athleteKey: firstKey, name: '가람', team: '서울고', date: '2025-06-02', season: 2025 })],
+  });
+  const second = athleteFor({
+    athleteKey: secondKey,
+    name: '가람',
+    team: '부산고',
+    records: [recordFor({ id: 'direct-b', athleteKey: secondKey, name: '가람', team: '부산고', date: '2025-05-02', season: 2025 })],
+  });
+  const service = createFixtureService([first, second], new Map([
+    [uniqueAlias, new Set([firstKey])],
+    [secondKey, new Set([firstKey])],
+    [sameCanonicalAlias, new Set([firstKey])],
+    [ambiguousAlias, new Set([firstKey, secondKey])],
+  ]));
+
+  const preview = service.getRecordWorkspacePreview({
+    subjectKeys: [uniqueAlias, secondKey, sameCanonicalAlias, ambiguousAlias],
+    limit: 50,
+  });
+
+  assert.deepEqual(preview.subjects.map((subject) => subject.athleteKey), [firstKey, secondKey]);
+  assert.deepEqual(preview.resolvedSubjectKeys, [
+    { requestedSubjectKey: uniqueAlias, athleteKey: firstKey },
+    { requestedSubjectKey: secondKey, athleteKey: secondKey },
+    { requestedSubjectKey: sameCanonicalAlias, athleteKey: firstKey },
+    { requestedSubjectKey: ambiguousAlias, athleteKey: firstKey },
+    { requestedSubjectKey: ambiguousAlias, athleteKey: secondKey },
+  ]);
+  assert.deepEqual(preview.unavailableSubjectKeys, []);
+  assert.equal(preview.identity.warning, 'same_name');
+  assert.deepEqual(preview.records.map((record) => record.athleteKey), [firstKey, secondKey]);
+});
+
+test('Given safe and hostile public metadata When workspace records are projected Then only opaque IDs and taxonomy provenance survive', () => {
+  const safe = recordFor({
+    id: 'safe-division',
+    athleteKey: '8888888888888888',
+    name: '마루',
+    team: '광주고',
+    date: '2025-06-02',
+    season: 2025,
+  });
+  const hostile = recordFor({
+    id: 'hostile-division',
+    athleteKey: '8888888888888888',
+    name: '마루',
+    team: '광주고',
+    date: '2024-06-02',
+    season: 2024,
+  });
+  safe.recordIdAliases = ['0123456789abcdef'];
+  hostile.sourceDivisionLabel = '남고 athlete@example.test';
+  hostile.rawDivision = '남고 athlete@example.test';
+  hostile.recordIdAliases = ['athlete@example.test'];
+  const service = createFixtureService([
+    athleteFor({ athleteKey: '8888888888888888', name: '마루', team: '광주고', records: [safe, hostile] }),
+  ]);
+
+  const preview = service.getRecordWorkspacePreview({ subjectKeys: ['8888888888888888'] });
+
+  assert.equal(JSON.stringify(preview).includes('rawDivision'), false);
+  assert.deepEqual(preview.records.map((record) => record.sourceDivisionLabel), ['남자부', null]);
+  assert.deepEqual(preview.records.map((record) => record.recordIdAliases), [['0123456789abcdef'], []]);
+  assert.equal(JSON.stringify(preview).includes('athlete@example.test'), false);
+  assert.equal(preview.records.some((record) => Object.prototype.hasOwnProperty.call(record.source, 'sourceId')), false);
+});
 
 test('Given visible records for two same-name public profiles When a workspace preview is requested Then it keeps profile boundaries and aggregates only visible records', () => {
   const firstRecords = [

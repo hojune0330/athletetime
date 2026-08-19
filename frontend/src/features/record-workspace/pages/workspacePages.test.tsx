@@ -1,7 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import type { PublicRecord } from '@/api/recordAnalytics'
-import type { RecordWorkspacePreview } from '@/api/recordWorkspace'
+import type { RecordWorkspacePreview, RecordWorkspaceRecord } from '@/api/recordWorkspace'
 import { WorkspaceReviewContent } from '../components/WorkspaceReviewContent'
 import { WorkspaceSubjectList } from '../components/WorkspaceSubjectList'
 import { WorkspaceRecordTab } from './WorkspaceRecordTab'
@@ -9,9 +8,10 @@ import { WorkspaceRecordTab } from './WorkspaceRecordTab'
 const KEY_A = '1111111111111111'
 const KEY_B = '2222222222222222'
 
-function record(): PublicRecord {
+function record(): RecordWorkspaceRecord {
   return {
     id: 'record-1',
+    recordIdAliases: [],
     athleteKey: KEY_A,
     name: '김선수',
     team: '서울고',
@@ -26,7 +26,7 @@ function record(): PublicRecord {
     gender: 'men',
     divisionLevel: 'high',
     divisionDetail: null,
-    rawDivision: '남자 고등부',
+    sourceDivisionLabel: '남자 고등부',
     phase: '결승',
     record: '11.20',
     recordValue: 11.2,
@@ -74,6 +74,10 @@ function preview(warning: RecordWorkspacePreview['identity']['warning']): Record
         ambiguity: 'name_team',
         note: '',
       },
+    ],
+    resolvedSubjectKeys: [
+      { requestedSubjectKey: KEY_A, athleteKey: KEY_A },
+      { requestedSubjectKey: KEY_B, athleteKey: KEY_B },
     ],
     unavailableSubjectKeys: [],
     identity: { displayName: names.join(' · '), distinctNames: names, warning },
