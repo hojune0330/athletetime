@@ -1,6 +1,6 @@
 # AthleteTime 40-Persona Improvement Plan
 
-Status: active planning baseline
+Status: active planning baseline; production checkpoint 2026-08-19
 
 ## Why this plan exists
 
@@ -258,8 +258,13 @@ single happy-path page visit:
 
 ## Next checkpoint
 
+PR #88 completed the policy-neutral records reliability slice on 2026-08-19:
+dependent season/event/gender/division controls, invalid-link recovery,
+legacy-key compatibility, strict public DTO boundaries, and responsive browser
+verification are merged and deployed from `ad1c963`.
+
 The immediate safe priority is to keep Wave A through C continuously verified
 while the owner considers the seven boundary decisions. The next code feature
-should be selected only after one of those decisions is written down; until
-then, the best improvement is reliability, clarity, provenance, and recovery
-rather than another data-collection or social feature.
+should be selected only after one of those decisions is written down. Until
+then, the executable queue is trust-gate closure, status/runbook accuracy, and
+regression reliability rather than another data-collection or social feature.
