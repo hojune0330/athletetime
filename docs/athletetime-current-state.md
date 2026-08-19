@@ -10,7 +10,7 @@
 
 데이터 스냅샷과 커버리지 수치는 2026-07-14 실측을 유지하고, 운영·검증 상태는 2026-08-19 PR #88 병합과 배포를 반영한다. PR #88은 `data/results`, `data/competitions`, package/lock을 변경하지 않았으므로 아래 데이터 수치는 재산출 없이 유지한다. 다른 문서의 수치나 상태가 이 문서 또는 같은 시점에 생성한 coverage 산출물과 다르면 **이 문서와 생성 coverage를 정본**으로 본다.
 
-2026-08-20 신뢰 상태 갱신(범위 한정): PR #8은 `2026-08-19T16:27:05Z`에 닫혔고 병합되지 않았으며, superseded 댓글 `5344621004`로 대체 사유가 기록되어 있다. Data-request DB 구현은 PR #50 (`5efdf77`)로 병합되었다. 별도로 배포 `/health`에서 `dataRights: ready`가 관찰되었다. 이는 구현·런타임 준비도 기록이며 owner/privacy approval 또는 production rollout completion을 뜻하지 않는다. 백업/checksum, migration rehearsal/dry-run, shadow suppression comparison, post-rollout request roundtrip은 계속 pending이다. 2026-07-14 데이터 기준선은 이번 상태 갱신에서 재감사하지 않았다.
+2026-08-20 신뢰 상태 갱신(범위 한정): PR #8은 `2026-08-19T16:27:05Z`에 닫혔고 병합되지 않았으며, superseded 댓글 `5344621004`로 대체 사유가 기록되어 있다. Data-request DB 구현은 PR #50 (`5efdf77`)로 병합되었고, PR #50 댓글 `4982112480`에 따른 Fable 검수·병합 승인도 완료되었다. 별도로 배포 `/health`에서 `dataRights: ready`가 관찰되었다. 이는 구현·런타임 준비도 증거일 뿐 production rollout 완료를 뜻하지 않는다. 백업/checksum, migration rehearsal/dry-run, shadow suppression comparison, post-rollout request roundtrip은 계속 pending이다. 2026-07-14 데이터 기준선은 이번 상태 갱신에서 재감사하지 않았다.
 
 ## 데이터 스냅샷
 
