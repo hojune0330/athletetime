@@ -106,11 +106,14 @@ test('BACKFILL-IMPORT-003 Given direct tar extraction is unsafe When safe-entry 
   }
 });
 
-test('BACKFILL-IMPORT-004 Given a storage path crosses drives When checking Git tracking Then only repository paths are classified', () => {
+test('BACKFILL-IMPORT-004 Given a storage path is outside the repository When checking Git tracking Then only repository paths are classified', () => {
   const rootDrive = path.parse(ROOT).root.toUpperCase();
   const externalDrive = rootDrive === 'C:\\' ? 'D:\\' : 'C:\\';
+  const externalPath = process.platform === 'win32'
+    ? path.join(externalDrive, 'kaaf-backfill-external-probe')
+    : path.join(path.parse(ROOT).root, 'kaaf-backfill-external-probe');
 
-  assert.equal(isTrackedByGit(path.join(externalDrive, 'kaaf-backfill-external-probe')), false);
+  assert.equal(isTrackedByGit(externalPath), false);
   assert.equal(isTrackedByGit(path.join(ROOT, 'data', 'sources', 'import', 'originals', 'kaaf-path-probe')), false);
   assert.equal(isTrackedByGit(path.join(ROOT, 'backend', 'tests', 'kaaf-backfill-originals-import.test.js')), true);
 });
