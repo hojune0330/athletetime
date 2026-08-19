@@ -10,6 +10,8 @@
 
 데이터 스냅샷과 커버리지 수치는 2026-07-14 실측을 유지하고, 운영·검증 상태는 2026-08-19 PR #88 병합과 배포를 반영한다. PR #88은 `data/results`, `data/competitions`, package/lock을 변경하지 않았으므로 아래 데이터 수치는 재산출 없이 유지한다. 다른 문서의 수치나 상태가 이 문서 또는 같은 시점에 생성한 coverage 산출물과 다르면 **이 문서와 생성 coverage를 정본**으로 본다.
 
+2026-08-20 신뢰 상태 갱신(범위 한정): PR #8은 `2026-08-19T16:27:05Z`에 닫혔고 병합되지 않았으며, superseded 댓글 `5344621004`로 대체 사유가 기록되어 있다. Data-request DB 구현은 PR #50 (`5efdf77`)로 병합되었다. 별도로 배포 `/health`에서 `dataRights: ready`가 관찰되었다. 이는 구현·런타임 준비도 기록이며 owner/privacy approval 또는 production rollout completion을 뜻하지 않는다. 백업/checksum, migration rehearsal/dry-run, shadow suppression comparison, post-rollout request roundtrip은 계속 pending이다. 2026-07-14 데이터 기준선은 이번 상태 갱신에서 재감사하지 않았다.
+
 ## 데이터 스냅샷
 
 | 항목 | 현재 값 | 해석 |
@@ -58,7 +60,7 @@
 | [#88](https://github.com/hojune0330/athletetime/pull/88) records division navigation | 2026-08-19 merged and deployed | 현재 기록 탐색·시즌 조합·legacy identity·public DTO 회귀 기준선이다. |
 | [#47](https://github.com/hojune0330/athletetime/pull/47) A-3 Step 2 | 2026-07-15 merged | dry-run 후보 생성만 완료했다. 서비스 승격은 trust gate 이후 별도 PR이다. |
 | [#46](https://github.com/hojune0330/athletetime/pull/46) records UX | 2026-07-15 merged | 단계형 records UX는 #88의 종속 필터·복구 계약으로 이어졌다. |
-| [#8](https://github.com/hojune0330/athletetime/pull/8) launch surface | Open Draft, superseded | 대체된 `main` 근거를 남기고 닫는다. 머지하거나 재구현하지 않는다. |
+| [#8](https://github.com/hojune0330/athletetime/pull/8) launch surface | **Closed 2026-08-19; unmerged; superseded** | 대체된 `main` 근거와 superseded 댓글 `5344621004`를 보존한다. 추가 변경 대상이 아니다. |
 
 ## 정본 운영 규칙
 
