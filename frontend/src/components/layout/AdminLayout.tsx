@@ -19,6 +19,7 @@ import {
   ServerIcon,
   ShieldExclamationIcon,
   BookOpenIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -27,6 +28,7 @@ const adminNavItems = [
   { path: '/admin', label: '대시보드', icon: ChartBarIcon, end: true },
   { path: '/admin/gallery', label: '갤러리', icon: PhotoIcon, end: false },
   { path: '/admin/card-studio', label: '카드 스튜디오', icon: PaintBrushIcon, end: false },
+  { path: '/admin/content-studio', label: 'AI 콘텐츠 제작', icon: SparklesIcon, end: false },
   { path: '/admin/content', label: '콘텐츠 관리', icon: DocumentTextIcon, end: false },
   { path: '/admin/pipeline', label: '파이프라인', icon: CogIcon, end: false },
   { path: '/admin/data-requests', label: '정정·삭제 요청', icon: ShieldExclamationIcon, end: false },
@@ -46,16 +48,17 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+              aria-label={sidebarOpen ? '관리 메뉴 닫기' : '관리 메뉴 열기'}
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-white/10 lg:hidden"
             >
               {sidebarOpen ? <XMarkIcon className="w-5 h-5" /> : <Bars3Icon className="w-5 h-5" />}
             </button>
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-[#C3FF00] rounded-lg flex items-center justify-center text-xs font-black text-neutral-900">
+            <Link to="/" className="flex min-h-11 items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-caption font-black text-surface">
                 AT
               </div>
               <span className="font-bold text-lg">AthleteTime</span>
-              <span className="text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded font-bold tracking-wider">
+              <span className="rounded bg-err px-1.5 py-0.5 text-mono-xs font-bold text-surface">
                 ADMIN
               </span>
             </Link>
@@ -65,13 +68,13 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm text-neutral-300 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              className="hidden min-h-11 items-center gap-1.5 rounded-lg px-3 text-sm text-neutral-300 transition-all hover:bg-white/10 hover:text-white sm:flex"
             >
               <ArrowLeftIcon className="w-4 h-4" />
               <span>사이트로</span>
             </Link>
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg">
-              <div className="w-6 h-6 bg-[#C3FF00] rounded-full flex items-center justify-center text-xs font-bold text-neutral-900">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-caption font-bold text-surface">
                 {user?.nickname?.charAt(0) || 'A'}
               </div>
               <span className="text-sm font-medium hidden sm:inline">{user?.nickname || 'Admin'}</span>
@@ -110,7 +113,7 @@ export default function AdminLayout() {
                 end={item.end}
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  `flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-primary-50 text-primary-700 shadow-sm'
                       : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
@@ -130,7 +133,7 @@ export default function AdminLayout() {
             <Link
               to="/community"
               onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-all"
+              className="flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-all"
             >
               <span className="text-lg">💬</span>
               <span>커뮤니티</span>
@@ -138,7 +141,7 @@ export default function AdminLayout() {
             <Link
               to="/competitions"
               onClick={() => setSidebarOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-all"
+              className="flex min-h-11 items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition-all"
             >
               <span className="text-lg">🏆</span>
               <span>대회 관리</span>
@@ -153,7 +156,7 @@ export default function AdminLayout() {
                 <span className="font-medium text-neutral-600">시스템</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-ok" />
                 <span className="text-neutral-500">서버 정상</span>
               </div>
             </div>
