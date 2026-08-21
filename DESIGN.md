@@ -115,6 +115,15 @@ All spacing derives from 4px.
 - **Accessibility**: progress is text-announced, candidates use `aria-pressed`, status/error states use live regions.
 - **Motion**: candidate selection must not scroll or reorder the list; step changes may reset to the top of the new step.
 
+### Admin Content Studio
+
+- **Structure**: public record search, locked facts, editable copy, source and rights gate, 4:5 preview.
+- **Export**: the live preview and the 1080 × 1350 PNG use the same card component.
+- **Export scale**: use canonical Tailwind spacing and type scales; only the fixed 1080 × 1350 output frame uses absolute dimensions.
+- **AI boundary**: send only public source facts; accept only strict JSON title and body fields.
+- **Safety**: AI handoff and export stay disabled until source URL and human rights confirmation pass.
+- **Draft lifecycle**: validate and restore one device-local draft; provide a visible clear action.
+
 ## 6. Motion & Interaction
 
 | Type | Duration | Easing | Usage |

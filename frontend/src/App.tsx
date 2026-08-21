@@ -38,6 +38,7 @@ const ScheduleCardPage = lazy(() => import('./pages/ScheduleCardPage'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminGalleryPage = lazy(() => import('./pages/admin/AdminGalleryPage'))
 const AdminCardStudioPage = lazy(() => import('./pages/admin/AdminCardStudioPage'))
+const AdminContentStudioPage = lazy(() => import('./pages/admin/AdminContentStudioPage'))
 const AdminContentPage = lazy(() => import('./pages/admin/AdminContentPage'))
 const AdminPipelinePage = lazy(() => import('./pages/admin/AdminPipelinePage'))
 const AdminDataRequestsPage = lazy(() => import('./pages/admin/AdminDataRequestsPage'))
@@ -96,6 +97,7 @@ function App() {
                 <Route index element={lazyPage(<AdminDashboardPage />)} />
                 <Route path="gallery" element={lazyPage(<AdminGalleryPage />)} />
                 <Route path="card-studio" element={lazyPage(<AdminCardStudioPage />)} />
+                <Route path="content-studio" element={lazyPage(<AdminContentStudioPage />)} />
                 <Route path="content" element={lazyPage(<AdminContentPage />)} />
                 <Route path="pipeline" element={lazyPage(<AdminPipelinePage />)} />
                 <Route path="data-requests" element={lazyPage(<AdminDataRequestsPage />)} />
