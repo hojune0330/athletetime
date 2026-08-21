@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const test = require('node:test');
 const { expectVisible, navigateToReady, withRecordsPage } = require('./records-flow-e2e-fixture');
 
@@ -28,6 +29,43 @@ test('PACE-CALCULATOR-FIRST-USE-E2E Given a first visit When a runner enters and
     assert.equal(await minuteInput.inputValue(), '');
     visited.push(page.url());
   }, { fileName: 'pace-calculator-first-use-e2e-results.json', scenario: 'pace calculator first-use and reset' });
+});
+
+test('PACE-CHART-EXPORT-E2E Given a pace chart When PNG and PDF are saved Then both downloads contain the expected file format', { timeout: 120_000 }, async () => {
+  await withRecordsPage(async ({ page, baseUrl, visited }) => {
+    await navigateToReady(
+      page,
+      `${baseUrl}/pace-calculator`,
+      page.getByRole('heading', { name: '목표 페이스 계산기' }),
+    );
+    await page.getByRole('tab', { name: /페이스 차트/u }).click();
+    await expectVisible(page.getByRole('heading', { name: '러닝 페이스 차트' }));
+
+    const downloads = [
+      {
+        button: 'PNG 저장',
+        fileName: '페이스_거리별_예상시간.png',
+        signature: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      },
+      {
+        button: 'PDF 저장',
+        fileName: '페이스_거리별_예상시간.pdf',
+        signature: Buffer.from('%PDF-'),
+      },
+    ];
+
+    for (const expected of downloads) {
+      const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        page.getByRole('button', { name: expected.button, exact: true }).first().click(),
+      ]);
+      assert.equal(download.suggestedFilename(), expected.fileName);
+      const downloadedPath = await download.path();
+      assert.ok(downloadedPath, `${expected.button} should create a local download`);
+      assert.deepEqual(fs.readFileSync(downloadedPath).subarray(0, expected.signature.length), expected.signature);
+    }
+    visited.push(page.url());
+  }, { fileName: 'pace-chart-export-e2e-results.json', scenario: 'pace chart PNG and PDF export' });
 });
 
 test('TRAINING-CALCULATOR-FIRST-USE-E2E Given a first visit When a runner has not entered a real performance Then generation stays unavailable until direct input and reset returns to empty', { timeout: 90_000 }, async () => {
