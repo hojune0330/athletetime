@@ -17,7 +17,7 @@ export const PaceChartTable: React.FC<PaceChartTableProps> = ({ id = 'chart1' })
         <div>
           <p className="font-mono text-[10px] font-semibold uppercase tracking-widest-2 text-ink-4">DISTANCE TABLE</p>
           <h3 className="mt-1 text-h3 font-semibold tracking-tight text-ink">거리별 예상 시간</h3>
-          <p className="mt-2 max-w-xl text-body-sm leading-relaxed text-ink-3">
+          <p className="mt-2 max-w-xl break-keep text-body-sm leading-relaxed text-ink-3 [text-wrap:pretty]">
             km 페이스를 기준으로 각 거리의 예상 시간을 비교해요. 코스와 날씨, 급수 지점에 따라 실제 기록은 달라질 수 있어요.
           </p>
         </div>

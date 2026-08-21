@@ -106,7 +106,7 @@ const PaceCalculatorPage: React.FC = () => {
               </p>
               <h2 className="mt-1 text-h3 font-semibold tracking-tight text-ink">오늘 필요한 계산부터</h2>
             </div>
-            <p className="max-w-xl text-body-sm leading-relaxed text-ink-3">
+            <p className="max-w-xl break-keep text-body-sm leading-relaxed text-ink-3 [text-wrap:pretty]">
               처음 들어온 선수도 목표 기록만 넣으면 바로 페이스를 확인할 수 있게, 가장 많이 쓰는 계산을 앞에 뒀어요.
             </p>
           </div>
